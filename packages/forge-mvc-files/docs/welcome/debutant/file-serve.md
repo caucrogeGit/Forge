@@ -1,11 +1,8 @@
 # Servir un fichier
 
-Objectif : **relire** un fichier stocké via `serve_media_file`, sans jamais
-laisser sortir de la racine d'upload.
+Objectif : **relire** un fichier stocké via `serve_media_file`, sans jamais laisser sortir de la racine d'upload.
 
-**Ce que vous allez apprendre :** `serve_media_file` prend un **chemin relatif**,
-vérifie qu'il reste dans la racine d'upload (anti-traversal), et renvoie le fichier,
-ou `404` s'il est absent ou le chemin invalide.
+**Ce que vous allez apprendre :** `serve_media_file` prend un **chemin relatif**, vérifie qu'il reste dans la racine d'upload (anti-traversal), et renvoie le fichier, ou `404` s'il est absent ou le chemin invalide.
 
 Troisième palier du **niveau débutant** de la progression files.
 
@@ -31,9 +28,8 @@ Troisième palier du **niveau débutant** de la progression files.
 forge run
 ```
 
-Stockez un fichier au palier précédent, notez son chemin, puis ouvrez
-`https://localhost:8000/file-serve` et demandez-le. Un chemin `../secret` est
-refusé (`404`).
+Stockez un fichier au palier précédent, notez son chemin, puis ouvrez `https://localhost:8000/file-serve` et demandez-le.
+Un chemin `../secret` est refusé (`404`).
 
 ## Le contrôleur
 
@@ -110,22 +106,19 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- On passe un **chemin relatif** (celui du `SavedUpload.path`), jamais un chemin
-  absolu : `serve_media_file` résout par rapport à la racine d'upload.
-- L'anti-traversal est **dans la primitive**, pas dans le contrôleur : impossible
-  d'oublier la garde.
+- On passe un **chemin relatif** (celui du `SavedUpload.path`), jamais un chemin absolu : `serve_media_file` résout par rapport à la racine d'upload.
+- L'anti-traversal est **dans la primitive**, pas dans le contrôleur : impossible d'oublier la garde.
 - Fichier absent ou chemin piégé → `404`, jamais une fuite hors zone.
 
 ## À retenir
 
 - Servir un fichier = donner son **chemin relatif** à `serve_media_file`.
 - La protection anti-traversal est **portée par la primitive**.
-- Stocker (`save_upload`) et servir (`serve_media_file`) sont les deux faces du
-  cycle de vie d'un fichier.
+- Stocker (`save_upload`) et servir (`serve_media_file`) sont les deux faces du cycle de vie d'un fichier.
 
 ## Après ce starter
 
-Vous savez stocker et servir. La suite : comprendre **pourquoi** un fichier est
-parfois refusé.
+Vous savez stocker et servir.
+La suite : comprendre **pourquoi** un fichier est parfois refusé.
 
 [Bilan du niveau débutant](bilan.md)

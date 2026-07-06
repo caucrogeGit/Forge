@@ -1,7 +1,8 @@
 # La commande make:public-show dans Forge
 
 `forge make:public-show` génère une fiche publique détaillée pour une entité.
-C'est le pendant « détail » de [`make:public-list`](public_list.md).
+C'est le pendant « détail »
+de [`make:public-list`](public_list.md).
 
 Le code correspondant est dans `cli/public/public_show.py`.
 

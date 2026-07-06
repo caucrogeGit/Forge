@@ -2,13 +2,12 @@
 
 Objectif : observer le **cycle de vie** des vidéos en les regroupant par statut.
 
-**Ce que vous allez apprendre :** `VideoRepository.list_by_status`. Une vidéo
-passe par `uploaded` → `processing` → `ready` (ou `failed`). Ce palier liste les
-vidéos par statut et renvoie le tout en JSON. C'est le statut que le **worker de
-transcodage** (niveau avancé) fera avancer ; ici, on l'**observe**.
+**Ce que vous allez apprendre :** `VideoRepository.list_by_status`.
+Une vidéo passe par `uploaded` → `processing` → `ready` (ou `failed`).
+Ce palier liste les vidéos par statut et renvoie le tout en JSON.
+C'est le statut que le **worker de transcodage** (niveau avancé) fera avancer ; ici, on l'**observe**.
 
-Dernier palier du **niveau intermédiaire** de la progression vidéo, après
-[Lire une vidéo](video-playback.md).
+Dernier palier du **niveau intermédiaire** de la progression vidéo, après [Lire une vidéo](video-playback.md).
 
 ## Ce que ce starter montre
 
@@ -17,7 +16,8 @@ Dernier palier du **niveau intermédiaire** de la progression vidéo, après
 - une réponse JSON `{ "by_status": { … } }` ;
 - la **réponse `503` pédagogique** si la table n'existe pas encore.
 
-Lecture seule. La table `videos` est garantie par la migration fournie plus bas.
+Lecture seule.
+La table `videos` est garantie par la migration fournie plus bas.
 
 ## Classes Forge utilisées
 
@@ -33,9 +33,8 @@ forge db:init
 forge run
 ```
 
-Ouvrez `https://localhost:8000/video-status` : les vidéos sont rangées sous
-`uploaded`, `processing`, `ready`, `failed`. Tant qu'aucun transcodage n'a tourné,
-elles restent au statut `uploaded`.
+Ouvrez `https://localhost:8000/video-status` : les vidéos sont rangées sous `uploaded`, `processing`, `ready`, `failed`.
+Tant qu'aucun transcodage n'a tourné, elles restent au statut `uploaded`.
 
 ## Le contrôleur
 
@@ -78,17 +77,14 @@ class VideoStatusController(BaseController):
 
 ### Comprendre ce code
 
-- `list_by_status(status, limit=…)` lit les vidéos d'**un** statut ; on boucle sur
-  les quatre statuts du cycle de vie pour une vue d'ensemble.
-- Le statut n'est **pas** modifié ici : faire avancer une vidéo de `uploaded` à
-  `ready` est le rôle du worker de transcodage (`forge video:process`, niveau
-  avancé), jamais d'une requête HTTP.
+- `list_by_status(status, limit=…)` lit les vidéos d'**un** statut ; on boucle sur les quatre statuts du cycle de vie pour une vue d'ensemble.
+- Le statut n'est **pas** modifié ici : faire avancer une vidéo de `uploaded` à `ready` est le rôle du worker de transcodage (`forge video:process`, niveau avancé), jamais d'une requête HTTP.
 - L'absence de table reste un `503` pédagogique.
 
 ## La migration
 
-Créez la table `videos` si elle n'existe pas déjà, pour observer le cycle de
-vie par statut. `CREATE TABLE IF NOT EXISTS` reste idempotent.
+Créez la table `videos` si elle n'existe pas déjà, pour observer le cycle de vie par statut.
+`CREATE TABLE IF NOT EXISTS` reste idempotent.
 
 ```sql
 -- mvc/migrations/20260601220000_create_videos.sql

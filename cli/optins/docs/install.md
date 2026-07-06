@@ -9,7 +9,8 @@ Elle affiche la commande d'installation du package d'un opt-in officiel, sans ri
 Elle affiche la commande d'installation du package PyPI correspondant, puis n'exécute rien.
 
 Selon le contexte, elle propose `pip install` (en environnement courant ou venv) ou `pipx inject` (en installation pipx).
-Le choix « afficher plutôt qu'exécuter » est délibéré : installer un package est un geste explicite de l'utilisateur (principe 9).
+Le choix « afficher plutôt qu'exécuter »
+est délibéré : installer un package est un geste explicite de l'utilisateur (principe 9).
 La commande détecte l'environnement pipx en inspectant le chemin de l'exécutable Python.
 
 ## 2. Vue d'ensemble rapide

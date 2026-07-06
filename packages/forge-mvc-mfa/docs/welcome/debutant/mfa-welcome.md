@@ -2,17 +2,13 @@
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-mfa`.
 
-**Ce que vous allez apprendre :** vérifier que le module répond et **inspecter ses
-briques** : facteurs (`TOTP`, `recovery`), statuts (`pending`/`active`/`disabled`),
-et la présence de la clé de chiffrement `FORGE_MFA_SECRET_KEY` (sans la révéler).
+**Ce que vous allez apprendre :** vérifier que le module répond et **inspecter ses briques** : facteurs (`TOTP`, `recovery`), statuts (`pending`/`active`/`disabled`), et la présence de la clé de chiffrement `FORGE_MFA_SECRET_KEY` (sans la révéler).
 
-Premier palier du **niveau débutant** de la progression MFA
-(vue d'ensemble des starters).
+Premier palier du **niveau débutant** de la progression MFA (vue d'ensemble des starters).
 
 !!! note "Module opt-in"
-    Ce parcours décortique **chaque brique** MFA isolément, pour comprendre
-    chaque API avant de la câbler dans votre propre flux Auth. Installé via
-    `pip install --pre forge-mvc-mfa` (palier « Installation »).
+    Ce parcours décortique **chaque brique** MFA isolément, pour comprendre chaque API avant de la câbler dans votre propre flux Auth.
+    Installé via `pip install --pre forge-mvc-mfa` (palier « Installation »).
 
 ## Ce que ce starter montre
 
@@ -91,12 +87,9 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- MFA repose sur **deux facteurs** : un code TOTP (application d'authentification) et
-  des **codes de récupération** (secours).
-- Un facteur passe par trois **statuts** : `pending` (créé), `active` (confirmé),
-  `disabled`.
-- La clé `FORGE_MFA_SECRET_KEY` chiffre les secrets au repos : on vérifie sa présence
-  sans jamais l'exposer.
+- MFA repose sur **deux facteurs** : un code TOTP (application d'authentification) et des **codes de récupération** (secours).
+- Un facteur passe par trois **statuts** : `pending` (créé), `active` (confirmé), `disabled`.
+- La clé `FORGE_MFA_SECRET_KEY` chiffre les secrets au repos : on vérifie sa présence sans jamais l'exposer.
 
 ## À retenir
 
@@ -106,6 +99,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Premier contact établi. La suite : générer un secret TOTP.
+Premier contact établi.
+La suite : générer un secret TOTP.
 
 [Secret TOTP et QR](mfa-secret.md)

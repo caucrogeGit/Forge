@@ -1,7 +1,7 @@
 # Bilan : niveau intermédiaire (i18n)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Welcome i18n*. Ce niveau couvre la locale par défaut, le repli, et le cas de la clé
-manquante.
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome i18n*.
+Ce niveau couvre la locale par défaut, le repli, et le cas de la clé manquante.
 
 ## Ce que vous avez validé
 
@@ -15,7 +15,6 @@ Vous maîtrisez la résolution d'une traduction : locale, secours, dernier recou
 
 ## Et ensuite
 
-Place au niveau **avancé**, **templates, cache et robustesse** : `trans` dans
-Jinja, vider le cache, et gérer les catalogues absents ou invalides.
+Place au niveau **avancé**, **templates, cache et robustesse** : `trans` dans Jinja, vider le cache, et gérer les catalogues absents ou invalides.
 
 [Niveau avancé : trans dans un template](../avance/i18n-jinja.md)

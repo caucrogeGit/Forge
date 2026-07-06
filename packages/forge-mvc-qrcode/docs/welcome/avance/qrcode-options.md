@@ -2,10 +2,8 @@
 
 Objectif : ajuster la taille, la marge et la robustesse du QR Code.
 
-**Ce que vous allez apprendre :** `to_png` et `to_svg` acceptent `scale` et
-`border`.
-`QrCode.from_text` accepte `error`, le niveau de correction d'erreur, qui rend le
-code lisible même partiellement abîmé.
+**Ce que vous allez apprendre :** `to_png` et `to_svg` acceptent `scale` et `border`.
+`QrCode.from_text` accepte `error`, le niveau de correction d'erreur, qui rend le code lisible même partiellement abîmé.
 
 Deuxième palier du **niveau avancé**.
 

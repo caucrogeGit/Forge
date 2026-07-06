@@ -1,17 +1,15 @@
 # Revalidation (step-up)
 
-Objectif : exiger une **MFA récente** avant une action sensible, même déjà connecté,
-le *step-up*.
+Objectif : exiger une **MFA récente** avant une action sensible, même déjà connecté, le *step-up*.
 
-**Ce que vous allez apprendre :** `mark_mfa_revalidated` enregistre une revalidation
-en session ; `has_recent_mfa_revalidation` dit si elle est encore fraîche. Le
-décorateur `require_recent_mfa` s'appuie sur ces briques pour protéger une route.
+**Ce que vous allez apprendre :** `mark_mfa_revalidated` enregistre une revalidation en session ; `has_recent_mfa_revalidation` dit si elle est encore fraîche.
+Le décorateur `require_recent_mfa` s'appuie sur ces briques pour protéger une route.
 
 Premier palier du **niveau avancé** de la progression MFA.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-mfa` installé. Démo **en session** (utilisateur
-    démo), aucune clé requise.
+    Ce starter suppose `forge-mvc-mfa` installé.
+    Démo **en session** (utilisateur démo), aucune clé requise.
 
 ## Ce que ce starter montre
 
@@ -33,8 +31,8 @@ Premier palier du **niveau avancé** de la progression MFA.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/mfa-revalidation` : l'état « MFA récente » passe à oui
-après avoir cliqué « Revalider ».
+Ouvrez `https://localhost:8000/mfa-revalidation` : l'état « MFA récente »
+passe à oui après avoir cliqué « Revalider ».
 
 ## Le contrôleur
 
@@ -145,8 +143,7 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Le *step-up* protège les actions à risque (changer le mot de passe, supprimer le
-  compte) même au sein d'une session déjà authentifiée.
+- Le *step-up* protège les actions à risque (changer le mot de passe, supprimer le compte) même au sein d'une session déjà authentifiée.
 - La fraîcheur expire (`max_age_minutes`) : passé le délai, on redemande une MFA.
 - `require_recent_mfa` est le **décorateur** qui applique cette règle à une route.
 

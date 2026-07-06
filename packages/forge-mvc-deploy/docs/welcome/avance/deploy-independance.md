@@ -1,13 +1,10 @@
 # Indépendance du cœur
 
-Objectif : comprendre pourquoi le cœur ne dépend pas de l'outillage de
-déploiement.
+Objectif : comprendre pourquoi le cœur ne dépend pas de l'outillage de déploiement.
 
-**Ce que vous allez apprendre :** Forge Core ne dépend pas de
-`forge-mvc-deploy`.
+**Ce que vous allez apprendre :** Forge Core ne dépend pas de `forge-mvc-deploy`.
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
-Vous pouvez déployer autrement, par exemple en conteneur, sans installer cet
-opt-in : l'opinion Nginx/systemd/Gunicorn reste un choix, pas une obligation.
+Vous pouvez déployer autrement, par exemple en conteneur, sans installer cet opt-in : l'opinion Nginx/systemd/Gunicorn reste un choix, pas une obligation.
 
 Deuxième palier du **niveau avancé** de la progression Deploy.
 

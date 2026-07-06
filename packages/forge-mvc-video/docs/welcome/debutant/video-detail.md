@@ -2,13 +2,10 @@
 
 Objectif : lire **une vidéo précise** par son UUID et la renvoyer en JSON.
 
-**Ce que vous allez apprendre :** cibler une vidéo avec
-`VideoRepository.get_by_uuid`, et distinguer trois cas : trouvée (`200`),
-inconnue (`404`), table absente (`503`). C'est la lecture unitaire, après la
-liste.
+**Ce que vous allez apprendre :** cibler une vidéo avec `VideoRepository.get_by_uuid`, et distinguer trois cas : trouvée (`200`), inconnue (`404`), table absente (`503`).
+C'est la lecture unitaire, après la liste.
 
-Dernier palier du **niveau débutant** de la progression vidéo, après
-[Lister les vidéos](video-list.md).
+Dernier palier du **niveau débutant** de la progression vidéo, après [Lister les vidéos](video-list.md).
 
 ## Ce que ce starter montre
 
@@ -32,9 +29,8 @@ Lecture seule, aucun ffmpeg.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/video-detail/<uuid>` avec l'UUID d'une vidéo
-enregistrée : la réponse JSON donne ses métadonnées. Un UUID inconnu renvoie
-`404` ; sans table, `503`.
+Ouvrez `https://localhost:8000/video-detail/<uuid>` avec l'UUID d'une vidéo enregistrée : la réponse JSON donne ses métadonnées.
+Un UUID inconnu renvoie `404` ; sans table, `503`.
 
 ## Le contrôleur
 
@@ -76,8 +72,7 @@ class VideoDetailController(BaseController):
 ### Comprendre ce code
 
 - `uuid` vient de l'**URL** (`route`) : on cible la vidéo sans query string.
-- `get_by_uuid(uuid)` renvoie un dictionnaire **ou `None`** : on traduit `None` en
-  `404`, jamais une page d'erreur brute.
+- `get_by_uuid(uuid)` renvoie un dictionnaire **ou `None`** : on traduit `None` en `404`, jamais une page d'erreur brute.
 - L'absence de table reste un `503` pédagogique, comme au palier précédent.
 
 ## La route
@@ -100,7 +95,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous avez terminé le **niveau débutant** : configuration, liste, détail. Faites le
-point dans le bilan du niveau.
+Vous avez terminé le **niveau débutant** : configuration, liste, détail.
+Faites le point dans le bilan du niveau.
 
 [Bilan du niveau débutant](bilan.md)

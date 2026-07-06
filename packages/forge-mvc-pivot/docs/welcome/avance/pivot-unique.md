@@ -2,14 +2,12 @@
 
 Objectif : refuser l'attachement d'une paire déjà existante.
 
-**Ce que vous allez apprendre :** avec `unique_pair=True`, le service vérifie
-**avant l'INSERT** que la paire `(article_id, tag_id)` n'existe pas déjà. Sinon,
-il lève `PivotConstraintError(code="duplicate_pair")`.
+**Ce que vous allez apprendre :** avec `unique_pair=True`, le service vérifie **avant l'INSERT** que la paire `(article_id, tag_id)` n'existe pas déjà.
+Sinon, il lève `PivotConstraintError(code="duplicate_pair")`.
 
 !!! note "Module opt-in"
-    Ce contrôle applicatif est un **confort d'UX** : il donne une erreur claire
-    avant d'écrire. La garantie de fond reste la **clé primaire composite** du
-    schéma SQL (vue au niveau débutant).
+    Ce contrôle applicatif est un **confort d'UX** : il donne une erreur claire avant d'écrire.
+    La garantie de fond reste la **clé primaire composite** du schéma SQL (vue au niveau débutant).
 
 ## Classes Forge utilisées
 
@@ -58,11 +56,9 @@ class PivotUniqueController(BaseController):
 
 ### Comprendre ce code
 
-- `unique_pair=True` fait un `get(source_id, target_id)` avant l'`INSERT` ; si la
-  paire existe, `attach` lève `PivotConstraintError(code="duplicate_pair")`.
-- Le contrôle est **non atomique** : sous forte concurrence, deux requêtes
-  simultanées pourraient passer le `get` avant l'`INSERT`. La clé primaire SQL
-  reste donc le garde-fou décisif.
+- `unique_pair=True` fait un `get(source_id, target_id)` avant l'`INSERT` ; si la paire existe, `attach` lève `PivotConstraintError(code="duplicate_pair")`.
+- Le contrôle est **non atomique** : sous forte concurrence, deux requêtes simultanées pourraient passer le `get` avant l'`INSERT`.
+  La clé primaire SQL reste donc le garde-fou décisif.
 - On distingue le `code` pour répondre `409 Conflict` proprement.
 
 ## À retenir

@@ -2,11 +2,8 @@
 
 Objectif : comprendre et adapter les gabarits Nginx et systemd générés.
 
-**Ce que vous allez apprendre :** les fichiers produits par `deploy:init` sont
-des modèles.
-Quelques réglages sont à ajuster avant la mise en production : l'utilisateur du
-service, le nombre de workers Gunicorn, la taille d'upload Nginx et les chemins
-du projet.
+**Ce que vous allez apprendre :** les fichiers produits par `deploy:init` sont des modèles.
+Quelques réglages sont à ajuster avant la mise en production : l'utilisateur du service, le nombre de workers Gunicorn, la taille d'upload Nginx et les chemins du projet.
 
 Deuxième palier du **niveau intermédiaire** de la progression Deploy.
 
@@ -34,8 +31,7 @@ Fichier `deploy/systemd/forge-app.service` : il lance Gunicorn comme service.
 
 ## 2. Le gabarit Nginx
 
-Fichier `deploy/nginx/forge-app.conf` : il place Nginx en reverse proxy devant
-Forge.
+Fichier `deploy/nginx/forge-app.conf` : il place Nginx en reverse proxy devant Forge.
 
 | Réglage | À adapter |
 |---------|-----------|

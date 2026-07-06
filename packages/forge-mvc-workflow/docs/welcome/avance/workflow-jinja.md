@@ -2,9 +2,8 @@
 
 Objectif : utiliser les helpers de statut **directement dans un template**.
 
-**Ce que vous allez apprendre :** `make_workflow_jinja_helpers()` retourne un dict des
-helpers (`workflow_status_badge`, `_label`, `_color`, `_badge_class`) prêt à injecter
-dans le contexte d'une vue. Contrairement à RBAC, ils ne sont **pas** auto-enregistrés.
+**Ce que vous allez apprendre :** `make_workflow_jinja_helpers()` retourne un dict des helpers (`workflow_status_badge`, `_label`, `_color`, `_badge_class`) prêt à injecter dans le contexte d'une vue.
+Contrairement à RBAC, ils ne sont **pas** auto-enregistrés.
 
 Troisième palier du **niveau avancé** de la progression workflow.
 
@@ -29,8 +28,7 @@ Troisième palier du **niveau avancé** de la progression workflow.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/workflow-jinja` : badge, libellé, couleur et classes
-calculés dans le template.
+Ouvrez `https://localhost:8000/workflow-jinja` : badge, libellé, couleur et classes calculés dans le template.
 
 ## Le contrôleur
 
@@ -98,12 +96,9 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Les helpers de `forge-mvc-workflow` ne sont **pas** auto-enregistrés (contrairement
-  au `can()` de RBAC) : on les ajoute au contexte de la vue, ou à l'environnement Jinja
-  de l'application une fois pour toutes.
+- Les helpers de `forge-mvc-workflow` ne sont **pas** auto-enregistrés (contrairement au `can()` de RBAC) : on les ajoute au contexte de la vue, ou à l'environnement Jinja de l'application une fois pour toutes.
 - Une fois injectés, ils s'utilisent comme des fonctions de template.
-- Cela laisse l'application **maîtresse** de ce qu'elle expose à ses templates
-  (explicite plutôt que magique).
+- Cela laisse l'application **maîtresse** de ce qu'elle expose à ses templates (explicite plutôt que magique).
 
 ## À retenir
 

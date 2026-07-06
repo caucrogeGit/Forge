@@ -2,8 +2,7 @@
 
 Objectif : décrire précisément l'objet visé par une action.
 
-**Ce que vous allez apprendre :** enrichir une trace avec `target_type`,
-`target_id` et `details`, en plus de l'`actor`.
+**Ce que vous allez apprendre :** enrichir une trace avec `target_type`, `target_id` et `details`, en plus de l'`actor`.
 Ces champs permettent de savoir non seulement qui a agi, mais sur quoi.
 
 Premier palier du **niveau intermédiaire** de la progression Audit.

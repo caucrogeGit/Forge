@@ -1,18 +1,15 @@
 # Permission dans un template
 
-Objectif : afficher ou masquer un élément d'interface selon une permission, avec
-`can()`.
+Objectif : afficher ou masquer un élément d'interface selon une permission, avec `can()`.
 
-**Ce que vous allez apprendre :** `make_can(request)` retourne un callable
-`can(code) -> bool` lié à la requête. Forge l'expose automatiquement dans les
-templates Jinja sous le nom `can()` : `{% if can("article.create") %}` conditionne
-l'UI.
+**Ce que vous allez apprendre :** `make_can(request)` retourne un callable `can(code) -> bool` lié à la requête.
+Forge l'expose automatiquement dans les templates Jinja sous le nom `can()` : `{% if can("article.create") %}` conditionne l'UI.
 
 Troisième palier du **niveau intermédiaire** de la progression RBAC.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-rbac` installé. Sans utilisateur connecté,
-    `can(...)` renvoie `False`.
+    Ce starter suppose `forge-mvc-rbac` installé.
+    Sans utilisateur connecté, `can(...)` renvoie `False`.
 
 ## Ce que ce starter montre
 
@@ -32,8 +29,8 @@ Troisième palier du **niveau intermédiaire** de la progression RBAC.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/rbac-template` : le bouton « Créer » est masqué tant
-qu'aucun utilisateur n'a la permission.
+Ouvrez `https://localhost:8000/rbac-template` : le bouton « Créer »
+est masqué tant qu'aucun utilisateur n'a la permission.
 
 ## Le contrôleur
 
@@ -108,10 +105,8 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- `can()` est **auto-enregistré** par `forge-mvc-rbac` dans le contexte Jinja : pas
-  besoin de le passer à chaque vue.
-- Conditionner l'UI évite d'afficher des actions impossibles : meilleure expérience
-  **et** défense en profondeur (le guard reste indispensable côté serveur).
+- `can()` est **auto-enregistré** par `forge-mvc-rbac` dans le contexte Jinja : pas besoin de le passer à chaque vue.
+- Conditionner l'UI évite d'afficher des actions impossibles : meilleure expérience **et** défense en profondeur (le guard reste indispensable côté serveur).
 - Sans utilisateur, `can(...)` est `False` : sécurisé par défaut.
 
 ## À retenir
@@ -122,6 +117,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous savez vérifier et appliquer. La suite (avancé) : relier tout ça aux utilisateurs.
+Vous savez vérifier et appliquer.
+La suite (avancé) : relier tout ça aux utilisateurs.
 
 [Bilan du niveau intermédiaire](bilan.md)

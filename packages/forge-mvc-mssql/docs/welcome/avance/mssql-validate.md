@@ -15,7 +15,8 @@ docker run --rm -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Test_1234" \
   -p 1433:1433 mcr.microsoft.com/mssql/server
 ```
 
-Installez aussi un pilote ODBC (« ODBC Driver 18 for SQL Server ») et configurez `env/dev`.
+Installez aussi un pilote ODBC (« ODBC Driver 18 for SQL Server »)
+et configurez `env/dev`.
 
 ## Vérifier la chaîne
 

@@ -8,7 +8,8 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
 
 ## 1. Rôle du module
 
-Des capteurs publient des mesures sur un broker MQTT. L'opt-in les **écoute**, les **valide** selon un contrat, les **stocke** dans `iot_events`, puis les **expose** en JSON pour l'application.
+Des capteurs publient des mesures sur un broker MQTT.
+L'opt-in les **écoute**, les **valide** selon un contrat, les **stocke** dans `iot_events`, puis les **expose** en JSON pour l'application.
 
 L'écoute MQTT tourne dans un process séparé (`iot:listen`), pas dans le serveur web ; l'API HTTP, elle, se branche sur le routeur du projet (modèle opt-in de type route).
 

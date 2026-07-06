@@ -2,12 +2,9 @@
 
 Objectif : réessayer une tâche qui échoue et suivre son état.
 
-**Ce que vous allez apprendre :** `max_attempts` fixe le nombre d'essais d'une
-tâche.
-Si le gestionnaire lève une erreur et qu'il reste des essais, la tâche est
-remise en file ; sinon elle passe en `failed`.
-On inspecte l'état d'une tâche avec `get_job` et le nombre de tâches en attente
-avec `pending_count`.
+**Ce que vous allez apprendre :** `max_attempts` fixe le nombre d'essais d'une tâche.
+Si le gestionnaire lève une erreur et qu'il reste des essais, la tâche est remise en file ; sinon elle passe en `failed`.
+On inspecte l'état d'une tâche avec `get_job` et le nombre de tâches en attente avec `pending_count`.
 
 Deuxième palier du **niveau intermédiaire** de la progression Jobs.
 

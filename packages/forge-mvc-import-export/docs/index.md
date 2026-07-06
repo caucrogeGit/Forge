@@ -2,28 +2,19 @@
 
 `forge-mvc-import-export` est l'opt-in d'échange CSV de Forge.
 
-Il fait deux choses : **importer** un CSV (lire, valider chaque ligne par champ,
-produire un rapport d'erreurs, insérer les lignes valides via une fonction de
-l'application) et **exporter** programmatiquement des lignes en CSV (`to_csv`,
-l'inverse de `parse_csv`).
+Il fait deux choses : **importer** un CSV (lire, valider chaque ligne par champ, produire un rapport d'erreurs, insérer les lignes valides via une fonction de l'application) et **exporter** programmatiquement des lignes en CSV (`to_csv`, l'inverse de `parse_csv`).
 
 ## La frontière avec l'export du CRUD
 
-L'export d'une **entité** dans une page web est déjà couvert par la route
-d'export générée par le CRUD du cœur : c'est la voie officielle, elle reste
-inchangée (principe 11).
+L'export d'une **entité** dans une page web est déjà couvert par la route d'export générée par le CRUD du cœur : c'est la voie officielle, elle reste inchangée (principe 11).
 
-`to_csv` ne la remplace pas : il sert l'export **programmatique**, pour un
-script, un rapport, une agrégation, ou des données qui ne viennent pas d'une
-entité CRUD.
+`to_csv` ne la remplace pas : il sert l'export **programmatique**, pour un script, un rapport, une agrégation, ou des données qui ne viennent pas d'une entité CRUD.
 Deux outils pour deux contextes, pas deux façons de faire la même chose.
 
 ## Le style Forge
 
 Les briques sont génériques et explicites.
-À l'import, l'application décrit ses colonnes par des `FieldSpec` et fournit la
-fonction d'insertion : le SQL reste dans le modèle de l'application, ce paquet
-n'apporte que la validation et le rapport.
+À l'import, l'application décrit ses colonnes par des `FieldSpec` et fournit la fonction d'insertion : le SQL reste dans le modèle de l'application, ce paquet n'apporte que la validation et le rapport.
 Le cœur de Forge et les entités ne sont pas touchés (principe 8).
 
 ## Mise en route
@@ -49,8 +40,8 @@ for err in report.errors:
 
 ## Comportement
 
-Par défaut « tout ou rien » au niveau validation : une seule ligne invalide et
-rien n'est inséré, le rapport liste toutes les erreurs.
+Par défaut « tout ou rien »
+au niveau validation : une seule ligne invalide et rien n'est inséré, le rapport liste toutes les erreurs.
 L'option `partial=True` insère les lignes valides malgré des lignes en erreur.
 
 ## Pour aller plus loin

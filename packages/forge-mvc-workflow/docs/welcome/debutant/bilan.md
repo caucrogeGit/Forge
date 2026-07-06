@@ -1,7 +1,7 @@
 # Bilan : niveau débutant (Workflow)
 
-Récapitulatif du **niveau débutant** de la progression *Welcome Workflow*. Ce
-niveau pose les briques : statuts, noms, recherche.
+Récapitulatif du **niveau débutant** de la progression *Welcome Workflow*.
+Ce niveau pose les briques : statuts, noms, recherche.
 
 ## Ce que vous avez validé
 
@@ -15,7 +15,6 @@ Vous comprenez le vocabulaire workflow : statuts, noms, jeu cohérent.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : les **transitions**, déclarer, vérifier, lister
-les passages autorisés.
+Place au niveau **intermédiaire** : les **transitions**, déclarer, vérifier, lister les passages autorisés.
 
 [Niveau intermédiaire : Déclarer les transitions](../intermediaire/workflow-transition.md)

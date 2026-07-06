@@ -1,17 +1,15 @@
 # Codes de récupération
 
-Objectif : générer un lot de **codes de récupération** à usage unique, et en
-consommer un quand le TOTP est indisponible.
+Objectif : générer un lot de **codes de récupération** à usage unique, et en consommer un quand le TOTP est indisponible.
 
-**Ce que vous allez apprendre :** `create_recovery_codes` génère un lot (montré
-**une fois**, stocké **haché**) ; `verify_recovery_code` confronte un code à son
-hash ; `consume_recovery_code` le marque utilisé (usage **unique**).
+**Ce que vous allez apprendre :** `create_recovery_codes` génère un lot (montré **une fois**, stocké **haché**) ; `verify_recovery_code` confronte un code à son hash ; `consume_recovery_code` le marque utilisé (usage **unique**).
 
 Troisième palier du **niveau intermédiaire** de la progression MFA.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-mfa` installé. **Aucune clé de chiffrement requise**
-    ici : les codes sont **hachés**, pas chiffrés. Démo en session.
+    Ce starter suppose `forge-mvc-mfa` installé.
+    **Aucune clé de chiffrement requise** ici : les codes sont **hachés**, pas chiffrés.
+    Démo en session.
 
 ## Ce que ce starter montre
 
@@ -33,8 +31,7 @@ Troisième palier du **niveau intermédiaire** de la progression MFA.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/mfa-recovery` : un lot de codes s'affiche ; saisissez-en
-un pour le consommer.
+Ouvrez `https://localhost:8000/mfa-recovery` : un lot de codes s'affiche ; saisissez-en un pour le consommer.
 
 ## Le contrôleur
 
@@ -159,8 +156,7 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Les codes bruts sont montrés **une seule fois** ; seul leur **hash** est conservé
-  (comme un mot de passe).
+- Les codes bruts sont montrés **une seule fois** ; seul leur **hash** est conservé (comme un mot de passe).
 - `verify_recovery_code` utilise une comparaison à temps constant (anti-timing).
 - `consume_recovery_code` garantit l'**usage unique** : un code consommé ne repasse pas.
 
@@ -172,6 +168,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous maîtrisez le flux MFA. La suite (avancé) : le durcissement.
+Vous maîtrisez le flux MFA.
+La suite (avancé) : le durcissement.
 
 [Bilan du niveau intermédiaire](bilan.md)

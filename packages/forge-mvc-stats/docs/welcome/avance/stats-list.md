@@ -1,17 +1,15 @@
 # Lister les événements
 
-Objectif : **lire** les événements via un `fetch_all` injectable et obtenir des dicts
-propres.
+Objectif : **lire** les événements via un `fetch_all` injectable et obtenir des dicts propres.
 
-**Ce que vous allez apprendre :** `list_stats_events` lit via un `fetch_all`
-**injectable** et retourne des dicts **normalisés** (métadonnées désérialisées). La
-démo injecte un `fetch_all` factice.
+**Ce que vous allez apprendre :** `list_stats_events` lit via un `fetch_all` **injectable** et retourne des dicts **normalisés** (métadonnées désérialisées).
+La démo injecte un `fetch_all` factice.
 
 Deuxième palier du **niveau avancé** de la progression stats.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-stats` installé. **Aucune base réelle** : le
-    `fetch_all` de démo renvoie des lignes fixes.
+    Ce starter suppose `forge-mvc-stats` installé.
+    **Aucune base réelle** : le `fetch_all` de démo renvoie des lignes fixes.
 
 ## Ce que ce starter montre
 
@@ -66,10 +64,8 @@ class StatsListController(BaseController):
 
 ### Comprendre ce code
 
-- L'injection de `fetch_all` rend la lecture **testable** : vraie fonction en
-  production, fausse en démo/test.
-- Les **métadonnées** reviennent en **dict** (désérialisées du JSON stocké), prêtes à
-  l'usage, sans retraitement côté appelant.
+- L'injection de `fetch_all` rend la lecture **testable** : vraie fonction en production, fausse en démo/test.
+- Les **métadonnées** reviennent en **dict** (désérialisées du JSON stocké), prêtes à l'usage, sans retraitement côté appelant.
 - En production : `list_stats_events(core.database.db.fetch_all, ...)`.
 
 ## La route

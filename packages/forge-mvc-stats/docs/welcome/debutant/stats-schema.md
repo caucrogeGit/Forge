@@ -1,11 +1,9 @@
 # Le schéma SQL
 
-Objectif : lire le **schéma SQL** exact de la table des événements ; Forge garde le SQL
-visible.
+Objectif : lire le **schéma SQL** exact de la table des événements ; Forge garde le SQL visible.
 
-**Ce que vous allez apprendre :** `get_stats_events_schema_sql` retourne le
-`CREATE TABLE` de `forge_stats_events`. Fidèle à la charte (principe 5), Forge Stats
-n'a **pas d'ORM** : on lit le schéma réel.
+**Ce que vous allez apprendre :** `get_stats_events_schema_sql` retourne le `CREATE TABLE` de `forge_stats_events`.
+Fidèle à la charte (principe 5), Forge Stats n'a **pas d'ORM** : on lit le schéma réel.
 
 Troisième palier du **niveau débutant** de la progression stats.
 
@@ -61,8 +59,7 @@ class StatsSchemaController(BaseController):
 
 ### Comprendre ce code
 
-- On **lit** le schéma réel qui sera créé en base : aucune abstraction ne le cache
-  (charte principe 5, « garder SQL visible »).
+- On **lit** le schéma réel qui sera créé en base : aucune abstraction ne le cache (charte principe 5, « garder SQL visible »).
 - Exposer le SQL plutôt qu'un ORM rend le comportement auditable et prévisible.
 - L'application applique ce `CREATE TABLE` une fois (migration), puis Forge Stats y écrit.
 
@@ -109,6 +106,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous avez les briques (événement, schéma). La suite (intermédiaire) : **enregistrer**.
+Vous avez les briques (événement, schéma).
+La suite (intermédiaire) : **enregistrer**.
 
 [Bilan du niveau débutant](bilan.md)

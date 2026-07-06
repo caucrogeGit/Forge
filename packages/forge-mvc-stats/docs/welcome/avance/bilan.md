@@ -1,7 +1,7 @@
 # Bilan : niveau avancé (Stats)
 
-Récapitulatif du **niveau avancé** de la progression *Welcome Stats*. Ce niveau
-couvre la **consultation** des événements.
+Récapitulatif du **niveau avancé** de la progression *Welcome Stats*.
+Ce niveau couvre la **consultation** des événements.
 
 ## Ce que vous avez validé
 
@@ -15,9 +15,8 @@ Vous maîtrisez Forge Stats de bout en bout : événement, enregistrement, consu
 
 ## Et ensuite
 
-La progression *Welcome Stats* est terminée. En production : appliquez le schéma
-(`get_stats_events_schema_sql`), passez `core.database.db.execute` / `fetch_all` aux
-fonctions de tracking et de consultation. SQL visible partout, code testable par
-injection.
+La progression *Welcome Stats* est terminée.
+En production : appliquez le schéma (`get_stats_events_schema_sql`), passez `core.database.db.execute` / `fetch_all` aux fonctions de tracking et de consultation.
+SQL visible partout, code testable par injection.
 
 [Aide-mémoire de la progression Stats](../recapitulatif.md)

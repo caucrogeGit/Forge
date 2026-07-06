@@ -1,11 +1,9 @@
 # Limiter les uploads
 
-Objectif : protéger une route d'upload contre les abus avec un **rate-limit par
-IP**.
+Objectif : protéger une route d'upload contre les abus avec un **rate-limit par IP**.
 
-**Ce que vous allez apprendre :** `is_upload_rate_limited(ip)` indique si une IP a
-atteint le quota (fenêtre glissante en mémoire), `record_upload_attempt(ip)`
-enregistre une tentative. Au-delà du quota, la route répond `429`.
+**Ce que vous allez apprendre :** `is_upload_rate_limited(ip)` indique si une IP a atteint le quota (fenêtre glissante en mémoire), `record_upload_attempt(ip)` enregistre une tentative.
+Au-delà du quota, la route répond `429`.
 
 Deuxième palier du **niveau intermédiaire** de la progression files.
 
@@ -32,8 +30,7 @@ Deuxième palier du **niveau intermédiaire** de la progression files.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/file-rate-limit` et envoyez plus de 10 fois en moins
-d'une minute : la route bascule en `429`.
+Ouvrez `https://localhost:8000/file-rate-limit` et envoyez plus de 10 fois en moins d'une minute : la route bascule en `429`.
 
 ## Le contrôleur
 
@@ -139,10 +136,8 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- On teste **avant** d'enregistrer la tentative, et on n'enregistre que les
-  requêtes effectivement traitées.
-- Le compteur est **en mémoire** (fenêtre glissante) : simple, sans base, isolé des
-  compteurs de connexion.
+- On teste **avant** d'enregistrer la tentative, et on n'enregistre que les requêtes effectivement traitées.
+- Le compteur est **en mémoire** (fenêtre glissante) : simple, sans base, isolé des compteurs de connexion.
 - `request.ip` est l'IP **résolue** (un proxy de confiance ne masque pas le client).
 
 ## À retenir
@@ -153,6 +148,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-La route est protégée. La suite : supprimer un fichier proprement.
+La route est protégée.
+La suite : supprimer un fichier proprement.
 
 [Supprimer un fichier](file-delete.md)

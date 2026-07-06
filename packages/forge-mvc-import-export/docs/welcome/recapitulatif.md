@@ -38,7 +38,5 @@ Synthèse de l'API de `forge-mvc-import-export`, à garder sous la main.
 ## Rappel
 
 Forge Core ne dépend pas du paquet.
-Le paquet n'a aucune table : le SQL d'insertion vit dans le modèle de votre
-application, atteint par le callback `insert`.
-Pour télécharger une entité depuis une page web, la route d'export du CRUD reste
-la voie officielle ; `to_csv` sert l'export programmatique.
+Le paquet n'a aucune table : le SQL d'insertion vit dans le modèle de votre application, atteint par le callback `insert`.
+Pour télécharger une entité depuis une page web, la route d'export du CRUD reste la voie officielle ; `to_csv` sert l'export programmatique.

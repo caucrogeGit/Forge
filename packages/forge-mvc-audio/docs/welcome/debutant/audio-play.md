@@ -1,12 +1,9 @@
 # Lire un audio
 
-Objectif : brancher la route de **lecture officielle** de Forge Audio (streaming
-HTTP Range) sans écrire de code métier.
+Objectif : brancher la route de **lecture officielle** de Forge Audio (streaming HTTP Range) sans écrire de code métier.
 
-**Ce que vous allez apprendre :** `register_audio_routes(router)` enregistre la
-route `GET /audio/{uuid}` qui sert un fichier audio en **streaming** (support des
-requêtes HTTP Range, donc le *seek* dans un lecteur). Le code vit dans le paquet ;
-on ne fait que le **brancher**.
+**Ce que vous allez apprendre :** `register_audio_routes(router)` enregistre la route `GET /audio/{uuid}` qui sert un fichier audio en **streaming** (support des requêtes HTTP Range, donc le *seek* dans un lecteur).
+Le code vit dans le paquet ; on ne fait que le **brancher**.
 
 Troisième palier du **niveau débutant** de la progression audio.
 
@@ -31,15 +28,12 @@ Troisième palier du **niveau débutant** de la progression audio.
 forge run
 ```
 
-Téléversez un audio au palier précédent, notez son `uuid`, puis ouvrez
-`https://localhost:8000/audio/<uuid>` : le fichier est servi en streaming.
+Téléversez un audio au palier précédent, notez son `uuid`, puis ouvrez `https://localhost:8000/audio/<uuid>` : le fichier est servi en streaming.
 
 ## La route
 
-Ce palier ne crée **aucun contrôleur** : le code de lecture vit dans le paquet
-`forge-mvc-audio` ; on ne fait que le brancher.
-Ajoutez ces lignes dans `mvc/routes.py` (au niveau du module, pas dans un groupe :
-`register_audio_routes` déclare ses propres routes) :
+Ce palier ne crée **aucun contrôleur** : le code de lecture vit dans le paquet `forge-mvc-audio` ; on ne fait que le brancher.
+Ajoutez ces lignes dans `mvc/routes.py` (au niveau du module, pas dans un groupe : `register_audio_routes` déclare ses propres routes) :
 
 ```python
 # mvc/routes.py
@@ -53,11 +47,9 @@ register_audio_routes(router)
 
 ### Comprendre ce code
 
-- On ne réimplémente **pas** la lecture : `register_audio_routes` apporte une route
-  testée (Range, types MIME, anti-traversal par uuid). C'est la convention Forge
-  « le module fournit, l'application branche ».
-- Si un `api_token` est configuré, la route exige un `Authorization: Bearer …` ;
-  rien à coder côté application.
+- On ne réimplémente **pas** la lecture : `register_audio_routes` apporte une route testée (Range, types MIME, anti-traversal par uuid).
+  C'est la convention Forge « le module fournit, l'application branche ».
+- Si un `api_token` est configuré, la route exige un `Authorization: Bearer …` ; rien à coder côté application.
 
 ## À retenir
 
@@ -67,6 +59,7 @@ register_audio_routes(router)
 
 ## Après ce starter
 
-Vous savez stocker et lire. La suite (niveau avancé) : sonder et transcoder.
+Vous savez stocker et lire.
+La suite (niveau avancé) : sonder et transcoder.
 
 [Bilan du niveau débutant](bilan.md)

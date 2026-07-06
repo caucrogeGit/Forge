@@ -1,13 +1,11 @@
 # Aide-mémoire de la progression Workflow
 
-Récapitulatif des paliers de la progression *Welcome Workflow* et des API du
-module opt-in `forge-mvc-workflow` introduites à chaque étape.
+Récapitulatif des paliers de la progression *Welcome Workflow* et des API du module opt-in `forge-mvc-workflow` introduites à chaque étape.
 
 !!! note "Module opt-in : sans état"
     `forge-mvc-workflow` est **publié sur PyPI** : `pip install --pre forge-mvc-workflow`.
-    Il fournit des **fonctions pures** (statuts, transitions, badges) ; l'application
-    stocke le statut courant de ses objets. Les helpers Jinja **ne sont pas**
-    auto-enregistrés (injection explicite).
+    Il fournit des **fonctions pures** (statuts, transitions, badges) ; l'application stocke le statut courant de ses objets.
+    Les helpers Jinja **ne sont pas** auto-enregistrés (injection explicite).
 
 ## Niveau débutant : statuts
 

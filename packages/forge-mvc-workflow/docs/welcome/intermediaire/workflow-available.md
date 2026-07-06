@@ -2,9 +2,7 @@
 
 Objectif : lister les statuts **atteignables** depuis un statut courant.
 
-**Ce que vous allez apprendre :** `get_available_transitions(transitions, from)` liste
-les passages partant du statut courant : idéal pour générer dynamiquement les
-**boutons d'action** d'une fiche.
+**Ce que vous allez apprendre :** `get_available_transitions(transitions, from)` liste les passages partant du statut courant : idéal pour générer dynamiquement les **boutons d'action** d'une fiche.
 
 Troisième palier du **niveau intermédiaire** de la progression workflow.
 
@@ -65,10 +63,10 @@ class WorkflowAvailableController(BaseController):
 
 ### Comprendre ce code
 
-- Plutôt que de coder chaque bouton en dur, on **dérive** les actions possibles du
-  statut courant : l'UI suit le workflow automatiquement.
+- Plutôt que de coder chaque bouton en dur, on **dérive** les actions possibles du statut courant : l'UI suit le workflow automatiquement.
 - Un statut final renvoie une liste vide → aucune action, naturellement.
-- C'est la version « lecture » de `can_transition` : on liste au lieu de tester un cas.
+- C'est la version « lecture »
+  de `can_transition` : on liste au lieu de tester un cas.
 
 ## La vue
 
@@ -122,6 +120,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous maîtrisez statuts et transitions. La suite (avancé) : l'**affichage**.
+Vous maîtrisez statuts et transitions.
+La suite (avancé) : l'**affichage**.
 
 [Bilan du niveau intermédiaire](bilan.md)

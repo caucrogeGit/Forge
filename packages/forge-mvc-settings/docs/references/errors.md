@@ -1,7 +1,6 @@
 # Les erreurs
 
-Ce document décrit l'erreur levée par `forge_mvc_settings` en cas d'entrée
-invalide.
+Ce document décrit l'erreur levée par `forge_mvc_settings` en cas d'entrée invalide.
 
 Le fichier de code correspondant est `forge_mvc_settings/errors.py`.
 
@@ -13,8 +12,7 @@ class SettingsError(ValueError):
 ```
 
 `SettingsError` signale une entrée invalide pour un paramètre applicatif.
-Elle hérite de `ValueError` : un appelant peut la rattraper comme une erreur
-d'entrée ordinaire.
+Elle hérite de `ValueError` : un appelant peut la rattraper comme une erreur d'entrée ordinaire.
 
 ## 2. Quand est-elle levée ?
 

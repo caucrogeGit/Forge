@@ -1,8 +1,7 @@
 # Bilan : niveau avancé (Pivot)
 
-Récapitulatif du **niveau avancé** de la progression *Welcome Pivot*. Ce
-niveau verrouille l'intégrité et l'UX : contraintes, unicité, erreurs de
-formulaire.
+Récapitulatif du **niveau avancé** de la progression *Welcome Pivot*.
+Ce niveau verrouille l'intégrité et l'UX : contraintes, unicité, erreurs de formulaire.
 
 ## Ce que vous avez validé
 
@@ -16,7 +15,6 @@ Vous maîtrisez le pivot enrichi : modèle, manipulation, intégrité et UX.
 
 ## Et ensuite
 
-Consultez l'**aide-mémoire** pour retrouver d'un coup d'œil chaque palier et son
-API.
+Consultez l'**aide-mémoire** pour retrouver d'un coup d'œil chaque palier et son API.
 
 [Aide-mémoire de la progression Pivot](../recapitulatif.md)

@@ -8,7 +8,8 @@ Synthèse du backend `forge-mvc-mssql` (Alpha).
 pip install --pre forge-mvc-mssql
 ```
 
-Découvert automatiquement ; si plusieurs backends : `DB_BACKEND=mssql`. Un serveur SQL Server et un pilote ODBC sont requis.
+Découvert automatiquement ; si plusieurs backends : `DB_BACKEND=mssql`.
+Un serveur SQL Server et un pilote ODBC sont requis.
 
 ## Préparer (Alpha : manuel)
 

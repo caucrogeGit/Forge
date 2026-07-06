@@ -1,17 +1,15 @@
 # Rôles de la requête
 
-Objectif : inspecter les **rôles et permissions de la requête courante**, ce que
-RBAC consomme au runtime.
+Objectif : inspecter les **rôles et permissions de la requête courante**, ce que RBAC consomme au runtime.
 
-**Ce que vous allez apprendre :** `get_request_roles(request)` retourne les rôles
-déduits de l'utilisateur connecté (session) ; `get_request_permissions(request)` les
-permissions qui en découlent. C'est ce que `can()` et les guards utilisent en interne.
+**Ce que vous allez apprendre :** `get_request_roles(request)` retourne les rôles déduits de l'utilisateur connecté (session) ; `get_request_permissions(request)` les permissions qui en découlent.
+C'est ce que `can()` et les guards utilisent en interne.
 
 Troisième palier du **niveau avancé** de la progression RBAC.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-rbac` installé. **Sans utilisateur connecté**, les
-    deux listes sont vides.
+    Ce starter suppose `forge-mvc-rbac` installé.
+    **Sans utilisateur connecté**, les deux listes sont vides.
 
 ## Ce que ce starter montre
 
@@ -32,8 +30,7 @@ Troisième palier du **niveau avancé** de la progression RBAC.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/rbac-request-roles` : sans utilisateur connecté,
-`{"roles": [], "permissions": []}`.
+Ouvrez `https://localhost:8000/rbac-request-roles` : sans utilisateur connecté, `{"roles": [], "permissions": []}`.
 
 ## Le contrôleur
 
@@ -61,10 +58,8 @@ class RbacRequestRolesController(BaseController):
 
 ### Comprendre ce code
 
-- Au runtime, RBAC part des **rôles de la requête** (issus de l'utilisateur connecté),
-  pas de paramètres d'URL : c'est la version réelle des démos précédentes.
-- `get_request_permissions` combine ces rôles avec le contrat pour donner les
-  permissions effectives de la requête.
+- Au runtime, RBAC part des **rôles de la requête** (issus de l'utilisateur connecté), pas de paramètres d'URL : c'est la version réelle des démos précédentes.
+- `get_request_permissions` combine ces rôles avec le contrat pour donner les permissions effectives de la requête.
 - Listes vides sans utilisateur : **aucun droit par défaut**.
 
 ## La route

@@ -1,20 +1,18 @@
 # Installation : Progression « Welcome MFA »
 
-Ce préambule installe le module **opt-in** `forge-mvc-mfa` dans un projet Forge
-existant. La progression se réalise ensuite **à la main** : chaque palier décrit
-les fichiers à créer et la route à câbler.
+Ce préambule installe le module **opt-in** `forge-mvc-mfa` dans un projet Forge existant.
+La progression se réalise ensuite **à la main** : chaque palier décrit les fichiers à créer et la route à câbler.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core, voir Installer Forge.
 
 ## Prérequis
 
-- **Forge installé** (core `forge-mvc`). Sinon, suivre d'abord
-  Installer Forge.
+- **Forge installé** (core `forge-mvc`).
+  Sinon, suivre d'abord Installer Forge.
 - **Python 3.12+**.
-- Aucune base de données pour ce parcours : les flux (enrôlement, challenge,
-  récupération) sont démontrés **en session**. Une vraie application persiste les
-  facteurs (`auth_mfa_factors`) et codes (`auth_mfa_recovery_codes`).
+- Aucune base de données pour ce parcours : les flux (enrôlement, challenge, récupération) sont démontrés **en session**.
+  Une vraie application persiste les facteurs (`auth_mfa_factors`) et codes (`auth_mfa_recovery_codes`).
 
 ## 1. Installer le module opt-in MFA
 
@@ -33,9 +31,8 @@ Générez une clé :
 python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 ```
 
-Puis renseignez-la dans la configuration Forge (fichier `env/dev`) :
-`FORGE_MFA_SECRET_KEY=<clé générée>`. Sans elle, les paliers d'enrôlement et de
-chiffrement restent pédagogiques (message explicite) mais ne chiffrent rien.
+Puis renseignez-la dans la configuration Forge (fichier `env/dev`) : `FORGE_MFA_SECRET_KEY=<clé générée>`.
+Sans elle, les paliers d'enrôlement et de chiffrement restent pédagogiques (message explicite) mais ne chiffrent rien.
 
 ## 3. Disposer d'un projet Forge
 
@@ -46,10 +43,8 @@ Si ce n'est pas le cas, créez-en un avec :
 forge new mon-projet-mfa
 ```
 
-Le détail de la création d'un projet est décrit dans
-Installer Forge.
-Aucun starter n'est généré : les fichiers du parcours se créent à la main au
-fil des paliers.
+Le détail de la création d'un projet est décrit dans Installer Forge.
+Aucun starter n'est généré : les fichiers du parcours se créent à la main au fil des paliers.
 
 ## 4. Vérifier l'installation
 
@@ -61,7 +56,6 @@ forge doctor
 
 ## Après l'installation
 
-Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le
-contrôleur, la vue et la route `/mfa-welcome`.
+Vous pouvez attaquer le premier palier de code, où vous créerez vous-même le contrôleur, la vue et la route `/mfa-welcome`.
 
 [Continuer sur le starter Welcome MFA](debutant/mfa-welcome.md)

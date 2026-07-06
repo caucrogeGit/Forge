@@ -65,7 +65,8 @@ sequenceDiagram
 
 - le slug est fixe (`contact`), aucun argument n'est attendu ;
 - la génération réutilise la spécification et les helpers de `public_page` ;
-- le gabarit existant est préservé, avec le message « Aucun écrasement effectué. ».
+- le gabarit existant est préservé, avec le message « Aucun écrasement effectué.
+  ».
 
 ## 4. API publique / Commande
 
@@ -75,7 +76,7 @@ Invocation :
 forge make:public-contact
 ```
 
-La commande n'accepte aucun argument ; sinon elle affiche `Usage : forge make:public-contact  (aucun argument attendu)`.
+La commande n'accepte aucun argument ; sinon elle affiche `Usage : forge make:public-contact (aucun argument attendu)`.
 
 | Symbole | Signature | Rôle |
 |---|---|---|
@@ -124,7 +125,9 @@ print(result.spec.slug)  # "contact"
 
 !!! note "Préservation des fichiers utilisateur"
     Si `mvc/views/public/contact.html` existe déjà, il est conservé tel quel.
-    La sortie indique alors « Page contact déjà existante » suivie de « Aucun écrasement effectué. ».
+    La sortie indique alors « Page contact déjà existante »
+    suivie de « Aucun écrasement effectué.
+    ».
 
 !!! tip "Coordonnées à compléter"
     Le gabarit généré contient des valeurs de démonstration (email, téléphone, adresse).

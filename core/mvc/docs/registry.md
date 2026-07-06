@@ -10,7 +10,8 @@ Certaines valeurs doivent être disponibles dans tous les gabarits (utilisateur 
 
 Certains opt-ins fournissent aussi leurs propres templates par défaut.
 
-Ce module expose deux registres « push » : un pour les fournisseurs de contexte que `BaseController.render` injecte automatiquement, un pour les loaders de templates contribués par les opt-ins (ADR-046).
+Ce module expose deux registres « push »
+: un pour les fournisseurs de contexte que `BaseController.render` injecte automatiquement, un pour les loaders de templates contribués par les opt-ins (ADR-046).
 
 Le cœur itère sur ces registres sans nommer aucun module opt-in : chaque opt-in s'enregistre lui-même à l'import (charte, principe 8).
 

@@ -4,7 +4,8 @@ Ce document explique ce que fait l'opt-in `forge-mvc-mariadb`, ce qu'il expose, 
 
 `forge-mvc-mariadb` est **un** backend de base de données **de production** pour Forge : il fait fonctionner la couche BDD du cœur au-dessus d'un serveur MariaDB, via un pool de connexions.
 
-Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend installé par un entry point, et n'en utilise **qu'un seul** par projet, au choix du développeur (MariaDB, SQLite, PostgreSQL ou SQL Server). Forge n'impose aucun backend de référence.
+Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend installé par un entry point, et n'en utilise **qu'un seul** par projet, au choix du développeur (MariaDB, SQLite, PostgreSQL ou SQL Server).
+Forge n'impose aucun backend de référence.
 
 ## 1. Rôle du module
 
@@ -12,7 +13,8 @@ Le cœur génère le SQL et pilote `db:init` / `db:apply` / `migration:*`, mais 
 
 `forge-mvc-mariadb` fournit ce backend : un pool de connexions MariaDB adapté aux attentes du cœur (curseur lignes-dict, `lastrowid`, `autocommit`), un dialecte SQL MariaDB, et le **provisioning** de la base et des comptes par `db:init`.
 
-MariaDB est **client-serveur** : un serveur doit être joignable. C'est un choix éprouvé pour la production.
+MariaDB est **client-serveur** : un serveur doit être joignable.
+C'est un choix éprouvé pour la production.
 
 ## 2. Installation et désinstallation
 
@@ -214,7 +216,8 @@ Le code applicatif ne sait pas qu'il parle à MariaDB : il utilise la couche BDD
 
 ## 8. Serveur, comptes et dialecte
 
-MariaDB est client-serveur : un serveur doit être joignable. `forge doctor` aide à diagnostiquer la connexion.
+MariaDB est client-serveur : un serveur doit être joignable.
+`forge doctor` aide à diagnostiquer la connexion.
 
 Deux comptes séparent les responsabilités (ADR-033) : `DB_ADMIN_*` pour la structure, `DB_APP_*` (DML strict) pour le runtime, ce qui limite les droits de l'application en exécution.
 

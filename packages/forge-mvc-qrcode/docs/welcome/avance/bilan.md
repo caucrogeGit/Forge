@@ -1,8 +1,7 @@
 # Bilan : niveau avancé (QR Code)
 
 Récapitulatif du **niveau avancé** de la progression QR Code.
-Ce niveau ajoute la robustesse : erreurs d'entrée, options de rendu, et
-indépendance du cœur.
+Ce niveau ajoute la robustesse : erreurs d'entrée, options de rendu, et indépendance du cœur.
 
 ## Ce que vous avez validé
 

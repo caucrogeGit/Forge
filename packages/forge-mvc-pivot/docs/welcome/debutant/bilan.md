@@ -1,8 +1,7 @@
 # Bilan : niveau débutant (Pivot)
 
-Récapitulatif du **niveau débutant** de la progression *Welcome Pivot*. Ce
-niveau pose les bases : ce qu'est un pivot enrichi, comment le générer, et son
-stockage SQL.
+Récapitulatif du **niveau débutant** de la progression *Welcome Pivot*.
+Ce niveau pose les bases : ce qu'est un pivot enrichi, comment le générer, et son stockage SQL.
 
 ## Ce que vous avez validé
 
@@ -16,7 +15,6 @@ Vous comprenez l'enjeu du pivot enrichi et son stockage à SQL visible.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : **manipuler** les associations par le
-service : attacher, modifier, détacher, lister.
+Place au niveau **intermédiaire** : **manipuler** les associations par le service : attacher, modifier, détacher, lister.
 
 [Niveau intermédiaire : Attacher une association](../intermediaire/pivot-attach.md)

@@ -2,8 +2,7 @@
 
 Objectif : connaître le format des clés et gérer les erreurs de validation.
 
-**Ce que vous allez apprendre :** une clé commence par une lettre, suivie de
-lettres, chiffres, `_` ou `.`, sur 191 caractères au plus.
+**Ce que vous allez apprendre :** une clé commence par une lettre, suivie de lettres, chiffres, `_` ou `.`, sur 191 caractères au plus.
 Le point autorise des clés hiérarchiques comme `qcm.session_duration`.
 Une clé invalide ou un type non supporté lève `SettingsError`.
 

@@ -2,10 +2,8 @@
 
 Objectif : lancer `forge deploy:check` et lire ses résultats.
 
-**Ce que vous allez apprendre :** `forge deploy:check` contrôle l'environnement
-de production sans rien modifier.
-Elle affiche des lignes taguées `[OK]`, `[WARN]` ou `[ERREUR]`, et sort en code
-1 si une erreur bloquante existe.
+**Ce que vous allez apprendre :** `forge deploy:check` contrôle l'environnement de production sans rien modifier.
+Elle affiche des lignes taguées `[OK]`, `[WARN]` ou `[ERREUR]`, et sort en code 1 si une erreur bloquante existe.
 
 Premier palier du **niveau intermédiaire** de la progression Deploy.
 

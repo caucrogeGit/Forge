@@ -1,7 +1,7 @@
 # Bilan : niveau intermédiaire (Pivot)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Welcome Pivot*. Ce niveau couvre le cycle de vie d'une association : créer, modifier,
-supprimer, lire.
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome Pivot*.
+Ce niveau couvre le cycle de vie d'une association : créer, modifier, supprimer, lire.
 
 ## Ce que vous avez validé
 
@@ -15,7 +15,6 @@ Vous savez manipuler un pivot enrichi par le service, en SQL paramétré.
 
 ## Et ensuite
 
-Place au niveau **avancé** : **contraintes et intégrité**, champs requis/non
-nullables, unicité de la paire, et erreurs prêtes pour un formulaire.
+Place au niveau **avancé** : **contraintes et intégrité**, champs requis/non nullables, unicité de la paire, et erreurs prêtes pour un formulaire.
 
 [Niveau avancé : Contraintes de champ](../avance/pivot-constraints.md)

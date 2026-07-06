@@ -2,8 +2,7 @@
 
 Objectif : maîtriser le comportement de `parse_csv` au-delà du cas simple.
 
-**Ce que vous allez apprendre :** comment `parse_csv` traite l'en-tête, les
-lignes vides, un séparateur autre que la virgule, et les cas qu'il refuse.
+**Ce que vous allez apprendre :** comment `parse_csv` traite l'en-tête, les lignes vides, un séparateur autre que la virgule, et les cas qu'il refuse.
 Connaître ces détails évite des surprises sur des fichiers réels.
 
 Deuxième palier du **niveau débutant** de la progression Import/Export.
@@ -35,11 +34,9 @@ print(lignes)
 
 ### Comprendre ce code
 
-- La première ligne, `nom,age`, donne les clés ; elle n'apparaît pas dans le
-  résultat.
+- La première ligne, `nom,age`, donne les clés ; elle n'apparaît pas dans le résultat.
 - La ligne vide entre Alice et Bob est ignorée.
-- La ligne `Bob` est plus courte que l'en-tête : la colonne `age` manquante
-  est complétée par une chaîne vide `""`.
+- La ligne `Bob` est plus courte que l'en-tête : la colonne `age` manquante est complétée par une chaîne vide `""`.
 
 ## 2. Choisir un autre séparateur
 
@@ -54,8 +51,7 @@ print(lignes)  # [{"nom": "Alice", "age": "30"}]
 
 ### Comprendre ce code
 
-- `delimiter=";"` lit un CSV à points-virgules, courant dans les exports
-  francophones de tableur.
+- `delimiter=";"` lit un CSV à points-virgules, courant dans les exports francophones de tableur.
 - Le séparateur s'applique aussi bien à l'en-tête qu'aux lignes de données.
 
 ## 3. Les CSV refusés
@@ -72,8 +68,7 @@ except CsvImportError as erreur:
 ### Comprendre ce code
 
 - `parse_csv` lève `CsvImportError` si le CSV est vide.
-- Il refuse aussi un en-tête dont une colonne n'a pas de nom, ou un en-tête
-  comportant deux fois la même colonne.
+- Il refuse aussi un en-tête dont une colonne n'a pas de nom, ou un en-tête comportant deux fois la même colonne.
 - Capturer `CsvImportError` permet de signaler proprement un fichier mal formé.
 
 ## À retenir

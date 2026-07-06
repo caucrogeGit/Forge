@@ -1,7 +1,7 @@
 # Bilan : niveau débutant (Files)
 
-Récapitulatif du **niveau débutant** de la progression *Welcome Files*. Ce
-niveau couvre le cycle de base d'un fichier : **inspecter**, **stocker**, **servir**.
+Récapitulatif du **niveau débutant** de la progression *Welcome Files*.
+Ce niveau couvre le cycle de base d'un fichier : **inspecter**, **stocker**, **servir**.
 
 ## Ce que vous avez validé
 
@@ -15,7 +15,6 @@ Vous savez stocker et relire un fichier en sécurité.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : la robustesse, valider finement, limiter les
-abus, supprimer proprement.
+Place au niveau **intermédiaire** : la robustesse, valider finement, limiter les abus, supprimer proprement.
 
 [Niveau intermédiaire : Valider un upload](../intermediaire/file-validate.md)

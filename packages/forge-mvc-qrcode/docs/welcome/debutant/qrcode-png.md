@@ -2,10 +2,8 @@
 
 Objectif : comprendre ce que renvoie `to_png` et comment ajuster le rendu.
 
-**Ce que vous allez apprendre :** `to_png` renvoie des **octets** (`bytes`), pas
-un fichier.
-Deux options simples, `scale` et `border`, contrôlent la taille des modules et
-la marge blanche autour du code.
+**Ce que vous allez apprendre :** `to_png` renvoie des **octets** (`bytes`), pas un fichier.
+Deux options simples, `scale` et `border`, contrôlent la taille des modules et la marge blanche autour du code.
 
 Deuxième palier du **niveau débutant**.
 

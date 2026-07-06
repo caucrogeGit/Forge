@@ -8,7 +8,8 @@ Synthèse du backend `forge-mvc-mariadb`.
 pip install --pre forge-mvc-mariadb
 ```
 
-Découvert automatiquement ; si plusieurs backends : `DB_BACKEND=mariadb`. Un serveur MariaDB doit être joignable.
+Découvert automatiquement ; si plusieurs backends : `DB_BACKEND=mariadb`.
+Un serveur MariaDB doit être joignable.
 
 ## Comptes (ADR-033)
 

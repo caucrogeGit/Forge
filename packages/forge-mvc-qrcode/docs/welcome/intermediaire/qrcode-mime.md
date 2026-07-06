@@ -2,10 +2,8 @@
 
 Objectif : connaître les types MIME servis et où ils sont définis.
 
-**Ce que vous allez apprendre :** le paquet expose deux constantes, `PNG_MIME`
-et `SVG_MIME`.
-Elles valent `image/png` et `image/svg+xml`, et ce sont exactement les en-têtes
-`Content-Type` posés par `QrCodeResponse`.
+**Ce que vous allez apprendre :** le paquet expose deux constantes, `PNG_MIME` et `SVG_MIME`.
+Elles valent `image/png` et `image/svg+xml`, et ce sont exactement les en-têtes `Content-Type` posés par `QrCodeResponse`.
 
 Troisième palier du **niveau intermédiaire**.
 

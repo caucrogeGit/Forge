@@ -20,7 +20,8 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
 ## 1. Rôle du module
 
-Le mot de passe seul ne suffit pas pour les actions sensibles. L'opt-in ajoute un **second facteur**.
+Le mot de passe seul ne suffit pas pour les actions sensibles.
+L'opt-in ajoute un **second facteur**.
 
 Il couvre quatre temps :
 
@@ -274,11 +275,10 @@ Appelez `validate_mfa_secret_key_config()` au démarrage (app.py / wsgi.py) : d�
 
 ### Statut actuel
 
-`forge-mvc-mfa` est en Beta. Le secret TOTP est
-**chiffré au repos** via Fernet (bibliothèque `cryptography`).
+`forge-mvc-mfa` est en Beta.
+Le secret TOTP est **chiffré au repos** via Fernet (bibliothèque `cryptography`).
 
-Le module est opt-in, non inclus dans `forge-mvc[all]`, et doit être configuré avec
-`FORGE_MFA_SECRET_KEY` avant tout déploiement.
+Le module est opt-in, non inclus dans `forge-mvc[all]`, et doit être configuré avec `FORGE_MFA_SECRET_KEY` avant tout déploiement.
 
 ### Développement et tests
 
@@ -297,9 +297,9 @@ En développement et en environnement de test isolé :
 
 ### Production
 
-Le module est en Beta. Le chiffrement Fernet est en place (depuis `SEC-MFA-SECRET-ENCRYPTION-001`).
-Certaines exigences avancées (rotation de clé, sauvegarde/restauration, revue
-sécurité formelle) restent à la charge de l'application avant un usage critique.
+Le module est en Beta.
+Le chiffrement Fernet est en place (depuis `SEC-MFA-SECRET-ENCRYPTION-001`).
+Certaines exigences avancées (rotation de clé, sauvegarde/restauration, revue sécurité formelle) restent à la charge de l'application avant un usage critique.
 
 **Protection additionnelle recommandée en production :**
 
@@ -316,7 +316,9 @@ Le secret TOTP est une clé partagée utilisée pour calculer les codes TOTP (RF
 
 **Pourquoi on ne peut pas simplement hasher le secret TOTP :**
 
-Un hash est à sens unique. Pour vérifier un code TOTP, le serveur doit pouvoir recalculer `TOTP(secret, timestamp)`. Si le secret est hashé, cette opération est impossible.
+Un hash est à sens unique.
+Pour vérifier un code TOTP, le serveur doit pouvoir recalculer `TOTP(secret, timestamp)`.
+Si le secret est hashé, cette opération est impossible.
 
 Le stockage production-ready d'un secret TOTP nécessite :
 
@@ -324,10 +326,8 @@ Le stockage production-ready d'un secret TOTP nécessite :
 - un **HSM** (*Hardware Security Module*), **ou**
 - un **gestionnaire de secrets** (Vault, AWS Secrets Manager, ou équivalent).
 
-Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, `forge-mvc-mfa` implémente le chiffrement Fernet
-(`cryptography.fernet.Fernet`, AES-128-CBC + HMAC-SHA256) via la clé `FORGE_MFA_SECRET_KEY`.
-Les valeurs stockées en base sont préfixées `enc:` pour distinguer les secrets chiffrés
-d'éventuelles valeurs legacy.
+Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, `forge-mvc-mfa` implémente le chiffrement Fernet (`cryptography.fernet.Fernet`, AES-128-CBC + HMAC-SHA256) via la clé `FORGE_MFA_SECRET_KEY`.
+Les valeurs stockées en base sont préfixées `enc:` pour distinguer les secrets chiffrés d'éventuelles valeurs legacy.
 
 Pour renforcer davantage, coupler `FORGE_MFA_SECRET_KEY` à un gestionnaire de secrets externe.
 
@@ -340,11 +340,13 @@ Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` (s
 - vérifiés via `secrets.compare_digest()` (résistant aux timing attacks) ;
 - stockés en base uniquement sous forme de hash : le code brut n'est jamais persisté.
 
-**Cette conception est conforme pour la production**, à condition que la base elle-même soit protégée. Un hash de code de récupération exposé ne permet pas de retrouver le code brut.
+**Cette conception est conforme pour la production**, à condition que la base elle-même soit protégée.
+Un hash de code de récupération exposé ne permet pas de retrouver le code brut.
 
 ### Exigences avant production-ready
 
-`forge-mvc-mfa` est en **Beta** (publié sur PyPI depuis `1.0.0-beta.9`). Avant un usage en production critique, l'application doit couvrir les exigences suivantes :
+`forge-mvc-mfa` est en **Beta** (publié sur PyPI depuis `1.0.0-beta.9`).
+Avant un usage en production critique, l'application doit couvrir les exigences suivantes :
 
 1. ~~**Chiffrement applicatif des secrets TOTP**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : Fernet + `FORGE_MFA_SECRET_KEY`.
 2. **Politique de rotation documentée** : rotation ou invalidation maîtrisée des secrets compromis.

@@ -1,12 +1,9 @@
 # Assainir un nom de fichier
 
-Objectif : transformer un nom de fichier utilisateur **arbitraire** en un nom
-**sûr**, avec la primitive `secure_filename`.
+Objectif : transformer un nom de fichier utilisateur **arbitraire** en un nom **sûr**, avec la primitive `secure_filename`.
 
-**Ce que vous allez apprendre :** on entre dans les **primitives** de
-`forge-mvc-files`, la boîte à outils que les opt-ins média composent (ADR-020).
-`secure_filename` retire toute composante de répertoire et neutralise les caractères
-dangereux : ce qui reste ne peut désigner qu'un fichier.
+**Ce que vous allez apprendre :** on entre dans les **primitives** de `forge-mvc-files`, la boîte à outils que les opt-ins média composent (ADR-020).
+`secure_filename` retire toute composante de répertoire et neutralise les caractères dangereux : ce qui reste ne peut désigner qu'un fichier.
 
 Premier palier du **niveau avancé** de la progression files.
 
@@ -32,8 +29,7 @@ Premier palier du **niveau avancé** de la progression files.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/file-safe-name` et essayez
-`../Mon Dossier/Rapport Final!.PDF` → `Rapport_Final_.PDF`.
+Ouvrez `https://localhost:8000/file-safe-name` et essayez `../Mon Dossier/Rapport Final!.PDF` → `Rapport_Final_.PDF`.
 
 ## Le contrôleur
 
@@ -117,10 +113,9 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Le **nom** n'est jamais de confiance : il peut contenir `../`, des espaces, des
-  caractères de contrôle. `secure_filename` le réduit à un nom de fichier inerte.
-- Un nom qui devient **vide** après nettoyage est refusé (`UploadError`) plutôt que
-  de produire un fichier sans nom.
+- Le **nom** n'est jamais de confiance : il peut contenir `../`, des espaces, des caractères de contrôle.
+  `secure_filename` le réduit à un nom de fichier inerte.
+- Un nom qui devient **vide** après nettoyage est refusé (`UploadError`) plutôt que de produire un fichier sans nom.
 - C'est une brique que `save_upload` utilise en interne ; ici on la voit isolée.
 
 ## À retenir
@@ -131,6 +126,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Le nom est sûr. La suite : juger la sûreté d'un **chemin** entier.
+Le nom est sûr.
+La suite : juger la sûreté d'un **chemin** entier.
 
 [Chemin anti-traversal](file-safe-path.md)

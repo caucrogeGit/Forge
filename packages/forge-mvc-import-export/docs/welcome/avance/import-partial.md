@@ -1,7 +1,7 @@
 # Import partiel
 
-Objectif : choisir entre « tout ou rien » et l'insertion des seules lignes
-valides.
+Objectif : choisir entre « tout ou rien »
+et l'insertion des seules lignes valides.
 
 **Ce que vous allez apprendre :** par défaut, `import_rows` est « tout ou rien »
 au niveau validation : une seule ligne invalide empêche toute insertion.
@@ -16,7 +16,8 @@ Premier palier du **niveau avancé** de la progression Import/Export.
 
 ## Ce que ce starter montre
 
-- le comportement « tout ou rien » par défaut ;
+- le comportement « tout ou rien »
+  par défaut ;
 - l'insertion partielle avec `partial=True` ;
 - la capture d'une erreur d'insertion levée par `insert`.
 
@@ -47,8 +48,7 @@ print([e.row for e in rapport.errors])  # [2]
 ### Comprendre ce code
 
 - La ligne 2 (Bob) n'a pas d'`age` : elle est invalide.
-- Par défaut, dès qu'une ligne est invalide, **rien n'est inséré** : ni Alice
-  ni Bob.
+- Par défaut, dès qu'une ligne est invalide, **rien n'est inséré** : ni Alice ni Bob.
 - C'est volontaire : on corrige le CSV, puis on relance un import propre.
 
 ## 2. Insérer les lignes valides avec `partial=True`
@@ -71,8 +71,7 @@ print([e.row for e in rapport.errors])  # [2]
 
 - `partial=True` insère les lignes valides (Alice) malgré la ligne en erreur.
 - Le rapport reste honnête : `ok` vaut `False` tant qu'il reste une erreur.
-- À choisir selon le besoin : un import strict refuse tout fichier imparfait ;
-  un import partiel sauve ce qui est valide et liste le reste.
+- À choisir selon le besoin : un import strict refuse tout fichier imparfait ; un import partiel sauve ce qui est valide et liste le reste.
 
 ## 3. Une erreur d'insertion est capturée
 
@@ -96,12 +95,9 @@ for erreur in rapport.errors:
 
 ### Comprendre ce code
 
-- Si `insert` lève une exception, `import_rows` la capture et produit un
-  `RowError` dont `field` vaut `None`.
-- Les lignes déjà insérées le restent ; l'import ne s'arrête pas au premier
-  problème d'insertion.
-- Votre callback peut donc signaler un conflit métier (doublon, contrainte)
-  sans casser tout l'import.
+- Si `insert` lève une exception, `import_rows` la capture et produit un `RowError` dont `field` vaut `None`.
+- Les lignes déjà insérées le restent ; l'import ne s'arrête pas au premier problème d'insertion.
+- Votre callback peut donc signaler un conflit métier (doublon, contrainte) sans casser tout l'import.
 
 ## À retenir
 
@@ -111,6 +107,7 @@ for erreur in rapport.errors:
 
 ## Après ce starter
 
-Vous maîtrisez l'import. Voyons l'autre sens : produire un CSV.
+Vous maîtrisez l'import.
+Voyons l'autre sens : produire un CSV.
 
 [Exporter avec to_csv](export-tocsv.md)

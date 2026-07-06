@@ -1,7 +1,6 @@
 # Les commandes deploy:init et deploy:check
 
-Ce document décrit les commandes `forge deploy:init` et `forge deploy:check`,
-fournies par l'opt-in `forge-mvc-deploy` (ADR-053).
+Ce document décrit les commandes `forge deploy:init` et `forge deploy:check`, fournies par l'opt-in `forge-mvc-deploy` (ADR-053).
 
 Le fichier de code correspondant est `forge_mvc_deploy/cli/deploy.py`.
 

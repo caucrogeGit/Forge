@@ -1,18 +1,16 @@
 # Supprimer proprement
 
-Objectif : supprimer une image **sans laisser de trace** : ni ligne en base, ni
-fichier orphelin, ni variante oubliée.
+Objectif : supprimer une image **sans laisser de trace** : ni ligne en base, ni fichier orphelin, ni variante oubliée.
 
-**Ce que vous allez apprendre :** supprimer une image, c'est supprimer trois
-choses : la ligne `media`, le fichier original et ses variantes.
+**Ce que vous allez apprendre :** supprimer une image, c'est supprimer trois choses : la ligne `media`, le fichier original et ses variantes.
 `delete_media(..., delete_files=True)` fait les trois en une opération.
 
 Deuxième palier du **niveau avancé** de la progression images.
 
 !!! note "Module opt-in et table `media`"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation ») et
-    la table `media` appliquée (`forge migration:apply`). Si elle manque, la
-    page reste **pédagogique**.
+    Ce starter suppose `forge-mvc-images` installé (palier « Installation »)
+    et la table `media` appliquée (`forge migration:apply`).
+    Si elle manque, la page reste **pédagogique**.
 
 ## Ce que ce starter montre
 
@@ -33,8 +31,7 @@ Deuxième palier du **niveau avancé** de la progression images.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/image-delete` et supprimez une image : sa ligne et
-ses fichiers disparaissent ensemble.
+Ouvrez `https://localhost:8000/image-delete` et supprimez une image : sa ligne et ses fichiers disparaissent ensemble.
 
 ## Le contrôleur
 
@@ -90,11 +87,8 @@ class ImageDeleteController(BaseController):
 
 ### Comprendre ce code
 
-- `delete_files=True` est ce qui distingue une suppression **propre** d'une
-  simple suppression de ligne : sans lui, le fichier et ses variantes
-  resteraient sur le disque.
-- `delete_media` est idempotent : supprimer un média déjà absent ne lève pas
-  d'erreur, il renvoie un compte rendu.
+- `delete_files=True` est ce qui distingue une suppression **propre** d'une simple suppression de ligne : sans lui, le fichier et ses variantes resteraient sur le disque.
+- `delete_media` est idempotent : supprimer un média déjà absent ne lève pas d'erreur, il renvoie un compte rendu.
 - On supprime par identifiant `media_id` : une opération ciblée, jamais en masse.
 
 ## La vue
@@ -137,9 +131,8 @@ Le contrôleur rend `image_delete/index.html` : créez ce fichier.
 
 ## La migration
 
-Ce palier utilise la table `media`. Si vous ne l'avez pas encore créée, créez le
-fichier de migration suivant sous `mvc/migrations/`, puis appliquez-le avec
-`forge migration:apply`.
+Ce palier utilise la table `media`.
+Si vous ne l'avez pas encore créée, créez le fichier de migration suivant sous `mvc/migrations/`, puis appliquez-le avec `forge migration:apply`.
 
 ```sql
 -- mvc/migrations/20260605111000_create_media.sql
@@ -174,13 +167,13 @@ with router.group("", public=True) as public:
 
 ## À retenir
 
-- Une suppression propre retire **la ligne et les fichiers** (original +
-  variantes).
+- Une suppression propre retire **la ligne et les fichiers** (original + variantes).
 - `delete_media(delete_files=True)` couvre les trois en une fois.
 - Laisser des fichiers orphelins est une dette silencieuse ; Forge l'évite.
 
 ## Après ce starter
 
-La suppression est propre. Dernier palier : la garde de sécurité à l'upload.
+La suppression est propre.
+Dernier palier : la garde de sécurité à l'upload.
 
 [Garde de sécurité à l'upload](image-safety.md)

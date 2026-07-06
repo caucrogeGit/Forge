@@ -6,7 +6,8 @@ Le fichier de code correspondant est `forge_mvc_rbac/authorization.py`.
 
 ## 1. À quoi sert ce module ?
 
-C'est le pont entre l'utilisateur authentifié (Auth/User) et le RBAC : il répond à la question « l'utilisateur **connecté** a-t-il cette permission ? ».
+C'est le pont entre l'utilisateur authentifié (Auth/User) et le RBAC : il répond à la question « l'utilisateur **connecté** a-t-il cette permission ?
+».
 
 ## 2. L'API
 

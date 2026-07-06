@@ -2,10 +2,8 @@
 
 Objectif : recevoir un fichier et le **stocker** proprement avec `save_upload`.
 
-**Ce que vous allez apprendre :** `save_upload` est la **façade document** de
-`forge-mvc-files` : elle valide (extension/MIME/taille), écrit le fichier sur le
-disque et retourne un `SavedUpload` décrivant ce qui a été stocké. C'est exactement
-la primitive qu'`forge-mvc-images` réutilise pour son chemin document.
+**Ce que vous allez apprendre :** `save_upload` est la **façade document** de `forge-mvc-files` : elle valide (extension/MIME/taille), écrit le fichier sur le disque et retourne un `SavedUpload` décrivant ce qui a été stocké.
+C'est exactement la primitive qu'`forge-mvc-images` réutilise pour son chemin document.
 
 Deuxième palier du **niveau débutant** de la progression files.
 
@@ -32,8 +30,7 @@ Deuxième palier du **niveau débutant** de la progression files.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/file-store`, envoyez un fichier autorisé (`.pdf`,
-`.png`…) : la page affiche le `SavedUpload` (nom, chemin, taille, type).
+Ouvrez `https://localhost:8000/file-store`, envoyez un fichier autorisé (`.pdf`, `.png`…) : la page affiche le `SavedUpload` (nom, chemin, taille, type).
 
 ## Le contrôleur
 
@@ -128,21 +125,20 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- La **catégorie** (`"documents"`) range le fichier dans un sous-dossier dédié de
-  la racine d'upload.
-- `SavedUpload` expose `original_name`, `path`, `size`, `mime_type` : tout ce qu'il
-  faut pour, plus tard, le servir ou l'enregistrer en base (côté application).
-- La validation est **dans le core** (réexportée par files) : un fichier refusé
-  lève `UploadError` avant toute écriture.
+- La **catégorie** (`"documents"`) range le fichier dans un sous-dossier dédié de la racine d'upload.
+- `SavedUpload` expose `original_name`, `path`, `size`, `mime_type` : tout ce qu'il faut pour, plus tard, le servir ou l'enregistrer en base (côté application).
+- La validation est **dans le core** (réexportée par files) : un fichier refusé lève `UploadError` avant toute écriture.
 
 ## À retenir
 
 - `save_upload` = valider **puis** écrire, jamais l'inverse.
 - Le `SavedUpload` décrit le fichier stocké (nom, chemin, taille, type).
-- C'est la façade « document » ; le chemin image-aware vit dans `forge-mvc-images`.
+- C'est la façade « document »
+  ; le chemin image-aware vit dans `forge-mvc-images`.
 
 ## Après ce starter
 
-Le document est stocké. La suite : le **relire** sans faille de chemin.
+Le document est stocké.
+La suite : le **relire** sans faille de chemin.
 
 [Servir un fichier](file-serve.md)

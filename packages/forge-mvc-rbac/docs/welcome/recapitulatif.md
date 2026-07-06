@@ -1,12 +1,11 @@
 # Aide-mémoire de la progression RBAC
 
-Récapitulatif des paliers de la progression *Welcome RBAC* et des API du module
-opt-in `forge-mvc-rbac` introduites à chaque étape.
+Récapitulatif des paliers de la progression *Welcome RBAC* et des API du module opt-in `forge-mvc-rbac` introduites à chaque étape.
 
 !!! note "Module opt-in"
-    `forge-mvc-rbac` est **publié sur PyPI** : `pip install --pre forge-mvc-rbac`. Il
-    repose sur un **contrat déclaratif** `mvc/security/rbac.json` (ADR-014). `can()`
-    est auto-enregistré dans les templates.
+    `forge-mvc-rbac` est **publié sur PyPI** : `pip install --pre forge-mvc-rbac`.
+    Il repose sur un **contrat déclaratif** `mvc/security/rbac.json` (ADR-014).
+    `can()` est auto-enregistré dans les templates.
 
 ## Niveau débutant : déclarer & comprendre (sans BDD)
 

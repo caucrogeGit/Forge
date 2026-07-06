@@ -12,7 +12,8 @@ Une application a souvent besoin d'avertir un utilisateur : élève inscrit, not
 
 L'opt-in stocke ces avis dans une table SQL (`notifications`) et expose des fonctions pour notifier, lister, compter les non lues et marquer comme lu.
 
-Son périmètre V1 est **in-app** : des lignes en base. La livraison hors application (email, push) reste applicative, par exemple en combinant ce paquet avec `forge-mvc-jobs` et `forge-mvc-mail`.
+Son périmètre V1 est **in-app** : des lignes en base.
+La livraison hors application (email, push) reste applicative, par exemple en combinant ce paquet avec `forge-mvc-jobs` et `forge-mvc-mail`.
 
 ## 2. Installation et désinstallation
 

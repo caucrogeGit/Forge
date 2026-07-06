@@ -1,28 +1,24 @@
 # Rattacher une image à une entité
 
-Objectif : faire entrer l'image **en base**. Jusqu'ici elle vivait sur le
-disque ; on crée maintenant une ligne `media` qui la relie à une entité.
+Objectif : faire entrer l'image **en base**.
+Jusqu'ici elle vivait sur le disque ; on crée maintenant une ligne `media` qui la relie à une entité.
 
-**Ce que vous allez apprendre :** après l'upload (`save_image_upload`),
-`attach_media_to_entity` crée une ligne dans la table `media` reliée à une
-entité par `(EntityName, EntityId)` et un `role`. Une image appartient toujours
-à « quelque chose ».
+**Ce que vous allez apprendre :** après l'upload (`save_image_upload`), `attach_media_to_entity` crée une ligne dans la table `media` reliée à une entité par `(EntityName, EntityId)` et un `role`.
+Une image appartient toujours à « quelque chose ».
 
 Premier palier du **niveau intermédiaire** de la progression images.
 
 !!! note "Module opt-in et table `media`"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation »). La
-    table `media` est créée par la **migration livrée avec le starter** :
-    appliquez-la avec `forge migration:apply`. Si la table manque, la route
-    reste **pédagogique** au lieu de planter.
+    Ce starter suppose `forge-mvc-images` installé (palier « Installation »).
+    La table `media` est créée par la **migration livrée avec le starter** : appliquez-la avec `forge migration:apply`.
+    Si la table manque, la route reste **pédagogique** au lieu de planter.
 
 ## Ce que ce starter montre
 
 - un formulaire d'upload (CSRF) ;
 - `save_image_upload` pour vérifier + écrire + générer les variantes ;
 - `attach_media_to_entity` pour créer la ligne `media` (rôle `gallery`) ;
-- l'affichage de l'identifiant média attribué, ou d'un message pédagogique si la
-  table n'existe pas encore.
+- l'affichage de l'identifiant média attribué, ou d'un message pédagogique si la table n'existe pas encore.
 
 ## Classes Forge utilisées
 
@@ -40,8 +36,7 @@ Appliquez d'abord la migration (`forge migration:apply`), puis :
 forge run
 ```
 
-Ouvrez `https://localhost:8000/image-attach`, envoyez une image : la page
-confirme la création de la ligne `media` avec son identifiant.
+Ouvrez `https://localhost:8000/image-attach`, envoyez une image : la page confirme la création de la ligne `media` avec son identifiant.
 
 ## Le contrôleur
 
@@ -114,13 +109,10 @@ class ImageAttachController(BaseController):
 
 ### Comprendre ce code
 
-- `(EntityName, EntityId)` relie l'image à une entité. La table `media`
-  n'impose **aucune clé étrangère** : on illustre ici avec une entité de démo
-  neutre (`gallery-demo`, `1`), sans dépendre d'une entité métier.
-- Le `role` (`gallery`, `cover`…) classe le média : une même entité peut avoir
-  une galerie et une couverture.
-- L'upload précède toujours le rattachement : on n'enregistre en base qu'un
-  fichier déjà vérifié et écrit.
+- `(EntityName, EntityId)` relie l'image à une entité.
+  La table `media` n'impose **aucune clé étrangère** : on illustre ici avec une entité de démo neutre (`gallery-demo`, `1`), sans dépendre d'une entité métier.
+- Le `role` (`gallery`, `cover`…) classe le média : une même entité peut avoir une galerie et une couverture.
+- L'upload précède toujours le rattachement : on n'enregistre en base qu'un fichier déjà vérifié et écrit.
 
 ## La vue
 
@@ -159,8 +151,8 @@ Le contrôleur rend `image_attach/index.html` : créez ce fichier.
 
 ## La migration
 
-Ce palier introduit la table `media`. Créez le fichier de migration suivant sous
-`mvc/migrations/`, puis appliquez-le avec `forge migration:apply`.
+Ce palier introduit la table `media`.
+Créez le fichier de migration suivant sous `mvc/migrations/`, puis appliquez-le avec `forge migration:apply`.
 
 ```sql
 -- mvc/migrations/20260605100000_create_media.sql
@@ -195,13 +187,13 @@ with router.group("", public=True) as public:
 
 ## À retenir
 
-- Une image en base est une ligne `media` reliée à une entité par
-  `(EntityName, EntityId, role)`.
+- Une image en base est une ligne `media` reliée à une entité par `(EntityName, EntityId, role)`.
 - `attach_media_to_entity` prend le `SavedUpload` issu de `save_image_upload`.
 - La table est créée par une migration **livrée avec le starter**.
 
 ## Après ce starter
 
-L'image est en base. La suite : afficher toutes les images d'une entité.
+L'image est en base.
+La suite : afficher toutes les images d'une entité.
 
 [Afficher la galerie](image-gallery.md)

@@ -1,11 +1,10 @@
 # Aide-mémoire de la progression IoT
 
-Récapitulatif des paliers de la progression *Welcome IoT* et des API du
-module opt-in `forge-mvc-iot` introduites à chaque étape.
+Récapitulatif des paliers de la progression *Welcome IoT* et des API du module opt-in `forge-mvc-iot` introduites à chaque étape.
 
 !!! note "Module opt-in"
-    Toute cette progression suppose `forge-mvc-iot` installé
-    (`forge opt-in:install iot`). Le cœur de Forge reste autonome.
+    Toute cette progression suppose `forge-mvc-iot` installé (`forge opt-in:install iot`).
+    Le cœur de Forge reste autonome.
 
 ## Niveau débutant : découvrir (lecture, sans broker)
 
@@ -37,8 +36,7 @@ module opt-in `forge-mvc-iot` introduites à chaque étape.
 |---------|-------|
 | `load_iot_config()` | Lire la configuration MQTT (hôte, port, topic, identifiants, token API) |
 
-Un secret (mot de passe, token) est **toujours masqué** quand la config est
-sérialisée.
+Un secret (mot de passe, token) est **toujours masqué** quand la config est sérialisée.
 
 ## Stockage (`forge_mvc_iot.storage`)
 

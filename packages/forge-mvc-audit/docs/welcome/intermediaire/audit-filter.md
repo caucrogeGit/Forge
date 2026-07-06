@@ -2,9 +2,7 @@
 
 Objectif : retrouver des entrées précises dans le journal d'audit.
 
-**Ce que vous allez apprendre :** restreindre `get_audit_log` avec des filtres
-(`action`, `actor`, `target_type`, `target_id`) et borner le nombre de lignes
-avec `limit`.
+**Ce que vous allez apprendre :** restreindre `get_audit_log` avec des filtres (`action`, `actor`, `target_type`, `target_id`) et borner le nombre de lignes avec `limit`.
 Les filtres fournis sont combinés en ET.
 
 Deuxième palier du **niveau intermédiaire** de la progression Audit.

@@ -2,10 +2,8 @@
 
 Objectif : réagir proprement à une entrée invalide.
 
-**Ce que vous allez apprendre :** le paquet lève `QrCodeError` dans deux cas, un
-texte vide (ou composé uniquement d'espaces) et un format de sortie inconnu.
-`QrCodeError` hérite de `ValueError` : un contrôleur peut la rattraper comme une
-erreur d'entrée ordinaire.
+**Ce que vous allez apprendre :** le paquet lève `QrCodeError` dans deux cas, un texte vide (ou composé uniquement d'espaces) et un format de sortie inconnu.
+`QrCodeError` hérite de `ValueError` : un contrôleur peut la rattraper comme une erreur d'entrée ordinaire.
 
 Premier palier du **niveau avancé**.
 

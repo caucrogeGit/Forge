@@ -2,8 +2,7 @@
 
 Objectif : lire les dernières actions enregistrées dans le journal d'audit.
 
-**Ce que vous allez apprendre :** relire le journal avec `get_audit_log`, qui
-renvoie une liste d'objets `AuditEntry`.
+**Ce que vous allez apprendre :** relire le journal avec `get_audit_log`, qui renvoie une liste d'objets `AuditEntry`.
 Les entrées arrivent des plus récentes aux plus anciennes.
 Chaque `AuditEntry` expose les champs d'une trace.
 

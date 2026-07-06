@@ -1,19 +1,14 @@
 # Valider un upload
 
-Objectif : comprendre **pourquoi** un fichier est refusé : la taxonomie des
-règles de validation.
+Objectif : comprendre **pourquoi** un fichier est refusé : la taxonomie des règles de validation.
 
-**Ce que vous allez apprendre :** `save_upload` valide extension, type MIME et
-taille avant d'écrire. Chaque refus lève une exception **précise** de la hiérarchie
-`UploadError` (qui vit dans le core, réexportée par files). Ce palier nomme la règle
-qui rejette.
+**Ce que vous allez apprendre :** `save_upload` valide extension, type MIME et taille avant d'écrire.
+Chaque refus lève une exception **précise** de la hiérarchie `UploadError` (qui vit dans le core, réexportée par files).
+Ce palier nomme la règle qui rejette.
 
 !!! warning "Le `content_type` du client n'est pas digne de confiance"
     L'extension et le type MIME sont fournis par le client et peuvent mentir.
-    Pour les types à signature connue (image, PDF), `save_upload` vérifie en plus
-    les **magic bytes** du contenu réel : un fichier HTML renommé en `.png` est
-    rejeté (`UploadInvalidMimeTypeError`), avant toute écriture disque
-    (SEC-UPLOAD-MIME-MAGIC-001).
+    Pour les types à signature connue (image, PDF), `save_upload` vérifie en plus les **magic bytes** du contenu réel : un fichier HTML renommé en `.png` est rejeté (`UploadInvalidMimeTypeError`), avant toute écriture disque (SEC-UPLOAD-MIME-MAGIC-001).
 
 Premier palier du **niveau intermédiaire** de la progression files.
 
@@ -23,8 +18,7 @@ Premier palier du **niveau intermédiaire** de la progression files.
 ## Ce que ce starter montre
 
 - un formulaire d'upload (CSRF) ;
-- la capture des sous-types `UploadInvalidExtensionError`,
-  `UploadInvalidMimeTypeError`, `UploadTooLargeError` ;
+- la capture des sous-types `UploadInvalidExtensionError`, `UploadInvalidMimeTypeError`, `UploadTooLargeError` ;
 - l'affichage de la **règle** qui a rejeté le fichier.
 
 ## Classes Forge utilisées
@@ -40,8 +34,7 @@ Premier palier du **niveau intermédiaire** de la progression files.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/file-validate` et tentez un `.exe` (extension), un
-fichier mal typé, ou un fichier trop gros : chaque refus nomme sa règle.
+Ouvrez `https://localhost:8000/file-validate` et tentez un `.exe` (extension), un fichier mal typé, ou un fichier trop gros : chaque refus nomme sa règle.
 
 ## Le contrôleur
 
@@ -145,10 +138,8 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- La hiérarchie `UploadError` permet d'attraper du **plus précis** au **plus
-  général** : on nomme la cause exacte, ou on retombe sur « autre ».
-- La validation est **partagée** (elle vit dans le core) : même politique pour
-  files, images, et tout consommateur.
+- La hiérarchie `UploadError` permet d'attraper du **plus précis** au **plus général** : on nomme la cause exacte, ou on retombe sur « autre ».
+- La validation est **partagée** (elle vit dans le core) : même politique pour files, images, et tout consommateur.
 
 ## À retenir
 
@@ -158,6 +149,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous savez pourquoi un fichier est refusé. La suite : empêcher l'abus de la route.
+Vous savez pourquoi un fichier est refusé.
+La suite : empêcher l'abus de la route.
 
 [Limiter les uploads](file-rate-limit.md)

@@ -9,8 +9,7 @@ Le fichier de code correspondant est `forge_mvc_audio/config.py`.
 Le module audio a besoin de quelques réglages pour travailler : où trouver `ffmpeg`, où ranger les fichiers, quelle taille d'upload accepter.
 La configuration rassemble ces réglages en un seul endroit, au lieu de les disperser dans le code.
 
-Ce module est **pur** : il ne lit aucun fichier, ne lance aucun `ffmpeg` et n'écrit nulle part.
-Il fixe seulement le **contrat de configuration** ; ce sont les autres modules (ingestion, transcodage…) qui s'en servent.
+Ce module est **pur** : il ne lit aucun fichier, ne lance aucun `ffmpeg` et n'écrit nulle part. Il fixe seulement le **contrat de configuration** ; ce sont les autres modules (ingestion, transcodage…) qui s'en servent.
 
 ## 2. La configuration dans Forge
 

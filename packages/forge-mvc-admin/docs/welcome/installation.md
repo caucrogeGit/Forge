@@ -1,14 +1,12 @@
 # Installation : parcours « Welcome Admin »
 
 Ce préambule installe l'opt-in `forge-mvc-admin` dans un projet Forge existant.
-La progression se réalise ensuite **à la main** : chaque palier décrit les
-fichiers à créer et le code à écrire.
+La progression se réalise ensuite **à la main** : chaque palier décrit les fichiers à créer et le code à écrire.
 
 !!! info "Ce que ce parcours suppose"
     Vous avez déjà un projet Forge qui tourne, avec une entité et son CRUD.
     Le back-office **administre** une entité existante ; il ne la crée pas.
-    Les exemples utilisent une entité `Article` (table `articles`, colonnes
-    `id`, `title`, `body`, `published_at`).
+    Les exemples utilisent une entité `Article` (table `articles`, colonnes `id`, `title`, `body`, `published_at`).
 
 ## Prérequis
 
@@ -49,8 +47,7 @@ import mvc.admin.resources  # enregistre les ressources déclarées
 register_admin_routes(router)
 ```
 
-L'import de `mvc.admin.resources` peuple le registre ; `register_admin_routes`
-ajoute les routes sous `/admin`.
+L'import de `mvc.admin.resources` peuple le registre ; `register_admin_routes` ajoute les routes sous `/admin`.
 
 ## Étape suivante
 

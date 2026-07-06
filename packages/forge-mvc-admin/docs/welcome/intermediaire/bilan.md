@@ -7,8 +7,7 @@ Vous savez maintenant :
 - éditer une ligne existante, pré-remplie.
 
 Le back-office couvre désormais la consultation et l'écriture.
-Le niveau avancé aborde la suppression contrôlée, la surcharge des templates et
-les permissions.
+Le niveau avancé aborde la suppression contrôlée, la surcharge des templates et les permissions.
 
 ## Étape suivante
 

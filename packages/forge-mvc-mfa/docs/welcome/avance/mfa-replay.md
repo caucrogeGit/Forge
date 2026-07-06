@@ -2,15 +2,15 @@
 
 Objectif : empêcher qu'un même code TOTP soit **rejoué** dans sa fenêtre de validité.
 
-**Ce que vous allez apprendre :** un code reste valide ~30 s. `record_used` marque une
-*step* (fenêtre de temps) consommée pour un facteur ; `is_replay` refuse ensuite sa
-réutilisation. `step_for_time` calcule la step d'un instant.
+**Ce que vous allez apprendre :** un code reste valide ~30 s.
+`record_used` marque une *step* (fenêtre de temps) consommée pour un facteur ; `is_replay` refuse ensuite sa réutilisation.
+`step_for_time` calcule la step d'un instant.
 
 Deuxième palier du **niveau avancé** de la progression MFA.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-mfa` installé. État **en mémoire**, aucune base,
-    aucune clé.
+    Ce starter suppose `forge-mvc-mfa` installé.
+    État **en mémoire**, aucune base, aucune clé.
 
 ## Ce que ce starter montre
 
@@ -32,8 +32,7 @@ Deuxième palier du **niveau avancé** de la progression MFA.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/mfa-replay` et cliquez deux fois dans la même fenêtre
-(~30 s) : la seconde est refusée.
+Ouvrez `https://localhost:8000/mfa-replay` et cliquez deux fois dans la même fenêtre (~30 s) : la seconde est refusée.
 
 ## Le contrôleur
 
@@ -131,10 +130,8 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Sans anti-rejeu, un attaquant interceptant un code valide pourrait le **rejouer**
-  dans les ~30 s.
-- On raisonne par **step** (numéro de fenêtre), pas par code : une step consommée est
-  refusée pour ce facteur.
+- Sans anti-rejeu, un attaquant interceptant un code valide pourrait le **rejouer** dans les ~30 s.
+- On raisonne par **step** (numéro de fenêtre), pas par code : une step consommée est refusée pour ce facteur.
 - L'état vit **en mémoire**, avec purge opportoniste des vieilles steps.
 
 ## À retenir

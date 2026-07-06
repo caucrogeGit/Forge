@@ -1,7 +1,7 @@
 # Bilan : niveau avancé (i18n)
 
-Récapitulatif du **niveau avancé** de la progression *Welcome i18n*. Ce
-niveau couvre l'intégration template, le cache et la robustesse.
+Récapitulatif du **niveau avancé** de la progression *Welcome i18n*.
+Ce niveau couvre l'intégration template, le cache et la robustesse.
 
 ## Ce que vous avez validé
 
@@ -15,7 +15,6 @@ Vous maîtrisez l'i18n Forge : catalogues, locale, repli, templates et robustess
 
 ## Et ensuite
 
-Consultez l'**aide-mémoire** pour retrouver d'un coup d'œil chaque palier et son
-API.
+Consultez l'**aide-mémoire** pour retrouver d'un coup d'œil chaque palier et son API.
 
 [Aide-mémoire de la progression i18n](../recapitulatif.md)

@@ -6,8 +6,7 @@ Le fichier de code correspondant est `forge_mvc_workflow/status.py`.
 
 ## 1. À quoi sert ce module ?
 
-Un statut décrit l'état d'une entité applicative : `draft`, `pending`, `published`, `archived`…
-Ce module fournit l'objet `WorkflowStatus` et les fonctions pour créer et valider un jeu de statuts cohérent.
+Un statut décrit l'état d'une entité applicative : `draft`, `pending`, `published`, `archived`… Ce module fournit l'objet `WorkflowStatus` et les fonctions pour créer et valider un jeu de statuts cohérent.
 
 Les statuts restent **génériques** : aucun métier n'est imposé, c'est l'application qui choisit ses états.
 

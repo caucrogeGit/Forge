@@ -1,23 +1,18 @@
 # Contrat MQTT Forge IoT
 
-> **Statut** : contrat **en vigueur** : le subscriber `forge-mvc-iot` est
-> livré et applique ce format. Cette page fige le format des topics et du
-> payload JSON acceptés (voir
-> [Subscriber MQTT](mqtt-subscriber.md) et
-> [Architecture Forge IoT](architecture.md)).
+> **Statut** : contrat **en vigueur** : le subscriber `forge-mvc-iot` est livré et applique ce format.
+> Cette page fige le format des topics et du payload JSON acceptés (voir [Subscriber MQTT](mqtt-subscriber.md) et [Architecture Forge IoT](architecture.md)).
 
 ## Objectif
 
-Répondre à une seule question : quand un capteur publie un message MQTT,
-quel topic et quel JSON Forge IoT accepte-t-il ?
+Répondre à une seule question : quand un capteur publie un message MQTT, quel topic et quel JSON Forge IoT accepte-t-il ?
 
 Le contrat doit rester :
 
 - explicite (on lit le topic et le payload, on sait ce qui est attendu) ;
 - simple (un seul message = une seule mesure ponctuelle) ;
 - routable (le topic identifie naturellement la source) ;
-- testable (les exemples valides et invalides figurent dans cette page
-  et sont vérifiés par un test méta).
+- testable (les exemples valides et invalides figurent dans cette page et sont vérifiés par un test méta).
 
 ## Topic officiel
 
@@ -40,8 +35,8 @@ Exemple :
 forge/atelier/esp32-001/telemetry
 ```
 
-Le slug ne contient ni espaces, ni accents, ni majuscules, ni segments
-vides. Les `+` et `#` (wildcards MQTT) sont interdits dans la publication.
+Le slug ne contient ni espaces, ni accents, ni majuscules, ni segments vides.
+Les `+` et `#` (wildcards MQTT) sont interdits dans la publication.
 
 ## Payload officiel
 
@@ -62,15 +57,13 @@ Le payload est un objet JSON UTF-8 sur une seule mesure ponctuelle.
 |-------|-----------|-------------|
 | `metadata` | `object` | Métadonnées libres clé/valeur (chaînes courtes). Aucun champ imposé. |
 
-Tout champ supplémentaire en dehors de cette liste est **ignoré** par
-Forge IoT lors de la réception. Les ajouts au contrat se feront par
-ticket dédié, jamais en douce.
+Tout champ supplémentaire en dehors de cette liste est **ignoré** par Forge IoT lors de la réception.
+Les ajouts au contrat se feront par ticket dédié, jamais en douce.
 
 ## Décision : `device_id` et `site` viennent du topic, pas du payload
 
 En MQTT, le topic sert naturellement à router et à identifier la source.
-Faire figurer `device_id` ou `site` dans le payload **en plus** ouvre la
-porte aux contradictions silencieuses :
+Faire figurer `device_id` ou `site` dans le payload **en plus** ouvre la porte aux contradictions silencieuses :
 
 ```text
 topic   : forge/atelier/esp32-001/telemetry
@@ -85,11 +78,8 @@ Pour l'itération 1, le contrat est sans ambiguïté :
 
 Conséquences :
 
-- un payload qui contient quand même un champ `device_id` ou `site` ne
-  fait pas échouer le message, mais sa valeur **est ignorée** : la
-  vérité est dans le topic ;
-- si un capteur veut envoyer plusieurs mesures de natures différentes,
-  il publie plusieurs messages, pas un payload composite.
+- un payload qui contient quand même un champ `device_id` ou `site` ne fait pas échouer le message, mais sa valeur **est ignorée** : la vérité est dans le topic ;
+- si un capteur veut envoyer plusieurs mesures de natures différentes, il publie plusieurs messages, pas un payload composite.
 
 ## Exemples valides
 
@@ -156,8 +146,9 @@ Payload :
 
 ## Exemples invalides
 
-Chaque exemple ci-dessous est refusé. La colonne « Raison » indique la
-règle qu'il viole.
+Chaque exemple ci-dessous est refusé.
+La colonne « Raison »
+indique la règle qu'il viole.
 
 ### Topic mal formé
 
@@ -208,8 +199,7 @@ Timestamp non UTC :
 }
 ```
 
-Raison : format ISO 8601 avec suffixe `Z` obligatoire (pas
-d'espace séparateur, pas de fuseau implicite).
+Raison : format ISO 8601 avec suffixe `Z` obligatoire (pas d'espace séparateur, pas de fuseau implicite).
 
 JSON invalide :
 
@@ -230,13 +220,11 @@ Raison : non parsable.
 }
 ```
 
-Raison : `kind` doit être un slug `[a-z0-9_-]+` ; `"Température"`
-contient des majuscules et des accents.
+Raison : `kind` doit être un slug `[a-z0-9_-]+` ; `"Température"` contient des majuscules et des accents.
 
 ## Erreurs de contrat : taxonomie
 
-À l'usage du futur subscriber et de ses tests, les violations sont
-classées comme suit :
+À l'usage du futur subscriber et de ses tests, les violations sont classées comme suit :
 
 | Code | Sens | Action attendue côté Forge IoT |
 |------|------|-------------------------------|
@@ -246,43 +234,31 @@ classées comme suit :
 | `PAYLOAD_FIELD_TYPE` | Champ présent mais type incorrect | refus, log warning |
 | `PAYLOAD_VALUE_FORMAT` | Champ correct côté type mais mal formé (`kind` non slug, `timestamp` non ISO 8601 UTC, etc.) | refus, log warning |
 
-Les codes ci-dessus sont des **identifiants stables** : ils figureront
-tels quels dans les logs et dans les tests du subscriber. Ils ne sont
-pas exposés publiquement par une API Python à ce stade : c'est un
-contrat documentaire.
+Les codes ci-dessus sont des **identifiants stables** : ils figureront tels quels dans les logs et dans les tests du subscriber.
+Ils ne sont pas exposés publiquement par une API Python à ce stade : c'est un contrat documentaire.
 
 ## Limites de l'itération 1
 
-Sont explicitement **hors périmètre** de cette première version du
-contrat :
+Sont explicitement **hors périmètre** de cette première version du contrat :
 
 - pas de batch : un message MQTT = une seule mesure ;
-- pas de mesures composites (par exemple `{"temperature": …, "humidity":
-  …}` dans le même payload) ;
+- pas de mesures composites (par exemple `{"temperature": …, "humidity": …}` dans le même payload) ;
 - pas de topics commandes (downlink Forge → capteur) ;
 - pas de topics de configuration (`forge/{site}/{device_id}/config`) ;
 - pas de topics d'événement (`forge/{site}/{device_id}/event`) ;
-- pas de politique QoS imposée : Forge IoT acceptera ce que le broker
-  délivre ;
+- pas de politique QoS imposée : Forge IoT acceptera ce que le broker délivre ;
 - pas de politique `retain` imposée ;
-- pas de schéma versionné dans le payload (`schema_version`), l'évolution
-  passera par un nouveau ticket de contrat.
+- pas de schéma versionné dans le payload (`schema_version`), l'évolution passera par un nouveau ticket de contrat.
 
-Toute extension de ce contrat passera par un ticket
-`IOT-MQTT-CONTRACT-NNN` ultérieur. Une fois l'itération 1 figée, **les
-champs obligatoires ne peuvent plus changer rétroactivement** sans
-rupture explicite documentée.
+Toute extension de ce contrat passera par un ticket `IOT-MQTT-CONTRACT-NNN` ultérieur.
+Une fois l'itération 1 figée, **les champs obligatoires ne peuvent plus changer rétroactivement** sans rupture explicite documentée.
 
 ## Tickets suivants
 
 Ce contrat débloque :
 
-- `IOT-MQTT-SUBSCRIBER-001` : implémentation du subscriber `paho-mqtt`
-  qui consomme exactement ces topics et payloads ;
-- `IOT-CONFIG-001` : variables d'environnement broker (host, port, TLS,
-  login) ;
-- `IOT-STORAGE-EVENTS-001` : table SQL des événements IoT, dont les
-  colonnes seront alignées sur les champs du contrat.
+- `IOT-MQTT-SUBSCRIBER-001` : implémentation du subscriber `paho-mqtt` qui consomme exactement ces topics et payloads ;
+- `IOT-CONFIG-001` : variables d'environnement broker (host, port, TLS, login) ;
+- `IOT-STORAGE-EVENTS-001` : table SQL des événements IoT, dont les colonnes seront alignées sur les champs du contrat.
 
-Voir [Architecture Forge IoT](architecture.md#tickets-suivants) pour
-la liste complète des jalons.
+Voir [Architecture Forge IoT](architecture.md#tickets-suivants) pour la liste complète des jalons.

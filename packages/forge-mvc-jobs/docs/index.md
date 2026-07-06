@@ -2,20 +2,15 @@
 
 `forge-mvc-jobs` est l'opt-in de file de tâches de fond de Forge.
 
-Il permet de déporter un travail lourd hors de la requête HTTP (envoi d'emails en
-nombre, transcodage, import massif), via une file adossée à MariaDB et un worker
-explicite.
+Il permet de déporter un travail lourd hors de la requête HTTP (envoi d'emails en nombre, transcodage, import massif), via une file adossée à MariaDB et un worker explicite.
 
 ## Le modèle, sans broker ni async
 
 La file est une simple table `jobs` : le SQL reste visible.
-On enfile une tâche depuis un contrôleur (`enqueue`), la requête répond tout de
-suite.
-Un process worker séparé traite la file (`drain` ou `run_worker`), en appelant
-les gestionnaires que l'application a enregistrés.
+On enfile une tâche depuis un contrôleur (`enqueue`), la requête répond tout de suite.
+Un process worker séparé traite la file (`drain` ou `run_worker`), en appelant les gestionnaires que l'application a enregistrés.
 
-Pas de Celery ni de Redis, pas de boucle async : le serveur web reste synchrone
-(WSGI).
+Pas de Celery ni de Redis, pas de boucle async : le serveur web reste synchrone (WSGI).
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 
 ## Mise en route

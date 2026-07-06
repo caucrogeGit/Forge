@@ -173,7 +173,8 @@ Relisez et adaptez les fichiers générés (domaine, chemins, nombre de workers)
 
 ## 8. CLI-only et adaptation
 
-`forge-mvc-deploy` n'a pas d'API runtime : il sert uniquement à préparer le déploiement. Une application ne l'importe pas à l'exécution.
+`forge-mvc-deploy` n'a pas d'API runtime : il sert uniquement à préparer le déploiement.
+Une application ne l'importe pas à l'exécution.
 
 Les fichiers générés sont des **points de départ** : adaptez le domaine, les chemins absolus, le nombre de workers et les options TLS à votre serveur.
 

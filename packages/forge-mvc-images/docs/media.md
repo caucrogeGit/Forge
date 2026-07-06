@@ -1,19 +1,14 @@
 # Module média Forge
 
 !!! info "Statut : opt-in officiel, publié sur PyPI depuis `1.0.0-beta.13`, API encore bêta"
-    `forge-mvc-images` (qui détient la couche applicative média) est publié sur
-    PyPI depuis `1.0.0-beta.13` : `pip install --pre forge-mvc-images`. L'API
-    applicative reste bêta, voir les limites de production
-    avant déploiement. Pour le développement depuis les sources,
-    voir [section ci-dessous](#installation).
+    `forge-mvc-images` (qui détient la couche applicative média) est publié sur PyPI depuis `1.0.0-beta.13` : `pip install --pre forge-mvc-images`.
+    L'API applicative reste bêta, voir les limites de production avant déploiement.
+    Pour le développement depuis les sources, voir [section ci-dessous](#installation).
 
-    Le module reste opt-in : le core Forge ne dépend pas de
-    `forge-mvc-images`.
+    Le module reste opt-in : le core Forge ne dépend pas de `forge-mvc-images`.
 
-Forge sépare l'**upload générique** (opt-in `forge-mvc-files`, ADR-019) des
-helpers applicatifs médias (`forge_mvc_images`). L'upload (écriture, storage,
-service de fichiers) est fourni par `forge-mvc-files` ; la **validation** pure
-(extension/MIME/taille) reste dans le core (`core.forms`).
+Forge sépare l'**upload générique** (opt-in `forge-mvc-files`, ADR-019) des helpers applicatifs médias (`forge_mvc_images`).
+L'upload (écriture, storage, service de fichiers) est fourni par `forge-mvc-files` ; la **validation** pure (extension/MIME/taille) reste dans le core (`core.forms`).
 
 ## Frontière upload / opt-in média
 
@@ -34,7 +29,9 @@ service de fichiers) est fourni par `forge-mvc-files` ; la **validation** pure
 - `delete_media`, `delete_media_record`
 - `get_media_gallery`, `get_cover_media`, `media_url`
 
-Les anciens imports `from core.uploads import attach_media_to_entity` ne sont plus supportés depuis `MEDIA-SHIMS-REMOVE-001`. Les fichiers `core/uploads/media_repository.py` et `core/uploads/media_gallery.py` ont été supprimés. Utiliser `from forge_mvc_images import ...`.
+Les anciens imports `from core.uploads import attach_media_to_entity` ne sont plus supportés depuis `MEDIA-SHIMS-REMOVE-001`.
+Les fichiers `core/uploads/media_repository.py` et `core/uploads/media_gallery.py` ont été supprimés.
+Utiliser `from forge_mvc_images import ...`.
 
 ## Installation
 
@@ -52,8 +49,8 @@ cd Forge
 pip install -e packages/forge-mvc-images/
 ```
 
-La dépendance `forge-mvc=={{forge_version}}` doit être satisfaite. Si vous travaillez depuis
-le dépôt Forge directement (sans venv isolé), le core est déjà disponible via `PYTHONPATH`.
+La dépendance `forge-mvc=={{forge_version}}` doit être satisfaite.
+Si vous travaillez depuis le dépôt Forge directement (sans venv isolé), le core est déjà disponible via `PYTHONPATH`.
 
 ---
 
@@ -133,17 +130,17 @@ media = save_image(
 - **Extensions** : `jpg`, `jpeg`, `png`, `webp`
 - **MIME** : `image/jpeg`, `image/png`, `image/webp`
 
-**GIF refusé par défaut** : le format GIF n'est pas supporté. `ImageField` rejette les fichiers `.gif` / `image/gif` à la validation. Cette limite est intentionnelle : le pipeline de variantes n'est pas conçu pour les GIF animés.
+**GIF refusé par défaut** : le format GIF n'est pas supporté.
+`ImageField` rejette les fichiers `.gif` / `image/gif` à la validation.
+Cette limite est intentionnelle : le pipeline de variantes n'est pas conçu pour les GIF animés.
 
 La taille maximale est lue depuis `UPLOAD_MAX_SIZE` (défaut : 5 Mo).
 
-**Protection anti-décompression-bomb** : la **surface en pixels** d'une image
-est plafonnée par `upload_max_image_pixels` (défaut : 24 000 000, soit ~6000×4000).
-Le contrôle porte sur les dimensions lues dans l'en-tête, *avant* tout décodage
-ou écriture disque : un fichier léger se décompressant en une image démesurée
-(qui épuiserait la mémoire) est rejeté immédiatement.
+**Protection anti-décompression-bomb** : la **surface en pixels** d'une image est plafonnée par `upload_max_image_pixels` (défaut : 24 000 000, soit ~6000×4000).
+Le contrôle porte sur les dimensions lues dans l'en-tête, *avant* tout décodage ou écriture disque : un fichier léger se décompressant en une image démesurée (qui épuiserait la mémoire) est rejeté immédiatement.
 
-**Dépendance** : Pillow (`>=10.0,<13`) est requis pour la génération des variantes d'images. Depuis l'ADR-018 (`CORE-DROP-PILLOW-001`), il est déclaré par l'opt-in `forge-mvc-images` (et non plus par le core).
+**Dépendance** : Pillow (`>=10.0,<13`) est requis pour la génération des variantes d'images.
+Depuis l'ADR-018 (`CORE-DROP-PILLOW-001`), il est déclaré par l'opt-in `forge-mvc-images` (et non plus par le core).
 
 ---
 
@@ -173,9 +170,7 @@ Les variantes conservent les proportions :
 - `thumbnail` : maximum `300 x 300`
 - `medium` : maximum `1280 x 1280`
 
-Le chemin d'upload **image-aware** (vérification du contenu + variantes) est
-fourni par l'opt-in `forge-mvc-images` via `save_image_upload` (ADR-018,
-`CORE-SAVEUPLOAD-GENERIC-CLEANUP`) :
+Le chemin d'upload **image-aware** (vérification du contenu + variantes) est fourni par l'opt-in `forge-mvc-images` via `save_image_upload` (ADR-018, `CORE-SAVEUPLOAD-GENERIC-CLEANUP`) :
 
 ```python
 from forge_mvc_images import save_image_upload
@@ -192,17 +187,14 @@ saved.variants
 # }
 ```
 
-Avec `variants=False`, `save_image_upload` vérifie le contenu et écrit
-l'original sans générer de variantes. Le `save_upload` du core, lui, est
-**purement générique** : il écrit le fichier dans la catégorie demandée sans
-vérification image ni variantes.
+Avec `variants=False`, `save_image_upload` vérifie le contenu et écrit l'original sans générer de variantes.
+Le `save_upload` du core, lui, est **purement générique** : il écrit le fichier dans la catégorie demandée sans vérification image ni variantes.
 
 ---
 
 ## Supprimer un média
 
-Pour supprimer un fichier média stocké sous `storage/uploads/`, utiliser
-`delete_media_file` avec un chemin relatif :
+Pour supprimer un fichier média stocké sous `storage/uploads/`, utiliser `delete_media_file` avec un chemin relatif :
 
 ```python
 from forge_mvc_files import delete_media_file
@@ -211,8 +203,8 @@ delete_media_file("images/photo.png")
 # {"images/photo.png": True}
 ```
 
-Par défaut, seule la cible est supprimée. Pour supprimer aussi `medium` et
-`thumbnail`, activer explicitement `variants=True` :
+Par défaut, seule la cible est supprimée.
+Pour supprimer aussi `medium` et `thumbnail`, activer explicitement `variants=True` :
 
 ```python
 delete_media_file("images/photo.png", variants=True)
@@ -223,9 +215,9 @@ delete_media_file("images/photo.png", variants=True)
 # }
 ```
 
-Si une variante manque, la suppression continue et retourne `False` pour ce
-chemin. Les chemins absolus, URL et traversals (`..`) sont refusés. Cette API
-ne supprime pas encore l'enregistrement SQL de l'entité `Media`.
+Si une variante manque, la suppression continue et retourne `False` pour ce chemin.
+Les chemins absolus, URL et traversals (`..`) sont refusés.
+Cette API ne supprime pas encore l'enregistrement SQL de l'entité `Media`.
 
 ---
 
@@ -237,7 +229,8 @@ Forge expose une route média minimale :
 /media/<chemin-relatif>
 ```
 
-Le fichier reste stocké sous `storage/uploads/`. Par exemple :
+Le fichier reste stocké sous `storage/uploads/`.
+Par exemple :
 
 ```text
 Media.path = "images/photo.png"
@@ -247,20 +240,18 @@ Variante medium = "images/medium/photo.png"
 URL publique locale = "/media/images/medium/photo.png"
 ```
 
-La route sert uniquement des chemins relatifs sûrs. Les chemins absolus, URL,
-traversals (`..`), dossiers et symlinks sortant de `storage/uploads/` sont
-refusés. Un fichier absent retourne `404`.
+La route sert uniquement des chemins relatifs sûrs.
+Les chemins absolus, URL, traversals (`..`), dossiers et symlinks sortant de `storage/uploads/` sont refusés.
+Un fichier absent retourne `404`.
 
-Cette route ne fournit pas encore de galerie, contrôleur CRUD média,
-permissions média ou règles métier.
+Cette route ne fournit pas encore de galerie, contrôleur CRUD média, permissions média ou règles métier.
 
 ---
 
 ## Métadonnées SQL
 
-L'entité `Media` fournit une table générique `media` pour relier un fichier
-stocké à une entité applicative. Elle ne contient pas de logique métier :
-`entity_name` indique le type d'entité liée, `entity_id` son identifiant.
+L'entité `Media` fournit une table générique `media` pour relier un fichier stocké à une entité applicative.
+Elle ne contient pas de logique métier : `entity_name` indique le type d'entité liée, `entity_id` son identifiant.
 
 ```python
 from forge_mvc_images import create_media_record, list_media_for_entity
@@ -278,13 +269,11 @@ media_id = create_media_record(
 medias = list_media_for_entity("hebergement", 12)
 ```
 
-`Media.path` reste un chemin relatif normalisé sous `storage/uploads/`. Le
-champ `role` permet de distinguer des usages génériques comme `default`,
-`cover` ou `gallery`. Le champ `position` permet un tri stable par
-`position ASC`, puis `id ASC`.
+`Media.path` reste un chemin relatif normalisé sous `storage/uploads/`.
+Le champ `role` permet de distinguer des usages génériques comme `default`, `cover` ou `gallery`.
+Le champ `position` permet un tri stable par `position ASC`, puis `id ASC`.
 
-La suppression des métadonnées SQL est volontairement séparée de la suppression
-des fichiers :
+La suppression des métadonnées SQL est volontairement séparée de la suppression des fichiers :
 
 ```python
 from forge_mvc_images import delete_media, delete_media_record
@@ -304,13 +293,10 @@ result = delete_media(
 )
 ```
 
-Par défaut, `delete_media(media_id)` ne supprime pas les fichiers physiques
-(`delete_files=False`) afin d'éviter une suppression accidentelle. Avec
-`delete_files=True`, l'original est supprimé, et les variantes `medium` /
-`thumbnail` le sont aussi si `variants=True`.
+Par défaut, `delete_media(media_id)` ne supprime pas les fichiers physiques (`delete_files=False`) afin d'éviter une suppression accidentelle.
+Avec `delete_files=True`, l'original est supprimé, et les variantes `medium` / `thumbnail` le sont aussi si `variants=True`.
 
-Pour relier un fichier déjà uploadé à une entité, utiliser
-`attach_media_to_entity` :
+Pour relier un fichier déjà uploadé à une entité, utiliser `attach_media_to_entity` :
 
 ```python
 from forge_mvc_images import save_image_upload, attach_media_to_entity
@@ -328,20 +314,22 @@ media_id = attach_media_to_entity(
 ```
 
 `save_image_upload()` stocke le fichier et ses variantes éventuelles.
-`attach_media_to_entity()` crée seulement la ligne `Media` correspondante. Elle
-ne crée pas de fichier, ne supprime rien et ne modifie pas les variantes.
+`attach_media_to_entity()` crée seulement la ligne `Media` correspondante.
+Elle ne crée pas de fichier, ne supprime rien et ne modifie pas les variantes.
 
 ---
 
 ## Texte alternatif
 
-Chaque média peut porter un `alt_text` optionnel (`VARCHAR(255) NULL`). Il sert à l'accessibilité, au référencement et à l'affichage public.
+Chaque média peut porter un `alt_text` optionnel (`VARCHAR(255) NULL`).
+Il sert à l'accessibilité, au référencement et à l'affichage public.
 
 Dans le CRUD généré par `make:crud`, Forge expose automatiquement ce champ :
 
 - **Création** : un champ texte `_media_alt_{name}` (média unique) ou `_media_alt_{name}_new` (galerie) permet de renseigner l'alt_text lors de l'ajout d'un fichier.
 - **Modification, média unique** : si un nouveau fichier est fourni, l'alt_text saisi accompagne l'attachement ; sinon, il est mis à jour sur le média existant via `update_media_alt_text`.
-- **Modification, galerie** : chaque item existant dispose d'un champ `_media_alt_{name}_{id}` ; les valeurs sont mises à jour individuellement. Un nouveau fichier uploadé reçoit l'alt_text du champ `_media_alt_{name}_new`.
+- **Modification, galerie** : chaque item existant dispose d'un champ `_media_alt_{name}_{id}` ; les valeurs sont mises à jour individuellement.
+  Un nouveau fichier uploadé reçoit l'alt_text du champ `_media_alt_{name}_new`.
 - Une chaîne vide est traitée comme absence de texte alternatif (`None`).
 
 Pour les usages manuels, passer `alt_text` explicitement à `attach_media_to_entity` ou appeler `update_media_alt_text` directement.
@@ -367,15 +355,15 @@ attach_media_to_entity(
 )
 ```
 
-`alt_text` est inclus dans tous les dictionnaires retournés par `get_media_record`, `list_media_for_entity`, `get_media_gallery` et `get_cover_media`. Sa valeur est `None` quand il n'a pas été renseigné.
+`alt_text` est inclus dans tous les dictionnaires retournés par `get_media_record`, `list_media_for_entity`, `get_media_gallery` et `get_cover_media`.
+Sa valeur est `None` quand il n'a pas été renseigné.
 
 ---
 
 ## Galerie ordonnée
 
 Une galerie est une liste de médias liés à une entité avec `role="gallery"`.
-Forge ne génère pas de galerie HTML dans cette étape : l'API retourne des
-dictionnaires simples, prêts à être utilisés par l'application.
+Forge ne génère pas de galerie HTML dans cette étape : l'API retourne des dictionnaires simples, prêts à être utilisés par l'application.
 
 ```python
 from forge_mvc_images import get_media_gallery
@@ -383,10 +371,12 @@ from forge_mvc_images import get_media_gallery
 gallery = get_media_gallery("hebergement", 12)
 ```
 
-Les éléments sont triés par `position ASC`, puis `id ASC`. `path` reste le
-chemin relatif stocké, tandis que `url` est l'URL locale `/media/...`.
+Les éléments sont triés par `position ASC`, puis `id ASC`.
+`path` reste le chemin relatif stocké, tandis que `url` est l'URL locale `/media/...`.
 
-Les galeries `multiple=true` acceptent l'ajout de plusieurs fichiers en une seule soumission via un champ file HTML `multiple`. Le comportement reste append-only : Forge ajoute les nouveaux médias à la galerie sans supprimer, remplacer ni réordonner automatiquement les médias existants. Le drag-and-drop et les aperçus JavaScript restent hors périmètre.
+Les galeries `multiple=true` acceptent l'ajout de plusieurs fichiers en une seule soumission via un champ file HTML `multiple`.
+Le comportement reste append-only : Forge ajoute les nouveaux médias à la galerie sans supprimer, remplacer ni réordonner automatiquement les médias existants.
+Le drag-and-drop et les aperçus JavaScript restent hors périmètre.
 
 Exemple :
 
@@ -403,17 +393,15 @@ Exemple :
 ]
 ```
 
-Pour les images, Forge expose aussi `medium_path`, `medium_url`,
-`thumbnail_path` et `thumbnail_url`. Pour les documents non-image, ces valeurs
-restent à `None`.
+Pour les images, Forge expose aussi `medium_path`, `medium_url`, `thumbnail_path` et `thumbnail_url`.
+Pour les documents non-image, ces valeurs restent à `None`.
 
 ---
 
 ## Image de couverture
 
 L'image principale d'une entité utilise la convention générique `role="cover"`.
-Elle sert de couverture pour une carte, une fiche ou une future page publique,
-sans imposer de logique métier.
+Elle sert de couverture pour une carte, une fiche ou une future page publique, sans imposer de logique métier.
 
 ```python
 from forge_mvc_images import get_cover_media
@@ -430,8 +418,8 @@ cover["thumbnail_url"]
 # "/media/images/thumbnail/cover.png"
 ```
 
-S'il n'existe aucun média `cover`, la fonction retourne `None`. Le tri suit la
-même règle que les galeries : `position ASC`, puis `id ASC`.
+S'il n'existe aucun média `cover`, la fonction retourne `None`.
+Le tri suit la même règle que les galeries : `position ASC`, puis `id ASC`.
 
 Un fallback explicite peut utiliser la première image de galerie :
 
@@ -443,9 +431,9 @@ cover = get_cover_media(
 )
 ```
 
-Le fallback est désactivé par défaut. Il ignore les documents non-image et ne
-crée ni ne modifie aucun enregistrement. Comme pour la galerie, aucun HTML,
-contrôleur média ou upload CRUD n'est généré dans cette étape.
+Le fallback est désactivé par défaut.
+Il ignore les documents non-image et ne crée ni ne modifie aucun enregistrement.
+Comme pour la galerie, aucun HTML, contrôleur média ou upload CRUD n'est généré dans cette étape.
 
 ---
 
@@ -466,9 +454,12 @@ Les chemins retournés sont relatifs à `storage/uploads/`.
 
 ## Déclarer des médias dans une entité
 
-La clé optionnelle `"media"` dans un fichier `entity.json` déclare les médias liés à l'entité. Elle n'ajoute aucune colonne SQL et ne modifie pas `_base.py`. `make:crud` utilise cette déclaration pour générer automatiquement les champs de formulaire et l'upload à la création et à l'édition.
+La clé optionnelle `"media"` dans un fichier `entity.json` déclare les médias liés à l'entité.
+Elle n'ajoute aucune colonne SQL et ne modifie pas `_base.py`.
+`make:crud` utilise cette déclaration pour générer automatiquement les champs de formulaire et l'upload à la création et à l'édition.
 
-Les médias sont stockés dans la table `media` séparée, liés à l'entité via `media.entity_name` et `media.entity_id`. La table métier ne contient aucun champ média.
+Les médias sont stockés dans la table `media` séparée, liés à l'entité via `media.entity_name` et `media.entity_id`.
+La table métier ne contient aucun champ média.
 
 ```json
 {
@@ -527,11 +518,15 @@ Les médias sont stockés dans la table `media` séparée, liés à l'entité vi
 | `gallery` | Galerie d'images | Réservé, non géré comme galerie CRUD |
 | `brochure` | Document PDF ou fichier joint | Géré par `make:crud` |
 
-D'autres rôles peuvent être définis librement. Le rôle est une chaîne non vide, unique dans l'entité. `gallery` est réservé par convention à un usage futur de galerie multiple ; `make:crud` traite tout rôle de la même façon pour `multiple=false`.
+D'autres rôles peuvent être définis librement.
+Le rôle est une chaîne non vide, unique dans l'entité.
+`gallery` est réservé par convention à un usage futur de galerie multiple ; `make:crud` traite tout rôle de la même façon pour `multiple=false`.
 
 ### Champs SQL vs médias
 
-Les `fields` d'une entité correspondent à des colonnes SQL dans la table métier (`hebergement.nom`, etc.). Les entrées `media` ne correspondent à **aucune colonne** : elles sont stockées dans la table `media` séparée, liées à l'entité via `entity_name`/`entity_id`. Cette séparation permet d'attacher plusieurs médias à un même enregistrement sans modifier le schéma métier.
+Les `fields` d'une entité correspondent à des colonnes SQL dans la table métier (`hebergement.nom`, etc.).
+Les entrées `media` ne correspondent à **aucune colonne** : elles sont stockées dans la table `media` séparée, liées à l'entité via `entity_name`/`entity_id`.
+Cette séparation permet d'attacher plusieurs médias à un même enregistrement sans modifier le schéma métier.
 
 ### Ce que cette déclaration ne fait pas
 
@@ -542,11 +537,20 @@ Les `fields` d'une entité correspondent à des colonnes SQL dans la table méti
 
 Depuis Forge 1.3.0, les médias déclarés `multiple=true` peuvent être affichés en galerie et recevoir de nouveaux médias depuis le CRUD généré.
 
-**Lecture :** `make:crud` appelle `list_media_for_entity(entity_name, entity_id, role=...)` dans `show()`, `edit()` et `update()` invalide, et transmet la liste sous la variable de contexte `{name}_media_list`. Les templates `show.html` et `form.html` affichent cette liste en lecture seule (miniatures ou liens).
+**Lecture :** `make:crud` appelle `list_media_for_entity(entity_name, entity_id, role=...)` dans `show()`, `edit()` et `update()` invalide, et transmet la liste sous la variable de contexte `{name}_media_list`.
+Les templates `show.html` et `form.html` affichent cette liste en lecture seule (miniatures ou liens).
 
-**Ajout (append-only, multi-upload) :** le formulaire `form.html` inclut un `<input type="file" multiple>` pour chaque champ `multiple=true`. Plusieurs fichiers peuvent être sélectionnés en une seule soumission. En `create()` et `update()` valides, chaque fichier soumis est validé individuellement (extension, taille, MIME) avant toute opération en base : un seul fichier invalide bloque la soumission complète. Les fichiers valides sont sauvegardés et attachés à la galerie. Le comportement est **append-only** : Forge ajoute les nouveaux médias sans remplacer ni réordonner les médias existants.
+**Ajout (append-only, multi-upload) :** le formulaire `form.html` inclut un `<input type="file" multiple>` pour chaque champ `multiple=true`.
+Plusieurs fichiers peuvent être sélectionnés en une seule soumission.
+En `create()` et `update()` valides, chaque fichier soumis est validé individuellement (extension, taille, MIME) avant toute opération en base : un seul fichier invalide bloque la soumission complète.
+Les fichiers valides sont sauvegardés et attachés à la galerie.
+Le comportement est **append-only** : Forge ajoute les nouveaux médias sans remplacer ni réordonner les médias existants.
 
-**Suppression individuelle :** le formulaire `form.html` affiche les miniatures existantes avec une checkbox par item (`name="_delete_media_{name}"`, `value="{{ _m.id }}"`). En `update()` valide, Forge supprime chaque média coché avant l'éventuel ajout. La suppression est irréversible (`delete_files=True`). Les médias non cochés ne sont pas touchés. En cas de formulaire invalide, aucune suppression n'est effectuée.
+**Suppression individuelle :** le formulaire `form.html` affiche les miniatures existantes avec une checkbox par item (`name="_delete_media_{name}"`, `value="{{ _m.id }}"`).
+En `update()` valide, Forge supprime chaque média coché avant l'éventuel ajout.
+La suppression est irréversible (`delete_files=True`).
+Les médias non cochés ne sont pas touchés.
+En cas de formulaire invalide, aucune suppression n'est effectuée.
 
 ```python
 # Flux généré dans update() pour un champ multiple=true :
@@ -572,13 +576,19 @@ for _photos_f in _photos_files:
                                role="gallery", position=0)
 ```
 
-Les galeries `multiple=true` peuvent être affichées, enrichies (multi-upload), nettoyées par suppression individuelle et réordonnées par position numérique depuis le CRUD généré. L'ordre d'affichage repose sur `Position ASC` puis `Id ASC`. Le drag-and-drop reste un ticket séparé.
+Les galeries `multiple=true` peuvent être affichées, enrichies (multi-upload), nettoyées par suppression individuelle et réordonnées par position numérique depuis le CRUD généré.
+L'ordre d'affichage repose sur `Position ASC` puis `Id ASC`.
+Le drag-and-drop reste un ticket séparé.
 
 ### Position des médias
 
-Les médias peuvent porter une position numérique optionnelle. Elle sert à stabiliser l'ordre d'affichage des galeries. Forge ne fournit pas encore d'interface de réorganisation dans ce ticket : le drag-and-drop et la modification manuelle de l'ordre seront traités séparément.
+Les médias peuvent porter une position numérique optionnelle.
+Elle sert à stabiliser l'ordre d'affichage des galeries.
+Forge ne fournit pas encore d'interface de réorganisation dans ce ticket : le drag-and-drop et la modification manuelle de l'ordre seront traités séparément.
 
-La colonne `Position INT NOT NULL DEFAULT 0` est présente dans la table `media`. `list_media_for_entity` trie systématiquement par `Position ASC, Id ASC`. `attach_media_to_entity` accepte `position=None` (traité comme `0`) et `position=<entier>` ; les appels sans argument continuent de fonctionner.
+La colonne `Position INT NOT NULL DEFAULT 0` est présente dans la table `media`.
+`list_media_for_entity` trie systématiquement par `Position ASC, Id ASC`.
+`attach_media_to_entity` accepte `position=None` (traité comme `0`) et `position=<entier>` ; les appels sans argument continuent de fonctionner.
 
 ### Intégration dans make:crud
 
@@ -689,9 +699,7 @@ Avec l'entité ci-dessous, `make:crud` génère la chaîne complète.
 
 ## Garanties de sécurité
 
-Les garanties suivantes sont assurées par le storage de `forge-mvc-files`
-(`forge_mvc_files/storage.py`, ADR-019) et s'appliquent à l'ensemble du module
-`forge-mvc-images` qui délègue toutes les opérations sur les chemins.
+Les garanties suivantes sont assurées par le storage de `forge-mvc-files` (`forge_mvc_files/storage.py`, ADR-019) et s'appliquent à l'ensemble du module `forge-mvc-images` qui délègue toutes les opérations sur les chemins.
 
 | Menace | Garantie | Mécanisme |
 |---|---|---|
@@ -707,14 +715,12 @@ Les garanties suivantes sont assurées par le storage de `forge-mvc-files`
 | **Exposition hors racine** | Impossible | La route `/media/...` refuse tout chemin sortant de `storage/uploads/` |
 | **Double slash / normpath** | Nettoyé | `//` réduits avant normalisation |
 
-Ces garanties couvrent le code source audité en `{{forge_version}}`. Elles ne couvrent pas la
-détection MIME côté serveur (repose sur le `Content-Type` déclaré par le navigateur ;
-`python-magic` est hors périmètre) ni les permissions d'accès aux médias servis.
+Ces garanties couvrent le code source audité en `{{forge_version}}`.
+Elles ne couvrent pas la détection MIME côté serveur (repose sur le `Content-Type` déclaré par le navigateur ; `python-magic` est hors périmètre) ni les permissions d'accès aux médias servis.
 
 ## Conditions de publication PyPI (remplies)
 
-Ces conditions ont toutes été remplies avant la publication sur PyPI en
-`1.0.0-beta.13` (retrait du classifier `"Private :: Do Not Upload"`) :
+Ces conditions ont toutes été remplies avant la publication sur PyPI en `1.0.0-beta.13` (retrait du classifier `"Private :: Do Not Upload"`) :
 
 | Condition | Ticket | État |
 |---|---|---|

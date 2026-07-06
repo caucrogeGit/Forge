@@ -1,13 +1,10 @@
 # Indépendance du cœur
 
-Objectif : comprendre pourquoi l'import/export est un opt-in, et non une brique
-du cœur.
+Objectif : comprendre pourquoi l'import/export est un opt-in, et non une brique du cœur.
 
-**Ce que vous allez apprendre :** Forge Core ne dépend pas de
-`forge-mvc-import-export`.
+**Ce que vous allez apprendre :** Forge Core ne dépend pas de `forge-mvc-import-export`.
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
-Le paquet ne connaît ni la base ni vos entités : le SQL d'insertion vit dans le
-modèle de votre application, atteint par le callback `insert`.
+Le paquet ne connaît ni la base ni vos entités : le SQL d'insertion vit dans le modèle de votre application, atteint par le callback `insert`.
 
 Troisième palier du **niveau avancé**.
 
@@ -25,8 +22,7 @@ L'application décide où et comment insérer.
 ```
 
 - Le paquet est en pur Python et ne déclare aucune table ni migration.
-- Il ne connaît ni la base ni vos entités : `import_rows` valide des lignes,
-  puis délègue l'écriture à la fonction `insert` que vous passez.
+- Il ne connaît ni la base ni vos entités : `import_rows` valide des lignes, puis délègue l'écriture à la fonction `insert` que vous passez.
 - Aucun fichier du cœur n'importe `forge_mvc_import_export`.
 
 ## Le SQL reste dans le modèle
@@ -48,8 +44,7 @@ print(rapport.imported, "élèves importés")
 ### Comprendre ce code
 
 - `add_eleve` est votre fonction métier : elle porte le SQL, le paquet l'ignore.
-- `import_rows` ne fait que valider puis appeler ce callback : la frontière
-  entre framework et application reste nette.
+- `import_rows` ne fait que valider puis appeler ce callback : la frontière entre framework et application reste nette.
 - Vous gardez le SQL visible dans votre modèle, fidèle à la charte Forge.
 
 ## Ce que cela vous apporte

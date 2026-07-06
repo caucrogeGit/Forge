@@ -22,9 +22,11 @@ Particularité technique : Forge génère des paramètres `?` ; l'adaptateur les
 ## 2. Installation et désinstallation
 
 !!! warning "Backend Alpha"
-    PostgreSQL est un backend **Alpha** : le dialecte et l'adaptateur sont testés, mais l'intégration sur un vrai serveur reste à valider. À réserver aux essais, pas encore à la production.
+    PostgreSQL est un backend **Alpha** : le dialecte et l'adaptateur sont testés, mais l'intégration sur un vrai serveur reste à valider.
+    À réserver aux essais, pas encore à la production.
 
-PostgreSQL est **client-serveur** : un serveur doit être joignable. Le pilote est `psycopg` (v3).
+PostgreSQL est **client-serveur** : un serveur doit être joignable.
+Le pilote est `psycopg` (v3).
 
 ```bash
 pip install --pre forge-mvc-postgres
@@ -212,7 +214,8 @@ Le code applicatif utilise `core.database.db`, comme avec tout autre backend.
 
 ## 8. Statut Alpha et limites
 
-Le dialecte (types, DDL) et la traduction des paramètres sont testés unitairement. L'**intégration** sur un vrai serveur reste à valider côté projet.
+Le dialecte (types, DDL) et la traduction des paramètres sont testés unitairement.
+L'**intégration** sur un vrai serveur reste à valider côté projet.
 
 Le **provisioning par `db:init`** n'est pas encore câblé pour PostgreSQL : créez la base et le rôle manuellement en attendant.
 

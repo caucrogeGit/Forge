@@ -1,8 +1,7 @@
 # Bilan : niveau débutant (Jobs)
 
 Récapitulatif du **niveau débutant** de la progression Jobs.
-Ce niveau pose les bases : enfiler une tâche depuis un contrôleur, puis la
-traiter avec un gestionnaire.
+Ce niveau pose les bases : enfiler une tâche depuis un contrôleur, puis la traiter avec un gestionnaire.
 
 ## Ce que vous avez validé
 
@@ -15,7 +14,6 @@ Vous savez enfiler une tâche côté requête et la traiter côté gestionnaire.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : lancer un process worker séparé qui traite
-la file en continu, indépendamment du serveur web.
+Place au niveau **intermédiaire** : lancer un process worker séparé qui traite la file en continu, indépendamment du serveur web.
 
 [Niveau intermédiaire : Le process worker](../intermediaire/jobs-worker.md)

@@ -57,8 +57,12 @@ classDiagram
 
 Comportement de `slugify` :
 
-- translittère les accents par décomposition NFKD (« Écrire » devient « ecrire ») ;
-- insère un tiret aux frontières camelCase (« MaPage » devient « ma-page ») ;
+- translittère les accents par décomposition NFKD (« Écrire »
+  devient « ecrire »)
+  ;
+- insère un tiret aux frontières camelCase (« MaPage »
+  devient « ma-page »)
+  ;
 - passe en minuscules, remplace toute suite hors `[a-z0-9]` par un tiret, compacte et retire les tirets de bordure ;
 - borne la longueur à `max_length` ;
 - le résultat est toujours path-safe (`../admin` devient `admin`) ;

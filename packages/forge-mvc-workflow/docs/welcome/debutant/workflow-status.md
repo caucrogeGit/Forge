@@ -3,8 +3,8 @@
 Objectif : comprendre le **nom de statut** et comment Forge le normalise et le valide.
 
 **Ce que vous allez apprendre :** un nom de statut est un identifiant `snake_case`.
-`normalize_status_name` le met en forme (« En Revue » → `en_revue`) ;
-`validate_status_name` refuse les noms invalides.
+`normalize_status_name` le met en forme (« En Revue »
+→ `en_revue`) ; `validate_status_name` refuse les noms invalides.
 
 Deuxième palier du **niveau débutant** de la progression workflow.
 
@@ -67,8 +67,8 @@ class WorkflowStatusController(BaseController):
 
 ### Comprendre ce code
 
-- Normaliser **avant** de comparer évite les faux négatifs (« En Revue » vs
-  `en_revue`).
+- Normaliser **avant** de comparer évite les faux négatifs (« En Revue »
+  vs `en_revue`).
 - Le nom est stable et machine-friendly ; le libellé reste libre pour l'affichage.
 - `validate_status_name` lève `WorkflowStatusError` sur un nom vide ou mal formé.
 

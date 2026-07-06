@@ -11,16 +11,13 @@ class CsvImportError(ValueError):
     ...
 ```
 
-`CsvImportError` signale une entrée invalide de niveau global : un CSV illisible,
-ou une liste de colonnes vide.
+`CsvImportError` signale une entrée invalide de niveau global : un CSV illisible, ou une liste de colonnes vide.
 Elle hérite de `ValueError`.
 
 ## 2. Erreurs par ligne
 
-Les erreurs **par ligne** ne lèvent pas d'exception : elles sont collectées dans
-le `ImportReport` sous forme de `RowError` (numéro de ligne, champ, message).
-C'est ce qui permet de présenter un rapport complet plutôt que de s'arrêter à la
-première ligne fautive.
+Les erreurs **par ligne** ne lèvent pas d'exception : elles sont collectées dans le `ImportReport` sous forme de `RowError` (numéro de ligne, champ, message).
+C'est ce qui permet de présenter un rapport complet plutôt que de s'arrêter à la première ligne fautive.
 
 ## 3. Quand `CsvImportError` est-elle levée ?
 

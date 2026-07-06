@@ -1,8 +1,7 @@
 # Bilan : niveau intermédiaire (Jobs)
 
 Récapitulatif du **niveau intermédiaire** de la progression Jobs.
-Ce niveau sépare les deux côtés : un process worker traite la file, et les
-tâches savent réessayer en cas d'échec.
+Ce niveau sépare les deux côtés : un process worker traite la file, et les tâches savent réessayer en cas d'échec.
 
 ## Ce que vous avez validé
 
@@ -15,7 +14,6 @@ Vous savez faire tourner un worker et suivre l'état des tâches.
 
 ## Et ensuite
 
-Place au niveau **avancé** : savoir quand recourir à une file, comprendre le
-modèle sans broker, et connaître les limites de la version actuelle.
+Place au niveau **avancé** : savoir quand recourir à une file, comprendre le modèle sans broker, et connaître les limites de la version actuelle.
 
 [Niveau avancé : Quand utiliser Jobs](../avance/jobs-perimeter.md)

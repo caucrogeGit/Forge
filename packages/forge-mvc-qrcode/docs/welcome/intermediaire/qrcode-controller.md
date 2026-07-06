@@ -2,8 +2,7 @@
 
 Objectif : renvoyer un QR Code en HTTP depuis un contrôleur Forge.
 
-**Ce que vous allez apprendre :** `QrCodeResponse.from_text` renvoie une
-`core.http.Response` ordinaire.
+**Ce que vous allez apprendre :** `QrCodeResponse.from_text` renvoie une `core.http.Response` ordinaire.
 Le contrôleur la retourne telle quelle, comme n'importe quelle réponse Forge.
 Par défaut, la réponse est un PNG avec l'en-tête `Content-Type: image/png`.
 

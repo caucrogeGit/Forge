@@ -2,11 +2,8 @@
 
 Objectif : valider chaque ligne d'un CSV, puis insérer les lignes valides.
 
-**Ce que vous allez apprendre :** on décrit les colonnes attendues par des
-`FieldSpec`, puis `import_rows` valide chaque ligne et appelle une fonction
-`insert` que vous fournissez.
-Le résultat est un `ImportReport` qui dit combien de lignes ont été insérées et
-liste les erreurs rencontrées.
+**Ce que vous allez apprendre :** on décrit les colonnes attendues par des `FieldSpec`, puis `import_rows` valide chaque ligne et appelle une fonction `insert` que vous fournissez.
+Le résultat est un `ImportReport` qui dit combien de lignes ont été insérées et liste les erreurs rencontrées.
 
 Premier palier du **niveau intermédiaire** de la progression Import/Export.
 
@@ -56,10 +53,8 @@ print(rapport.ok)        # True
 
 ### Comprendre ce code
 
-- Chaque `FieldSpec` nomme une colonne attendue ; par défaut elle est
-  `required=True`.
-- `import_rows` valide chaque ligne, construit un dictionnaire validé `record`,
-  puis appelle `insert(record)` pour les lignes valides.
+- Chaque `FieldSpec` nomme une colonne attendue ; par défaut elle est `required=True`.
+- `import_rows` valide chaque ligne, construit un dictionnaire validé `record`, puis appelle `insert(record)` pour les lignes valides.
 - `insert` est fourni par votre application : c'est lui qui écrit en base.
   Le paquet ne connaît ni la base ni vos entités.
 - Le `ImportReport` renvoyé porte `imported` (nombre inséré) et `errors`.
@@ -86,15 +81,15 @@ for erreur in rapport.errors:
 - La deuxième ligne n'a pas de `nom` : `import_rows` produit un `RowError`.
 - `RowError.row` est le numéro de la ligne de données, 1-based ; la ligne 2 ici.
 - `RowError.field` indique la colonne fautive, `RowError.message` le motif.
-- Par défaut, une seule ligne invalide empêche toute insertion : `imported`
-  vaut 0. Ce comportement « tout ou rien » est détaillé au niveau avancé.
+- Par défaut, une seule ligne invalide empêche toute insertion : `imported` vaut 0.
+  Ce comportement « tout ou rien »
+  est détaillé au niveau avancé.
 
 ## À retenir
 
 - `FieldSpec(name, required)` décrit une colonne attendue.
 - `import_rows(rows, specs, insert)` valide puis insère via votre callback.
-- `ImportReport.imported`, `ImportReport.ok` et `ImportReport.errors`
-  résument le résultat ; chaque erreur est un `RowError`.
+- `ImportReport.imported`, `ImportReport.ok` et `ImportReport.errors` résument le résultat ; chaque erreur est un `RowError`.
 
 ## Après ce starter
 

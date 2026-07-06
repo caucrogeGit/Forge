@@ -18,8 +18,7 @@ Synthèse de l'API de `forge-mvc-jobs`, à garder sous la main.
 | `enqueue(task, payload, available_in=60)` | Diffère la disponibilité (en secondes). |
 | `enqueue(task, payload, queue="emails")` | Choisit une file nommée. |
 
-`task` vide, `max_attempts < 1` ou `payload` non sérialisable en JSON lèvent
-`JobError`.
+`task` vide, `max_attempts < 1` ou `payload` non sérialisable en JSON lèvent `JobError`.
 
 ## Traiter (côté worker)
 
@@ -29,8 +28,7 @@ Synthèse de l'API de `forge-mvc-jobs`, à garder sous la main.
 | `drain(handlers)` | Traite toutes les tâches disponibles (passe unique) ; renvoie le nombre traité. |
 | `run_worker(handlers)` | Boucle de worker : vide la file, attend si vide, recommence. |
 
-`handlers` est un dict `{"nom.de.tache": fonction}`, chaque fonction recevant la
-charge utile (dict).
+`handlers` est un dict `{"nom.de.tache": fonction}`, chaque fonction recevant la charge utile (dict).
 
 ## Inspecter
 
@@ -39,8 +37,7 @@ charge utile (dict).
 | `pending_count()` | Nombre de tâches en attente. |
 | `get_job(job_id)` | État d'une tâche (`Job`) ou `None`. |
 
-`Job` (figé) expose `id`, `queue`, `task`, `status`, `attempts`,
-`max_attempts`, `last_error`.
+`Job` (figé) expose `id`, `queue`, `task`, `status`, `attempts`, `max_attempts`, `last_error`.
 `status` vaut `pending`, `running`, `done` ou `failed`.
 
 ## Constantes

@@ -1,21 +1,16 @@
 # Welcome Files
 
-Objectif : premier contact avec le module **opt-in** `forge-mvc-files`, le
-pipeline d'upload générique de Forge.
+Objectif : premier contact avec le module **opt-in** `forge-mvc-files`, le pipeline d'upload générique de Forge.
 
-**Ce que vous allez apprendre :** vérifier que le module répond et **inspecter sa
-politique** : racine de stockage (`upload_root`), extensions, types MIME et taille
-max autorisés. Aucune base de données : `forge-mvc-files` est sans état.
+**Ce que vous allez apprendre :** vérifier que le module répond et **inspecter sa politique** : racine de stockage (`upload_root`), extensions, types MIME et taille max autorisés.
+Aucune base de données : `forge-mvc-files` est sans état.
 
-Premier palier du **niveau débutant** de la progression files
-(vue d'ensemble des starters).
+Premier palier du **niveau débutant** de la progression files (vue d'ensemble des starters).
 
 !!! note "Module opt-in et fondation"
-    `forge-mvc-files` est l'upload générique extrait du core (ADR-019) ; c'est la
-    **fondation** sur laquelle `forge-mvc-images` est bâti. Ce parcours en montre
-    la façade `save_upload` (documents) puis, au niveau avancé, les **primitives**
-    que les opt-ins média composent (ADR-020). Installé depuis les sources (palier
-    « Installation »).
+    `forge-mvc-files` est l'upload générique extrait du core (ADR-019) ; c'est la **fondation** sur laquelle `forge-mvc-images` est bâti.
+    Ce parcours en montre la façade `save_upload` (documents) puis, au niveau avancé, les **primitives** que les opt-ins média composent (ADR-020).
+    Installé depuis les sources (palier « Installation »).
 
 ## Ce que ce starter montre
 
@@ -37,8 +32,7 @@ Premier palier du **niveau débutant** de la progression files
 forge run
 ```
 
-Ouvrez `https://localhost:8000/files-welcome` (« Welcome Files »), puis
-`/files-welcome/inspect` pour la politique d'upload en JSON.
+Ouvrez `https://localhost:8000/files-welcome` (« Welcome Files »), puis `/files-welcome/inspect` pour la politique d'upload en JSON.
 
 ## Le contrôleur
 
@@ -87,20 +81,18 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- La politique d'upload (extensions, MIME, taille) vit dans la **config Forge**
-  (`core.forge.get`) : elle est explicite et modifiable, pas codée en dur.
-- `upload_root()` donne la racine sous laquelle tout fichier est stocké : tout le
-  reste du parcours s'y rapporte.
+- La politique d'upload (extensions, MIME, taille) vit dans la **config Forge** (`core.forge.get`) : elle est explicite et modifiable, pas codée en dur.
+- `upload_root()` donne la racine sous laquelle tout fichier est stocké : tout le reste du parcours s'y rapporte.
 
 ## À retenir
 
-- `forge-mvc-files` est **opt-in** et **sans état** : il gère des fichiers sur
-  disque, rien en base.
+- `forge-mvc-files` est **opt-in** et **sans état** : il gère des fichiers sur disque, rien en base.
 - C'est la **fondation** générique ; image en est le premier client.
 - La politique d'upload est explicite (config).
 
 ## Après ce starter
 
-Premier contact établi. La suite : stocker un vrai document.
+Premier contact établi.
+La suite : stocker un vrai document.
 
 [Stocker un document](file-store.md)

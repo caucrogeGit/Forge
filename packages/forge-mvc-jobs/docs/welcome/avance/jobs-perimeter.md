@@ -1,12 +1,9 @@
 # Quand utiliser Jobs
 
-Objectif : savoir quand recourir à une file de tâches, et connaître les limites
-du modèle.
+Objectif : savoir quand recourir à une file de tâches, et connaître les limites du modèle.
 
-**Ce que vous allez apprendre :** une file de tâches sert à déporter un travail
-lourd hors de la requête HTTP.
-Le modèle de `forge-mvc-jobs` reste volontairement simple : une table MariaDB et
-un worker explicite, sans broker ni code asynchrone.
+**Ce que vous allez apprendre :** une file de tâches sert à déporter un travail lourd hors de la requête HTTP.
+Le modèle de `forge-mvc-jobs` reste volontairement simple : une table MariaDB et un worker explicite, sans broker ni code asynchrone.
 
 Premier palier du **niveau avancé** de la progression Jobs.
 
@@ -46,8 +43,7 @@ Serveur web     =  synchrone (WSGI), il enfile et répond
 - Le SQL reste visible : la file est une table que vous pouvez inspecter.
 - Le worker est un process explicite, lancé par l'application, jamais caché.
 
-Ce modèle suit la charte Forge : pas de magie cachée, SQL visible, brique
-opt-in.
+Ce modèle suit la charte Forge : pas de magie cachée, SQL visible, brique opt-in.
 
 ## Limite de la version actuelle
 

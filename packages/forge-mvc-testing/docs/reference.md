@@ -24,7 +24,8 @@ Infrastructure de test réservée au développement (ADR-041), listée dans `req
 pip install forge-mvc-testing
 ```
 
-Le plugin pytest et `FakeRequest` sont disponibles dès l'installation. Ce n'est pas un opt-in applicatif : il n'y a pas d'`opt-in:enable`.
+Le plugin pytest et `FakeRequest` sont disponibles dès l'installation.
+Ce n'est pas un opt-in applicatif : il n'y a pas d'`opt-in:enable`.
 
 ### Désinstallation
 

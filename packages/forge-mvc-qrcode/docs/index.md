@@ -1,8 +1,6 @@
 # QR Code (forge-mvc-qrcode)
 
-`forge-mvc-qrcode` est un opt-in qui génère des QR Codes PNG ou SVG depuis du
-texte ou une URL, et les sert via une réponse HTTP utilisable dans un contrôleur
-Forge.
+`forge-mvc-qrcode` est un opt-in qui génère des QR Codes PNG ou SVG depuis du texte ou une URL, et les sert via une réponse HTTP utilisable dans un contrôleur Forge.
 
 Le cœur de Forge ignore tout des QR Codes.
 Ce paquet fournit l'API.
@@ -14,8 +12,7 @@ L'application décide de ce qu'elle encode.
 pip install --pre forge-mvc-qrcode
 ```
 
-Le paquet dépend du cœur `forge-mvc` et de `segno`, une bibliothèque de
-génération de QR Codes en pur Python, sans Pillow ni dépendance lourde.
+Le paquet dépend du cœur `forge-mvc` et de `segno`, une bibliothèque de génération de QR Codes en pur Python, sans Pillow ni dépendance lourde.
 
 ## Génération PNG
 

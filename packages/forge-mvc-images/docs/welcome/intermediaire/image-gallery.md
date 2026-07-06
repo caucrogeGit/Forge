@@ -1,18 +1,15 @@
 # Afficher la galerie
 
-Objectif : lire toutes les images rattachées à une entité et les **afficher
-ensemble**, miniatures comprises.
+Objectif : lire toutes les images rattachées à une entité et les **afficher ensemble**, miniatures comprises.
 
-**Ce que vous allez apprendre :** `get_media_gallery` renvoie, pour chaque image
-de rôle `gallery` d'une entité, l'URL de l'original **et** celles de ses
-variantes (`medium`, `thumbnail`), prêtes à poser dans des balises `<img>`.
+**Ce que vous allez apprendre :** `get_media_gallery` renvoie, pour chaque image de rôle `gallery` d'une entité, l'URL de l'original **et** celles de ses variantes (`medium`, `thumbnail`), prêtes à poser dans des balises `<img>`.
 
 Deuxième palier du **niveau intermédiaire** de la progression images.
 
 !!! note "Module opt-in et table `media`"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation ») et
-    la table `media` appliquée (`forge migration:apply`). Si elle manque, la
-    page reste **pédagogique**.
+    Ce starter suppose `forge-mvc-images` installé (palier « Installation »)
+    et la table `media` appliquée (`forge migration:apply`).
+    Si elle manque, la page reste **pédagogique**.
 
 ## Ce que ce starter montre
 
@@ -33,8 +30,7 @@ Deuxième palier du **niveau intermédiaire** de la progression images.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/image-gallery` : la page affiche les images
-rattachées à l'entité de démo, chacune avec sa miniature.
+Ouvrez `https://localhost:8000/image-gallery` : la page affiche les images rattachées à l'entité de démo, chacune avec sa miniature.
 
 ## Le contrôleur
 
@@ -77,12 +73,9 @@ class ImageGalleryController(BaseController):
 
 ### Comprendre ce code
 
-- `get_media_gallery` filtre sur le rôle `gallery` et trie par `Position` : la
-  galerie respecte l'ordre que vous fixerez au palier suivant.
-- Chaque élément expose `url`, `medium_url`, `thumbnail_url` et `alt_text` : la
-  vue n'a plus qu'à choisir la bonne taille selon le contexte.
-- On entoure la lecture d'un `try/except` : un starter de découverte ne plante
-  pas si la table manque, il **explique**.
+- `get_media_gallery` filtre sur le rôle `gallery` et trie par `Position` : la galerie respecte l'ordre que vous fixerez au palier suivant.
+- Chaque élément expose `url`, `medium_url`, `thumbnail_url` et `alt_text` : la vue n'a plus qu'à choisir la bonne taille selon le contexte.
+- On entoure la lecture d'un `try/except` : un starter de découverte ne plante pas si la table manque, il **explique**.
 
 ## La vue
 
@@ -123,9 +116,8 @@ Le contrôleur rend `image_gallery/index.html` : créez ce fichier.
 
 ## La migration
 
-Ce palier lit la table `media`. Si vous ne l'avez pas encore créée au palier
-précédent, créez le fichier de migration suivant sous `mvc/migrations/`, puis
-appliquez-le avec `forge migration:apply`.
+Ce palier lit la table `media`.
+Si vous ne l'avez pas encore créée au palier précédent, créez le fichier de migration suivant sous `mvc/migrations/`, puis appliquez-le avec `forge migration:apply`.
 
 ```sql
 -- mvc/migrations/20260605101000_create_media.sql
@@ -165,6 +157,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-La galerie s'affiche. La suite : la rendre accessible et ordonnée.
+La galerie s'affiche.
+La suite : la rendre accessible et ordonnée.
 
 [Texte alternatif et ordre](image-alt-order.md)

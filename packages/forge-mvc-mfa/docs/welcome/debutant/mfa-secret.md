@@ -1,17 +1,14 @@
 # Secret TOTP et QR
 
-Objectif : générer le **secret** TOTP et l'URI `otpauth://` que lit une application
-d'authentification.
+Objectif : générer le **secret** TOTP et l'URI `otpauth://` que lit une application d'authentification.
 
-**Ce que vous allez apprendre :** `generate_totp_secret` produit un secret base32 ;
-`totp_provisioning_uri` construit l'URI `otpauth://` (ce que code un QR) à présenter
-à l'utilisateur lors de l'enrôlement.
+**Ce que vous allez apprendre :** `generate_totp_secret` produit un secret base32 ; `totp_provisioning_uri` construit l'URI `otpauth://` (ce que code un QR) à présenter à l'utilisateur lors de l'enrôlement.
 
 Deuxième palier du **niveau débutant** de la progression MFA.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-mfa` installé (palier « Installation »). Aucune clé
-    de chiffrement requise ici : le secret n'est pas encore stocké.
+    Ce starter suppose `forge-mvc-mfa` installé (palier « Installation »).
+    Aucune clé de chiffrement requise ici : le secret n'est pas encore stocké.
 
 ## Ce que ce starter montre
 
@@ -97,8 +94,7 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Le **secret** est partagé une seule fois entre serveur et application
-  d'authentification ; ensuite, les deux calculent le même code à partir de l'heure.
+- Le **secret** est partagé une seule fois entre serveur et application d'authentification ; ensuite, les deux calculent le même code à partir de l'heure.
 - L'URI `otpauth://` encode secret + compte + émetteur : l'utilisateur la scanne en QR.
 - Rien n'est persisté ici : la génération est une **primitive pure**.
 
@@ -110,6 +106,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Le secret est généré. La suite : vérifier un code calculé à partir de lui.
+Le secret est généré.
+La suite : vérifier un code calculé à partir de lui.
 
 [Vérifier un code TOTP](mfa-verify.md)

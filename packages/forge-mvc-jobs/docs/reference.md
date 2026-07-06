@@ -12,7 +12,8 @@ Certaines actions sont trop lentes pour une requête HTTP : envoyer 200 emails, 
 
 L'opt-in enfile ces actions avec `enqueue` (depuis un contrôleur) et les traite dans un **process séparé** avec `drain` ou `run_worker`, qui appellent les gestionnaires enregistrés par l'application.
 
-Il reste fidèle au modèle WSGI synchrone : **pas de broker, pas de Celery/Redis, pas d'async**. La file est une table SQL ; le worker est un simple process Python.
+Il reste fidèle au modèle WSGI synchrone : **pas de broker, pas de Celery/Redis, pas d'async**.
+La file est une table SQL ; le worker est un simple process Python.
 
 ## 2. Installation et désinstallation
 

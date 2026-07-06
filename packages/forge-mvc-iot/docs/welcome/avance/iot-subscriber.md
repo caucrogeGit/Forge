@@ -2,25 +2,20 @@
 
 Objectif : recevoir les mesures d'un **vrai broker MQTT**, en temps réel.
 
-**Ce que vous allez apprendre :** le chemin de production complet. Un broker
-pousse les messages ; `forge iot:listen` lance un `MqttSubscriber` qui, pour
-chaque message, **valide** (`parse_message`) puis **stocke**
-(`IotEventRepository.insert`). C'est l'aboutissement de la progression : les
-mêmes données qu'en simulation, mais venues d'un vrai capteur.
+**Ce que vous allez apprendre :** le chemin de production complet.
+Un broker pousse les messages ; `forge iot:listen` lance un `MqttSubscriber` qui, pour chaque message, **valide** (`parse_message`) puis **stocke** (`IotEventRepository.insert`).
+C'est l'aboutissement de la progression : les mêmes données qu'en simulation, mais venues d'un vrai capteur.
 
-Palier 2 du **niveau avancé** de la progression IoT, après
-[Valider un message IoT](iot-contract.md).
+Palier 2 du **niveau avancé** de la progression IoT, après [Valider un message IoT](iot-contract.md).
 
 !!! note "Infrastructure requise"
-    Recevoir de vrais messages demande un **broker MQTT** (par exemple Mosquitto)
-    démarré et atteignable, à votre charge. Ce starter explique et câble le
-    chemin ; il ne fournit pas le broker.
+    Recevoir de vrais messages demande un **broker MQTT** (par exemple Mosquitto) démarré et atteignable, à votre charge.
+    Ce starter explique et câble le chemin ; il ne fournit pas le broker.
 
 ## Ce que ce starter montre
 
 - la chaîne réelle : `Mosquitto → forge iot:listen → MqttSubscriber → parse_message → insert` ;
-- une route qui affiche la **configuration broker effective** (hôte, topic, TLS)
-  pour la vérifier avant de lancer le subscriber ;
+- une route qui affiche la **configuration broker effective** (hôte, topic, TLS) pour la vérifier avant de lancer le subscriber ;
 - la commande officielle `forge iot:listen`.
 
 ## Classes Forge utilisées
@@ -37,16 +32,15 @@ Palier 2 du **niveau avancé** de la progression IoT, après
 forge run
 ```
 
-Ouvrez `https://localhost:8000/iot-subscriber` : la page récapitule le broker, le
-topic et l'état TLS. Puis, avec un broker démarré :
+Ouvrez `https://localhost:8000/iot-subscriber` : la page récapitule le broker, le topic et l'état TLS.
+Puis, avec un broker démarré :
 
 ```bash
 forge iot:listen
 ```
 
 Le subscriber se connecte, s'abonne au topic et stocke chaque message reçu.
-Consultez-les via le [tableau de bord](../intermediaire/iot-dashboard.md) ou
-l'[API JSON](../intermediaire/iot-api.md).
+Consultez-les via le [tableau de bord](../intermediaire/iot-dashboard.md) ou l'[API JSON](../intermediaire/iot-api.md).
 
 ## Le contrôleur
 
@@ -80,19 +74,14 @@ class IotSubscriberController(BaseController):
 
 ### Comprendre ce code
 
-- La route **ne lance pas** le subscriber : recevoir en continu est le rôle d'une
-  commande CLI (`forge iot:listen`), pas d'une requête web. La route sert à
-  **vérifier la configuration** avant de lancer.
-- Le `MqttSubscriber` (utilisé par `forge iot:listen`) applique **le même**
-  `parse_message` que le palier précédent : le contrat est le point d'entrée
-  unique, qu'on simule ou qu'on reçoive pour de vrai.
-- En TLS, `load_iot_config` expose `mqtt_tls_enabled` et le fichier CA : la
-  connexion sécurisée est explicite, jamais devinée.
+- La route **ne lance pas** le subscriber : recevoir en continu est le rôle d'une commande CLI (`forge iot:listen`), pas d'une requête web.
+  La route sert à **vérifier la configuration** avant de lancer.
+- Le `MqttSubscriber` (utilisé par `forge iot:listen`) applique **le même** `parse_message` que le palier précédent : le contrat est le point d'entrée unique, qu'on simule ou qu'on reçoive pour de vrai.
+- En TLS, `load_iot_config` expose `mqtt_tls_enabled` et le fichier CA : la connexion sécurisée est explicite, jamais devinée.
 
 ## La vue
 
-Créez le gabarit ci-dessous : il récapitule la configuration de connexion et
-rappelle la commande d'écoute.
+Créez le gabarit ci-dessous : il récapitule la configuration de connexion et rappelle la commande d'écoute.
 
 ```html
 <!-- mvc/views/iot_subscriber/index.html -->
@@ -139,13 +128,12 @@ with router.group("", public=True) as public:
 ## À retenir
 
 - Le temps réel passe par un **broker** + `forge iot:listen` (un `MqttSubscriber`).
-- Le subscriber **valide puis stocke** chaque message : même contrat qu'en
-  simulation.
+- Le subscriber **valide puis stocke** chaque message : même contrat qu'en simulation.
 - Une route web vérifie la config ; l'écoute continue est une commande CLI.
 
 ## Après ce starter
 
-Vous recevez les vraies données. Dernier palier : diagnostiquer le module quand
-quelque chose cloche.
+Vous recevez les vraies données.
+Dernier palier : diagnostiquer le module quand quelque chose cloche.
 
 [Diagnostiquer le module IoT](iot-doctor.md)

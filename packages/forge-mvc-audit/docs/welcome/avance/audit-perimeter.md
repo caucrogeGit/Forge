@@ -2,8 +2,7 @@
 
 Objectif : comprendre ce que ce module trace, et ce qu'il ne trace pas.
 
-**Ce que vous allez apprendre :** `forge-mvc-audit` est un journal d'audit
-**applicatif**, au périmètre volontairement borné.
+**Ce que vous allez apprendre :** `forge-mvc-audit` est un journal d'audit **applicatif**, au périmètre volontairement borné.
 Il enregistre des événements métier décidés par l'application.
 Ce n'est pas un SIEM de cybersécurité.
 
@@ -38,10 +37,8 @@ Des événements métier que l'application choisit de consigner :
 ## Cohérence avec l'ADR-008
 
 Cette frontière suit l'ADR-008.
-Forge fournit la table `audit_log` et les helpers `record_audit` et
-`get_audit_log`.
-La décision de tracer un événement, et le choix de ce qui mérite une trace,
-restent applicatifs.
+Forge fournit la table `audit_log` et les helpers `record_audit` et `get_audit_log`.
+La décision de tracer un événement, et le choix de ce qui mérite une trace, restent applicatifs.
 
 ## À retenir
 

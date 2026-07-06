@@ -1,7 +1,7 @@
 # Bilan : niveau intermédiaire (MFA)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Welcome MFA*. Ce
-niveau couvre le **flux** : enrôler, challenger à la connexion, récupérer.
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome MFA*.
+Ce niveau couvre le **flux** : enrôler, challenger à la connexion, récupérer.
 
 ## Ce que vous avez validé
 
@@ -15,7 +15,6 @@ Vous savez dérouler le flux MFA complet, du facteur au secours.
 
 ## Et ensuite
 
-Place au niveau **avancé** : le durcissement, avec revalidation (step-up), anti-rejeu, et
-chiffrement des secrets au repos.
+Place au niveau **avancé** : le durcissement, avec revalidation (step-up), anti-rejeu, et chiffrement des secrets au repos.
 
 [Niveau avancé : Revalidation (step-up)](../avance/mfa-revalidation.md)

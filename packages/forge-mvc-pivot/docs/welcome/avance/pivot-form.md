@@ -2,15 +2,12 @@
 
 Objectif : afficher une erreur de pivot dans un formulaire, proprement.
 
-**Ce que vous allez apprendre :** `pivot_error_to_form_error` convertit une
-exception du service en `PivotFormError`, un objet stable (`code`, `message`,
-`field`) prêt à être affiché à côté du bon champ.
+**Ce que vous allez apprendre :** `pivot_error_to_form_error` convertit une exception du service en `PivotFormError`, un objet stable (`code`, `message`, `field`) prêt à être affiché à côté du bon champ.
 
 Dernier palier du **niveau avancé**.
 
 !!! note "Module opt-in"
-    On ne laisse jamais une exception brute remonter à l'utilisateur : on la
-    traduit en message de formulaire.
+    On ne laisse jamais une exception brute remonter à l'utilisateur : on la traduit en message de formulaire.
 
 ## Classes Forge utilisées
 
@@ -76,12 +73,9 @@ class PivotFormController(BaseController):
 
 ### Comprendre ce code
 
-- `pivot_error_to_form_error` transforme `PivotConstraintError` en
-  `PivotFormError` : un `code`, un `message` humain et le `field` fautif.
-- Le `field` permet d'afficher l'erreur **à côté du bon champ** du formulaire
-  (par exemple sous `position`).
-- Une exception non liée au pivot renvoie un `PivotFormError` générique : pas de
-  fuite de détail SQL vers l'utilisateur.
+- `pivot_error_to_form_error` transforme `PivotConstraintError` en `PivotFormError` : un `code`, un `message` humain et le `field` fautif.
+- Le `field` permet d'afficher l'erreur **à côté du bon champ** du formulaire (par exemple sous `position`).
+- Une exception non liée au pivot renvoie un `PivotFormError` générique : pas de fuite de détail SQL vers l'utilisateur.
 
 ## La vue (extrait)
 
@@ -99,6 +93,7 @@ class PivotFormController(BaseController):
 
 ## Après ce starter
 
-Vous tenez le pivot enrichi de bout en bout. Faisons le **bilan** du niveau avancé.
+Vous tenez le pivot enrichi de bout en bout.
+Faisons le **bilan** du niveau avancé.
 
 [Bilan du niveau avancé](bilan.md)

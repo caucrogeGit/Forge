@@ -4,8 +4,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-jobs`.
 
 **Ce que vous allez apprendre :** on enfile une tâche avec `enqueue`.
 La fonction écrit une ligne dans la table `jobs` et renvoie son identifiant.
-La requête HTTP n'attend pas le traitement : elle répond tout de suite, le
-travail sera fait plus tard par un worker.
+La requête HTTP n'attend pas le traitement : elle répond tout de suite, le travail sera fait plus tard par un worker.
 
 Premier palier du **niveau débutant** de la progression Jobs.
 

@@ -1,13 +1,10 @@
 # Aide-mémoire de la progression Stats
 
-Récapitulatif des paliers de la progression *Welcome Stats* et des API du module
-opt-in `forge-mvc-stats` introduites à chaque étape.
+Récapitulatif des paliers de la progression *Welcome Stats* et des API du module opt-in `forge-mvc-stats` introduites à chaque étape.
 
 !!! note "Module opt-in : SQL visible"
-    `forge-mvc-stats` est **publié sur PyPI** : `pip install --pre forge-mvc-stats`. Il
-    expose le **SQL réel** (schéma, insert, select), aucun ORM (charte principe 5), et
-    s'appuie sur des **exécuteurs injectables** (`execute`, `fetch_all`), donc testable
-    sans base réelle.
+    `forge-mvc-stats` est **publié sur PyPI** : `pip install --pre forge-mvc-stats`.
+    Il expose le **SQL réel** (schéma, insert, select), aucun ORM (charte principe 5), et s'appuie sur des **exécuteurs injectables** (`execute`, `fetch_all`), donc testable sans base réelle.
 
 ## Niveau débutant : l'événement & le schéma
 

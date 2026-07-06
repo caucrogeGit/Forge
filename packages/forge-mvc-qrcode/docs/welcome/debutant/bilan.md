@@ -15,7 +15,6 @@ Vous savez générer un QR Code en PNG et en SVG depuis du texte ou une URL.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : servir un QR Code en HTTP, directement depuis
-un contrôleur Forge.
+Place au niveau **intermédiaire** : servir un QR Code en HTTP, directement depuis un contrôleur Forge.
 
 [Niveau intermédiaire : Servir depuis un contrôleur](../intermediaire/qrcode-controller.md)

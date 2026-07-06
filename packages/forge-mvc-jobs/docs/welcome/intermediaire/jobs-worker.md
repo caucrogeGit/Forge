@@ -2,10 +2,8 @@
 
 Objectif : traiter la file en continu depuis un process séparé du serveur web.
 
-**Ce que vous allez apprendre :** `run_worker` est une boucle qui vide la file,
-puis attend si elle est vide, et recommence.
-On la lance depuis un petit script de l'application, un process distinct du
-serveur web.
+**Ce que vous allez apprendre :** `run_worker` est une boucle qui vide la file, puis attend si elle est vide, et recommence.
+On la lance depuis un petit script de l'application, un process distinct du serveur web.
 La requête HTTP enfile ; le worker traite : ce sont deux processus différents.
 
 Premier palier du **niveau intermédiaire** de la progression Jobs.

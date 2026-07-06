@@ -6,15 +6,11 @@ Le fichier de code correspondant est `forge_mvc_settings/store.py`.
 
 ## 1. Le modèle
 
-Un paramètre est une paire clé/valeur typée, stockée dans la table
-`app_settings` (colonnes `setting_key`, `setting_value`, `value_type`,
-`updated_at`).
+Un paramètre est une paire clé/valeur typée, stockée dans la table `app_settings` (colonnes `setting_key`, `setting_value`, `value_type`, `updated_at`).
 La valeur est sérialisée en texte et recoercée à la lecture selon son type.
-Les types supportés sont `str`, `int`, `bool` et `float` (constante
-`SUPPORTED_TYPES`).
+Les types supportés sont `str`, `int`, `bool` et `float` (constante `SUPPORTED_TYPES`).
 
-La clé commence par une lettre, suivie de lettres, chiffres, `_` ou `.`, sur 191
-caractères au plus.
+La clé commence par une lettre, suivie de lettres, chiffres, `_` ou `.`, sur 191 caractères au plus.
 Le point autorise des clés hiérarchiques comme `qcm.session_duration`.
 
 ## 2. Écrire (`set_setting`)
@@ -23,8 +19,7 @@ Le point autorise des clés hiérarchiques comme `qcm.session_duration`.
 def set_setting(key: str, value: str | int | bool | float, *, db=None) -> None
 ```
 
-`set_setting` crée ou met à jour le paramètre `key` (upsert `ON DUPLICATE KEY
-UPDATE`).
+`set_setting` crée ou met à jour le paramètre `key` (upsert `ON DUPLICATE KEY UPDATE`).
 Le type est déduit de `value`.
 Lève `SettingsError` si la clé est invalide ou si le type n'est pas supporté.
 
@@ -42,8 +37,7 @@ set_setting("maintenance", False)         # bool
 def get_setting(key: str, default=None, *, db=None) -> str | int | bool | float | None
 ```
 
-`get_setting` renvoie la valeur recoercée selon le type stocké, ou `default` si
-le paramètre n'existe pas.
+`get_setting` renvoie la valeur recoercée selon le type stocké, ou `default` si le paramètre n'existe pas.
 
 ```python
 from forge_mvc_settings import get_setting
@@ -73,10 +67,8 @@ Renvoie `True` s'il existait, `False` sinon.
 ## 6. Le paramètre `db`
 
 Toutes les fonctions acceptent un paramètre `db` injectable.
-Par défaut, l'accès passe par `core.database.db` (le pool configuré par
-l'application).
-En test, on peut injecter un adapter qui expose `fetch_one`, `fetch_all` et
-`execute`, ce qui rend le store vérifiable sans base réelle.
+Par défaut, l'accès passe par `core.database.db` (le pool configuré par l'application).
+En test, on peut injecter un adapter qui expose `fetch_one`, `fetch_all` et `execute`, ce qui rend le store vérifiable sans base réelle.
 
 ## 7. Voir aussi
 

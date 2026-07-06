@@ -1,11 +1,8 @@
 # Diagnostiquer le module Audio
 
-Objectif : exposer le **diagnostic** non invasif de Forge Audio en JSON, à partir
-des contrôles de `forge audio:doctor`.
+Objectif : exposer le **diagnostic** non invasif de Forge Audio en JSON, à partir des contrôles de `forge audio:doctor`.
 
-**Ce que vous allez apprendre :** Forge Audio fournit `forge audio:doctor` ; ce
-palier en expose le **sous-ensemble non invasif** : paquet importable, configuration
-chargeable, présence de `ffprobe`/`ffmpeg`, routes enregistrables.
+**Ce que vous allez apprendre :** Forge Audio fournit `forge audio:doctor` ; ce palier en expose le **sous-ensemble non invasif** : paquet importable, configuration chargeable, présence de `ffprobe`/`ffmpeg`, routes enregistrables.
 
 Troisième palier du **niveau avancé** de la progression audio.
 
@@ -30,8 +27,8 @@ Troisième palier du **niveau avancé** de la progression audio.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/audio-doctor` : la page renvoie le statut de chaque
-contrôle en JSON. La présence de `ffprobe`/`ffmpeg` y apparaît.
+Ouvrez `https://localhost:8000/audio-doctor` : la page renvoie le statut de chaque contrôle en JSON.
+La présence de `ffprobe`/`ffmpeg` y apparaît.
 
 ## Le contrôleur
 
@@ -77,10 +74,9 @@ class AudioDoctorController(BaseController):
 
 ### Comprendre ce code
 
-- Chaque `check_*()` renvoie un `CheckResult(status, name, detail)` : on les
-  sérialise tels quels.
-- Tous les contrôles retenus sont **sûrs** : aucun ne touche un fichier, le réseau
-  ou une base. Un diagnostic ne doit jamais avoir d'effet de bord.
+- Chaque `check_*()` renvoie un `CheckResult(status, name, detail)` : on les sérialise tels quels.
+- Tous les contrôles retenus sont **sûrs** : aucun ne touche un fichier, le réseau ou une base.
+  Un diagnostic ne doit jamais avoir d'effet de bord.
 - La commande `forge audio:doctor` reste le diagnostic complet en ligne de commande.
 
 ## La route
@@ -103,7 +99,6 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous avez parcouru toute la progression audio : découvrir, ingérer, lire, sonder,
-transcoder, diagnostiquer.
+Vous avez parcouru toute la progression audio : découvrir, ingérer, lire, sonder, transcoder, diagnostiquer.
 
 [Bilan du niveau avancé](bilan.md)

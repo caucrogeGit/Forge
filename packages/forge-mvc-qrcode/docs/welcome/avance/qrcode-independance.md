@@ -2,8 +2,7 @@
 
 Objectif : comprendre pourquoi le QR Code est un opt-in, et non une brique du cœur.
 
-**Ce que vous allez apprendre :** Forge Core ne dépend pas de
-`forge-mvc-qrcode`.
+**Ce que vous allez apprendre :** Forge Core ne dépend pas de `forge-mvc-qrcode`.
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 Une application qui n'installe pas le paquet ne voit aucune référence aux QR Codes.
 

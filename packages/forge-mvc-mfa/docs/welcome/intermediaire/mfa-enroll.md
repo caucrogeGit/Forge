@@ -1,17 +1,14 @@
 # Enrôler un facteur TOTP
 
-Objectif : créer un facteur TOTP **pending**, puis le **confirmer** : l'enrôlement
-en deux temps.
+Objectif : créer un facteur TOTP **pending**, puis le **confirmer** : l'enrôlement en deux temps.
 
-**Ce que vous allez apprendre :** `create_totp_factor` crée un facteur pending dont
-le secret est déjà **chiffré au repos** ; `confirm_totp_factor` l'active après
-vérification d'un premier code (preuve que l'utilisateur a enregistré le secret).
+**Ce que vous allez apprendre :** `create_totp_factor` crée un facteur pending dont le secret est déjà **chiffré au repos** ; `confirm_totp_factor` l'active après vérification d'un premier code (preuve que l'utilisateur a enregistré le secret).
 
 Premier palier du **niveau intermédiaire** de la progression MFA.
 
 !!! note "Module opt-in, clé requise"
-    Ce starter suppose `forge-mvc-mfa` installé et `FORGE_MFA_SECRET_KEY` configurée
-    (palier « Installation »). Sans clé, la page reste **pédagogique**.
+    Ce starter suppose `forge-mvc-mfa` installé et `FORGE_MFA_SECRET_KEY` configurée (palier « Installation »).
+    Sans clé, la page reste **pédagogique**.
 
 ## Ce que ce starter montre
 
@@ -32,8 +29,7 @@ Premier palier du **niveau intermédiaire** de la progression MFA.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/mfa-enroll` : un secret/URI s'affiche, saisissez un
-code valide pour confirmer le facteur.
+Ouvrez `https://localhost:8000/mfa-enroll` : un secret/URI s'affiche, saisissez un code valide pour confirmer le facteur.
 
 ## Le contrôleur
 
@@ -157,11 +153,10 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- `create_totp_factor` **ne touche pas la base** : il retourne des objets. La
-  **persistance est le job de l'application** : ici on simule avec la session.
+- `create_totp_factor` **ne touche pas la base** : il retourne des objets.
+  La **persistance est le job de l'application** : ici on simule avec la session.
 - Le secret du facteur (`factor.totp_secret`) est déjà **chiffré** (`enc:…`).
-- La confirmation prouve que l'utilisateur a bien enregistré le secret avant de
-  l'activer.
+- La confirmation prouve que l'utilisateur a bien enregistré le secret avant de l'activer.
 
 ## À retenir
 
@@ -171,6 +166,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Le facteur est actif. La suite : le second facteur au moment de la connexion.
+Le facteur est actif.
+La suite : le second facteur au moment de la connexion.
 
 [Challenge de connexion](mfa-challenge.md)

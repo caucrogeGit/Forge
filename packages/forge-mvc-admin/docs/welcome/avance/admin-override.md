@@ -5,8 +5,7 @@ Objectif : adapter l'apparence du back-office à votre projet.
 ## Le principe
 
 Forge Admin embarque ses templates par défaut.
-Votre projet peut en remplacer n'importe lequel en plaçant un fichier de même
-chemin sous `mvc/views/admin/`.
+Votre projet peut en remplacer n'importe lequel en plaçant un fichier de même chemin sous `mvc/views/admin/`.
 L'ordre des loaders donne la priorité au projet : votre fichier l'emporte.
 
 ## Un exemple
@@ -28,8 +27,7 @@ Pour personnaliser le gabarit de base, créez `mvc/views/admin/layout.html` :
 </html>
 ```
 
-Rechargez `/admin` : votre gabarit remplace celui du paquet, sans toucher au
-module.
+Rechargez `/admin` : votre gabarit remplace celui du paquet, sans toucher au module.
 
 ## Templates surchargeables
 

@@ -23,7 +23,8 @@ def test_qr_png():
 
 ## Opt-ins à exécuteur injecté
 
-Beaucoup d'opt-ins (settings, audit, stats...) reçoivent un exécuteur SQL injecté. En test, passez un **faux exécuteur** pour vérifier les requêtes sans base :
+Beaucoup d'opt-ins (settings, audit, stats...) reçoivent un exécuteur SQL injecté.
+En test, passez un **faux exécuteur** pour vérifier les requêtes sans base :
 
 ```python
 def fake_execute(sql, params):

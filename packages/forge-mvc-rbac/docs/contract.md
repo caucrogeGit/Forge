@@ -1,13 +1,11 @@
 # Contrat RBAC Forge
 
-> **Usage applicatif** : pour le workflow complet (validation, audit, helpers Python,
-> guards opt-in), voir [RBAC opt-in : guide d'usage applicatif](usage.md).
+> **Usage applicatif** : pour le workflow complet (validation, audit, helpers Python, guards opt-in), voir [RBAC opt-in : guide d'usage applicatif](usage.md).
 
 ## Rôle
 
 Le contrat RBAC Forge définit les rôles et permissions d'accès dans un projet.
-Il est **séparé du schéma d'entité** (`entity.schema.json`) : le schéma d'entité
-décrit la structure de données, le contrat RBAC décrit les règles d'autorisation.
+Il est **séparé du schéma d'entité** (`entity.schema.json`) : le schéma d'entité décrit la structure de données, le contrat RBAC décrit les règles d'autorisation.
 
 Cette séparation est décidée dans ADR-014.
 
@@ -90,11 +88,11 @@ python forge.py rbac:validate
 python forge.py rbac:validate --json
 ```
 
-Le fichier est **optionnel** : s'il est absent, la commande se termine avec succès
-(code retour 0) et affiche un message informatif. Le RBAC n'est pas requis.
+Le fichier est **optionnel** : s'il est absent, la commande se termine avec succès (code retour 0) et affiche un message informatif.
+Le RBAC n'est pas requis.
 
-S'il existe, il doit respecter `rbac.schema.json`. En cas d'erreur, la commande
-affiche les problèmes et retourne le code 1.
+S'il existe, il doit respecter `rbac.schema.json`.
+En cas d'erreur, la commande affiche les problèmes et retourne le code 1.
 
 ## Audit de cohérence
 
@@ -124,13 +122,11 @@ Seule une erreur de schéma (contrat invalide) provoque un échec (code 1).
 | Fichier invalide | 1 |
 | Fichier valide (avec ou sans avertissements) | 0 |
 
-Avec `--json`, la sortie inclut `warnings_count` et `warnings` (liste de dicts avec
-`code`, `message`, et selon le cas `role`, `entity`, `action`, `permission`).
+Avec `--json`, la sortie inclut `warnings_count` et `warnings` (liste de dicts avec `code`, `message`, et selon le cas `role`, `entity`, `action`, `permission`).
 
 ## Chargement depuis le module RBAC opt-in
 
-Le package `forge-mvc-rbac` peut charger et valider `mvc/security/rbac.json`
-depuis Python :
+Le package `forge-mvc-rbac` peut charger et valider `mvc/security/rbac.json` depuis Python :
 
 ```python
 from forge_mvc_rbac import load_rbac_contract
@@ -156,8 +152,7 @@ Il prépare les futurs services RBAC applicatifs (RBAC-MODULE-004).
 
 ## Vérification des permissions depuis le contrat
 
-Une fois le contrat chargé, le module `forge-mvc-rbac` peut vérifier si un
-ensemble de rôles possède une permission déclarée dans `mvc/security/rbac.json` :
+Une fois le contrat chargé, le module `forge-mvc-rbac` peut vérifier si un ensemble de rôles possède une permission déclarée dans `mvc/security/rbac.json` :
 
 ```python
 from forge_mvc_rbac import (
@@ -195,8 +190,7 @@ Elle ne modifie pas `make:crud`.
 
 ## Protection opt-in d'une action
 
-Le module `forge-mvc-rbac` peut être utilisé explicitement dans une route ou
-un contrôleur pour protéger une action avec une permission contractuelle.
+Le module `forge-mvc-rbac` peut être utilisé explicitement dans une route ou un contrôleur pour protéger une action avec une permission contractuelle.
 
 ### Avec le helper direct
 
@@ -247,8 +241,8 @@ Voir [les limites détaillées](usage.md#limites-actuelles) dans le guide d'usag
 
 ## Relation avec entity.schema.json
 
-`entity.schema.json` n'a **pas** de propriété `rbac`. Les entités canoniques
-(`schema_version: "1.0"`) ne peuvent pas contenir de configuration RBAC.
+`entity.schema.json` n'a **pas** de propriété `rbac`.
+Les entités canoniques (`schema_version: "1.0"`) ne peuvent pas contenir de configuration RBAC.
 
 ```json
 {

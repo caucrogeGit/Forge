@@ -1,18 +1,16 @@
 # Texte alternatif et ordre
 
-Objectif : rendre la galerie **accessible** et **ordonnée** en éditant deux
-champs d'une image : son texte alternatif et sa position.
+Objectif : rendre la galerie **accessible** et **ordonnée** en éditant deux champs d'une image : son texte alternatif et sa position.
 
-**Ce que vous allez apprendre :** `update_media_alt_text` renseigne le texte lu
-par les lecteurs d'écran (`alt_text`), `update_media_position` fixe l'ordre
-d'affichage (`position`). Deux écritures ciblées sur une ligne `media`.
+**Ce que vous allez apprendre :** `update_media_alt_text` renseigne le texte lu par les lecteurs d'écran (`alt_text`), `update_media_position` fixe l'ordre d'affichage (`position`).
+Deux écritures ciblées sur une ligne `media`.
 
 Troisième palier du **niveau intermédiaire** de la progression images.
 
 !!! note "Module opt-in et table `media`"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation ») et
-    la table `media` appliquée (`forge migration:apply`). Si elle manque, la
-    page reste **pédagogique**.
+    Ce starter suppose `forge-mvc-images` installé (palier « Installation »)
+    et la table `media` appliquée (`forge migration:apply`).
+    Si elle manque, la page reste **pédagogique**.
 
 ## Ce que ce starter montre
 
@@ -34,8 +32,7 @@ Troisième palier du **niveau intermédiaire** de la progression images.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/image-alt-order`, renseignez un texte alternatif
-et une position, enregistrez : la galerie reflète l'ordre et l'accessibilité.
+Ouvrez `https://localhost:8000/image-alt-order`, renseignez un texte alternatif et une position, enregistrez : la galerie reflète l'ordre et l'accessibilité.
 
 ## Le contrôleur
 
@@ -102,10 +99,9 @@ class ImageAltOrderController(BaseController):
 
 ### Comprendre ce code
 
-- `alt_text` est un enjeu d'**accessibilité** : un lecteur d'écran l'annonce à
-  la place de l'image. Le module le limite à 255 caractères.
-- `position` pilote l'ordre : `get_media_gallery` trie dessus, l'effet est donc
-  immédiat à l'affichage.
+- `alt_text` est un enjeu d'**accessibilité** : un lecteur d'écran l'annonce à la place de l'image.
+  Le module le limite à 255 caractères.
+- `position` pilote l'ordre : `get_media_gallery` trie dessus, l'effet est donc immédiat à l'affichage.
 - Les deux écritures ciblent une ligne précise par son identifiant `media_id`.
 
 ## La vue
@@ -155,9 +151,8 @@ Le contrôleur rend `image_alt_order/index.html` : créez ce fichier.
 
 ## La migration
 
-Ce palier édite la table `media`. Si vous ne l'avez pas encore créée, créez le
-fichier de migration suivant sous `mvc/migrations/`, puis appliquez-le avec
-`forge migration:apply`.
+Ce palier édite la table `media`.
+Si vous ne l'avez pas encore créée, créez le fichier de migration suivant sous `mvc/migrations/`, puis appliquez-le avec `forge migration:apply`.
 
 ```sql
 -- mvc/migrations/20260605102000_create_media.sql
@@ -192,10 +187,8 @@ with router.group("", public=True) as public:
 
 ## À retenir
 
-- Une galerie sérieuse est **accessible** (`alt_text`) et **ordonnée**
-  (`position`).
-- `update_media_alt_text` et `update_media_position` modifient une ligne `media`
-  ciblée.
+- Une galerie sérieuse est **accessible** (`alt_text`) et **ordonnée** (`position`).
+- `update_media_alt_text` et `update_media_position` modifient une ligne `media` ciblée.
 - L'ordre fixé ici est respecté par `get_media_gallery`.
 
 ## Après ce starter

@@ -3,16 +3,15 @@
 Objectif : créer une association pivot **avec ses attributs**.
 
 **Ce que vous allez apprendre :** `attach` ajoute une ligne dans la table pivot.
-On lui donne l'`article_id`, le `tag_id` et un dictionnaire d'attributs
-(`position`, `epingle`). Seuls les champs déclarés dans la liste blanche sont
-acceptés.
+On lui donne l'`article_id`, le `tag_id` et un dictionnaire d'attributs (`position`, `epingle`).
+Seuls les champs déclarés dans la liste blanche sont acceptés.
 
 Premier palier du **niveau intermédiaire**.
 
 !!! note "Module opt-in : SQL visible"
-    En production, le service délègue à `core.database.db` (`execute`,
-    `fetch_one`…). La table `article_tag` doit exister. Pour les tests, ces
-    exécuteurs sont **injectables**.
+    En production, le service délègue à `core.database.db` (`execute`, `fetch_one`…).
+    La table `article_tag` doit exister.
+    Pour les tests, ces exécuteurs sont **injectables**.
 
 ## Classes Forge utilisées
 
@@ -55,16 +54,13 @@ class PivotAttachController(BaseController):
 
 ### Comprendre ce code
 
-- `attach(article_id, tag_id, {...})` insère la ligne `(article_id, tag_id,
-  position, epingle)` et retourne l'identifiant inséré.
-- Le dictionnaire d'attributs ne peut contenir **que** `position` et `epingle` :
-  un champ inconnu lève une erreur (liste blanche).
+- `attach(article_id, tag_id, {...})` insère la ligne `(article_id, tag_id, position, epingle)` et retourne l'identifiant inséré.
+- Le dictionnaire d'attributs ne peut contenir **que** `position` et `epingle` : un champ inconnu lève une erreur (liste blanche).
 - Le SQL produit est un `INSERT` paramétré : aucune valeur n'est concaténée.
 
 !!! warning "Doublon de paire"
-    Tel quel, attacher deux fois la même paire crée deux lignes (ou échoue sur la
-    clé primaire SQL). Pour refuser le doublon **avant** l'`INSERT`, on active
-    `unique_pair`, au niveau avancé.
+    Tel quel, attacher deux fois la même paire crée deux lignes (ou échoue sur la clé primaire SQL).
+    Pour refuser le doublon **avant** l'`INSERT`, on active `unique_pair`, au niveau avancé.
 
 ## La route
 
@@ -84,6 +80,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Une association existe. Voyons comment la **modifier** et la **détacher**.
+Une association existe.
+Voyons comment la **modifier** et la **détacher**.
 
 [Modifier et détacher](pivot-update.md)

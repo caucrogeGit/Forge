@@ -2,15 +2,13 @@
 
 Objectif : construire et valider l'association **utilisateur ↔ rôle**.
 
-**Ce que vous allez apprendre :** `create_auth_user_role(user_id, role_id)` construit
-et valide une association `AuthUserRole` que l'application persiste ensuite dans
-`user_roles`.
+**Ce que vous allez apprendre :** `create_auth_user_role(user_id, role_id)` construit et valide une association `AuthUserRole` que l'application persiste ensuite dans `user_roles`.
 
 Premier palier du **niveau avancé** de la progression RBAC.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-rbac` installé. La démo **ne persiste pas**
-    l'association (pas de base).
+    Ce starter suppose `forge-mvc-rbac` installé.
+    La démo **ne persiste pas** l'association (pas de base).
 
 ## Ce que ce starter montre
 
@@ -66,10 +64,8 @@ class RbacUserRoleController(BaseController):
 
 ### Comprendre ce code
 
-- `create_auth_user_role` **valide** le couple (entiers positifs) et renvoie un objet
-  ; il **ne touche pas la base**.
-- La **persistance est le job de l'application** : on insère le couple dans
-  `user_roles`.
+- `create_auth_user_role` **valide** le couple (entiers positifs) et renvoie un objet ; il **ne touche pas la base**.
+- La **persistance est le job de l'application** : on insère le couple dans `user_roles`.
 - Une même personne peut cumuler plusieurs associations (plusieurs rôles).
 
 ## La vue

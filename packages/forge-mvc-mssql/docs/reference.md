@@ -22,9 +22,11 @@ Bonne nouvelle côté paramètres : `pyodbc` utilise nativement les `?` de Forge
 ## 2. Installation et désinstallation
 
 !!! warning "Backend Alpha"
-    SQL Server est un backend **Alpha** : le dialecte et l'adaptateur sont testés, mais l'intégration sur un vrai serveur reste à valider. À réserver aux essais, pas encore à la production.
+    SQL Server est un backend **Alpha** : le dialecte et l'adaptateur sont testés, mais l'intégration sur un vrai serveur reste à valider.
+    À réserver aux essais, pas encore à la production.
 
-SQL Server est **client-serveur** : un serveur doit être joignable. Le pilote est `pyodbc`, qui requiert un pilote ODBC système.
+SQL Server est **client-serveur** : un serveur doit être joignable.
+Le pilote est `pyodbc`, qui requiert un pilote ODBC système.
 
 ```bash
 pip install --pre forge-mvc-mssql

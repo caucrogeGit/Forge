@@ -1,12 +1,9 @@
 # Convertir les valeurs
 
-Objectif : convertir les chaînes du CSV en types Python et gérer les colonnes
-facultatives.
+Objectif : convertir les chaînes du CSV en types Python et gérer les colonnes facultatives.
 
-**Ce que vous allez apprendre :** un `FieldSpec` peut porter une fonction de
-conversion `coerce`.
-Forge en fournit trois prêtes à l'emploi : `coerce_int`, `coerce_float` et
-`coerce_bool`.
+**Ce que vous allez apprendre :** un `FieldSpec` peut porter une fonction de conversion `coerce`.
+Forge en fournit trois prêtes à l'emploi : `coerce_int`, `coerce_float` et `coerce_bool`.
 On voit aussi les colonnes `required=False`, qui acceptent une valeur absente.
 
 Deuxième palier du **niveau intermédiaire** de la progression Import/Export.
@@ -53,12 +50,9 @@ print(records[0])  # {"nom": "Alice", "age": 30, "actif": True}
 
 ### Comprendre ce code
 
-- `coerce=coerce_int` convertit `"30"` en entier `30` ; `coerce_float` ferait
-  de même pour un nombre décimal.
-- `coerce_bool` accepte `1/0`, `true/false`, `oui/non`, `yes/no`, `on/off`,
-  sans tenir compte de la casse.
-- Le `record` transmis à `insert` contient donc des valeurs typées, prêtes pour
-  le modèle.
+- `coerce=coerce_int` convertit `"30"` en entier `30` ; `coerce_float` ferait de même pour un nombre décimal.
+- `coerce_bool` accepte `1/0`, `true/false`, `oui/non`, `yes/no`, `on/off`, sans tenir compte de la casse.
+- Le `record` transmis à `insert` contient donc des valeurs typées, prêtes pour le modèle.
 
 ## 2. Une conversion invalide devient une erreur
 
@@ -77,8 +71,7 @@ for erreur in rapport.errors:
 
 ### Comprendre ce code
 
-- `coerce_int("trente")` lève `ValueError` ; `import_rows` la capture et produit
-  un `RowError` au lieu de planter.
+- `coerce_int("trente")` lève `ValueError` ; `import_rows` la capture et produit un `RowError` au lieu de planter.
 - La ligne fautive est rapportée, jamais insérée.
 
 ## 3. Colonne facultative

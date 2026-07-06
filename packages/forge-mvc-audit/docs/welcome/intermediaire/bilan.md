@@ -14,7 +14,6 @@ Vous savez tracer une action ciblée et retrouver des entrées précises.
 
 ## Et ensuite
 
-Place au niveau **avancé** : comprendre le périmètre borné du module et son
-indépendance vis-à-vis du cœur.
+Place au niveau **avancé** : comprendre le périmètre borné du module et son indépendance vis-à-vis du cœur.
 
 [Niveau avancé : Le périmètre de l'audit](../avance/audit-perimeter.md)

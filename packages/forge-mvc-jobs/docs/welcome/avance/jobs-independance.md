@@ -1,12 +1,10 @@
 # Indépendance du cœur
 
-Objectif : comprendre pourquoi Jobs est un opt-in, et comment l'isoler pour les
-tests.
+Objectif : comprendre pourquoi Jobs est un opt-in, et comment l'isoler pour les tests.
 
 **Ce que vous allez apprendre :** Forge Core ne dépend pas de `forge-mvc-jobs`.
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
-Le paramètre `db=` rend la file injectable, ce qui facilite les tests, et la
-constante `CREATE_TABLE_SQL` décrit la table en SQL visible.
+Le paramètre `db=` rend la file injectable, ce qui facilite les tests, et la constante `CREATE_TABLE_SQL` décrit la table en SQL visible.
 
 Deuxième palier du **niveau avancé** de la progression Jobs.
 

@@ -1,11 +1,8 @@
 # Supprimer un fichier
 
-Objectif : supprimer un fichier stocké avec `delete_media_file`, sans jamais sortir
-de la racine d'upload.
+Objectif : supprimer un fichier stocké avec `delete_media_file`, sans jamais sortir de la racine d'upload.
 
-**Ce que vous allez apprendre :** `delete_media_file` prend un **chemin relatif**,
-reste à l'intérieur de la zone d'upload (anti-traversal) et retourne un compte rendu
-de ce qui a été supprimé.
+**Ce que vous allez apprendre :** `delete_media_file` prend un **chemin relatif**, reste à l'intérieur de la zone d'upload (anti-traversal) et retourne un compte rendu de ce qui a été supprimé.
 
 Troisième palier du **niveau intermédiaire** de la progression files.
 
@@ -31,8 +28,8 @@ Troisième palier du **niveau intermédiaire** de la progression files.
 forge run
 ```
 
-Stockez un fichier, puis supprimez-le via son chemin sur
-`https://localhost:8000/file-delete`. Un chemin hors zone est refusé.
+Stockez un fichier, puis supprimez-le via son chemin sur `https://localhost:8000/file-delete`.
+Un chemin hors zone est refusé.
 
 ## Le contrôleur
 
@@ -126,10 +123,8 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Le compte rendu (`{"original": ...}`) dit si le fichier existait : la suppression
-  est **idempotente**, supprimer un absent ne plante pas.
-- La garde anti-traversal est la **même primitive** que pour servir : on ne
-  supprime jamais hors de la racine d'upload.
+- Le compte rendu (`{"original": ...}`) dit si le fichier existait : la suppression est **idempotente**, supprimer un absent ne plante pas.
+- La garde anti-traversal est la **même primitive** que pour servir : on ne supprime jamais hors de la racine d'upload.
 
 ## À retenir
 
@@ -139,7 +134,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous maîtrisez le cycle de vie. La suite : les **primitives** de sécurité qui le
-sous-tendent.
+Vous maîtrisez le cycle de vie.
+La suite : les **primitives** de sécurité qui le sous-tendent.
 
 [Bilan du niveau intermédiaire](bilan.md)

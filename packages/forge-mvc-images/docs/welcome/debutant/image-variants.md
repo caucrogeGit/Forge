@@ -1,27 +1,22 @@
 # Miniatures et variantes
 
-Objectif : comprendre **où** Forge range les variantes d'une image (`medium`,
-`thumbnail`) et **comment construire leurs URL publiques**, sans rien
-téléverser.
+Objectif : comprendre **où** Forge range les variantes d'une image (`medium`, `thumbnail`) et **comment construire leurs URL publiques**, sans rien téléverser.
 
-**Ce que vous allez apprendre :** `image_variant_relative_paths(path)` dérive,
-par simple transformation de chemin, l'originale et ses variantes
-(`parent/medium/nom`, `parent/thumbnail/nom`). `media_url(rel)` en fait une URL
-publique `/media/...`. C'est une transformation de chaîne **pure** : aucune
-écriture, aucune base de données, aucune image réelle requise.
+**Ce que vous allez apprendre :** `image_variant_relative_paths(path)` dérive, par simple transformation de chemin, l'originale et ses variantes (`parent/medium/nom`, `parent/thumbnail/nom`).
+`media_url(rel)` en fait une URL publique `/media/...`.
+C'est une transformation de chaîne **pure** : aucune écriture, aucune base de données, aucune image réelle requise.
 
 Troisième palier du **niveau débutant** de la progression images.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation » de
-    ce parcours).
+    Ce starter suppose `forge-mvc-images` installé (palier « Installation »
+    de ce parcours).
 
 ## Ce que ce starter montre
 
 - la dérivation des chemins de variantes avec `image_variant_relative_paths` ;
 - la construction des URL publiques avec `media_url` ;
-- l'affichage du tableau originale / `medium` / `thumbnail` pour un chemin donné
-  (`GET /image-variants?path=...`) ;
+- l'affichage du tableau originale / `medium` / `thumbnail` pour un chemin donné (`GET /image-variants?path=...`) ;
 - la même information en JSON (`GET /image-variants/inspect`).
 
 Aucune base de données.
@@ -41,9 +36,8 @@ Aucune base de données.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/image-variants` : la page affiche, pour un chemin
-d'exemple, l'originale et ses variantes avec leurs URL. Changez de chemin avec
-`?path=images/2026/autre.png`.
+Ouvrez `https://localhost:8000/image-variants` : la page affiche, pour un chemin d'exemple, l'originale et ses variantes avec leurs URL.
+Changez de chemin avec `?path=images/2026/autre.png`.
 
 ## Le contrôleur
 
@@ -96,15 +90,10 @@ class ImageVariantsController(BaseController):
 
 ### Comprendre ce code
 
-- `image_variant_relative_paths("images/2026/photo.jpg")` retourne
-  `{"original": "images/2026/photo.jpg", "medium": "images/2026/medium/photo.jpg",
-  "thumbnail": "images/2026/thumbnail/photo.jpg"}` ; les variantes vivent dans un
-  sous-dossier frère, à côté de l'originale.
-- C'est une **convention de nommage**, pas une lecture de disque : la fonction
-  ne touche aucun fichier, elle transforme une chaîne. Pratique pour comprendre
-  sans rien téléverser.
-- `media_url(rel)` préfixe le chemin relatif par `/media/` pour obtenir l'URL
-  servie publiquement.
+- `image_variant_relative_paths("images/2026/photo.jpg")` retourne `{"original": "images/2026/photo.jpg", "medium": "images/2026/medium/photo.jpg", "thumbnail": "images/2026/thumbnail/photo.jpg"}` ; les variantes vivent dans un sous-dossier frère, à côté de l'originale.
+- C'est une **convention de nommage**, pas une lecture de disque : la fonction ne touche aucun fichier, elle transforme une chaîne.
+  Pratique pour comprendre sans rien téléverser.
+- `media_url(rel)` préfixe le chemin relatif par `/media/` pour obtenir l'URL servie publiquement.
 
 ## La vue
 
@@ -164,14 +153,12 @@ with router.group("", public=True) as public:
 
 ## À retenir
 
-- Les variantes suivent une **convention de chemin** prévisible
-  (`parent/<taille>/nom`).
+- Les variantes suivent une **convention de chemin** prévisible (`parent/<taille>/nom`).
 - Dériver un chemin de variante est une transformation **pure**, sans I/O.
 - `media_url` fait le pont entre le chemin de stockage et l'URL publique.
 
 ## Après ce starter
 
-Vous avez fait le tour du niveau débutant : inspecter le module, téléverser une
-image, comprendre ses variantes.
+Vous avez fait le tour du niveau débutant : inspecter le module, téléverser une image, comprendre ses variantes.
 
 [Bilan du niveau débutant](bilan.md)

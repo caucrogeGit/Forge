@@ -234,7 +234,8 @@ Le chemin servi par `serve_media_file` est validé pour rester sous `UPLOAD_ROOT
 !!! note "Validation au cœur, écriture dans l'opt-in"
     La validation pure (extension, MIME, taille) vit dans `core.forms.upload_validation` et est réexportée ici (ADR-019).
 
-    L'écriture, le service et le rate-limit vivent dans l'opt-in. Le cœur ne dépend pas de `forge-mvc-files` (ADR-004).
+    L'écriture, le service et le rate-limit vivent dans l'opt-in.
+    Le cœur ne dépend pas de `forge-mvc-files` (ADR-004).
 
 !!! note "Configuration du stockage"
     La racine de stockage est `UPLOAD_ROOT` (défaut `storage/uploads`).

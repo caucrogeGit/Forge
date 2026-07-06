@@ -21,8 +21,7 @@ La table n'est jamais créée automatiquement.
 | `get_all_settings()` | `dict` de tous les paramètres, triés par clé. |
 | `delete_setting(key)` | `True` si le paramètre existait, `False` sinon. |
 
-Toutes ces fonctions acceptent un paramètre `db=` injectable (défaut
-`core.database.db`), utile en test.
+Toutes ces fonctions acceptent un paramètre `db=` injectable (défaut `core.database.db`), utile en test.
 
 ## Clés et types
 

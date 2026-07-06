@@ -1,14 +1,11 @@
 # Tableau de bord IoT
 
-Objectif : afficher les derniers événements dans une **page HTML** lisible par un
-humain.
+Objectif : afficher les derniers événements dans une **page HTML** lisible par un humain.
 
-**Ce que vous allez apprendre :** combiner `IotEventRepository.list_recent` et
-`BaseController.render` pour présenter les événements dans un tableau. Après
-l'API JSON (côté machine), voici la lecture **côté humain**.
+**Ce que vous allez apprendre :** combiner `IotEventRepository.list_recent` et `BaseController.render` pour présenter les événements dans un tableau.
+Après l'API JSON (côté machine), voici la lecture **côté humain**.
 
-Dernier palier du **niveau intermédiaire** de la progression IoT, après
-[Exposer l'API IoT](iot-api.md).
+Dernier palier du **niveau intermédiaire** de la progression IoT, après [Exposer l'API IoT](iot-api.md).
 
 ## Ce que ce starter montre
 
@@ -32,9 +29,8 @@ forge db:init
 forge run
 ```
 
-Ouvrez `https://localhost:8000/iot-dashboard` : les événements injectés au palier
-*Simuler une mesure IoT* s'affichent dans un tableau. Sans données, la page
-affiche un message d'invitation.
+Ouvrez `https://localhost:8000/iot-dashboard` : les événements injectés au palier *Simuler une mesure IoT* s'affichent dans un tableau.
+Sans données, la page affiche un message d'invitation.
 
 ## Le contrôleur
 
@@ -67,12 +63,9 @@ class IotDashboardController(BaseController):
 
 ### Comprendre ce code
 
-- `list_recent(limit=50)` renvoie les 50 derniers événements ; on les passe au
-  template via le `context`.
-- Le `try/except` garde la page **robuste** : pas de table → tableau vide, pas de
-  page d'erreur.
-- C'est le **même** repository qu'aux paliers de lecture : on change seulement la
-  sortie (HTML au lieu de JSON).
+- `list_recent(limit=50)` renvoie les 50 derniers événements ; on les passe au template via le `context`.
+- Le `try/except` garde la page **robuste** : pas de table → tableau vide, pas de page d'erreur.
+- C'est le **même** repository qu'aux paliers de lecture : on change seulement la sortie (HTML au lieu de JSON).
 
 ## La vue
 
@@ -128,9 +121,8 @@ with router.group("", public=True) as public:
 
 ## La migration
 
-Le tableau de bord lit la table `iot_events`. Créez le fichier de migration
-ci-dessous (le nom commence par un horodatage), puis appliquez-le avec
-`forge db:init`.
+Le tableau de bord lit la table `iot_events`.
+Créez le fichier de migration ci-dessous (le nom commence par un horodatage), puis appliquez-le avec `forge db:init`.
 
 ```sql
 -- mvc/migrations/20260601190000_create_iot_events.sql
@@ -150,8 +142,7 @@ CREATE TABLE IF NOT EXISTS iot_events (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-`CREATE TABLE IF NOT EXISTS` rend la migration idempotente : elle est sûre même
-si un autre palier a déjà créé la table.
+`CREATE TABLE IF NOT EXISTS` rend la migration idempotente : elle est sûre même si un autre palier a déjà créé la table.
 
 ## À retenir
 

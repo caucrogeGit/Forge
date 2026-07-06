@@ -2,24 +2,22 @@
 
 Objectif : extraire les **métadonnées** d'une vidéo uploadée avec ffprobe.
 
-**Ce que vous allez apprendre :** `probe_video`. La fonction lance **ffprobe**
-(lecture seule) sur le fichier d'origine d'une vidéo et en extrait durée,
-dimensions, codecs et conteneur. C'est l'étape qui **précède le transcodage** :
-on inspecte la source avant de la convertir.
+**Ce que vous allez apprendre :** `probe_video`.
+La fonction lance **ffprobe** (lecture seule) sur le fichier d'origine d'une vidéo et en extrait durée, dimensions, codecs et conteneur.
+C'est l'étape qui **précède le transcodage** : on inspecte la source avant de la convertir.
 
-Premier palier du **niveau avancé** de la progression vidéo, la bascule vers le
-**transcodage réel**. Après le [niveau intermédiaire](../intermediaire/bilan.md).
+Premier palier du **niveau avancé** de la progression vidéo, la bascule vers le **transcodage réel**.
+Après le [niveau intermédiaire](../intermediaire/bilan.md).
 
 !!! note "ffprobe requis"
-    Ce palier exécute **ffprobe**. Installez ffmpeg/ffprobe et renseignez au
-    besoin `FORGE_VIDEO_FFPROBE_BIN`. ffprobe **lit** la source ; il ne
-    transcode pas.
+    Ce palier exécute **ffprobe**.
+    Installez ffmpeg/ffprobe et renseignez au besoin `FORGE_VIDEO_FFPROBE_BIN`.
+    ffprobe **lit** la source ; il ne transcode pas.
 
 ## Ce que ce starter montre
 
 - la sonde d'un fichier via `probe_video` (ffprobe, lecture seule) ;
-- l'extraction de `duration_seconds`, `width`, `height`, `video_codec`,
-  `audio_codec`, `container` ;
+- l'extraction de `duration_seconds`, `width`, `height`, `video_codec`, `audio_codec`, `container` ;
 - des réponses pédagogiques : `404` (UUID inconnu), `502` (sonde échouée).
 
 La table `videos` est garantie par la migration fournie plus bas.
@@ -39,9 +37,7 @@ forge db:init
 forge run
 ```
 
-Avec une vidéo uploadée (niveau intermédiaire) et ffprobe installé, ouvrez
-`https://localhost:8000/video-probe/<uuid>` : la réponse JSON donne les
-métadonnées extraites du fichier.
+Avec une vidéo uploadée (niveau intermédiaire) et ffprobe installé, ouvrez `https://localhost:8000/video-probe/<uuid>` : la réponse JSON donne les métadonnées extraites du fichier.
 
 ## Le contrôleur
 
@@ -103,18 +99,16 @@ class VideoProbeController(BaseController):
 
 ### Comprendre ce code
 
-- On retrouve le **chemin** du fichier via la ligne `videos` (`original_path`,
-  relatif à `storage_root`), jamais un chemin fourni par le client.
-- `probe_video(path, config=cfg)` exécute ffprobe en **lecture seule** : il
-  n'altère pas le fichier. Une `VideoProbeError` (source illisible, pas une vidéo)
-  devient un `502` clair.
-- C'est l'inspection préalable : le transcodage proprement dit vient au palier
-  suivant.
+- On retrouve le **chemin** du fichier via la ligne `videos` (`original_path`, relatif à `storage_root`), jamais un chemin fourni par le client.
+- `probe_video(path, config=cfg)` exécute ffprobe en **lecture seule** : il n'altère pas le fichier.
+  Une `VideoProbeError` (source illisible, pas une vidéo) devient un `502` clair.
+- C'est l'inspection préalable : le transcodage proprement dit vient au palier suivant.
 
 ## La migration
 
-La sonde lit le chemin du fichier d'origine depuis la table `videos`. Créez-la
-si elle n'existe pas déjà. `CREATE TABLE IF NOT EXISTS` reste idempotent.
+La sonde lit le chemin du fichier d'origine depuis la table `videos`.
+Créez-la si elle n'existe pas déjà.
+`CREATE TABLE IF NOT EXISTS` reste idempotent.
 
 ```sql
 -- mvc/migrations/20260601230000_create_videos.sql
@@ -160,6 +154,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous savez inspecter une source. La suite : la **transcoder** en MP4.
+Vous savez inspecter une source.
+La suite : la **transcoder** en MP4.
 
 [Transcoder une vidéo](video-transcode.md)

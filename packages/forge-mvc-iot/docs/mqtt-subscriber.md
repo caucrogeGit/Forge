@@ -1,17 +1,12 @@
 # Subscriber MQTT Forge IoT
 
-> **Statut** : subscriber **livré**, branché sur
-> [paho-mqtt](https://pypi.org/project/paho-mqtt/). Le module parse les
-> messages en objets `Measurement`, les **persiste** dans `iot_events`, les
-> **expose** via une API HTTP JSON, et fournit la CLI `iot:*`
-> (`doctor`/`init`/`listen`/`simulate`). Cette page décrit la couche subscriber.
+> **Statut** : subscriber **livré**, branché sur [paho-mqtt](https://pypi.org/project/paho-mqtt/).
+> Le module parse les messages en objets `Measurement`, les **persiste** dans `iot_events`, les **expose** via une API HTTP JSON, et fournit la CLI `iot:*` (`doctor`/`init`/`listen`/`simulate`).
+> Cette page décrit la couche subscriber.
 
 ## Objectif
 
-Brancher Forge sur un broker MQTT pour recevoir les messages des
-capteurs, **strictement selon le contrat figé** par
-[IOT-MQTT-CONTRACT-001](mqtt-contract.md), et délivrer chaque mesure
-valide à un callback applicatif.
+Brancher Forge sur un broker MQTT pour recevoir les messages des capteurs, **strictement selon le contrat figé** par [IOT-MQTT-CONTRACT-001](mqtt-contract.md), et délivrer chaque mesure valide à un callback applicatif.
 
 ## Architecture du module
 
@@ -25,8 +20,7 @@ Le code est volontairement scindé en deux modules :
 Cette séparation permet de :
 
 - tester l'intégralité du contrat sans installer ou simuler un broker ;
-- réutiliser `parse_message` ailleurs (par exemple dans un test d'API
-  HTTP qui injecte directement une mesure) ;
+- réutiliser `parse_message` ailleurs (par exemple dans un test d'API HTTP qui injecte directement une mesure) ;
 - changer plus tard de bibliothèque MQTT sans toucher au contrat.
 
 ## API publique
@@ -66,13 +60,12 @@ class Measurement:
     metadata: dict[str, str] | None
 ```
 
-Le `timestamp` reste en chaîne ISO pour rester proche du payload reçu :
-les consommateurs convertissent en `datetime` quand ils en ont besoin.
+Le `timestamp` reste en chaîne ISO pour rester proche du payload reçu : les consommateurs convertissent en `datetime` quand ils en ont besoin.
 
 ### `contract.ContractError`
 
-Exception levée pour toute violation du contrat. Porte un attribut
-`code` issu de la taxonomie stable :
+Exception levée pour toute violation du contrat.
+Porte un attribut `code` issu de la taxonomie stable :
 
 | Constante | Valeur |
 |-----------|--------|
@@ -82,8 +75,7 @@ Exception levée pour toute violation du contrat. Porte un attribut
 | `CODE_PAYLOAD_FIELD_TYPE` | `"PAYLOAD_FIELD_TYPE"` |
 | `CODE_PAYLOAD_VALUE_FORMAT` | `"PAYLOAD_VALUE_FORMAT"` |
 
-Ces codes sont identiques à ceux documentés dans
-[Contrat MQTT : Erreurs](mqtt-contract.md#erreurs-de-contrat-taxonomie).
+Ces codes sont identiques à ceux documentés dans [Contrat MQTT : Erreurs](mqtt-contract.md#erreurs-de-contrat-taxonomie).
 
 ```python
 from forge_mvc_iot.mqtt.contract import ContractError, parse_message
@@ -168,8 +160,7 @@ if __name__ == "__main__":
     main()
 ```
 
-Avec un Mosquitto local qui tourne, on peut publier depuis un autre
-terminal :
+Avec un Mosquitto local qui tourne, on peut publier depuis un autre terminal :
 
 ```bash
 mosquitto_pub \
@@ -219,48 +210,38 @@ sub.handle_message(
 )
 ```
 
-C'est le pattern utilisé par la suite de tests
-`tests/test_iot_mqtt_subscriber_001.py`.
+C'est le pattern utilisé par la suite de tests `tests/test_iot_mqtt_subscriber_001.py`.
 
 ## Comportement face aux erreurs
 
-Pour chaque message reçu, le subscriber tente
-`parse_message(topic, payload)` :
+Pour chaque message reçu, le subscriber tente `parse_message(topic, payload)` :
 
 - **Succès** → `on_measurement(Measurement)` est appelé.
 - **`ContractError`** :
-  - un message `WARNING` est logué sur `forge_mvc_iot.mqtt.subscriber`
-    avec le code d'erreur et le topic en cause ;
-  - si `on_contract_error` est fourni, il est appelé avec
-    `(exc, topic, payload)` ;
-  - le subscriber **ne se déconnecte pas** : un message invalide ne
-    casse pas la session MQTT.
+  - un message `WARNING` est logué sur `forge_mvc_iot.mqtt.subscriber` avec le code d'erreur et le topic en cause ;
+  - si `on_contract_error` est fourni, il est appelé avec `(exc, topic, payload)` ;
+  - le subscriber **ne se déconnecte pas** : un message invalide ne casse pas la session MQTT.
 
-Les erreurs de connexion broker (broker injoignable, identifiants
-refusés) restent gérées par paho-mqtt. La reconnexion automatique se
-fait via `loop_forever()` / `loop_start()`. Un raffinement (backoff,
-politique de reconnexion personnalisée) sera abordé dans
-`IOT-DOCTOR-001`.
+Les erreurs de connexion broker (broker injoignable, identifiants refusés) restent gérées par paho-mqtt.
+La reconnexion automatique se fait via `loop_forever()` / `loop_start()`.
+Un raffinement (backoff, politique de reconnexion personnalisée) sera abordé dans `IOT-DOCTOR-001`.
 
 ## Décisions verrouillées
 
-- **`site` et `device_id` viennent du topic.** Tout champ `site` ou
-  `device_id` présent dans le payload est ignoré silencieusement
-  (couvert par les tests).
-- **Codes d'erreur stables.** La taxonomie est figée : un futur test
-  du subscriber peut s'appuyer sur `exc.code == "PAYLOAD_PARSE"` sans
-  craindre un renommage.
-- **Pas d'imports paho dans `contract.py`.** La séparation est testée :
-  `parse_message` reste utilisable même si paho-mqtt n'est pas installé.
+- **`site` et `device_id` viennent du topic.**
+  Tout champ `site` ou `device_id` présent dans le payload est ignoré silencieusement (couvert par les tests).
+- **Codes d'erreur stables.**
+  La taxonomie est figée : un futur test du subscriber peut s'appuyer sur `exc.code == "PAYLOAD_PARSE"` sans craindre un renommage.
+- **Pas d'imports paho dans `contract.py`.**
+  La séparation est testée : `parse_message` reste utilisable même si paho-mqtt n'est pas installé.
 
 ## Hors périmètre du module
 
-Le module couvre l'ingestion (subscriber), le stockage `iot_events`, l'API HTTP
-JSON et la CLI `iot:*`. Restent hors périmètre :
+Le module couvre l'ingestion (subscriber), le stockage `iot_events`, l'API HTTP JSON et la CLI `iot:*`.
+Restent hors périmètre :
 
 - pas de dashboard, pas de Forge Design ;
 - pas d'ACL Mosquitto gérée par Forge (côté broker) ;
 - pas de downlink Forge → capteur (commande descendante).
 
-Voir [Architecture Forge IoT](architecture.md#tickets-suivants) pour la
-liste complète des jalons.
+Voir [Architecture Forge IoT](architecture.md#tickets-suivants) pour la liste complète des jalons.

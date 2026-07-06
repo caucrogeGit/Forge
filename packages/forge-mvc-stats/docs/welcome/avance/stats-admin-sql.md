@@ -2,9 +2,8 @@
 
 Objectif : **voir** le SQL de lecture filtrable des événements.
 
-**Ce que vous allez apprendre :** `get_stats_events_admin_sql` construit un `SELECT`
-filtrable (nom, catégorie, limite) ; `prepare_stats_events_admin_params` fournit ses
-paramètres liés. SQL visible, filtres paramétrés.
+**Ce que vous allez apprendre :** `get_stats_events_admin_sql` construit un `SELECT` filtrable (nom, catégorie, limite) ; `prepare_stats_events_admin_params` fournit ses paramètres liés.
+SQL visible, filtres paramétrés.
 
 Premier palier du **niveau avancé** de la progression stats.
 

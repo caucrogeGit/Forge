@@ -1,11 +1,10 @@
 # Aide-mémoire de la progression Vidéo
 
-Récapitulatif des paliers de la progression *Welcome Vidéo* et des API du
-module opt-in `forge-mvc-video` introduites à chaque étape.
+Récapitulatif des paliers de la progression *Welcome Vidéo* et des API du module opt-in `forge-mvc-video` introduites à chaque étape.
 
 !!! note "Module opt-in"
-    Toute cette progression suppose `forge-mvc-video` installé
-    (`forge opt-in:install video`). Le cœur de Forge reste autonome.
+    Toute cette progression suppose `forge-mvc-video` installé (`forge opt-in:install video`).
+    Le cœur de Forge reste autonome.
 
 ## Niveau débutant : découvrir (lecture, sans ffmpeg)
 

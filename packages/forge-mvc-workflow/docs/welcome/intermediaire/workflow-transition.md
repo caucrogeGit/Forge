@@ -2,9 +2,8 @@
 
 Objectif : déclarer les **passages autorisés** entre statuts.
 
-**Ce que vous allez apprendre :** `make_transition(from, to)` crée une transition ;
-`validate_transitions` vérifie l'ensemble contre les statuts connus. Ce qui n'est
-**pas** déclaré est interdit (fermé par défaut).
+**Ce que vous allez apprendre :** `make_transition(from, to)` crée une transition ; `validate_transitions` vérifie l'ensemble contre les statuts connus.
+Ce qui n'est **pas** déclaré est interdit (fermé par défaut).
 
 Premier palier du **niveau intermédiaire** de la progression workflow.
 

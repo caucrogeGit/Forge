@@ -7,13 +7,11 @@ Objectif : ajouter un article depuis le back-office.
 La fiche et la liste mènent à `/admin/articles/new`.
 La page affiche un formulaire avec un champ par colonne de `form_fields`.
 
-Le formulaire est protégé contre la falsification de requête (CSRF) : un jeton
-caché est inséré automatiquement et vérifié à la soumission.
+Le formulaire est protégé contre la falsification de requête (CSRF) : un jeton caché est inséré automatiquement et vérifié à la soumission.
 
 ## Ce qui est écrit
 
-À la soumission (`POST /admin/articles/new`), seules les colonnes de
-`form_fields` sont insérées :
+À la soumission (`POST /admin/articles/new`), seules les colonnes de `form_fields` sont insérées :
 
 ```sql
 INSERT INTO articles (title, body) VALUES (?, ?)
@@ -23,8 +21,7 @@ Les valeurs passent par des paramètres.
 Une valeur laissée vide est enregistrée comme `NULL`.
 Aucune autre colonne ne peut être écrite : c'est une liste blanche.
 
-En cas de succès, le back-office redirige vers la fiche de la ligne créée et
-affiche un message de confirmation.
+En cas de succès, le back-office redirige vers la fiche de la ligne créée et affiche un message de confirmation.
 
 ## Limite à connaître
 

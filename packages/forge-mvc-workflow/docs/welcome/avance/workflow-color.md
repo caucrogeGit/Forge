@@ -2,10 +2,8 @@
 
 Objectif : accéder aux **pièces** d'un badge pour un affichage sur mesure.
 
-**Ce que vous allez apprendre :** `workflow_status_label` (texte),
-`workflow_status_color` (couleur, défaut `gray`) et `workflow_status_badge_class`
-(classes Tailwind, repli gris si couleur inconnue) exposent séparément les éléments
-d'un statut. Ils acceptent un statut **ou** une simple chaîne.
+**Ce que vous allez apprendre :** `workflow_status_label` (texte), `workflow_status_color` (couleur, défaut `gray`) et `workflow_status_badge_class` (classes Tailwind, repli gris si couleur inconnue) exposent séparément les éléments d'un statut.
+Ils acceptent un statut **ou** une simple chaîne.
 
 Deuxième palier du **niveau avancé** de la progression workflow.
 
@@ -78,8 +76,7 @@ class WorkflowColorController(BaseController):
 
 ### Comprendre ce code
 
-- Ces helpers servent quand le badge tout fait ne suffit pas (intégration design
-  spécifique).
+- Ces helpers servent quand le badge tout fait ne suffit pas (intégration design spécifique).
 - Ils sont **tolérants** : une couleur inconnue retombe sur le gris, un `None` est géré.
 - Accepter une chaîne **ou** un statut les rend utilisables même sans objet complet.
 

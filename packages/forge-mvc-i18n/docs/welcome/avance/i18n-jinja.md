@@ -2,16 +2,14 @@
 
 Objectif : traduire directement dans une vue Jinja.
 
-**Ce que vous allez apprendre :** quand `forge-mvc-i18n` est installé, `trans`
-est disponible comme **global Jinja**. On écrit `{{ trans("welcome.title") }}`
-dans un template. Les valeurs traduites sont **auto-échappées** comme tout le
-reste : pas d'injection HTML.
+**Ce que vous allez apprendre :** quand `forge-mvc-i18n` est installé, `trans` est disponible comme **global Jinja**.
+On écrit `{{ trans("welcome.title") }}` dans un template.
+Les valeurs traduites sont **auto-échappées** comme tout le reste : pas d'injection HTML.
 
 Premier palier du **niveau avancé**.
 
 !!! note "Module opt-in : auto-échappement"
-    L'auto-échappement HTML de Jinja s'applique aux traductions : une valeur
-    contenant `<` est rendue en `&lt;`, jamais interprétée.
+    L'auto-échappement HTML de Jinja s'applique aux traductions : une valeur contenant `<` est rendue en `&lt;`, jamais interprétée.
 
 ## Classes Forge utilisées
 
@@ -54,10 +52,8 @@ class I18nPageController(BaseController):
 
 ### Comprendre ce code
 
-- `trans` est injecté comme global Jinja par le moteur de rendu Forge : pas
-  d'import à faire dans le template.
-- On passe la `locale` au contexte, puis `{{ trans("clé", locale) }}` rend la
-  bonne langue.
+- `trans` est injecté comme global Jinja par le moteur de rendu Forge : pas d'import à faire dans le template.
+- On passe la `locale` au contexte, puis `{{ trans("clé", locale) }}` rend la bonne langue.
 - Si une traduction contenait du HTML, l'auto-échappement la neutralise.
 
 ## La route
@@ -78,6 +74,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous éditez un catalogue à chaud : pourquoi la page ne change-t-elle pas ? Le **cache**.
+Vous éditez un catalogue à chaud : pourquoi la page ne change-t-elle pas ?
+Le **cache**.
 
 [Vider le cache](i18n-cache.md)

@@ -1,12 +1,9 @@
 # Chemin anti-traversal
 
-Objectif : juger si un **chemin** reste à l'intérieur de la racine d'upload : la
-défense contre la traversée de répertoire.
+Objectif : juger si un **chemin** reste à l'intérieur de la racine d'upload : la défense contre la traversée de répertoire.
 
-**Ce que vous allez apprendre :** `is_safe_media_path(path)` répond oui/non,
-`normalize_media_path(path)` renvoie un chemin relatif sûr ou **refuse**
-(`UploadStorageError`). Ce sont les primitives que `serve_media_file` et
-`delete_media_file` utilisent en interne.
+**Ce que vous allez apprendre :** `is_safe_media_path(path)` répond oui/non, `normalize_media_path(path)` renvoie un chemin relatif sûr ou **refuse** (`UploadStorageError`).
+Ce sont les primitives que `serve_media_file` et `delete_media_file` utilisent en interne.
 
 Deuxième palier du **niveau avancé** de la progression files.
 
@@ -32,8 +29,7 @@ Deuxième palier du **niveau avancé** de la progression files.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/file-safe-path` et comparez `documents/a.pdf` (sûr)
-et `../../etc/passwd` (refusé).
+Ouvrez `https://localhost:8000/file-safe-path` et comparez `documents/a.pdf` (sûr) et `../../etc/passwd` (refusé).
 
 ## Le contrôleur
 
@@ -120,19 +116,19 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- `../../etc/passwd` est jugé **non sûr** et **refusé** à la normalisation : c'est
-  exactement ce qui empêche de servir ou supprimer un fichier hors zone.
-- Ces deux fonctions sont les **primitives** sous `serve_media_file` /
-  `delete_media_file` : la garde est écrite **une fois**, réutilisée partout.
+- `../../etc/passwd` est jugé **non sûr** et **refusé** à la normalisation : c'est exactement ce qui empêche de servir ou supprimer un fichier hors zone.
+- Ces deux fonctions sont les **primitives** sous `serve_media_file` / `delete_media_file` : la garde est écrite **une fois**, réutilisée partout.
 
 ## À retenir
 
 - L'anti-traversal repose sur `is_safe_media_path` + `normalize_media_path`.
-- Un chemin piégé est **refusé**, pas « corrigé » silencieusement.
+- Un chemin piégé est **refusé**, pas « corrigé »
+  silencieusement.
 - Sécurité écrite **une fois**, composée par tout le module (et les opt-ins média).
 
 ## Après ce starter
 
-Vous comprenez la garde de chemin. Dernier palier : écrire des octets générés.
+Vous comprenez la garde de chemin.
+Dernier palier : écrire des octets générés.
 
 [Écrire des octets générés](file-bytes.md)

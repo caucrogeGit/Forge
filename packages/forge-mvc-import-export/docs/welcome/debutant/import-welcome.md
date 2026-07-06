@@ -2,12 +2,9 @@
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-import-export`.
 
-**Ce que vous allez apprendre :** la lecture d'un CSV repose sur la fonction
-`parse_csv`.
-On lui passe le texte d'un fichier CSV et elle renvoie une liste de
-dictionnaires, une par ligne de données.
-Le module ne sait rien de vos entités : il rend des chaînes, vous décidez
-ensuite quoi en faire.
+**Ce que vous allez apprendre :** la lecture d'un CSV repose sur la fonction `parse_csv`.
+On lui passe le texte d'un fichier CSV et elle renvoie une liste de dictionnaires, une par ligne de données.
+Le module ne sait rien de vos entités : il rend des chaînes, vous décidez ensuite quoi en faire.
 
 Premier palier du **niveau débutant** de la progression Import/Export.
 
@@ -40,10 +37,8 @@ for ligne in lignes:
 
 ### Comprendre ce code
 
-- `parse_csv(texte)` lit la première ligne comme en-tête : `nom` et `age`
-  deviennent les clés.
-- Chaque ligne de données devient un dictionnaire, par exemple
-  `{"nom": "Alice", "age": "30"}`.
+- `parse_csv(texte)` lit la première ligne comme en-tête : `nom` et `age` deviennent les clés.
+- Chaque ligne de données devient un dictionnaire, par exemple `{"nom": "Alice", "age": "30"}`.
 - Les valeurs sont des chaînes : `age` vaut `"30"`, pas l'entier `30`.
   La conversion viendra plus tard, au niveau intermédiaire.
 

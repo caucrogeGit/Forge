@@ -14,7 +14,6 @@ Vous savez manipuler des paramètres typés, les lister tous et en supprimer.
 
 ## Et ensuite
 
-Place au niveau **avancé** : les règles de clé, la gestion de `SettingsError`,
-et l'indépendance du cœur.
+Place au niveau **avancé** : les règles de clé, la gestion de `SettingsError`, et l'indépendance du cœur.
 
 [Niveau avancé : Les règles de clé](../avance/settings-keys.md)

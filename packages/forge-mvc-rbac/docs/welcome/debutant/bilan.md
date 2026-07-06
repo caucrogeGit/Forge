@@ -1,7 +1,7 @@
 # Bilan : niveau débutant (RBAC)
 
-Récapitulatif du **niveau débutant** de la progression *Welcome RBAC*. Ce
-niveau pose les briques : contrat déclaratif, permissions, rôles.
+Récapitulatif du **niveau débutant** de la progression *Welcome RBAC*.
+Ce niveau pose les briques : contrat déclaratif, permissions, rôles.
 
 ## Ce que vous avez validé
 
@@ -15,7 +15,6 @@ Vous comprenez le vocabulaire RBAC : rôles, permissions, contrat déclaratif.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : vérifier une permission, protéger une route,
-conditionner l'interface.
+Place au niveau **intermédiaire** : vérifier une permission, protéger une route, conditionner l'interface.
 
 [Niveau intermédiaire : Vérifier une permission](../intermediaire/rbac-check.md)

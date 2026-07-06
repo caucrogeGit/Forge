@@ -2,13 +2,12 @@
 
 Objectif : retomber sur une autre langue quand une clé manque.
 
-**Ce que vous allez apprendre :** `set_fallback_locale("en")` déclare une langue
-de secours. Si une clé est absente du catalogue de la locale courante mais
-présente dans le catalogue de secours, `trans` renvoie la valeur de secours.
+**Ce que vous allez apprendre :** `set_fallback_locale("en")` déclare une langue de secours.
+Si une clé est absente du catalogue de la locale courante mais présente dans le catalogue de secours, `trans` renvoie la valeur de secours.
 
 !!! note "Module opt-in"
-    Le repli porte sur les **clés manquantes** d'une locale existante. Si le
-    catalogue principal lui-même est absent, c'est une erreur (niveau avancé).
+    Le repli porte sur les **clés manquantes** d'une locale existante.
+    Si le catalogue principal lui-même est absent, c'est une erreur (niveau avancé).
 
 ## Classes Forge utilisées
 
@@ -64,10 +63,8 @@ class I18nFallbackController(BaseController):
 ### Comprendre ce code
 
 - `trans("nav.home")` trouve la clé en `fr` → `"Accueil"`.
-- `trans("footer.note")` ne la trouve pas en `fr`, bascule sur le catalogue de
-  secours `en` → `"All rights reserved"`.
-- Le repli **n'écrase pas** la langue principale : il ne sert que de filet pour
-  les clés manquantes.
+- `trans("footer.note")` ne la trouve pas en `fr`, bascule sur le catalogue de secours `en` → `"All rights reserved"`.
+- Le repli **n'écrase pas** la langue principale : il ne sert que de filet pour les clés manquantes.
 
 ## La route
 
@@ -87,6 +84,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Et si la clé manque **partout** ? Voyons le comportement par défaut.
+Et si la clé manque **partout** ?
+Voyons le comportement par défaut.
 
 [Clé manquante](i18n-missing.md)

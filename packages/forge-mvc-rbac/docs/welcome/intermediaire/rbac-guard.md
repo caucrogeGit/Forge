@@ -1,10 +1,8 @@
 # Protéger une route
 
-Objectif : refuser l'accès à une route si les rôles n'accordent pas la permission
-requise.
+Objectif : refuser l'accès à une route si les rôles n'accordent pas la permission requise.
 
-**Ce que vous allez apprendre :** `require_contract_permission(result, roles, permission)`
-renvoie une réponse `403` si la permission manque, sinon `None` (la route continue).
+**Ce que vous allez apprendre :** `require_contract_permission(result, roles, permission)` renvoie une réponse `403` si la permission manque, sinon `None` (la route continue).
 Une ligne en tête de contrôleur suffit.
 
 Deuxième palier du **niveau intermédiaire** de la progression RBAC.
@@ -30,8 +28,7 @@ Deuxième palier du **niveau intermédiaire** de la progression RBAC.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/rbac-guard?roles=reader` (403) puis `?roles=editor`
-(autorisé).
+Ouvrez `https://localhost:8000/rbac-guard?roles=reader` (403) puis `?roles=editor` (autorisé).
 
 ## Le contrôleur
 
@@ -67,16 +64,14 @@ class RbacGuardController(BaseController):
 
 ### Comprendre ce code
 
-- Le pattern est **explicite** : on appelle la garde, et si elle renvoie une réponse,
-  on la retourne immédiatement (court-circuit `403`).
-- En production, les **rôles viennent de l'utilisateur connecté**, pas de l'URL ;
-  ici on les passe en paramètre pour la démonstration.
+- Le pattern est **explicite** : on appelle la garde, et si elle renvoie une réponse, on la retourne immédiatement (court-circuit `403`).
+- En production, les **rôles viennent de l'utilisateur connecté**, pas de l'URL ; ici on les passe en paramètre pour la démonstration.
 - La permission requise est déclarée **une fois**, en tête de l'action.
 
 ## Le contrat
 
-Ce palier réutilise le contrat `mvc/security/rbac.json` introduit au palier
-« Welcome RBAC ». Si vous démarrez ici, créez-le :
+Ce palier réutilise le contrat `mvc/security/rbac.json` introduit au palier « Welcome RBAC ».
+Si vous démarrez ici, créez-le :
 
 ```json
 {

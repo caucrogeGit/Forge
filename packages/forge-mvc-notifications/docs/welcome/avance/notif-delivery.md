@@ -2,8 +2,7 @@
 
 Objectif : comprendre que ce paquet ne fait que le stockage in-app, et comment livrer hors application.
 
-**Ce que vous allez apprendre :** le périmètre V1 de `forge-mvc-notifications` se limite aux notifications in-app, c'est-à-dire des lignes en base, affichées dans l'IHM.
-La livraison hors application (email, push) reste applicative.
+**Ce que vous allez apprendre :** le périmètre V1 de `forge-mvc-notifications` se limite aux notifications in-app, c'est-à-dire des lignes en base, affichées dans l'IHM. La livraison hors application (email, push) reste applicative.
 On peut la réaliser en combinant ce paquet avec `forge-mvc-jobs` et `forge-mvc-mail`.
 
 Premier palier du **niveau avancé** de la progression Notifications.

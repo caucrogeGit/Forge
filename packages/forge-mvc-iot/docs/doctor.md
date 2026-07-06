@@ -1,24 +1,19 @@
 # Diagnostic Forge IoT : `forge iot:doctor`
 
 > **Statut** : diagnostic **statique par défaut** (`IOT-DOCTOR-001`).
-> Deux options activent des vérifications réseau / base de manière
-> **explicite** : `--db` (test de la table `iot_events`,
-> `IOT-DOCTOR-DB-001`) et `--mqtt` (connexion au broker MQTT,
-> `IOT-DOCTOR-MQTT-001`). Sans option, le doctor ne touche ni au broker
-> ni à la base, et n'importe ni `paho` ni `core.database`.
+> Deux options activent des vérifications réseau / base de manière **explicite** : `--db` (test de la table `iot_events`, `IOT-DOCTOR-DB-001`) et `--mqtt` (connexion au broker MQTT, `IOT-DOCTOR-MQTT-001`).
+> Sans option, le doctor ne touche ni au broker ni à la base, et n'importe ni `paho` ni `core.database`.
 
 ## Objectif
 
-Donner un signal **avant** d'exécuter quoi que ce soit côté broker ou
-base de données :
+Donner un signal **avant** d'exécuter quoi que ce soit côté broker ou base de données :
 
 - le module `forge-mvc-iot` est bien installé ;
 - la configuration `load_iot_config()` est cohérente ;
 - la migration `iot_events` est shippée avec le package ;
 - l'API HTTP est enregistrable (`register_iot_routes`).
 
-C'est l'étape recommandée **avant** un starter pédagogique
-(`IOT-STARTER-MQTT-HELLO-001`) ou un déploiement.
+C'est l'étape recommandée **avant** un starter pédagogique (`IOT-STARTER-MQTT-HELLO-001`) ou un déploiement.
 
 ## Usage
 
@@ -35,8 +30,7 @@ Aide via :
 forge iot:doctor --help
 ```
 
-Les options `--db` et `--mqtt` sont **explicites** : tant qu'elles ne
-sont pas passées, aucune connexion réseau ou base n'est tentée.
+Les options `--db` et `--mqtt` sont **explicites** : tant qu'elles ne sont pas passées, aucune connexion réseau ou base n'est tentée.
 
 ## Vérifications
 
@@ -59,8 +53,7 @@ sont pas passées, aucune connexion réseau ou base n'est tentée.
 | `warn` | avertissement | aucun |
 | `fail` | erreur | **exit 1** |
 
-Le doctor exit 0 dès qu'aucun `fail` n'est remonté ; un `warn` ou un
-`skip` ne casse pas la CI.
+Le doctor exit 0 dès qu'aucun `fail` n'est remonté ; un `warn` ou un `skip` ne casse pas la CI.
 
 ## Sortie exemple : diagnostic statique
 
@@ -92,8 +85,7 @@ Table présente et schéma conforme :
   [OK]    schéma iot_events - conforme
 ```
 
-Le contrôle de schéma (ligne 7) n'est lancé **que** si la table est
-accessible, voir [Vérification du schéma `iot_events`](#verification-du-schema-iot_events).
+Le contrôle de schéma (ligne 7) n'est lancé **que** si la table est accessible, voir [Vérification du schéma `iot_events`](#verification-du-schema-iot_events).
 
 Table absente (migration pas appliquée) :
 
@@ -102,9 +94,9 @@ Table absente (migration pas appliquée) :
            Conseil : lance forge iot:init puis forge migration:apply
 ```
 
-Le `--db` traite l'absence de table comme un **`warn`** (pas un `fail`) :
-le module est installé correctement, c'est juste l'étape « apply »
-qui manque. Exit code 0.
+Le `--db` traite l'absence de table comme un **`warn`** (pas un `fail`) : le module est installé correctement, c'est juste l'étape « apply »
+qui manque.
+Exit code 0.
 
 Connexion MariaDB impossible :
 
@@ -112,10 +104,9 @@ Connexion MariaDB impossible :
   [FAIL]  base iot_events - connexion MariaDB impossible - OperationalError: Can't connect to MySQL server on 'localhost' (111)
 ```
 
-Cas typiques : MariaDB pas démarré, mauvais host/port, identifiants
-refusés, base inexistante. Exit code 1. Le mot de passe n'est jamais
-inclus dans le message : les drivers MariaDB n'incluent que `using
-password: YES/NO`, sans la valeur.
+Cas typiques : MariaDB pas démarré, mauvais host/port, identifiants refusés, base inexistante.
+Exit code 1.
+Le mot de passe n'est jamais inclus dans le message : les drivers MariaDB n'incluent que `using password: YES/NO`, sans la valeur.
 
 ## Vérification du schéma `iot_events`
 
@@ -124,14 +115,10 @@ password: YES/NO`, sans la valeur.
 `forge iot:doctor --db` vérifie deux choses :
 
 1. que la table `iot_events` est **accessible** (`SELECT COUNT(*)`) ;
-2. que ses **colonnes principales** correspondent au contrat Forge IoT
-   (types SQL, nullabilité, `AUTO_INCREMENT` de `id`).
+2. que ses **colonnes principales** correspondent au contrat Forge IoT (types SQL, nullabilité, `AUTO_INCREMENT` de `id`).
 
-Le contrôle de schéma s'appuie sur `INFORMATION_SCHEMA.COLUMNS` (plus
-propre et plus testable qu'un parsing de `SHOW CREATE TABLE`). Il n'est
-lancé **que si la table est accessible** : table absente ou connexion
-impossible sont déjà signalées par la ligne précédente, sans bruit
-redondant.
+Le contrôle de schéma s'appuie sur `INFORMATION_SCHEMA.COLUMNS` (plus propre et plus testable qu'un parsing de `SHOW CREATE TABLE`).
+Il n'est lancé **que si la table est accessible** : table absente ou connexion impossible sont déjà signalées par la ligne précédente, sans bruit redondant.
 
 ### Contrat vérifié
 
@@ -147,10 +134,8 @@ redondant.
 | `metadata_json` | `TEXT` | `NULL` |
 | `received_at` | `DATETIME(6)` | `NOT NULL` |
 
-Une colonne **supplémentaire** (non prévue par le contrat) est
-**tolérée** : une migration future peut en ajouter sans casser le
-contrat actuel. Les colonnes manquantes ou incompatibles sont le vrai
-problème.
+Une colonne **supplémentaire** (non prévue par le contrat) est **tolérée** : une migration future peut en ajouter sans casser le contrat actuel.
+Les colonnes manquantes ou incompatibles sont le vrai problème.
 
 ### Exemple : schéma conforme
 
@@ -178,24 +163,18 @@ Exit code 0.
   [WARN]  schéma iot_events - type inattendu pour value : attendu DOUBLE, obtenu VARCHAR(255)
 ```
 
-Une divergence (colonne manquante, type ou nullabilité inattendus, `id`
-sans `AUTO_INCREMENT`) est un **`warn`**, jamais un `fail` : la base est
-joignable, le problème est réparable. Le `fail` reste réservé aux
-erreurs bloquantes : connexion impossible ou lecture
-`INFORMATION_SCHEMA` impossible. Exit code 0 pour un `warn`.
+Une divergence (colonne manquante, type ou nullabilité inattendus, `id` sans `AUTO_INCREMENT`) est un **`warn`**, jamais un `fail` : la base est joignable, le problème est réparable.
+Le `fail` reste réservé aux erreurs bloquantes : connexion impossible ou lecture `INFORMATION_SCHEMA` impossible.
+Exit code 0 pour un `warn`.
 
-> **Le doctor diagnostique, il ne répare pas.** Aucun `ALTER TABLE`,
-> aucune migration ni recréation de table n'est déclenché ; voir
-> [Limites](#limites).
+> **Le doctor diagnostique, il ne répare pas.**
+> Aucun `ALTER TABLE`, aucune migration ni recréation de table n'est déclenché ; voir [Limites](#limites).
 
 ## Sortie exemple : avec `--mqtt`
 
-L'option `--mqtt` établit une connexion **brève** au broker configuré :
-ouverture TCP, attente du CONNACK, déconnexion immédiate. Pas
-d'abonnement durable, pas de publication, pas de boucle bloquante. Le
-but est de confirmer qu'un **vrai broker MQTT** (et pas seulement un
-port ouvert) accepte la connexion ; d'où l'usage de `paho-mqtt` plutôt
-qu'un simple `socket` TCP.
+L'option `--mqtt` établit une connexion **brève** au broker configuré : ouverture TCP, attente du CONNACK, déconnexion immédiate.
+Pas d'abonnement durable, pas de publication, pas de boucle bloquante.
+Le but est de confirmer qu'un **vrai broker MQTT** (et pas seulement un port ouvert) accepte la connexion ; d'où l'usage de `paho-mqtt` plutôt qu'un simple `socket` TCP.
 
 Broker joignable :
 
@@ -203,8 +182,7 @@ Broker joignable :
   [OK]    broker MQTT - connexion réussie à localhost:1883
 ```
 
-Broker injoignable (Mosquitto pas démarré, mauvais host/port, réseau
-coupé) :
+Broker injoignable (Mosquitto pas démarré, mauvais host/port, réseau coupé) :
 
 ```text
   [FAIL]  broker MQTT - connexion impossible à localhost:1883
@@ -216,15 +194,14 @@ Authentification refusée (mauvais username/password) :
   [FAIL]  broker MQTT - authentification refusée
 ```
 
-Exit code 1 dans les deux cas d'échec. Le mot de passe MQTT n'apparaît
-**jamais** dans la sortie. L'import `paho` est paresseux : rien n'est
-importé tant que `--mqtt` n'est pas passé.
+Exit code 1 dans les deux cas d'échec.
+Le mot de passe MQTT n'apparaît **jamais** dans la sortie.
+L'import `paho` est paresseux : rien n'est importé tant que `--mqtt` n'est pas passé.
 
 ### Connexion TLS
 
-Si `FORGE_IOT_MQTT_TLS_ENABLED=true`, `--mqtt` se connecte en **TLS**
-(`client.tls_set` appelé avant la connexion). Pense à configurer aussi le
-port TLS du broker (généralement `8883`) :
+Si `FORGE_IOT_MQTT_TLS_ENABLED=true`, `--mqtt` se connecte en **TLS** (`client.tls_set` appelé avant la connexion).
+Pense à configurer aussi le port TLS du broker (généralement `8883`) :
 
 ```bash
 export FORGE_IOT_MQTT_HOST="mqtt.example.net"
@@ -236,14 +213,11 @@ forge iot:doctor --mqtt
 ```
 
 Sans `FORGE_IOT_MQTT_TLS_CA_FILE`, paho utilise les certificats système.
-Le chemin du CA n'apparaît jamais dans la sortie. Détails :
-[Configuration : TLS MQTT](configuration.md#tls-mqtt).
+Le chemin du CA n'apparaît jamais dans la sortie.
+Détails : [Configuration : TLS MQTT](configuration.md#tls-mqtt).
 
-> **Astuce ateliers** : si Mosquitto n'est pas lancé, `forge iot:doctor
-> --mqtt` sort légitimement en `[FAIL]` avec un message clair : c'est le
-> signal attendu avant de démarrer un subscriber ou un simulateur. Pour
-> installer et lancer un broker local, voir
-> [Mosquitto local](mosquitto-local.md).
+> **Astuce ateliers** : si Mosquitto n'est pas lancé, `forge iot:doctor --mqtt` sort légitimement en `[FAIL]` avec un message clair : c'est le signal attendu avant de démarrer un subscriber ou un simulateur.
+> Pour installer et lancer un broker local, voir [Mosquitto local](mosquitto-local.md).
 
 ## Parcours recommandé
 
@@ -256,8 +230,7 @@ forge iot:doctor --mqtt   # 5. confirmer que le broker répond
 forge run                 # 6. démarrer
 ```
 
-Chaque étape produit un signal clair avant la suivante : pas besoin
-de deviner ce qui manque.
+Chaque étape produit un signal clair avant la suivante : pas besoin de deviner ce qui manque.
 
 Avec un username/password configurés :
 
@@ -268,9 +241,7 @@ Avec un username/password configurés :
            mqtt_password   : ***
 ```
 
-Le mot de passe est **toujours masqué** par `***` : c'est le contrat
-de [`IotConfig.__repr__`](configuration.md#masquage-du-mot-de-passe)
-appliqué uniformément dans le doctor.
+Le mot de passe est **toujours masqué** par `***` : c'est le contrat de [`IotConfig.__repr__`](configuration.md#masquage-du-mot-de-passe) appliqué uniformément dans le doctor.
 
 ## Cas d'erreur typiques
 
@@ -282,19 +253,13 @@ Si `FORGE_IOT_MQTT_HOST` est défini mais vide, par exemple :
   [FAIL]  configuration IoT - FORGE_IOT_MQTT_HOST ne peut pas être vide
 ```
 
-Idem pour un port hors plage, un topic vide, etc. Voir
-[Configuration Forge IoT : erreurs](configuration.md#erreurs-levees).
+Idem pour un port hors plage, un topic vide, etc. Voir [Configuration Forge IoT : erreurs](configuration.md#erreurs-levees).
 
 ### Migration manquante
 
-Depuis `IOT-PACKAGE-DATA-MIGRATIONS-001`, le doctor lit la migration
-via `importlib.resources.files("forge_mvc_iot") / "migrations"` : la
-ressource est embarquée dans le package Python lui-même
-(`forge_mvc_iot/migrations/`) et déclarée dans `pyproject.toml`
-(`[tool.setuptools.package-data]`).
+Depuis `IOT-PACKAGE-DATA-MIGRATIONS-001`, le doctor lit la migration via `importlib.resources.files("forge_mvc_iot") / "migrations"` : la ressource est embarquée dans le package Python lui-même (`forge_mvc_iot/migrations/`) et déclarée dans `pyproject.toml` (`[tool.setuptools.package-data]`).
 
-Si le doctor ne trouve plus la migration, c'est probablement le signe
-d'une installation cassée :
+Si le doctor ne trouve plus la migration, c'est probablement le signe d'une installation cassée :
 
 ```text
   [FAIL]  migration iot_events - aucun *_create_iot_events.sql sous
@@ -303,64 +268,48 @@ d'une installation cassée :
            [tool.setuptools.package-data] dans pyproject.toml
 ```
 
-Solution : réinstaller le package (`pip install -e packages/forge-mvc-iot`
-ou `pip install --force-reinstall forge-mvc-iot`).
+Solution : réinstaller le package (`pip install -e packages/forge-mvc-iot` ou `pip install --force-reinstall forge-mvc-iot`).
 
-Pour **copier ensuite** la migration dans le projet, voir
-[`forge iot:init`](init-command.md) : copie idempotente vers
-`mvc/migrations/`, sans exécuter le SQL.
+Pour **copier ensuite** la migration dans le projet, voir [`forge iot:init`](init-command.md) : copie idempotente vers `mvc/migrations/`, sans exécuter le SQL.
 
 ### Module non installé
 
-Si l'utilisateur tape `forge iot:doctor` sans avoir installé
-`forge-mvc-iot` :
+Si l'utilisateur tape `forge iot:doctor` sans avoir installé `forge-mvc-iot` :
 
 ```text
 Erreur : module forge-mvc-iot non installé.
 indice : installe le module opt-in : pip install forge-mvc-iot
 ```
 
-Forge Core reste fonctionnel sans le module : l'import est paresseux
-côté dispatcher (`forge.py`).
+Forge Core reste fonctionnel sans le module : l'import est paresseux côté dispatcher (`forge.py`).
 
 ## Limites
 
 Sont volontairement **hors périmètre**, y compris pour `--mqtt` :
 
-- aucun abonnement durable, aucune publication de mesure, aucun
-  `loop_forever` : `--mqtt` ne fait qu'un connect / disconnect bref ;
+- aucun abonnement durable, aucune publication de mesure, aucun `loop_forever` : `--mqtt` ne fait qu'un connect / disconnect bref ;
 - aucun subscriber lancé, aucun simulateur de capteur ;
 - aucune écriture en base déclenchée par `--mqtt` ;
 - pas de test de topic via `subscribe` / `publish` ;
-- pas de vérification de la version du contrat MQTT déployé côté
-  capteurs ;
-- pas d'audit des permissions ACL Mosquitto avancées, pas de certificat
-  client (mTLS). Le **TLS est désormais pris en charge** : si
-  `FORGE_IOT_MQTT_TLS_ENABLED=true`, `--mqtt` se connecte en TLS
-  (`client.tls_set`, `ca_certs` = `FORGE_IOT_MQTT_TLS_CA_FILE` si fourni)
-  ; voir [Configuration : TLS MQTT](configuration.md#tls-mqtt).
+- pas de vérification de la version du contrat MQTT déployé côté capteurs ;
+- pas d'audit des permissions ACL Mosquitto avancées, pas de certificat client (mTLS).
+  Le **TLS est désormais pris en charge** : si `FORGE_IOT_MQTT_TLS_ENABLED=true`, `--mqtt` se connecte en TLS (`client.tls_set`, `ca_certs` = `FORGE_IOT_MQTT_TLS_CA_FILE` si fourni) ; voir [Configuration : TLS MQTT](configuration.md#tls-mqtt).
   Sinon, la connexion reste en clair (comportement par défaut).
 
 Côté `--db` et contrôle de schéma, sont aussi **hors périmètre** :
 
-- aucune réparation : pas d'`ALTER TABLE`, pas de migration ni de
-  recréation de table déclenchée par le doctor ;
-- pas de gestion multi-version du schéma, pas de comparaison de hash de
-  migration ;
-- pas d'audit SQL complet (collation, moteur, index secondaires
-  au-delà du contrat de colonnes).
+- aucune réparation : pas d'`ALTER TABLE`, pas de migration ni de recréation de table déclenchée par le doctor ;
+- pas de gestion multi-version du schéma, pas de comparaison de hash de migration ;
+- pas d'audit SQL complet (collation, moteur, index secondaires au-delà du contrat de colonnes).
 
-Chacun de ces points peut justifier sa propre option / commande pour
-rester lisible et localement testable.
+Chacun de ces points peut justifier sa propre option / commande pour rester lisible et localement testable.
 
 ## Tickets suivants
 
 La trilogie `doctor` est complète :
 
-- `forge iot:doctor`        → diagnostic statique ;
-- `forge iot:doctor --db`   → diagnostic table `iot_events` ;
+- `forge iot:doctor` → diagnostic statique ;
+- `forge iot:doctor --db` → diagnostic table `iot_events` ;
 - `forge iot:doctor --mqtt` → diagnostic broker MQTT.
 
-Pistes ultérieures : `IOT-SIMULATOR-001` (script de publication MQTT
-factice pour les ateliers) ou une intégration Forge Design IoT au-dessus
-de l'API HTTP JSON.
+Pistes ultérieures : `IOT-SIMULATOR-001` (script de publication MQTT factice pour les ateliers) ou une intégration Forge Design IoT au-dessus de l'API HTTP JSON.

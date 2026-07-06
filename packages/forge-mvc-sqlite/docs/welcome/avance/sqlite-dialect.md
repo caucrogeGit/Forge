@@ -22,7 +22,8 @@ SQLite n'accepte pas de déclaration d'index à l'intérieur du `CREATE TABLE` :
 
 ## Types
 
-SQLite raisonne par **affinités** (`TEXT`, `INTEGER`, `REAL`, `NUMERIC`) plutôt que par types stricts. Le dialecte mappe les types Forge vers ces affinités, et la validation d'entité reste cohérente (un `datetime` stocké en `TEXT` est accepté).
+SQLite raisonne par **affinités** (`TEXT`, `INTEGER`, `REAL`, `NUMERIC`) plutôt que par types stricts.
+Le dialecte mappe les types Forge vers ces affinités, et la validation d'entité reste cohérente (un `datetime` stocké en `TEXT` est accepté).
 
 !!! note "SQL visible"
     Le dialecte produit du SQL lisible : vous pouvez relire le schéma généré et les migrations.

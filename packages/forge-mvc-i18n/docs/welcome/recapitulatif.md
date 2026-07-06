@@ -1,12 +1,10 @@
 # Aide-mémoire de la progression i18n
 
-Récapitulatif des paliers de la progression *Welcome i18n* et des API du
-module opt-in `forge-mvc-i18n` introduites à chaque étape.
+Récapitulatif des paliers de la progression *Welcome i18n* et des API du module opt-in `forge-mvc-i18n` introduites à chaque étape.
 
 !!! note "Module opt-in : repli no-op"
-    `forge-mvc-i18n` est **publié sur PyPI** : `pip install --pre forge-mvc-i18n`. Sans
-    le module, le noyau fournit un `trans()` **no-op** (retourne la clé) : une
-    application sans i18n ne casse pas (ADR-027).
+    `forge-mvc-i18n` est **publié sur PyPI** : `pip install --pre forge-mvc-i18n`.
+    Sans le module, le noyau fournit un `trans()` **no-op** (retourne la clé) : une application sans i18n ne casse pas (ADR-027).
 
 ## Niveau débutant : traduire avec un catalogue
 

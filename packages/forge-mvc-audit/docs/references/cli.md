@@ -6,12 +6,9 @@ Le fichier de code correspondant est `forge_mvc_audit/cli/init.py`.
 
 ## 1. À quoi sert la commande
 
-La table `audit_log` n'est pas créée automatiquement : l'écriture en base reste
-explicite (principe 3, SQL visible).
-`forge audit:init` copie la migration SQL embarquée dans le dossier
-`mvc/migrations/` du projet.
-Aucune connexion MariaDB ni exécution SQL à cette étape : on prépare seulement le
-fichier.
+La table `audit_log` n'est pas créée automatiquement : l'écriture en base reste explicite (principe 3, SQL visible).
+`forge audit:init` copie la migration SQL embarquée dans le dossier `mvc/migrations/` du projet.
+Aucune connexion MariaDB ni exécution SQL à cette étape : on prépare seulement le fichier.
 
 ```bash
 forge audit:init
@@ -26,16 +23,13 @@ La commande est idempotente et ne réécrit jamais en silence :
 
 - un fichier absent est copié (`[OK]`) ;
 - un fichier déjà présent et identique est laissé tel quel (`[OK]`) ;
-- un fichier présent au contenu différent déclenche un `[WARN]` et n'est pas
-  écrasé.
+- un fichier présent au contenu différent déclenche un `[WARN]` et n'est pas écrasé.
 
-Si le dossier `mvc/` est absent, la commande s'arrête avec un message clair
-(`[ERREUR]`).
+Si le dossier `mvc/` est absent, la commande s'arrête avec un message clair (`[ERREUR]`).
 
 ## 3. La migration
 
-La migration crée la table avec `CREATE TABLE IF NOT EXISTS`, donc sûre même si
-la table existe déjà.
+La migration crée la table avec `CREATE TABLE IF NOT EXISTS`, donc sûre même si la table existe déjà.
 La même définition est exposée par la constante `CREATE_TABLE_SQL` du module.
 
 ## 4. Voir aussi

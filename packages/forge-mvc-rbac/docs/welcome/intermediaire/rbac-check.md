@@ -1,10 +1,11 @@
 # Vérifier une permission
 
-Objectif : répondre « ces **rôles** accordent-ils cette **permission** ? » selon le
-contrat.
+Objectif : répondre « ces **rôles** accordent-ils cette **permission** ?
+»
+selon le contrat.
 
-**Ce que vous allez apprendre :** `has_contract_permission(result, roles, permission)`
-agrège les permissions des rôles via le contrat et répond oui/non. Pur, sans base.
+**Ce que vous allez apprendre :** `has_contract_permission(result, roles, permission)` agrège les permissions des rôles via le contrat et répond oui/non.
+Pur, sans base.
 
 Premier palier du **niveau intermédiaire** de la progression RBAC.
 
@@ -30,8 +31,7 @@ Premier palier du **niveau intermédiaire** de la progression RBAC.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/rbac-check?roles=reader&permission=article.create`
-(refusée), puis `roles=editor` (accordée).
+Ouvrez `https://localhost:8000/rbac-check?roles=reader&permission=article.create` (refusée), puis `roles=editor` (accordée).
 
 ## Le contrôleur
 
@@ -65,16 +65,15 @@ class RbacCheckController(BaseController):
 
 ### Comprendre ce code
 
-- La vérification est **pure** : rôles + permission + contrat → booléen. Aucune base,
-  aucune session.
+- La vérification est **pure** : rôles + permission + contrat → booléen.
+  Aucune base, aucune session.
 - Un utilisateur peut cumuler plusieurs rôles : `has_contract_permission` agrège.
-- C'est la brique que `require_contract_permission` (guard) et `can()` (template)
-  utilisent.
+- C'est la brique que `require_contract_permission` (guard) et `can()` (template) utilisent.
 
 ## Le contrat
 
-Ce palier s'appuie sur le contrat `mvc/security/rbac.json` introduit au palier
-« Welcome RBAC ». Si vous démarrez ici, créez-le :
+Ce palier s'appuie sur le contrat `mvc/security/rbac.json` introduit au palier « Welcome RBAC ».
+Si vous démarrez ici, créez-le :
 
 ```json
 {
@@ -147,7 +146,8 @@ with router.group("", public=True) as public:
 
 ## À retenir
 
-- `has_contract_permission` répond à « ces rôles ont-ils ce droit ? ».
+- `has_contract_permission` répond à « ces rôles ont-ils ce droit ?
+  ».
 - Le contrat est la **source de vérité** unique.
 - Cette brique alimente guards et templates.
 

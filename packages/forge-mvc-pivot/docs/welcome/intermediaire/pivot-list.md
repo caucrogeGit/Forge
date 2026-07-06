@@ -2,9 +2,8 @@
 
 Objectif : lire toutes les associations d'un article, avec leurs attributs.
 
-**Ce que vous allez apprendre :** `list_for_source` retourne les `PivotRow` liés
-à une source. Chaque `PivotRow` porte `source_id`, `target_id` et un dict
-`pivot_data` (les attributs `position`, `epingle`).
+**Ce que vous allez apprendre :** `list_for_source` retourne les `PivotRow` liés à une source.
+Chaque `PivotRow` porte `source_id`, `target_id` et un dict `pivot_data` (les attributs `position`, `epingle`).
 
 !!! note "Module opt-in : SQL visible"
     `list_for_source` produit un `SELECT * FROM article_tag WHERE article_id = ?`.
@@ -57,10 +56,8 @@ class PivotListController(BaseController):
 ### Comprendre ce code
 
 - `list_for_source(article_id)` retourne une liste de `PivotRow`.
-- `row.pivot_data` est un dict des attributs : on lit `position` et `epingle`
-  avec `.get(...)` pour rester tolérant si une colonne est absente.
-- Les clés (`source_id`, `target_id`) sont séparées des attributs : la structure
-  reflète exactement la table.
+- `row.pivot_data` est un dict des attributs : on lit `position` et `epingle` avec `.get(...)` pour rester tolérant si une colonne est absente.
+- Les clés (`source_id`, `target_id`) sont séparées des attributs : la structure reflète exactement la table.
 
 ## La route
 
@@ -80,6 +77,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous maîtrisez le cycle attacher/modifier/lister. Faisons le **bilan**.
+Vous maîtrisez le cycle attacher/modifier/lister.
+Faisons le **bilan**.
 
 [Bilan du niveau intermédiaire](bilan.md)

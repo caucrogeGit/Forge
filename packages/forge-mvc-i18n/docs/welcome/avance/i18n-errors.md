@@ -2,16 +2,14 @@
 
 Objectif : réagir proprement à un catalogue absent, invalide, ou à une locale dangereuse.
 
-**Ce que vous allez apprendre :** un catalogue principal absent ou mal formé lève
-`TranslationCatalogError`. Une locale contenant des caractères de chemin (`..`,
-`/`) est **refusée** de la même manière : elle ne peut jamais désigner un fichier
-hors du dossier des catalogues.
+**Ce que vous allez apprendre :** un catalogue principal absent ou mal formé lève `TranslationCatalogError`.
+Une locale contenant des caractères de chemin (`..`, `/`) est **refusée** de la même manière : elle ne peut jamais désigner un fichier hors du dossier des catalogues.
 
 Dernier palier du **niveau avancé**.
 
 !!! note "Module opt-in : sécurité"
-    La locale ne sert qu'à composer `<locale>.json`. Tout caractère de chemin est
-    rejeté : pas de traversal possible.
+    La locale ne sert qu'à composer `<locale>.json`.
+    Tout caractère de chemin est rejeté : pas de traversal possible.
 
 ## Classes Forge utilisées
 
@@ -47,10 +45,8 @@ class I18nErrorsController(BaseController):
 ### Comprendre ce code
 
 - `load_catalog("zz")` (catalogue inexistant) lève `TranslationCatalogError`.
-- `load_catalog("../secret")` est **refusé** : la locale doit correspondre à un
-  motif strict (lettres, chiffres, `-`, `_`), donc aucun chemin n'en sort.
-- Un fichier JSON mal formé (ou dont une valeur n'est pas une chaîne) lève la
-  même erreur : on l'attrape et on répond `422` sans détail technique.
+- `load_catalog("../secret")` est **refusé** : la locale doit correspondre à un motif strict (lettres, chiffres, `-`, `_`), donc aucun chemin n'en sort.
+- Un fichier JSON mal formé (ou dont une valeur n'est pas une chaîne) lève la même erreur : on l'attrape et on répond `422` sans détail technique.
 
 ## La route
 
@@ -70,6 +66,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous tenez l'i18n de bout en bout. Faisons le **bilan** du niveau avancé.
+Vous tenez l'i18n de bout en bout.
+Faisons le **bilan** du niveau avancé.
 
 [Bilan du niveau avancé](bilan.md)

@@ -6,11 +6,8 @@ Le fichier de code correspondant est `forge_mvc_audit/store.py`.
 
 ## 1. Le modèle
 
-Une trace est une ligne de la table `audit_log` : un acteur (`actor`), une action
-(`action`), une cible (`target_type`, `target_id`), un complément libre
-(`details`) et une date (`created_at`).
-Le périmètre est borné : c'est un audit applicatif, pas un SIEM de cybersécurité
-(cohérent avec ADR-008).
+Une trace est une ligne de la table `audit_log` : un acteur (`actor`), une action (`action`), une cible (`target_type`, `target_id`), un complément libre (`details`) et une date (`created_at`).
+Le périmètre est borné : c'est un audit applicatif, pas un SIEM de cybersécurité (cohérent avec ADR-008).
 
 ## 2. Écrire (`record_audit`)
 
@@ -35,11 +32,9 @@ record_audit("note.modifiee", actor="prof.dupont", target_type="note", target_id
 def get_audit_log(*, limit=100, actor=None, action=None, target_type=None, target_id=None, db=None) -> list[AuditEntry]
 ```
 
-`get_audit_log` renvoie les entrées les plus récentes (ordre décroissant par
-identifiant), filtrables.
+`get_audit_log` renvoie les entrées les plus récentes (ordre décroissant par identifiant), filtrables.
 Les filtres fournis sont combinés en `AND` sur des colonnes en liste blanche.
-`limit` est borné à `MAX_LIMIT` (1000) ; un `limit` inférieur à 1 lève
-`AuditError`.
+`limit` est borné à `MAX_LIMIT` (1000) ; un `limit` inférieur à 1 lève `AuditError`.
 
 ```python
 from forge_mvc_audit import get_audit_log
@@ -66,8 +61,7 @@ class AuditEntry:
 
 Les deux fonctions acceptent un paramètre `db` injectable.
 Par défaut, l'accès passe par `core.database.db`.
-En test, on peut injecter un adapter qui expose `insert` et `fetch_all`, ce qui
-rend le store vérifiable sans base réelle.
+En test, on peut injecter un adapter qui expose `insert` et `fetch_all`, ce qui rend le store vérifiable sans base réelle.
 
 ## 6. Voir aussi
 

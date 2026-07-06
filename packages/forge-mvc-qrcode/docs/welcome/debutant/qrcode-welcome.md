@@ -2,10 +2,8 @@
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-qrcode`.
 
-**Ce que vous allez apprendre :** la génération de QR Codes repose sur une classe
-`QrCode`.
-On la construit depuis du texte ou une URL avec `QrCode.from_text`, puis on rend
-le code en PNG avec `to_png`.
+**Ce que vous allez apprendre :** la génération de QR Codes repose sur une classe `QrCode`.
+On la construit depuis du texte ou une URL avec `QrCode.from_text`, puis on rend le code en PNG avec `to_png`.
 Le module ne sait rien de ce qu'il encode : l'application décide du contenu.
 
 Premier palier du **niveau débutant** de la progression QR Code.

@@ -217,7 +217,9 @@ L'opt-in ne crée **aucune table** : le statut courant est un simple champ de vo
 `validate_statuses` et `validate_transitions` détectent les configurations incohérentes (statut inconnu, doublon de transition) au démarrage.
 
 !!! note "L'opt-in décide, l'application persiste"
-    `forge-mvc-workflow` répond « cette transition est-elle permise ? » ; il n'écrit jamais en base.
+    `forge-mvc-workflow` répond « cette transition est-elle permise ?
+    »
+    ; il n'écrit jamais en base.
 
     Vous gardez la main sur le stockage du statut (champ d'entité, migration).
 

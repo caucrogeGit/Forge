@@ -23,7 +23,8 @@ SQL Server n'a pas `IF NOT EXISTS` pour les tables et les index. Le dialecte ém
 
 ## Paramètres et insertion
 
-`pyodbc` utilise nativement `?` : pas de traduction. `lastrowid` est obtenu via `SELECT SCOPE_IDENTITY()`.
+`pyodbc` utilise nativement `?` : pas de traduction.
+`lastrowid` est obtenu via `SELECT SCOPE_IDENTITY()`.
 
 ## Introspection
 

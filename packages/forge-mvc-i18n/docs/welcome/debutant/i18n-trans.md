@@ -2,13 +2,11 @@
 
 Objectif : rendre la bonne langue selon la locale demandée.
 
-**Ce que vous allez apprendre :** `trans(clé, locale)` choisit le catalogue de la
-locale et retourne la valeur de la clé. En passant la locale depuis la requête,
-une même route sert la page en FR ou en EN.
+**Ce que vous allez apprendre :** `trans(clé, locale)` choisit le catalogue de la locale et retourne la valeur de la clé.
+En passant la locale depuis la requête, une même route sert la page en FR ou en EN.
 
 !!! note "Module opt-in"
-    La locale ne sert qu'à choisir un fichier `<locale>.json` : elle est validée
-    (caractères de chemin interdits, vu au niveau avancé).
+    La locale ne sert qu'à choisir un fichier `<locale>.json` : elle est validée (caractères de chemin interdits, vu au niveau avancé).
 
 ## Classes Forge utilisées
 
@@ -42,12 +40,9 @@ class I18nTransController(BaseController):
 
 ### Comprendre ce code
 
-- `trans("welcome.title", locale="en")` lit `translations/en.json` et renvoie
-  `"Hello Forge i18n"` ; avec `locale="fr"`, `"Welcome i18n"`.
-- Une **seule** route sert les deux langues : c'est le catalogue qui varie, pas
-  le code.
-- La locale vient de l'utilisateur (`?lang=`), mais elle ne désigne qu'un fichier
-  catalogue, jamais un chemin arbitraire.
+- `trans("welcome.title", locale="en")` lit `translations/en.json` et renvoie `"Hello Forge i18n"` ; avec `locale="fr"`, `"Welcome i18n"`.
+- Une **seule** route sert les deux langues : c'est le catalogue qui varie, pas le code.
+- La locale vient de l'utilisateur (`?lang=`), mais elle ne désigne qu'un fichier catalogue, jamais un chemin arbitraire.
 
 ## Tester
 
@@ -75,6 +70,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous traduisez à la demande. Faisons le **bilan** du niveau débutant.
+Vous traduisez à la demande.
+Faisons le **bilan** du niveau débutant.
 
 [Bilan du niveau débutant](bilan.md)

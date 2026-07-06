@@ -4,11 +4,9 @@ Objectif : consulter une ligne précise.
 
 ## Ouvrir une fiche
 
-Une ligne de la liste est accessible à `/admin/articles/<id>`, où `<id>` est la
-valeur de la clé primaire.
+Une ligne de la liste est accessible à `/admin/articles/<id>`, où `<id>` est la valeur de la clé primaire.
 
-La fiche affiche les champs de la ligne : la clé primaire, puis les champs de
-`list_fields` et de `form_fields`, sans doublon.
+La fiche affiche les champs de la ligne : la clé primaire, puis les champs de `list_fields` et de `form_fields`, sans doublon.
 
 ## Comment la fiche lit la ligne
 

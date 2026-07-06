@@ -1,15 +1,16 @@
 # Configuration Forge IoT
 
-> **Statut** : configuration **en vigueur**. Le subscriber `forge-mvc-iot`
-> est instancié à partir de cet objet (host, port, identifiants, TLS). Voir
-> [Subscriber MQTT](mqtt-subscriber.md) et [Architecture Forge IoT](architecture.md).
+> **Statut** : configuration **en vigueur**.
+> Le subscriber `forge-mvc-iot` est instancié à partir de cet objet (host, port, identifiants, TLS).
+> Voir [Subscriber MQTT](mqtt-subscriber.md) et [Architecture Forge IoT](architecture.md).
 
 ## Objectif
 
-Définir comment `forge-mvc-iot` lit sa configuration MQTT à partir de
-l'environnement, **avant** d'écrire le subscriber. L'objectif est
-d'isoler les questions « où va-t-on lire host/port/topic ? » des
-questions « comment se connecter au broker ? ».
+Définir comment `forge-mvc-iot` lit sa configuration MQTT à partir de l'environnement, **avant** d'écrire le subscriber.
+L'objectif est d'isoler les questions « où va-t-on lire host/port/topic ?
+»
+des questions « comment se connecter au broker ?
+».
 
 ## Variables d'environnement
 
@@ -25,25 +26,17 @@ questions « comment se connecter au broker ? ».
 | `FORGE_IOT_MQTT_TLS_ENABLED` | `false` | oui (= `false`) | `bool` |
 | `FORGE_IOT_MQTT_TLS_CA_FILE` | `None` | oui (= `None`) | `str | None` |
 
-`FORGE_IOT_API_TOKEN` protège l'[API HTTP](http-api.md#protection-par-bearer-token) :
-**absent ou vide** → API ouverte (parcours local) ; **défini** →
-`Authorization: Bearer <token>` exigé sur les routes `/api/iot/*`. Comme
-le mot de passe MQTT, il est **masqué** dans `repr(IotConfig)`.
+`FORGE_IOT_API_TOKEN` protège l'[API HTTP](http-api.md#protection-par-bearer-token) : **absent ou vide** → API ouverte (parcours local) ; **défini** → `Authorization: Bearer <token>` exigé sur les routes `/api/iot/*`.
+Comme le mot de passe MQTT, il est **masqué** dans `repr(IotConfig)`.
 
-Les valeurs par défaut sont **locales et pédagogiques** : un
-[Mosquitto](architecture.md#role-de-mosquitto) installé sur la même
-machine (`localhost:1883`) écoute sur tous les topics compatibles avec
-le [contrat MQTT](mqtt-contract.md).
+Les valeurs par défaut sont **locales et pédagogiques** : un [Mosquitto](architecture.md#role-de-mosquitto) installé sur la même machine (`localhost:1883`) écoute sur tous les topics compatibles avec le [contrat MQTT](mqtt-contract.md).
 
-Le topic par défaut `forge/+/+/telemetry` utilise les wildcards MQTT
-`+` (single-level) pour s'abonner à *toutes* les paires
-`site`/`device_id` sous `forge/.../telemetry`. C'est l'inverse du
-contrat de publication, où `+` est interdit.
+Le topic par défaut `forge/+/+/telemetry` utilise les wildcards MQTT `+` (single-level) pour s'abonner à *toutes* les paires `site`/`device_id` sous `forge/.../telemetry`.
+C'est l'inverse du contrat de publication, où `+` est interdit.
 
 ## TLS MQTT
 
-Deux variables activent **MQTT over TLS** (port broker `8883` en usage
-réel, certificat CA) :
+Deux variables activent **MQTT over TLS** (port broker `8883` en usage réel, certificat CA) :
 
 | Variable | Rôle |
 |----------|------|
@@ -52,25 +45,15 @@ réel, certificat CA) :
 
 Règles :
 
-- **Pour un Mosquitto local pédagogique, TLS reste désactivé** (`false`,
-  le défaut) : on continue d'utiliser `localhost:1883` en clair. Voir
-  [Mosquitto local](mosquitto-local.md).
-- **Pour un broker exposé sur le réseau, TLS doit être préparé** :
-  `FORGE_IOT_MQTT_TLS_ENABLED=true`, un `FORGE_IOT_MQTT_TLS_CA_FILE`
-  pointant vers le CA du broker, et le port `8883`.
-- Le chemin du fichier CA est **masqué** dans `repr(IotConfig)` (comme le
-  mot de passe et le token), pour ne pas exposer de chemin sensible dans
-  les logs ; les clients le lisent via l'attribut.
+- **Pour un Mosquitto local pédagogique, TLS reste désactivé** (`false`, le défaut) : on continue d'utiliser `localhost:1883` en clair.
+  Voir [Mosquitto local](mosquitto-local.md).
+- **Pour un broker exposé sur le réseau, TLS doit être préparé** : `FORGE_IOT_MQTT_TLS_ENABLED=true`, un `FORGE_IOT_MQTT_TLS_CA_FILE` pointant vers le CA du broker, et le port `8883`.
+- Le chemin du fichier CA est **masqué** dans `repr(IotConfig)` (comme le mot de passe et le token), pour ne pas exposer de chemin sensible dans les logs ; les clients le lisent via l'attribut.
 
 !!! success "TLS branché dans les clients (IOT-MQTT-TLS-CLIENTS-001)"
-    `FORGE_IOT_MQTT_TLS_ENABLED=true` est désormais **réellement
-    consommé** par `forge iot:doctor --mqtt`, `forge iot:listen` (via le
-    `MqttSubscriber`) et `forge iot:simulate` : le client paho appelle
-    `client.tls_set(...)` avant de se connecter (`ca_certs` = le fichier
-    CA si fourni, sinon les certificats système). Le **port n'est pas
-    forcé** : pour un broker TLS, configure aussi `FORGE_IOT_MQTT_PORT`
-    (généralement `8883`). Hors périmètre : pas de certificat client
-    (mTLS), pas de `tls_insecure_set`.
+    `FORGE_IOT_MQTT_TLS_ENABLED=true` est désormais **réellement consommé** par `forge iot:doctor --mqtt`, `forge iot:listen` (via le `MqttSubscriber`) et `forge iot:simulate` : le client paho appelle `client.tls_set(...)` avant de se connecter (`ca_certs` = le fichier CA si fourni, sinon les certificats système).
+    Le **port n'est pas forcé** : pour un broker TLS, configure aussi `FORGE_IOT_MQTT_PORT` (généralement `8883`).
+    Hors périmètre : pas de certificat client (mTLS), pas de `tls_insecure_set`.
 
 ```env
 # Broker exposé sur le réseau, MQTT over TLS
@@ -109,12 +92,9 @@ class IotConfig:
     mqtt_tls_ca_file: str | None = None
 ```
 
-Les champs avec défaut (`api_token`, `mqtt_tls_enabled`,
-`mqtt_tls_ca_file`) garantissent la **compatibilité ascendante** : les
-instanciations historiques à 6 champs restent valides.
+Les champs avec défaut (`api_token`, `mqtt_tls_enabled`, `mqtt_tls_ca_file`) garantissent la **compatibilité ascendante** : les instanciations historiques à 6 champs restent valides.
 
-L'objet est immuable (`frozen=True`) : le subscriber qui le reçoit ne
-peut pas le modifier par effet de bord.
+L'objet est immuable (`frozen=True`) : le subscriber qui le reçoit ne peut pas le modifier par effet de bord.
 
 ### `load_iot_config()`
 
@@ -130,9 +110,8 @@ cfg = load_iot_config({"FORGE_IOT_MQTT_HOST": "broker.lan"})
 ```
 
 - `env=None` (défaut) → lit `os.environ`.
-- `env=mapping` → lit le mapping fourni, sans toucher à
-  `os.environ`. C'est le point d'injection pour les tests ; aucune
-  variable d'environnement réelle n'est nécessaire.
+- `env=mapping` → lit le mapping fourni, sans toucher à `os.environ`.
+  C'est le point d'injection pour les tests ; aucune variable d'environnement réelle n'est nécessaire.
 
 ### Erreurs levées
 
@@ -145,14 +124,11 @@ cfg = load_iot_config({"FORGE_IOT_MQTT_HOST": "broker.lan"})
 | `FORGE_IOT_MQTT_PORT` hors plage `1..65535` | `FORGE_IOT_MQTT_PORT hors plage 1-65535 (vu : ...)` |
 | `FORGE_IOT_MQTT_TOPIC` présent mais vide | `FORGE_IOT_MQTT_TOPIC ne peut pas être vide` |
 
-Les autres erreurs (broker indisponible, payload invalide, etc.)
-n'appartiennent pas à ce contrat : elles seront traitées par le
-subscriber.
+Les autres erreurs (broker indisponible, payload invalide, etc.) n'appartiennent pas à ce contrat : elles seront traitées par le subscriber.
 
 ## Masquage du mot de passe
 
-Le `repr()` d'un `IotConfig` ne révèle jamais le mot de passe en
-clair :
+Le `repr()` d'un `IotConfig` ne révèle jamais le mot de passe en clair :
 
 ```python
 >>> cfg = load_iot_config({
@@ -163,8 +139,7 @@ clair :
 "IotConfig(mqtt_host='localhost', mqtt_port=1883, mqtt_topic='forge/+/+/telemetry', mqtt_client_id='forge-iot', mqtt_username='forge', mqtt_password='***')"
 ```
 
-Si le mot de passe est `None` (pas d'authentification), le champ
-apparaît tel quel : il n'y a rien à protéger.
+Si le mot de passe est `None` (pas d'authentification), le champ apparaît tel quel : il n'y a rien à protéger.
 
 Cette protection couvre :
 
@@ -172,9 +147,7 @@ Cette protection couvre :
 - les logs qui sérialisent l'objet via `repr()` ou `f"{cfg!r}"` ;
 - les sorties `pprint` et la plupart des outils de debug.
 
-Elle ne couvre **pas** un accès direct à l'attribut
-(`cfg.mqtt_password`) ; c'est volontaire : le subscriber a besoin de
-la valeur en clair pour s'authentifier.
+Elle ne couvre **pas** un accès direct à l'attribut (`cfg.mqtt_password`) ; c'est volontaire : le subscriber a besoin de la valeur en clair pour s'authentifier.
 
 ## Exemples d'environnement
 
@@ -188,8 +161,7 @@ FORGE_IOT_MQTT_TOPIC=forge/+/+/telemetry
 FORGE_IOT_MQTT_CLIENT_ID=forge-iot-dev
 ```
 
-Pas d'identifiants nécessaires : Mosquitto local accepte les
-connexions anonymes par défaut.
+Pas d'identifiants nécessaires : Mosquitto local accepte les connexions anonymes par défaut.
 
 ### Broker MQTT avec authentification
 
@@ -202,8 +174,7 @@ FORGE_IOT_MQTT_USERNAME=forge
 FORGE_IOT_MQTT_PASSWORD=motdepassefort
 ```
 
-Le topic est ici restreint au site `atelier`, utile pour qu'une
-instance Forge IoT n'écoute qu'un périmètre précis.
+Le topic est ici restreint au site `atelier`, utile pour qu'une instance Forge IoT n'écoute qu'un périmètre précis.
 
 ### Broker MQTT cloud
 
@@ -216,50 +187,30 @@ FORGE_IOT_MQTT_USERNAME=forge-prod
 FORGE_IOT_MQTT_PASSWORD=...
 ```
 
-Aucun branchement spécial n'est nécessaire : le contrat est identique
-à un broker local. Pour un broker exposé, active le
-[TLS MQTT](#tls-mqtt) (`FORGE_IOT_MQTT_TLS_ENABLED`,
-`FORGE_IOT_MQTT_TLS_CA_FILE`, port `8883`). Les certificats client (mTLS)
-restent hors périmètre.
+Aucun branchement spécial n'est nécessaire : le contrat est identique à un broker local. Pour un broker exposé, active le [TLS MQTT](#tls-mqtt) (`FORGE_IOT_MQTT_TLS_ENABLED`, `FORGE_IOT_MQTT_TLS_CA_FILE`, port `8883`).
+Les certificats client (mTLS) restent hors périmètre.
 
 ## Limites itération 1
 
 Sont explicitement **hors périmètre** :
 
-- pas de lecture automatique de `env/dev` ou `.env` : c'est l'appelant
-  qui charge ces fichiers en amont (par exemple via `python-dotenv` ou
-  `cli.config.load_env()`) ;
-- TLS est branché dans les clients (`IOT-MQTT-TLS-CLIENTS-001`) via
-  `client.tls_set` ; restent **hors périmètre** : le certificat client
-  (mTLS), la génération de certificats, `tls_insecure_set` et la
-  configuration serveur Mosquitto TLS complète ;
+- pas de lecture automatique de `env/dev` ou `.env` : c'est l'appelant qui charge ces fichiers en amont (par exemple via `python-dotenv` ou `cli.config.load_env()`) ;
+- TLS est branché dans les clients (`IOT-MQTT-TLS-CLIENTS-001`) via `client.tls_set` ; restent **hors périmètre** : le certificat client (mTLS), la génération de certificats, `tls_insecure_set` et la configuration serveur Mosquitto TLS complète ;
 - pas de ACL Mosquitto : gestion côté broker, hors Forge ;
-- pas de gestion de secrets externes (Vault, AWS Secrets Manager) : la
-  config se contente de lire un mapping `str → str` ;
-- pas de validation runtime du topic vs contrat MQTT (le pattern
-  `forge/+/+/telemetry` est accepté tel quel par Forge IoT, qui
-  s'abonne « bêtement » au topic fourni) ;
+- pas de gestion de secrets externes (Vault, AWS Secrets Manager) : la config se contente de lire un mapping `str → str` ;
+- pas de validation runtime du topic vs contrat MQTT (le pattern `forge/+/+/telemetry` est accepté tel quel par Forge IoT, qui s'abonne « bêtement »
+  au topic fourni) ;
 - pas de connexion au broker : aucune dépendance `paho-mqtt`.
 
-Toute extension passera par un ticket `IOT-CONFIG-NNN` ultérieur, sans
-casser le contrat actuel.
+Toute extension passera par un ticket `IOT-CONFIG-NNN` ultérieur, sans casser le contrat actuel.
 
 ## Tickets suivants
 
 Ce contrat de configuration débloque :
 
-- `IOT-MQTT-SUBSCRIBER-001` : le subscriber `paho-mqtt` reçoit un
-  `IotConfig` en argument et n'a plus à connaître les variables
-  d'environnement ;
-- `IOT-DOCTOR-001` : `forge iot:doctor` affichera la configuration
-  effective (avec mot de passe masqué) avant de tester la connexion ;
-- `IOT-CONFIG-TLS-001` (**livré**) : a étendu `IotConfig` avec
-  `mqtt_tls_enabled` / `mqtt_tls_ca_file`, sans changer les défauts
-  existants (TLS désactivé par défaut) ;
-- `IOT-MQTT-TLS-CLIENTS-001` (**livré**) : branche réellement TLS dans
-  `forge iot:doctor --mqtt`, `forge iot:listen` et `forge iot:simulate`
-  (via le helper `forge_mvc_iot.mqtt.tls.configure_tls` → `client.tls_set`,
-  appelé avant `connect`).
+- `IOT-MQTT-SUBSCRIBER-001` : le subscriber `paho-mqtt` reçoit un `IotConfig` en argument et n'a plus à connaître les variables d'environnement ;
+- `IOT-DOCTOR-001` : `forge iot:doctor` affichera la configuration effective (avec mot de passe masqué) avant de tester la connexion ;
+- `IOT-CONFIG-TLS-001` (**livré**) : a étendu `IotConfig` avec `mqtt_tls_enabled` / `mqtt_tls_ca_file`, sans changer les défauts existants (TLS désactivé par défaut) ;
+- `IOT-MQTT-TLS-CLIENTS-001` (**livré**) : branche réellement TLS dans `forge iot:doctor --mqtt`, `forge iot:listen` et `forge iot:simulate` (via le helper `forge_mvc_iot.mqtt.tls.configure_tls` → `client.tls_set`, appelé avant `connect`).
 
-Voir [Architecture Forge IoT](architecture.md#tickets-suivants) pour
-la liste complète des jalons.
+Voir [Architecture Forge IoT](architecture.md#tickets-suivants) pour la liste complète des jalons.

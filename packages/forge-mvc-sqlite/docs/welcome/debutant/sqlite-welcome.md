@@ -23,7 +23,8 @@ Premier palier du **niveau débutant** de la progression SQLite.
 forge doctor
 ```
 
-`doctor` indique le backend BDD résolu. Avec seulement `forge-mvc-sqlite` installé, c'est `sqlite`.
+`doctor` indique le backend BDD résolu.
+Avec seulement `forge-mvc-sqlite` installé, c'est `sqlite`.
 
 ## 2. Créer la base
 

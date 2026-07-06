@@ -4,7 +4,8 @@ Objectif : modifier un article existant.
 
 ## Le formulaire d'édition
 
-La fiche détail propose un lien « Modifier » vers `/admin/articles/<id>/edit`.
+La fiche détail propose un lien « Modifier »
+vers `/admin/articles/<id>/edit`.
 Le formulaire est pré-rempli avec les valeurs actuelles de la ligne.
 
 Comme la création, il est protégé par un jeton CSRF.
@@ -17,12 +18,9 @@ Comme la création, il est protégé par un jeton CSRF.
 UPDATE articles SET title = ?, body = ? WHERE id = ? LIMIT 1
 ```
 
-Mêmes garanties que la création : seules les colonnes de `form_fields` sont
-écrites, les valeurs passent par des paramètres, et la clé primaire cible la
-bonne ligne.
+Mêmes garanties que la création : seules les colonnes de `form_fields` sont écrites, les valeurs passent par des paramètres, et la clé primaire cible la bonne ligne.
 
-En cas de succès, le back-office redirige vers la fiche avec un message de
-confirmation.
+En cas de succès, le back-office redirige vers la fiche avec un message de confirmation.
 
 ## À retenir
 

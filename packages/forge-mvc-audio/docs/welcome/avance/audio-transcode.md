@@ -1,17 +1,16 @@
 # Transcoder en MP3
 
-Objectif : convertir un fichier audio source en **MP3 standard** avec
-`transcode_to_mp3`, via `ffmpeg`.
+Objectif : convertir un fichier audio source en **MP3 standard** avec `transcode_to_mp3`, via `ffmpeg`.
 
-**Ce que vous allez apprendre :** `transcode_to_mp3(input, output)` lance `ffmpeg`
-de façon **synchrone**. Forge Audio reste **sobre** : pas de file de jobs, pas de
-table ; l'opération attend la fin de `ffmpeg` et lève `FfmpegError` en cas d'échec.
+**Ce que vous allez apprendre :** `transcode_to_mp3(input, output)` lance `ffmpeg` de façon **synchrone**.
+Forge Audio reste **sobre** : pas de file de jobs, pas de table ; l'opération attend la fin de `ffmpeg` et lève `FfmpegError` en cas d'échec.
 
 Deuxième palier du **niveau avancé** de la progression audio.
 
 !!! note "Module opt-in : `ffmpeg` requis"
-    Ce starter suppose `forge-mvc-audio` installé (palier « Installation ») et le
-    binaire `ffmpeg` présent. Sans lui, la page reste **pédagogique**.
+    Ce starter suppose `forge-mvc-audio` installé (palier « Installation »)
+    et le binaire `ffmpeg` présent.
+    Sans lui, la page reste **pédagogique**.
 
 ## Ce que ce starter montre
 
@@ -32,8 +31,7 @@ Deuxième palier du **niveau avancé** de la progression audio.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/audio-transcode`, indiquez l'`original_path` d'un
-audio uploadé : un MP3 est écrit dans `transcoded/sortie.mp3`.
+Ouvrez `https://localhost:8000/audio-transcode`, indiquez l'`original_path` d'un audio uploadé : un MP3 est écrit dans `transcoded/sortie.mp3`.
 
 ## Le contrôleur
 
@@ -94,11 +92,10 @@ class AudioTranscodeController(BaseController):
 
 ### Comprendre ce code
 
-- Le transcodage est **synchrone** : la requête HTTP attend `ffmpeg`. En production,
-  on le **déporte** hors de la requête (tâche/worker) ; le starter le dit
-  explicitement.
-- Forge Audio est **sans état** : aucun suivi de job, aucune table. Simplicité
-  assumée.
+- Le transcodage est **synchrone** : la requête HTTP attend `ffmpeg`.
+  En production, on le **déporte** hors de la requête (tâche/worker) ; le starter le dit explicitement.
+- Forge Audio est **sans état** : aucun suivi de job, aucune table.
+  Simplicité assumée.
 - `FfmpegError` (ou binaire absent) → message clair.
 
 ## La vue
@@ -154,6 +151,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous transcodez. Dernier palier : diagnostiquer le module.
+Vous transcodez.
+Dernier palier : diagnostiquer le module.
 
 [Diagnostiquer le module Audio](audio-doctor.md)

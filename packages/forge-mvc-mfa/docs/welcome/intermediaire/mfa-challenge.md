@@ -1,11 +1,8 @@
 # Challenge de connexion
 
-Objectif : le **second facteur** à la connexion : ouvrir un challenge après le mot
-de passe, puis le valider.
+Objectif : le **second facteur** à la connexion : ouvrir un challenge après le mot de passe, puis le valider.
 
-**Ce que vous allez apprendre :** `start_mfa_challenge` ouvre un challenge
-**temporaire en session** (sans connecter l'utilisateur) ; `verify_mfa_challenge`
-confronte le code (TOTP ou récupération) au challenge, avec tentatives limitées.
+**Ce que vous allez apprendre :** `start_mfa_challenge` ouvre un challenge **temporaire en session** (sans connecter l'utilisateur) ; `verify_mfa_challenge` confronte le code (TOTP ou récupération) au challenge, avec tentatives limitées.
 
 Deuxième palier du **niveau intermédiaire** de la progression MFA.
 
@@ -32,8 +29,7 @@ Deuxième palier du **niveau intermédiaire** de la progression MFA.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/mfa-challenge` : un secret démo s'affiche ; saisissez
-un code pour valider le challenge.
+Ouvrez `https://localhost:8000/mfa-challenge` : un secret démo s'affiche ; saisissez un code pour valider le challenge.
 
 ## Le contrôleur
 
@@ -168,12 +164,10 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Le challenge **ne connecte pas** : il mémorise « cet utilisateur a passé le 1er
-  facteur, en attente du 2e ». La connexion réelle suit la validation.
-- `verify_mfa_challenge` accepte un code **TOTP ou de récupération**, et limite les
-  tentatives (anti-bruteforce).
-- Dans une vraie application, le challenge suit le login et les facteurs viennent de
-  la base ; ici on simule en session.
+- Le challenge **ne connecte pas** : il mémorise « cet utilisateur a passé le 1er facteur, en attente du 2e ».
+  La connexion réelle suit la validation.
+- `verify_mfa_challenge` accepte un code **TOTP ou de récupération**, et limite les tentatives (anti-bruteforce).
+- Dans une vraie application, le challenge suit le login et les facteurs viennent de la base ; ici on simule en session.
 
 ## À retenir
 
@@ -183,6 +177,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Le 2e facteur fonctionne. La suite : les codes de récupération en secours.
+Le 2e facteur fonctionne.
+La suite : les codes de récupération en secours.
 
 [Codes de récupération](mfa-recovery.md)

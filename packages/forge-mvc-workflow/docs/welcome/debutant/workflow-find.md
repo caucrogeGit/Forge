@@ -2,9 +2,7 @@
 
 Objectif : localiser un statut **par son nom** dans un jeu de statuts.
 
-**Ce que vous allez apprendre :** `find_status(statuses, name)` retourne le statut
-correspondant, ou `None` s'il n'existe pas : utile avant d'agir sur un objet dont on
-connaît le nom de statut courant.
+**Ce que vous allez apprendre :** `find_status(statuses, name)` retourne le statut correspondant, ou `None` s'il n'existe pas : utile avant d'agir sur un objet dont on connaît le nom de statut courant.
 
 Troisième palier du **niveau débutant** de la progression workflow.
 
@@ -29,8 +27,7 @@ Troisième palier du **niveau débutant** de la progression workflow.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/workflow-find?name=review` (trouvé) puis
-`?name=inconnu` (introuvable).
+Ouvrez `https://localhost:8000/workflow-find?name=review` (trouvé) puis `?name=inconnu` (introuvable).
 
 ## Le contrôleur
 
@@ -71,11 +68,10 @@ class WorkflowFindController(BaseController):
 
 ### Comprendre ce code
 
-- `find_status` renvoie `None` plutôt que de lever une exception : on teste
-  explicitement l'existence.
+- `find_status` renvoie `None` plutôt que de lever une exception : on teste explicitement l'existence.
 - On normalise le nom recherché avant la recherche (cohérence avec les noms stockés).
-- C'est la brique qui relie un objet (« cet article est en `review` ») à la définition
-  de son statut.
+- C'est la brique qui relie un objet (« cet article est en `review` »)
+  à la définition de son statut.
 
 ## La vue
 
@@ -127,6 +123,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous avez les briques « statut ». La suite (intermédiaire) : les **transitions**.
+Vous avez les briques « statut ».
+La suite (intermédiaire) : les **transitions**.
 
 [Bilan du niveau débutant](bilan.md)

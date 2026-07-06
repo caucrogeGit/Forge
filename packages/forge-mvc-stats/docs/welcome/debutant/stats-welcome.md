@@ -2,17 +2,14 @@
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-stats`.
 
-**Ce que vous allez apprendre :** Forge Stats enregistre des **événements génériques**
-(un nom, un libellé, une catégorie, des métadonnées) dans une table SQL.
-`make_event` crée un événement ; `STATS_EVENTS_TABLE` / `STATS_EVENTS_COLUMNS`
-décrivent le stockage.
+**Ce que vous allez apprendre :** Forge Stats enregistre des **événements génériques** (un nom, un libellé, une catégorie, des métadonnées) dans une table SQL.
+`make_event` crée un événement ; `STATS_EVENTS_TABLE` / `STATS_EVENTS_COLUMNS` décrivent le stockage.
 
-Premier palier du **niveau débutant** de la progression stats
-(vue d'ensemble des starters).
+Premier palier du **niveau débutant** de la progression stats (vue d'ensemble des starters).
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-stats` installé (palier « Installation »). Module à
-    **SQL visible** : aucun ORM.
+    Ce starter suppose `forge-mvc-stats` installé (palier « Installation »).
+    Module à **SQL visible** : aucun ORM.
 
 ## Ce que ce starter montre
 
@@ -68,10 +65,8 @@ class StatsWelcomeController(BaseController):
 
 ### Comprendre ce code
 
-- Un événement est **générique** : un nom, un libellé, une catégorie, et des
-  métadonnées libres (un dict), pas de table par type d'événement.
-- Le stockage est explicite (`STATS_EVENTS_TABLE`, colonnes) : Forge Stats est à
-  **SQL visible**, sans ORM.
+- Un événement est **générique** : un nom, un libellé, une catégorie, et des métadonnées libres (un dict), pas de table par type d'événement.
+- Le stockage est explicite (`STATS_EVENTS_TABLE`, colonnes) : Forge Stats est à **SQL visible**, sans ORM.
 - `make_event` valide à la construction (le nom doit être valide).
 
 ## La route
@@ -95,6 +90,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Premier contact établi. La suite : la brique « nom d'événement ».
+Premier contact établi.
+La suite : la brique « nom d'événement ».
 
 [Nom d'événement](stats-event.md)

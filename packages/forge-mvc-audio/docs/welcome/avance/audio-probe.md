@@ -1,18 +1,16 @@
 # Sonder un audio
 
-Objectif : extraire les **métadonnées** d'un fichier audio (durée, codec, bitrate…)
-avec `probe_audio`, via `ffprobe`.
+Objectif : extraire les **métadonnées** d'un fichier audio (durée, codec, bitrate…) avec `probe_audio`, via `ffprobe`.
 
-**Ce que vous allez apprendre :** `probe_audio(path)` lance `ffprobe` (lecture
-seule) et retourne un `AudioMetadata` (durée, codec, bitrate, fréquence, canaux,
-conteneur). Il valide aussi que la durée reste sous la limite configurée.
+**Ce que vous allez apprendre :** `probe_audio(path)` lance `ffprobe` (lecture seule) et retourne un `AudioMetadata` (durée, codec, bitrate, fréquence, canaux, conteneur).
+Il valide aussi que la durée reste sous la limite configurée.
 
 Premier palier du **niveau avancé** de la progression audio.
 
 !!! note "Module opt-in : `ffprobe` requis"
-    Ce starter suppose `forge-mvc-audio` installé (palier « Installation ») et le
-    binaire `ffprobe` présent. Sans lui, la page reste **pédagogique** (message
-    d'erreur clair).
+    Ce starter suppose `forge-mvc-audio` installé (palier « Installation »)
+    et le binaire `ffprobe` présent.
+    Sans lui, la page reste **pédagogique** (message d'erreur clair).
 
 ## Ce que ce starter montre
 
@@ -34,8 +32,7 @@ Premier palier du **niveau avancé** de la progression audio.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/audio-probe?path=<original_path>` (le chemin renvoyé
-à l'upload) : la page affiche durée, codec, bitrate…
+Ouvrez `https://localhost:8000/audio-probe?path=<original_path>` (le chemin renvoyé à l'upload) : la page affiche durée, codec, bitrate…
 
 ## Le contrôleur
 
@@ -87,8 +84,7 @@ class AudioProbeController(BaseController):
 
 ### Comprendre ce code
 
-- On reconstruit le **chemin absolu** à partir de `storage_root` et du chemin
-  relatif renvoyé à l'upload : `probe_audio` lit le fichier réel.
+- On reconstruit le **chemin absolu** à partir de `storage_root` et du chemin relatif renvoyé à l'upload : `probe_audio` lit le fichier réel.
 - `ffprobe` est **lecture seule** : aucune transformation, aucune écriture.
 - On reste **pédagogique** si `ffprobe` manque (binaire système absent).
 
@@ -151,6 +147,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous lisez les métadonnées. La suite : transcoder en MP3.
+Vous lisez les métadonnées.
+La suite : transcoder en MP3.
 
 [Transcoder en MP3](audio-transcode.md)

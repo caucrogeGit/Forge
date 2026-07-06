@@ -2,10 +2,8 @@
 
 Objectif : écrire le code qui traite une tâche et vider la file.
 
-**Ce que vous allez apprendre :** un gestionnaire est une fonction qui reçoit la
-charge utile (un dict).
-On associe chaque nom de tâche à son gestionnaire dans un dict `handlers`, puis
-on traite toutes les tâches disponibles avec `drain`.
+**Ce que vous allez apprendre :** un gestionnaire est une fonction qui reçoit la charge utile (un dict).
+On associe chaque nom de tâche à son gestionnaire dans un dict `handlers`, puis on traite toutes les tâches disponibles avec `drain`.
 
 Deuxième palier du **niveau débutant** de la progression Jobs.
 

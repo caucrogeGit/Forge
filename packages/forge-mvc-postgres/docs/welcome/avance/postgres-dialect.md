@@ -16,7 +16,8 @@ Comme SQLite, PostgreSQL n'accepte pas d'index dans le `CREATE TABLE` : Forge é
 
 ## Identifiants et types
 
-Les identifiants sont entre guillemets doubles (`"table"`). L'introspection (diff de migrations) passe par `information_schema`.
+Les identifiants sont entre guillemets doubles (`"table"`).
+L'introspection (diff de migrations) passe par `information_schema`.
 
 ## Paramètres
 

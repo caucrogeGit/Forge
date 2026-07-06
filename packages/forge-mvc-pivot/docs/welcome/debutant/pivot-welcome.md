@@ -2,18 +2,15 @@
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-pivot`.
 
-**Ce que vous allez apprendre :** un pivot **enrichi** est une association
-`many_to_many` dont la table de liaison **porte des attributs**. Entre un
-`Article` et un `Tag`, la table `article_tag` peut stocker une `position`
-(ordre du tag sur l'article) et un drapeau `epingle` (tag mis en avant). C'est
-précisément ce que `PivotAdvancedService` rend explicite et sûr.
+**Ce que vous allez apprendre :** un pivot **enrichi** est une association `many_to_many` dont la table de liaison **porte des attributs**.
+Entre un `Article` et un `Tag`, la table `article_tag` peut stocker une `position` (ordre du tag sur l'article) et un drapeau `epingle` (tag mis en avant).
+C'est précisément ce que `PivotAdvancedService` rend explicite et sûr.
 
-Premier palier du **niveau débutant** de la progression pivot
-(vue d'ensemble des starters).
+Premier palier du **niveau débutant** de la progression pivot (vue d'ensemble des starters).
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-pivot` installé (palier « Installation »). Module à
-    **SQL visible** : aucun ORM, les requêtes restent lisibles.
+    Ce starter suppose `forge-mvc-pivot` installé (palier « Installation »).
+    Module à **SQL visible** : aucun ORM, les requêtes restent lisibles.
 
 ## Pivot ordinaire vs pivot enrichi
 
@@ -83,10 +80,8 @@ class PivotWelcomeController(BaseController):
 
 ### Comprendre ce code
 
-- Un `PivotAdvancedService` est **générique** : on lui déclare la table, la clé
-  source, la clé cible et la **liste blanche** des champs d'attributs autorisés.
-- Cette liste blanche est centrale : seuls `position` et `epingle` pourront être
-  écrits ; tout autre champ sera refusé (vous le verrez au niveau avancé).
+- Un `PivotAdvancedService` est **générique** : on lui déclare la table, la clé source, la clé cible et la **liste blanche** des champs d'attributs autorisés.
+- Cette liste blanche est centrale : seuls `position` et `epingle` pourront être écrits ; tout autre champ sera refusé (vous le verrez au niveau avancé).
 - Aucun accès base ici : on ne fait qu'instancier et décrire le service.
 
 ## La route
@@ -110,6 +105,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Premier contact établi. La suite : **générer** le sous-CRUD pivot avec une commande.
+Premier contact établi.
+La suite : **générer** le sous-CRUD pivot avec une commande.
 
 [Générer le sous-CRUD pivot](pivot-make.md)

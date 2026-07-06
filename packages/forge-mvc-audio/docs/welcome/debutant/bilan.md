@@ -1,8 +1,7 @@
 # Bilan : niveau débutant (Audio)
 
-Récapitulatif du **niveau débutant** de la progression *Welcome Audio*. Ce
-niveau couvre le cycle de base : **découvrir**, **téléverser**, **lire**, sans
-`ffmpeg`.
+Récapitulatif du **niveau débutant** de la progression *Welcome Audio*.
+Ce niveau couvre le cycle de base : **découvrir**, **téléverser**, **lire**, sans `ffmpeg`.
 
 ## Ce que vous avez validé
 
@@ -16,7 +15,6 @@ Vous savez ingérer et servir un fichier audio, sans dépendre de `ffmpeg`.
 
 ## Et ensuite
 
-Place au niveau **avancé** : sonder les métadonnées (`ffprobe`), transcoder en MP3
-(`ffmpeg`) et diagnostiquer le module.
+Place au niveau **avancé** : sonder les métadonnées (`ffprobe`), transcoder en MP3 (`ffmpeg`) et diagnostiquer le module.
 
 [Niveau avancé : Sonder un audio](../avance/audio-probe.md)

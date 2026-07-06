@@ -1,8 +1,7 @@
 # Bilan : niveau débutant (i18n)
 
-Récapitulatif du **niveau débutant** de la progression *Welcome i18n*. Ce
-niveau pose les bases : le helper `trans`, les catalogues JSON, la traduction à
-la demande.
+Récapitulatif du **niveau débutant** de la progression *Welcome i18n*.
+Ce niveau pose les bases : le helper `trans`, les catalogues JSON, la traduction à la demande.
 
 ## Ce que vous avez validé
 
@@ -16,7 +15,6 @@ Vous savez traduire une page à partir de catalogues JSON.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire**, **locale et repli** : locale par défaut,
-locale de secours, et comportement sur clé manquante.
+Place au niveau **intermédiaire**, **locale et repli** : locale par défaut, locale de secours, et comportement sur clé manquante.
 
 [Niveau intermédiaire : Locale par défaut](../intermediaire/i18n-locale.md)

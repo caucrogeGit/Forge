@@ -1,8 +1,7 @@
 # Bilan : niveau intermédiaire (QR Code)
 
 Récapitulatif du **niveau intermédiaire** de la progression QR Code.
-Ce niveau relie le générateur au web : servir un QR Code en HTTP depuis un
-contrôleur.
+Ce niveau relie le générateur au web : servir un QR Code en HTTP depuis un contrôleur.
 
 ## Ce que vous avez validé
 
@@ -16,7 +15,6 @@ Vous savez servir un QR Code en PNG ou en SVG depuis une route Forge.
 
 ## Et ensuite
 
-Place au niveau **avancé** : gérer les erreurs d'entrée, régler les options de
-rendu, et comprendre l'indépendance du cœur.
+Place au niveau **avancé** : gérer les erreurs d'entrée, régler les options de rendu, et comprendre l'indépendance du cœur.
 
 [Niveau avancé : Gérer les erreurs](../avance/qrcode-errors.md)

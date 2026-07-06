@@ -1,8 +1,7 @@
 # Installation : Progression « Welcome Pivot »
 
-Ce préambule installe le module **opt-in** `forge-mvc-pivot` dans un projet
-Forge existant. La progression se réalise ensuite **à la main** : chaque palier
-décrit les fichiers à créer et le code à écrire.
+Ce préambule installe le module **opt-in** `forge-mvc-pivot` dans un projet Forge existant.
+La progression se réalise ensuite **à la main** : chaque palier décrit les fichiers à créer et le code à écrire.
 
 !!! info "Référence complète"
     Pour l'installation détaillée du core, voir Installer Forge.
@@ -10,12 +9,11 @@ décrit les fichiers à créer et le code à écrire.
 
 ## Prérequis
 
-- **Forge installé** (core `forge-mvc`). Sinon, suivre d'abord
-  Installer Forge.
+- **Forge installé** (core `forge-mvc`).
+  Sinon, suivre d'abord Installer Forge.
 - **Python 3.12+**.
-- Aucune base de données pour ce parcours : les opérations sur la base sont démontrées
-  via un **exécuteur injecté** de démonstration. Une vraie application crée la table
-  pivot et passe `core.database.db.execute` / `fetch_all` / `fetch_one`.
+- Aucune base de données pour ce parcours : les opérations sur la base sont démontrées via un **exécuteur injecté** de démonstration.
+  Une vraie application crée la table pivot et passe `core.database.db.execute` / `fetch_all` / `fetch_one`.
 
 ## 1. Installer le module opt-in Pivot
 
@@ -34,8 +32,7 @@ Si ce n'est pas le cas, créez-en un avec :
 forge new mon-projet-pivot
 ```
 
-Aucun starter n'est généré : les fichiers du parcours se créent à la main au
-fil des paliers.
+Aucun starter n'est généré : les fichiers du parcours se créent à la main au fil des paliers.
 
 ## 3. Vérifier l'installation
 
@@ -47,7 +44,6 @@ forge doctor
 
 ## Après l'installation
 
-Vous pouvez attaquer le premier palier, où vous découvrirez **pourquoi** un pivot
-enrichi diffère d'un `many_to_many` ordinaire.
+Vous pouvez attaquer le premier palier, où vous découvrirez **pourquoi** un pivot enrichi diffère d'un `many_to_many` ordinaire.
 
 [Continuer sur le starter Welcome Pivot](debutant/pivot-welcome.md)

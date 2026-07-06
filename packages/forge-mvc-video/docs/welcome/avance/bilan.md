@@ -1,8 +1,7 @@
 # Bilan : niveau avancé (Vidéo)
 
-Récapitulatif des compétences acquises au **niveau avancé** de la progression
-*Welcome Vidéo*. Ce niveau **bascule vers le réel** : sonde ffprobe,
-transcodage ffmpeg, et diagnostic du module.
+Récapitulatif des compétences acquises au **niveau avancé** de la progression *Welcome Vidéo*.
+Ce niveau **bascule vers le réel** : sonde ffprobe, transcodage ffmpeg, et diagnostic du module.
 
 ## Ce que vous avez validé
 
@@ -12,12 +11,10 @@ transcodage ffmpeg, et diagnostic du module.
 | 2 : [Transcoder une vidéo](video-transcode.md) | Lancer le worker `forge video:process` (`process_video`, ffmpeg) : `uploaded → ready`. |
 | 3 : [Diagnostiquer le module Vidéo](video-doctor.md) | Vérifier la santé du module, dont la présence de ffprobe/ffmpeg (`forge video:doctor`). |
 
-Vous savez maintenant inspecter une source, la transcoder en MP4 via le worker et
-diagnostiquer le module en exploitation.
+Vous savez maintenant inspecter une source, la transcoder en MP4 via le worker et diagnostiquer le module en exploitation.
 
 ## Et ensuite
 
-Le récapitulatif rassemble toutes les API vidéo de la progression sur une seule
-page.
+Le récapitulatif rassemble toutes les API vidéo de la progression sur une seule page.
 
 [Récapitulatif de la progression Vidéo](../recapitulatif.md)

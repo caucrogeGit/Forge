@@ -134,7 +134,8 @@ pip install -e packages/forge-mvc-exemple --no-deps
 ```
 
 Si l'opt-in n'est pas installé, son entry point n'existe pas, la commande n'est pas découverte.
-`forge` répond alors « commande inconnue » avec un conseil qui oriente vers l'installation du module opt-in.
+`forge` répond alors « commande inconnue »
+avec un conseil qui oriente vers l'installation du module opt-in.
 
 ## Voir aussi
 

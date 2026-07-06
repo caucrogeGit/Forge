@@ -2,8 +2,7 @@
 
 Objectif : installer l'opt-in QR Code et vérifier qu'il est prêt.
 
-Le parcours qui suit montre, en trois niveaux, comment générer un QR Code, le
-servir depuis un contrôleur, puis gérer les erreurs et les options de rendu.
+Le parcours qui suit montre, en trois niveaux, comment générer un QR Code, le servir depuis un contrôleur, puis gérer les erreurs et les options de rendu.
 
 ## Installer le paquet
 
@@ -11,8 +10,7 @@ servir depuis un contrôleur, puis gérer les erreurs et les options de rendu.
 pip install --pre forge-mvc-qrcode
 ```
 
-Le paquet dépend du cœur `forge-mvc` et de `segno`, une bibliothèque de
-génération de QR Codes en pur Python.
+Le paquet dépend du cœur `forge-mvc` et de `segno`, une bibliothèque de génération de QR Codes en pur Python.
 `segno` n'a aucune dépendance et n'utilise pas Pillow.
 
 ## Vérifier l'installation

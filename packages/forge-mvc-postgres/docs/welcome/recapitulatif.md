@@ -8,7 +8,8 @@ Synthèse du backend `forge-mvc-postgres` (Alpha).
 pip install --pre forge-mvc-postgres
 ```
 
-Découvert automatiquement ; si plusieurs backends : `DB_BACKEND=postgres`. Un serveur PostgreSQL doit être joignable.
+Découvert automatiquement ; si plusieurs backends : `DB_BACKEND=postgres`.
+Un serveur PostgreSQL doit être joignable.
 
 ## Préparer (Alpha : manuel)
 

@@ -2,13 +2,12 @@
 
 Objectif : changer les attributs d'une association, puis la supprimer.
 
-**Ce que vous allez apprendre :** `update` modifie les **attributs** d'une paire
-existante (jamais les clés). `detach` supprime l'association. Les deux ciblent la
-paire `(article_id, tag_id)`.
+**Ce que vous allez apprendre :** `update` modifie les **attributs** d'une paire existante (jamais les clés).
+`detach` supprime l'association.
+Les deux ciblent la paire `(article_id, tag_id)`.
 
 !!! note "Module opt-in : SQL visible"
-    `update` produit un `UPDATE … WHERE article_id = ? AND tag_id = ?`,
-    `detach` un `DELETE …` ; tout paramétré.
+    `update` produit un `UPDATE … WHERE article_id = ? AND tag_id = ?`, `detach` un `DELETE …` ; tout paramétré.
 
 ## Classes Forge utilisées
 
@@ -59,11 +58,9 @@ class PivotUpdateController(BaseController):
 
 ### Comprendre ce code
 
-- `update` ne touche **que** les attributs fournis (mise à jour partielle) ; il
-  ne modifie jamais `article_id` ni `tag_id`.
+- `update` ne touche **que** les attributs fournis (mise à jour partielle) ; il ne modifie jamais `article_id` ni `tag_id`.
 - Un `update` avec un dictionnaire vide ne fait rien (retourne `0`).
-- `detach` supprime la ligne de la paire et retourne le nombre de lignes
-  supprimées (`0` si la paire n'existait pas).
+- `detach` supprime la ligne de la paire et retourne le nombre de lignes supprimées (`0` si la paire n'existait pas).
 
 ## Les routes
 
@@ -84,6 +81,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous savez écrire et supprimer. Voyons comment **lire** les associations d'un article.
+Vous savez écrire et supprimer.
+Voyons comment **lire** les associations d'un article.
 
 [Lister les associations](pivot-list.md)

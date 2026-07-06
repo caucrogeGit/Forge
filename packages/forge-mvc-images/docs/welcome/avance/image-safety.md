@@ -1,20 +1,15 @@
 # Garde de sécurité à l'upload
 
-Objectif : comprendre **comment Forge refuse une image piégée** : un fichier
-déguisé en image, ou une image-bombe conçue pour saturer le serveur.
+Objectif : comprendre **comment Forge refuse une image piégée** : un fichier déguisé en image, ou une image-bombe conçue pour saturer le serveur.
 
-**Ce que vous allez apprendre :** avant toute écriture, `verify_image_content`
-ouvre réellement le fichier pour confirmer que c'est une image d'un format
-autorisé, et rejette les images dont la surface dépasse `upload_max_image_pixels`
-(défense anti-bombe de décompression). Ce palier met la garde en scène **sans
-rien écrire** ni base de données.
+**Ce que vous allez apprendre :** avant toute écriture, `verify_image_content` ouvre réellement le fichier pour confirmer que c'est une image d'un format autorisé, et rejette les images dont la surface dépasse `upload_max_image_pixels` (défense anti-bombe de décompression).
+Ce palier met la garde en scène **sans rien écrire** ni base de données.
 
 Troisième palier du **niveau avancé** de la progression images.
 
 !!! note "Module opt-in"
     Ce starter suppose `forge-mvc-images` installé (palier « Installation »).
-    Comme images est une brique **bibliothèque** (pas de CLI `images:doctor`),
-    ce palier joue le rôle de diagnostic de sécurité.
+    Comme images est une brique **bibliothèque** (pas de CLI `images:doctor`), ce palier joue le rôle de diagnostic de sécurité.
 
 ## Ce que ce starter montre
 
@@ -37,9 +32,7 @@ Troisième palier du **niveau avancé** de la progression images.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/image-safety`, envoyez une vraie image (acceptée),
-puis un fichier texte renommé en `.jpg` (rejeté) : la garde fait la différence
-sur le **contenu**, pas sur l'extension.
+Ouvrez `https://localhost:8000/image-safety`, envoyez une vraie image (acceptée), puis un fichier texte renommé en `.jpg` (rejeté) : la garde fait la différence sur le **contenu**, pas sur l'extension.
 
 ## Le contrôleur
 
@@ -96,12 +89,10 @@ class ImageSafetyController(BaseController):
 
 ### Comprendre ce code
 
-- La garde décide sur le **contenu binaire**, pas sur l'extension ni le
-  `Content-Type` (tous deux falsifiables).
-- Le budget `UPLOAD_MAX_IMAGE_PIXELS` (24 Mpx par défaut, lu depuis
-  l'environnement) rejette une image démesurée **avant** tout décodage coûteux,
-  c'est la défense anti-bombe.
-- On ne fait que vérifier : aucun fichier n'est écrit. Idéal pour un diagnostic.
+- La garde décide sur le **contenu binaire**, pas sur l'extension ni le `Content-Type` (tous deux falsifiables).
+- Le budget `UPLOAD_MAX_IMAGE_PIXELS` (24 Mpx par défaut, lu depuis l'environnement) rejette une image démesurée **avant** tout décodage coûteux, c'est la défense anti-bombe.
+- On ne fait que vérifier : aucun fichier n'est écrit.
+  Idéal pour un diagnostic.
 
 ## La vue
 
@@ -165,7 +156,6 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous avez fait le tour du niveau avancé : couverture, suppression propre,
-sécurité.
+Vous avez fait le tour du niveau avancé : couverture, suppression propre, sécurité.
 
 [Bilan du niveau avancé](bilan.md)

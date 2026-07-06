@@ -2,10 +2,8 @@
 
 Objectif : comprendre pourquoi Deploy est un opt-in à CLI seule.
 
-**Ce que vous allez apprendre :** `forge-mvc-deploy` n'expose aucune API
-runtime.
-Il ajoute seulement deux commandes à la CLI `forge` ; une application ne
-l'importe jamais à l'exécution.
+**Ce que vous allez apprendre :** `forge-mvc-deploy` n'expose aucune API runtime.
+Il ajoute seulement deux commandes à la CLI `forge` ; une application ne l'importe jamais à l'exécution.
 S'il n'est pas installé, les commandes `deploy:*` sont simplement absentes.
 
 Premier palier du **niveau avancé** de la progression Deploy.
@@ -17,7 +15,8 @@ Premier palier du **niveau avancé** de la progression Deploy.
 ## Ce que ce starter montre
 
 - la forme particulière d'un opt-in à CLI seule ;
-- le repli « module non installé » ;
+- le repli « module non installé »
+  ;
 - le rattachement à la charte (principe 8, ADR-004, ADR-053).
 
 ## 1. Aucune API runtime

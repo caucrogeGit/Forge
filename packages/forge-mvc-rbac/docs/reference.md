@@ -219,7 +219,8 @@ Les droits sont décrits dans `mvc/security/rbac.json`, pas codés en dur.
 
 ## 8. Contrat, sécurité et validation
 
-Le contrat `mvc/security/rbac.json` décrit les rôles et les permissions, séparément du schéma d'entité (ADR-014). Son schéma `rbac.schema.json` est embarqué par cet opt-in (ADR-056).
+Le contrat `mvc/security/rbac.json` décrit les rôles et les permissions, séparément du schéma d'entité (ADR-014).
+Son schéma `rbac.schema.json` est embarqué par cet opt-in (ADR-056).
 
 `forge rbac:validate` vérifie la conformité au schéma ; `forge rbac:audit` repère les incohérences fonctionnelles (permission déclarée mais inutilisée, action CRUD sans permission).
 
@@ -242,10 +243,13 @@ Forge distingue deux niveaux d'autorisation :
 
 **RBAC léger core** : primitives dans `core/security/` (dépréciées, héritées du développement pré-1.0) :
 
-- `user_has_role(request, role)` : vérifie qu'un rôle est présent dans le champ `roles` de la session Auth/User. Ne consulte pas les tables SQL RBAC.
+- `user_has_role(request, role)` : vérifie qu'un rôle est présent dans le champ `roles` de la session Auth/User.
+  Ne consulte pas les tables SQL RBAC.
 - `require_role(role)` : décorateur qui redirige vers `/login` si non authentifié, retourne 403 si le rôle est absent de la session.
 
-Ces deux fonctions conviennent aux cas les plus simples (protéger une route par un rôle déjà dans la session). Elles ne connaissent pas les permissions fines et ne remplacent pas `forge-mvc-rbac`. Les nouveaux projets utilisent `forge_mvc_rbac.require_user_permission`.
+Ces deux fonctions conviennent aux cas les plus simples (protéger une route par un rôle déjà dans la session).
+Elles ne connaissent pas les permissions fines et ne remplacent pas `forge-mvc-rbac`.
+Les nouveaux projets utilisent `forge_mvc_rbac.require_user_permission`.
 
 **RBAC complet opt-in** : module `forge-mvc-rbac` :
 
@@ -269,7 +273,9 @@ Ces deux fonctions conviennent aux cas les plus simples (protéger une route par
 
 ### Frontière d'import
 
-`core/` ne doit pas importer `forge_mvc_rbac`. La dépendance va dans un seul sens : `forge-mvc-rbac` → `core`. `core/auth/audit.py` peut nommer des événements d'audit RBAC génériques : ce vocabulaire est assumé dans le core (ADR-011), il ne représente pas une dépendance fonctionnelle vers le module opt-in.
+`core/` ne doit pas importer `forge_mvc_rbac`.
+La dépendance va dans un seul sens : `forge-mvc-rbac` → `core`.
+`core/auth/audit.py` peut nommer des événements d'audit RBAC génériques : ce vocabulaire est assumé dans le core (ADR-011), il ne représente pas une dépendance fonctionnelle vers le module opt-in.
 
 ## Voir aussi
 

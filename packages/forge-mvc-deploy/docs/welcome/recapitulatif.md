@@ -49,5 +49,4 @@ Tags de résultat : `[OK]`, `[WARN]`, `[ERREUR]`.
 ## Rappel
 
 Forge Core ne dépend pas du paquet.
-L'opinion Nginx/systemd/Gunicorn est un raccourci recommandé : vous pouvez
-déployer en conteneur ou autrement sans cet opt-in.
+L'opinion Nginx/systemd/Gunicorn est un raccourci recommandé : vous pouvez déployer en conteneur ou autrement sans cet opt-in.

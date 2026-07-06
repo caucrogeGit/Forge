@@ -1,8 +1,7 @@
 # Bilan : niveau débutant (Settings)
 
 Récapitulatif du **niveau débutant** de la progression Settings.
-Ce niveau pose les bases : créer la table, écrire un paramètre, le relire avec
-ou sans valeur par défaut.
+Ce niveau pose les bases : créer la table, écrire un paramètre, le relire avec ou sans valeur par défaut.
 
 ## Ce que vous avez validé
 
@@ -15,7 +14,6 @@ Vous savez créer la table des paramètres, écrire une valeur et la relire.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : enregistrer des valeurs typées (entier,
-booléen, décimal) et les retrouver dans leur type d'origine.
+Place au niveau **intermédiaire** : enregistrer des valeurs typées (entier, booléen, décimal) et les retrouver dans leur type d'origine.
 
 [Niveau intermédiaire : Valeurs typées](../intermediaire/settings-types.md)

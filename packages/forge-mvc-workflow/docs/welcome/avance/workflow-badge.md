@@ -2,8 +2,7 @@
 
 Objectif : afficher un statut sous forme de **badge HTML** prêt à l'emploi.
 
-**Ce que vous allez apprendre :** `workflow_status_badge(status)` produit un badge
-HTML **sûr** (`Markup` : Jinja ne le double-échappe pas), couleur et libellé inclus.
+**Ce que vous allez apprendre :** `workflow_status_badge(status)` produit un badge HTML **sûr** (`Markup` : Jinja ne le double-échappe pas), couleur et libellé inclus.
 
 Premier palier du **niveau avancé** de la progression workflow.
 
@@ -98,8 +97,7 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Le badge est un `Markup` : Jinja l'affiche **tel quel**, sans rééchapper le HTML ;
-  pas de `| safe` à risque, pas de HTML codé à la main.
+- Le badge est un `Markup` : Jinja l'affiche **tel quel**, sans rééchapper le HTML ; pas de `| safe` à risque, pas de HTML codé à la main.
 - Couleur et libellé du statut sont déjà intégrés dans le badge.
 - Centraliser le rendu d'un statut garantit la cohérence visuelle partout.
 

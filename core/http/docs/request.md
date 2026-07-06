@@ -8,7 +8,8 @@ Cette page sert aussi de modèle de formalisme pour documenter les classes impor
 
 `Request` représente une requête HTTP entrante dans Forge.
 
-Quand un navigateur ouvre une page, envoie un formulaire, appelle une API ou téléverse un fichier, il envoie une requête au serveur. Forge transforme cette requête en objet `Request`, puis transmet cet objet à l'action de contrôleur concernée.
+Quand un navigateur ouvre une page, envoie un formulaire, appelle une API ou téléverse un fichier, il envoie une requête au serveur.
+Forge transforme cette requête en objet `Request`, puis transmet cet objet à l'action de contrôleur concernée.
 
 Le contrôleur lit ensuite `Request` pour construire une `Response`.
 
@@ -22,7 +23,8 @@ def hello(request: Request) -> Response:
     return Response.text(f"Bonjour {name}")
 ```
 
-Vous ne créez jamais cet objet vous-même. Forge le construit pour vous et vous le transmet au moment où l'action du contrôleur est appelée.
+Vous ne créez jamais cet objet vous-même.
+Forge le construit pour vous et vous le transmet au moment où l'action du contrôleur est appelée.
 
 Votre rôle est de lire `Request` pour produire la réponse adaptée.
 
@@ -66,7 +68,8 @@ Le diagramme de séquence montre le déroulement d'une requête jusqu'à la rép
 
 Le diagramme de classe montre la place de `Request` dans les objets manipulés par Forge.
 
-Il permet de voir que `Request` est construit à partir de la requête HTTP reçue, qu'il peut contenir des fichiers `UploadedFile`, et qu'il est transmis au contrôleur. Le contrôleur ne crée pas `Request` : il le reçoit déjà prêt à être lu.
+Il permet de voir que `Request` est construit à partir de la requête HTTP reçue, qu'il peut contenir des fichiers `UploadedFile`, et qu'il est transmis au contrôleur.
+Le contrôleur ne crée pas `Request` : il le reçoit déjà prêt à être lu.
 
 ```mermaid
 classDiagram
@@ -430,7 +433,8 @@ Ils sont repliables pour garder une vision générale de la page.
 
 ## 7. Anatomie d'une requête Forge
 
-Une même requête circule sur le réseau. Forge la découpe et expose chaque morceau par un accesseur dédié.
+Une même requête circule sur le réseau.
+Forge la découpe et expose chaque morceau par un accesseur dédié.
 
 Exemple de requête :
 
@@ -551,7 +555,8 @@ Ils sont repliables pour ne pas alourdir la lecture principale.
 
     Cette section concerne les API REST desservies depuis un formulaire HTML.
 
-    Le tutoriel `welcome-forge` n'en a pas besoin. Il peut supprimer une donnée par une vraie route `POST`, par exemple `POST /note/delete/{id}`.
+    Le tutoriel `welcome-forge` n'en a pas besoin.
+    Il peut supprimer une donnée par une vraie route `POST`, par exemple `POST /note/delete/{id}`.
 
     Un formulaire HTML ne sait envoyer directement que deux verbes : `GET` et `POST`.
 

@@ -2,10 +2,8 @@
 
 Objectif : générer un QR Code au format SVG.
 
-**Ce que vous allez apprendre :** `to_svg` renvoie une **chaîne de texte**
-contenant un document SVG.
-Le SVG est vectoriel : il reste net à toutes les tailles, ce qui est utile pour
-l'impression ou un affichage responsive.
+**Ce que vous allez apprendre :** `to_svg` renvoie une **chaîne de texte** contenant un document SVG.
+Le SVG est vectoriel : il reste net à toutes les tailles, ce qui est utile pour l'impression ou un affichage responsive.
 
 Troisième palier du **niveau débutant**.
 

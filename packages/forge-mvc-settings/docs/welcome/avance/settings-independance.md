@@ -2,11 +2,9 @@
 
 Objectif : comprendre pourquoi Settings est un opt-in, et comment le tester.
 
-**Ce que vous allez apprendre :** Forge Core ne dépend pas de
-`forge-mvc-settings`.
+**Ce que vous allez apprendre :** Forge Core ne dépend pas de `forge-mvc-settings`.
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
-Le paramètre `db` injectable et la constante `CREATE_TABLE_SQL` rendent le store
-vérifiable et auditable.
+Le paramètre `db` injectable et la constante `CREATE_TABLE_SQL` rendent le store vérifiable et auditable.
 
 Deuxième palier du **niveau avancé** de la progression Settings.
 

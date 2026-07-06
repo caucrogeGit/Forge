@@ -9,7 +9,8 @@ Le fichier de code correspondant est `forge_mvc_images/media_repository.py`.
 Une image stockée sur le disque ne sert à rien si on ne sait pas à quoi elle appartient.
 Le **dépôt de médias** enregistre, liste et met à jour les associations entre un fichier et une entité (un article, un produit…) en base.
 
-Le SQL reste **visible** (principe charte « garder SQL visible ») ; ce module n'est pas un ORM.
+Le SQL reste **visible** (principe charte « garder SQL visible »)
+; ce module n'est pas un ORM.
 
 ## 2. Rattacher un média
 

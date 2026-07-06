@@ -1,11 +1,9 @@
 # Code de permission
 
-Objectif : comprendre ce qu'est un **code de permission** et comment Forge le
-normalise et le valide.
+Objectif : comprendre ce qu'est un **code de permission** et comment Forge le normalise et le valide.
 
-**Ce que vous allez apprendre :** une permission est un code en **notation pointée**
-(`entité.action`, ex. `article.create`). `normalize_permission_code` le met en forme ;
-`validate_permission` refuse les codes invalides.
+**Ce que vous allez apprendre :** une permission est un code en **notation pointée** (`entité.action`, ex. `article.create`).
+`normalize_permission_code` le met en forme ; `validate_permission` refuse les codes invalides.
 
 Deuxième palier du **niveau débutant** de la progression RBAC.
 
@@ -31,8 +29,7 @@ Deuxième palier du **niveau débutant** de la progression RBAC.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/rbac-permission?code=Article.Create` :
-`article.create`, valide.
+Ouvrez `https://localhost:8000/rbac-permission?code=Article.Create` : `article.create`, valide.
 
 ## Le contrôleur
 
@@ -71,10 +68,8 @@ class RbacPermissionController(BaseController):
 
 ### Comprendre ce code
 
-- La **notation pointée** `entité.action` rend les permissions lisibles et
-  cohérentes à travers l'application.
-- Normaliser **avant** de comparer évite les faux négatifs (`Article.Create` vs
-  `article.create`).
+- La **notation pointée** `entité.action` rend les permissions lisibles et cohérentes à travers l'application.
+- Normaliser **avant** de comparer évite les faux négatifs (`Article.Create` vs `article.create`).
 - `validate_permission` lève `RbacValidationError` sur un code vide ou mal formé.
 
 ## La vue

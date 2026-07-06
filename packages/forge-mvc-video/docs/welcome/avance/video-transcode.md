@@ -1,29 +1,24 @@
 # Transcoder une vidéo
 
-Objectif : transformer une vidéo uploadée en **MP4 lisible**, via le worker de
-transcodage.
+Objectif : transformer une vidéo uploadée en **MP4 lisible**, via le worker de transcodage.
 
 **Ce que vous allez apprendre :** le modèle **worker-CLI** de Forge Vidéo.
-`forge video:process` lance `process_video`, qui sonde la source, génère un
-poster et **transcode en MP4 avec ffmpeg**, faisant avancer le statut
-`uploaded → processing → ready`. Le transcodage est lourd : il reste un **worker**,
-**jamais** une requête HTTP.
+`forge video:process` lance `process_video`, qui sonde la source, génère un poster et **transcode en MP4 avec ffmpeg**, faisant avancer le statut `uploaded → processing → ready`.
+Le transcodage est lourd : il reste un **worker**, **jamais** une requête HTTP.
 
-Palier 2 du **niveau avancé** de la progression vidéo, après
-[Sonder une vidéo](video-probe.md).
+Palier 2 du **niveau avancé** de la progression vidéo, après [Sonder une vidéo](video-probe.md).
 
 !!! note "ffmpeg requis"
-    Le transcodage exécute **ffmpeg**. Installez-le et renseignez au besoin
-    `FORGE_VIDEO_FFMPEG_BIN`. Le travail lourd se fait en ligne de commande, hors
-    du cycle requête/réponse.
+    Le transcodage exécute **ffmpeg**.
+    Installez-le et renseignez au besoin `FORGE_VIDEO_FFMPEG_BIN`.
+    Le travail lourd se fait en ligne de commande, hors du cycle requête/réponse.
 
 ## Ce que ce starter montre
 
 - le **worker** `forge video:process` (un identifiant, ou `--pending` pour tout) ;
 - l'orchestration `process_video` : sonde + poster + transcodage MP4 ;
 - l'avancée du statut `uploaded → processing → ready` (ou `failed`) ;
-- une route qui **liste les vidéos en attente** et la config ffmpeg, sans rien
-  transcoder elle-même.
+- une route qui **liste les vidéos en attente** et la config ffmpeg, sans rien transcoder elle-même.
 
 La table `videos` est garantie par la migration fournie plus bas.
 
@@ -42,9 +37,8 @@ forge db:init
 forge run
 ```
 
-Ouvrez `https://localhost:8000/video-transcode` : la page liste les vidéos au
-statut `uploaded` et le binaire ffmpeg configuré. Puis, en ligne de commande
-(ffmpeg installé) :
+Ouvrez `https://localhost:8000/video-transcode` : la page liste les vidéos au statut `uploaded` et le binaire ffmpeg configuré.
+Puis, en ligne de commande (ffmpeg installé) :
 
 ```bash
 forge video:process <id>        # traite une vidéo
@@ -83,13 +77,10 @@ class VideoTranscodeController(BaseController):
 
 ### Comprendre ce code
 
-- La route **ne transcode pas** : elle prépare le terrain (liste des vidéos à
-  traiter + config). Lancer ffmpeg dans une requête web la bloquerait : c'est
-  exactement ce que le modèle worker-CLI **évite**.
-- `process_video` (appelé par `forge video:process`) fait le travail lourd
-  **hors HTTP** et écrit le résultat (`mp4_path`, `poster_path`, statut `ready`).
-- En cas d'échec ffmpeg, la vidéo passe à `failed` avec un `error_message`
-  lisible ; le diagnostic est le palier suivant.
+- La route **ne transcode pas** : elle prépare le terrain (liste des vidéos à traiter + config).
+  Lancer ffmpeg dans une requête web la bloquerait : c'est exactement ce que le modèle worker-CLI **évite**.
+- `process_video` (appelé par `forge video:process`) fait le travail lourd **hors HTTP** et écrit le résultat (`mp4_path`, `poster_path`, statut `ready`).
+- En cas d'échec ffmpeg, la vidéo passe à `failed` avec un `error_message` lisible ; le diagnostic est le palier suivant.
 
 ## La vue
 
@@ -131,8 +122,8 @@ forge video:process --pending   # toutes les vidéos uploaded</pre>
 
 ## La migration
 
-Créez la table `videos` si elle n'existe pas déjà : le worker fait avancer son
-`status` de `uploaded` à `ready`. `CREATE TABLE IF NOT EXISTS` reste idempotent.
+Créez la table `videos` si elle n'existe pas déjà : le worker fait avancer son `status` de `uploaded` à `ready`.
+`CREATE TABLE IF NOT EXISTS` reste idempotent.
 
 ```sql
 -- mvc/migrations/20260601240000_create_videos.sql
@@ -178,7 +169,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous savez transcoder. Dernier palier : diagnostiquer le module quand quelque
-chose cloche.
+Vous savez transcoder.
+Dernier palier : diagnostiquer le module quand quelque chose cloche.
 
 [Diagnostiquer le module Vidéo](video-doctor.md)

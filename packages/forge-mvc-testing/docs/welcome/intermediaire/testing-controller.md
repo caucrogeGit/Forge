@@ -8,7 +8,8 @@ Deuxième palier du **niveau intermédiaire**.
 
 ## Le principe
 
-Un contrôleur Forge est une fonction `action(request) -> Response`. Pour le tester, on lui passe une `FakeRequest` et on inspecte la `Response`.
+Un contrôleur Forge est une fonction `action(request) -> Response`.
+Pour le tester, on lui passe une `FakeRequest` et on inspecte la `Response`.
 
 ## Exemple
 

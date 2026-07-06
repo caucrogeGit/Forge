@@ -2,15 +2,13 @@
 
 Objectif : définir la langue par défaut de l'application.
 
-**Ce que vous allez apprendre :** `set_default_locale("fr")` fixe la locale
-utilisée quand on appelle `trans(clé)` **sans** préciser de locale.
+**Ce que vous allez apprendre :** `set_default_locale("fr")` fixe la locale utilisée quand on appelle `trans(clé)` **sans** préciser de locale.
 `get_default_locale()` la relit.
 
 Premier palier du **niveau intermédiaire**.
 
 !!! note "Module opt-in"
-    La locale par défaut est une **configuration d'application** : on la fixe au
-    démarrage, pas à chaque requête.
+    La locale par défaut est une **configuration d'application** : on la fixe au démarrage, pas à chaque requête.
 
 ## Classes Forge utilisées
 
@@ -21,8 +19,7 @@ Premier palier du **niveau intermédiaire**.
 
 ## Fixer la locale au démarrage
 
-Dans le point d'entrée de l'application (ou un module de configuration chargé au
-boot) :
+Dans le point d'entrée de l'application (ou un module de configuration chargé au boot) :
 
 ```python
 # mvc/config_i18n.py  (importé au démarrage)
@@ -57,8 +54,7 @@ class I18nLocaleController(BaseController):
 
 - `trans("welcome.title")` **sans** `locale=` utilise `get_default_locale()`.
 - La locale par défaut est globale : la fixer une fois suffit.
-- On peut toujours forcer une autre langue ponctuellement avec `trans(clé,
-  locale="en")`.
+- On peut toujours forcer une autre langue ponctuellement avec `trans(clé, locale="en")`.
 
 ## La route
 
@@ -78,6 +74,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Que se passe-t-il si une clé manque dans la langue par défaut ? Voyons le **repli**.
+Que se passe-t-il si une clé manque dans la langue par défaut ?
+Voyons le **repli**.
 
 [Locale de secours](i18n-fallback.md)

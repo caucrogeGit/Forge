@@ -3,8 +3,8 @@
 Objectif : transformer une **ligne brute** de la base en dict propre, prêt à afficher.
 
 **Ce que vous allez apprendre :** en base, les métadonnées sont une **chaîne JSON**.
-`normalize_stats_event_row` désérialise les métadonnées et valide la ligne. Une ligne
-incomplète ou un JSON invalide lève `StatsAdminError`.
+`normalize_stats_event_row` désérialise les métadonnées et valide la ligne.
+Une ligne incomplète ou un JSON invalide lève `StatsAdminError`.
 
 Troisième palier du **niveau avancé** de la progression stats.
 
@@ -70,10 +70,8 @@ class StatsNormalizeController(BaseController):
 
 ### Comprendre ce code
 
-- `list_stats_events` applique déjà cette normalisation ; ce palier l'**isole** pour
-  comprendre la transformation `chaîne JSON → dict`.
-- La validation **refuse** une ligne incomplète ou un JSON invalide (`StatsAdminError`)
-  plutôt que de propager des données douteuses.
+- `list_stats_events` applique déjà cette normalisation ; ce palier l'**isole** pour comprendre la transformation `chaîne JSON → dict`.
+- La validation **refuse** une ligne incomplète ou un JSON invalide (`StatsAdminError`) plutôt que de propager des données douteuses.
 - Le résultat est directement utilisable dans une vue ou une API.
 
 ## La vue

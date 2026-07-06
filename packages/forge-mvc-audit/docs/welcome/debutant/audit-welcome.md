@@ -2,10 +2,8 @@
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-audit`.
 
-**Ce que vous allez apprendre :** enregistrer une action importante de
-l'application dans le journal d'audit.
-On écrit une trace avec la fonction `record_audit`, qui renvoie l'identifiant de
-la ligne créée.
+**Ce que vous allez apprendre :** enregistrer une action importante de l'application dans le journal d'audit.
+On écrit une trace avec la fonction `record_audit`, qui renvoie l'identifiant de la ligne créée.
 Le module ne décide jamais quoi tracer : l'application le décide.
 
 Premier palier du **niveau débutant** de la progression Audit.

@@ -1,8 +1,7 @@
 # Bilan : niveau avancé (Settings)
 
 Récapitulatif du **niveau avancé** de la progression Settings.
-Ce niveau ajoute la robustesse : règles de clé, gestion des erreurs et
-indépendance du cœur.
+Ce niveau ajoute la robustesse : règles de clé, gestion des erreurs et indépendance du cœur.
 
 ## Ce que vous avez validé
 

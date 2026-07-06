@@ -2,17 +2,13 @@
 
 `forge-mvc-audit` est l'opt-in de journal d'audit applicatif de Forge.
 
-Il enregistre les actions importantes de l'application (élève créé, note
-modifiée, QCM corrigé, connexion, rôle changé, fichier supprimé) dans une table
-`audit_log`, avec une API explicite.
+Il enregistre les actions importantes de l'application (élève créé, note modifiée, QCM corrigé, connexion, rôle changé, fichier supprimé) dans une table `audit_log`, avec une API explicite.
 
 ## Périmètre borné
 
 C'est un audit applicatif, pas un SIEM de cybersécurité.
-Cohérent avec ADR-008 : Forge fournit la table et le helper, la décision de
-tracer reste applicative.
-Le cœur de Forge ignore tout des traces ; la dépendance va de l'opt-in vers le
-cœur, jamais l'inverse.
+Cohérent avec ADR-008 : Forge fournit la table et le helper, la décision de tracer reste applicative.
+Le cœur de Forge ignore tout des traces ; la dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 
 ## Mise en route
 

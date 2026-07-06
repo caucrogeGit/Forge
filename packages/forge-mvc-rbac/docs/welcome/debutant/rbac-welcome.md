@@ -1,25 +1,20 @@
 # Welcome RBAC
 
-Objectif : premier contact avec le module **opt-in** `forge-mvc-rbac` et son
-**contrat déclaratif**.
+Objectif : premier contact avec le module **opt-in** `forge-mvc-rbac` et son **contrat déclaratif**.
 
-**Ce que vous allez apprendre :** Forge sépare les **rôles** (qui on est) des
-**permissions** (ce qu'on a le droit de faire), déclarés dans un contrat
-`mvc/security/rbac.json` (ADR-014). `load_rbac_contract` le charge ;
-`get_contract_permissions` liste les permissions d'un rôle.
+**Ce que vous allez apprendre :** Forge sépare les **rôles** (qui on est) des **permissions** (ce qu'on a le droit de faire), déclarés dans un contrat `mvc/security/rbac.json` (ADR-014).
+`load_rbac_contract` le charge ; `get_contract_permissions` liste les permissions d'un rôle.
 
-Premier palier du **niveau débutant** de la progression RBAC
-(vue d'ensemble des starters).
+Premier palier du **niveau débutant** de la progression RBAC (vue d'ensemble des starters).
 
 !!! note "Module opt-in"
-    Ce starter livre un contrat de démonstration (`mvc/security/rbac.json`) et
-    l'inspecte. Installé via `pip install --pre forge-mvc-rbac` (palier « Installation »).
+    Ce starter livre un contrat de démonstration (`mvc/security/rbac.json`) et l'inspecte.
+    Installé via `pip install --pre forge-mvc-rbac` (palier « Installation »).
 
 ## Ce que ce starter montre
 
 - une route texte de **premier contact** (`GET /rbac-welcome`) ;
-- le contrat chargé (rôles, entités) + les permissions du rôle `admin`
-  (`GET /rbac-welcome/inspect`).
+- le contrat chargé (rôles, entités) + les permissions du rôle `admin` (`GET /rbac-welcome/inspect`).
 
 ## Classes Forge utilisées
 
@@ -74,12 +69,9 @@ class RbacWelcomeController(BaseController):
 
 ### Comprendre ce code
 
-- Le contrat est un **fichier déclaratif** : on décrit qui peut quoi, sans coder de
-  conditions dans chaque contrôleur.
-- `load_rbac_contract` est **lecture seule** : il valide le fichier et renvoie un
-  résultat (existence, validité, comptes).
-- `get_contract_permissions(result, ["admin"])` agrège les permissions de tous les
-  rôles donnés.
+- Le contrat est un **fichier déclaratif** : on décrit qui peut quoi, sans coder de conditions dans chaque contrôleur.
+- `load_rbac_contract` est **lecture seule** : il valide le fichier et renvoie un résultat (existence, validité, comptes).
+- `get_contract_permissions(result, ["admin"])` agrège les permissions de tous les rôles donnés.
 
 ## Le contrat
 
@@ -107,8 +99,7 @@ Créez le contrat de démonstration `mvc/security/rbac.json` :
 }
 ```
 
-Ce contrat sert tout le parcours : il déclare une entité `Article`, ses permissions,
-et trois rôles (`admin`, `editor`, `reader`) avec les permissions accordées à chacun.
+Ce contrat sert tout le parcours : il déclare une entité `Article`, ses permissions, et trois rôles (`admin`, `editor`, `reader`) avec les permissions accordées à chacun.
 
 !!! tip "Valider `rbac.json` dans VS Code (optionnel)"
     RBAC est un opt-in : son schéma n'est pas livré par le squelette nu.
@@ -149,6 +140,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Premier contact établi. La suite : la brique « permission ».
+Premier contact établi.
+La suite : la brique « permission ».
 
 [Code de permission](rbac-permission.md)

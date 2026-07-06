@@ -1,15 +1,12 @@
 # Mosquitto local pour Forge IoT
 
-> **Statut** : page pédagogique. Elle explique comment installer, lancer
-> et **tester** un broker Mosquitto **local** pour faire tourner le flux
-> Forge IoT de bout en bout. Le broker est volontairement **en clair sur
-> `localhost:1883`**, sans TLS ni authentification ; voir
-> [Limites](#limites).
+> **Statut** : page pédagogique.
+> Elle explique comment installer, lancer et **tester** un broker Mosquitto **local** pour faire tourner le flux Forge IoT de bout en bout.
+> Le broker est volontairement **en clair sur `localhost:1883`**, sans TLS ni authentification ; voir [Limites](#limites).
 
 ## Objectif
 
-Mettre en place le broker MQTT manquant, puis dérouler le flux complet
-désormais disponible :
+Mettre en place le broker MQTT manquant, puis dérouler le flux complet désormais disponible :
 
 ```text
 Mosquitto local
@@ -25,9 +22,8 @@ iot_events                  # stockage
 /api/iot/events             # lecture HTTP (terminal 3)
 ```
 
-Cette page cible un poste **Linux / WSL / Debian / Ubuntu**. Pour
-dérouler ce flux d'un coup, voir le
-[smoke test local](local-smoke-test.md).
+Cette page cible un poste **Linux / WSL / Debian / Ubuntu**.
+Pour dérouler ce flux d'un coup, voir le [smoke test local](local-smoke-test.md).
 
 ## Installer Mosquitto
 
@@ -36,9 +32,7 @@ sudo apt update
 sudo apt install -y mosquitto mosquitto-clients
 ```
 
-Le paquet `mosquitto` fournit le broker ; `mosquitto-clients` fournit
-`mosquitto_pub` et `mosquitto_sub`, utiles pour publier et écouter à la
-main.
+Le paquet `mosquitto` fournit le broker ; `mosquitto-clients` fournit `mosquitto_pub` et `mosquitto_sub`, utiles pour publier et écouter à la main.
 
 ## Démarrer le service
 
@@ -47,8 +41,8 @@ sudo systemctl enable --now mosquitto
 sudo systemctl status mosquitto
 ```
 
-`enable --now` active Mosquitto au démarrage **et** le lance tout de
-suite. `status` doit afficher `active (running)`.
+`enable --now` active Mosquitto au démarrage **et** le lance tout de suite.
+`status` doit afficher `active (running)`.
 
 ## Vérifier que Mosquitto écoute
 
@@ -59,8 +53,7 @@ ss -tulpn | grep 1883
 ```
 
 Une ligne contenant `127.0.0.1:1883` (ou `0.0.0.0:1883`) confirme l'écoute.
-Si **rien ne sort**, Mosquitto n'écoute pas ; voir
-[Erreurs fréquentes](#erreurs-frequentes).
+Si **rien ne sort**, Mosquitto n'écoute pas ; voir [Erreurs fréquentes](#erreurs-frequentes).
 
 ## Vérifier Forge IoT avec doctor
 
@@ -79,8 +72,8 @@ Détail : [Diagnostic Forge IoT](doctor.md).
 
 ## Initialiser la table IoT
 
-Le subscriber stocke les mesures dans `iot_events`. Crée la table une
-fois pour toutes :
+Le subscriber stocke les mesures dans `iot_events`.
+Crée la table une fois pour toutes :
 
 ```bash
 forge iot:init            # copie la migration vers mvc/migrations/
@@ -114,8 +107,7 @@ Détail : [Simulateur (iot:simulate)](simulator.md).
 
 ## Lire les événements via l'API HTTP
 
-Dans un **troisième terminal** (l'application Forge tournant via
-`forge run`), relis les mesures stockées :
+Dans un **troisième terminal** (l'application Forge tournant via `forge run`), relis les mesures stockées :
 
 ```bash
 curl http://localhost:8000/api/iot/events
@@ -125,21 +117,18 @@ Détail : [API HTTP IoT](http-api.md).
 
 ## Tester avec `mosquitto_sub`
 
-Pour observer le trafic MQTT brut, sans Forge, abonne-toi au motif de
-topic et laisse tourner :
+Pour observer le trafic MQTT brut, sans Forge, abonne-toi au motif de topic et laisse tourner :
 
 ```bash
 mosquitto_sub -h localhost -t 'forge/+/+/telemetry' -v
 ```
 
-- les `+` sont des jokers MQTT (un niveau chacun) : n'importe quel `site`
-  et `device_id` ;
+- les `+` sont des jokers MQTT (un niveau chacun) : n'importe quel `site` et `device_id` ;
 - `-v` affiche le topic **et** le payload de chaque message.
 
 ## Publier manuellement avec `mosquitto_pub`
 
-Pour comprendre exactement ce que Forge publie, envoie un message à la
-main :
+Pour comprendre exactement ce que Forge publie, envoie un message à la main :
 
 ```bash
 mosquitto_pub -h localhost \
@@ -147,16 +136,14 @@ mosquitto_pub -h localhost \
   -m '{"kind":"temperature","value":22.4,"unit":"°C","timestamp":"2026-05-29T10:00:00Z"}'
 ```
 
-Le message doit apparaître dans `mosquitto_sub` **et**, si
-`forge iot:listen` tourne, être inséré dans `iot_events`. Pour publier
-depuis un vrai microcontrôleur, voir l'[exemple ESP32](esp32-example.md).
+Le message doit apparaître dans `mosquitto_sub` **et**, si `forge iot:listen` tourne, être inséré dans `iot_events`.
+Pour publier depuis un vrai microcontrôleur, voir l'[exemple ESP32](esp32-example.md).
 
 ## Erreurs fréquentes
 
 ### Broker arrêté (`ConnectionRefusedError`)
 
-Si `forge iot:doctor --mqtt`, `forge iot:listen` ou `forge iot:simulate`
-échoue avec une connexion refusée, le broker n'est pas démarré :
+Si `forge iot:doctor --mqtt`, `forge iot:listen` ou `forge iot:simulate` échoue avec une connexion refusée, le broker n'est pas démarré :
 
 ```bash
 sudo systemctl start mosquitto
@@ -168,13 +155,11 @@ sudo systemctl start mosquitto
 ss -tulpn | grep 1883
 ```
 
-Si rien ne sort, Mosquitto **n'écoute pas** : vérifie
-`sudo systemctl status mosquitto` et `journalctl -u mosquitto`.
+Si rien ne sort, Mosquitto **n'écoute pas** : vérifie `sudo systemctl status mosquitto` et `journalctl -u mosquitto`.
 
 ### Table IoT absente (`iot_storage_not_ready`)
 
-Si `forge iot:listen` ou l'API HTTP signale que le stockage n'est pas
-prêt, la table n'existe pas encore :
+Si `forge iot:listen` ou l'API HTTP signale que le stockage n'est pas prêt, la table n'existe pas encore :
 
 ```bash
 forge iot:init
@@ -215,14 +200,13 @@ Le payload JSON doit contenir au minimum les quatre champs obligatoires :
 - `unit` (unité) ;
 - `timestamp` (ISO 8601 UTC, suffixe `Z`).
 
-Un champ manquant ou un `timestamp` sans `Z` est rejeté. Le champ
-`metadata` est optionnel.
+Un champ manquant ou un `timestamp` sans `Z` est rejeté.
+Le champ `metadata` est optionnel.
 
 ## Limites
 
-Cette page documente **uniquement** un broker local pédagogique. Les
-sujets suivants sont **hors périmètre** de cette page et feront l'objet
-de tickets ultérieurs :
+Cette page documente **uniquement** un broker local pédagogique.
+Les sujets suivants sont **hors périmètre** de cette page et feront l'objet de tickets ultérieurs :
 
 - **TLS** (chiffrement du transport, port 8883) : non couvert ici, hors périmètre ;
 - **authentification** Mosquitto (utilisateurs, mots de passe, ACL) : non couverte ici, hors périmètre ;

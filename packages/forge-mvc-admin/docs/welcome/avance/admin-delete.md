@@ -5,11 +5,9 @@ Objectif : supprimer un article, sans risque de clic accidentel.
 ## Une suppression en deux temps
 
 La fiche détail propose un lien « Supprimer ».
-Il mène à une **page de confirmation** (`GET /admin/articles/<id>/delete`) qui
-n'efface rien : elle affiche la ligne et un bouton de confirmation.
+Il mène à une **page de confirmation** (`GET /admin/articles/<id>/delete`) qui n'efface rien : elle affiche la ligne et un bouton de confirmation.
 
-La suppression effective n'a lieu qu'à la soumission du formulaire
-(`POST /admin/articles/<id>/delete`).
+La suppression effective n'a lieu qu'à la soumission du formulaire (`POST /admin/articles/<id>/delete`).
 
 ## Pourquoi ce détour
 
@@ -23,8 +21,7 @@ La requête exécutée est ciblée :
 DELETE FROM articles WHERE id = ? LIMIT 1
 ```
 
-En cas de succès, le back-office redirige vers la liste avec un message de
-confirmation.
+En cas de succès, le back-office redirige vers la liste avec un message de confirmation.
 
 ## À retenir
 

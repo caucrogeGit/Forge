@@ -1,10 +1,10 @@
 # Vérifier une transition
 
-Objectif : répondre « peut-on passer de ce statut à cet autre ? ».
+Objectif : répondre « peut-on passer de ce statut à cet autre ?
+».
 
-**Ce que vous allez apprendre :** `can_transition(transitions, from, to)` dit si le
-passage est autorisé par les transitions déclarées. C'est le contrôle à poser
-**avant** d'appliquer un changement de statut.
+**Ce que vous allez apprendre :** `can_transition(transitions, from, to)` dit si le passage est autorisé par les transitions déclarées.
+C'est le contrôle à poser **avant** d'appliquer un changement de statut.
 
 Deuxième palier du **niveau intermédiaire** de la progression workflow.
 
@@ -29,8 +29,7 @@ Deuxième palier du **niveau intermédiaire** de la progression workflow.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/workflow-check?from=draft&to=review` (autorisé) puis
-`from=draft&to=published` (refusé).
+Ouvrez `https://localhost:8000/workflow-check?from=draft&to=review` (autorisé) puis `from=draft&to=published` (refusé).
 
 ## Le contrôleur
 
@@ -68,9 +67,9 @@ class WorkflowCheckController(BaseController):
 ### Comprendre ce code
 
 - On vérifie **avant** d'agir : si `can_transition` est faux, on refuse le changement.
-- Le contrôle est **pur** : transitions + from + to → booléen. Aucune base.
-- `draft → published` est refusé : il faut passer par `review`, le workflow impose
-  le chemin.
+- Le contrôle est **pur** : transitions + from + to → booléen.
+  Aucune base.
+- `draft → published` est refusé : il faut passer par `review`, le workflow impose le chemin.
 
 ## La vue
 

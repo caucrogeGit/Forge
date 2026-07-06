@@ -2,14 +2,11 @@
 
 Objectif : **servir** une vidéo en streaming HTTP, sans écrire de code métier.
 
-**Ce que vous allez apprendre :** `register_video_routes(router)`. Une seule
-ligne branche la route de lecture officielle `GET /videos/{uuid}`, qui sert le
-fichier en **streaming HTTP avec support des requêtes Range** (un lecteur peut se
-positionner dans la vidéo). Le code vit dans le paquet `forge-mvc-video` ; votre
-application ne fait que le **brancher** : principe « lock + delegate ».
+**Ce que vous allez apprendre :** `register_video_routes(router)`.
+Une seule ligne branche la route de lecture officielle `GET /videos/{uuid}`, qui sert le fichier en **streaming HTTP avec support des requêtes Range** (un lecteur peut se positionner dans la vidéo).
+Le code vit dans le paquet `forge-mvc-video` ; votre application ne fait que le **brancher** : principe « lock + delegate ».
 
-Palier 2 du **niveau intermédiaire** de la progression vidéo, après
-[Téléverser une vidéo](video-upload.md).
+Palier 2 du **niveau intermédiaire** de la progression vidéo, après [Téléverser une vidéo](video-upload.md).
 
 ## Ce que ce starter montre
 
@@ -17,9 +14,8 @@ Palier 2 du **niveau intermédiaire** de la progression vidéo, après
 - la route `GET /videos/{uuid}` en **streaming Range** ;
 - aucun contrôleur à écrire : on délègue au paquet.
 
-Aucun contrôleur à créer ici : la lecture vient entièrement du paquet
-`forge-mvc-video`, branché par `register_video_routes`. La table `videos` est
-garantie par la migration fournie plus bas.
+Aucun contrôleur à créer ici : la lecture vient entièrement du paquet `forge-mvc-video`, branché par `register_video_routes`.
+La table `videos` est garantie par la migration fournie plus bas.
 
 ## Classes Forge utilisées
 
@@ -34,20 +30,18 @@ forge db:init
 forge run
 ```
 
-Après avoir téléversé une vidéo (palier précédent), ouvrez son URL de lecture
-avec son UUID :
+Après avoir téléversé une vidéo (palier précédent), ouvrez son URL de lecture avec son UUID :
 
 ```
 https://localhost:8000/videos/<uuid>
 ```
 
-Le fichier est servi en streaming ; un lecteur vidéo peut se positionner grâce au
-support des requêtes **Range**.
+Le fichier est servi en streaming ; un lecteur vidéo peut se positionner grâce au support des requêtes **Range**.
 
 ## La route
 
-Branchez la route de lecture officielle dans `mvc/routes.py`. Le code métier
-vit dans le paquet `forge-mvc-video` ; on ne fait que le brancher.
+Branchez la route de lecture officielle dans `mvc/routes.py`.
+Le code métier vit dans le paquet `forge-mvc-video` ; on ne fait que le brancher.
 
 ```python
 # mvc/routes.py
@@ -58,20 +52,16 @@ register_video_routes(router)
 
 ### Comprendre ce code
 
-- `register_video_routes(router)` enregistre la route officielle d'un coup. Vous
-  n'écrivez **aucun** contrôleur : le code métier appartient au paquet,
-  l'application le **branche** explicitement (pas de découverte automatique,
-  principe « refuser la magie cachée »).
-- La lecture gère le **streaming Range** : indispensable pour qu'un lecteur
-  vidéo charge progressivement et se positionne sans tout télécharger.
-- La route sert le fichier référencé par la ligne `videos` : l'UUID, jamais le
-  nom de fichier d'origine.
+- `register_video_routes(router)` enregistre la route officielle d'un coup.
+  Vous n'écrivez **aucun** contrôleur : le code métier appartient au paquet, l'application le **branche** explicitement (pas de découverte automatique, principe « refuser la magie cachée »).
+- La lecture gère le **streaming Range** : indispensable pour qu'un lecteur vidéo charge progressivement et se positionne sans tout télécharger.
+- La route sert le fichier référencé par la ligne `videos` : l'UUID, jamais le nom de fichier d'origine.
 
 ## La migration
 
-La route de lecture sert les fichiers référencés par la table `videos`. Créez
-donc cette table si elle n'existe pas déjà. `CREATE TABLE IF NOT EXISTS` reste
-sûr même si le palier upload l'a déjà créée.
+La route de lecture sert les fichiers référencés par la table `videos`.
+Créez donc cette table si elle n'existe pas déjà.
+`CREATE TABLE IF NOT EXISTS` reste sûr même si le palier upload l'a déjà créée.
 
 ```sql
 -- mvc/migrations/20260601210000_create_videos.sql
@@ -105,6 +95,7 @@ CREATE TABLE IF NOT EXISTS videos (
 
 ## Après ce starter
 
-Vous savez servir une vidéo. La suite : suivre son **cycle de vie**.
+Vous savez servir une vidéo.
+La suite : suivre son **cycle de vie**.
 
 [Suivre l'état d'une vidéo](video-status.md)

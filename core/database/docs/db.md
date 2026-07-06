@@ -195,7 +195,8 @@ with transaction() as tx:
 !!! warning "Toujours paramétrer les valeurs"
     Les valeurs passent toujours par `params` (placeholders `?`), jamais par interpolation dans la chaîne SQL.
 
-    C'est la protection contre l'injection SQL. Le nom des tables et des colonnes, lui, ne peut pas être paramétré : il doit venir de code de confiance, jamais d'une entrée utilisateur.
+    C'est la protection contre l'injection SQL.
+    Le nom des tables et des colonnes, lui, ne peut pas être paramétré : il doit venir de code de confiance, jamais d'une entrée utilisateur.
 
 !!! note "Commit après lecture"
     Forge valide la connexion même après un simple SELECT.

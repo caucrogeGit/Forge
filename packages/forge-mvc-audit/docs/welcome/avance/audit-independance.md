@@ -2,11 +2,9 @@
 
 Objectif : comprendre pourquoi l'audit est un opt-in, et non une brique du cœur.
 
-**Ce que vous allez apprendre :** Forge Core ne dépend pas de
-`forge-mvc-audit`.
+**Ce que vous allez apprendre :** Forge Core ne dépend pas de `forge-mvc-audit`.
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
-Vous verrez aussi le paramètre `db=` injectable pour les tests et la constante
-`CREATE_TABLE_SQL`.
+Vous verrez aussi le paramètre `db=` injectable pour les tests et la constante `CREATE_TABLE_SQL`.
 
 Deuxième palier du **niveau avancé** de la progression Audit.
 

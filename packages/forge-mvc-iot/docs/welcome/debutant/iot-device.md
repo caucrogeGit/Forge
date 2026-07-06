@@ -1,15 +1,11 @@
 # Les événements d'un capteur
 
-Objectif : lire les événements d'**un capteur précis** et leur nombre, via une
-route paramétrée.
+Objectif : lire les événements d'**un capteur précis** et leur nombre, via une route paramétrée.
 
-**Ce que vous allez apprendre :** cibler un capteur par `site` et `device_id`
-avec `IotEventRepository.find_by_device`, et compter ses événements avec
-`count_by_device`. C'est la lecture filtrée, après le flux global du palier
-précédent.
+**Ce que vous allez apprendre :** cibler un capteur par `site` et `device_id` avec `IotEventRepository.find_by_device`, et compter ses événements avec `count_by_device`.
+C'est la lecture filtrée, après le flux global du palier précédent.
 
-Dernier palier du **niveau débutant** de la progression IoT, après
-[Lire les événements IoT](iot-events.md).
+Dernier palier du **niveau débutant** de la progression IoT, après [Lire les événements IoT](iot-events.md).
 
 ## Ce que ce starter montre
 
@@ -34,9 +30,8 @@ Lecture seule, aucun broker.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/iot-device/atelier/capteur-1`. La réponse JSON
-donne le `site`, le `device_id`, le `count` et la liste `events` de ce capteur
-(ou `503` tant que la table n'est pas créée).
+Ouvrez `https://localhost:8000/iot-device/atelier/capteur-1`.
+La réponse JSON donne le `site`, le `device_id`, le `count` et la liste `events` de ce capteur (ou `503` tant que la table n'est pas créée).
 
 ## Le contrôleur
 
@@ -84,16 +79,13 @@ class IotDeviceController(BaseController):
 
 ### Comprendre ce code
 
-- `site` et `device_id` viennent de l'**URL** (`route`) : on cible le
-  capteur sans query string.
-- `find_by_device(...)` filtre les événements de ce capteur ; `count_by_device`
-  donne le total : deux lectures complémentaires du même repository.
+- `site` et `device_id` viennent de l'**URL** (`route`) : on cible le capteur sans query string.
+- `find_by_device(...)` filtre les événements de ce capteur ; `count_by_device` donne le total : deux lectures complémentaires du même repository.
 - Comme au palier précédent, l'absence de table devient un `503` pédagogique.
 
 ## La route
 
-Déclarez la route paramétrée dans `mvc/routes.py`, à l'intérieur du groupe
-public.
+Déclarez la route paramétrée dans `mvc/routes.py`, à l'intérieur du groupe public.
 
 ```python
 # mvc/routes.py
@@ -111,7 +103,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous avez terminé le **niveau débutant** : configuration, flux global, lecture
-par capteur. Faites le point dans le bilan du niveau.
+Vous avez terminé le **niveau débutant** : configuration, flux global, lecture par capteur.
+Faites le point dans le bilan du niveau.
 
 [Bilan du niveau débutant](bilan.md)

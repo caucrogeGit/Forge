@@ -1,10 +1,8 @@
 # Smoke test local Forge IoT
 
-> **Statut** : parcours de vérification **local et opt-in**. Il valide
-> que les briques Forge IoT livrées fonctionnent **ensemble** avec un
-> vrai broker Mosquitto et une vraie base MariaDB. Ce n'est **pas** un
-> test de la CI standard : il dépend de services locaux qui ne sont pas
-> toujours disponibles.
+> **Statut** : parcours de vérification **local et opt-in**.
+> Il valide que les briques Forge IoT livrées fonctionnent **ensemble** avec un vrai broker Mosquitto et une vraie base MariaDB.
+> Ce n'est **pas** un test de la CI standard : il dépend de services locaux qui ne sont pas toujours disponibles.
 
 ## Objectif
 
@@ -27,8 +25,7 @@ Si chaque étape passe, l'intégration locale est saine.
 
 Ce smoke test suppose :
 
-- **Mosquitto actif** localement, voir
-  [Mosquitto local](mosquitto-local.md) :
+- **Mosquitto actif** localement, voir [Mosquitto local](mosquitto-local.md) :
 
   ```bash
   sudo systemctl status mosquitto
@@ -39,16 +36,13 @@ Ce smoke test suppose :
 
 ## Script semi-automatique
 
-Le dépôt fournit un script qui enchaîne les étapes et marque des pauses
-aux endroits manuels (migration et écoute, à lancer toi-même) :
+Le dépôt fournit un script qui enchaîne les étapes et marque des pauses aux endroits manuels (migration et écoute, à lancer toi-même) :
 
 ```bash
 bash scripts/iot-local-smoke.sh
 ```
 
-Le script ne masque aucune étape : il lance les diagnostics et la
-simulation, mais te laisse exécuter `forge migration:apply` et
-`forge iot:listen` toi-même, entre deux pauses.
+Le script ne masque aucune étape : il lance les diagnostics et la simulation, mais te laisse exécuter `forge migration:apply` et `forge iot:listen` toi-même, entre deux pauses.
 
 ## Parcours manuel détaillé
 
@@ -77,8 +71,8 @@ Dans un **deuxième terminal**, publie des mesures :
 forge iot:simulate --count 3 --interval 1
 ```
 
-Trois lignes `[OK]` doivent apparaître côté `forge iot:listen`. Quand tu
-arrêtes l'écoute (`Ctrl+C`), un résumé de session confirme le compte :
+Trois lignes `[OK]` doivent apparaître côté `forge iot:listen`.
+Quand tu arrêtes l'écoute (`Ctrl+C`), un résumé de session confirme le compte :
 
 ```text
 [INFO] Arrêt demandé.
@@ -91,16 +85,11 @@ Résumé :
   erreurs de stockage  : 0
 ```
 
-Si un message invalide arrive, il est **ignoré** (`[WARN] Message MQTT
-ignoré - …`) et compté dans `erreurs de contrat` sans arrêter l'écoute.
-Si la table manque, `forge iot:listen` affiche `Table iot_events
-absente` et renvoie vers `forge iot:init` / `forge migration:apply` ; si
-la base est injoignable, il affiche `Connexion base impossible` et
-renvoie vers `forge iot:doctor --db`. Détail dans
-[Écoute](listen-command.md).
+Si un message invalide arrive, il est **ignoré** (`[WARN] Message MQTT ignoré - …`) et compté dans `erreurs de contrat` sans arrêter l'écoute.
+Si la table manque, `forge iot:listen` affiche `Table iot_events absente` et renvoie vers `forge iot:init` / `forge migration:apply` ; si la base est injoignable, il affiche `Connexion base impossible` et renvoie vers `forge iot:doctor --db`.
+Détail dans [Écoute](listen-command.md).
 
-Enfin, avec l'application lancée (`forge run`), relis les mesures
-stockées :
+Enfin, avec l'application lancée (`forge run`), relis les mesures stockées :
 
 ```bash
 curl http://localhost:8000/api/iot/events
@@ -108,14 +97,11 @@ curl http://localhost:8000/api/iot/events
 
 ## Ce que ce smoke test n'est pas
 
-- **pas un test de CI standard** : il dépend de Mosquitto et MariaDB
-  locaux, qui ne sont pas toujours présents en intégration continue ;
+- **pas un test de CI standard** : il dépend de Mosquitto et MariaDB locaux, qui ne sont pas toujours présents en intégration continue ;
 - il **suppose Mosquitto actif** et **MariaDB configurée** ;
 - il **suppose** un projet Forge avec `forge-mvc-iot` installé ;
 - il **ne teste pas** TLS ni l'authentification MQTT ;
 - il **ne teste pas** Forge Design.
 
-Pour un broker local, voir [Mosquitto local](mosquitto-local.md). Pour
-le détail de chaque commande, voir [Diagnostic](doctor.md),
-[Initialisation](init-command.md), [Écoute](listen-command.md) et
-[Simulateur](simulator.md).
+Pour un broker local, voir [Mosquitto local](mosquitto-local.md).
+Pour le détail de chaque commande, voir [Diagnostic](doctor.md), [Initialisation](init-command.md), [Écoute](listen-command.md) et [Simulateur](simulator.md).

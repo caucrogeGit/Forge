@@ -2,8 +2,7 @@
 
 Objectif : lister tous les paramètres et en supprimer un.
 
-**Ce que vous allez apprendre :** `get_all_settings` renvoie tous les
-paramètres dans un dictionnaire, triés par clé et recoercés dans leur type.
+**Ce que vous allez apprendre :** `get_all_settings` renvoie tous les paramètres dans un dictionnaire, triés par clé et recoercés dans leur type.
 `delete_setting` retire un paramètre et indique s'il existait.
 Vous disposez ainsi d'une vue d'ensemble et d'un moyen de nettoyage.
 

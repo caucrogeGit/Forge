@@ -2,9 +2,8 @@
 
 Objectif : refuser un événement mal formé **avant** de l'écrire en base.
 
-**Ce que vous allez apprendre :** `make_event` valide à la construction et
-`validate_event` re-vérifie un événement existant. Un nom invalide lève
-`StatsEventError` : on refuse avant toute écriture.
+**Ce que vous allez apprendre :** `make_event` valide à la construction et `validate_event` re-vérifie un événement existant.
+Un nom invalide lève `StatsEventError` : on refuse avant toute écriture.
 
 Troisième palier du **niveau intermédiaire** de la progression stats.
 
@@ -31,8 +30,7 @@ Troisième palier du **niveau intermédiaire** de la progression stats.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/stats-validate?name=page_view` (valide) puis
-`?name=page.view` (refusé).
+Ouvrez `https://localhost:8000/stats-validate?name=page_view` (valide) puis `?name=page.view` (refusé).
 
 ## Le contrôleur
 
@@ -68,10 +66,8 @@ class StatsValidateController(BaseController):
 
 ### Comprendre ce code
 
-- La validation se fait **à la construction** : un `make_event` invalide lève
-  immédiatement, avant tout SQL.
-- `validate_event` permet de re-vérifier un événement reçu d'ailleurs (désérialisé,
-  par exemple).
+- La validation se fait **à la construction** : un `make_event` invalide lève immédiatement, avant tout SQL.
+- `validate_event` permet de re-vérifier un événement reçu d'ailleurs (désérialisé, par exemple).
 - Refuser tôt = pas de données invalides en base.
 
 ## La vue
@@ -124,6 +120,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous savez écrire des événements valides. La suite (avancé) : les **consulter**.
+Vous savez écrire des événements valides.
+La suite (avancé) : les **consulter**.
 
 [Bilan du niveau intermédiaire](bilan.md)

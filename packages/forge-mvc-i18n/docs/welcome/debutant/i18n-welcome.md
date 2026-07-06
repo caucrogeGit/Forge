@@ -2,18 +2,15 @@
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-i18n`.
 
-**Ce que vous allez apprendre :** l'internationalisation de Forge repose sur des
-**catalogues JSON** (un fichier par locale) et un helper `trans(clé, locale)`.
-Sans catalogue ni module, le noyau dégrade en **no-op** : `trans` retourne la
-clé. Avec l'opt-in et un catalogue, `trans` retourne la traduction.
+**Ce que vous allez apprendre :** l'internationalisation de Forge repose sur des **catalogues JSON** (un fichier par locale) et un helper `trans(clé, locale)`.
+Sans catalogue ni module, le noyau dégrade en **no-op** : `trans` retourne la clé.
+Avec l'opt-in et un catalogue, `trans` retourne la traduction.
 
-Premier palier du **niveau débutant** de la progression i18n
-(vue d'ensemble des starters).
+Premier palier du **niveau débutant** de la progression i18n (vue d'ensemble des starters).
 
 !!! note "Module opt-in : repli no-op"
-    Si `forge-mvc-i18n` n'est pas installé, `trans("welcome.title")` renvoie
-    `"welcome.title"`. L'application ne casse jamais ; elle n'est simplement pas
-    traduite.
+    Si `forge-mvc-i18n` n'est pas installé, `trans("welcome.title")` renvoie `"welcome.title"`.
+    L'application ne casse jamais ; elle n'est simplement pas traduite.
 
 ## Ce que ce starter montre
 
@@ -56,10 +53,8 @@ class I18nWelcomeController(BaseController):
 
 ### Comprendre ce code
 
-- `trans("welcome.title", locale="fr")` lit `translations/fr.json` et retourne
-  `"Welcome i18n"`.
-- Le catalogue est un simple objet JSON `clé → texte` : rien de magique, le
-  stockage est visible et éditable.
+- `trans("welcome.title", locale="fr")` lit `translations/fr.json` et retourne `"Welcome i18n"`.
+- Le catalogue est un simple objet JSON `clé → texte` : rien de magique, le stockage est visible et éditable.
 - Sans le module opt-in, la même ligne renverrait `"welcome.title"` (repli no-op).
 
 ## La route
@@ -80,6 +75,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Premier mot traduit. Voyons la structure d'un **catalogue** avec deux langues.
+Premier mot traduit.
+Voyons la structure d'un **catalogue** avec deux langues.
 
 [Écrire un catalogue](i18n-catalog.md)

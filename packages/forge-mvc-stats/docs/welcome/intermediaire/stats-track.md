@@ -2,15 +2,14 @@
 
 Objectif : **enregistrer** un événement, via un exécuteur injectable.
 
-**Ce que vous allez apprendre :** `track_event` prend un **exécuteur** (`execute`)
-plutôt que d'accéder directement à la base, ce qui le rend testable. La démo injecte
-un exécuteur factice ; en production on passe `core.database.db.execute`.
+**Ce que vous allez apprendre :** `track_event` prend un **exécuteur** (`execute`) plutôt que d'accéder directement à la base, ce qui le rend testable.
+La démo injecte un exécuteur factice ; en production on passe `core.database.db.execute`.
 
 Deuxième palier du **niveau intermédiaire** de la progression stats.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-stats` installé. **Aucune base réelle** : l'exécuteur
-    de démo capture la requête.
+    Ce starter suppose `forge-mvc-stats` installé.
+    **Aucune base réelle** : l'exécuteur de démo capture la requête.
 
 ## Ce que ce starter montre
 
@@ -63,8 +62,7 @@ class StatsTrackController(BaseController):
 
 ### Comprendre ce code
 
-- L'**injection** de l'exécuteur découple Forge Stats de la base : testable sans
-  MariaDB, branché en une ligne en production.
+- L'**injection** de l'exécuteur découple Forge Stats de la base : testable sans MariaDB, branché en une ligne en production.
 - Le même motif que la résolution RBAC (`fetch_all` injecté) : le code métier reste pur.
 - En production : `track_event(core.database.db.execute, event)`.
 

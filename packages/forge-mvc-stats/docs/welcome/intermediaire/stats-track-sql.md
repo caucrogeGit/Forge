@@ -2,9 +2,8 @@
 
 Objectif : **voir** le SQL d'insertion d'un événement avant de l'exécuter.
 
-**Ce que vous allez apprendre :** `get_track_event_sql` retourne l'`INSERT` paramétré ;
-`prepare_track_event_values` retourne le tuple de valeurs d'un événement (métadonnées
-sérialisées en JSON). SQL visible, requête paramétrée (anti-injection).
+**Ce que vous allez apprendre :** `get_track_event_sql` retourne l'`INSERT` paramétré ; `prepare_track_event_values` retourne le tuple de valeurs d'un événement (métadonnées sérialisées en JSON).
+SQL visible, requête paramétrée (anti-injection).
 
 Premier palier du **niveau intermédiaire** de la progression stats.
 

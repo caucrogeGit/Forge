@@ -2,13 +2,11 @@
 
 Objectif : structurer des catalogues pour deux langues et les charger.
 
-**Ce que vous allez apprendre :** chaque locale a son fichier
-`translations/<locale>.json`. `load_catalog(locale)` lit et **valide** le
-catalogue (objet JSON de chaînes), puis retourne un dict.
+**Ce que vous allez apprendre :** chaque locale a son fichier `translations/<locale>.json`.
+`load_catalog(locale)` lit et **valide** le catalogue (objet JSON de chaînes), puis retourne un dict.
 
 !!! note "Module opt-in"
-    Les clés et les valeurs doivent être des **chaînes** : un catalogue mal formé
-    lève `TranslationCatalogError` (vu au niveau avancé).
+    Les clés et les valeurs doivent être des **chaînes** : un catalogue mal formé lève `TranslationCatalogError` (vu au niveau avancé).
 
 ## Classes Forge utilisées
 
@@ -63,10 +61,9 @@ class I18nCatalogController(BaseController):
 
 ### Comprendre ce code
 
-- `load_catalog("fr")` lit `translations/fr.json` et retourne le dict
-  `{clé: texte}`.
-- Les deux catalogues partagent **les mêmes clés** : seule la valeur change selon
-  la langue. C'est la base de l'i18n.
+- `load_catalog("fr")` lit `translations/fr.json` et retourne le dict `{clé: texte}`.
+- Les deux catalogues partagent **les mêmes clés** : seule la valeur change selon la langue.
+  C'est la base de l'i18n.
 - La validation est stricte : clés et valeurs doivent être des chaînes.
 
 ## La route
@@ -87,6 +84,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Les catalogues sont prêts. Traduisons selon la **langue demandée**.
+Les catalogues sont prêts.
+Traduisons selon la **langue demandée**.
 
 [Traduire une clé](i18n-trans.md)

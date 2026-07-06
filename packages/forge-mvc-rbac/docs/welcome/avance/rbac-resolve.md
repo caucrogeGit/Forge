@@ -1,17 +1,15 @@
 # Résoudre les permissions d'un utilisateur
 
-Objectif : calculer les permissions **effectives** d'un utilisateur (ses rôles ×
-leurs permissions) depuis la base.
+Objectif : calculer les permissions **effectives** d'un utilisateur (ses rôles × leurs permissions) depuis la base.
 
-**Ce que vous allez apprendre :** `get_user_permissions` et `user_has_permission`
-font ce calcul via un `fetch_all` **injectable**, testables sans vraie base. On
-injecte ici un `fetch_all` de démonstration.
+**Ce que vous allez apprendre :** `get_user_permissions` et `user_has_permission` font ce calcul via un `fetch_all` **injectable**, testables sans vraie base.
+On injecte ici un `fetch_all` de démonstration.
 
 Deuxième palier du **niveau avancé** de la progression RBAC.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-rbac` installé. La démo injecte un `fetch_all`
-    fixe : **aucune base réelle requise**.
+    Ce starter suppose `forge-mvc-rbac` installé.
+    La démo injecte un `fetch_all` fixe : **aucune base réelle requise**.
 
 ## Ce que ce starter montre
 
@@ -32,8 +30,7 @@ Deuxième palier du **niveau avancé** de la progression RBAC.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/rbac-resolve` : permissions de l'utilisateur démo +
-deux vérifications, en JSON.
+Ouvrez `https://localhost:8000/rbac-resolve` : permissions de l'utilisateur démo + deux vérifications, en JSON.
 
 ## Le contrôleur
 
@@ -73,10 +70,8 @@ class RbacResolveController(BaseController):
 
 ### Comprendre ce code
 
-- L'injection de `fetch_all` rend la résolution **testable** sans base : on passe la
-  vraie fonction d'accès en production, une fausse en démo/test.
-- `user_has_permission` s'appuie sur `get_user_permissions` : un seul endroit de
-  vérité.
+- L'injection de `fetch_all` rend la résolution **testable** sans base : on passe la vraie fonction d'accès en production, une fausse en démo/test.
+- `user_has_permission` s'appuie sur `get_user_permissions` : un seul endroit de vérité.
 - Par défaut (sans `fetch_all` ni accès), **aucune permission** : sécurisé par défaut.
 
 ## La route

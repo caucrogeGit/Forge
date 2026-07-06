@@ -1,12 +1,9 @@
 # Écrire des octets générés
 
-Objectif : écrire un fichier **produit côté serveur** (rapport, export) avec la
-primitive `save_bytes`, sans passer par un upload HTTP.
+Objectif : écrire un fichier **produit côté serveur** (rapport, export) avec la primitive `save_bytes`, sans passer par un upload HTTP.
 
-**Ce que vous allez apprendre :** tout n'arrive pas d'un formulaire. `save_bytes`
-range des octets dans la zone d'upload, avec un nom sûr et la même garde
-anti-traversal. C'est la brique d'écriture bas niveau sur laquelle `save_upload`
-lui-même est bâti (ADR-020).
+**Ce que vous allez apprendre :** tout n'arrive pas d'un formulaire.
+`save_bytes` range des octets dans la zone d'upload, avec un nom sûr et la même garde anti-traversal. C'est la brique d'écriture bas niveau sur laquelle `save_upload` lui-même est bâti (ADR-020).
 
 Troisième palier du **niveau avancé** de la progression files.
 
@@ -32,8 +29,7 @@ Troisième palier du **niveau avancé** de la progression files.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/file-bytes`, saisissez un contenu : un fichier
-`documents/rapport-….txt` est créé.
+Ouvrez `https://localhost:8000/file-bytes`, saisissez un contenu : un fichier `documents/rapport-….txt` est créé.
 
 ## Le contrôleur
 
@@ -125,11 +121,9 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- `save_bytes` prend des **octets** (pas un fichier HTTP) : idéal pour un contenu
-  généré (CSV, PDF, JSON exporté).
+- `save_bytes` prend des **octets** (pas un fichier HTTP) : idéal pour un contenu généré (CSV, PDF, JSON exporté).
 - Le nom est rendu **sûr** et **unique** : pas de collision, pas de traversée.
-- C'est la **même primitive d'écriture** que `save_upload` utilise après validation,
-  d'où la vision ADR-020 : files = des primitives, chaque opt-in compose.
+- C'est la **même primitive d'écriture** que `save_upload` utilise après validation, d'où la vision ADR-020 : files = des primitives, chaque opt-in compose.
 
 ## À retenir
 

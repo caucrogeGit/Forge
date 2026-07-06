@@ -12,8 +12,7 @@ class AuditError(ValueError):
 ```
 
 `AuditError` signale une entrée invalide pour une trace d'audit.
-Elle hérite de `ValueError` : un appelant peut la rattraper comme une erreur
-d'entrée ordinaire.
+Elle hérite de `ValueError` : un appelant peut la rattraper comme une erreur d'entrée ordinaire.
 
 ## 2. Quand est-elle levée ?
 

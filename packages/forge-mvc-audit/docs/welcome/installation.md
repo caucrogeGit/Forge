@@ -2,9 +2,7 @@
 
 Objectif : installer l'opt-in journal d'audit et préparer sa table.
 
-Le parcours qui suit montre, en trois niveaux, comment enregistrer une action,
-relire le journal, enrichir et filtrer les traces, puis comprendre le périmètre
-borné du module.
+Le parcours qui suit montre, en trois niveaux, comment enregistrer une action, relire le journal, enrichir et filtrer les traces, puis comprendre le périmètre borné du module.
 
 ## Installer le paquet
 
@@ -12,8 +10,7 @@ borné du module.
 pip install --pre forge-mvc-audit
 ```
 
-En développement, depuis le dépôt, vous pouvez installer le paquet en mode
-éditable :
+En développement, depuis le dépôt, vous pouvez installer le paquet en mode éditable :
 
 ```bash
 pip install -e packages/forge-mvc-audit
@@ -25,8 +22,7 @@ Il enregistre les actions dans une table MariaDB nommée `audit_log`.
 ## Créer la table d'audit
 
 La table n'est pas créée automatiquement.
-Forge copie la migration fournie par le paquet dans votre projet, puis vous
-l'appliquez :
+Forge copie la migration fournie par le paquet dans votre projet, puis vous l'appliquez :
 
 ```bash
 forge audit:init

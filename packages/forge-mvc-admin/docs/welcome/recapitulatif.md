@@ -21,6 +21,5 @@ Ce parcours a couvert l'administration complète d'une entité.
 
 ## Aller plus loin
 
-- Le contrat d'une ressource (champs, table, tri, clé) est détaillé dans la
-  page [Contrat de ressource](../resources.md).
+- Le contrat d'une ressource (champs, table, tri, clé) est détaillé dans la page [Contrat de ressource](../resources.md).
 - `forge admin:doctor` reste votre point de contrôle quand le schéma évolue.

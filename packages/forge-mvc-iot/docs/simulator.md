@@ -1,9 +1,8 @@
 # Simulateur Forge IoT : `forge iot:simulate`
 
-> **Statut** : outil **pédagogique**. Il publie des mesures factices
-> mais **conformes au contrat MQTT Forge IoT** vers le broker configuré,
-> sans capteur physique. Il ne lance pas le subscriber, n'écrit pas en
-> base et n'appelle pas l'API HTTP.
+> **Statut** : outil **pédagogique**.
+> Il publie des mesures factices mais **conformes au contrat MQTT Forge IoT** vers le broker configuré, sans capteur physique.
+> Il ne lance pas le subscriber, n'écrit pas en base et n'appelle pas l'API HTTP.
 
 ## Objectif
 
@@ -21,9 +20,8 @@ iot_events                # 4. stockage
 /api/iot/events           # 5. lecture HTTP
 ```
 
-Le simulateur couvre **uniquement l'étape 2** : la publication. Les
-étapes 3 à 5 relèvent du subscriber, du stockage et de l'API HTTP, déjà
-documentés ailleurs dans cette section.
+Le simulateur couvre **uniquement l'étape 2** : la publication.
+Les étapes 3 à 5 relèvent du subscriber, du stockage et de l'API HTTP, déjà documentés ailleurs dans cette section.
 
 ## Usage
 
@@ -31,8 +29,7 @@ documentés ailleurs dans cette section.
 forge iot:simulate
 ```
 
-Publie **une** mesure par défaut sur le topic
-`forge/atelier/esp32-001/telemetry` :
+Publie **une** mesure par défaut sur le topic `forge/atelier/esp32-001/telemetry` :
 
 ```json
 {
@@ -46,8 +43,7 @@ Publie **une** mesure par défaut sur le topic
 }
 ```
 
-Le `timestamp` est toujours en UTC avec suffixe `Z`, généré à la
-publication.
+Le `timestamp` est toujours en UTC avec suffixe `Z`, généré à la publication.
 
 Aide via :
 
@@ -78,9 +74,8 @@ forge iot:simulate --count 10 --interval 1
 
 ## Profils de simulation
 
-Plutôt que de retenir les bonnes valeurs `--kind`/`--value`/`--unit` pour
-chaque type de mesure, un **profil** les fournit d'un coup. Pratique pour
-construire des exercices sans capteur réel :
+Plutôt que de retenir les bonnes valeurs `--kind`/`--value`/`--unit` pour chaque type de mesure, un **profil** les fournit d'un coup.
+Pratique pour construire des exercices sans capteur réel :
 
 ```bash
 forge iot:simulate --profile temperature --count 5
@@ -111,9 +106,7 @@ Quand un profil est actif, le payload porte `metadata.profile` :
 }
 ```
 
-Un profil ne fournit que des **défauts** : `--kind`, `--value` et
-`--unit` peuvent encore les surcharger explicitement, quel que soit leur
-ordre :
+Un profil ne fournit que des **défauts** : `--kind`, `--value` et `--unit` peuvent encore les surcharger explicitement, quel que soit leur ordre :
 
 ```bash
 forge iot:simulate --profile temperature --value 24.8
@@ -127,22 +120,18 @@ Un profil inconnu est rejeté (exit code 2) :
 Profils disponibles : temperature, humidity, presence, energy
 ```
 
-Sans `--profile`, le comportement est **inchangé** (température simple,
-`metadata` sans `profile`).
+Sans `--profile`, le comportement est **inchangé** (température simple, `metadata` sans `profile`).
 
 ## Conformité au contrat
 
-Le simulateur valide chaque message contre le contrat
-[`forge/{site}/{device_id}/telemetry`](mqtt-contract.md) **avant** de se
-connecter au broker. Une option hors slug est donc rejetée proprement,
-sans ouvrir de socket :
+Le simulateur valide chaque message contre le contrat [`forge/{site}/{device_id}/telemetry`](mqtt-contract.md) **avant** de se connecter au broker.
+Une option hors slug est donc rejetée proprement, sans ouvrir de socket :
 
 ```text
 [ERREUR] message non conforme au contrat MQTT - Topic invalide : 'forge/Atelier/esp32-001/telemetry' (...)
 ```
 
-C'est volontaire : on ne publie **que** des messages que le subscriber
-Forge IoT saura parser.
+C'est volontaire : on ne publie **que** des messages que le subscriber Forge IoT saura parser.
 
 ## Sortie exemple
 
@@ -154,16 +143,12 @@ Forge IoT saura parser.
 [OK] 3 mesure(s) publiée(s).
 ```
 
-Le mot de passe MQTT n'apparaît **jamais** dans la sortie, même quand un
-username/password est configuré (il est transmis au broker, pas affiché).
+Le mot de passe MQTT n'apparaît **jamais** dans la sortie, même quand un username/password est configuré (il est transmis au broker, pas affiché).
 
 ## Connexion TLS
 
-`forge iot:simulate` consomme la configuration TLS : si
-`FORGE_IOT_MQTT_TLS_ENABLED=true`, le client appelle `client.tls_set(...)`
-avant de se connecter (`ca_certs` = `FORGE_IOT_MQTT_TLS_CA_FILE` si
-fourni, sinon les certificats système). Pense à configurer aussi le port
-TLS du broker (généralement `8883`) :
+`forge iot:simulate` consomme la configuration TLS : si `FORGE_IOT_MQTT_TLS_ENABLED=true`, le client appelle `client.tls_set(...)` avant de se connecter (`ca_certs` = `FORGE_IOT_MQTT_TLS_CA_FILE` si fourni, sinon les certificats système).
+Pense à configurer aussi le port TLS du broker (généralement `8883`) :
 
 ```bash
 export FORGE_IOT_MQTT_HOST="mqtt.example.net"
@@ -174,8 +159,8 @@ export FORGE_IOT_MQTT_TLS_CA_FILE="/etc/ssl/certs/mosquitto-ca.crt"
 forge iot:simulate --profile temperature --count 3
 ```
 
-Le chemin du CA n'apparaît jamais dans la sortie. Détails :
-[Configuration : TLS MQTT](configuration.md#tls-mqtt).
+Le chemin du CA n'apparaît jamais dans la sortie.
+Détails : [Configuration : TLS MQTT](configuration.md#tls-mqtt).
 
 ## Codes de sortie
 
@@ -185,34 +170,28 @@ Le chemin du CA n'apparaît jamais dans la sortie. Détails :
 | `2` | Option invalide (valeur manquante, hors plage, message non conforme). |
 | `1` | Configuration invalide ou échec de connexion / publication. |
 
-En cas d'échec de connexion, le message reste sobre (type d'erreur, pas
-de stacktrace) : lance d'abord `forge iot:doctor --mqtt` pour
-diagnostiquer le broker.
+En cas d'échec de connexion, le message reste sobre (type d'erreur, pas de stacktrace) : lance d'abord `forge iot:doctor --mqtt` pour diagnostiquer le broker.
 
 ## Parcours recommandé
 
-Besoin d'un broker pour ces commandes ? Voir
-[Mosquitto local](mosquitto-local.md) pour l'installer et le lancer.
+Besoin d'un broker pour ces commandes ?
+Voir [Mosquitto local](mosquitto-local.md) pour l'installer et le lancer.
 
 ```bash
 forge iot:doctor --mqtt              # 1. confirmer que le broker répond
 forge iot:simulate --count 3 --interval 1   # 2. publier 3 mesures
 ```
 
-Côté consommation, lance [`forge iot:listen`](listen-command.md) dans un
-autre terminal : il écoute le broker et insère les mesures reçues dans
-`iot_events`. Tu peux ensuite les relire via `GET /api/iot/events`.
+Côté consommation, lance [`forge iot:listen`](listen-command.md) dans un autre terminal : il écoute le broker et insère les mesures reçues dans `iot_events`.
+Tu peux ensuite les relire via `GET /api/iot/events`.
 
 ## Limites (hors périmètre)
 
-- ne lance **pas** le subscriber, n'écrit **pas** en base, n'appelle
-  **pas** l'API HTTP ;
+- ne lance **pas** le subscriber, n'écrit **pas** en base, n'appelle **pas** l'API HTTP ;
 - pas de `retain`, pas de QoS avancé, pas de downlink ;
 - pas de capteur réel, pas de code embarqué ;
-- QoS 0 uniquement : un message peut être perdu si le broker est
-  saturé (acceptable pour un simulateur pédagogique).
+- QoS 0 uniquement : un message peut être perdu si le broker est saturé (acceptable pour un simulateur pédagogique).
 
 ## Tickets suivants
 
-- `IOT-MOSQUITTO-LOCAL-DOCS-001` : documenter le lancement d'un
-  Mosquitto local pour exécuter ce flux de bout en bout.
+- `IOT-MOSQUITTO-LOCAL-DOCS-001` : documenter le lancement d'un Mosquitto local pour exécuter ce flux de bout en bout.

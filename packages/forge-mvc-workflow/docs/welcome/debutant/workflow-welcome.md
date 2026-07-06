@@ -1,24 +1,20 @@
 # Welcome Workflow
 
-Objectif : premier contact avec le module **opt-in** `forge-mvc-workflow`, une
-machine à états applicative.
+Objectif : premier contact avec le module **opt-in** `forge-mvc-workflow`, une machine à états applicative.
 
-**Ce que vous allez apprendre :** un **statut** porte un nom, un libellé, une
-couleur, et des marqueurs `is_initial` / `is_final`. `make_status` en crée un ;
-`validate_statuses` vérifie l'ensemble (pas de doublon, au plus un statut initial).
+**Ce que vous allez apprendre :** un **statut** porte un nom, un libellé, une couleur, et des marqueurs `is_initial` / `is_final`.
+`make_status` en crée un ; `validate_statuses` vérifie l'ensemble (pas de doublon, au plus un statut initial).
 
-Premier palier du **niveau débutant** de la progression workflow
-(vue d'ensemble des starters).
+Premier palier du **niveau débutant** de la progression workflow (vue d'ensemble des starters).
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-workflow` installé (palier « Installation »). Module
-    **sans état** : que des fonctions pures.
+    Ce starter suppose `forge-mvc-workflow` installé (palier « Installation »).
+    Module **sans état** : que des fonctions pures.
 
 ## Ce que ce starter montre
 
 - une route texte de **premier contact** (`GET /workflow-welcome`) ;
-- un jeu de statuts de démo (`draft → review → published → archived`) en JSON
-  (`GET /workflow-welcome/inspect`).
+- un jeu de statuts de démo (`draft → review → published → archived`) en JSON (`GET /workflow-welcome/inspect`).
 
 ## Classes Forge utilisées
 
@@ -83,12 +79,9 @@ class WorkflowWelcomeController(BaseController):
 
 ### Comprendre ce code
 
-- Un workflow a **un** statut initial (`is_initial`) et peut avoir des statuts finaux
-  (`is_final`) : `validate_statuses` le vérifie.
-- Le **nom** est l'identifiant (`snake_case`) ; le **libellé** et la **couleur** sont
-  pour l'affichage.
-- Le module est **sans état** : il décrit la machine, l'application stocke le statut
-  courant de ses objets.
+- Un workflow a **un** statut initial (`is_initial`) et peut avoir des statuts finaux (`is_final`) : `validate_statuses` le vérifie.
+- Le **nom** est l'identifiant (`snake_case`) ; le **libellé** et la **couleur** sont pour l'affichage.
+- Le module est **sans état** : il décrit la machine, l'application stocke le statut courant de ses objets.
 
 ## La route
 
@@ -111,6 +104,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Premier contact établi. La suite : la brique « nom de statut ».
+Premier contact établi.
+La suite : la brique « nom de statut ».
 
 [Nom de statut](workflow-status.md)

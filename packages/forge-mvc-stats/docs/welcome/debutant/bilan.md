@@ -1,7 +1,7 @@
 # Bilan : niveau débutant (Stats)
 
-Récapitulatif du **niveau débutant** de la progression *Welcome Stats*. Ce
-niveau pose les briques : l'événement, son nom, son schéma SQL.
+Récapitulatif du **niveau débutant** de la progression *Welcome Stats*.
+Ce niveau pose les briques : l'événement, son nom, son schéma SQL.
 
 ## Ce que vous avez validé
 
@@ -15,7 +15,6 @@ Vous comprenez l'événement générique et le stockage à SQL visible.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : **enregistrer**, voir le SQL d'insertion, le
-tracker, et valider avant d'écrire.
+Place au niveau **intermédiaire** : **enregistrer**, voir le SQL d'insertion, le tracker, et valider avant d'écrire.
 
 [Niveau intermédiaire : Le SQL d'insertion](../intermediaire/stats-track-sql.md)

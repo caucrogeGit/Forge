@@ -2,10 +2,8 @@
 
 Objectif : maîtriser `set_setting` et `get_setting`, valeur par défaut comprise.
 
-**Ce que vous allez apprendre :** `set_setting` enregistre ou met à jour une
-valeur (un upsert).
-`get_setting` la relit, et accepte une valeur par défaut quand le paramètre
-n'existe pas encore.
+**Ce que vous allez apprendre :** `set_setting` enregistre ou met à jour une valeur (un upsert).
+`get_setting` la relit, et accepte une valeur par défaut quand le paramètre n'existe pas encore.
 C'est la base de tout réglage applicatif persistant.
 
 Deuxième palier du **niveau débutant** de la progression Settings.

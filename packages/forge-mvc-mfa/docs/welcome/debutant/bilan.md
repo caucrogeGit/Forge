@@ -1,7 +1,7 @@
 # Bilan : niveau débutant (MFA)
 
-Récapitulatif du **niveau débutant** de la progression *Welcome MFA*. Ce
-niveau couvre les **mécaniques TOTP**, sans base ni session.
+Récapitulatif du **niveau débutant** de la progression *Welcome MFA*.
+Ce niveau couvre les **mécaniques TOTP**, sans base ni session.
 
 ## Ce que vous avez validé
 
@@ -15,7 +15,6 @@ Vous comprenez la base du TOTP : secret partagé, code dérivé du temps, vérif
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : l'enrôlement d'un vrai facteur, le challenge de
-connexion et les codes de récupération.
+Place au niveau **intermédiaire** : l'enrôlement d'un vrai facteur, le challenge de connexion et les codes de récupération.
 
 [Niveau intermédiaire : Enrôler un facteur TOTP](../intermediaire/mfa-enroll.md)

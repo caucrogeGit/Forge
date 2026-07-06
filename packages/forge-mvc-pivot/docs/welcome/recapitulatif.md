@@ -1,13 +1,10 @@
 # Aide-mémoire de la progression Pivot
 
-Récapitulatif des paliers de la progression *Welcome Pivot* et des API du
-module opt-in `forge-mvc-pivot` introduites à chaque étape.
+Récapitulatif des paliers de la progression *Welcome Pivot* et des API du module opt-in `forge-mvc-pivot` introduites à chaque étape.
 
 !!! note "Module opt-in : SQL visible"
-    `forge-mvc-pivot` est **publié sur PyPI** : `pip install --pre forge-mvc-pivot`. Il
-    expose le **SQL réel** (insert, update, select, delete), aucun ORM (charte
-    principe 5), et s'appuie sur des **exécuteurs injectables** (`execute`,
-    `fetch_all`, `fetch_one`), donc testable sans base réelle.
+    `forge-mvc-pivot` est **publié sur PyPI** : `pip install --pre forge-mvc-pivot`.
+    Il expose le **SQL réel** (insert, update, select, delete), aucun ORM (charte principe 5), et s'appuie sur des **exécuteurs injectables** (`execute`, `fetch_all`, `fetch_one`), donc testable sans base réelle.
 
 ## Niveau débutant : comprendre le pivot enrichi
 

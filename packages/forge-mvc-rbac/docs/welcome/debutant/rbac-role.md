@@ -2,9 +2,9 @@
 
 Objectif : comprendre la brique **rôle**, son nom lisible et son slug stable.
 
-**Ce que vous allez apprendre :** un rôle a un **nom** (« Éditeur en chef ») et un
-**slug** identifiant (`editeur-en-chef`). `normalize_role_slug` dérive le slug ;
-`validate_role` refuse un rôle invalide.
+**Ce que vous allez apprendre :** un rôle a un **nom** (« Éditeur en chef »)
+et un **slug** identifiant (`editeur-en-chef`).
+`normalize_role_slug` dérive le slug ; `validate_role` refuse un rôle invalide.
 
 Troisième palier du **niveau débutant** de la progression RBAC.
 
@@ -30,8 +30,7 @@ Troisième palier du **niveau débutant** de la progression RBAC.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/rbac-role?name=Éditeur en chef` → slug
-`editeur-en-chef`.
+Ouvrez `https://localhost:8000/rbac-role?name=Éditeur en chef` → slug `editeur-en-chef`.
 
 ## Le contrôleur
 
@@ -70,8 +69,7 @@ class RbacRoleController(BaseController):
 
 ### Comprendre ce code
 
-- Le **slug** est l'identifiant stable du rôle ; il ne change pas même si le nom
-  d'affichage évolue.
+- Le **slug** est l'identifiant stable du rôle ; il ne change pas même si le nom d'affichage évolue.
 - Séparer nom et slug évite de coder en dur des libellés dans les comparaisons.
 - `validate_role` garantit un couple nom/slug cohérent.
 
@@ -126,6 +124,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous avez les briques (permission, rôle). La suite (intermédiaire) : les confronter.
+Vous avez les briques (permission, rôle).
+La suite (intermédiaire) : les confronter.
 
 [Bilan du niveau débutant](bilan.md)

@@ -1,19 +1,17 @@
 # Image de couverture
 
-Objectif : désigner **une** image mise en avant pour une entité (sa couverture)
-et l'afficher.
+Objectif : désigner **une** image mise en avant pour une entité (sa couverture) et l'afficher.
 
 **Ce que vous allez apprendre :** Forge distingue les médias par leur **rôle**.
-Une couverture est un média de rôle `cover` (≠ `gallery`). `get_cover_media` la
-lit, avec repli optionnel sur la première image de la galerie si aucune
-couverture explicite n'existe.
+Une couverture est un média de rôle `cover` (≠ `gallery`).
+`get_cover_media` la lit, avec repli optionnel sur la première image de la galerie si aucune couverture explicite n'existe.
 
 Premier palier du **niveau avancé** de la progression images.
 
 !!! note "Module opt-in et table `media`"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation ») et
-    la table `media` appliquée (`forge migration:apply`). Si elle manque, la
-    page reste **pédagogique**.
+    Ce starter suppose `forge-mvc-images` installé (palier « Installation »)
+    et la table `media` appliquée (`forge migration:apply`).
+    Si elle manque, la page reste **pédagogique**.
 
 ## Ce que ce starter montre
 
@@ -35,8 +33,7 @@ Premier palier du **niveau avancé** de la progression images.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/image-cover` : la page affiche la couverture
-courante et permet d'en définir une nouvelle.
+Ouvrez `https://localhost:8000/image-cover` : la page affiche la couverture courante et permet d'en définir une nouvelle.
 
 ## Le contrôleur
 
@@ -100,10 +97,9 @@ class ImageCoverController(BaseController):
 
 ### Comprendre ce code
 
-- Le **rôle** est la clé : une même entité peut avoir une galerie (`gallery`) et
-  une couverture (`cover`), distinguées par cette seule colonne.
-- `fallback_to_gallery=True` rend l'affichage robuste : pas de couverture
-  explicite ? On montre la première image de la galerie.
+- Le **rôle** est la clé : une même entité peut avoir une galerie (`gallery`) et une couverture (`cover`), distinguées par cette seule colonne.
+- `fallback_to_gallery=True` rend l'affichage robuste : pas de couverture explicite ?
+  On montre la première image de la galerie.
 - Désigner une couverture, c'est simplement rattacher un média avec le bon rôle.
 
 ## La vue
@@ -148,9 +144,8 @@ Le contrôleur rend `image_cover/index.html` : créez ce fichier.
 
 ## La migration
 
-Ce palier utilise la table `media`. Si vous ne l'avez pas encore créée, créez le
-fichier de migration suivant sous `mvc/migrations/`, puis appliquez-le avec
-`forge migration:apply`.
+Ce palier utilise la table `media`.
+Si vous ne l'avez pas encore créée, créez le fichier de migration suivant sous `mvc/migrations/`, puis appliquez-le avec `forge migration:apply`.
 
 ```sql
 -- mvc/migrations/20260605110000_create_media.sql
@@ -191,6 +186,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-La couverture est en place. La suite : supprimer une image proprement.
+La couverture est en place.
+La suite : supprimer une image proprement.
 
 [Supprimer proprement](image-delete.md)

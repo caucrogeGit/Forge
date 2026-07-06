@@ -1,16 +1,11 @@
 # Simuler une mesure IoT
 
-Objectif : **alimenter** la base d'événements sans capteur ni broker, pour
-travailler en local.
+Objectif : **alimenter** la base d'événements sans capteur ni broker, pour travailler en local.
 
-**Ce que vous allez apprendre :** composer une mesure, la **valider contre le
-contrat IoT** (`build_payload` + `parse_message`) puis l'insérer dans
-`iot_events` via `IotEventRepository.insert`. C'est exactement la validation que
-le subscriber MQTT applique en production : on emprunte simplement un autre
-chemin d'entrée, **sans broker**.
+**Ce que vous allez apprendre :** composer une mesure, la **valider contre le contrat IoT** (`build_payload` + `parse_message`) puis l'insérer dans `iot_events` via `IotEventRepository.insert`.
+C'est exactement la validation que le subscriber MQTT applique en production : on emprunte simplement un autre chemin d'entrée, **sans broker**.
 
-Premier palier du **niveau intermédiaire** de la progression IoT, après le
-[niveau débutant](../debutant/bilan.md).
+Premier palier du **niveau intermédiaire** de la progression IoT, après le [niveau débutant](../debutant/bilan.md).
 
 ## Ce que ce starter montre
 
@@ -38,9 +33,8 @@ forge db:init
 forge run
 ```
 
-Ouvrez `https://localhost:8000/iot-simulate`, ajustez les champs et cliquez
-**Injecter la mesure** : elle apparaît dans la liste des derniers événements. Vous
-venez d'alimenter `iot_events` **sans broker**.
+Ouvrez `https://localhost:8000/iot-simulate`, ajustez les champs et cliquez **Injecter la mesure** : elle apparaît dans la liste des derniers événements.
+Vous venez d'alimenter `iot_events` **sans broker**.
 
 ## Le contrôleur
 
@@ -109,19 +103,16 @@ class IotSimulateController(BaseController):
 
 ### Comprendre ce code
 
-- `build_payload(...)` produit un payload **conforme** (champs `kind`, `value`,
-  `unit`, `timestamp`). `parse_message` le **valide** et renvoie un `Measurement`
-  typé ; une `ContractError` est levée si quelque chose ne respecte pas le
-  contrat.
-- `IotEventRepository().insert(measurement)` écrit la mesure validée. C'est le
-  **même** repository qu'en lecture.
-- En production, ce `Measurement` viendrait du broker via le subscriber ; ici, il
-  vient du formulaire. Le reste du chemin est identique.
+- `build_payload(...)` produit un payload **conforme** (champs `kind`, `value`, `unit`, `timestamp`).
+  `parse_message` le **valide** et renvoie un `Measurement` typé ; une `ContractError` est levée si quelque chose ne respecte pas le contrat.
+- `IotEventRepository().insert(measurement)` écrit la mesure validée.
+  C'est le **même** repository qu'en lecture.
+- En production, ce `Measurement` viendrait du broker via le subscriber ; ici, il vient du formulaire.
+  Le reste du chemin est identique.
 
 ## La vue
 
-Créez le gabarit ci-dessous : il porte le formulaire et la liste des derniers
-événements.
+Créez le gabarit ci-dessous : il porte le formulaire et la liste des derniers événements.
 
 ```html
 <!-- mvc/views/iot_simulate/index.html -->
@@ -164,8 +155,7 @@ Créez le gabarit ci-dessous : il porte le formulaire et la liste des derniers
 
 ## La route
 
-Déclarez les deux routes (`GET` pour la page, `POST` pour l'injection) dans
-`mvc/routes.py`, à l'intérieur du groupe public.
+Déclarez les deux routes (`GET` pour la page, `POST` pour l'injection) dans `mvc/routes.py`, à l'intérieur du groupe public.
 
 ```python
 # mvc/routes.py
@@ -178,9 +168,8 @@ with router.group("", public=True) as public:
 
 ## La migration
 
-La simulation a besoin de la table `iot_events`. Créez le fichier de migration
-ci-dessous (le nom commence par un horodatage), puis appliquez-le avec
-`forge db:init`.
+La simulation a besoin de la table `iot_events`.
+Créez le fichier de migration ci-dessous (le nom commence par un horodatage), puis appliquez-le avec `forge db:init`.
 
 ```sql
 -- mvc/migrations/20260601170000_create_iot_events.sql
@@ -200,19 +189,16 @@ CREATE TABLE IF NOT EXISTS iot_events (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-`CREATE TABLE IF NOT EXISTS` rend la migration idempotente : elle est sûre même
-si un autre palier a déjà créé la table.
+`CREATE TABLE IF NOT EXISTS` rend la migration idempotente : elle est sûre même si un autre palier a déjà créé la table.
 
 ## À retenir
 
 - On peut alimenter `iot_events` **sans broker**, via le contrat IoT.
 - `parse_message` valide la mesure exactement comme en production.
-- `IotEventRepository.insert` écrit ; `list_recent` relit : la boucle est
-  bouclée en local.
+- `IotEventRepository.insert` écrit ; `list_recent` relit : la boucle est bouclée en local.
 
 ## Après ce starter
 
-Vous savez alimenter les données en local. La suite : exposer l'API HTTP JSON
-officielle.
+Vous savez alimenter les données en local. La suite : exposer l'API HTTP JSON officielle.
 
 [Exposer l'API IoT](iot-api.md)

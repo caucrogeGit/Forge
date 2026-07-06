@@ -6,7 +6,8 @@ Un utilisateur qui a oublié son mot de passe demande un lien (jeton), puis pose
 
 ## 1. Rôle
 
-Le module orchestre le parcours « mot de passe oublié » au-dessus des jetons Auth et du hachage Argon2id.
+Le module orchestre le parcours « mot de passe oublié »
+au-dessus des jetons Auth et du hachage Argon2id.
 
 Il fournit deux étapes : créer une demande de réinitialisation (jeton de `purpose` `password_reset`, expiration par défaut de 30 minutes) à partir d'un utilisateur valide et actif, puis vérifier ce jeton et produire le nouveau hash.
 

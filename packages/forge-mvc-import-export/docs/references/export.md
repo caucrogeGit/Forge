@@ -10,11 +10,9 @@ Le fichier de code correspondant est `forge_mvc_import_export/csv_writer.py`.
 def to_csv(rows, columns, *, delimiter: str = ",") -> str
 ```
 
-`to_csv` est l'inverse de `parse_csv` : il prend des lignes (des dictionnaires)
-et une liste de colonnes, et renvoie le texte CSV correspondant.
+`to_csv` est l'inverse de `parse_csv` : il prend des lignes (des dictionnaires) et une liste de colonnes, et renvoie le texte CSV correspondant.
 La première ligne est l'en-tête (`columns`).
-Pour chaque ligne, les valeurs sont prises dans l'ordre des colonnes : une valeur
-absente ou `None` devient une chaîne vide, les autres sont converties par `str`.
+Pour chaque ligne, les valeurs sont prises dans l'ordre des colonnes : une valeur absente ou `None` devient une chaîne vide, les autres sont converties par `str`.
 
 ```python
 from forge_mvc_import_export import to_csv
@@ -26,11 +24,9 @@ to_csv(rows, ["nom", "classe"])
 
 ## 2. Quand l'utiliser
 
-`to_csv` sert l'export **programmatique** : un script, un rapport, une
-agrégation, ou des données qui ne viennent pas d'une entité CRUD.
+`to_csv` sert l'export **programmatique** : un script, un rapport, une agrégation, ou des données qui ne viennent pas d'une entité CRUD.
 
-Pour télécharger une **entité** depuis une page web, la route d'export générée
-par le CRUD du cœur reste la voie officielle (principe 11).
+Pour télécharger une **entité** depuis une page web, la route d'export générée par le CRUD du cœur reste la voie officielle (principe 11).
 Les deux ne se concurrencent pas : ce sont deux outils pour deux contextes.
 
 ## 3. Erreurs

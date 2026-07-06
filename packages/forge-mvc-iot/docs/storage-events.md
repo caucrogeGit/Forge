@@ -1,16 +1,13 @@
 # Stockage des événements IoT : contrat SQL
 
-> **Statut** : stockage **livré**. Le module définit la table `iot_events`,
-> l'ordre canonique des colonnes, les fonctions pures qui sérialisent une
-> `Measurement` en `(sql, params)`, et l'insertion réelle via un exécuteur
-> injecté. Cette page décrit le contrat SQL appliqué.
+> **Statut** : stockage **livré**.
+> Le module définit la table `iot_events`, l'ordre canonique des colonnes, les fonctions pures qui sérialisent une `Measurement` en `(sql, params)`, et l'insertion réelle via un exécuteur injecté.
+> Cette page décrit le contrat SQL appliqué.
 
 ## Objectif
 
-Poser le contrat de stockage **avant** d'écrire le repository qui
-exécute le SQL. Le subscriber de `IOT-MQTT-SUBSCRIBER-001` produit déjà
-des `Measurement` valides ; il manquait juste un consommateur officiel
-côté storage, factorisable, testable hors base.
+Poser le contrat de stockage **avant** d'écrire le repository qui exécute le SQL.
+Le subscriber de `IOT-MQTT-SUBSCRIBER-001` produit déjà des `Measurement` valides ; il manquait juste un consommateur officiel côté storage, factorisable, testable hors base.
 
 ## Module concerné
 
@@ -30,16 +27,14 @@ API exposée :
 
 ## Schéma SQL cible
 
-La migration versionnée est livrée comme **ressource embarquée** du
-package depuis `IOT-PACKAGE-DATA-MIGRATIONS-001` :
+La migration versionnée est livrée comme **ressource embarquée** du package depuis `IOT-PACKAGE-DATA-MIGRATIONS-001` :
 
 ```text
 packages/forge-mvc-iot/forge_mvc_iot/migrations/20260528120000_create_iot_events.sql
 ```
 
-Elle est déclarée dans `pyproject.toml` via
-`[tool.setuptools.package-data]` pour voyager avec la distribution
-PyPI. Lecture côté code Python :
+Elle est déclarée dans `pyproject.toml` via `[tool.setuptools.package-data]` pour voyager avec la distribution PyPI.
+Lecture côté code Python :
 
 ```python
 from importlib import resources
@@ -52,16 +47,10 @@ migration = (
 content = migration.read_text(encoding="utf-8")
 ```
 
-La migration utilise `CREATE TABLE IF NOT EXISTS` (idempotente) et
-reproduit exactement le schéma ci-dessous. Le contrat Python
-(`COLUMNS`) reste la source de vérité : le test
-`tests/test_iot_storage_migration_001.py::TestMigrationMirrorsPythonContract`
-vérifie que les colonnes du DDL correspondent à l'ordre canonique
-Python.
+La migration utilise `CREATE TABLE IF NOT EXISTS` (idempotente) et reproduit exactement le schéma ci-dessous.
+Le contrat Python (`COLUMNS`) reste la source de vérité : le test `tests/test_iot_storage_migration_001.py::TestMigrationMirrorsPythonContract` vérifie que les colonnes du DDL correspondent à l'ordre canonique Python.
 
-L'application réelle de la migration (`forge migration:apply` après
-copie dans `mvc/migrations/` du projet utilisateur) reste à la charge
-de l'utilisateur et sera automatisée dans un ticket dédié.
+L'application réelle de la migration (`forge migration:apply` après copie dans `mvc/migrations/` du projet utilisateur) reste à la charge de l'utilisateur et sera automatisée dans un ticket dédié.
 
 ```sql
 CREATE TABLE IF NOT EXISTS iot_events (
@@ -83,15 +72,11 @@ CREATE TABLE IF NOT EXISTS iot_events (
 Notes :
 
 - `value` en `DOUBLE` couvre les `int` et `float` du contrat MQTT.
-- `timestamp` reste en `VARCHAR(40)` pour préserver la chaîne ISO 8601
-  reçue dans le payload. Le consommateur convertit en `DATETIME` quand
-  il en a besoin (préserver la valeur d'origine évite les conversions
-  silencieuses de fuseau et la perte de microsecondes).
-- `metadata_json` en `TEXT NULL` : JSON sérialisé via
-  `json.dumps(..., sort_keys=True, ensure_ascii=False)` ou `NULL`.
+- `timestamp` reste en `VARCHAR(40)` pour préserver la chaîne ISO 8601 reçue dans le payload.
+  Le consommateur convertit en `DATETIME` quand il en a besoin (préserver la valeur d'origine évite les conversions silencieuses de fuseau et la perte de microsecondes).
+- `metadata_json` en `TEXT NULL` : JSON sérialisé via `json.dumps(..., sort_keys=True, ensure_ascii=False)` ou `NULL`.
 - `received_at` en `DATETIME(6)` côté serveur (microsecondes).
-- Deux index minimaux : couple `(site, device_id)` pour filtrer par
-  capteur, `received_at` pour les fenêtres temporelles.
+- Deux index minimaux : couple `(site, device_id)` pour filtrer par capteur, `received_at` pour les fenêtres temporelles.
 
 ## API Python
 
@@ -130,9 +115,7 @@ row = serialize_measurement_for_storage(
 
 Si `received_at` n'est pas fourni, `datetime.now(UTC)` est utilisé.
 
-Si `measurement.metadata` est `None`, `metadata_json` est `None` (pas
-la chaîne `"null"`) : c'est cette valeur qui sera passée au connecteur
-SQL pour produire un vrai `NULL`.
+Si `measurement.metadata` est `None`, `metadata_json` est `None` (pas la chaîne `"null"`) : c'est cette valeur qui sera passée au connecteur SQL pour produire un vrai `NULL`.
 
 ### `build_insert_iot_event_sql`
 
@@ -147,8 +130,8 @@ sql, params = build_insert_iot_event_sql(m)
 #           datetime(..., tzinfo=UTC))
 ```
 
-Le tuple `params` suit exactement l'ordre de `COLUMNS`. Cette paire
-`(sql, params)` est conçue pour être consommée plus tard par :
+Le tuple `params` suit exactement l'ordre de `COLUMNS`.
+Cette paire `(sql, params)` est conçue pour être consommée plus tard par :
 
 ```python
 # Code à venir dans IOT-STORAGE-REPOSITORY-001 :
@@ -158,21 +141,20 @@ execute(sql, params)
 
 ## Décisions verrouillées
 
-- **Le module reste pur.** Pas d'import de `core.database.db`, pas de
-  connexion, pas de migration appliquée. La fonction
-  `build_insert_iot_event_sql` produit du SQL textuel + paramètres :
-  c'est l'appelant qui exécutera la requête.
-- **Le SQL est visible.** `INSERT_IOT_EVENT_SQL` est une chaîne Python
-  lisible, conforme à la charte v2 §5 « Garder SQL visible ».
-- **Placeholders `?`.** Style qmark, cohérent avec le reste de Forge
-  (voir le starter Contacts et `core.database.db.execute`).
-- **`received_at` toujours UTC.** Pas de fuseau implicite. `datetime.now(UTC)`
-  par défaut, ou injection explicite via le paramètre.
-- **`metadata` → JSON.** Sérialisation déterministe
-  (`sort_keys=True`), utile pour les tests, le diff, et la
-  réindexation future.
-- **`id` exclu des colonnes.** Généré par la base, jamais inséré
-  explicitement.
+- **Le module reste pur.**
+  Pas d'import de `core.database.db`, pas de connexion, pas de migration appliquée.
+  La fonction `build_insert_iot_event_sql` produit du SQL textuel + paramètres : c'est l'appelant qui exécutera la requête.
+- **Le SQL est visible.**
+  `INSERT_IOT_EVENT_SQL` est une chaîne Python lisible, conforme à la charte v2 §5 « Garder SQL visible ».
+- **Placeholders `?`.**
+  Style qmark, cohérent avec le reste de Forge (voir le starter Contacts et `core.database.db.execute`).
+- **`received_at` toujours UTC.**
+  Pas de fuseau implicite.
+  `datetime.now(UTC)` par défaut, ou injection explicite via le paramètre.
+- **`metadata` → JSON.**
+  Sérialisation déterministe (`sort_keys=True`), utile pour les tests, le diff, et la réindexation future.
+- **`id` exclu des colonnes.**
+  Généré par la base, jamais inséré explicitement.
 
 ## Tests sans base
 
@@ -196,17 +178,15 @@ assert params[0] == "atelier"
 assert params[6] is None  # metadata_json
 ```
 
-Aucun MariaDB n'est requis. La validation runtime du schéma viendra
-avec la migration appliquée.
+Aucun MariaDB n'est requis.
+La validation runtime du schéma viendra avec la migration appliquée.
 
 ## Repository d'insertion
 
 Le repository est la première couche qui **exécute réellement le SQL**.
-Il ne crée pas la table ; il suppose que la migration `iot_events` a
-déjà été appliquée.
+Il ne crée pas la table ; il suppose que la migration `iot_events` a déjà été appliquée.
 
-Module : `forge_mvc_iot.storage.repository`, exporté par
-`forge_mvc_iot.storage`.
+Module : `forge_mvc_iot.storage.repository`, exporté par `forge_mvc_iot.storage`.
 
 ```python
 from forge_mvc_iot.storage import IotEventRepository
@@ -217,10 +197,8 @@ result = repo.insert(measurement)            # exécute INSERT_IOT_EVENT_SQL via
 
 ### Adapter injectable
 
-Le repository accepte n'importe quel objet exposant
-`execute(sql, params)`. Par défaut, il utilise `core.database.db`,
-qui gère le pool de connexions, le commit et le rollback
-automatiquement (voir `core/database/db.py`).
+Le repository accepte n'importe quel objet exposant `execute(sql, params)`.
+Par défaut, il utilise `core.database.db`, qui gère le pool de connexions, le commit et le rollback automatiquement (voir `core/database/db.py`).
 
 Pour les tests, on injecte un `MagicMock` (aucun MariaDB requis) :
 
@@ -234,8 +212,7 @@ repo.insert(measurement)
 adapter.execute.assert_called_once()
 ```
 
-Pour récupérer le `lastrowid` plutôt que le `rowcount`, on enveloppe
-soi-même `core.database.db.insert` :
+Pour récupérer le `lastrowid` plutôt que le `rowcount`, on enveloppe soi-même `core.database.db.insert` :
 
 ```python
 from core.database import db
@@ -266,32 +243,19 @@ subscriber.handle_message(topic, payload)
    iot_events
 ```
 
-> **Le branchement automatique** `on_measurement=repo.insert` reste
-> **un exemple documentaire**. Le subscriber ne tire pas le repository
-> dans son code ; c'est le code applicatif qui décide explicitement de
-> connecter les deux :
->
-> ```python
-> repo = IotEventRepository()
-> sub = MqttSubscriber(cfg, on_measurement=repo.insert)
-> sub.connect()
-> sub.loop_forever()
-> ```
+> **Le branchement automatique** `on_measurement=repo.insert` reste **un exemple documentaire**.
+> Le subscriber ne tire pas le repository dans son code ; c'est le code applicatif qui décide explicitement de connecter les deux : ```python repo = IotEventRepository() sub = MqttSubscriber(cfg, on_measurement=repo.insert) sub.connect() sub.loop_forever() ```
 
 ### Comportement
 
-- Les erreurs SQL sont **propagées telles quelles** ; le repository
-  n'intercepte rien silencieusement.
-- Aucun `commit` ou `rollback` manuel : c'est l'adapter (par défaut
-  Forge) qui s'en charge.
-- Le `id` n'est pas retourné par défaut (puisque `db.execute` renvoie
-  `rowcount`). Utiliser le pattern d'adapter ci-dessus pour récupérer
-  `lastrowid`.
+- Les erreurs SQL sont **propagées telles quelles** ; le repository n'intercepte rien silencieusement.
+- Aucun `commit` ou `rollback` manuel : c'est l'adapter (par défaut Forge) qui s'en charge.
+- Le `id` n'est pas retourné par défaut (puisque `db.execute` renvoie `rowcount`).
+  Utiliser le pattern d'adapter ci-dessus pour récupérer `lastrowid`.
 
 ### Méthodes de lecture
 
-Trois méthodes pour interroger la table, toutes paramétrées et toutes
-testables via le même adapter (`fetch_one`/`fetch_all`) :
+Trois méthodes pour interroger la table, toutes paramétrées et toutes testables via le même adapter (`fetch_one`/`fetch_all`) :
 
 ```python
 repo.list_recent(limit=100)
@@ -299,8 +263,7 @@ repo.find_by_device("atelier", "esp32-001", limit=100)
 repo.count_by_device("atelier", "esp32-001")
 ```
 
-Chaque ligne retournée par `list_recent` et `find_by_device` est un
-dict **prêt à consommer** :
+Chaque ligne retournée par `list_recent` et `find_by_device` est un dict **prêt à consommer** :
 
 ```python
 {
@@ -318,31 +281,25 @@ dict **prêt à consommer** :
 
 Notes :
 
-- `metadata_json` (interne stockage) est automatiquement parsé en
-  `metadata` (dict ou `None`). Le consommateur n'a jamais à voir le
-  JSON sérialisé.
-- `received_at` reste un `datetime` tel que retourné par le connecteur
-  MariaDB (UTC). La conversion en chaîne JSON-friendly sera le travail
-  de la future API HTTP.
-- L'ordre est `received_at DESC` : les événements les plus récents en
-  premier.
+- `metadata_json` (interne stockage) est automatiquement parsé en `metadata` (dict ou `None`).
+  Le consommateur n'a jamais à voir le JSON sérialisé.
+- `received_at` reste un `datetime` tel que retourné par le connecteur MariaDB (UTC).
+  La conversion en chaîne JSON-friendly sera le travail de la future API HTTP.
+- L'ordre est `received_at DESC` : les événements les plus récents en premier.
 
 ### Limites et validation
 
-- `limit` doit être un `int` strict dans `1..MAX_LIMIT` (par défaut
-  `MAX_LIMIT = 1000`). Hors plage → `ValueError`. Type incorrect →
-  `TypeError`. `True`/`False` sont refusés bien qu'ils héritent de
-  `int`.
-- Pas de pagination par offset à ce ticket : un appel qui voudrait
-  paginer au-delà de `MAX_LIMIT` est probablement le signe qu'il faut
-  un autre endpoint (agrégat, filtre temporel, etc.).
+- `limit` doit être un `int` strict dans `1..MAX_LIMIT` (par défaut `MAX_LIMIT = 1000`).
+  Hors plage → `ValueError`.
+  Type incorrect → `TypeError`.
+  `True`/`False` sont refusés bien qu'ils héritent de `int`.
+- Pas de pagination par offset à ce ticket : un appel qui voudrait paginer au-delà de `MAX_LIMIT` est probablement le signe qu'il faut un autre endpoint (agrégat, filtre temporel, etc.).
 - Aucun filtre temporel exposé pour l'instant (`since=`, `until=`).
   Sera ajouté avec l'API HTTP si nécessaire.
 
 ### SQL exposé
 
-Les requêtes de lecture sont publiques pour rester lisibles
-(charte v2 §5) :
+Les requêtes de lecture sont publiques pour rester lisibles (charte v2 §5) :
 
 ```python
 from forge_mvc_iot.storage import (
@@ -352,17 +309,14 @@ from forge_mvc_iot.storage import (
 )
 ```
 
-Toutes utilisent les placeholders qmark `?` (cohérent avec le reste
-de Forge) et la table `iot_events`.
+Toutes utilisent les placeholders qmark `?` (cohérent avec le reste de Forge) et la table `iot_events`.
 
 ## Hors périmètre de ce ticket
 - **Pas d'API HTTP** : lecture JSON par `IOT-HTTP-API-001`.
 - **Pas de CLI**, pas de dashboard, pas d'intégration Forge Design.
-- **Pas de rétention long terme**, pas d'agrégation, pas de
-  downsampling, pas d'alertes.
+- **Pas de rétention long terme**, pas d'agrégation, pas de downsampling, pas d'alertes.
 
-Ces points feront chacun l'objet d'un ticket dédié, voir
-[Architecture Forge IoT](architecture.md#tickets-suivants).
+Ces points feront chacun l'objet d'un ticket dédié, voir [Architecture Forge IoT](architecture.md#tickets-suivants).
 
 ## Découpage rappelé
 

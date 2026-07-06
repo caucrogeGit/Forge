@@ -6,8 +6,7 @@ Le module correspondant est `cli.entities.relations`.
 
 ## 1. Rôle
 
-Ce module valide les relations déclarées entre entités et en génère le SQL global.
-Il résout les champs concernés, vérifie la cohérence des liens et signale les problèmes rencontrés.
+Ce module valide les relations déclarées entre entités et en génère le SQL global. Il résout les champs concernés, vérifie la cohérence des liens et signale les problèmes rencontrés.
 
 Il prend en charge les relations `many_to_one` et les relations `many_to_many` canoniques (pivot enrichi).
 Le SQL produit reste visible et inspectable (principe 5).

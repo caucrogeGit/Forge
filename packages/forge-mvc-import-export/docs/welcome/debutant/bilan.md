@@ -14,7 +14,6 @@ Vous savez transformer un texte CSV en liste de lignes exploitables.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : valider chaque ligne, puis l'insérer dans
-votre application.
+Place au niveau **intermédiaire** : valider chaque ligne, puis l'insérer dans votre application.
 
 [Niveau intermédiaire : Valider et insérer](../intermediaire/import-validate.md)

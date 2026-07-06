@@ -2,8 +2,7 @@
 
 Objectif : lancer `forge deploy:init` et comprendre les fichiers générés.
 
-**Ce que vous allez apprendre :** `forge deploy:init` produit les fichiers de
-déploiement à la racine du projet, en mode write-if-new.
+**Ce que vous allez apprendre :** `forge deploy:init` produit les fichiers de déploiement à la racine du projet, en mode write-if-new.
 Chaque fichier est un modèle à adapter, jamais écrasé s'il existe déjà.
 
 Deuxième palier du **niveau débutant** de la progression Deploy.

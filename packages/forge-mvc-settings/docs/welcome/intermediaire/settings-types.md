@@ -2,8 +2,7 @@
 
 Objectif : enregistrer et relire des valeurs entières, booléennes et décimales.
 
-**Ce que vous allez apprendre :** `set_setting` déduit le type de la valeur
-fournie (`str`, `int`, `bool` ou `float`).
+**Ce que vous allez apprendre :** `set_setting` déduit le type de la valeur fournie (`str`, `int`, `bool` ou `float`).
 À la lecture, `get_setting` recoerce la valeur dans ce même type.
 Un entier ressort entier, un booléen ressort booléen.
 

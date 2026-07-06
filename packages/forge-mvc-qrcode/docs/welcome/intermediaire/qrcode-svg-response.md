@@ -2,10 +2,8 @@
 
 Objectif : renvoyer un QR Code SVG depuis un contrôleur.
 
-**Ce que vous allez apprendre :** `QrCodeResponse.from_text` accepte un argument
-`fmt`.
-Avec `fmt="svg"`, la réponse porte l'en-tête `Content-Type: image/svg+xml` et son
-corps est le document SVG.
+**Ce que vous allez apprendre :** `QrCodeResponse.from_text` accepte un argument `fmt`.
+Avec `fmt="svg"`, la réponse porte l'en-tête `Content-Type: image/svg+xml` et son corps est le document SVG.
 
 Deuxième palier du **niveau intermédiaire**.
 

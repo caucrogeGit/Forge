@@ -7,7 +7,8 @@ Le fichier de code correspondant est `forge_mvc_stats/admin.py`.
 ## 1. À quoi sert ce module ?
 
 Une fois les événements enregistrés, on veut les **lister** : les derniers, ou ceux d'un nom ou d'une catégorie.
-Ce module fournit cette consultation. Le développeur **injecte** la fonction `fetch_all` : Forge ne lit jamais la base automatiquement.
+Ce module fournit cette consultation.
+Le développeur **injecte** la fonction `fetch_all` : Forge ne lit jamais la base automatiquement.
 
 Pas de dashboard graphique, pas de middleware, pas de cookie de session.
 

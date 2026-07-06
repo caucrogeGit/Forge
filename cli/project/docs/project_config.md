@@ -9,8 +9,7 @@ En cas de configuration absente ou invalide, il lève une exception dédiée plu
 
 `load_project_config` charge le fichier `config.py` du projet courant et retourne le module Python correspondant.
 
-Il ajoute temporairement la racine du projet au chemin d'import et bascule le répertoire courant le temps du chargement, puis restaure l'état initial.
-Le module chargé n'est pas conservé dans `sys.modules` après le retour, ce qui évite de polluer l'environnement.
+Il ajoute temporairement la racine du projet au chemin d'import et bascule le répertoire courant le temps du chargement, puis restaure l'état initial. Le module chargé n'est pas conservé dans `sys.modules` après le retour, ce qui évite de polluer l'environnement.
 
 Si `config.py` est absent ou si son chargement échoue, le module lève `ProjectConfigError` avec un message explicite.
 

@@ -17,7 +17,8 @@ Envoyer un email demande de composer un message, de choisir un canal d'envoi, et
 
 L'opt-in sépare ces trois préoccupations : un `MailMessage` (le contenu), un **transport** (le canal), un `Mailer` (l'orchestrateur qui envoie et journalise).
 
-Le **transport est interchangeable** : `console` ou `log` en développement, `smtp` en production, `fake`/`null` en test. Le code applicatif ne change pas.
+Le **transport est interchangeable** : `console` ou `log` en développement, `smtp` en production, `fake`/`null` en test.
+Le code applicatif ne change pas.
 
 ## 2. Installation et désinstallation
 
@@ -174,7 +175,8 @@ sequenceDiagram
 
 Le mail est lu directement depuis l'environnement (ADR-031), sans passer par le noyau.
 
-Le squelette nu ne fournit pas ces variables ; ajoutez le bloc `MAIL_*` à `env/dev`. Les défauts s'appliquent quand une variable est absente.
+Le squelette nu ne fournit pas ces variables ; ajoutez le bloc `MAIL_*` à `env/dev`.
+Les défauts s'appliquent quand une variable est absente.
 
 | Variable | Défaut | Rôle |
 |---|---|---|
@@ -249,7 +251,8 @@ Mailer.from_config().send(
 )
 ```
 
-Les kwargs `message_type`, `related_entity`, `related_id` sont enregistrés dans `mail_log` si `MAIL_LOG_ENABLED=true`. Le corps du message n'est **jamais** stocké dans le journal.
+Les kwargs `message_type`, `related_entity`, `related_id` sont enregistrés dans `mail_log` si `MAIL_LOG_ENABLED=true`.
+Le corps du message n'est **jamais** stocké dans le journal.
 
 ### Test unitaire avec `FakeTransport`
 

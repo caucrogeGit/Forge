@@ -1,19 +1,16 @@
 # Welcome Audio
 
-Objectif : premier contact avec le module **opt-in** `forge-mvc-audio`, une chaîne
-audio **sans état**.
+Objectif : premier contact avec le module **opt-in** `forge-mvc-audio`, une chaîne audio **sans état**.
 
-**Ce que vous allez apprendre :** vérifier que le module répond et **inspecter sa
-configuration** (`load_audio_config`), à savoir stockage, limites, binaires `ffprobe`/`ffmpeg`,
-avec le **token masqué**. Aucune base de données.
+**Ce que vous allez apprendre :** vérifier que le module répond et **inspecter sa configuration** (`load_audio_config`), à savoir stockage, limites, binaires `ffprobe`/`ffmpeg`, avec le **token masqué**.
+Aucune base de données.
 
-Premier palier du **niveau débutant** de la progression audio
-(vue d'ensemble des starters).
+Premier palier du **niveau débutant** de la progression audio (vue d'ensemble des starters).
 
 !!! note "Module opt-in"
     Ce starter suppose `forge-mvc-audio` installé (palier « Installation »).
-    `ffmpeg`/`ffprobe` sont des binaires système, requis seulement au niveau
-    avancé. Le cœur de Forge reste autonome.
+    `ffmpeg`/`ffprobe` sont des binaires système, requis seulement au niveau avancé.
+    Le cœur de Forge reste autonome.
 
 ## Ce que ce starter montre
 
@@ -34,8 +31,7 @@ Premier palier du **niveau débutant** de la progression audio
 forge run
 ```
 
-Ouvrez `https://localhost:8000/audio-welcome` (« Welcome Audio »), puis
-`/audio-welcome/inspect` pour la configuration en JSON.
+Ouvrez `https://localhost:8000/audio-welcome` (« Welcome Audio »), puis `/audio-welcome/inspect` pour la configuration en JSON.
 
 ## Le contrôleur
 
@@ -74,10 +70,8 @@ class AudioWelcomeController(BaseController):
 
 ### Comprendre ce code
 
-- La configuration est **explicite** (variables d'environnement Forge) : stockage,
-  taille et durée maximales, binaires utilisés.
-- On **masque** toujours le token (`"***"`) : une config exposée ne révèle jamais
-  ses secrets.
+- La configuration est **explicite** (variables d'environnement Forge) : stockage, taille et durée maximales, binaires utilisés.
+- On **masque** toujours le token (`"***"`) : une config exposée ne révèle jamais ses secrets.
 
 ## La route
 
@@ -94,13 +88,13 @@ with router.group("", public=True) as public:
 
 ## À retenir
 
-- `forge-mvc-audio` est **opt-in** et **sans état** : pas de table, opérations
-  synchrones.
+- `forge-mvc-audio` est **opt-in** et **sans état** : pas de table, opérations synchrones.
 - La configuration audio est inspectable et masque ses secrets.
 - `ffprobe`/`ffmpeg` n'interviennent qu'au niveau avancé.
 
 ## Après ce starter
 
-Premier contact établi. La suite : téléverser un fichier audio.
+Premier contact établi.
+La suite : téléverser un fichier audio.
 
 [Téléverser un audio](audio-upload.md)

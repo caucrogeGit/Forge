@@ -1,13 +1,11 @@
 # Aide-mémoire de la progression Audio
 
-Récapitulatif des paliers de la progression *Welcome Audio* et des API du
-module opt-in `forge-mvc-audio` introduites à chaque étape.
+Récapitulatif des paliers de la progression *Welcome Audio* et des API du module opt-in `forge-mvc-audio` introduites à chaque étape.
 
 !!! note "Module opt-in : sans état"
-    `forge-mvc-audio` est une chaîne audio **sans base de données** : opérations
-    synchrones, fichiers repérés par **uuid**. `ffmpeg`/`ffprobe` sont des binaires
-    système (pas des dépendances pip), requis au niveau avancé. Pas encore publié
-    sur PyPI : install depuis les sources (palier « Installation »).
+    `forge-mvc-audio` est une chaîne audio **sans base de données** : opérations synchrones, fichiers repérés par **uuid**.
+    `ffmpeg`/`ffprobe` sont des binaires système (pas des dépendances pip), requis au niveau avancé.
+    Pas encore publié sur PyPI : install depuis les sources (palier « Installation »).
 
 ## Niveau débutant : découvrir, téléverser, lire (sans ffmpeg)
 

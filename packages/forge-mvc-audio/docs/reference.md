@@ -214,7 +214,8 @@ def register(router) -> None:
 
 ## 8. Sobriété, uuid et dépendances
 
-Le module est **sans état** : pas de table, pas de file de jobs. L'application garde elle-même la trace des `uuid` qu'elle a ingérés.
+Le module est **sans état** : pas de table, pas de file de jobs.
+L'application garde elle-même la trace des `uuid` qu'elle a ingérés.
 
 `ffmpeg` et `ffprobe` sont des binaires système (pas des dépendances pip) ; `forge audio:doctor` vérifie leur présence.
 

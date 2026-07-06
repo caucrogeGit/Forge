@@ -2,10 +2,8 @@
 
 Objectif : déclarer des contraintes sur les attributs du pivot.
 
-**Ce que vous allez apprendre :** `PivotFieldConstraint` rend un attribut
-**requis** (`required=True`) ou **non nullable** (`nullable=False`). Le service
-les vérifie avant d'écrire et lève `PivotConstraintError` avec un **code** stable
-et le **champ** concerné.
+**Ce que vous allez apprendre :** `PivotFieldConstraint` rend un attribut **requis** (`required=True`) ou **non nullable** (`nullable=False`).
+Le service les vérifie avant d'écrire et lève `PivotConstraintError` avec un **code** stable et le **champ** concerné.
 
 Premier palier du **niveau avancé**.
 
@@ -65,14 +63,10 @@ class PivotConstraintsController(BaseController):
 
 ### Comprendre ce code
 
-- `required=True` sur `position` : un `attach` **sans** `position` lève
-  `PivotConstraintError(code="required_field_missing", field="position")`.
-- `nullable=False` : passer `position=None` (ou `epingle=None`) est refusé
-  (`code="nullable_field_rejected"`).
-- À l'`update`, `required` n'est **pas** vérifié (mise à jour partielle), mais
-  `nullable` l'est toujours.
-- `pivot_constraints` définit aussi la **liste blanche** : seuls `position` et
-  `epingle` restent autorisés.
+- `required=True` sur `position` : un `attach` **sans** `position` lève `PivotConstraintError(code="required_field_missing", field="position")`.
+- `nullable=False` : passer `position=None` (ou `epingle=None`) est refusé (`code="nullable_field_rejected"`).
+- À l'`update`, `required` n'est **pas** vérifié (mise à jour partielle), mais `nullable` l'est toujours.
+- `pivot_constraints` définit aussi la **liste blanche** : seuls `position` et `epingle` restent autorisés.
 
 ## À retenir
 

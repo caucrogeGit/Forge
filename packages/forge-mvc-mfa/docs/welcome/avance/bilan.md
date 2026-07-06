@@ -1,7 +1,7 @@
 # Bilan : niveau avancé (MFA)
 
-Récapitulatif du **niveau avancé** de la progression *Welcome MFA*. Ce niveau
-couvre le **durcissement** : revalidation, anti-rejeu, chiffrement au repos.
+Récapitulatif du **niveau avancé** de la progression *Welcome MFA*.
+Ce niveau couvre le **durcissement** : revalidation, anti-rejeu, chiffrement au repos.
 
 ## Ce que vous avez validé
 
@@ -15,9 +15,8 @@ Vous maîtrisez les briques MFA, de la génération du secret au durcissement.
 
 ## Et ensuite
 
-La progression *Welcome MFA* est terminée. Chaque brique a été vue isolément ;
-à vous de les **câbler dans votre flux Auth** en suivant l'ordre des paliers.
-En production, persistez facteurs et codes (`auth_mfa_factors`,
-`auth_mfa_recovery_codes`) et appelez `validate_mfa_secret_key_config` au démarrage.
+La progression *Welcome MFA* est terminée.
+Chaque brique a été vue isolément ; à vous de les **câbler dans votre flux Auth** en suivant l'ordre des paliers.
+En production, persistez facteurs et codes (`auth_mfa_factors`, `auth_mfa_recovery_codes`) et appelez `validate_mfa_secret_key_config` au démarrage.
 
 [Aide-mémoire de la progression MFA](../recapitulatif.md)

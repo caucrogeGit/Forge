@@ -1,18 +1,15 @@
 # Téléverser un audio
 
-Objectif : ingérer un fichier audio avec `ingest_audio` : valider et stocker, sans
-lancer `ffprobe` ni `ffmpeg`.
+Objectif : ingérer un fichier audio avec `ingest_audio` : valider et stocker, sans lancer `ffprobe` ni `ffmpeg`.
 
-**Ce que vous allez apprendre :** `ingest_audio` valide (extension, taille) et
-**stocke** le fichier source à un emplacement **uuid-based** (le nom utilisateur
-n'apparaît jamais dans le chemin, anti-traversal par construction). Il retourne un
-dict `{uuid, title, original_path, size_bytes, mime_type}`.
+**Ce que vous allez apprendre :** `ingest_audio` valide (extension, taille) et **stocke** le fichier source à un emplacement **uuid-based** (le nom utilisateur n'apparaît jamais dans le chemin, anti-traversal par construction).
+Il retourne un dict `{uuid, title, original_path, size_bytes, mime_type}`.
 
 Deuxième palier du **niveau débutant** de la progression audio.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-audio` installé (palier « Installation »). Aucun
-    `ffmpeg`/`ffprobe` n'est requis ici.
+    Ce starter suppose `forge-mvc-audio` installé (palier « Installation »).
+    Aucun `ffmpeg`/`ffprobe` n'est requis ici.
 
 ## Ce que ce starter montre
 
@@ -34,9 +31,8 @@ Deuxième palier du **niveau débutant** de la progression audio.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/audio-upload`, envoyez un fichier audio autorisé :
-la page affiche l'uuid attribué et le chemin source. Notez l'`original_path` pour
-les paliers avancés (sonder, transcoder).
+Ouvrez `https://localhost:8000/audio-upload`, envoyez un fichier audio autorisé : la page affiche l'uuid attribué et le chemin source.
+Notez l'`original_path` pour les paliers avancés (sonder, transcoder).
 
 ## Le contrôleur
 
@@ -84,11 +80,9 @@ class AudioUploadController(BaseController):
 
 ### Comprendre ce code
 
-- `ingest_audio` prend des **octets** (`uploaded.content`) et un nom : il valide
-  **avant** d'écrire, puis range le fichier sous un chemin uuid.
-- Le **nom utilisateur n'entre jamais dans le chemin** : c'est l'anti-traversal par
-  construction (modèle propre à audio/video, distinct du modèle « nom assaini » de
-  `forge-mvc-files`).
+- `ingest_audio` prend des **octets** (`uploaded.content`) et un nom : il valide **avant** d'écrire, puis range le fichier sous un chemin uuid.
+- Le **nom utilisateur n'entre jamais dans le chemin** : c'est l'anti-traversal par construction (modèle propre à audio/video, distinct du modèle « nom assaini »
+  de `forge-mvc-files`).
 - Aucun `ffprobe`/`ffmpeg` : l'ingestion ne fait que valider et stocker.
 
 ## La vue
@@ -149,6 +143,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-L'audio est stocké. La suite : le **lire** en streaming.
+L'audio est stocké.
+La suite : le **lire** en streaming.
 
 [Lire un audio](audio-play.md)

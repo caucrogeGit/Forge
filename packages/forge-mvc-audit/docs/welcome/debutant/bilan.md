@@ -14,7 +14,6 @@ Vous savez écrire une trace et relire le journal.
 
 ## Et ensuite
 
-Place au niveau **intermédiaire** : enrichir une trace avec sa cible et ses
-détails, puis filtrer le journal.
+Place au niveau **intermédiaire** : enrichir une trace avec sa cible et ses détails, puis filtrer le journal.
 
 [Niveau intermédiaire : Enrichir une trace](../intermediaire/audit-target.md)

@@ -2,14 +2,12 @@
 
 Objectif : recharger les catalogues après les avoir modifiés.
 
-**Ce que vous allez apprendre :** pour la performance, les catalogues sont mis en
-**cache** après leur première lecture. Si vous éditez un fichier JSON pendant
-que l'application tourne, le changement n'apparaît qu'après
-`clear_translation_cache()`.
+**Ce que vous allez apprendre :** pour la performance, les catalogues sont mis en **cache** après leur première lecture.
+Si vous éditez un fichier JSON pendant que l'application tourne, le changement n'apparaît qu'après `clear_translation_cache()`.
 
 !!! note "Module opt-in"
-    Le cache évite de relire le disque à chaque `trans`. En contrepartie, une
-    modification à chaud nécessite de vider le cache.
+    Le cache évite de relire le disque à chaque `trans`.
+    En contrepartie, une modification à chaud nécessite de vider le cache.
 
 ## Classes Forge utilisées
 
@@ -42,11 +40,9 @@ class I18nCacheController(BaseController):
 
 ### Comprendre ce code
 
-- Sans `clear_translation_cache()`, `trans` continue de servir la version
-  **déjà lue** du catalogue, même si le fichier a changé.
+- Sans `clear_translation_cache()`, `trans` continue de servir la version **déjà lue** du catalogue, même si le fichier a changé.
 - Après l'appel, la prochaine lecture relit `translations/fr.json` à jour.
-- En production, on vide rarement le cache : les catalogues changent au
-  déploiement, pas en cours de requête.
+- En production, on vide rarement le cache : les catalogues changent au déploiement, pas en cours de requête.
 
 ## La route
 

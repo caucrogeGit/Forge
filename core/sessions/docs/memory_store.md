@@ -81,8 +81,7 @@ Il ajoute deux méthodes propres au backend.
 | `SESSION_TTL` | `SESSION_TTL = 3600` | durée de vie par défaut, en secondes |
 
 !!! note "Nettoyage des sessions expirées"
-    Le nettoyage est opportuniste : `get()`, `replace()` et `touch_expiry()` retirent une session expirée à son accès, et `create()` déclenche un balayage global.
-    `cleanup_expired()` permet en plus un balayage complet déclenché explicitement, sans thread ni scheduler.
+    Le nettoyage est opportuniste : `get()`, `replace()` et `touch_expiry()` retirent une session expirée à son accès, et `create()` déclenche un balayage global. `cleanup_expired()` permet en plus un balayage complet déclenché explicitement, sans thread ni scheduler.
 
 ## 5. Contextes d'utilisation
 

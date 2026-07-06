@@ -2,18 +2,13 @@
 
 `forge-mvc-notifications` est l'opt-in de notifications in-app de Forge.
 
-Il crée des notifications destinées aux utilisateurs (élève inscrit, note
-publiée, devoir à rendre) dans une table `notifications`, permet de les lire et
-de les marquer comme lues.
+Il crée des notifications destinées aux utilisateurs (élève inscrit, note publiée, devoir à rendre) dans une table `notifications`, permet de les lire et de les marquer comme lues.
 
 ## Périmètre in-app
 
 Le périmètre V1 est l'in-app : des lignes en base, affichées dans l'interface.
-La livraison hors application (email, push) reste applicative, par exemple en
-combinant ce paquet avec `forge-mvc-jobs` (tâche de fond) et `forge-mvc-mail`
-(envoi).
-Le cœur de Forge ignore tout des notifications ; la dépendance va de l'opt-in
-vers le cœur, jamais l'inverse.
+La livraison hors application (email, push) reste applicative, par exemple en combinant ce paquet avec `forge-mvc-jobs` (tâche de fond) et `forge-mvc-mail` (envoi).
+Le cœur de Forge ignore tout des notifications ; la dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 
 ## Mise en route
 

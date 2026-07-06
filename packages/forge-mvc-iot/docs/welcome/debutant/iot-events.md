@@ -1,22 +1,17 @@
 # Lire les événements IoT
 
-Objectif : lire les mesures déjà **stockées** par le module IoT et les renvoyer
-en JSON.
+Objectif : lire les mesures déjà **stockées** par le module IoT et les renvoyer en JSON.
 
-**Ce que vous allez apprendre :** le `IotEventRepository` et sa méthode
-`list_recent`, qui renvoie les derniers événements de la table `iot_events`
-(ordre du plus récent). Et un réflexe Forge : rester **pédagogique** quand la
-table n'existe pas encore, au lieu de planter.
+**Ce que vous allez apprendre :** le `IotEventRepository` et sa méthode `list_recent`, qui renvoie les derniers événements de la table `iot_events` (ordre du plus récent).
+Et un réflexe Forge : rester **pédagogique** quand la table n'existe pas encore, au lieu de planter.
 
-Palier 2 du **niveau débutant** de la progression IoT, après
-[Welcome IoT](iot-welcome.md).
+Palier 2 du **niveau débutant** de la progression IoT, après [Welcome IoT](iot-welcome.md).
 
 ## Ce que ce starter montre
 
 - la lecture des derniers événements via `IotEventRepository.list_recent` ;
 - une réponse JSON `{ "events": [...] }` ;
-- une **réponse `503` explicite** quand la table `iot_events` n'est pas encore
-  disponible (aucun `iot:init` lancé), au lieu d'une erreur brute.
+- une **réponse `503` explicite** quand la table `iot_events` n'est pas encore disponible (aucun `iot:init` lancé), au lieu d'une erreur brute.
 
 Aucun broker, aucune écriture.
 
@@ -34,10 +29,9 @@ Aucun broker, aucune écriture.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/iot-events`. Sans table créée, la route répond
-`503` avec un message qui invite à lancer `forge iot:init`. Une fois la table
-présente (et des mesures injectées au niveau intermédiaire), elle renvoie la
-liste des événements.
+Ouvrez `https://localhost:8000/iot-events`.
+Sans table créée, la route répond `503` avec un message qui invite à lancer `forge iot:init`.
+Une fois la table présente (et des mesures injectées au niveau intermédiaire), elle renvoie la liste des événements.
 
 ## Le contrôleur
 
@@ -78,13 +72,10 @@ class IotEventsController(BaseController):
 
 ### Comprendre ce code
 
-- `IotEventRepository()` utilise par défaut l'accès base de Forge
-  (`core.database.db`), aucun branchement manuel.
-- `list_recent(limit=20)` renvoie les 20 derniers événements sous forme de
-  dictionnaires, directement sérialisables en JSON.
-- Le `try/except` **ne masque pas un bug** : il traduit l'absence de table en
-  réponse `503` pédagogique. Un starter de découverte ne doit jamais planter
-  parce que l'infrastructure n'est pas encore montée.
+- `IotEventRepository()` utilise par défaut l'accès base de Forge (`core.database.db`), aucun branchement manuel.
+- `list_recent(limit=20)` renvoie les 20 derniers événements sous forme de dictionnaires, directement sérialisables en JSON.
+- Le `try/except` **ne masque pas un bug** : il traduit l'absence de table en réponse `503` pédagogique.
+  Un starter de découverte ne doit jamais planter parce que l'infrastructure n'est pas encore montée.
 
 ## La route
 
@@ -102,12 +93,11 @@ with router.group("", public=True) as public:
 
 - `IotEventRepository.list_recent` lit les derniers événements stockés.
 - Le repository s'appuie sur l'accès base standard de Forge.
-- Un starter de découverte **reste pédagogique** quand la table manque (`503`),
-  il ne plante pas.
+- Un starter de découverte **reste pédagogique** quand la table manque (`503`), il ne plante pas.
 
 ## Après ce starter
 
-Vous savez lire le flux global des événements. La suite : cibler un capteur
-précis.
+Vous savez lire le flux global des événements.
+La suite : cibler un capteur précis.
 
 [Les événements d'un capteur](iot-device.md)

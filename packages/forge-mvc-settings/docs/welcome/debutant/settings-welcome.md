@@ -2,8 +2,7 @@
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-settings`.
 
-**Ce que vous allez apprendre :** un paramètre applicatif est une paire
-clé/valeur stockée en base.
+**Ce que vous allez apprendre :** un paramètre applicatif est une paire clé/valeur stockée en base.
 On écrit un paramètre avec `set_setting`, puis on le relit avec `get_setting`.
 La table de stockage doit d'abord exister, ce qui se fait en deux commandes.
 

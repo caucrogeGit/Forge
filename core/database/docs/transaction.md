@@ -151,7 +151,8 @@ Si la seconde requête échoue, l'insertion de l'article est annulée par le rol
 !!! note "Les helpers ne committent pas dans une transaction"
     Quand un helper SQL reçoit `tx=tx`, il écrit dans la transaction sans valider lui-même.
 
-    C'est le bloc `with transaction()` qui décide du commit final ou du rollback. Vous gardez ainsi la maîtrise du périmètre atomique.
+    C'est le bloc `with transaction()` qui décide du commit final ou du rollback.
+    Vous gardez ainsi la maîtrise du périmètre atomique.
 
 ## Voir aussi
 

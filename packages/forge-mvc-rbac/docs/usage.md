@@ -1,11 +1,9 @@
 # RBAC opt-in : guide d'usage applicatif
 
-Le RBAC Forge est **opt-in** : le package `forge-mvc-rbac` doit être installé
-et ses helpers appliqués explicitement par le développeur. Aucune route n'est
-protégée automatiquement par Forge Core.
+Le RBAC Forge est **opt-in** : le package `forge-mvc-rbac` doit être installé et ses helpers appliqués explicitement par le développeur.
+Aucune route n'est protégée automatiquement par Forge Core.
 
-Cette page décrit le workflow complet, de la déclaration du contrat à la
-protection d'une action dans un contrôleur.
+Cette page décrit le workflow complet, de la déclaration du contrat à la protection d'une action dans un contrôleur.
 
 ## Prérequis
 
@@ -17,8 +15,8 @@ pip install forge-mvc-rbac
 
 ## Étape 1 : déclarer le contrat RBAC
 
-Créez `mvc/security/rbac.json` à la racine de votre projet. Ce fichier est
-**optionnel** : s'il est absent, Forge fonctionne sans RBAC contractuel.
+Créez `mvc/security/rbac.json` à la racine de votre projet.
+Ce fichier est **optionnel** : s'il est absent, Forge fonctionne sans RBAC contractuel.
 
 Exemple complet :
 
@@ -69,8 +67,8 @@ Ajoutez la clé `$schema` pour l'autocomplétion dans VS Code :
 
 ## Étape 2 : valider la structure
 
-`rbac:validate` vérifie que `mvc/security/rbac.json` respecte le schéma JSON
-Forge. C'est une vérification **structurelle** (forme du fichier).
+`rbac:validate` vérifie que `mvc/security/rbac.json` respecte le schéma JSON Forge.
+C'est une vérification **structurelle** (forme du fichier).
 
 ```bash
 python forge.py rbac:validate
@@ -84,8 +82,7 @@ python forge.py rbac:validate --json
 
 ## Étape 3 : auditer la cohérence
 
-`rbac:audit` vérifie la cohérence **fonctionnelle** du contrat : rôles sans
-permissions, entités sans actions CRUD, permissions inutilisées, etc.
+`rbac:audit` vérifie la cohérence **fonctionnelle** du contrat : rôles sans permissions, entités sans actions CRUD, permissions inutilisées, etc.
 
 ```bash
 python forge.py rbac:audit
@@ -188,8 +185,7 @@ def delete(request, article_id):
     # suppression réelle ici
 ```
 
-Le décorateur est équivalent au helper direct : il applique
-`require_contract_permission_for_request` avant d'appeler la fonction.
+Le décorateur est équivalent au helper direct : il applique `require_contract_permission_for_request` avant d'appeler la fonction.
 
 | Helper | Retour si accordé | Retour si refusé |
 |---|---|---|
@@ -198,14 +194,12 @@ Le décorateur est équivalent au helper direct : il applique
 
 ## Résolution des rôles
 
-Les helpers `require_contract_permission_for_request` et
-`contract_permission_required` extraient les rôles dans cet ordre :
+Les helpers `require_contract_permission_for_request` et `contract_permission_required` extraient les rôles dans cet ordre :
 
 1. `request.roles` : liste injectée directement (tests, middleware applicatif)
 2. Session utilisateur : champ `"roles"` dans la session Forge
 
-Si aucun rôle n'est trouvé (attribut absent, session vide ou invalide),
-l'accès est refusé avec `Response(403)`.
+Si aucun rôle n'est trouvé (attribut absent, session vide ou invalide), l'accès est refusé avec `Response(403)`.
 
 ## Imports publics disponibles
 
@@ -227,8 +221,6 @@ from forge_mvc_rbac import (
 - `make:crud` ne génère pas de guards RBAC : les contrôleurs générés sont neutres.
 - Les routes ne sont **pas protégées automatiquement** par Forge Core.
 - `rbac:audit` ne corrige rien automatiquement : il signale des avertissements informatifs.
-- Le contrat est **rechargé à chaque appel** dans l'état actuel. Si les
-  performances sont critiques, charger le contrat une fois et réutiliser le
-  résultat avec `require_contract_permission`.
-- `entity.schema.json` ne contient pas de propriété RBAC : la configuration RBAC
-  vit exclusivement dans `mvc/security/rbac.json`.
+- Le contrat est **rechargé à chaque appel** dans l'état actuel.
+  Si les performances sont critiques, charger le contrat une fois et réutiliser le résultat avec `require_contract_permission`.
+- `entity.schema.json` ne contient pas de propriété RBAC : la configuration RBAC vit exclusivement dans `mvc/security/rbac.json`.

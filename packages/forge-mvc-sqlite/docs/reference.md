@@ -12,7 +12,8 @@ Le cœur sait générer du SQL et piloter `db:init` / `db:apply` / `migration:*`
 
 `forge-mvc-sqlite` fournit ce backend : une connexion `sqlite3` adaptée aux attentes du cœur (curseur lignes-dict, `lastrowid`, `autocommit`) et un dialecte SQL propre à SQLite.
 
-SQLite est **sans serveur** : la base est un simple fichier (`DB_NAME`). C'est le choix idéal en développement, en test et pour l'onboarding.
+SQLite est **sans serveur** : la base est un simple fichier (`DB_NAME`).
+C'est le choix idéal en développement, en test et pour l'onboarding.
 
 ## 2. Installation et désinstallation
 

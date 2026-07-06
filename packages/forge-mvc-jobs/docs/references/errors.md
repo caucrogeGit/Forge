@@ -22,8 +22,7 @@ Elle hérite de `ValueError`.
 | `max_attempts` inférieur à 1 | `enqueue` |
 | Charge utile non sérialisable en JSON | `enqueue` |
 
-Les échecs **pendant l'exécution** d'une tâche ne lèvent pas `JobError` : ils
-sont gérés par la file (reprise ou statut `failed`, avec `last_error`).
+Les échecs **pendant l'exécution** d'une tâche ne lèvent pas `JobError` : ils sont gérés par la file (reprise ou statut `failed`, avec `last_error`).
 
 ## 3. Rattraper l'erreur
 

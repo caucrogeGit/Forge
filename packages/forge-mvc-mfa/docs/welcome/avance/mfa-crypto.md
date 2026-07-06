@@ -1,11 +1,8 @@
 # Secret chiffré au repos
 
-Objectif : ne **jamais** stocker un secret TOTP en clair : le chiffrer au repos avec
-`FORGE_MFA_SECRET_KEY`.
+Objectif : ne **jamais** stocker un secret TOTP en clair : le chiffrer au repos avec `FORGE_MFA_SECRET_KEY`.
 
-**Ce que vous allez apprendre :** `encrypt_totp_secret` chiffre un secret (préfixe
-`enc:`) via Fernet ; `decrypt_totp_secret` le déchiffre au moment de vérifier un
-code ; `validate_mfa_secret_key_config` contrôle la clé.
+**Ce que vous allez apprendre :** `encrypt_totp_secret` chiffre un secret (préfixe `enc:`) via Fernet ; `decrypt_totp_secret` le déchiffre au moment de vérifier un code ; `validate_mfa_secret_key_config` contrôle la clé.
 
 Troisième palier du **niveau avancé** de la progression MFA.
 
@@ -33,8 +30,7 @@ Troisième palier du **niveau avancé** de la progression MFA.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/mfa-crypto` : saisissez un secret, observez sa version
-chiffrée `enc:…` et l'aller-retour.
+Ouvrez `https://localhost:8000/mfa-crypto` : saisissez un secret, observez sa version chiffrée `enc:…` et l'aller-retour.
 
 ## Le contrôleur
 
@@ -138,11 +134,10 @@ with router.group("", public=True) as public:
 
 ### Comprendre ce code
 
-- Seule la valeur préfixée `enc:` est stockée ; la **clé reste hors base**
-  (`FORGE_MFA_SECRET_KEY`). Une base volée ne livre pas les secrets.
+- Seule la valeur préfixée `enc:` est stockée ; la **clé reste hors base** (`FORGE_MFA_SECRET_KEY`).
+  Une base volée ne livre pas les secrets.
 - `create_totp_factor` applique déjà ce chiffrement : `factor.totp_secret` est `enc:…`.
-- `validate_mfa_secret_key_config` doit être appelé au démarrage pour échouer **tôt**
-  si la clé manque.
+- `validate_mfa_secret_key_config` doit être appelé au démarrage pour échouer **tôt** si la clé manque.
 
 ## À retenir
 

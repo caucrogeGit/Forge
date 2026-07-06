@@ -29,13 +29,13 @@ Chaque attribut est explicite :
 - `form_fields` : les colonnes éditables en formulaire ;
 - `table` : la table physique.
 
-Ces noms de colonnes entrent directement dans les requêtes : ce sont les noms
-réels des colonnes de la table.
+Ces noms de colonnes entrent directement dans les requêtes : ce sont les noms réels des colonnes de la table.
 
 ## Vérifier
 
 Rechargez `/admin`.
-La ressource « Articles » apparaît désormais dans le tableau de bord.
+La ressource « Articles »
+apparaît désormais dans le tableau de bord.
 
 Vous pouvez aussi vérifier la cohérence avec le contrat d'entité :
 

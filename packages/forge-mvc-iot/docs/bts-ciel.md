@@ -1,14 +1,12 @@
 # Forge IoT pour Bac Pro / BTS CIEL
 
-> **Statut** : page **pédagogique**. Elle explique le sens du socle Forge
-> IoT pour un usage en lycée professionnel (Bac Pro) et en BTS CIEL, et
-> propose des activités simples exploitables en classe. Elle s'appuie sur
-> les commandes déjà livrées, sans capteur physique obligatoire.
+> **Statut** : page **pédagogique**.
+> Elle explique le sens du socle Forge IoT pour un usage en lycée professionnel (Bac Pro) et en BTS CIEL, et propose des activités simples exploitables en classe.
+> Elle s'appuie sur les commandes déjà livrées, sans capteur physique obligatoire.
 
 ## Objectif pédagogique
 
-Comprendre, de bout en bout, comment une **mesure** voyage d'un capteur
-jusqu'à son exploitation :
+Comprendre, de bout en bout, comment une **mesure** voyage d'un capteur jusqu'à son exploitation :
 
 ```text
 capteur
@@ -20,9 +18,7 @@ capteur
    → exploitation / visualisation
 ```
 
-L'élève peut dérouler tout ce flux **sans matériel**, grâce au
-simulateur `forge iot:simulate`, puis remplacer plus tard le simulateur
-par un vrai capteur.
+L'élève peut dérouler tout ce flux **sans matériel**, grâce au simulateur `forge iot:simulate`, puis remplacer plus tard le simulateur par un vrai capteur.
 
 ## Compétences travaillées
 
@@ -47,15 +43,12 @@ par un vrai capteur.
 
 ## Rôle du capteur
 
-Le capteur **produit** une mesure : une grandeur physique (température,
-humidité, luminosité…) transformée en nombre. En classe, on le remplace
-par `forge iot:simulate`, qui produit des mesures factices mais
-réalistes.
+Le capteur **produit** une mesure : une grandeur physique (température, humidité, luminosité…) transformée en nombre.
+En classe, on le remplace par `forge iot:simulate`, qui produit des mesures factices mais réalistes.
 
 Les **profils** du simulateur (`--profile temperature|humidity|presence|energy`)
-permettent de construire des exercices sans capteur réel : chaque profil
-fournit un `kind`, une `value` et une `unit` cohérents. Voir
-[Simulateur : profils de simulation](simulator.md#profils-de-simulation).
+permettent de construire des exercices sans capteur réel : chaque profil fournit un `kind`, une `value` et une `unit` cohérents.
+Voir [Simulateur : profils de simulation](simulator.md#profils-de-simulation).
 
 ```bash
 forge iot:simulate --profile humidity --count 5
@@ -63,8 +56,9 @@ forge iot:simulate --profile humidity --count 5
 
 ## Rôle de MQTT
 
-MQTT est le **protocole de transport**. Une mesure est publiée sur un
-**topic**, une adresse hiérarchique. Le contrat Forge IoT impose :
+MQTT est le **protocole de transport**.
+Une mesure est publiée sur un **topic**, une adresse hiérarchique.
+Le contrat Forge IoT impose :
 
 ```text
 forge/{site}/{device_id}/telemetry
@@ -78,40 +72,33 @@ forge/atelier/esp32-001/telemetry
 
 ## Rôle de Mosquitto
 
-Mosquitto est le **broker** : il reçoit les messages publiés et les
-redistribue à tous les abonnés du topic. Il ne stocke pas les mesures à
-long terme ; il les fait circuler. Installation et démarrage :
-[Mosquitto local](mosquitto-local.md).
+Mosquitto est le **broker** : il reçoit les messages publiés et les redistribue à tous les abonnés du topic.
+Il ne stocke pas les mesures à long terme ; il les fait circuler.
+Installation et démarrage : [Mosquitto local](mosquitto-local.md).
 
 ## Rôle de Forge IoT
 
-Forge IoT est le **consommateur** côté serveur. Avec `forge iot:listen`,
-il :
+Forge IoT est le **consommateur** côté serveur.
+Avec `forge iot:listen`, il :
 
 1. **écoute** le topic configuré ;
 2. **valide** chaque message contre le contrat (topic + JSON) ;
 3. **stocke** la mesure dans la table `iot_events` ;
 4. l'**expose** ensuite via l'API HTTP.
 
-Un message qui ne respecte pas le contrat est rejeté : c'est ce qui
-garantit des données propres en base.
+Un message qui ne respecte pas le contrat est rejeté : c'est ce qui garantit des données propres en base.
 
 ## Rôle de la base de données
 
-MariaDB conserve les événements dans la table `iot_events`. Chaque ligne
-garde le `site`, le `device_id`, le `kind`, la `value`, l'`unit`, le
-`timestamp` du capteur et un `received_at` (heure de réception serveur).
+MariaDB conserve les événements dans la table `iot_events`.
+Chaque ligne garde le `site`, le `device_id`, le `kind`, la `value`, l'`unit`, le `timestamp` du capteur et un `received_at` (heure de réception serveur).
 La base est la **mémoire** du système.
 
 ## Rôle de l'API HTTP
 
-L'API HTTP `GET /api/iot/events` permet d'**exploiter** les mesures
-stockées (les afficher, les analyser, les visualiser). C'est le point
-d'entrée d'une future interface, sans dépendre du broker directement.
-En classe, l'API reste **ouverte** ; pour un projet exposé sur le
-réseau, on peut la protéger par un
-[token Bearer](http-api.md#protection-par-bearer-token)
-(`FORGE_IOT_API_TOKEN`).
+L'API HTTP `GET /api/iot/events` permet d'**exploiter** les mesures stockées (les afficher, les analyser, les visualiser).
+C'est le point d'entrée d'une future interface, sans dépendre du broker directement.
+En classe, l'API reste **ouverte** ; pour un projet exposé sur le réseau, on peut la protéger par un [token Bearer](http-api.md#protection-par-bearer-token) (`FORGE_IOT_API_TOKEN`).
 
 ## Exemple de message
 
@@ -165,8 +152,7 @@ Le scénario complet encadré : [smoke test local](local-smoke-test.md).
 
 ### Activité 2 : Valider un payload JSON
 
-Parmi ces payloads, lesquels sont **valides** (champs obligatoires
-`kind`, `value`, `unit`, `timestamp` ; `timestamp` en UTC suffixe `Z`) ?
+Parmi ces payloads, lesquels sont **valides** (champs obligatoires `kind`, `value`, `unit`, `timestamp` ; `timestamp` en UTC suffixe `Z`) ?
 
 ```json
 {"kind":"temperature","value":22.4,"unit":"°C","timestamp":"2026-05-29T10:00:00Z"}
@@ -191,8 +177,7 @@ Observer les lignes `[OK]` côté `forge iot:listen`.
 curl http://localhost:8000/api/iot/events
 ```
 
-Faire identifier dans la réponse : `site`, `device_id`, `kind`, `value`,
-`unit`, `timestamp`, `received_at`.
+Faire identifier dans la réponse : `site`, `device_id`, `kind`, `value`, `unit`, `timestamp`, `received_at`.
 
 ### Activité 5 : Diagnostiquer une panne
 
@@ -207,24 +192,18 @@ Associer chaque panne à la commande utile :
 
 ## Erreurs fréquentes
 
-- **Mosquitto arrêté** → `ConnectionRefusedError` : démarrer le broker
-  (voir [Mosquitto local](mosquitto-local.md)) ;
-- **table absente** → `iot_storage_not_ready` : `forge iot:init` puis
-  `forge migration:apply` ;
-- **topic invalide** → le message est rejeté : respecter
-  `forge/{site}/{device_id}/telemetry` ;
-- **payload invalide** → champ obligatoire manquant ou `timestamp` sans
-  `Z`.
+- **Mosquitto arrêté** → `ConnectionRefusedError` : démarrer le broker (voir [Mosquitto local](mosquitto-local.md)) ;
+- **table absente** → `iot_storage_not_ready` : `forge iot:init` puis `forge migration:apply` ;
+- **topic invalide** → le message est rejeté : respecter `forge/{site}/{device_id}/telemetry` ;
+- **payload invalide** → champ obligatoire manquant ou `timestamp` sans `Z`.
 
 ## Limites
 
 Cette page pose le cadre pédagogique général. Sont **hors périmètre** :
 
-- en classe, on part du simulateur `forge iot:simulate` ; pour un
-  capteur réel, voir l'[exemple ESP32](esp32-example.md) ;
+- en classe, on part du simulateur `forge iot:simulate` ; pour un capteur réel, voir l'[exemple ESP32](esp32-example.md) ;
 - l'**Arduino R4** n'est pas couvert ici (hors périmètre) : l'exemple cible l'ESP32 ;
-- pas de fiche élève PDF, pas de grille d'évaluation, pas de séquence
-  pédagogique complète, pourront venir plus tard ;
+- pas de fiche élève PDF, pas de grille d'évaluation, pas de séquence pédagogique complète, pourront venir plus tard ;
 - pas de cockpit de visualisation (Forge Design), à venir ;
 - pas de TLS ni d'authentification MQTT.
 

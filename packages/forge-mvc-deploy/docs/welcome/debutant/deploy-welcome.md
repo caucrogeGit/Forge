@@ -2,11 +2,8 @@
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-deploy`.
 
-**Ce que vous allez apprendre :** déployer une application Forge demande
-quelques fichiers de configuration toujours semblables (point d'entrée WSGI,
-reverse proxy Nginx, service systemd).
-L'opt-in Deploy les génère pour vous, à adapter, puis vérifie l'environnement
-de production avant la mise en ligne.
+**Ce que vous allez apprendre :** déployer une application Forge demande quelques fichiers de configuration toujours semblables (point d'entrée WSGI, reverse proxy Nginx, service systemd).
+L'opt-in Deploy les génère pour vous, à adapter, puis vérifie l'environnement de production avant la mise en ligne.
 
 Premier palier du **niveau débutant** de la progression Deploy.
 
@@ -17,13 +14,10 @@ Premier palier du **niveau débutant** de la progression Deploy.
 ## Pourquoi un opt-in de déploiement
 
 Le chemin de production officiel de Forge est Gunicorn derrière Nginx.
-Nginx termine HTTPS côté public, Forge écoute en HTTP local
-(`APP_SSL_ENABLED=false`).
+Nginx termine HTTPS côté public, Forge écoute en HTTP local (`APP_SSL_ENABLED=false`).
 
-Mettre cela en place à la main signifie écrire toujours les mêmes fichiers :
-un `wsgi.py`, une config Nginx, une unité systemd.
-L'opt-in Deploy capture cette recette et la rend reproductible, sans rien
-écrire dans votre code applicatif.
+Mettre cela en place à la main signifie écrire toujours les mêmes fichiers : un `wsgi.py`, une config Nginx, une unité systemd.
+L'opt-in Deploy capture cette recette et la rend reproductible, sans rien écrire dans votre code applicatif.
 
 ## Ce que ce niveau montre
 

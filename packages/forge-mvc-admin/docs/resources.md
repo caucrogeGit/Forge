@@ -1,25 +1,18 @@
 # Contrat d'une ressource admin
 
-Une **ressource admin** décrit comment une entité d'un projet Forge est
-administrée : quelle entité, sous quel slug d'URL, avec quels libellés, et quels
-champs sont montrés en liste et éditables en formulaire.
+Une **ressource admin** décrit comment une entité d'un projet Forge est administrée : quelle entité, sous quel slug d'URL, avec quels libellés, et quels champs sont montrés en liste et éditables en formulaire.
 
 !!! warning "Statut : châssis en cours"
-    Cette page documente le contrat (`AdminResource`) et le registre
-    (`AdminRegistry`) livrés par le ticket `ADMIN-RESOURCE-CONTRACT-001`.
+    Cette page documente le contrat (`AdminResource`) et le registre (`AdminRegistry`) livrés par le ticket `ADMIN-RESOURCE-CONTRACT-001`.
     Les vues qui consomment ce contrat viendront par les tickets suivants.
 
 ## Principe
 
-Le contrat est une **déclaration Python**, pas un nouveau fichier de
-configuration.
-L'entité reste décrite par son contrat JSON ; la ressource admin est une couche
-de présentation au-dessus, écrite en code explicite et modifiable.
+Le contrat est une **déclaration Python**, pas un nouveau fichier de configuration.
+L'entité reste décrite par son contrat JSON ; la ressource admin est une couche de présentation au-dessus, écrite en code explicite et modifiable.
 
 La ressource valide sa propre forme à la construction.
-Elle ne lit ni le contrat d'entité ni la base : le rapprochement avec l'entité
-réelle (existence de l'entité, des champs) relèvera d'une vérification ultérieure
-(`forge admin:doctor`).
+Elle ne lit ni le contrat d'entité ni la base : le rapprochement avec l'entité réelle (existence de l'entité, des champs) relèvera d'une vérification ultérieure (`forge admin:doctor`).
 
 ## `AdminResource`
 
@@ -59,40 +52,27 @@ article = AdminResource(
 )
 ```
 
-La liste (`GET /admin/<slug>`) construit un `SELECT` contraint à partir de ce
-contrat : seuls la table, les colonnes `list_fields` et la colonne de tri
-entrent dans la requête (identifiants validés en liste blanche), la pagination
-passe par des paramètres. Aucune introspection, pas d'ORM.
+La liste (`GET /admin/<slug>`) construit un `SELECT` contraint à partir de ce contrat : seuls la table, les colonnes `list_fields` et la colonne de tri entrent dans la requête (identifiants validés en liste blanche), la pagination passe par des paramètres.
+Aucune introspection, pas d'ORM.
 
-La fiche détail (`GET /admin/<slug>/<id>`) lit une ligne par sa clé primaire
-(`WHERE <pk> = ?`, valeur paramétrée) et affiche `pk` puis `list_fields` puis
-`form_fields` (colonnes uniques).
+La fiche détail (`GET /admin/<slug>/<id>`) lit une ligne par sa clé primaire (`WHERE <pk> = ?`, valeur paramétrée) et affiche `pk` puis `list_fields` puis `form_fields` (colonnes uniques).
 
-La création (`GET`/`POST /admin/<slug>/new`) affiche un formulaire des
-`form_fields` puis insère une ligne : seules ces colonnes sont écrites (liste
-blanche), les valeurs sont paramétrées, une valeur vide devient `NULL`, et le
-jeton CSRF est vérifié. En cas de succès, redirection vers la fiche créée.
-À ce stade il n'y a pas de validation par champ (pas de contrat au runtime) :
-les contraintes restent celles de la base.
+La création (`GET`/`POST /admin/<slug>/new`) affiche un formulaire des `form_fields` puis insère une ligne : seules ces colonnes sont écrites (liste blanche), les valeurs sont paramétrées, une valeur vide devient `NULL`, et le jeton CSRF est vérifié.
+En cas de succès, redirection vers la fiche créée.
+À ce stade il n'y a pas de validation par champ (pas de contrat au runtime) : les contraintes restent celles de la base.
 
-L'édition (`GET`/`POST /admin/<slug>/<id>/edit`) pré-remplit le formulaire depuis
-la ligne existante puis fait un `UPDATE … WHERE <pk> = ?` (mêmes garanties que la
-création : colonnes en liste blanche, valeurs paramétrées, CSRF). La fiche détail
-propose un lien « Modifier ».
+L'édition (`GET`/`POST /admin/<slug>/<id>/edit`) pré-remplit le formulaire depuis la ligne existante puis fait un `UPDATE … WHERE <pk> = ?` (mêmes garanties que la création : colonnes en liste blanche, valeurs paramétrées, CSRF).
+La fiche détail propose un lien « Modifier ».
 
-La suppression est **contrôlée** : `GET /admin/<slug>/<id>/delete` affiche une
-page de confirmation (lecture seule), et seule la soumission
-`POST /admin/<slug>/<id>/delete` exécute `DELETE … WHERE <pk> = ? LIMIT 1` (jamais
-en GET, CSRF vérifié), puis redirige vers la liste. La fiche détail propose un
-lien « Supprimer » vers la page de confirmation.
+La suppression est **contrôlée** : `GET /admin/<slug>/<id>/delete` affiche une page de confirmation (lecture seule), et seule la soumission `POST /admin/<slug>/<id>/delete` exécute `DELETE … WHERE <pk> = ? LIMIT 1` (jamais en GET, CSRF vérifié), puis redirige vers la liste.
+La fiche détail propose un lien « Supprimer »
+vers la page de confirmation.
 
 ## `AdminRegistry`
 
 Le registre rassemble les ressources d'un projet.
-Il est **explicite** : l'application enregistre ses ressources à la main, il n'y
-a aucune découverte automatique.
-Forge Core n'enregistre rien ; le registre par défaut est vide tant que
-l'application ne l'a pas peuplé.
+Il est **explicite** : l'application enregistre ses ressources à la main, il n'y a aucune découverte automatique.
+Forge Core n'enregistre rien ; le registre par défaut est vide tant que l'application ne l'a pas peuplé.
 
 | Méthode | Rôle |
 |---|---|

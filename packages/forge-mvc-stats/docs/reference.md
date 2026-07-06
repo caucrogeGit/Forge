@@ -7,7 +7,8 @@ Ce document explique ce que fait l'opt-in `forge-mvc-stats`, ce qu'il expose, et
 
 `forge-mvc-stats` enregistre des événements applicatifs dans une table (`forge_stats_events`), puis permet de les lister et de les agréger par comptage.
 
-Forge ne trace **rien** automatiquement : le développeur appelle `track_event()` quand il le décide, et injecte lui-même l'exécuteur SQL. Aucun cookie visiteur, aucune IP.
+Forge ne trace **rien** automatiquement : le développeur appelle `track_event()` quand il le décide, et injecte lui-même l'exécuteur SQL.
+Aucun cookie visiteur, aucune IP.
 
 ## 1. Rôle du module
 
@@ -201,7 +202,8 @@ totaux = count_stats_events(db.fetch_all, group_by="category")
 
 ## 8. Tracking explicite et exécuteur injecté
 
-Forge ne trace rien de lui-même : pas de middleware caché, pas de cookie, pas d'IP. Le développeur décide quoi compter avec `track_event`.
+Forge ne trace rien de lui-même : pas de middleware caché, pas de cookie, pas d'IP.
+Le développeur décide quoi compter avec `track_event`.
 
 Les noms d'événements sont des chaînes `snake_case` définies par l'application (principe 1) ; un nom invalide lève `StatsEventError`.
 

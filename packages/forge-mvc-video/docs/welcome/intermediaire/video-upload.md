@@ -1,16 +1,12 @@
 # Téléverser une vidéo
 
-Objectif : **alimenter** le module en enregistrant une vidéo uploadée, sans
-transcodage.
+Objectif : **alimenter** le module en enregistrant une vidéo uploadée, sans transcodage.
 
-**Ce que vous allez apprendre :** `ingest_video`. Le formulaire envoie un
-fichier ; la fonction le **valide** (taille, conteneur déclaré), le **stocke**
-sous un UUID (jamais le nom de fichier utilisateur) et **insère** une ligne
-`videos` au statut `uploaded`, **sans ffmpeg**. Le transcodage est un worker
-séparé (niveau avancé) : jamais pendant une requête HTTP.
+**Ce que vous allez apprendre :** `ingest_video`.
+Le formulaire envoie un fichier ; la fonction le **valide** (taille, conteneur déclaré), le **stocke** sous un UUID (jamais le nom de fichier utilisateur) et **insère** une ligne `videos` au statut `uploaded`, **sans ffmpeg**.
+Le transcodage est un worker séparé (niveau avancé) : jamais pendant une requête HTTP.
 
-Premier palier du **niveau intermédiaire** de la progression vidéo, après le
-[niveau débutant](../debutant/bilan.md).
+Premier palier du **niveau intermédiaire** de la progression vidéo, après le [niveau débutant](../debutant/bilan.md).
 
 ## Ce que ce starter montre
 
@@ -19,7 +15,8 @@ Premier palier du **niveau intermédiaire** de la progression vidéo, après le
 - le statut initial `uploaded` ;
 - la liste des vidéos enregistrées, avec leur statut.
 
-La table `videos` est créée par la migration fournie plus bas. **Aucun ffmpeg.**
+La table `videos` est créée par la migration fournie plus bas.
+**Aucun ffmpeg.**
 
 ## Classes Forge utilisées
 
@@ -36,9 +33,8 @@ forge db:init
 forge run
 ```
 
-Ouvrez `https://localhost:8000/video-upload`, choisissez un fichier vidéo et
-cliquez **Téléverser** : il apparaît dans la liste au statut `uploaded`. Vous
-venez d'alimenter la table `videos` **sans lancer aucun transcodage**.
+Ouvrez `https://localhost:8000/video-upload`, choisissez un fichier vidéo et cliquez **Téléverser** : il apparaît dans la liste au statut `uploaded`.
+Vous venez d'alimenter la table `videos` **sans lancer aucun transcodage**.
 
 ## Le contrôleur
 
@@ -91,12 +87,9 @@ class VideoUploadController(BaseController):
 
 ### Comprendre ce code
 
-- `ingest_video(data, filename, title=...)` fait tout le travail sûr : validation,
-  stockage sous UUID, insertion de la ligne `videos` au statut `uploaded`. Une
-  `VideoIngestError` (fichier vide, trop gros, type refusé) est attrapée pour
-  afficher un message clair.
-- **Aucun ffmpeg n'est lancé ici** : l'upload est rapide et synchrone, le
-  transcodage lourd est délégué à un worker CLI (modèle worker-CLI de Forge).
+- `ingest_video(data, filename, title=...)` fait tout le travail sûr : validation, stockage sous UUID, insertion de la ligne `videos` au statut `uploaded`.
+  Une `VideoIngestError` (fichier vide, trop gros, type refusé) est attrapée pour afficher un message clair.
+- **Aucun ffmpeg n'est lancé ici** : l'upload est rapide et synchrone, le transcodage lourd est délégué à un worker CLI (modèle worker-CLI de Forge).
 - En cas de succès, on **redirige** (POST-Redirect-GET).
 
 ## La vue
@@ -139,15 +132,13 @@ class VideoUploadController(BaseController):
 
 ### Comprendre ce code
 
-- `enctype="multipart/form-data"` est **obligatoire** pour transmettre un
-  fichier.
+- `enctype="multipart/form-data"` est **obligatoire** pour transmettre un fichier.
 - Le formulaire reste protégé par **CSRF**, comme tout POST.
 
 ## La migration
 
-Créez la migration qui crée la table `videos` (cycle de vie
-`uploaded → processing → ready → failed`). `CREATE TABLE IF NOT EXISTS` la
-rend idempotente.
+Créez la migration qui crée la table `videos` (cycle de vie `uploaded → processing → ready → failed`).
+`CREATE TABLE IF NOT EXISTS` la rend idempotente.
 
 ```sql
 -- mvc/migrations/20260601200000_create_videos.sql
@@ -194,6 +185,7 @@ with router.group("", public=True) as public:
 
 ## Après ce starter
 
-Vous savez enregistrer une vidéo. La suite : la **servir** en streaming.
+Vous savez enregistrer une vidéo.
+La suite : la **servir** en streaming.
 
 [Lire une vidéo](video-playback.md)
