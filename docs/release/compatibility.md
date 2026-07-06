@@ -1,7 +1,6 @@
 # Matrice de compatibilité Forge
 
-Ce document définit les versions officiellement supportées et testées pour
-chaque composant de l'environnement d'exécution Forge.
+Ce document définit les versions officiellement supportées et testées pour chaque composant de l'environnement d'exécution Forge.
 
 Il complète :
 
@@ -24,8 +23,7 @@ Il complète :
 
 **Version recommandée pour le développement :** Python 3.12.
 
-**CI :** les trois versions 3.12, 3.13 et 3.14 sont testées en parallèle
-via la matrice GitHub Actions (`.github/workflows/tests.yml`).
+**CI :** les trois versions 3.12, 3.13 et 3.14 sont testées en parallèle via la matrice GitHub Actions (`.github/workflows/tests.yml`).
 
 ---
 
@@ -49,16 +47,14 @@ sudo apt install build-essential libmariadb-dev pkg-config
 ```
 
 **Tests MariaDB :** opt-in via la variable d'environnement `FORGE_E2E_MARIADB=1`.
-Les bases de données créées par les tests doivent avoir un nom commençant par
-`forge_e2e_`.
+Les bases de données créées par les tests doivent avoir un nom commençant par `forge_e2e_`.
 
 ```bash
 FORGE_E2E_MARIADB=1 pytest tests/test_e2e_mariadb.py
 ```
 
-**Note :** les tests unitaires Forge (hors `test_e2e_mariadb.py`) ne nécessitent
-pas de MariaDB. Une base de données n'est requise que pour les tests E2E et
-le déploiement d'un projet Forge réel.
+**Note :** les tests unitaires Forge (hors `test_e2e_mariadb.py`) ne nécessitent pas de MariaDB.
+Une base de données n'est requise que pour les tests E2E et le déploiement d'un projet Forge réel.
 
 ---
 
@@ -71,9 +67,8 @@ le déploiement d'un projet Forge réel.
 | Tailwind CSS | Génération de `static/tailwind.css` | ^4.2.2 |
 | @tailwindcss/cli | CLI Tailwind | ^4.2.2 |
 
-**Node.js n'est pas requis pour faire tourner un projet Forge.** Il est
-uniquement nécessaire pour régénérer le fichier CSS Tailwind lors du
-développement du framework lui-même.
+**Node.js n'est pas requis pour faire tourner un projet Forge.**
+Il est uniquement nécessaire pour régénérer le fichier CSS Tailwind lors du développement du framework lui-même.
 
 Commande de build CSS :
 
@@ -111,21 +106,18 @@ Ces dépendances sont installées automatiquement avec Forge via `pip` ou `pipx`
 | `python-dotenv` | ==1.2.2 | Chargement `.env` |
 | `argon2-cffi` | >=25.1,<26 | Hachage de mots de passe (Auth/User) |
 
-**Philosophie :** Forge vise un minimum de dépendances runtime. Les trois
-dépendances fondamentales sont `mariadb`, `jinja2` et `python-dotenv` ;
-`argon2-cffi` n'est utilisée que pour le hachage des mots de passe
-(Auth/User). Toutes sont installées par défaut. Les dépendances spécifiques
-aux modules opt-in ne sont installées que via le bon extra ou le paquet opt-in, `pyotp` pour MFA, **`Pillow>=10.0,<13` pour l'opt-in `forge-mvc-images`**
-(traitement d'images, retiré du core par l'ADR-018), voir « Dépendances
-optionnelles » ci-dessous.
+**Philosophie :** Forge vise un minimum de dépendances runtime.
+Les trois dépendances fondamentales sont `mariadb`, `jinja2` et `python-dotenv` ; `argon2-cffi` n'est utilisée que pour le hachage des mots de passe (Auth/User).
+Toutes sont installées par défaut.
+Les dépendances spécifiques aux modules opt-in ne sont installées que via le bon extra ou le paquet opt-in, `pyotp` pour MFA, **`Pillow>=10.0,<13` pour l'opt-in `forge-mvc-images`** (traitement d'images, retiré du core par l'ADR-018), voir « Dépendances optionnelles »
+ci-dessous.
 
 ---
 
 ## Dépendances optionnelles
 
-Les modules opt-in de Forge ont leurs propres dépendances, qui ne sont
-pas installées par défaut. Elles sont tirées via les extras du package
-`forge-mvc`.
+Les modules opt-in de Forge ont leurs propres dépendances, qui ne sont pas installées par défaut.
+Elles sont tirées via les extras du package `forge-mvc`.
 
 | Extra | Module | Dépendances additionnelles |
 |---|---|---|
@@ -137,17 +129,9 @@ pas installées par défaut. Elles sont tirées via les extras du package
 ### Installation
 
 !!! info "Les opt-ins officiels sont distribués séparément sur PyPI"
-    Les modules opt-in (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`,
-    `forge-mvc-mfa`, `forge-mvc-iot`, `forge-mvc-files`, `forge-mvc-images`,
-    `forge-mvc-audio`, `forge-mvc-video`, `forge-mvc-pivot`, `forge-mvc-mail`,
-    `forge-mvc-i18n`, et les briques plus récentes) sont distribués séparément
-    sur PyPI en préversion, synchronisés avec le core.
+    Les modules opt-in (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`, `forge-mvc-iot`, `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-video`, `forge-mvc-pivot`, `forge-mvc-mail`, `forge-mvc-i18n`, et les briques plus récentes) sont distribués séparément sur PyPI en préversion, synchronisés avec le core.
 
-    La maturité par paquet fait foi dans le classifier `Development Status` de
-    chaque `pyproject.toml` et dans [release-policy.md](release-policy.md) : la
-    plupart des opt-ins sont en Bêta ; les backends `forge-mvc-postgres` et
-    `forge-mvc-mssql` restent en Alpha (dialecte et adaptateur livrés,
-    intégration bout-en-bout à valider).
+    La maturité par paquet fait foi dans le classifier `Development Status` de chaque `pyproject.toml` et dans [release-policy.md](release-policy.md) : la plupart des opt-ins sont en Bêta ; les backends `forge-mvc-postgres` et `forge-mvc-mssql` restent en Alpha (dialecte et adaptateur livrés, intégration bout-en-bout à valider).
 
     Les opt-ins restent optionnels : le core Forge ne dépend d'aucun d'eux.
 
@@ -173,16 +157,16 @@ git clone --branch {{forge_tag}} https://github.com/caucrogeGit/Forge.git
 cd Forge && pip install -e . && pip install -r requirements-dev.txt
 ```
 
-**Note sur MFA** : le module `forge-mvc-mfa` est en statut Beta
-(`Development Status :: 4 - Beta`). Le secret TOTP est chiffré au repos via
-Fernet (`FORGE_MFA_SECRET_KEY`). Publié sur PyPI depuis `1.0.0-beta.9`.
+**Note sur MFA** : le module `forge-mvc-mfa` est en statut Beta (`Development Status :: 4 - Beta`).
+Le secret TOTP est chiffré au repos via Fernet (`FORGE_MFA_SECRET_KEY`).
+Publié sur PyPI depuis `1.0.0-beta.9`.
 
 ---
 
 ## Dépendances de développement
 
-Ces dépendances ne sont pas incluses dans la wheel Forge. Elles sont requises
-pour travailler sur le code source de Forge.
+Ces dépendances ne sont pas incluses dans la wheel Forge.
+Elles sont requises pour travailler sur le code source de Forge.
 
 | Paquet | Version minimum | Usage |
 |---|---|---|
@@ -228,8 +212,7 @@ Les tests unitaires Forge tournent sans base de données et sans MariaDB install
 pytest
 ```
 
-Ils couvrent : CLI, générateurs, templates, RBAC, Auth/User, sécurité, CSRF,
-sessions, mails, médias, pages publiques, migrations SQL (SQLite en mémoire).
+Ils couvrent : CLI, générateurs, templates, RBAC, Auth/User, sécurité, CSRF, sessions, mails, médias, pages publiques, migrations SQL (SQLite en mémoire).
 
 ---
 
@@ -246,8 +229,8 @@ FORGE_E2E_MARIADB=1 pytest tests/test_e2e_mariadb.py
 - MariaDB démarré et accessible sur `127.0.0.1:3306`.
 - Utilisateur MariaDB autorisé à créer des bases commençant par `forge_e2e_`.
 
-Ces tests sont lancés manuellement avant les releases. Ils ne font pas partie
-de la CI automatique sur push.
+Ces tests sont lancés manuellement avant les releases.
+Ils ne font pas partie de la CI automatique sur push.
 
 ---
 
@@ -265,16 +248,10 @@ de la CI automatique sur push.
 
 ## Politique de mise à jour des dépendances
 
-- Les versions fixes (`mariadb==1.1.14`, `jinja2==3.1.6`, `python-dotenv==1.2.2`)
-  sont mises à jour délibérément après audit de compatibilité.
-- Les versions bornées (`argon2-cffi>=25.1,<26` pour le core ;
-  `Pillow>=10.0,<13` pour l'opt-in `forge-mvc-images`) suivent les nouvelles
-  releases mineures compatibles.
-- Les dépendances d'extras (ex. `pyotp>=2.9,<3` pour `[mfa]`) suivent
-  la même politique, vérifiée dans le `pyproject.toml` du package opt-in
-  correspondant.
-- Chaque mise à jour de dépendance fait l'objet d'un commit dédié avec
-  justification dans le CHANGELOG.
+- Les versions fixes (`mariadb==1.1.14`, `jinja2==3.1.6`, `python-dotenv==1.2.2`) sont mises à jour délibérément après audit de compatibilité.
+- Les versions bornées (`argon2-cffi>=25.1,<26` pour le core ; `Pillow>=10.0,<13` pour l'opt-in `forge-mvc-images`) suivent les nouvelles releases mineures compatibles.
+- Les dépendances d'extras (ex. `pyotp>=2.9,<3` pour `[mfa]`) suivent la même politique, vérifiée dans le `pyproject.toml` du package opt-in correspondant.
+- Chaque mise à jour de dépendance fait l'objet d'un commit dédié avec justification dans le CHANGELOG.
 - Un audit `pip-audit` est recommandé avant chaque release :
 
 ```bash

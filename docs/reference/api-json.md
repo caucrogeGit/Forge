@@ -6,8 +6,7 @@
 
 ## Objectif
 
-Forge propose une capacité JSON légère pour construire des endpoints simples
-sans transformer le framework en moteur d'API.
+Forge propose une capacité JSON légère pour construire des endpoints simples sans transformer le framework en moteur d'API.
 
 ```text
 réponse JSON explicite
@@ -70,9 +69,8 @@ Content-Type: application/json; charset=utf-8
 {"status": "ok"}
 ```
 
-`json_response` sérialise tout type compatible `json.dumps` : `dict`, `list`,
-`str`, `int`, `float`, `bool`, `None`. Lève `ValueError` si les données ne
-sont pas sérialisables.
+`json_response` sérialise tout type compatible `json.dumps` : `dict`, `list`, `str`, `int`, `float`, `bool`, `None`.
+Lève `ValueError` si les données ne sont pas sérialisables.
 
 ---
 
@@ -223,8 +221,8 @@ Pas d'héritage spécifique requis, un contrôleur API est une fonction Python o
 ## Routes API séparées
 
 Les routes API se déclarent dans un fichier optionnel `mvc/api_routes.py`.
-Si ce fichier est absent, l'application fonctionne normalement. S'il est présent,
-il est chargé automatiquement par `Application` au démarrage.
+Si ce fichier est absent, l'application fonctionne normalement.
+S'il est présent, il est chargé automatiquement par `Application` au démarrage.
 
 ```python
 # mvc/api_routes.py
@@ -239,12 +237,11 @@ def register_api_routes(router):
                 csrf=False)
 ```
 
-Les routes HTML restent dans `mvc/routes.py`. Les deux fichiers partagent
-le même routeur mais sont séparés organisationnellement.
+Les routes HTML restent dans `mvc/routes.py`.
+Les deux fichiers partagent le même routeur mais sont séparés organisationnellement.
 
-Le flag `api=True` est déclaratif, il identifie les routes API sans modifier
-leur comportement. Le flag `csrf=False` est recommandé pour les routes API
-qui reçoivent du JSON, car elles utilisent le token Bearer plutôt que le CSRF.
+Le flag `api=True` est déclaratif, il identifie les routes API sans modifier leur comportement.
+Le flag `csrf=False` est recommandé pour les routes API qui reçoivent du JSON, car elles utilisent le token Bearer plutôt que le CSRF.
 
 ---
 
@@ -373,8 +370,8 @@ curl -H "Authorization: Bearer changeme-en-production" \
 - **Ne pas exposer `API_TOKEN` dans Git**, utilisez `env/prod` hors versionnement.
 - **Ne pas afficher le token dans les logs**, le module `api_auth` ne le logue jamais.
 - **Rotation des tokens**, changer `API_TOKEN` régulièrement en production.
-- **Auth minimale**, cette approche est adaptée aux projets simples. Pour une application
-  SaaS publique ou multi-utilisateur, envisagez JWT ou OAuth dans un ticket futur.
+- **Auth minimale**, cette approche est adaptée aux projets simples.
+  Pour une application SaaS publique ou multi-utilisateur, envisagez JWT ou OAuth dans un ticket futur.
 
 ---
 

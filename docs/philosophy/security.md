@@ -1,13 +1,10 @@
 # Sécurité
 
 !!! tip "Guide production"
-    Pour les bonnes pratiques de déploiement sécurisé (checklist, secrets, HTTPS,
-    cookies, headers, CSRF, uploads, logs), voir
-    **[Sécurité en production](../deployment/production-security.md)**.
+    Pour les bonnes pratiques de déploiement sécurisé (checklist, secrets, HTTPS, cookies, headers, CSRF, uploads, logs), voir **[Sécurité en production](../deployment/production-security.md)**.
 
 !!! info "Auth/User avancée"
-    Pour l'authentification complète (login, MFA, OIDC, sessions, audit, CLI admin),
-    voir **[Authentification Forge](../features/auth.md)**.
+    Pour l'authentification complète (login, MFA, OIDC, sessions, audit, CLI admin), voir **[Authentification Forge](../features/auth.md)**.
 
 ## Socle de sécurité
 
@@ -25,13 +22,16 @@ Le RBAC complet (`Role`, `Permission`, `@require_permission`, `make_can`…) est
 
 ### TLS du serveur de développement
 
-Le serveur HTTPS intégré à Forge impose explicitement **TLS 1.2 minimum** (`ssl.TLSVersion.TLSv1_2`). Il est destiné au développement local, à la pédagogie et aux tests, pas à la production.
+Le serveur HTTPS intégré à Forge impose explicitement **TLS 1.2 minimum** (`ssl.TLSVersion.TLSv1_2`).
+Il est destiné au développement local, à la pédagogie et aux tests, pas à la production.
 
-**En production, TLS doit être terminé par Nginx** ou un reverse proxy équivalent. Forge écoute en HTTP local derrière Nginx.
+**En production, TLS doit être terminé par Nginx** ou un reverse proxy équivalent.
+Forge écoute en HTTP local derrière Nginx.
 
 ### Nonce CSP
 
-Forge inclut par défaut l'en-tête `Content-Security-Policy` avec `script-src 'self'`. Pour autoriser des scripts inline contrôlés sans affaiblir la CSP avec `unsafe-inline`, activez le mécanisme de nonce :
+Forge inclut par défaut l'en-tête `Content-Security-Policy` avec `script-src 'self'`.
+Pour autoriser des scripts inline contrôlés sans affaiblir la CSP avec `unsafe-inline`, activez le mécanisme de nonce :
 
 ```dotenv
 APP_CSP_NONCE_ENABLED=true
@@ -41,13 +41,15 @@ APP_CSP_NONCE_ENABLED=true
 <script nonce="{{ csp_nonce() }}">/* script inline autorisé */</script>
 ```
 
-`unsafe-inline` n'est jamais ajouté automatiquement. Voir [la référence CSP](../core-security/csp.md) pour les détails.
+`unsafe-inline` n'est jamais ajouté automatiquement.
+Voir [la référence CSP](../core-security/csp.md) pour les détails.
 
 ---
 
 ## En-têtes de sécurité
 
-Forge applique des en-têtes HTTP de sécurité par défaut sur toutes les réponses (200, 302, 404, fichiers statiques, erreurs). Ces en-têtes sont des garde-fous par défaut, ils ne remplacent pas une configuration de déploiement complète.
+Forge applique des en-têtes HTTP de sécurité par défaut sur toutes les réponses (200, 302, 404, fichiers statiques, erreurs).
+Ces en-têtes sont des garde-fous par défaut, ils ne remplacent pas une configuration de déploiement complète.
 
 ### Contrat actuel
 
@@ -69,11 +71,13 @@ default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:;
 frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'
 ```
 
-`unsafe-inline` et `unsafe-eval` ne sont jamais ajoutés automatiquement. Pour les scripts inline contrôlés, activer le nonce par requête (`APP_CSP_NONCE_ENABLED=true`, voir section Nonce CSP ci-dessus).
+`unsafe-inline` et `unsafe-eval` ne sont jamais ajoutés automatiquement.
+Pour les scripts inline contrôlés, activer le nonce par requête (`APP_CSP_NONCE_ENABLED=true`, voir section Nonce CSP ci-dessus).
 
 ### HSTS
 
-Forge émet `Strict-Transport-Security` sur toutes les réponses, y compris en HTTP local. En développement, cet en-tête est inoffensif mais techniquement redondant. **En production, HTTPS doit être terminé par Nginx** ou un reverse proxy équivalent.
+Forge émet `Strict-Transport-Security` sur toutes les réponses, y compris en HTTP local. En développement, cet en-tête est inoffensif mais techniquement redondant.
+**En production, HTTPS doit être terminé par Nginx** ou un reverse proxy équivalent.
 
 ### Limites
 
@@ -83,7 +87,8 @@ Ces en-têtes ne remplacent pas :
 - une revue de sécurité des templates applicatifs ;
 - une politique de déploiement sécurisé complète (voir [Sécurité en production](../deployment/production-security.md)).
 
-Forge ne promet pas une sécurité complète par défaut. Les en-têtes fournis sont des garde-fous raisonnables, testés et verrouillés comme contrat public (`SECURITY-HEADERS-DOC-LOCK-001`).
+Forge ne promet pas une sécurité complète par défaut.
+Les en-têtes fournis sont des garde-fous raisonnables, testés et verrouillés comme contrat public (`SECURITY-HEADERS-DOC-LOCK-001`).
 
 ### Ce que Forge n'émet pas encore
 
@@ -94,24 +99,16 @@ Forge ne promet pas une sécurité complète par défaut. Les en-têtes fournis 
 
 ## Service de fichiers : défense symlinks (UPLOADS-SYMLINK-DEFENSE-001)
 
-Les fichiers publics servis par Forge (route `/static/...` par `app.py`, route
-`/media/...` servie par le module d'upload optionnel)
-**ne doivent pas traverser de symlinks**. Les chemins sont résolus via
-`os.path.realpath()` / `Path.resolve()` puis vérifiés par `os.path.commonpath()` :
-toute cible résolue hors de la racine autorisée (`static/`, `storage/uploads/`)
-fait échouer le check et la requête retourne `403` (statics) ou `404` (media).
+Les fichiers publics servis par Forge (route `/static/...` par `app.py`, route `/media/...` servie par le module d'upload optionnel) **ne doivent pas traverser de symlinks**.
+Les chemins sont résolus via `os.path.realpath()` / `Path.resolve()` puis vérifiés par `os.path.commonpath()` : toute cible résolue hors de la racine autorisée (`static/`, `storage/uploads/`) fait échouer le check et la requête retourne `403` (statics) ou `404` (media).
 
 Cette défense couvre :
 
-- les symlinks **fichier** dans `static/` ou `storage/uploads/` pointant
-  vers un fichier hors racine (`/etc/passwd`, etc.) ;
-- les symlinks **répertoire** intermédiaires dans le chemin demandé
-  (`uploads/dir_link/secret.txt` où `dir_link → /tmp/secret_dir`) ;
+- les symlinks **fichier** dans `static/` ou `storage/uploads/` pointant vers un fichier hors racine (`/etc/passwd`, etc.) ;
+- les symlinks **répertoire** intermédiaires dans le chemin demandé (`uploads/dir_link/secret.txt` où `dir_link → /tmp/secret_dir`) ;
 - les `..` classiques de path traversal.
 
-Le contrat est verrouillé par
-[`tests/test_uploads_symlink_defense_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/test_uploads_symlink_defense_001.py)
-(12 tests, dont 3 garde-fous source-level sur `app.py`).
+Le contrat est verrouillé par [`tests/test_uploads_symlink_defense_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/test_uploads_symlink_defense_001.py) (12 tests, dont 3 garde-fous source-level sur `app.py`).
 ## Store de session configurable
 
 Forge accepte un store de session explicite via :
@@ -121,15 +118,12 @@ import core.forge as forge
 forge.configure(session_store=my_store)
 ```
 
-Le store doit implémenter le protocole `SessionStore` (`core.sessions.contract`) :
-`create`, `get`, `set`, `replace`, `delete`, `regenerate`, `authenticate`,
-`touch_expiry`, `set_flash`, `get_flash`.
+Le store doit implémenter le protocole `SessionStore` (`core.sessions.contract`) : `create`, `get`, `set`, `replace`, `delete`, `regenerate`, `authenticate`, `touch_expiry`, `set_flash`, `get_flash`.
 
-Le store par défaut est `MemorySessionStore` (mono-processus, sessions perdues au
-redémarrage). Passer `None` réinitialise à ce comportement par défaut.
+Le store par défaut est `MemorySessionStore` (mono-processus, sessions perdues au redémarrage).
+Passer `None` réinitialise à ce comportement par défaut.
 
-Trois backends sont disponibles dans `core.sessions` :
-`MemorySessionStore`, `FileSessionStore`, `MariaDbSessionStore`.
+Trois backends sont disponibles dans `core.sessions` : `MemorySessionStore`, `FileSessionStore`, `MariaDbSessionStore`.
 Leur documentation complète est traitée dans le ticket SESSIONS-STORE-CONTRACT-DOC-001.
 
 ---

@@ -1,23 +1,18 @@
 # Charte graphique : « Accessible chaleureux »
 
-Document de référence de l'identité visuelle du squelette : palette, typographie,
-rayons et règles d'usage. La source unique de ces valeurs est le bloc `@theme`
-de `static/src/input.css` ; cette page en explique le **sens**.
+Document de référence de l'identité visuelle du squelette : palette, typographie, rayons et règles d'usage.
+La source unique de ces valeurs est le bloc `@theme` de `static/src/input.css` ; cette page en explique le **sens**.
 
-Pour apprendre à modifier la charte pas à pas, voir le palier
-[La charte graphique](debutant/charte.md).
+Pour apprendre à modifier la charte pas à pas, voir le palier [La charte graphique](debutant/charte.md).
 
 ## Esprit
 
-Une interface **chaleureuse et lisible** : fonds crème plutôt que blanc pur,
-la couleur primaire **orange Forge** (signature de la marque), un accent ocre
-ponctuel, et une hiérarchie de texte nette. L'objectif est un service clair, à
-fort contraste, sans surcharge.
+Une interface **chaleureuse et lisible** : fonds crème plutôt que blanc pur, la couleur primaire **orange Forge** (signature de la marque), un accent ocre ponctuel, et une hiérarchie de texte nette.
+L'objectif est un service clair, à fort contraste, sans surcharge.
 
 ## Palette
 
-Chaque couleur est un token `--color-<nom>` qui génère les utilitaires Tailwind
-`bg-<nom>`, `text-<nom>`, `border-<nom>`.
+Chaque couleur est un token `--color-<nom>` qui génère les utilitaires Tailwind `bg-<nom>`, `text-<nom>`, `border-<nom>`.
 
 ### Primaire et accent
 
@@ -54,10 +49,8 @@ Chaque couleur est un token `--color-<nom>` qui génère les utilitaires Tailwin
 | Corps et titres | `--font-sans` | Figtree | `font-sans` |
 | Code et données techniques | `--font-mono` | JetBrains Mono | `font-mono` |
 
-Graisses employées : `font-medium` (texte courant accentué), `font-semibold`
-(libellés, liens), `font-bold` et `font-extrabold` (titres). Les polices sont
-chargées dans `layouts/base.html` ; en repli, la pile `system-ui` prend le
-relais.
+Graisses employées : `font-medium` (texte courant accentué), `font-semibold` (libellés, liens), `font-bold` et `font-extrabold` (titres).
+Les polices sont chargées dans `layouts/base.html` ; en repli, la pile `system-ui` prend le relais.
 
 ## Formes
 
@@ -65,26 +58,22 @@ relais.
 |---|---|---|---|
 | `--radius-card` | `16px` | `rounded-card` | cartes, panneaux, modale |
 
-Les boutons et champs utilisent un rayon plus serré (`rounded-[10px]`) pour
-contraster avec les cartes.
+Les boutons et champs utilisent un rayon plus serré (`rounded-[10px]`) pour contraster avec les cartes.
 
 ## Règles d'usage
 
 - **Primaire avec parcimonie** : `forge` (orange Forge) signale l'action principale et les liens.
   Évitez de le multiplier sur une même vue.
 - **Ocre = accent, pas décor** : réservé aux signaux (champ requis, attention).
-- **Hiérarchie du texte** : `ink` pour le contenu fort, `muted` pour le
-  secondaire, `subtle` pour les libellés, `faint` pour la méta. Ne sautez pas
-  d'un titre `ink` directement à `faint`.
-- **Profondeur sobre** : `cream` pour la page, `surface` pour ce qui est posé
-  dessus (cartes, en-tête), `line` pour délimiter. Pas d'ombres lourdes.
-- **Contraste** : la charte vise un bon contraste (esprit RGAA) ; vérifiez-le si
-  vous changez les tokens.
+- **Hiérarchie du texte** : `ink` pour le contenu fort, `muted` pour le secondaire, `subtle` pour les libellés, `faint` pour la méta.
+  Ne sautez pas d'un titre `ink` directement à `faint`.
+- **Profondeur sobre** : `cream` pour la page, `surface` pour ce qui est posé dessus (cartes, en-tête), `line` pour délimiter.
+  Pas d'ombres lourdes.
+- **Contraste** : la charte vise un bon contraste (esprit RGAA) ; vérifiez-le si vous changez les tokens.
 
 ## Personnaliser
 
-Modifiez les valeurs dans le bloc `@theme` de `static/src/input.css`, puis
-reconstruisez le CSS (`npm run build:css` ou `npm run watch:css`). Tout ce qui
-utilise les utilitaires correspondants suit, sans toucher aux templates.
+Modifiez les valeurs dans le bloc `@theme` de `static/src/input.css`, puis reconstruisez le CSS (`npm run build:css` ou `npm run watch:css`).
+Tout ce qui utilise les utilitaires correspondants suit, sans toucher aux templates.
 
 Voir aussi : [Récapitulatif des composants](recapitulatif.md).

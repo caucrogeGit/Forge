@@ -10,8 +10,7 @@ Chaque composant est une **macro Jinja** : importez-la, puis appelez-la.
 {% from "components/interactive.html" import modal, modal_trigger %}
 ```
 
-Les composants marqués **`{% call %}`** enveloppent un contenu :
-`{% call card() %} ... {% endcall %}`.
+Les composants marqués **`{% call %}`** enveloppent un contenu : `{% call card() %} ... {% endcall %}`.
 
 ## `components/ui.html`
 
@@ -44,9 +43,8 @@ Les composants marqués **`{% call %}`** enveloppent un contenu :
 | `submit` | `submit(label="Envoyer")` | bouton d'envoi pleine largeur |
 
 !!! note "Validation"
-    Passez `error="message"` à `field`, `textarea_field` ou `select_field` pour
-    la bordure rouge et le message. La balise `<form>` et le jeton CSRF
-    (`{% include "partials/csrf.html" %}`) restent à votre charge.
+    Passez `error="message"` à `field`, `textarea_field` ou `select_field` pour la bordure rouge et le message.
+    La balise `<form>` et le jeton CSRF (`{% include "partials/csrf.html" %}`) restent à votre charge.
 
 ## `components/data.html`
 
@@ -69,8 +67,7 @@ HTML natif, sans framework JavaScript.
 
 ## Personnaliser
 
-La charte (couleurs, police, rayons) vit dans `static/src/input.css` (bloc
-`@theme`). Ces macros sont **votre code** : étendez-les ou ajoutez les vôtres
-dans `mvc/views/components/`, en réutilisant les tokens de la charte.
+La charte (couleurs, police, rayons) vit dans `static/src/input.css` (bloc `@theme`).
+Ces macros sont **votre code** : étendez-les ou ajoutez les vôtres dans `mvc/views/components/`, en réutilisant les tokens de la charte.
 
 Voir le parcours pas à pas : [Préambule du système de design](installation.md).

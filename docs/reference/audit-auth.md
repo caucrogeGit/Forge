@@ -1,6 +1,7 @@
 # Audit Auth : Journalisation des événements d'authentification
 
-`log_auth_event()` est la fonction centrale pour journaliser les événements d'authentification dans Forge. Elle émet des messages via le logger Python `forge.auth.audit`, sans jamais accéder à la base de données et sans jamais propager d'exception.
+`log_auth_event()` est la fonction centrale pour journaliser les événements d'authentification dans Forge.
+Elle émet des messages via le logger Python `forge.auth.audit`, sans jamais accéder à la base de données et sans jamais propager d'exception.
 
 ### Niveaux de log
 
@@ -40,7 +41,8 @@ logging.getLogger("forge.auth.audit").setLevel(logging.INFO)
 
 ## Cookies de session : Attributs de sécurité
 
-Tous les cookies `session_id` émis par Forge portent `HttpOnly`, `SameSite=Strict`, `Secure` et `Path=/`. Le flag `Secure` est toujours actif quelle que soit la valeur de `app_env`.
+Tous les cookies `session_id` émis par Forge portent `HttpOnly`, `SameSite=Strict`, `Secure` et `Path=/`.
+Le flag `Secure` est toujours actif quelle que soit la valeur de `app_env`.
 
 | Point d'émission | Action | Attributs |
 |---|---|---|
@@ -52,19 +54,24 @@ Tous les cookies `session_id` émis par Forge portent `HttpOnly`, `SameSite=Stri
 
 ### Contenu et stockage
 
-La valeur du cookie est un token hexadécimal opaque de 64 caractères (`secrets.token_hex(32)`). Aucune donnée utilisateur ne transite dans le cookie. Les données de session sont stockées côté serveur uniquement.
+La valeur du cookie est un token hexadécimal opaque de 64 caractères (`secrets.token_hex(32)`).
+Aucune donnée utilisateur ne transite dans le cookie.
+Les données de session sont stockées côté serveur uniquement.
 
 ### Protection contre la fixation de session
 
-`authentifier_session()` génère un nouveau `session_id` à chaque login et supprime l'ancien. Le cookie pré-authentification ne peut pas être réutilisé après connexion.
+`authentifier_session()` génère un nouveau `session_id` à chaque login et supprime l'ancien.
+Le cookie pré-authentification ne peut pas être réutilisé après connexion.
 
 ### Logout
 
-Le logout émet `session_id=; Max-Age=0` (expiration côté client) et appelle `supprimer_session()` (invalidation côté serveur). Les mêmes attributs de sécurité sont conservés sur la réponse de logout.
+Le logout émet `session_id=; Max-Age=0` (expiration côté client) et appelle `supprimer_session()` (invalidation côté serveur).
+Les mêmes attributs de sécurité sont conservés sur la réponse de logout.
 
 ### Comportement dev / prod
 
-Le flag `Secure` est présent en dev et en prod. Forge suppose un accès HTTPS ou proxy TLS dans tous les environnements.
+Le flag `Secure` est présent en dev et en prod.
+Forge suppose un accès HTTPS ou proxy TLS dans tous les environnements.
 
 ### Limites
 
@@ -91,15 +98,14 @@ Forge émet les headers de sécurité suivants sur **toutes** les réponses (200
 
 ### Content-Security-Policy
 
-La CSP est construite par `core/security/csp.py`. Par défaut, sans nonce :
+La CSP est construite par `core/security/csp.py`.
+Par défaut, sans nonce :
 
 ```
 default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'
 ```
 
-Avec `APP_CSP_NONCE_ENABLED=true`, chaque requête reçoit un nonce unique et
-`script-src` inclut `'nonce-<valeur>'`, les scripts inline portant ce nonce
-sont autorisés sans `unsafe-inline`.
+Avec `APP_CSP_NONCE_ENABLED=true`, chaque requête reçoit un nonce unique et `script-src` inclut `'nonce-<valeur>'`, les scripts inline portant ce nonce sont autorisés sans `unsafe-inline`.
 
 La CSP ne contient jamais `unsafe-inline` ni `unsafe-eval`.
 
@@ -118,26 +124,24 @@ La CSP ne contient jamais `unsafe-inline` ni `unsafe-eval`.
 
 `default-src 'self'` ne couvre pas :
 
-- **`img-src`** sans `data:` bloque les images encodées en base64 (cas légitimes : SVG inline, avatars, placeholders générés par JS). La directive `img-src 'self' data:` les autorise explicitement.
-- **`form-action`** n'a pas de fallback sur `default-src` selon la spécification CSP. Sans déclaration, n'importe quelle URL peut être destination d'un `<form>`. La directive `form-action 'self'` ferme ce trou.
+- **`img-src`** sans `data:` bloque les images encodées en base64 (cas légitimes : SVG inline, avatars, placeholders générés par JS).
+  La directive `img-src 'self' data:` les autorise explicitement.
+- **`form-action`** n'a pas de fallback sur `default-src` selon la spécification CSP.
+  Sans déclaration, n'importe quelle URL peut être destination d'un `<form>`.
+  La directive `form-action 'self'` ferme ce trou.
 
 ### HSTS
 
-`Strict-Transport-Security: max-age=31536000; includeSubDomains` est émis sur
-toutes les réponses, y compris en développement local. Forge suppose que toute
-configuration (y compris dev) passe par HTTPS ou un proxy TLS (cohérent avec
-le flag `Secure` sur les cookies).
+`Strict-Transport-Security: max-age=31536000; includeSubDomains` est émis sur toutes les réponses, y compris en développement local. Forge suppose que toute configuration (y compris dev) passe par HTTPS ou un proxy TLS (cohérent avec le flag `Secure` sur les cookies).
 
 ### Limites restantes
 
 - `Cache-Control: no-store` absent sur les pages HTML authentifiées (login, admin).
-  Le navigateur peut mettre ces pages en cache local. Ticket futur :
-  `SECURITY-CACHE-001`.
-- La CSP ne liste pas explicitement `font-src` et `connect-src`
-  (couverts par `default-src 'self'`). `img-src` et `form-action` sont
-  déclarés explicitement (voir section ci-dessus).
-- `Permissions-Policy` ne couvre pas exhaustivement toutes les API navigateur
-  (gyroscope, accelerometer, usb…). Complément dans un ticket futur si nécessaire.
+  Le navigateur peut mettre ces pages en cache local. Ticket futur : `SECURITY-CACHE-001`.
+- La CSP ne liste pas explicitement `font-src` et `connect-src` (couverts par `default-src 'self'`).
+  `img-src` et `form-action` sont déclarés explicitement (voir section ci-dessus).
+- `Permissions-Policy` ne couvre pas exhaustivement toutes les API navigateur (gyroscope, accelerometer, usb…).
+  Complément dans un ticket futur si nécessaire.
 
 ### Tests
 
@@ -154,11 +158,14 @@ le flag `Secure` sur les cookies).
 
 ### Architecture
 
-Tout fichier uploadé transite par la chaîne : `validate_upload_metadata()` → `save_bytes()` → `normalize_media_path()`. Chaque étape est indépendante et peut échouer sans laisser d'état partiel.
+Tout fichier uploadé transite par la chaîne : `validate_upload_metadata()` → `save_bytes()` → `normalize_media_path()`.
+Chaque étape est indépendante et peut échouer sans laisser d'état partiel.
 
 ### Racine contrôlée
 
-La racine de stockage (défaut `storage/uploads/`) est lue depuis la variable d'environnement `UPLOAD_ROOT` par le module d'upload optionnel (ADR-032). Tout accès au système de fichiers (lecture, écriture, suppression) passe par `os.path.commonpath()` pour vérifier le confinement. Les chemins persistés en base sont **toujours relatifs** à cette racine.
+La racine de stockage (défaut `storage/uploads/`) est lue depuis la variable d'environnement `UPLOAD_ROOT` par le module d'upload optionnel (ADR-032).
+Tout accès au système de fichiers (lecture, écriture, suppression) passe par `os.path.commonpath()` pour vérifier le confinement.
+Les chemins persistés en base sont **toujours relatifs** à cette racine.
 
 ### Anti-path-traversal (`normalize_media_path`)
 
@@ -174,35 +181,52 @@ Les chemins encodés `%2e%2e` ne sont **pas** URL-décodés, ils sont traités c
 
 ### Extensions : liste blanche
 
-Par défaut : `jpg`, `jpeg`, `png`, `webp`, `pdf`. Refusées (non dans la liste) : `.php`, `.py`, `.html`, `.js`, `.svg`, `.sh`, `.exe`, `.env`, etc.
+Par défaut : `jpg`, `jpeg`, `png`, `webp`, `pdf`.
+Refusées (non dans la liste) : `.php`, `.py`, `.html`, `.js`, `.svg`, `.sh`, `.exe`, `.env`, etc.
 
-La validation porte sur la **dernière extension** du fichier. `photo.php.jpg` est accepté si `.jpg` est autorisé, limite documentée. `photo.jpg.php` est refusé car `.php` n'est pas autorisé.
+La validation porte sur la **dernière extension** du fichier.
+`photo.php.jpg` est accepté si `.jpg` est autorisé, limite documentée.
+`photo.jpg.php` est refusé car `.php` n'est pas autorisé.
 
 ### MIME
 
-Le MIME est extrait du `Content-Type` fourni par le client. Les paramètres (`; charset=binary`) sont ignorés. La casse est normalisée. **Limite** : Forge ne vérifie pas la signature binaire du fichier (magic bytes). Un fichier dangereux renommé avec une extension autorisée et un Content-Type valide est accepté. Corriger nécessiterait `python-magic` (hors périmètre).
+Le MIME est extrait du `Content-Type` fourni par le client.
+Les paramètres (`; charset=binary`) sont ignorés.
+La casse est normalisée.
+**Limite** : Forge ne vérifie pas la signature binaire du fichier (magic bytes).
+Un fichier dangereux renommé avec une extension autorisée et un Content-Type valide est accepté.
+Corriger nécessiterait `python-magic` (hors périmètre).
 
 ### Taille
 
-Configurable via `UPLOAD_MAX_SIZE` (défaut : 5 Mo). Fichier vide (0 octet) accepté. Taille négative refusée. La vérification de la `Content-Length` HTTP est faite avant le parsing du body.
+Configurable via `UPLOAD_MAX_SIZE` (défaut : 5 Mo).
+Fichier vide (0 octet) accepté.
+Taille négative refusée.
+La vérification de la `Content-Length` HTTP est faite avant le parsing du body.
 
 ### Noms de fichiers
 
-`secure_filename()` retire les chemins (basename uniquement), remplace espaces et caractères spéciaux par `_`, supprime les null bytes. `generate_unique_filename()` ajoute un UUID hex, impossible de prédire ou d'écraser un fichier existant.
+`secure_filename()` retire les chemins (basename uniquement), remplace espaces et caractères spéciaux par `_`, supprime les null bytes.
+`generate_unique_filename()` ajoute un UUID hex, impossible de prédire ou d'écraser un fichier existant.
 
 ### Catégories
 
-Les répertoires de catégorie (`images`, `documents`, `tmp`) sont validés par regex `^[A-Za-z0-9_-]+$`. Toute catégorie contenant `/`, `..`, espace ou caractère spécial est refusée.
+Les répertoires de catégorie (`images`, `documents`, `tmp`) sont validés par regex `^[A-Za-z0-9_-]+$`.
+Toute catégorie contenant `/`, `..`, espace ou caractère spécial est refusée.
 
 ### Route /media
 
-GET `/media/<path>` → `_serve_media()` → `serve_media_file()` → `normalize_media_path()` → `media_path_to_storage_path()`. Le path traversal via l'URL est bloqué avant toute lecture de fichier.
+GET `/media/<path>` → `_serve_media()` → `serve_media_file()` → `normalize_media_path()` → `media_path_to_storage_path()`.
+Le path traversal via l'URL est bloqué avant toute lecture de fichier.
 
 ### Limites restantes
 
-- Pas de test HTTP multipart réel (cycle POST complet). Ticket futur : `E2E-UPLOAD-HTTP-001`.
-- Pas de validation de la signature binaire (magic bytes). Limit MIME spoofing documentée.
-- Pas de rate limit sur les uploads (DoS upload). Ticket futur si nécessaire.
+- Pas de test HTTP multipart réel (cycle POST complet).
+  Ticket futur : `E2E-UPLOAD-HTTP-001`.
+- Pas de validation de la signature binaire (magic bytes).
+  Limit MIME spoofing documentée.
+- Pas de rate limit sur les uploads (DoS upload).
+  Ticket futur si nécessaire.
 - Pas de scan antivirus intégré.
 
 ### Tests

@@ -1,11 +1,9 @@
 # Les composants interactifs
 
-**Objectif** : ajouter un accordéon, un menu déroulant et une modale de
-confirmation, sans aucun framework JavaScript.
+**Objectif** : ajouter un accordéon, un menu déroulant et une modale de confirmation, sans aucun framework JavaScript.
 
-**Ce que vous allez apprendre :** `components/interactive.html` s'appuie sur les
-éléments natifs `<details>` (accordéon, menu) et `<dialog>` (modale). Fidèle à
-la charte : pas de magie, pas de dépendance JS imposée.
+**Ce que vous allez apprendre :** `components/interactive.html` s'appuie sur les éléments natifs `<details>` (accordéon, menu) et `<dialog>` (modale).
+Fidèle à la charte : pas de magie, pas de dépendance JS imposée.
 
 ## Accordéon (zéro JS)
 
@@ -17,8 +15,7 @@ la charte : pas de magie, pas de dépendance JS imposée.
 {% endcall %}
 ```
 
-L'ouverture et la fermeture sont natives (`<details>`), sans une ligne de
-JavaScript.
+L'ouverture et la fermeture sont natives (`<details>`), sans une ligne de JavaScript.
 
 ## Menu déroulant (zéro JS)
 
@@ -33,9 +30,7 @@ JavaScript.
 
 ## Modale de confirmation
 
-La modale utilise l'élément natif `<dialog>` : un bouton l'ouvre via
-`showModal()` (méthode native, pas un framework), et le formulaire
-`method="dialog"` la ferme sans JavaScript.
+La modale utilise l'élément natif `<dialog>` : un bouton l'ouvre via `showModal()` (méthode native, pas un framework), et le formulaire `method="dialog"` la ferme sans JavaScript.
 
 ```jinja
 {% from "components/interactive.html" import modal, modal_trigger %}
@@ -68,14 +63,13 @@ Côté contrôleur, branchez la route de suppression (l'action `<form>` ci-dessu
 public.add("POST", "/showcase/delete", ShowcaseController.delete, name="showcase-delete")
 ```
 
-La modale confirme, le formulaire poste vers `/showcase/delete`, et le flash
-« Contact supprimé. » s'affiche au retour (via `flash_messages`).
+La modale confirme, le formulaire poste vers `/showcase/delete`, et le flash « Contact supprimé.
+»
+s'affiche au retour (via `flash_messages`).
 
 ??? note "À retenir"
     - `accordion` et `dropdown` reposent sur `<details>` : zéro JavaScript.
-    - `modal` repose sur `<dialog>` : ouverture via `showModal()` natif,
-      fermeture via `<form method="dialog">`.
-    - Les versions animées (htmx / alpine) relèveront d'un choix frontend
-      séparé ; le squelette n'impose aucun framework.
+    - `modal` repose sur `<dialog>` : ouverture via `showModal()` natif, fermeture via `<form method="dialog">`.
+    - Les versions animées (htmx / alpine) relèveront d'un choix frontend séparé ; le squelette n'impose aucun framework.
 
 [Voir le bilan du parcours](bilan.md)

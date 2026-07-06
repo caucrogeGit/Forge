@@ -24,12 +24,10 @@ Ce fichier JSONL est la **source unique de vérité** des erreurs runtime de dé
 - Il est actif uniquement en `APP_ENV=dev`.
 - Le rendu Markdown (`errors.dev.md`) est régénéré automatiquement après chaque écriture.
 - La future vue Forge Design lira ce fichier directement.
-- Il n'est jamais la source de réponse HTTP. La page `errors/500.html` reste
-  statique en production. En `APP_ENV=dev`, le dispatcher lui passe en plus un
-  contexte `error` (type, message, trace) construit par
-  `build_dev_error_context()`, et le template affiche la cause si le bloc
-  `{% if error %}` est présent. Aucune trace n'est exposée en production
-  (`build_dev_error_context()` retourne `None` hors dev).
+- Il n'est jamais la source de réponse HTTP.
+  La page `errors/500.html` reste statique en production.
+  En `APP_ENV=dev`, le dispatcher lui passe en plus un contexte `error` (type, message, trace) construit par `build_dev_error_context()`, et le template affiche la cause si le bloc `{% if error %}` est présent.
+  Aucune trace n'est exposée en production (`build_dev_error_context()` retourne `None` hors dev).
 
 ---
 
@@ -166,7 +164,8 @@ Les erreurs runtime collectées en production sont majoritairement `ERROR`.
 
 ### safe_for_display
 
-Le champ `safe_for_display: false` (valeur par défaut) signifie que le `message` **ne peut pas** être affiché au visiteur. Il peut contenir des informations techniques internes.
+Le champ `safe_for_display: false` (valeur par défaut) signifie que le `message` **ne peut pas** être affiché au visiteur.
+Il peut contenir des informations techniques internes.
 
 Un message est `safe_for_display: true` uniquement s'il a été explicitement composé pour l'affichage (ex : message de validation métier).
 
@@ -255,7 +254,8 @@ except RuntimeError as exc:
 
 ## Collecteur : core/errors/runtime_error_logger.py
 
-Le collecteur est dans `core/errors/runtime_error_logger.py`. Il est branché sur `core/app/application.py`.
+Le collecteur est dans `core/errors/runtime_error_logger.py`.
+Il est branché sur `core/app/application.py`.
 
 **Comportement en `APP_ENV=dev` :**
 
@@ -284,7 +284,8 @@ except RuntimeError as exc:
 
 ## Rendu Markdown : core/errors/runtime_error_markdown.py
 
-Le rendu Markdown est dans `core/errors/runtime_error_markdown.py`. Il est déclenché automatiquement après chaque écriture JSONL.
+Le rendu Markdown est dans `core/errors/runtime_error_markdown.py`.
+Il est déclenché automatiquement après chaque écriture JSONL.
 
 ```text
 storage/logs/errors.dev.jsonl  →  storage/logs/errors.dev.md

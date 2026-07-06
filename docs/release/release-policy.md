@@ -56,12 +56,9 @@ Incrémenter `PATCH` pour :
 - tests supplémentaires sans modification du comportement observable ;
 - corrections de lint ou de format sans impact fonctionnel.
 
-**Exemples de tickets PATCH :**
-`SECURITY-HEADERS-001` (ajout Permissions-Policy sans changement API),
-`SECURITY-COOKIES-001` (audit sans modification de l'API de session).
+**Exemples de tickets PATCH :** `SECURITY-HEADERS-001` (ajout Permissions-Policy sans changement API), `SECURITY-COOKIES-001` (audit sans modification de l'API de session).
 
-**Règle d'or :** si un projet existant en Forge 1.x fonctionne sans modification
-après la mise à jour, c'est un PATCH.
+**Règle d'or :** si un projet existant en Forge 1.x fonctionne sans modification après la mise à jour, c'est un PATCH.
 
 ---
 
@@ -77,13 +74,9 @@ Incrémenter `MINOR` pour :
 - ajout d'API publique sans supprimer l'existante ;
 - nouvelle brique optionnelle (ex. Auth/User, module Forge).
 
-**Exemples de tickets MINOR :**
-`AUTH-MFA-002` (nouvelle fonctionnalité Auth),
-`MODULE-LIFECYCLE-001` (nouvelle commande `module:install`),
-`CRUD-HTMX-001` (comportement CRUD optionnel supplémentaire).
+**Exemples de tickets MINOR :** `AUTH-MFA-002` (nouvelle fonctionnalité Auth), `MODULE-LIFECYCLE-001` (nouvelle commande `module:install`), `CRUD-HTMX-001` (comportement CRUD optionnel supplémentaire).
 
-**Règle d'or :** si un projet existant fonctionne sans modification mais peut
-bénéficier des nouvelles fonctionnalités en opt-in, c'est un MINOR.
+**Règle d'or :** si un projet existant fonctionne sans modification mais peut bénéficier des nouvelles fonctionnalités en opt-in, c'est un MINOR.
 
 ---
 
@@ -99,8 +92,7 @@ Incrémenter `MAJOR` pour :
 - modification incompatible du schéma des fichiers générés (controllers, models, vues) ;
 - changement de configuration incompatible (clés `.env` renommées ou supprimées).
 
-**Règle d'or :** si un projet existant doit être modifié pour fonctionner après
-la mise à jour, c'est un MAJOR.
+**Règle d'or :** si un projet existant doit être modifié pour fonctionner après la mise à jour, c'est un MAJOR.
 
 **Ce qui n'est PAS un MAJOR :**
 
@@ -140,14 +132,12 @@ Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la
 
 ## Stratégie de classification PyPI
 
-> **Note RC** : en `{{forge_version}}` (release candidate), la **version** est une
-> préversion finale, mais le classifier `Development Status` reste `4 - Beta`.
-> PyPI ne propose pas de classifier « Release Candidate » distinct ; le signal
-> RC passe donc par le numéro de version (PEP 440 `rc`), pas par le classifier.
+> **Note RC** : en `{{forge_version}}` (release candidate), la **version** est une préversion finale, mais le classifier `Development Status` reste `4 - Beta`.
+> PyPI ne propose pas de classifier « Release Candidate »
+> distinct ; le signal RC passe donc par le numéro de version (PEP 440 `rc`), pas par le classifier.
 > Le passage à `5 - Production/Stable` se fera avec la `1.0.0` stable.
 
-Les classifiers `Development Status` reflètent la maturité réelle de
-chaque package publiable :
+Les classifiers `Development Status` reflètent la maturité réelle de chaque package publiable :
 
 | Package | Classifier | Justification |
 |---|---|---|
@@ -185,8 +175,7 @@ Critères de passage Beta → Stable d'un module opt-in :
 - Documentation complète et exemples à jour
 - Tests à 100 % des branches critiques
 
-La règle s'applique de manière indépendante à chaque package : le
-passage de `forge-mvc` à Stable ne tire pas les opt-in avec lui.
+La règle s'applique de manière indépendante à chaque package : le passage de `forge-mvc` à Stable ne tire pas les opt-in avec lui.
 
 ---
 
@@ -194,17 +183,14 @@ passage de `forge-mvc` à Stable ne tire pas les opt-in avec lui.
 
 ### main doit rester stable
 
-- `main` est la branche de référence. Elle doit toujours être dans un état
-  déployable et testé.
-- Les développements en cours peuvent être regroupés sur `main` entre les
-  releases, à condition que chaque commit soit validé (tests passants).
-- Un commit de release est distingué des commits de développement par un
-  message `release: preparer forge x.y.z`.
+- `main` est la branche de référence.
+  Elle doit toujours être dans un état déployable et testé.
+- Les développements en cours peuvent être regroupés sur `main` entre les releases, à condition que chaque commit soit validé (tests passants).
+- Un commit de release est distingué des commits de développement par un message `release: preparer forge x.y.z`.
 
 ### Format de tag
 
-Les tags Git Forge suivent la convention **SemVer publique**, jamais la
-forme PEP 440 :
+Les tags Git Forge suivent la convention **SemVer publique**, jamais la forme PEP 440 :
 
 ```
 vX.Y.Z              # stable
@@ -225,15 +211,11 @@ v1.0.0-beta.10
 - Les tags utilisent le préfixe `v` (minuscule).
 - Les tags sont annotés (`git tag -a`).
 - Le tag est créé sur le commit de release, après validation complète.
-- **Ne PAS utiliser** la forme PEP 440 pour les tags (`v<major>.<minor>.<patch>bN`
-  est interdit). Le tag suit toujours la forme publique lisible, la
-  version PEP 440 reste limitée à `pyproject.toml`, `core/__init__.py`,
-  `forge.py` et la publication PyPI. Voir
-  `RELEASE-VALIDATE-PEP440-SEMVERSION-001`.
+- **Ne PAS utiliser** la forme PEP 440 pour les tags (`v<major>.<minor>.<patch>bN` est interdit).
+  Le tag suit toujours la forme publique lisible, la version PEP 440 reste limitée à `pyproject.toml`, `core/__init__.py`, `forge.py` et la publication PyPI.
+  Voir `RELEASE-VALIDATE-PEP440-SEMVERSION-001`.
 
-L'utilitaire `tools/release-validate.sh --convert semver <pep440>` produit
-le suffixe SemVer correspondant à la version PEP 440 courante, c'est la
-source de vérité pour construire le nom de tag depuis la version Python.
+L'utilitaire `tools/release-validate.sh --convert semver <pep440>` produit le suffixe SemVer correspondant à la version PEP 440 courante, c'est la source de vérité pour construire le nom de tag depuis la version Python.
 
 ### Immuabilité des tags publiés
 
@@ -245,8 +227,8 @@ Si une erreur est détectée après publication :
 - Créer un nouveau tag de correctif (ex. `v1.2.1`).
 - Ne pas modifier le tag `v1.2.0`.
 
-Seuls les tags locaux non poussés peuvent être corrigés. Une fois poussé,
-le tag est immuable.
+Seuls les tags locaux non poussés peuvent être corrigés.
+Une fois poussé, le tag est immuable.
 
 ---
 
@@ -265,35 +247,28 @@ pip-audit -r requirements-dev.txt
 npm audit --omit=dev
 ```
 
-Aucune dérogation n'est tolérée. Si une validation échoue, le ticket doit
-être corrigé avant le tag.
+Aucune dérogation n'est tolérée.
+Si une validation échoue, le ticket doit être corrigé avant le tag.
 
-L'ensemble est aussi vérifié automatiquement par
-[`tools/release-validate.sh`](https://github.com/caucrogeGit/Forge/blob/main/tools/release-validate.sh) (sections 1 à 12).
+L'ensemble est aussi vérifié automatiquement par [`tools/release-validate.sh`](https://github.com/caucrogeGit/Forge/blob/main/tools/release-validate.sh) (sections 1 à 12).
 
-Voir aussi [Procédure de release](release.md) pour la checklist complète
-incluant la construction de la wheel.
+Voir aussi [Procédure de release](release.md) pour la checklist complète incluant la construction de la wheel.
 
 ### Audits dépendances
 
-Les audits de dépendances peuvent exister en surveillance continue, mais
-une release Forge ne doit être validée que si les audits Python et Node
-passent en mode **bloquant**. Deux contextes coexistent :
+Les audits de dépendances peuvent exister en surveillance continue, mais une release Forge ne doit être validée que si les audits Python et Node passent en mode **bloquant**.
+Deux contextes coexistent :
 
 | Contexte | Outil | Mode | Effet d'une CVE |
 |---|---|---|---|
 | Surveillance hebdomadaire | [`.github/workflows/dependency-audit.yml`](https://github.com/caucrogeGit/Forge/blob/main/.github/workflows/dependency-audit.yml) | **Informatif** (`continue-on-error: true`) | Rapport visible dans l'historique Actions, aucun blocage |
 | Validation release | [`tools/release-validate.sh`](https://github.com/caucrogeGit/Forge/blob/main/tools/release-validate.sh), sections 8 (`pip-audit`) et 9 (`npm audit --omit=dev`) | **Bloquant** | Échec immédiat, release impossible |
 
-Cette séparation évite de bloquer le développement quotidien sur une
-CVE transitoire (typiquement le délai entre la publication d'un avis et
-la disponibilité d'un patch upstream), tout en garantissant qu'aucune
-release Forge ne sort avec un audit dépendances rouge.
+Cette séparation évite de bloquer le développement quotidien sur une CVE transitoire (typiquement le délai entre la publication d'un avis et la disponibilité d'un patch upstream), tout en garantissant qu'aucune release Forge ne sort avec un audit dépendances rouge.
 
 Aucun masquage par `|| true` ou `continue-on-error: true` n'est toléré
-dans le chemin de validation release. Si une CVE bloque, le ticket de
-correction dépendance doit être ouvert et résolu avant la release,
-pas contourné.
+dans le chemin de validation release.
+Si une CVE bloque, le ticket de correction dépendance doit être ouvert et résolu avant la release, pas contourné.
 
 ---
 
@@ -314,8 +289,7 @@ pipx install dist/forge_mvc-X.Y.Z-py3-none-any.whl --force
 forge --version
 ```
 
-Voir [Validation locale](release-local.md) pour la procédure complète des
-parcours pédagogiques.
+Voir [Validation locale](release-local.md) pour la procédure complète des parcours pédagogiques.
 
 ---
 
@@ -410,8 +384,8 @@ Précautions spécifiques à PyPI :
 - Ne jamais publier un build non validé localement.
 - Mettre à jour `CHANGELOG.md` avant la publication.
 
-PyPI n'est pas automatisé dans la procédure actuelle. La publication
-reste manuelle et délibérée.
+PyPI n'est pas automatisé dans la procédure actuelle.
+La publication reste manuelle et délibérée.
 
 ---
 
@@ -437,8 +411,10 @@ reste manuelle et délibérée.
 
 ### Règles de version
 
-- **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` était bumped à chaque release. Les opt-ins source-only conservaient leur version interne.
-- Depuis `1.0.0-beta.9`, les opt-ins (`rbac`, `workflow`, `stats`, `mfa`) sont publiés sur PyPI et strictement synchronisés avec la version du core ; `iot` les a rejoints en `1.0.0-beta.12`, puis `files`, `images`, `audio`, `video`, `pivot` et `mail` en `1.0.0-beta.13`, et `i18n` (extrait en `1.0.0-beta.15`) ensuite. **Les opt-ins officiels** sont désormais publiés et synchronisés.
+- **Jusqu'à `1.0.0-beta.4`** : seul le core `forge-mvc` était bumped à chaque release.
+  Les opt-ins source-only conservaient leur version interne.
+- Depuis `1.0.0-beta.9`, les opt-ins (`rbac`, `workflow`, `stats`, `mfa`) sont publiés sur PyPI et strictement synchronisés avec la version du core ; `iot` les a rejoints en `1.0.0-beta.12`, puis `files`, `images`, `audio`, `video`, `pivot` et `mail` en `1.0.0-beta.13`, et `i18n` (extrait en `1.0.0-beta.15`) ensuite.
+  **Les opt-ins officiels** sont désormais publiés et synchronisés.
 
 ### Artefacts de build
 
@@ -466,9 +442,7 @@ Aucune automatisation ne déclenche la publication.
 ### État actuel
 
 `forge-mvc` (core) est publié sur PyPI depuis `1.0.0-beta.1`.
-**Les opt-ins officiels** (voir `packages/` pour la liste à jour) sont publiés
-sur PyPI et synchronisés avec le core, de même que les backends de base de
-données (`forge-mvc-mariadb`, `-sqlite`, `-postgres`, `-mssql`).
+**Les opt-ins officiels** (voir `packages/` pour la liste à jour) sont publiés sur PyPI et synchronisés avec le core, de même que les backends de base de données (`forge-mvc-mariadb`, `-sqlite`, `-postgres`, `-mssql`).
 Les règles applicables à chaque package restent documentées ici.
 
 Cette politique est livrée par le ticket `OPTIN-PACKAGES-PUBLICATION-POLICY-001`.
@@ -482,19 +456,14 @@ Il est le point d'entrée officiel du framework.
 
 Les opt-ins officiels ont été publiés sur PyPI au fil des bêtas :
 
-- `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) : publication
-  initiale en `1.0.0-beta.5` ;
+- `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats` (Bêta) : publication initiale en `1.0.0-beta.5` ;
 - `forge-mvc-mfa` (Beta) : publication en `1.0.0-beta.9` ;
 - `forge-mvc-iot` (Beta) : publication en `1.0.0-beta.12` ;
-- `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-video`,
-  `forge-mvc-pivot`, `forge-mvc-mail` : publication en `1.0.0-beta.13` ;
-- `forge-mvc-i18n` (Bêta) : extrait du core en `1.0.0-beta.15` (ADR-027),
-  publié et synchronisé avec le core.
+- `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-video`, `forge-mvc-pivot`, `forge-mvc-mail` : publication en `1.0.0-beta.13` ;
+- `forge-mvc-i18n` (Bêta) : extrait du core en `1.0.0-beta.15` (ADR-027), publié et synchronisé avec le core.
 
-Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et
-`forge-mvc[all]` sont disponibles via `pip install --pre forge-mvc[all]`.
-Les autres opt-ins ne sont pas déclarés comme extras : les installer
-directement avec `pip install --pre forge-mvc-<nom>`.
+Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et `forge-mvc[all]` sont disponibles via `pip install --pre forge-mvc[all]`.
+Les autres opt-ins ne sont pas déclarés comme extras : les installer directement avec `pip install --pre forge-mvc-<nom>`.
 
 ### Historique : opt-ins source-only avant publication PyPI
 
@@ -506,8 +475,7 @@ Avant leur publication PyPI, les opt-ins `forge-mvc-rbac`, `forge-mvc-workflow` 
 
 ### Opt-ins publiés et synchronisés
 
-Les opt-ins officiels sont publiés sur PyPI avec une version
-synchronisée avec le core :
+Les opt-ins officiels sont publiés sur PyPI avec une version synchronisée avec le core :
 
 | Package | Publication | Statut | Prérequis |
 |---|---|---|---|
@@ -536,17 +504,15 @@ La publication est strictement synchronisée : core et opt-ins portent la même 
 - le secret TOTP est chiffré au repos via Fernet (`SEC-MFA-SECRET-ENCRYPTION-001`) ;
 - `FORGE_MFA_SECRET_KEY` obligatoire au démarrage.
 
-Le secret TOTP chiffré au repos et la clé obligatoire au démarrage sont les
-acquis qui ont permis le passage en Beta. Voir auth-mfa pour la checklist.
+Le secret TOTP chiffré au repos et la clé obligatoire au démarrage sont les acquis qui ont permis le passage en Beta.
+Voir auth-mfa pour la checklist.
 
 ### Extras PyPI
 
 Les extras `forge-mvc[rbac]`, `forge-mvc[workflow]`, `forge-mvc[stats]` et `forge-mvc[all]` sont disponibles pour les opt-ins publiés.
 
-Seuls `rbac`, `workflow` et `stats` sont déclarés comme extras de
-`forge-mvc[all]`. Les autres opt-ins (`mfa`, `files`, `images`, `audio`,
-`video`, `iot`, `pivot`, `mail`) ne sont **pas déclarés** dans les extras
-PyPI : les installer directement avec `pip install --pre forge-mvc-<nom>`.
+Seuls `rbac`, `workflow` et `stats` sont déclarés comme extras de `forge-mvc[all]`.
+Les autres opt-ins (`mfa`, `files`, `images`, `audio`, `video`, `iot`, `pivot`, `mail`) ne sont **pas déclarés** dans les extras PyPI : les installer directement avec `pip install --pre forge-mvc-<nom>`.
 
 ### Règles de version
 
@@ -604,22 +570,21 @@ Chaque release doit avoir une entrée dans `CHANGELOG.md` avec la structure :
 - Tests ajoutés (TICKET-006).
 ```
 
-Ne lister que les sections non vides. Chaque entrée référence le ticket associé.
+Ne lister que les sections non vides.
+Chaque entrée référence le ticket associé.
 
 ---
 
 ## Roadmap et tickets
 
-La roadmap (`docs/roadmap/forge-roadmap.md`) est la source de vérité
-pour l'état d'avancement des tickets.
+La roadmap (`docs/roadmap/forge-roadmap.md`) est la source de vérité pour l'état d'avancement des tickets.
 
 Règles :
 
 - Un ticket livré doit être marqué `**livré**` dans la roadmap.
 - La prochaine priorité doit être indiquée clairement dans la roadmap.
 - Les limites restantes doivent être reportées dans les tickets futurs.
-- Les tickets futurs doivent être bornés, ne pas créer de tickets ouverts sans
-  critères d'acceptation.
+- Les tickets futurs doivent être bornés, ne pas créer de tickets ouverts sans critères d'acceptation.
 - La roadmap ne doit pas lister des ambitions non bornées comme des tickets actifs.
 
 ---

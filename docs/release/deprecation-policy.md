@@ -1,7 +1,6 @@
 # Politique de dépréciation Forge
 
-Ce document définit comment Forge annonce, maintient puis retire progressivement
-les fonctionnalités obsolètes, remplacées ou incompatibles.
+Ce document définit comment Forge annonce, maintient puis retire progressivement les fonctionnalités obsolètes, remplacées ou incompatibles.
 
 Il complète :
 
@@ -21,8 +20,7 @@ Chaque suppression d'un élément stable passe par un cycle explicite :
 Annonce → Maintien → Retrait
 ```
 
-Les projets en Forge 1.x ne doivent jamais se retrouver cassés après une
-mise à jour mineure.
+Les projets en Forge 1.x ne doivent jamais se retrouver cassés après une mise à jour mineure.
 
 ---
 
@@ -66,9 +64,7 @@ Les éléments suivants ne peuvent pas être supprimés sans cycle de déprécia
 - Format JSON canonique des entités (v1).
 - Comportement de `GET /health`.
 
-Les éléments **internes** ou **expérimentaux** (voir
-[Contrat de stabilité](stability-contract.md)) peuvent changer sans
-cycle de dépréciation.
+Les éléments **internes** ou **expérimentaux** (voir [Contrat de stabilité](stability-contract.md)) peuvent changer sans cycle de dépréciation.
 
 ---
 
@@ -85,16 +81,14 @@ Version (N+1) : retrait possible
 
 ### Durée minimale de maintien
 
-**Règle :** une fonctionnalité stable dépréciée reste disponible au moins jusqu'à la
-prochaine version MAJOR.
+**Règle :** une fonctionnalité stable dépréciée reste disponible au moins jusqu'à la prochaine version MAJOR.
 
 | Déprécié en | Maintenu jusqu'au moins | Retiré possible dès |
 |---|---|---|
 | une mineure `1.x` (ex. `1.2.0`) | Fin de la série `1.x` | la prochaine version majeure |
 | une mineure `1.x` (quelconque) | Fin de la série `1.x` | la prochaine version majeure |
 
-**Exception :** une vulnérabilité de sécurité grave peut imposer un retrait
-immédiat sans respecter cette durée (voir la section Exceptions de sécurité ci-dessous).
+**Exception :** une vulnérabilité de sécurité grave peut imposer un retrait immédiat sans respecter cette durée (voir la section Exceptions de sécurité ci-dessous).
 
 ---
 
@@ -132,8 +126,8 @@ def _warn_cmd_deprecated() -> None:
 
 ### Retrait
 
-Retirer la commande dans la version MAJOR suivante. Documenter le retrait dans
-le CHANGELOG sous `### Supprimé`.
+Retirer la commande dans la version MAJOR suivante.
+Documenter le retrait dans le CHANGELOG sous `### Supprimé`.
 
 ---
 
@@ -157,25 +151,23 @@ def ancienne_fonction():
     return nouvelle_fonction()
 ```
 
-Ajouter dans `CHANGELOG.md` et dans `docs/auth.md` ou `docs/reference.md`
-la mention de la dépréciation.
+Ajouter dans `CHANGELOG.md` et dans `docs/auth.md` ou `docs/reference.md` la mention de la dépréciation.
 
 ### Maintien pendant la série 1.x
 
-La fonction dépréciée reste fonctionnelle. Elle délègue à la nouvelle
-implémentation ou conserve son comportement original.
+La fonction dépréciée reste fonctionnelle.
+Elle délègue à la nouvelle implémentation ou conserve son comportement original.
 
 ### Exemple concret : core.security.hashing
 
-`core.security.hashing` (PBKDF2 legacy) est déprécié en faveur de
-`core.auth.password` (Argon2id). Il reste disponible pour la
-compatibilité et la migration transparente des anciens hashes. Son retrait
-est prévu dans la trajectoire 1.x stable.
+`core.security.hashing` (PBKDF2 legacy) est déprécié en faveur de `core.auth.password` (Argon2id).
+Il reste disponible pour la compatibilité et la migration transparente des anciens hashes.
+Son retrait est prévu dans la trajectoire 1.x stable.
 
 ### Retrait
 
-Supprimer le module ou la fonction dans la version MAJOR. Documenter
-la migration dans le guide de migration (`RELEASE-MIGRATION-GUIDE-001`).
+Supprimer le module ou la fonction dans la version MAJOR.
+Documenter la migration dans le guide de migration (`RELEASE-MIGRATION-GUIDE-001`).
 
 ---
 
@@ -183,8 +175,7 @@ la migration dans le guide de migration (`RELEASE-MIGRATION-GUIDE-001`).
 
 ### Annonce
 
-Documenter dans `docs/reference.md` que l'option est dépréciée,
-quelle option utiliser à la place, et depuis quelle version.
+Documenter dans `docs/reference.md` que l'option est dépréciée, quelle option utiliser à la place, et depuis quelle version.
 
 ### Avertissement runtime
 
@@ -196,8 +187,7 @@ Utiliser --nouveau-flag à la place.
 Suppression prévue : prochaine version MAJOR.
 ```
 
-L'option continue de fonctionner (elle est relayée vers la nouvelle option
-si applicable).
+L'option continue de fonctionner (elle est relayée vers la nouvelle option si applicable).
 
 ### Retrait
 
@@ -215,26 +205,24 @@ Retirer l'option dans la version MAJOR suivante.
 
 ### Règle
 
-Ne pas casser les projets existants en silence. Documenter :
+Ne pas casser les projets existants en silence.
+Documenter :
 
 - quelle convention est dépréciée ;
 - quelle convention la remplace ;
 - depuis quand ;
 - si Forge peut migrer automatiquement ou si une action manuelle est nécessaire.
 
-Si une migration automatique est possible (ex. `forge migrate:config`),
-la proposer sans l'imposer.
+Si une migration automatique est possible (ex. `forge migrate:config`), la proposer sans l'imposer.
 
 ---
 
 ## Fichiers générés et compatibilité
 
-Les fichiers générés une fois (contrôleurs, modèles, vues) ne sont pas régénérés
-automatiquement. Une modification du gabarit de génération n'affecte pas les
-fichiers existants.
+Les fichiers générés une fois (contrôleurs, modèles, vues) ne sont pas régénérés automatiquement.
+Une modification du gabarit de génération n'affecte pas les fichiers existants.
 
-Cependant, si le comportement attendu d'un fichier généré change et que les
-anciens fichiers deviennent incompatibles :
+Cependant, si le comportement attendu d'un fichier généré change et que les anciens fichiers deviennent incompatibles :
 
 - Documenter clairement ce qui a changé dans le CHANGELOG.
 - Proposer un guide de migration dans `docs/` ou `CHANGELOG.md`.
@@ -297,8 +285,7 @@ Avant le retrait :
 
 ## Exceptions de sécurité
 
-Une vulnérabilité de sécurité grave peut imposer un retrait ou une modification
-incompatible sans respecter le cycle normal de dépréciation.
+Une vulnérabilité de sécurité grave peut imposer un retrait ou une modification incompatible sans respecter le cycle normal de dépréciation.
 
 Conditions pour une exception de sécurité :
 
@@ -310,8 +297,7 @@ Dans ce cas :
 
 - Publier une version corrective (`PATCH` ou `MINOR`) en urgence.
 - Documenter l'exception dans `CHANGELOG.md` sous `### Sécurité`.
-- Mentionner explicitement que la rupture de compatibilité est due à une
-  contrainte de sécurité.
+- Mentionner explicitement que la rupture de compatibilité est due à une contrainte de sécurité.
 - Proposer un chemin de migration aussi court que possible.
 
 ---
@@ -329,8 +315,7 @@ Dans ce cas :
 
 - **Déprécié pendant** : le développement pré-1.0 (frontier API `core.auth` vs `core.security`).
 - **Alternative** : `core.auth.password` (Argon2id).
-- **Maintien** : PBKDF2 reste disponible pour vérifier d'anciens hashes et
-  effectuer la migration transparente.
+- **Maintien** : PBKDF2 reste disponible pour vérifier d'anciens hashes et effectuer la migration transparente.
 - **Retrait prévu** : Forge 1.x stable.
 - **Référence** : ticket `AUTH-LEGACY-BOUNDARY-001`.
 

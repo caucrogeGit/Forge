@@ -4,12 +4,9 @@ Votre page showcase est habillée et structurée.
 
 ## Ce que vous avez vu
 
-- **La charte** vit dans le bloc `@theme` de `static/src/input.css` ;
-  chaque token devient un utilitaire Tailwind, et recolorer revient à éditer un
-  token.
+- **La charte** vit dans le bloc `@theme` de `static/src/input.css` ; chaque token devient un utilitaire Tailwind, et recolorer revient à éditer un token.
 - **Le gabarit** `layouts/base.html` fournit l'enveloppe ; vos pages l'étendent.
-- **`navbar`**, **`breadcrumb`** et **`page_header`** posent la navigation et
-  l'en-tête de la page.
+- **`navbar`**, **`breadcrumb`** et **`page_header`** posent la navigation et l'en-tête de la page.
 
 ## À retenir
 
@@ -20,7 +17,6 @@ Votre page showcase est habillée et structurée.
 
 La page a une ossature mais pas encore de contenu.
 
-Le niveau intermédiaire la remplit : cartes, badges, statistiques, puis un
-formulaire avec validation.
+Le niveau intermédiaire la remplit : cartes, badges, statistiques, puis un formulaire avec validation.
 
 [Niveau intermédiaire : Cartes, badges et retours](../intermediaire/cartes.md)

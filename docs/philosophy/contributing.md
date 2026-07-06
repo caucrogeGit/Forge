@@ -1,7 +1,6 @@
 # Contribuer à Forge
 
-Ce guide explique comment contribuer au framework Forge de façon correcte et
-durable, en respectant la philosophie et les règles du projet.
+Ce guide explique comment contribuer au framework Forge de façon correcte et durable, en respectant la philosophie et les règles du projet.
 
 ---
 
@@ -161,7 +160,8 @@ Règles à respecter lors de toute modification :
 - **Préserver les fichiers utilisateur**, les fichiers générés marqués comme préservés ne doivent jamais être écrasés sans `--force` explicite.
 - **Ne pas casser les générateurs**, `make:entity`, `make:crud`, `sync:entity` doivent continuer à fonctionner.
 - **Ne pas changer une convention stable**, un changement de convention (nommage, structure JSON, format de fichier) sans ticket de dépréciation est une rupture de contrat.
-- **Ne pas ajouter de dépendance sans nécessité**, les dépendances runtime du core sont limitées à `mariadb`, `jinja2`, `python-dotenv`, `argon2-cffi`, `jsonschema`. Les dépendances des modules optionnels (par exemple le second facteur TOTP ou le traitement d'image) ne font pas partie du core.
+- **Ne pas ajouter de dépendance sans nécessité**, les dépendances runtime du core sont limitées à `mariadb`, `jinja2`, `python-dotenv`, `argon2-cffi`, `jsonschema`.
+  Les dépendances des modules optionnels (par exemple le second facteur TOTP ou le traitement d'image) ne font pas partie du core.
 - **Ne pas modifier la version**, la version dans `pyproject.toml` / `forge.py` / `core/__init__.py` n'est modifiée que par un ticket release dédié.
 - **Ne pas créer de tag manuellement**, les tags de version sont créés en suivant la [Procédure de release](../release/release.md).
 
@@ -169,7 +169,8 @@ Règles à respecter lors de toute modification :
 
 ## Ajouter ou modifier les tests
 
-Chaque nouvelle brique doit avoir ses tests. Forge distingue plusieurs types :
+Chaque nouvelle brique doit avoir ses tests.
+Forge distingue plusieurs types :
 
 | Type | Localisation | Rôle |
 |---|---|---|
@@ -185,17 +186,15 @@ Chaque nouvelle brique doit avoir ses tests. Forge distingue plusieurs types :
 
 ### Tests MariaDB opt-in
 
-Les tests E2E avec une vraie base MariaDB ne s'exécutent que si la variable
-d'environnement `FORGE_E2E_MARIADB=1` est définie. La base doit avoir un
-nom préfixé `forge_e2e_` pour éviter tout écrasement accidentel d'une base
-de développement ou de production.
+Les tests E2E avec une vraie base MariaDB ne s'exécutent que si la variable d'environnement `FORGE_E2E_MARIADB=1` est définie.
+La base doit avoir un nom préfixé `forge_e2e_` pour éviter tout écrasement accidentel d'une base de développement ou de production.
 
 ```bash
 FORGE_E2E_MARIADB=1 pytest tests/test_e2e_mariadb.py
 ```
 
-Ces tests ne sont pas requis dans la suite standard. Ils sont optionnels et
-documentés dans la [Matrice de compatibilité](../release/compatibility.md).
+Ces tests ne sont pas requis dans la suite standard.
+Ils sont optionnels et documentés dans la [Matrice de compatibilité](../release/compatibility.md).
 
 ### Règles pour les tests
 
@@ -203,49 +202,45 @@ documentés dans la [Matrice de compatibilité](../release/compatibility.md).
 - Les fixtures `tmp_path` et `monkeypatch.chdir` isolent les tests CLI et E2E.
 - `apply_model_sql` est moquée dans les tests E2E starters pour ne pas dépendre de MariaDB.
 - Un test qui modifie `sys.path` ou l'état global doit nettoyer après lui.
-- **Tests méta dans `tests/meta/`**, tout test qui lit principalement des fichiers de documentation, vérifie une roadmap, une version déclarée, un classifier, l'absence d'une chaîne interdite, une frontière d'import ou un invariant textuel doit vivre dans `tests/meta/`, pas à la racine de `tests/`. Chaque fichier `tests/meta/` doit porter `pytestmark = pytest.mark.meta`.
+- **Tests méta dans `tests/meta/`**, tout test qui lit principalement des fichiers de documentation, vérifie une roadmap, une version déclarée, un classifier, l'absence d'une chaîne interdite, une frontière d'import ou un invariant textuel doit vivre dans `tests/meta/`, pas à la racine de `tests/`.
+  Chaque fichier `tests/meta/` doit porter `pytestmark = pytest.mark.meta`.
 
 ### Règle behavior-first
 
 Un test méta vérifie une convention ou un invariant statique.
 Un test comportemental exécute Forge.
 
-Quand Forge expose une commande, une API, une génération ou un flux runtime,
-le test prioritaire doit exécuter ce comportement réellement. Un test méta
-peut compléter ce test, mais ne doit pas être la seule preuve du comportement.
+Quand Forge expose une commande, une API, une génération ou un flux runtime, le test prioritaire doit exécuter ce comportement réellement.
+Un test méta peut compléter ce test, mais ne doit pas être la seule preuve du comportement.
 
 Les tests méta restent adaptés :
 
 - aux invariants documentaires (sections attendues dans un guide, une roadmap) ;
 - aux politiques et frontières d'import (absences de symboles retirés) ;
 - aux chaînes interdites ou aux vérifications de version dans les docstrings ;
-- aux invariants impossibles à exécuter sans environnement externe (base de données,
-  réseau, infra complète).
+- aux invariants impossibles à exécuter sans environnement externe (base de données, réseau, infra complète).
 
-Quand un comportement peut être exécuté dans un test unitaire ou avec
-`tmp_path`, il doit l'être. Un test comportemental fort rend son test méta
-complémentaire optionnel, pas l'inverse.
+Quand un comportement peut être exécuté dans un test unitaire ou avec `tmp_path`, il doit l'être.
+Un test comportemental fort rend son test méta complémentaire optionnel, pas l'inverse.
 
 **Exemples de tests déjà behavior-first dans Forge :**
 
-- `test_forge_help_safe_flag_001.py`, vérifie via subprocess que `--help` n'exécute
-  aucune logique métier ;
-- `test_modules_explicit_routes_001.py`, génère réellement des routes dans un
-  répertoire temporaire ;
-- `test_doctor_mfa_warning_001.py`, appelle `check_mfa_dependency` avec un
-  environnement contrôlé et vérifie le message retourné ;
-- `test_module_routes_injection_remove_001.py`, appelle `install_module_manifest`
-  et vérifie que `mvc/routes.py` n'est pas touché.
+- `test_forge_help_safe_flag_001.py`, vérifie via subprocess que `--help` n'exécute aucune logique métier ;
+- `test_modules_explicit_routes_001.py`, génère réellement des routes dans un répertoire temporaire ;
+- `test_doctor_mfa_warning_001.py`, appelle `check_mfa_dependency` avec un environnement contrôlé et vérifie le message retourné ;
+- `test_module_routes_injection_remove_001.py`, appelle `install_module_manifest` et vérifie que `mvc/routes.py` n'est pas touché.
 
 ### Politique de rotation des tests méta
 
 #### Pourquoi des tests méta ?
 
-Les tests méta vérifient des invariants qui ne peuvent pas être couverts par des tests comportementaux : cohérence documentaire, absence d'une dépendance interdite, respect d'une frontière d'import, conformité d'un fichier de configuration statique. Ils protègent la lisibilité et la maintenabilité du projet sans exécuter de code runtime.
+Les tests méta vérifient des invariants qui ne peuvent pas être couverts par des tests comportementaux : cohérence documentaire, absence d'une dépendance interdite, respect d'une frontière d'import, conformité d'un fichier de configuration statique.
+Ils protègent la lisibilité et la maintenabilité du projet sans exécuter de code runtime.
 
 #### Tests méta permanents
 
-Garder indéfiniment. Suppression possible uniquement si l'invariant disparaît de l'architecture :
+Garder indéfiniment.
+Suppression possible uniquement si l'invariant disparaît de l'architecture :
 
 - frontières d'import entre `core/` et les opt-ins (`ADR-004`, `ADR-011`) ;
 - contrat de packaging (packages déclarés dans `pyproject.toml`) ;
@@ -257,17 +252,20 @@ Garder indéfiniment. Suppression possible uniquement si l'invariant disparaît 
 
 #### Tests méta temporaires
 
-Un test méta est temporaire s'il est créé pour empêcher la régression d'un ticket ponctuel (extraction, suppression, migration). Il doit mentionner dans son docstring le ticket ou la phase qui justifie son existence.
+Un test méta est temporaire s'il est créé pour empêcher la régression d'un ticket ponctuel (extraction, suppression, migration).
+Il doit mentionner dans son docstring le ticket ou la phase qui justifie son existence.
 
 Exemples : suppression d'OIDC, extraction de MFA, migration de l'API FR→EN.
 
-Critère : si le fichier a pour objet de vérifier qu'une transformation passée **n'est pas révoquée**, il est temporaire. Il peut être supprimé dans `META-TESTS-PRUNE-001` si l'invariant est couvert par un test comportemental plus fort, ou si la phase est définitivement close et la régression jugée improbable.
+Critère : si le fichier a pour objet de vérifier qu'une transformation passée **n'est pas révoquée**, il est temporaire.
+Il peut être supprimé dans `META-TESTS-PRUNE-001` si l'invariant est couvert par un test comportemental plus fort, ou si la phase est définitivement close et la régression jugée improbable.
 
 **Règle obligatoire** : tout fichier `tests/meta/` dont le nom contient `legacy`, `stale`, `migration` ou `deprecation` doit mentionner un ticket ou une référence de phase dans ses 20 premières lignes.
 
 #### Tests méta release-snapshot
 
-Ces tests vérifient une version ou un état courant. Ils sont valides mais doivent être mis à jour à chaque release :
+Ces tests vérifient une version ou un état courant.
+Ils sont valides mais doivent être mis à jour à chaque release :
 
 - `test_release_current_version_001.py`, cohérence de la version dans tous les fichiers ;
 - `test_pypi_classifiers_001.py`, classifiers PyPI alignés avec le statut réel.
@@ -276,7 +274,8 @@ La mise à jour est un acte délibéré, pas une anomalie.
 
 #### Fusion ou suppression
 
-Un test méta peut être **fusionné** si plusieurs fichiers vérifient le même invariant. Un test méta peut être **supprimé** uniquement :
+Un test méta peut être **fusionné** si plusieurs fichiers vérifient le même invariant.
+Un test méta peut être **supprimé** uniquement :
 
 1. dans un ticket dédié (`META-TESTS-PRUNE-001` ou équivalent) ;
 2. avec validation que l'invariant reste couvert (par un autre test méta ou un test comportemental) ;
@@ -286,24 +285,28 @@ Jamais en passant une suppression dans un ticket non dédié aux tests.
 
 #### Règle de sécurité
 
-Un test méta de sécurité (frontière d'import, chaîne interdite, politique de stockage) ne doit jamais être supprimé sans validation explicite de sécurité. Le doute profite au maintien.
+Un test méta de sécurité (frontière d'import, chaîne interdite, politique de stockage) ne doit jamais être supprimé sans validation explicite de sécurité.
+Le doute profite au maintien.
 
 #### Lien avec les tests comportementaux
 
-Un test comportemental est préférable à un test méta quand le comportement peut être exécuté directement. Si un test méta vérifie qu'une fonction existe dans le code source, et qu'un test comportemental l'appelle et vérifie son résultat, le test méta est candidat à suppression.
+Un test comportemental est préférable à un test méta quand le comportement peut être exécuté directement.
+Si un test méta vérifie qu'une fonction existe dans le code source, et qu'un test comportemental l'appelle et vérifie son résultat, le test méta est candidat à suppression.
 
 Un test méta reste pertinent quand : (a) l'invariant est purement textuel ou documentaire, (b) l'exécuter en runtime serait trop coûteux ou dépendant d'un environnement extérieur, (c) il protège une frontière architecturale indépendamment du comportement observable.
 
 #### Ticket de nettoyage
 
-`META-TESTS-PRUNE-001` est le ticket prévu pour la suppression et la fusion effectives. Il applique les critères définis ici. Ce ticket (8.2) définit la politique ; `META-TESTS-PRUNE-001` (8.3) l'applique.
+`META-TESTS-PRUNE-001` est le ticket prévu pour la suppression et la fusion effectives.
+Il applique les critères définis ici.
+Ce ticket (8.2) définit la politique ; `META-TESTS-PRUNE-001` (8.3) l'applique.
 
 ---
 
 ## Sources documentaires et artefacts générés
 
-Forge distingue **trois couches** dans sa documentation. Ne pas les
-confondre, chacune a un rôle strict.
+Forge distingue **trois couches** dans sa documentation.
+Ne pas les confondre, chacune a un rôle strict.
 
 | Chemin | Rôle | Suivi Git ? | Modifier à la main ? |
 |---|---|---|---|
@@ -311,8 +314,8 @@ confondre, chacune a un rôle strict.
 | `docs/index.html` | **Landing canonique** publique (ADR-044) | ✅ Oui | ✅ Oui, c'est la source à éditer directement |
 | `site/` | **Artefact MkDocs** généré par `mkdocs build` | ❌ Non (ignoré par `.gitignore`) | ❌ Jamais, supprimable sans perte |
 
-Depuis l'ADR-044, la landing n'est plus générée : `docs/index.html` est la
-source canonique, éditée directement. La chaîne à suivre quand on la modifie :
+Depuis l'ADR-044, la landing n'est plus générée : `docs/index.html` est la source canonique, éditée directement.
+La chaîne à suivre quand on la modifie :
 
 ```bash
 # 1. Éditer la landing canonique
@@ -328,26 +331,22 @@ mkdocs build --strict
 git diff --check
 ```
 
-`site/` est **supprimable sans perte** : c'est uniquement la sortie de
-`mkdocs build`, jamais une référence. Si `site/` est suivi par Git par
-erreur (commit accidentel), il faut le retirer de l'index, pas l'inverse.
+`site/` est **supprimable sans perte** : c'est uniquement la sortie de `mkdocs build`, jamais une référence.
+Si `site/` est suivi par Git par erreur (commit accidentel), il faut le retirer de l'index, pas l'inverse.
 
-Le contrat est verrouillé par
-[`tests/meta/test_docs_site_artifact_policy_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/meta/test_docs_site_artifact_policy_001.py).
+Le contrat est verrouillé par [`tests/meta/test_docs_site_artifact_policy_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/meta/test_docs_site_artifact_policy_001.py).
 
 ---
 
 ## Dépôt framework, pas projet (ADR-044)
 
 Le dépôt Forge ne contient **que le framework** : noyau, opt-ins, CLI, docs.
-Il n'y a plus d'application à sa racine, et on ne lance donc pas le dépôt avec
-`forge run`. Pour exercer Forge de bout en bout (serveur, vues, base), créer un
-projet avec `forge new` puis travailler dedans.
+Il n'y a plus d'application à sa racine, et on ne lance donc pas le dépôt avec `forge run`.
+Pour exercer Forge de bout en bout (serveur, vues, base), créer un projet avec `forge new` puis travailler dedans.
 
-Une application de dogfooding subsiste sous `tests/fixtures/app/` : c'est une
-**fixture de test** (non distribuée), qui sert de harnais d'intégration à la
-suite. Elle n'est pas « le projet de référence » : ce rôle revient au squelette
-`skeleton/data/`, seule application produite par `forge new`.
+Une application de dogfooding subsiste sous `tests/fixtures/app/` : c'est une **fixture de test** (non distribuée), qui sert de harnais d'intégration à la suite.
+Elle n'est pas « le projet de référence »
+: ce rôle revient au squelette `skeleton/data/`, seule application produite par `forge new`.
 
 ---
 
@@ -357,8 +356,7 @@ Une fonctionnalité non documentée est incomplète.
 
 ### Quand modifier `docs/reference.md`
 
-Toute nouvelle commande CLI, tout nouveau paramètre ou tout changement de comportement
-observable doit être reflété dans [Référence API et CLI](../reference/api.md).
+Toute nouvelle commande CLI, tout nouveau paramètre ou tout changement de comportement observable doit être reflété dans [Référence API et CLI](../reference/api.md).
 
 ### Quand modifier un guide spécifique
 
@@ -387,8 +385,7 @@ Choisissez la section la plus logique selon le contenu.
 
 ### Quand modifier le contrat de stabilité
 
-Si une nouvelle commande ou un nouveau fichier est garanti préservé (jamais écrasé
-par Forge), ajoutez-le dans [Contrat de stabilité](../release/stability-contract.md).
+Si une nouvelle commande ou un nouveau fichier est garanti préservé (jamais écrasé par Forge), ajoutez-le dans [Contrat de stabilité](../release/stability-contract.md).
 
 ---
 
@@ -420,15 +417,15 @@ git diff --check
 FORGE_E2E_MARIADB=1 pytest tests/test_e2e_mariadb.py
 ```
 
-Uniquement si une instance MariaDB réelle est configurée avec une base
-dont le nom commence par `forge_e2e_`. Non requis dans la suite standard.
+Uniquement si une instance MariaDB réelle est configurée avec une base dont le nom commence par `forge_e2e_`.
+Non requis dans la suite standard.
 
 ---
 
 ## Qualité du résumé final
 
-Chaque livraison de ticket doit inclure un résumé final structuré. Ce résumé
-va dans `CHANGELOG.md`.
+Chaque livraison de ticket doit inclure un résumé final structuré.
+Ce résumé va dans `CHANGELOG.md`.
 
 ### Format attendu
 
@@ -478,8 +475,8 @@ NOM-DU-TICKET
 ```
 ```
 
-Ne sautez pas de ticket. Si un ticket bloque, documentez pourquoi et proposez
-un ordre alternatif dans la roadmap.
+Ne sautez pas de ticket.
+Si un ticket bloque, documentez pourquoi et proposez un ordre alternatif dans la roadmap.
 
 Les phases sont regroupées par objectif :
 
@@ -538,7 +535,8 @@ Voici le déroulé typique d'une contribution à Forge.
 
 **Ticket** : `DOC-MODULE-AUTHOR-001`, guide de création d'un module Forge
 
-**1. Auditer l'existant**
+**1.
+Auditer l'existant**
 
 ```bash
 # Lire le code du système de modules
@@ -553,28 +551,32 @@ cat tests/test_e2e_module.py
 grep -n "module" docs/reference.md | head -20
 ```
 
-**2. Créer la documentation**
+**2.
+Créer la documentation**
 
 ```bash
 # Créer docs/module-author-guide.md
 # Ajouter dans mkdocs.yml (Modules et starters)
 ```
 
-**3. Créer les tests documentaires**
+**3.
+Créer les tests documentaires**
 
 ```bash
 # Créer tests/meta/test_doc_module_author.py
 # Tester que les sections existent, les commandes sont mentionnées, etc.
 ```
 
-**4. Mettre à jour la roadmap**
+**4.
+Mettre à jour la roadmap**
 
 ```bash
 # Dans docs/roadmap/forge-roadmap.md : marquer DOC-MODULE-AUTHOR-001 livré
 # Dans CHANGELOG.md : ajouter l'entrée complète du ticket
 ```
 
-**5. Valider**
+**5.
+Valider**
 
 ```bash
 pytest tests/meta/test_doc_module_author.py --tb=short -q
@@ -584,7 +586,8 @@ mkdocs build --strict
 git diff --check
 ```
 
-**6. Committer**
+**6.
+Committer**
 
 ```bash
 git add docs/module-author-guide.md tests/meta/test_doc_module_author.py \

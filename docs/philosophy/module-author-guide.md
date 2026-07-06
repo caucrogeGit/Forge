@@ -1,26 +1,22 @@
 # Créer un module Forge
 
-Ce guide explique comment créer un module Forge réutilisable : structure,
-manifeste, installation, routes, suppression et bonnes pratiques.
+Ce guide explique comment créer un module Forge réutilisable : structure, manifeste, installation, routes, suppression et bonnes pratiques.
 
 ---
 
 ## Objectif
 
 Un module Forge est une brique d'extension installable dans un projet existant.
-Il permet de partager des contrôleurs, des vues, des routes ou des entités
-entre projets sans dupliquer le code.
+Il permet de partager des contrôleurs, des vues, des routes ou des entités entre projets sans dupliquer le code.
 
 ---
 
 ## Ce qu'est un module Forge
 
-Un module Forge est un dossier autonome contenant un fichier `module.json`
-(le manifeste) et les fichiers qu'il apporte.
+Un module Forge est un dossier autonome contenant un fichier `module.json` (le manifeste) et les fichiers qu'il apporte.
 
 Il s'installe dans un projet Forge existant via les commandes `forge module:*`.
-Forge trace les fichiers qu'il a copiés dans `forge_modules.json` et peut
-les supprimer proprement.
+Forge trace les fichiers qu'il a copiés dans `forge_modules.json` et peut les supprimer proprement.
 
 ### Différences entre module, starter et application
 
@@ -50,8 +46,7 @@ Un module doit rester petit, ciblé et auditable.
 ## Structure minimale d'un module
 
 Les modules sont placés dans le dossier `modules/` à la racine du projet.
-Forge cherche dans ce dossier par défaut lors de `forge module:list` et
-`forge module:install`.
+Forge cherche dans ce dossier par défaut lors de `forge module:list` et `forge module:install`.
 
 ```text
 modules/
@@ -126,31 +121,26 @@ Le manifeste est le fichier `module.json` placé à la racine du dossier du modu
 
 !!! warning "Règle `routes`"
     Si `provides` contient `"routes"`, alors `paths.routes` est obligatoire.
-    Si `provides` contient `"controllers"`, `"views"` ou `"entities"`,
-    le chemin correspondant dans `paths` est obligatoire.
+    Si `provides` contient `"controllers"`, `"views"` ou `"entities"`, le chemin correspondant dans `paths` est obligatoire.
 
 ---
 
 ## Fichiers installables
 
-Lors de `forge module:files`, Forge copie les fichiers des briques `entities`,
-`controllers`, `views` et `docs` vers leur destination dans le projet.
+Lors de `forge module:files`, Forge copie les fichiers des briques `entities`, `controllers`, `views` et `docs` vers leur destination dans le projet.
 
-Les fichiers `static` et `migrations` sont déclarables dans le manifeste
-mais ne sont pas copiés automatiquement par Forge, leur gestion reste manuelle.
+Les fichiers `static` et `migrations` sont déclarables dans le manifeste mais ne sont pas copiés automatiquement par Forge, leur gestion reste manuelle.
 
-**Fichiers ignorés lors de la copie** : `__pycache__/`, `.git/`, `.venv/`,
-fichiers `.env`, `.DS_Store`, `*.pyc`, `*.tmp`, `*.bak`, liens symboliques.
+**Fichiers ignorés lors de la copie** : `__pycache__/`, `.git/`, `.venv/`, fichiers `.env`, `.DS_Store`, `*.pyc`, `*.tmp`, `*.bak`, liens symboliques.
 
-Forge refuse l'installation si un fichier cible existe déjà. C'est une
-protection contre l'écrasement silencieux.
+Forge refuse l'installation si un fichier cible existe déjà.
+C'est une protection contre l'écrasement silencieux.
 
 ---
 
 ## Routes de module
 
-Si votre module expose des routes, déclarez un fichier `routes.py` contenant
-une fonction `register_routes(router)`.
+Si votre module expose des routes, déclarez un fichier `routes.py` contenant une fonction `register_routes(router)`.
 
 ```python
 # modules/mon_module/routes.py
@@ -162,8 +152,7 @@ def register_routes(router):
 
 ### Génération du fichier de routes dédié
 
-`forge module:routes mon_module` génère un fichier `mvc/routes_mon_module.py`
-**sans modifier** `mvc/routes.py` :
+`forge module:routes mon_module` génère un fichier `mvc/routes_mon_module.py` **sans modifier** `mvc/routes.py` :
 
 ```python
 # mvc/routes_mon_module.py (généré par Forge - régénérable)
@@ -200,28 +189,24 @@ Il **ne génère pas** de fichier de routes et **n'écrit pas** dans `mvc/routes
 
 ### Comportement de module:routes
 
-`forge module:routes` génère `mvc/routes_<module>.py` et affiche les lignes
-à copier dans `mvc/routes.py`. Il **ne modifie pas** `mvc/routes.py`.
+`forge module:routes` génère `mvc/routes_<module>.py` et affiche les lignes à copier dans `mvc/routes.py`.
+Il **ne modifie pas** `mvc/routes.py`.
 
 ### Comportement de module:remove
 
-`forge module:remove` supprime les fichiers copiés par `module:files` et
-nettoie le registre.
+`forge module:remove` supprime les fichiers copiés par `module:files` et nettoie le registre.
 
-Pour les routes, **Forge ne supprime pas `mvc/routes_<module>.py`** ni
-les lignes que vous avez ajoutées dans `mvc/routes.py`. Ces fichiers restent
-sur le disque après la suppression, à retirer manuellement.
+Pour les routes, **Forge ne supprime pas `mvc/routes_<module>.py`** ni les lignes que vous avez ajoutées dans `mvc/routes.py`.
+Ces fichiers restent sur le disque après la suppression, à retirer manuellement.
 
 !!! note "Compatibilité arrière"
-    Si un projet existant contient d'anciens blocs à marqueurs
-    (`# forge-module-routes:<nom>:start/end`) dans `mvc/module_routes.py`,
-    `forge module:remove` peut les nettoyer. Ce mécanisme est conservé pour
-    compat arrière uniquement, les nouveaux projets utilisent le fichier dédié.
+    Si un projet existant contient d'anciens blocs à marqueurs (`# forge-module-routes:<nom>:start/end`) dans `mvc/module_routes.py`, `forge module:remove` peut les nettoyer.
+    Ce mécanisme est conservé pour compat arrière uniquement, les nouveaux projets utilisent le fichier dédié.
 
 ### Migration depuis l'ancien mécanisme injecté
 
-Si un ancien projet contient un bloc à marqueurs dans `mvc/module_routes.py`,
-Forge ne le maintient plus automatiquement. Migration recommandée :
+Si un ancien projet contient un bloc à marqueurs dans `mvc/module_routes.py`, Forge ne le maintient plus automatiquement.
+Migration recommandée :
 
 1. Générer `mvc/routes_<module>.py` avec `forge module:routes <nom>`.
 2. Vérifier le contenu du fichier généré.
@@ -233,8 +218,7 @@ Forge ne le maintient plus automatiquement. Migration recommandée :
 
 ## Templates de module
 
-Si votre module fournit des templates, déclarez `"views"` dans `provides`
-et indiquez le chemin source dans `paths.views`.
+Si votre module fournit des templates, déclarez `"views"` dans `provides` et indiquez le chemin source dans `paths.views`.
 
 ```json
 {
@@ -262,8 +246,7 @@ modules/mon_module/
 ## Fichiers statiques
 
 Les fichiers statiques ne sont pas copiés automatiquement par `forge module:files`.
-Déclarez `"static"` dans `provides` pour signaler l'intention, mais copiez
-les fichiers manuellement dans `static/` de votre projet.
+Déclarez `"static"` dans `provides` pour signaler l'intention, mais copiez les fichiers manuellement dans `static/` de votre projet.
 
 ---
 
@@ -300,7 +283,8 @@ Toutes ces commandes acceptent `--dry-run` pour simuler l'opération sans rien �
 
 ### Dossier de modules alternatif
 
-Par défaut, Forge cherche dans `modules/`. Pour utiliser un autre dossier :
+Par défaut, Forge cherche dans `modules/`.
+Pour utiliser un autre dossier :
 
 ```bash
 forge module:list --path /chemin/vers/mes_modules
@@ -345,18 +329,15 @@ Concrètement :
 
 Le registre `forge_modules.json` est nettoyé.
 Les fichiers copiés par `module:files` sont supprimés s'ils n'ont pas été modifiés.
-`mvc/routes_<module>.py` et les lignes ajoutées dans `mvc/routes.py` restent
-sur le disque, à retirer manuellement si souhaité.
+`mvc/routes_<module>.py` et les lignes ajoutées dans `mvc/routes.py` restent sur le disque, à retirer manuellement si souhaité.
 
 ---
 
 ## Préservation des fichiers modifiés
 
-Si vous modifiez un fichier installé par Forge (par exemple un contrôleur),
-`forge module:remove` le conservera au lieu de le supprimer.
+Si vous modifiez un fichier installé par Forge (par exemple un contrôleur), `forge module:remove` le conservera au lieu de le supprimer.
 
-Forge calcule un hash SHA256 du fichier installé et le compare au fichier
-source original. Si les deux diffèrent, le fichier est conservé et signalé :
+Forge calcule un hash SHA256 du fichier installé et le compare au fichier source original. Si les deux diffèrent, le fichier est conservé et signalé :
 
 ```text
 Fichiers conservés (non supprimés) :
@@ -364,8 +345,7 @@ Fichiers conservés (non supprimés) :
 ```
 
 Cette règle est testée par le test E2E `TestModuleRemovePreservesModified`.
-Elle garantit que vos modifications ne peuvent pas être perdues lors d'une
-désinstallation.
+Elle garantit que vos modifications ne peuvent pas être perdues lors d'une désinstallation.
 
 ---
 
@@ -415,9 +395,7 @@ def test_fichiers_sources_existent():
     assert Path("modules/mon_module/controllers/mon_module_controller.py").exists()
 ```
 
-Pour tester le cycle complet (install → files → routes → remove) dans un
-projet isolé, consultez `tests/test_e2e_module.py` comme exemple de test E2E
-avec `tmp_path` et `monkeypatch.chdir`.
+Pour tester le cycle complet (install → files → routes → remove) dans un projet isolé, consultez `tests/test_e2e_module.py` comme exemple de test E2E avec `tmp_path` et `monkeypatch.chdir`.
 
 ---
 

@@ -1,9 +1,7 @@
 # Roadmap Forge : Contrats canoniques JSON Schema
 
 > Roadmap autonome à ouvrir après la Phase 12 de consolidation Forge.
->
 > Point de départ prévu : après `v1.0.0-beta.5`.
->
 > Objectif : verrouiller les fichiers JSON canoniques des entités et relations Forge avec des contrats JSON Schema, une validation sémantique Forge, des erreurs stables, une sortie machine exploitable, une documentation complète et un branchement progressif dans les générateurs.
 
 ---
@@ -750,16 +748,7 @@ Phases : `json`, `schema`, `semantic`, `runtime`.
 > **Note de structure** : ENTITY-CONTRACT-011 est le ticket parent.
 > Il a été découpé en sous-tickets 011A–011G pour lever les préconditions une par une.
 > ENTITY-CONTRACT-012 reprend la numérotation normale (make:crud).
->
-> | Sous-ticket | Sujet | État |
-> |---|---|---|
-> | 011A | Audit migration build:model vers canonique | ✓ livré |
-> | 011B | Normaliseur canonique pour build:model | ✓ livré |
-> | 011C | Routage build:model vers normaliseur canonique | ✓ livré |
-> | 011D | Tests build:model canoniques | ✓ livré |
-> | 011E | Migrer media.json vers canonique | ✓ livré |
-> | 011F | Migrer relations.json vers canonique | ✓ livré |
-> | 011G | Reprendre le branchement strict entity:validate dans build:model | ✓ livré |
+> | Sous-ticket | Sujet | État | |---|---|---| | 011A | Audit migration build:model vers canonique | ✓ livré | | 011B | Normaliseur canonique pour build:model | ✓ livré | | 011C | Routage build:model vers normaliseur canonique | ✓ livré | | 011D | Tests build:model canoniques | ✓ livré | | 011E | Migrer media.json vers canonique | ✓ livré | | 011F | Migrer relations.json vers canonique | ✓ livré | | 011G | Reprendre le branchement strict entity:validate dans build:model | ✓ livré |
 
 ### Objectif
 
@@ -796,13 +785,12 @@ Brancher la validation JSON Schema avant `build:model` bloquerait :
 - Le dépôt réel (`mvc/entities/media/media.json` est en format legacy → `entity:validate` le rejette)
 - Tous les tests existants de `build:model` (`test_entity_model_cli.py` utilise le format legacy)
 
-Même si la validation JSON Schema passait, la génération échouerait : `build_entity_sql`,
-`build_entity_base`, etc. lisent `sql_type`, `python_type`, `column`, absents du format canonique.
+Même si la validation JSON Schema passait, la génération échouerait : `build_entity_sql`, `build_entity_base`, etc. lisent `sql_type`, `python_type`, `column`, absents du format canonique.
 
 ### Précondition requise
 
-Un ticket de migration doit précéder ENTITY-CONTRACT-011. Plan détaillé dans :
-`docs/history/audits/entity-contract-build-model-migration-audit.md`
+Un ticket de migration doit précéder ENTITY-CONTRACT-011.
+Plan détaillé dans : `docs/history/audits/entity-contract-build-model-migration-audit.md`
 
 ---
 
@@ -810,17 +798,13 @@ Un ticket de migration doit précéder ENTITY-CONTRACT-011. Plan détaillé dans
 
 ### Objectif
 
-Documenter précisément l'incompatibilité entre `build:model` (format legacy) et
-`entity:validate` (format canonique) et proposer un plan de migration découpé.
+Documenter précisément l'incompatibilité entre `build:model` (format legacy) et `entity:validate` (format canonique) et proposer un plan de migration découpé.
 
 ### Livraison
 
-Document d'audit complet dans :
-`docs/history/audits/entity-contract-build-model-migration-audit.md`
+Document d'audit complet dans : `docs/history/audits/entity-contract-build-model-migration-audit.md`
 
-Contenu : flux build:model, format legacy (8 clés racine, 12 clés de champ),
-format canonique (12 types Forge), table de correspondance complète,
-stratégie recommandée (normaliseur canonique→legacy), 6 tickets proposés.
+Contenu : flux build:model, format legacy (8 clés racine, 12 clés de champ), format canonique (12 types Forge), table de correspondance complète, stratégie recommandée (normaliseur canonique→legacy), 6 tickets proposés.
 
 ---
 
@@ -828,8 +812,7 @@ stratégie recommandée (normaliseur canonique→legacy), 6 tickets proposés.
 
 ### Objectif
 
-Créer un traducteur interne `canonical → legacy_normalized` permettant à
-`build_entity_sql()` et `build_entity_base()` de fonctionner sans modification.
+Créer un traducteur interne `canonical → legacy_normalized` permettant à `build_entity_sql()` et `build_entity_base()` de fonctionner sans modification.
 
 ### Résultat
 
@@ -851,8 +834,7 @@ Créer un traducteur interne `canonical → legacy_normalized` permettant à
 
 ### Objectif
 
-Détection automatique du format (`schema_version` vs `format_version`) dans
-`build:model` et appel du normaliseur canonique si nécessaire.
+Détection automatique du format (`schema_version` vs `format_version`) dans `build:model` et appel du normaliseur canonique si nécessaire.
 
 ### Résultat
 
@@ -870,21 +852,16 @@ Détection automatique du format (`schema_version` vs `format_version`) dans
 
 ### Objectif
 
-Réécrire les 18 tests de `test_entity_model_cli.py` en format canonique
-(`schema_version: "1.0"`) pour valider que `build:model` fonctionne
-end-to-end avec le nouveau format via le normaliseur.
+Réécrire les 18 tests de `test_entity_model_cli.py` en format canonique (`schema_version: "1.0"`) pour valider que `build:model` fonctionne end-to-end avec le nouveau format via le normaliseur.
 
 ### Résultat
 
 - `tests/test_entity_model_cli.py` réécrit : 18 tests → 20 tests (20/20 passent).
 - Fixtures canoniques : `_article()`, `_commande()`, `_relations_vides()`.
 - Fixtures legacy conservées : `_legacy_contact()`, `_legacy_commande()`, `_legacy_relations()`.
-- 2 tests maintenus en legacy : `test_sync_relations_writes_only_relations_sql` (FK complexe),
-  `test_sync_entity_does_not_touch_manual_py` (sync_entity non migré).
-- 2 nouveaux tests de non-régression legacy : `test_legacy_build_model_validates_then_writes`,
-  `test_legacy_check_model_preserves_entity_name`.
-- `test_build_model_accepts_short_and_mixed_entity_json` → renommé
-  `test_build_model_generates_correct_sql_and_base_py`, vérifie `Id BIGINT UNSIGNED NOT NULL`.
+- 2 tests maintenus en legacy : `test_sync_relations_writes_only_relations_sql` (FK complexe), `test_sync_entity_does_not_touch_manual_py` (sync_entity non migré).
+- 2 nouveaux tests de non-régression legacy : `test_legacy_build_model_validates_then_writes`, `test_legacy_check_model_preserves_entity_name`.
+- `test_build_model_accepts_short_and_mixed_entity_json` → renommé `test_build_model_generates_correct_sql_and_base_py`, vérifie `Id BIGINT UNSIGNED NOT NULL`.
 - Suite complète : 0 régression.
 
 ---
@@ -893,18 +870,15 @@ end-to-end avec le nouveau format via le normaliseur.
 
 ### Objectif
 
-Convertir `mvc/entities/media/media.json` (11 champs, format legacy) vers
-le format canonique `schema_version: "1.0"`.
+Convertir `mvc/entities/media/media.json` (11 champs, format legacy) vers le format canonique `schema_version: "1.0"`.
 
 ### Résultat
 
 - `mvc/entities/media/media.json` migré vers `schema_version: "1.0"`.
 - Champ `id` supprimé (auto-injecté par le normaliseur comme BIGINT UNSIGNED PK AI).
 - 10 champs métier conservés, tous convertis avec leur type Forge.
-- `created_at` déclaré comme champ `datetime` explicite (sans `options.timestamps` qui
-  ajouterait `updated_at` absent du legacy).
-- `constraints.min_value` → `min`, `constraints.not_empty` non représentable
-  dans le schéma canonique (perte documentée, conservatrice).
+- `created_at` déclaré comme champ `datetime` explicite (sans `options.timestamps` qui ajouterait `updated_at` absent du legacy).
+- `constraints.min_value` → `min`, `constraints.not_empty` non représentable dans le schéma canonique (perte documentée, conservatrice).
 - `role.default: "default"` et `position.default: 0` conservés via `default`.
 - `alt_text` conservé avec `nullable: true`.
 - `entity:validate` : `[OK] Entité Media valide.`, seul `relations.json` encore legacy.
@@ -918,18 +892,16 @@ le format canonique `schema_version: "1.0"`.
 
 ### Objectif
 
-Convertir `mvc/entities/relations.json` (vide, `format_version: 1`) vers
-`schema_version: "1.0"`.
+Convertir `mvc/entities/relations.json` (vide, `format_version: 1`) vers `schema_version: "1.0"`.
 
 ### Résultat
 
 - `mvc/entities/relations.json` migré : `format_version: 1` → `schema_version: "1.0"` + `$schema`.
 - Aucune relation présente, liste `relations: []` conservée intacte.
 - `entity:validate` : `valid: true, errors_count: 0`, dépôt entièrement propre.
-- `build:model` : fonctionne via correction minimale de `_validate_relations_root()` dans
-  `relations.py`, détecte `schema_version: "1.0"` et ne requiert plus `format_version`.
-  (Déviation documentée : le ticket interdisait de modifier `relations.py`, mais l'exigence
-  "build:model continue à fonctionner" l'imposait. Correction en 4 lignes, même pattern que 011C.)
+- `build:model` : fonctionne via correction minimale de `_validate_relations_root()` dans `relations.py`, détecte `schema_version: "1.0"` et ne requiert plus `format_version`.
+  (Déviation documentée : le ticket interdisait de modifier `relations.py`, mais l'exigence "build:model continue à fonctionner" l'imposait.
+  Correction en 4 lignes, même pattern que 011C.)
 - 14 tests dans `tests/test_relations_entity_canonical.py` (14/14 passent).
 - Suite complète : 0 régression.
 
@@ -962,7 +934,8 @@ Conseil : lancez forge entity:validate pour obtenir le détail.
 
 **Décision clé, filtre canonique dans le garde :**
 
-`collect_entity_validation_results()` ignore les entités au format legacy (`format_version: 1`) : elles sont validées par `_validate_model_or_raise()` à l'étape suivante. Ce filtre était nécessaire pour ne pas bloquer les tests meta qui utilisent des fixtures legacy en `tmp_path`.
+`collect_entity_validation_results()` ignore les entités au format legacy (`format_version: 1`) : elles sont validées par `_validate_model_or_raise()` à l'étape suivante.
+Ce filtre était nécessaire pour ne pas bloquer les tests meta qui utilisent des fixtures legacy en `tmp_path`.
 
 **Résultat :** 10 961 tests passés, 6 ignorés, 0 régression.
 
@@ -1007,7 +980,10 @@ forge.py → command == "make:crud" → cmd_make_crud_main()
 
 **Décision clé, normalisation canonique dans `make_crud()` :**
 
-`validate_entity_definition()` n’acceptait que le format legacy. Sans normalisation, les entités canoniques valides échouaient à l’étape 2 du flux. Ajout de 3 lignes identiques au pattern de `model.py`. Ce n’est pas une refonte, c’est la correction minimale requise pour que le cas valide canonical fonctionne.
+`validate_entity_definition()` n’acceptait que le format legacy.
+Sans normalisation, les entités canoniques valides échouaient à l’étape 2 du flux.
+Ajout de 3 lignes identiques au pattern de `model.py`.
+Ce n’est pas une refonte, c’est la correction minimale requise pour que le cas valide canonical fonctionne.
 
 **Note :** `_load_crud_many_to_one_relations()` utilisait déjà `load_entity_definitions()` (dans `relations.py`) qui supporte canonical depuis 011B, aucun changement nécessaire pour les relations.
 
@@ -1103,19 +1079,15 @@ Garantir que `many_to_one` génère une FK claire et valide.
 ### Objectif
 
 Corriger le traitement des relations `many_to_one` canoniques dans `relations.py`.
-Le ticket 015 avait introduit un `return None` silencieux pour les relations canoniques,
-empêchant la génération SQL FK.
+Le ticket 015 avait introduit un `return None` silencieux pour les relations canoniques, empêchant la génération SQL FK.
 
 ### Ce qui a été corrigé
 
 - Suppression du skip silencieux dans `_validate_relation_item()`.
-- Ajout de `_validate_relation_item_canonical()` : valide explicitement les relations
-  canoniques et retourne un `ValidatedRelation` complet.
-- Mapping `on_delete` canonique (lowercase) vers SQL : `restrict → RESTRICT`,
-  `cascade → CASCADE`, `set_null → SET NULL`, `no_action → NO ACTION`.
+- Ajout de `_validate_relation_item_canonical()` : valide explicitement les relations canoniques et retourne un `ValidatedRelation` complet.
+- Mapping `on_delete` canonique (lowercase) vers SQL : `restrict → RESTRICT`, `cascade → CASCADE`, `set_null → SET NULL`, `no_action → NO ACTION`.
 - Contrainte dérivée automatiquement : `fk_{from_table}_{foreign_key}`.
-- Si la FK column n'est pas déclarée comme champ dans l'entité source,
-  la SQL FK est quand même générée (from_python_type déduit du PK cible).
+- Si la FK column n'est pas déclarée comme champ dans l'entité source, la SQL FK est quand même générée (from_python_type déduit du PK cible).
 - `on_update` fixé à `RESTRICT` pour les relations canoniques (non spécifié dans le format).
 - `entity:validate` reste vert ; `build:model` ne plante pas ; legacy préservé.
 
@@ -1124,8 +1096,7 @@ empêchant la génération SQL FK.
 - Ce ticket ne traite pas `many_to_many`.
 - Ce ticket ne migre pas les starters.
 - Ce ticket ne supprime pas le support legacy.
-- La chaîne CRUD pouvait lever un `KeyError` si la FK n'était pas déclarée comme champ
-  dans l'entité source, corrigé par `ENTITY-CONTRACT-015-FIX-CRUD-CANONICAL-M2O`.
+- La chaîne CRUD pouvait lever un `KeyError` si la FK n'était pas déclarée comme champ dans l'entité source, corrigé par `ENTITY-CONTRACT-015-FIX-CRUD-CANONICAL-M2O`.
 
 ---
 
@@ -1133,23 +1104,17 @@ empêchant la génération SQL FK.
 
 ### Objectif
 
-Corriger `relations_loader.py` pour que `make:crud` fonctionne avec une relation
-`many_to_one` canonique même si la clé étrangère n'est pas déclarée comme champ
-métier dans l'entité source.
+Corriger `relations_loader.py` pour que `make:crud` fonctionne avec une relation `many_to_one` canonique même si la clé étrangère n'est pas déclarée comme champ métier dans l'entité source.
 
 ### Ce qui a été corrigé
 
-- Remplacement de `source_field = current_fields[relation.from_field]` par
-  `source_field = current_fields.get(relation.from_field)` avec fallback sur
-  `relation.from_column` (= valeur de `foreign_key` pour les relations canoniques).
-- Le contexte CRUD (`CrudManyToOneRelation`) est correctement produit avec
-  `field_column = foreign_key` quand le champ FK n'est pas déclaré dans l'entité.
+- Remplacement de `source_field = current_fields[relation.from_field]` par `source_field = current_fields.get(relation.from_field)` avec fallback sur `relation.from_column` (= valeur de `foreign_key` pour les relations canoniques).
+- Le contexte CRUD (`CrudManyToOneRelation`) est correctement produit avec `field_column = foreign_key` quand le champ FK n'est pas déclaré dans l'entité.
 - Legacy many_to_one préservé : si le champ est déclaré, `source_field["column"]` est utilisé.
 
 ### Limites restantes
 
-- Si la FK n'est pas déclarée comme champ dans l'entité, `build_form` ne génère pas
-  de `RelationField` pour cette FK (comportement attendu, FK technique invisible du formulaire).
+- Si la FK n'est pas déclarée comme champ dans l'entité, `build_form` ne génère pas de `RelationField` pour cette FK (comportement attendu, FK technique invisible du formulaire).
 - Ce ticket ne traite pas `many_to_many`.
 - Ce ticket ne migre pas les starters.
 
@@ -1161,27 +1126,16 @@ métier dans l'entité source.
 
 ### Objectif
 
-Permettre à `forge make:relation` de générer des relations `many_to_many`
-avec un bloc `pivot` canonique (`id`, `unique_pair`, deux FK), et valider/générer
-le SQL correspondant.
+Permettre à `forge make:relation` de générer des relations `many_to_many` avec un bloc `pivot` canonique (`id`, `unique_pair`, deux FK), et valider/générer le SQL correspondant.
 
 ### Ce qui a été livré
 
-- `make_relation.py` : suppression du rejet de `many_to_many` ;
-  ajout de `_build_m2m_relation_interactively()` avec prompts pour
-  `from`, `to`, `name`, `inverse_name`, `pivot.table`, `pivot.from_key`,
-  `pivot.to_key`, `pivot.on_delete`.
+- `make_relation.py` : suppression du rejet de `many_to_many` ; ajout de `_build_m2m_relation_interactively()` avec prompts pour `from`, `to`, `name`, `inverse_name`, `pivot.table`, `pivot.from_key`, `pivot.to_key`, `pivot.on_delete`.
 - Format généré : `{"type": "many_to_many", "from": …, "to": …, "name": …, "pivot": {"table": …, "from_key": …, "to_key": …, "id": true, "unique_pair": true, "on_delete": …, "fields": []}}`.
-- `relations.py` : ajout de `ValidatedCanonicalManyToManyRelation` (dataclass),
-  `_validate_m2m_canonical()` (validation avec résolution d'entités et contrôle
-  `on_delete` strictement minuscule), `_generate_canonical_m2m_sql()` (CREATE TABLE
-  avec `id AUTO_INCREMENT`, `UNIQUE KEY`, indexes, contraintes FK).
-- Dispatch dans `validate_relations_definition()` : M2M canonique détecté par
-  `"pivot" in relation`, legacy M2M préservé.
-- `generate_relations_sql()` : gère les trois types (`ValidatedRelation`,
-  `ValidatedCanonicalManyToManyRelation`, legacy `ValidatedManyToManyRelation`).
-- Tests : `tests/test_many_to_many_canonical_generation.py` (57 tests),
-  `tests/test_make_relation_command.py` mis à jour.
+- `relations.py` : ajout de `ValidatedCanonicalManyToManyRelation` (dataclass), `_validate_m2m_canonical()` (validation avec résolution d'entités et contrôle `on_delete` strictement minuscule), `_generate_canonical_m2m_sql()` (CREATE TABLE avec `id AUTO_INCREMENT`, `UNIQUE KEY`, indexes, contraintes FK).
+- Dispatch dans `validate_relations_definition()` : M2M canonique détecté par `"pivot" in relation`, legacy M2M préservé.
+- `generate_relations_sql()` : gère les trois types (`ValidatedRelation`, `ValidatedCanonicalManyToManyRelation`, legacy `ValidatedManyToManyRelation`).
+- Tests : `tests/test_many_to_many_canonical_generation.py` (57 tests), `tests/test_make_relation_command.py` mis à jour.
 
 ### Limites restantes
 
@@ -1195,24 +1149,15 @@ le SQL correspondant.
 
 ### Objectif
 
-Permettre des champs métier optionnels dans `pivot.fields[]` pour les
-relations `many_to_many` canoniques, avec validation, mapping SQL et
-protection des clés techniques.
+Permettre des champs métier optionnels dans `pivot.fields[]` pour les relations `many_to_many` canoniques, avec validation, mapping SQL et protection des clés techniques.
 
 ### Ce qui a été livré
 
-- `relations.py` : `ValidatedPivotField` étendu avec `unique: bool = False` ;
-  `ValidatedCanonicalManyToManyRelation` étendu avec `pivot_fields: tuple[ValidatedPivotField, ...]` ;
-  ajout de `_FORGE_PIVOT_SIMPLE_TYPES`, `_FORGE_PIVOT_ALL_TYPES`, `_pivot_field_sql_type()`,
-  `_validate_canonical_pivot_fields()`.
-- Mapping des 12 types Forge → SQL (string→VARCHAR, text→TEXT, integer→INT,
-  big_integer→BIGINT, float→DOUBLE, decimal→DECIMAL(p,s), boolean→BOOLEAN,
-  date→DATE, datetime→DATETIME, email→VARCHAR(255), password→VARCHAR(255), json→LONGTEXT).
-- Contraintes : `required: true` → NOT NULL ; `nullable: false` → NOT NULL ;
-  `nullable: true` → NULL ; `unique: true` → `UNIQUE KEY uq_{pivot}_{field}`.
+- `relations.py` : `ValidatedPivotField` étendu avec `unique: bool = False` ; `ValidatedCanonicalManyToManyRelation` étendu avec `pivot_fields: tuple[ValidatedPivotField, ...]` ; ajout de `_FORGE_PIVOT_SIMPLE_TYPES`, `_FORGE_PIVOT_ALL_TYPES`, `_pivot_field_sql_type()`, `_validate_canonical_pivot_fields()`.
+- Mapping des 12 types Forge → SQL (string→VARCHAR, text→TEXT, integer→INT, big_integer→BIGINT, float→DOUBLE, decimal→DECIMAL(p,s), boolean→BOOLEAN, date→DATE, datetime→DATETIME, email→VARCHAR(255), password→VARCHAR(255), json→LONGTEXT).
+- Contraintes : `required: true` → NOT NULL ; `nullable: false` → NOT NULL ; `nullable: true` → NULL ; `unique: true` → `UNIQUE KEY uq_{pivot}_{field}`.
 - Protection : `id`, `from_key`, `to_key` interdits dans `pivot.fields[]`.
-- `_generate_canonical_m2m_sql()` inclut les colonnes pivot et les UNIQUE KEY
-  correspondantes.
+- `_generate_canonical_m2m_sql()` inclut les colonnes pivot et les UNIQUE KEY correspondantes.
 - Tests : `tests/test_pivot_fields_controlled.py` (42 tests).
 - CRUD pivot avancé : hors périmètre (ticket futur).
 - `pivot.schema.json` inchangé (déjà conforme).
@@ -1231,8 +1176,7 @@ protection des clés techniques.
 
 ### Objectif
 
-Consolider les tickets 016 et 017 par des tests d'intégration bout en bout :
-`relations.json → entity:validate → build:model → SQL pivot généré`.
+Consolider les tickets 016 et 017 par des tests d'intégration bout en bout : `relations.json → entity:validate → build:model → SQL pivot généré`.
 
 ### Ce qui a été livré
 
@@ -1395,7 +1339,8 @@ docs/entities/pivots-many-to-many.md
 
 ### Note d'audit
 
-L'exemple SQL de la spec proposait `BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY`, la projection réelle de Forge utilise `INT NOT NULL AUTO_INCREMENT` avec `PRIMARY KEY (id)` séparé. La documentation reflète la réalité du générateur.
+L'exemple SQL de la spec proposait `BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY`, la projection réelle de Forge utilise `INT NOT NULL AUTO_INCREMENT` avec `PRIMARY KEY (id)` séparé.
+La documentation reflète la réalité du générateur.
 
 ### Garde-fous
 
@@ -1677,12 +1622,11 @@ Optionnel mais utile avant publication.
 
 ### Livraison
 
-- **`cli/schemas/schema_doctor.py`**, commande `schema_doctor_main()` avec 5 contrôles par schéma
-  (existence, JSON valide, `$schema` Draft 2020-12, `$id`, `$ref` locaux résolus)
-- **`tests/test_schema_doctor_command.py`**, 42 tests (sortie humaine, sortie `--json`,
-  gestion d'erreurs, non-régression)
+- **`cli/schemas/schema_doctor.py`**, commande `schema_doctor_main()` avec 5 contrôles par schéma (existence, JSON valide, `$schema` Draft 2020-12, `$id`, `$ref` locaux résolus)
+- **`tests/test_schema_doctor_command.py`**, 42 tests (sortie humaine, sortie `--json`, gestion d'erreurs, non-régression)
 - **`forge.py`**, dispatch `schema:doctor` ajouté
-- **`cli/_support/help.py`**, section « Schémas JSON » complétée avec `schema:doctor`
+- **`cli/_support/help.py`**, section « Schémas JSON »
+  complétée avec `schema:doctor`
 - Suite complète : 11 440 tests passent, 6 skipped, 0 régression
 
 Exemple de sortie :
@@ -1825,7 +1769,8 @@ Chacun nécessite un ticket séparé.
 
 ## Suites possibles
 
-Ces éléments ne sont pas des engagements. Ils constituent des pistes pour les roadmaps suivantes.
+Ces éléments ne sont pas des engagements.
+Ils constituent des pistes pour les roadmaps suivantes.
 
 - Roadmap de migration des starters vers le format canonique.
 - Ticket de décision sur le support legacy (maintien ou suppression).

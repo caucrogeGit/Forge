@@ -1,40 +1,33 @@
 # Dépannage du serveur de dev sous WSL2
 
-Ce document explique deux pièges qui, **combinés**, donnent l'impression que le
-serveur Forge est cassé alors qu'il fonctionne. Symptômes observés :
+Ce document explique deux pièges qui, **combinés**, donnent l'impression que le serveur Forge est cassé alors qu'il fonctionne.
+Symptômes observés :
 
-- `forge run` échoue en boucle avec « Le port 8000 est déjà utilisé sur
-  0.0.0.0 », **alors que `ss -tulpn | grep :8000` et `lsof -i :8000` ne montrent
-  rien**.
-- Quand le serveur démarre malgré tout, `curl http://127.0.0.1:<port>/` **reste
-  pendu** (timeout, `HTTP 000`) : la connexion TCP s'ouvre mais aucune réponse
-  n'arrive.
+- `forge run` échoue en boucle avec « Le port 8000 est déjà utilisé sur 0.0.0.0 », **alors que `ss -tulpn | grep :8000` et `lsof -i :8000` ne montrent rien**.
+- Quand le serveur démarre malgré tout, `curl http://127.0.0.1:<port>/` **reste pendu** (timeout, `HTTP 000`) : la connexion TCP s'ouvre mais aucune réponse n'arrive.
 
 !!! tip "En résumé"
-    1. Le serveur dev parle **HTTPS** : interrogez-le en `https://`, pas
-       `http://`.
-    2. Le port est tenu par un **forward fantôme de VS Code** côté Windows,
-       invisible aux outils Linux : libérez-le via l'onglet **PORTS**, ou changez
-       `APP_PORT`.
+    1. Le serveur dev parle **HTTPS** : interrogez-le en `https://`, pas `http://`.
+    2. Le port est tenu par un **forward fantôme de VS Code** côté Windows, invisible aux outils Linux : libérez-le via l'onglet **PORTS**, ou changez `APP_PORT`.
 
 ---
 
 ## Cause n° 1 : le serveur dev est en HTTPS par défaut
 
-En environnement `dev`, Forge active TLS : `config.APP_SSL_ENABLED` vaut `True`
-**même si** la ligne reste commentée dans `env/dev`.
+En environnement `dev`, Forge active TLS : `config.APP_SSL_ENABLED` vaut `True` **même si** la ligne reste commentée dans `env/dev`.
 
 ```ini
 # env/dev
 # APP_SSL_ENABLED=true     ← commentée, mais le défaut dev est déjà true
 ```
 
-Ce comportement vient du défaut de configuration : en `dev`, le défaut de
-`APP_SSL_ENABLED` est `true` (en `prod`, il est `false`, car Nginx termine TLS).
+Ce comportement vient du défaut de configuration : en `dev`, le défaut de `APP_SSL_ENABLED` est `true` (en `prod`, il est `false`, car Nginx termine TLS).
 
-Conséquence : le serveur écoute en **HTTPS**. Un client en clair (`http://`)
-ouvre la socket TCP puis attend une réponse qui ne viendra jamais. Le serveur,
-lui, attend un **handshake TLS**. D'où le `curl` qui « pend » et le `HTTP 000`.
+Conséquence : le serveur écoute en **HTTPS**.
+Un client en clair (`http://`) ouvre la socket TCP puis attend une réponse qui ne viendra jamais.
+Le serveur, lui, attend un **handshake TLS**.
+D'où le `curl` qui « pend »
+et le `HTTP 000`.
 
 Le log de démarrage le dit explicitement :
 
@@ -45,9 +38,9 @@ Le log de démarrage le dit explicitement :
 ```
 
 !!! note "Hôte affiché : 127.0.0.1 ou 0.0.0.0"
-    L'hôte du log dépend de `APP_HOST` (défaut : `127.0.0.1`). Les exemples
-    ci-dessus montrent `0.0.0.0`, valeur d'un projet qui écoute sur toutes les
-    interfaces. Le message de port occupé reprend la même valeur d'hôte.
+    L'hôte du log dépend de `APP_HOST` (défaut : `127.0.0.1`).
+    Les exemples ci-dessus montrent `0.0.0.0`, valeur d'un projet qui écoute sur toutes les interfaces.
+    Le message de port occupé reprend la même valeur d'hôte.
 
 ### Vérification
 
@@ -60,8 +53,7 @@ curl -sk -m 3 https://127.0.0.1:8001/
 # → Bonjour le monde !
 ```
 
-Dans le navigateur : ouvrir **`https://127.0.0.1:8001/`** et accepter
-l'avertissement de certificat auto-signé (normal en dev).
+Dans le navigateur : ouvrir **`https://127.0.0.1:8001/`** et accepter l'avertissement de certificat auto-signé (normal en dev).
 
 ---
 
@@ -70,14 +62,12 @@ l'avertissement de certificat auto-signé (normal en dev).
 ### Pourquoi `ss` et `lsof` ne voient rien
 
 Sous **WSL2 en réseau miroité**, `localhost` est partagé entre Windows et Linux.
-Quand un serveur ouvre un port dans WSL, **VS Code (`Code.exe`, côté Windows)
-auto-forwarde** ce port sur `127.0.0.1:<port>`. Ce forward **n'est pas toujours
-relâché** quand le serveur meurt.
+Quand un serveur ouvre un port dans WSL, **VS Code (`Code.exe`, côté Windows) auto-forwarde** ce port sur `127.0.0.1:<port>`.
+Ce forward **n'est pas toujours relâché** quand le serveur meurt.
 
-Le listener qui subsiste est alors un **processus Windows**. Les outils Linux
-(`ss`, `lsof`) ne le voient pas, mais `bind()` côté WSL échoue quand même avec
-`EADDRINUSE` (« déjà utilisé sur 0.0.0.0 »). D'où le paradoxe : rien n'écoute
-côté Linux, mais impossible de binder.
+Le listener qui subsiste est alors un **processus Windows**.
+Les outils Linux (`ss`, `lsof`) ne le voient pas, mais `bind()` côté WSL échoue quand même avec `EADDRINUSE` (« déjà utilisé sur 0.0.0.0 »).
+D'où le paradoxe : rien n'écoute côté Linux, mais impossible de binder.
 
 ### Diagnostic
 
@@ -102,21 +92,19 @@ PY
 ```
 
 !!! warning "À ne pas confondre avec les plages réservées par Windows"
-    Hyper-V, WSL et Docker réservent des plages de ports, autre cause possible
-    d'`EADDRINUSE` sans listener :
+    Hyper-V, WSL et Docker réservent des plages de ports, autre cause possible d'`EADDRINUSE` sans listener :
 
     ```bash
     netsh.exe int ipv4 show excludedportrange protocol=tcp
     ```
 
-    Si le port tombe dans une plage listée, il est réservé par le système :
-    changer de port.
+    Si le port tombe dans une plage listée, il est réservé par le système : changer de port.
 
 ### Résolution
 
 **Option A : libérer le port (garde 8000).**
-Dans VS Code, onglet **PORTS** (à côté de TERMINAL, en bas), clic droit sur la
-ligne du port, puis **Stop Forwarding Port**. Relancer ensuite `forge run`.
+Dans VS Code, onglet **PORTS** (à côté de TERMINAL, en bas), clic droit sur la ligne du port, puis **Stop Forwarding Port**.
+Relancer ensuite `forge run`.
 
 **Option B : changer de port (immédiat).**
 
@@ -128,17 +116,14 @@ APP_PORT=8001
 Relancer `forge run` et ouvrir `https://127.0.0.1:8001/`.
 
 !!! tip "Limiter les forwards automatiques"
-    Pour réduire les forwards automatiques à l'avenir, régler dans VS Code :
-    `"remote.autoForwardPorts": false` (désactive l'auto-forward) ou
-    `"remote.autoForwardPortsSource": "process"`.
+    Pour réduire les forwards automatiques à l'avenir, régler dans VS Code : `"remote.autoForwardPorts": false` (désactive l'auto-forward) ou `"remote.autoForwardPortsSource": "process"`.
 
 ---
 
 ## Piège bonus : processus serveurs orphelins
 
-`forge run` est un **superviseur autoreload** : il relance un **processus
-enfant** (`app.py`) à chaque sauvegarde. Tuer le PID du superviseur (ou de
-`python app.py`) ne tue pas forcément l'enfant qui détient réellement la socket.
+`forge run` est un **superviseur autoreload** : il relance un **processus enfant** (`app.py`) à chaque sauvegarde.
+Tuer le PID du superviseur (ou de `python app.py`) ne tue pas forcément l'enfant qui détient réellement la socket.
 Un orphelin continue alors d'écouter et provoque à son tour un `EADDRINUSE`.
 
 ```bash

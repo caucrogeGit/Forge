@@ -1,15 +1,13 @@
 # Cartes, badges et retours
 
-**Objectif** : afficher les données passées par le contrôleur sous forme de
-chiffre-clé et de cartes, avec des pastilles de statut.
+**Objectif** : afficher les données passées par le contrôleur sous forme de chiffre-clé et de cartes, avec des pastilles de statut.
 
-**Ce que vous allez apprendre :** les composants de présentation de
-`components/ui.html` (`button`, `card`, `badge`, `stat`, `alert`,
-`empty_state`), alimentés par le contexte du contrôleur (`total`, `contacts`).
+**Ce que vous allez apprendre :** les composants de présentation de `components/ui.html` (`button`, `card`, `badge`, `stat`, `alert`, `empty_state`), alimentés par le contexte du contrôleur (`total`, `contacts`).
 
 ## Rappel : ce que le contrôleur passe
 
-Au préambule, `index` passe déjà `total` et `contacts`. Nous les consommons ici.
+Au préambule, `index` passe déjà `total` et `contacts`.
+Nous les consommons ici.
 
 ## Chiffre-clé et cartes alimentées par les données
 
@@ -43,8 +41,8 @@ Dans `showcase/index.html`, remplacez le paragraphe par :
 {% endblock %}
 ```
 
-Le `stat` affiche un compte calculé, et une carte par contact réel boucle sur
-`contacts`. La pastille reflète le statut de chaque enregistrement.
+Le `stat` affiche un compte calculé, et une carte par contact réel boucle sur `contacts`.
+La pastille reflète le statut de chaque enregistrement.
 
 ## Boutons et messages
 
@@ -57,12 +55,11 @@ Le `stat` affiche un compte calculé, et une carte par contact réel boucle sur
 {{ alert("Pensez à compléter les coordonnées.", level="info") }}
 ```
 
-`button` a trois variantes (`primary`, `secondary`, `ghost`). Pour une liste
-vide, `empty_state("Aucun contact.")` remplace l'affichage.
+`button` a trois variantes (`primary`, `secondary`, `ghost`).
+Pour une liste vide, `empty_state("Aucun contact.")` remplace l'affichage.
 
 ??? note "À retenir"
-    - Les composants consomment le **contexte du contrôleur** (`contacts`,
-      `total`), pas des données en dur.
+    - Les composants consomment le **contexte du contrôleur** (`contacts`, `total`), pas des données en dur.
     - `card` s'utilise avec `{% call card() %} ... {% endcall %}`.
     - `badge(label, tone=...)` reflète une donnée (ici le statut).
     - `stat`, `alert`, `empty_state` complètent la présentation.

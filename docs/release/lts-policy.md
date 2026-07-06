@@ -1,7 +1,6 @@
 # Politique LTS Forge
 
-Ce document évalue l'intérêt d'une version LTS (Long Term Support) pour Forge
-et définit les conditions à remplir avant qu'une telle version puisse être déclarée.
+Ce document évalue l'intérêt d'une version LTS (Long Term Support) pour Forge et définit les conditions à remplir avant qu'une telle version puisse être déclarée.
 
 Il complète :
 
@@ -18,14 +17,14 @@ Répondre clairement à la question :
 
 > Forge doit-il proposer une version LTS maintenant, plus tard, ou pas encore ?
 
-Ce document est une évaluation, pas une promesse. Il ne déclare pas de version LTS.
+Ce document est une évaluation, pas une promesse.
+Il ne déclare pas de version LTS.
 
 ---
 
 ## Ce qu'est une LTS
 
-Une version LTS (Long Term Support) est une version d'un logiciel qui bénéficie
-d'un **support prolongé et documenté** au-delà du cycle normal de releases.
+Une version LTS (Long Term Support) est une version d'un logiciel qui bénéficie d'un **support prolongé et documenté** au-delà du cycle normal de releases.
 
 Elle implique un engagement explicite sur :
 
@@ -107,13 +106,14 @@ La série de préversion 1.0 (jusqu'à `1.0.0-rc.2`) est livrée, documentée et
 
 ### 2. La politique de release est formalisée
 
-La politique SemVer adaptée est documentée. Les règles de rupture compatible et
-incompatible sont claires. Une LTS pourrait s'appuyer sur ce cadre sans ambiguïté.
+La politique SemVer adaptée est documentée.
+Les règles de rupture compatible et incompatible sont claires.
+Une LTS pourrait s'appuyer sur ce cadre sans ambiguïté.
 
 ### 3. La politique de dépréciation est en place
 
-Le cycle `annonce → maintien → retrait` garantit qu'aucune rupture ne survient
-sans préavis. Une branche LTS pourrait interdire tout retrait pendant sa durée.
+Le cycle `annonce → maintien → retrait` garantit qu'aucune rupture ne survient sans préavis.
+Une branche LTS pourrait interdire tout retrait pendant sa durée.
 
 ### 4. La compatibilité est documentée
 
@@ -122,8 +122,8 @@ Une LTS pourrait geler cette matrice pour toute sa durée.
 
 ### 5. Des projets réels peuvent s'appuyer sur Forge 1.x
 
-Le starter Communes & Séjours est un démonstrateur viable. Des projets applicatifs
-construits sur Forge 1.0 méritent une stabilité garantie dans le temps.
+Le starter Communes & Séjours est un démonstrateur viable.
+Des projets applicatifs construits sur Forge 1.0 méritent une stabilité garantie dans le temps.
 
 ---
 
@@ -131,15 +131,13 @@ construits sur Forge 1.0 méritent une stabilité garantie dans le temps.
 
 ### 1. L'API JSON légère n'est pas encore créée
 
-Une LTS couvrant Forge 1.x sans API JSON serait incomplète pour les usages
-web modernes. L'ajout d'une API JSON après la déclaration LTS est risqué :
-elle devrait être stable dès sa création.
+Une LTS couvrant Forge 1.x sans API JSON serait incomplète pour les usages web modernes.
+L'ajout d'une API JSON après la déclaration LTS est risqué : elle devrait être stable dès sa création.
 
 ### 2. La documentation avancée n'est pas restructurée
 
-Les parcours pédagogiques (tutoriel 15 min, application complète, guide contributeur)
-ne sont pas encore créés. Une LTS sur une documentation partielle crée une fausse
-promesse de maturité.
+Les parcours pédagogiques (tutoriel 15 min, application complète, guide contributeur) ne sont pas encore créés.
+Une LTS sur une documentation partielle crée une fausse promesse de maturité.
 
 ### 3. Des dettes de sécurité restent ouvertes
 
@@ -150,25 +148,23 @@ Quatre tickets de sécurité identifiés lors des audits restent ouverts :
 - `E2E-UPLOAD-HTTP-001`, tests upload HTTP réels pas encore créés
 - `SECURITY-UPLOAD-RATE-LIMIT-001`, rate limit sur les uploads absent
 
-Ces dettes, même mineures, ne devraient pas faire partie d'une promesse LTS
-sans être d'abord corrigées.
+Ces dettes, même mineures, ne devraient pas faire partie d'une promesse LTS sans être d'abord corrigées.
 
 ### 4. Les tests E2E MariaDB ne sont pas automatisés en CI
 
-Les tests MariaDB réels sont opt-in (`FORGE_E2E_MARIADB=1`). Une LTS sérieuse
-implique une CI complète, y compris avec une base de données réelle.
+Les tests MariaDB réels sont opt-in (`FORGE_E2E_MARIADB=1`).
+Une LTS sérieuse implique une CI complète, y compris avec une base de données réelle.
 
 ### 5. Le SQL versionné est absent
 
-L'absence de migrations SQL versionnées (type Alembic) est une limite structurelle
-pour les projets qui évoluent. Les projets LTS ont souvent des cycles de vie longs
-avec des schémas SQL qui changent.
+L'absence de migrations SQL versionnées (type Alembic) est une limite structurelle pour les projets qui évoluent.
+Les projets LTS ont souvent des cycles de vie longs avec des schémas SQL qui changent.
 
 ### 6. La capacité de maintenance LTS n'est pas encore évaluée
 
-Une LTS implique un engagement humain dans la durée. Forge est un projet qui
-évolue encore rapidement. S'engager sur 2 ou 3 ans de maintenance d'une branche
-figée serait prématuré à ce stade.
+Une LTS implique un engagement humain dans la durée.
+Forge est un projet qui évolue encore rapidement.
+S'engager sur 2 ou 3 ans de maintenance d'une branche figée serait prématuré à ce stade.
 
 ---
 
@@ -187,11 +183,9 @@ Forge continue en série 1.x sans promesse LTS.
 
 **Inconvénients :**
 
-- les projets applicatifs existants n'ont pas de garantie formelle de stabilité
-  longue durée.
+- les projets applicatifs existants n'ont pas de garantie formelle de stabilité longue durée.
 
-**Mitigation :** le [Contrat de stabilité](stability-contract.md) offre déjà
-des garanties claires sur les API publiques en 1.x, sans aller jusqu'à une LTS.
+**Mitigation :** le [Contrat de stabilité](stability-contract.md) offre déjà des garanties claires sur les API publiques en 1.x, sans aller jusqu'à une LTS.
 
 ---
 
@@ -236,8 +230,7 @@ Forge attend la stabilisation de `1.0.0` pour déclarer sa première LTS.
 
 ## Critères avant de déclarer une LTS
 
-Une LTS Forge ne peut être déclarée que si toutes les conditions suivantes
-sont remplies :
+Une LTS Forge ne peut être déclarée que si toutes les conditions suivantes sont remplies :
 
 | Critère | Statut actuel |
 |---|---|
@@ -265,7 +258,8 @@ Si une LTS était déclarée, une durée réaliste pour un projet de cette taill
 | 24 mois | Corrections de sécurité garanties |
 | Au-delà | Hors capacité actuelle |
 
-Ces durées sont indicatives. Elles dépendent de la capacité de maintenance réelle.
+Ces durées sont indicatives.
+Elles dépendent de la capacité de maintenance réelle.
 
 ---
 
@@ -302,12 +296,9 @@ Sur la base de cette évaluation :
 Les raisons principales :
 
 1. Les dettes de sécurité identifiées doivent être corrigées avant tout engagement LTS.
-2. L'API JSON légère n'est pas encore créée, promettre une LTS sans API JSON
-   gèlerait une version incomplète.
-3. La documentation avancée n'est pas structurée, les utilisateurs d'une LTS
-   ont besoin d'une documentation pédagogique complète.
-4. Les tests E2E MariaDB ne sont pas automatisés, une LTS sans CI MariaDB
-   réelle est une promesse fragile.
+2. L'API JSON légère n'est pas encore créée, promettre une LTS sans API JSON gèlerait une version incomplète.
+3. La documentation avancée n'est pas structurée, les utilisateurs d'une LTS ont besoin d'une documentation pédagogique complète.
+4. Les tests E2E MariaDB ne sont pas automatisés, une LTS sans CI MariaDB réelle est une promesse fragile.
 5. La capacité humaine de maintenance LTS n'a pas été évaluée formellement.
 
 ---

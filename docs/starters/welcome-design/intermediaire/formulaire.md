@@ -1,16 +1,13 @@
 # Le formulaire
 
-**Objectif** : ajouter une page d'ajout de contact, servie par le contrôleur,
-avec les composants de saisie.
+**Objectif** : ajouter une page d'ajout de contact, servie par le contrôleur, avec les composants de saisie.
 
-**Ce que vous allez apprendre :** les macros de `components/forms.html` et le
-branchement route + contrôleur + vue du formulaire. Les macros produisent les
-champs ; la balise `<form>` et le jeton CSRF restent à votre charge.
+**Ce que vous allez apprendre :** les macros de `components/forms.html` et le branchement route + contrôleur + vue du formulaire.
+Les macros produisent les champs ; la balise `<form>` et le jeton CSRF restent à votre charge.
 
 ## La route et le contrôleur
 
-Ajoutez une méthode `new` (affiche le formulaire) et `store` (recevra l'envoi) à
-`ShowcaseController` :
+Ajoutez une méthode `new` (affiche le formulaire) et `store` (recevra l'envoi) à `ShowcaseController` :
 
 ```python
     @staticmethod
@@ -66,9 +63,8 @@ Créez `mvc/views/showcase/form.html` :
 {% endblock %}
 ```
 
-Le contrôleur passe `values` (vide ici) ; les champs réaffichent ces valeurs,
-ce qui servira à la validation au palier suivant. Le jeton CSRF est injecté
-automatiquement dans le contexte par `render` ; `partials/csrf.html` le pose.
+Le contrôleur passe `values` (vide ici) ; les champs réaffichent ces valeurs, ce qui servira à la validation au palier suivant.
+Le jeton CSRF est injecté automatiquement dans le contexte par `render` ; `partials/csrf.html` le pose.
 
 ## Le catalogue des champs
 

@@ -1,8 +1,7 @@
 # Aide-mémoire de la progression
 
-Récapitulatif des **23 paliers** de la progression *Bonjour Forge*, répartis en
-trois niveaux, et des API Forge introduites à chaque étape. À garder sous la main
-avant d'aborder les progressions opt-in autonomes.
+Récapitulatif des **23 paliers** de la progression *Bonjour Forge*, répartis en trois niveaux, et des API Forge introduites à chaque étape.
+À garder sous la main avant d'aborder les progressions opt-in autonomes.
 
 ## Niveau débutant (11 paliers)
 
@@ -77,9 +76,9 @@ Un seul mini-projet, le « Catalogue d'articles », construit à la main palier 
 | `db.execute(sql, params)` | Écriture générique |
 | `with transaction() as tx:` + `db.insert(..., tx=tx)` | Écritures **atomiques** (commit / rollback) |
 
-Les requêtes restent **paramétrées** (placeholders `?`) : jamais de
-concaténation de valeurs. **Forge garde le SQL visible.** Les relations
-s'écrivent à la main (`JOIN`), sans ORM.
+Les requêtes restent **paramétrées** (placeholders `?`) : jamais de concaténation de valeurs.
+**Forge garde le SQL visible.**
+Les relations s'écrivent à la main (`JOIN`), sans ORM.
 
 ## Sessions & flash (`core.security.session`, `core.sessions.manager`)
 
@@ -93,9 +92,6 @@ Cookie de session **durci** : `HttpOnly; SameSite=Strict; Secure`.
 
 ## Sécurité
 
-- **CSRF** : champ caché `csrf_token` exigé sur chaque POST, vérifié
-  automatiquement (palier débutant 7).
-- **Validation serveur** : ne jamais faire confiance au client ; valider avant
-  d'utiliser ou d'écrire (palier débutant 9).
-- **API** : vérifier l'autorisation (`Bearer`) **avant** de produire la donnée ;
-  un refus renvoie `401` (palier avancé 3).
+- **CSRF** : champ caché `csrf_token` exigé sur chaque POST, vérifié automatiquement (palier débutant 7).
+- **Validation serveur** : ne jamais faire confiance au client ; valider avant d'utiliser ou d'écrire (palier débutant 9).
+- **API** : vérifier l'autorisation (`Bearer`) **avant** de produire la donnée ; un refus renvoie `401` (palier avancé 3).

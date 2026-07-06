@@ -2,20 +2,17 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Forge est conçu pour Linux et macOS. Sur Windows, **la voie recommandée est WSL2**
-(Windows Subsystem for Linux 2), qui fournit un environnement Linux complet directement
-dans Windows 11.
+Forge est conçu pour Linux et macOS.
+Sur Windows, **la voie recommandée est WSL2** (Windows Subsystem for Linux 2), qui fournit un environnement Linux complet directement dans Windows 11.
 
 ---
 
 ## Pourquoi WSL2 et pas Windows natif ?
 
-Forge utilise des conventions Unix (chemins, permissions, scripts shell) qui s'intègrent
-mal au système de fichiers Windows. WSL2 fournit une distribution Linux native sans
-virtualisation lourde, ce qui permet d'utiliser Forge exactement comme sur un poste Linux.
+Forge utilise des conventions Unix (chemins, permissions, scripts shell) qui s'intègrent mal au système de fichiers Windows.
+WSL2 fournit une distribution Linux native sans virtualisation lourde, ce qui permet d'utiliser Forge exactement comme sur un poste Linux.
 
-C'est l'approche recommandée par l'écosystème Python web (Django, Flask et FastAPI
-font de même).
+C'est l'approche recommandée par l'écosystème Python web (Django, Flask et FastAPI font de même).
 
 ---
 
@@ -38,8 +35,8 @@ En résumé, dans un terminal PowerShell en mode administrateur :
 wsl --install
 ```
 
-Cette commande installe Ubuntu par défaut. Redémarrez Windows si demandé, puis ouvrez
-un terminal Ubuntu.
+Cette commande installe Ubuntu par défaut.
+Redémarrez Windows si demandé, puis ouvrez un terminal Ubuntu.
 
 ---
 
@@ -83,8 +80,7 @@ Puis suivre le [Guide de démarrage](../guide/getting-started.md) normalement.
 ## Accès aux fichiers
 
 Les fichiers créés dans WSL2 sont dans `~/` (répertoire home Linux).
-Depuis Windows, ils sont accessibles via l'explorateur de fichiers sous
-`\\wsl$\Ubuntu\home\<utilisateur>\`.
+Depuis Windows, ils sont accessibles via l'explorateur de fichiers sous `\\wsl$\Ubuntu\home\<utilisateur>\`.
 
 Pour éditer avec VS Code depuis Windows :
 
@@ -99,7 +95,8 @@ VS Code détecte automatiquement WSL2 et propose l'extension Remote WSL.
 
 ## MariaDB dans WSL2
 
-Forge nécessite MariaDB. Dans WSL2 :
+Forge nécessite MariaDB.
+Dans WSL2 :
 
 ```bash
 sudo apt install -y mariadb-server
@@ -113,16 +110,15 @@ Puis suivre [Préparer MariaDB](mariadb.md).
 
 ## Frictions connues : Windows natif (sans WSL2)
 
-Si vous souhaitez expérimenter Forge nativement sur Windows sans WSL2, les
-frictions suivantes peuvent apparaître :
+Si vous souhaitez expérimenter Forge nativement sur Windows sans WSL2, les frictions suivantes peuvent apparaître :
 
 - **Chemins** : certaines opérations sur fichiers utilisent des séparateurs Unix (`/`)
 - **Permissions** : `chmod` est ignoré silencieusement sous Windows
 - **MariaDB** : installation différente (MSI Windows vs `apt`)
 - **Tests** : certains tests dépendent du système Unix et peuvent échouer
 
-Ces frictions ne sont pas testées ni supportées dans Forge {{forge_version}}. Les contributions
-pour le support natif Windows sont bienvenues, mais non planifiées.
+Ces frictions ne sont pas testées ni supportées dans Forge {{forge_version}}.
+Les contributions pour le support natif Windows sont bienvenues, mais non planifiées.
 
 ---
 

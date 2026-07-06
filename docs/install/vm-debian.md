@@ -2,7 +2,8 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Cette page prépare une machine Debian minimale pour utiliser Forge. Une fois cette étape terminée, continuez avec le [guide de démarrage](../guide/guide.md).
+Cette page prépare une machine Debian minimale pour utiliser Forge.
+Une fois cette étape terminée, continuez avec le [guide de démarrage](../guide/guide.md).
 
 ## 1. Mettre à jour Debian
 
@@ -32,11 +33,9 @@ sudo apt install -y \
 
 ## 3. Node.js / npm : optionnel
 
-`forge new` utilise npm automatiquement s'il est présent pour installer les
-dépendances front et compiler le CSS Tailwind. Tailwind est le CSS officiel des
-templates générés par Forge. Si npm est absent, le projet est créé normalement
-et un avertissement est affiché, vous pourrez relancer
-`npm install && npm run build:css` plus tard.
+`forge new` utilise npm automatiquement s'il est présent pour installer les dépendances front et compiler le CSS Tailwind.
+Tailwind est le CSS officiel des templates générés par Forge.
+Si npm est absent, le projet est créé normalement et un avertissement est affiché, vous pourrez relancer `npm install && npm run build:css` plus tard.
 
 ```bash
 sudo apt install -y nodejs npm
@@ -79,7 +78,8 @@ sudo systemctl status mariadb
 
 ## 6. Vérifier l'accès administrateur MariaDB
 
-Sur certaines installations Debian, le compte `root` MariaDB peut être configuré avec l'authentification système `unix_socket`. Dans ce cas, `mariadb -u root -p` peut échouer alors que `sudo mariadb` fonctionne.
+Sur certaines installations Debian, le compte `root` MariaDB peut être configuré avec l'authentification système `unix_socket`.
+Dans ce cas, `mariadb -u root -p` peut échouer alors que `sudo mariadb` fonctionne.
 
 Dans cette procédure Forge, on suppose que le compte `root` MariaDB est configuré avec un mot de passe.
 
@@ -87,7 +87,9 @@ Dans cette procédure Forge, on suppose que le compte `root` MariaDB est configu
 mariadb -u root -p
 ```
 
-Entrer le mot de passe `root` MariaDB lorsqu'il est demandé. Une invite `MariaDB [(none)]>` confirme l'accès. Saisir `exit` pour quitter.
+Entrer le mot de passe `root` MariaDB lorsqu'il est demandé.
+Une invite `MariaDB [(none)]>` confirme l'accès.
+Saisir `exit` pour quitter.
 
 !!! note "Recommandation"
     Pour un environnement pédagogique simple, l'utilisation du compte `root` MariaDB avec mot de passe est acceptable.

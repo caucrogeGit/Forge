@@ -1,14 +1,14 @@
 # Pages publiques génériques
 
 
-Pages publiques séparées du CRUD admin, orientées visiteur. Forge génère
-contrôleurs, routes et vues via cinq commandes dédiées. Chaque génération est
-non destructive : les fichiers existants sont préservés.
+Pages publiques séparées du CRUD admin, orientées visiteur.
+Forge génère contrôleurs, routes et vues via cinq commandes dédiées.
+Chaque génération est non destructive : les fichiers existants sont préservés.
 
 ### Pages publiques : Principe général
 
-Les pages publiques et le CRUD admin coexistent dans le même projet mais ne
-partagent ni contrôleurs, ni vues, ni routes. Le flux est serveur d'abord :
+Les pages publiques et le CRUD admin coexistent dans le même projet mais ne partagent ni contrôleurs, ni vues, ni routes.
+Le flux est serveur d'abord :
 
 ```
 route publique → contrôleur public → lecture données → rendu Jinja → HTML public
@@ -44,14 +44,14 @@ mvc/views/public/               # pages et vues publiques générées
 mvc/views/components/           # composants Jinja réutilisables
 ```
 
-Le layout public (`layouts/public.html`) expose les blocs `title`, `content` et
-`scripts`. Il charge Tailwind et reste indépendant de HTMX et Alpine.js. Tous
-les templates générés étendent ce layout.
+Le layout public (`layouts/public.html`) expose les blocs `title`, `content` et `scripts`.
+Il charge Tailwind et reste indépendant de HTMX et Alpine.js.
+Tous les templates générés étendent ce layout.
 
 ### Pages publiques : Compatibilité i18n
 
-Les générateurs utilisent des clés i18n standards si i18n est activé. Clés
-prédéfinies dans `translations/fr.json` :
+Les générateurs utilisent des clés i18n standards si i18n est activé.
+Clés prédéfinies dans `translations/fr.json` :
 
 | Clé | Valeur par défaut |
 |---|---|
@@ -68,18 +68,15 @@ prédéfinies dans `translations/fr.json` :
 | `public.contact.email_label` | Email |
 | `public.contact.phone` | Téléphone |
 
-Pas de traduction automatique, pas de routes traduites, pas de détection de
-langue imposée.
+Pas de traduction automatique, pas de routes traduites, pas de détection de langue imposée.
 
 ### Pages publiques : Médias publics
 
-Les listes et fiches publiques générées intègrent les médias déclarés dans
-l'entité en lecture seule. Aucun upload, aucune suppression, aucune
-réorganisation n'est possible côté public.
+Les listes et fiches publiques générées intègrent les médias déclarés dans l'entité en lecture seule.
+Aucun upload, aucune suppression, aucune réorganisation n'est possible côté public.
 → Voir `### Médias dans les pages publiques` pour le comportement détaillé.
 
-Le mécanisme de position des médias (`media_order`) est propre au système média
-et ne dépend pas du champ `order_column` des relations `many_to_many`.
+Le mécanisme de position des médias (`media_order`) est propre au système média et ne dépend pas du champ `order_column` des relations `many_to_many`.
 
 ### Limites actuelles
 

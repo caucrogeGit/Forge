@@ -1,16 +1,13 @@
 # La façade Cookies
 
-Objectif : regrouper la lecture et l'écriture des cookies **applicatifs**
-(thème, préférence…) sous une façade `Cookies`, distincte du cookie de session.
+Objectif : regrouper la lecture et l'écriture des cookies **applicatifs** (thème, préférence…) sous une façade `Cookies`, distincte du cookie de session.
 
-**Ce que vous allez apprendre :** lire un cookie depuis la requête, en poser un
-sur la réponse avec des défauts sûrs, et une **limite importante** du noyau à
-connaître avant de vous en servir.
+**Ce que vous allez apprendre :** lire un cookie depuis la requête, en poser un sur la réponse avec des défauts sûrs, et une **limite importante** du noyau à connaître avant de vous en servir.
 
 ## Là où nous en sommes
 
-Vous avez `_facade.py` (palier 1) et `session.py` (palier 2). Nous ajoutons une
-façade pour les cookies génériques, qui ne sont pas du ressort de `Session`.
+Vous avez `_facade.py` (palier 1) et `session.py` (palier 2).
+Nous ajoutons une façade pour les cookies génériques, qui ne sont pas du ressort de `Session`.
 
 ## L'ajout
 
@@ -71,23 +68,18 @@ class Cookies(Facade):
 
 ## Comprendre ce code
 
-- **Lecture** : `get` parcourt l'en-tête `Cookie` de la requête et renvoie la
-  valeur (ou `default`). `all` renvoie tous les cookies sous forme de
-  dictionnaire. Aucune écriture, aucun effet de bord.
-- **Écriture** : `set` construit la chaîne `Set-Cookie` avec des **défauts sûrs**
-  (`Secure`, `HttpOnly`, `SameSite=Strict`). Ces défauts sont **surchargeables** :
-  pour un cookie lisible côté JavaScript (un thème, par exemple), passez
-  `http_only=False`.
+- **Lecture** : `get` parcourt l'en-tête `Cookie` de la requête et renvoie la valeur (ou `default`).
+  `all` renvoie tous les cookies sous forme de dictionnaire.
+  Aucune écriture, aucun effet de bord.
+- **Écriture** : `set` construit la chaîne `Set-Cookie` avec des **défauts sûrs** (`Secure`, `HttpOnly`, `SameSite=Strict`).
+  Ces défauts sont **surchargeables** : pour un cookie lisible côté JavaScript (un thème, par exemple), passez `http_only=False`.
 - **`clear`** efface un cookie en le réémettant avec `Max-Age=0`.
 
 !!! warning "Limite : un seul Set-Cookie par réponse"
-    `Response.headers` est un **dictionnaire** : il ne peut porter qu'**un seul**
-    `Set-Cookie`. Donc `Cookies.set(...)` **écrase** tout cookie déjà posé sur la
-    même réponse, y compris le cookie de **session** (`Session.set_cookie` écrit
-    la même clé). Concrètement : ne posez **pas** un cookie applicatif sur une
-    réponse qui pose aussi la session, l'un des deux serait perdu. La lecture
-    (`get` / `all`) n'est pas concernée ; c'est l'écriture **multiple** qui est
-    bloquée, côté noyau, tant que `Response` ne gère pas une liste de cookies.
+    `Response.headers` est un **dictionnaire** : il ne peut porter qu'**un seul** `Set-Cookie`.
+    Donc `Cookies.set(...)` **écrase** tout cookie déjà posé sur la même réponse, y compris le cookie de **session** (`Session.set_cookie` écrit la même clé).
+    Concrètement : ne posez **pas** un cookie applicatif sur une réponse qui pose aussi la session, l'un des deux serait perdu.
+    La lecture (`get` / `all`) n'est pas concernée ; c'est l'écriture **multiple** qui est bloquée, côté noyau, tant que `Response` ne gère pas une liste de cookies.
 
 ## Tester
 
@@ -112,12 +104,9 @@ Dans un shell Python du projet :
 
 ## À retenir
 
-- `Cookies` est pour les cookies **applicatifs génériques** ; le cookie de
-  session reste géré par `Session.set_cookie` (politique `__Host-` du noyau).
-- Lire un cookie = parser l'en-tête `Cookie` de la requête ; écrire = poser un
-  `Set-Cookie` sur la réponse.
-- **Un seul `Set-Cookie` par réponse** : ne combinez pas un cookie applicatif et
-  le cookie de session sur la même réponse.
+- `Cookies` est pour les cookies **applicatifs génériques** ; le cookie de session reste géré par `Session.set_cookie` (politique `__Host-` du noyau).
+- Lire un cookie = parser l'en-tête `Cookie` de la requête ; écrire = poser un `Set-Cookie` sur la réponse.
+- **Un seul `Set-Cookie` par réponse** : ne combinez pas un cookie applicatif et le cookie de session sur la même réponse.
 
 Au palier suivant, nous ajoutons une façade pour les messages flash.
 

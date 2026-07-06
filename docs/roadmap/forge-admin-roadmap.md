@@ -139,9 +139,7 @@ Dépendances attendues :
 - templates Jinja ;
 - conventions de fichiers générés et de fichiers manuels.
 
-Une dépendance technique a été identifiée au cadrage de l'intégration HTTP : pour
-servir des templates embarqués dans le paquet, le cœur doit exposer un registre
-de loaders Jinja ([ADR-046](../adr/046-optin-jinja-template-loaders.md)).
+Une dépendance technique a été identifiée au cadrage de l'intégration HTTP : pour servir des templates embarqués dans le paquet, le cœur doit exposer un registre de loaders Jinja ([ADR-046](../adr/046-optin-jinja-template-loaders.md)).
 C'est un prérequis du dashboard et des vues (ticket `CORE-JINJA-OPTIN-LOADERS-001`).
 
 Certains tickets Forge Admin peuvent attendre la stabilisation des contrats JSON.
@@ -188,8 +186,7 @@ packages/forge-mvc-admin/
 └── tests/
 ```
 
-Le châssis reste minimal.
-Il ne contient aucune connaissance des entités d'un projet donné.
+Le châssis reste minimal. Il ne contient aucune connaissance des entités d'un projet donné.
 
 ### Couche 2 : contrôleurs de ressource générés (dans le projet)
 
@@ -257,7 +254,9 @@ Le rapprochement entre la ressource déclarée et le contrat d'entité réel (ta
 L'écriture (création, édition, suppression) réutilise la pile existante du cœur, sans nouveau mécanisme.
 
 - **Colonnes en liste blanche** : seules les `form_fields` déclarées sont écrites (pas de mass-assignment d'une colonne arbitraire) ; les identifiants sont validés, les valeurs passent par des paramètres `?`.
-- **CSRF** : automatique. Les routes d'écriture utilisent une méthode non sûre (POST) avec `csrf=True` (défaut) ; le middleware vérifie le jeton **avant** le handler. Le formulaire embarque `csrf_token` (injecté par `BaseController.render`).
+- **CSRF** : automatique.
+  Les routes d'écriture utilisent une méthode non sûre (POST) avec `csrf=True` (défaut) ; le middleware vérifie le jeton **avant** le handler.
+  Le formulaire embarque `csrf_token` (injecté par `BaseController.render`).
 - **Champs vides → NULL** : une valeur vide est insérée comme `NULL` (précédent `public_form`), pour ne pas casser les colonnes nullables.
 - **Écriture** : `core.database.db.insert` (retourne `lastrowid`), adaptateur injectable pour les tests.
 - **Flux POST-Redirect-GET** : en cas de succès, redirection vers la fiche de la ligne créée (`/admin/<slug>/<id>`) avec un message flash (`redirect_with_flash`).
@@ -374,15 +373,12 @@ Un ticket qui ne peut pas les respecter est revu, pas contourné.
 
 ## 11. Documentation attendue
 
-La documentation de Forge Admin est **embarquée dans le paquet** sous
-`packages/forge-mvc-admin/docs/`, conformément à l'ADR-038.
-Elle est agrégée dans le site unique au build (plugin mkdocs-monorepo) et montée
-sous le préfixe `/admin/`.
+La documentation de Forge Admin est **embarquée dans le paquet** sous `packages/forge-mvc-admin/docs/`, conformément à l'ADR-038.
+Elle est agrégée dans le site unique au build (plugin mkdocs-monorepo) et montée sous le préfixe `/admin/`.
 
 Page livrée :
 
-- `packages/forge-mvc-admin/docs/index.md` : présentation et positionnement
-  (ticket `ADMIN-OPTIN-DOCS-001`).
+- `packages/forge-mvc-admin/docs/index.md` : présentation et positionnement (ticket `ADMIN-OPTIN-DOCS-001`).
 
 Pages prévues, ajoutées avec leur ticket de fonctionnalité :
 
@@ -398,18 +394,13 @@ et ne tissent pas de liens transversaux avec la documentation du cœur.
 
 ### Parcours `welcome-admin` (cadrage)
 
-Comme chaque opt-in (ADR-028, ADR-035, ADR-038), Forge Admin reçoit un parcours
-pédagogique embarqué, réalisé **à la main** (aucune commande `forge new` ni
-`forge starter:build` dans les pages), sous `packages/forge-mvc-admin/docs/welcome/`.
+Comme chaque opt-in (ADR-028, ADR-035, ADR-038), Forge Admin reçoit un parcours pédagogique embarqué, réalisé **à la main** (aucune commande `forge new` ni `forge starter:build` dans les pages), sous `packages/forge-mvc-admin/docs/welcome/`.
 
-**Prérequis du parcours** : un projet Forge existant avec une entité et son CRUD
-(par exemple l'`Article` de `welcome-forge`).
-Le back-office s'administre au-dessus d'une entité ; le parcours ne crée pas
-l'entité, il l'administre.
+**Prérequis du parcours** : un projet Forge existant avec une entité et son CRUD (par exemple l'`Article` de `welcome-forge`).
+Le back-office s'administre au-dessus d'une entité ; le parcours ne crée pas l'entité, il l'administre.
 
-**Fil conducteur** : trois niveaux, trois étapes chacun, chaînées par un lien
-« suivant », un `bilan.md` par niveau qui pointe vers le niveau suivant, puis un
-`recapitulatif.md`. Chaque étape ajoute une fonctionnalité déjà livrée.
+**Fil conducteur** : trois niveaux, trois étapes chacun, chaînées par un lien « suivant », un `bilan.md` par niveau qui pointe vers le niveau suivant, puis un `recapitulatif.md`.
+Chaque étape ajoute une fonctionnalité déjà livrée.
 
 | Niveau | Pages (chaînées) | Ce qui est appris |
 |---|---|---|
@@ -419,20 +410,13 @@ l'entité, il l'administre.
 | Avancé | `avance/admin-delete.md` → `admin-override.md` → `admin-rbac.md` → `bilan.md` | suppression contrôlée ; surcharger un template ; exiger une permission RBAC + `admin:doctor` |
 | Récapitulatif | `recapitulatif.md` | synthèse et points clés |
 
-**Câblage** : les pages sont ajoutées à la nav du paquet
-(`packages/forge-mvc-admin/mkdocs.yml`) sous une rubrique « Progression », à
-l'image de `forge-mvc-i18n`.
+**Câblage** : les pages sont ajoutées à la nav du paquet (`packages/forge-mvc-admin/mkdocs.yml`) sous une rubrique « Progression », à l'image de `forge-mvc-i18n`.
 
-**Test de nav** : un garde-fou `test_starter_welcome_admin_nav_001` verrouille le
-chaînage (chaque étape lie la suivante, chaque bilan lie le niveau suivant ou le
-récapitulatif, `installation.md` lie la première étape) et l'absence des commandes
-interdites, sur le modèle des 11 parcours existants.
+**Test de nav** : un garde-fou `test_starter_welcome_admin_nav_001` verrouille le chaînage (chaque étape lie la suivante, chaque bilan lie le niveau suivant ou le récapitulatif, `installation.md` lie la première étape) et l'absence des commandes interdites, sur le modèle des 11 parcours existants.
 
-**Style** : français, une phrase par ligne, pas de tiret cadratin, ton direct ;
-aucun lien transversal vers la documentation du cœur (ADR-042).
+**Style** : français, une phrase par ligne, pas de tiret cadratin, ton direct ; aucun lien transversal vers la documentation du cœur (ADR-042).
 
-Conséquence : `ADMIN-WELCOME-001` ajoute ces pages, la nav du paquet et le test
-de chaînage, sans toucher au code de production.
+Conséquence : `ADMIN-WELCOME-001` ajoute ces pages, la nav du paquet et le test de chaînage, sans toucher au code de production.
 
 ---
 
@@ -483,26 +467,14 @@ La clôture finale de l'effort Forge Admin relève du ticket `ADMIN-CLOSING-AUDI
 ### Clôture (ADMIN-CLOSING-AUDIT-001)
 
 Tous les tickets du découpage sont livrés.
-Le paquet `forge-mvc-admin` fournit : le contrat de ressource et le registre, le
-dashboard, la liste paginée, la fiche, la création, l'édition, la suppression
-contrôlée, l'intégration RBAC optionnelle, la surcharge des templates, les
-commandes `admin:init` et `admin:doctor`, et le parcours pédagogique
-`welcome-admin`. Le rendu repose sur le registre de loaders Jinja du cœur
-(ADR-046).
+Le paquet `forge-mvc-admin` fournit : le contrat de ressource et le registre, le dashboard, la liste paginée, la fiche, la création, l'édition, la suppression contrôlée, l'intégration RBAC optionnelle, la surcharge des templates, les commandes `admin:init` et `admin:doctor`, et le parcours pédagogique `welcome-admin`.
+Le rendu repose sur le registre de loaders Jinja du cœur (ADR-046).
 
-Les critères de clôture ci-dessus sont remplis : positionnement clair, séparation
-Core / Admin / Design explicite, découpage suivi, dépendances aux contrats et au
-CRUD explicites, sécurité posée par défaut (routes non publiques, CSRF, RBAC
-optionnel).
+Les critères de clôture ci-dessus sont remplis : positionnement clair, séparation Core / Admin / Design explicite, découpage suivi, dépendances aux contrats et au CRUD explicites, sécurité posée par défaut (routes non publiques, CSRF, RBAC optionnel).
 
-Validation finale : suite complète **16 298 tests verts** (1 échec résiduel
-`test_no_old_owner_name`, **pré-existant et hors périmètre** : identité
-`official-site`, aucun fichier du chantier concerné), `mkdocs build --strict` OK,
-`ruff` OK, `compileall` OK, `pyright` strict 0 erreur sur le paquet.
+Validation finale : suite complète **16 298 tests verts** (1 échec résiduel `test_no_old_owner_name`, **pré-existant et hors périmètre** : identité `official-site`, aucun fichier du chantier concerné), `mkdocs build --strict` OK, `ruff` OK, `compileall` OK, `pyright` strict 0 erreur sur le paquet.
 
-Reste hors périmètre, comme prévu : la publication PyPI (statut `1 - Planning`),
-l'annonce sur la landing, et les enrichissements futurs (granularité RBAC fine,
-filtres et recherche, widgets typés, liens liste vers fiche).
+Reste hors périmètre, comme prévu : la publication PyPI (statut `1 - Planning`), l'annonce sur la landing, et les enrichissements futurs (granularité RBAC fine, filtres et recherche, widgets typés, liens liste vers fiche).
 
 ---
 

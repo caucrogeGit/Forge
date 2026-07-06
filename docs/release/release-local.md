@@ -2,7 +2,8 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Ce document est destiné au développeur du framework. Il décrit la procédure complète pour valider une wheel Forge avant publication.
+Ce document est destiné au développeur du framework.
+Il décrit la procédure complète pour valider une wheel Forge avant publication.
 
 ---
 
@@ -10,13 +11,11 @@ Ce document est destiné au développeur du framework. Il décrit la procédure 
 
 ### Objectif
 
-Permettre à un auditeur de reproduire la validation locale d'une release Forge
-sans publier.
+Permettre à un auditeur de reproduire la validation locale d'une release Forge sans publier.
 
 ### Préconditions
 
-- Dépôt sur `main`, état propre (hors `.claude/settings.json` et fichiers
-  locaux explicitement exclus de Git).
+- Dépôt sur `main`, état propre (hors `.claude/settings.json` et fichiers locaux explicitement exclus de Git).
 - Environnement virtuel dédié.
 - Python 3.12+ (version recommandée : 3.12.13 via pyenv, voir ADR-006).
 - Dépendances de développement installées depuis `requirements-dev.txt`.
@@ -39,8 +38,7 @@ bash tools/release-validate.sh <VERSION>
 # ex. : bash tools/release-validate.sh {{forge_version}}
 ```
 
-Ce script couvre : cohérence de version, CHANGELOG, pytest, ruff, compileall,
-mkdocs build --strict, état git propre, whitespace, tag absent.
+Ce script couvre : cohérence de version, CHANGELOG, pytest, ruff, compileall, mkdocs build --strict, état git propre, whitespace, tag absent.
 
 Compléter avec la validation packaging :
 
@@ -75,8 +73,7 @@ bash scripts/release_check.sh --help   # aide
 Le script valide localement, ne publie rien et ne crée aucun tag.
 La publication reste le ticket **2.3 BETA-2-RELEASE-001**.
 
-`tools/check_version_sync.py` n'existe pas encore, la synchronisation des
-versions entre core et opt-ins est assurée par `tools/release-validate.sh`.
+`tools/check_version_sync.py` n'existe pas encore, la synchronisation des versions entre core et opt-ins est assurée par `tools/release-validate.sh`.
 
 ### Résultats attendus
 
@@ -93,14 +90,14 @@ versions entre core et opt-ins est assurée par `tools/release-validate.sh`.
 ### Artefacts produits
 
 Les répertoires `dist/`, `build/` et `*.egg-info/` sont des artefacts locaux.
-Ils sont exclus de Git (`.gitignore`). **Ils ne doivent pas être commités.**
+Ils sont exclus de Git (`.gitignore`).
+**Ils ne doivent pas être commités.**
 
 ### Limites
 
 - Cette procédure ne publie rien sur PyPI.
 - Elle ne crée aucun tag.
-- `twine check` valide les métadonnées localement, `twine upload` est
-  l'opération de publication, réservée au ticket **2.3 BETA-2-RELEASE-001**.
+- `twine check` valide les métadonnées localement, `twine upload` est l'opération de publication, réservée au ticket **2.3 BETA-2-RELEASE-001**.
 
 ---
 
@@ -114,7 +111,8 @@ rm -rf dist build *.egg-info
 PYENV_VERSION=3.12.13 python -m build
 ```
 
-Le préfixe `PYENV_VERSION=3.12.13` permet de forcer la version de développement recommandée pour Forge. Alternative permanente pour le dossier :
+Le préfixe `PYENV_VERSION=3.12.13` permet de forcer la version de développement recommandée pour Forge.
+Alternative permanente pour le dossier :
 
 ```bash
 pyenv local 3.12.13
@@ -153,7 +151,8 @@ Si le terminal indique :
 forge was already on your PATH at /home/roger/.pyenv/shims/forge
 ```
 
-Le shim pyenv intercepte la commande. Forcer la résolution :
+Le shim pyenv intercepte la commande.
+Forcer la résolution :
 
 ```bash
 pyenv rehash
@@ -178,12 +177,9 @@ forge --version
 `forge doctor` doit confirmer un socle sain et `forge --version` afficher la version installée.
 
 !!! note "Plus de génération de starter (ADR-035)"
-    Depuis ADR-035, les commandes `forge starter:list` et `forge starter:build`
-    n'existent plus.
-    Les parcours pédagogiques se réalisent **à la main**, palier après palier,
-    en suivant les progressions `welcome-<module>` de la documentation.
-    La validation locale d'une release ne repose donc plus sur la génération de
-    starters, mais sur le socle CLI, le packaging et la documentation.
+    Depuis ADR-035, les commandes `forge starter:list` et `forge starter:build` n'existent plus.
+    Les parcours pédagogiques se réalisent **à la main**, palier après palier, en suivant les progressions `welcome-<module>` de la documentation.
+    La validation locale d'une release ne repose donc plus sur la génération de starters, mais sur le socle CLI, le packaging et la documentation.
 
 ---
 
@@ -198,19 +194,15 @@ forge routes:list
 forge make:entity --help
 ```
 
-Ces commandes confirment que la CLI est disponible dans le package installé et
-que les ressources du squelette sont bien incluses dans la wheel.
+Ces commandes confirment que la CLI est disponible dans le package installé et que les ressources du squelette sont bien incluses dans la wheel.
 
 ---
 
 ## 5. Tester un parcours pédagogique avec base de données
 
-Les parcours `welcome-<module>` se réalisent **à la main** (ADR-035) : il n'y a
-plus de génération automatique.
-Pour valider une release de bout en bout, dérouler au moins un parcours dans un
-projet neuf, palier après palier, en suivant la progression documentée.
-Chaque parcours doit être réalisé dans un **projet séparé** : mélanger les
-entités de plusieurs parcours dans le même projet fausse le test.
+Les parcours `welcome-<module>` se réalisent **à la main** (ADR-035) : il n'y a plus de génération automatique.
+Pour valider une release de bout en bout, dérouler au moins un parcours dans un projet neuf, palier après palier, en suivant la progression documentée.
+Chaque parcours doit être réalisé dans un **projet séparé** : mélanger les entités de plusieurs parcours dans le même projet fausse le test.
 
 ### Prérequis : renseigner `env/dev` de chaque projet
 
@@ -225,7 +217,8 @@ DB_APP_PWD=mot_de_passe_applicatif
 ```
 
 !!! note "Erreur db:apply sans db:init"
-    Le message `Connexion MariaDB applicative impossible. Lancez d'abord forge db:init` est **normal** si `db:init` n'a pas été exécuté. Ce n'est pas un bug du starter.
+    Le message `Connexion MariaDB applicative impossible. Lancez d'abord forge db:init` est **normal** si `db:init` n'a pas été exécuté.
+    Ce n'est pas un bug du starter.
 
 ### Contacts
 
@@ -417,7 +410,8 @@ Dans le navigateur, à l'URL affichée par Forge :
 
 ### Premier pas : Bienvenue dans Forge (sans BDD)
 
-Ce parcours ne nécessite aucune base de données. Il se réalise à la main dans le projet courant, en suivant la progression `welcome-forge`.
+Ce parcours ne nécessite aucune base de données.
+Il se réalise à la main dans le projet courant, en suivant la progression `welcome-forge`.
 
 ```bash
 cd ~/Projets
@@ -434,7 +428,8 @@ Dans le navigateur, ouvrir `https://localhost:8000/welcome` et naviguer entre le
 
 ### Paramètres d'URL (sans BDD)
 
-Palier 2 de la [progression officielle des starters](../starters/index.md#progression-recommandee). Aucune base de données : le parcours `query-params` se réalise à la main.
+Palier 2 de la [progression officielle des starters](../starters/index.md#progression-recommandee).
+Aucune base de données : le parcours `query-params` se réalise à la main.
 
 ```bash
 cd ~/Projets

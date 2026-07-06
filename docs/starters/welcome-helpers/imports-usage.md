@@ -1,16 +1,13 @@
 # Imports et usage
 
-Objectif : exposer les trois façades sous un **import unique** et les utiliser
-dans un contrôleur réel.
+Objectif : exposer les trois façades sous un **import unique** et les utiliser dans un contrôleur réel.
 
-**Ce que vous allez apprendre :** ré-exporter les façades depuis le package, et
-les combiner (session, flash, cookie) dans le flux d'un formulaire, en restant
-cohérent avec les helpers déjà fournis par Forge.
+**Ce que vous allez apprendre :** ré-exporter les façades depuis le package, et les combiner (session, flash, cookie) dans le flux d'un formulaire, en restant cohérent avec les helpers déjà fournis par Forge.
 
 ## Là où nous en sommes
 
-Vous avez les quatre fichiers : `_facade.py`, `session.py`, `cookies.py`,
-`flash.py`. Il reste à les rendre commodes à importer, puis à les employer.
+Vous avez les quatre fichiers : `_facade.py`, `session.py`, `cookies.py`, `flash.py`.
+Il reste à les rendre commodes à importer, puis à les employer.
 
 ## L'ajout
 
@@ -72,37 +69,27 @@ class NoteController(BaseController):
 
 ## Comprendre ce code
 
-- **`__init__.py`** ré-exporte les trois classes : `from mvc.helpers import
-  Session, Flash, Cookies` suffit, et `__all__` borne la surface publique du
-  package.
-- **`_ensure_session`** compose les primitifs de `Session` (lire l'id, lire la
-  session, en créer une si besoin). On garde la logique *get-or-create* dans le
-  contrôleur ; les façades, elles, restent des primitifs.
-- **Lecture du flash** : `Flash.get(session_id)` dans le rendu. S'il y a un
-  message en attente (posé par une action précédente), il s'affiche **une fois**.
-- **Pose du flash** : pour le cas POST→redirect, on utilise
-  `BaseController.redirect(..., flash="…")`, **déjà fourni par Forge**, qui pose
-  le message et redirige. `Flash.set(...)` de notre façade sert seulement aux
-  rares cas où l'on pose un flash **sans** rediriger.
-- **Cookie** : on **lit** un cookie applicatif (`theme`) sans risque. On ne le
-  **réécrit pas** ici, car cette réponse pose déjà le cookie de session
-  (`Session.set_cookie`) ; rappel du palier 3 : **un seul `Set-Cookie` par
-  réponse**. Pour changer le thème, on le ferait sur une réponse dédiée qui ne
-  pose pas la session.
+- **`__init__.py`** ré-exporte les trois classes : `from mvc.helpers import Session, Flash, Cookies` suffit, et `__all__` borne la surface publique du package.
+- **`_ensure_session`** compose les primitifs de `Session` (lire l'id, lire la session, en créer une si besoin).
+  On garde la logique *get-or-create* dans le contrôleur ; les façades, elles, restent des primitifs.
+- **Lecture du flash** : `Flash.get(session_id)` dans le rendu.
+  S'il y a un message en attente (posé par une action précédente), il s'affiche **une fois**.
+- **Pose du flash** : pour le cas POST→redirect, on utilise `BaseController.redirect(..., flash="…")`, **déjà fourni par Forge**, qui pose le message et redirige.
+  `Flash.set(...)` de notre façade sert seulement aux rares cas où l'on pose un flash **sans** rediriger.
+- **Cookie** : on **lit** un cookie applicatif (`theme`) sans risque.
+  On ne le **réécrit pas** ici, car cette réponse pose déjà le cookie de session (`Session.set_cookie`) ; rappel du palier 3 : **un seul `Set-Cookie` par réponse**.
+  Pour changer le thème, on le ferait sur une réponse dédiée qui ne pose pas la session.
 
 ## Tester
 
-Lancez l'application (`forge run`) et ouvrez le formulaire : le jeton CSRF est
-rempli, le thème lu depuis le cookie, et après une création le message « Note
-enregistrée » apparaît une seule fois au retour.
+Lancez l'application (`forge run`) et ouvrez le formulaire : le jeton CSRF est rempli, le thème lu depuis le cookie, et après une création le message « Note enregistrée »
+apparaît une seule fois au retour.
 
 ## À retenir
 
 - `mvc/helpers/__init__.py` donne un **import unique** pour les trois façades.
-- La logique *get-or-create* se compose dans le contrôleur ; les façades restent
-  des primitifs.
-- Réutilisez les helpers de Forge quand ils existent (`BaseController.redirect`
-  pour flash+redirect) ; vos façades complètent, elles ne remplacent pas.
+- La logique *get-or-create* se compose dans le contrôleur ; les façades restent des primitifs.
+- Réutilisez les helpers de Forge quand ils existent (`BaseController.redirect` pour flash+redirect) ; vos façades complètent, elles ne remplacent pas.
 - Respectez la limite **un seul `Set-Cookie` par réponse**.
 
 [Continuer avec le Bilan](bilan.md)

@@ -1,8 +1,7 @@
 # Modules Forge
 
-Un module Forge est un dossier lisible contenant au minimum un fichier
-`module.json`. Il décrit ce qu'il fournit et Forge installe ce contenu
-par étapes explicites et contrôlées.
+Un module Forge est un dossier lisible contenant au minimum un fichier `module.json`.
+Il décrit ce qu'il fournit et Forge installe ce contenu par étapes explicites et contrôlées.
 
 ### Modules : Principe général
 
@@ -178,8 +177,7 @@ forge module:list
 forge module:list --path modules
 ```
 
-`forge module:list` scanne un dossier et liste les modules détectés par la
-présence d'un fichier `module.json` valide dans chaque sous-dossier direct.
+`forge module:list` scanne un dossier et liste les modules détectés par la présence d'un fichier `module.json` valide dans chaque sous-dossier direct.
 Le dossier par défaut est `modules/`.
 
 Exemple de sortie :
@@ -239,8 +237,7 @@ forge module:files agenda --dry-run
 forge module:files agenda
 ```
 
-`forge module:files` copie les fichiers déclarés d'un module déjà enregistré
-avec `forge module:install`.
+`forge module:files` copie les fichiers déclarés d'un module déjà enregistré avec `forge module:install`.
 
 ```text
 module:files = copie contrôlée, sans écrasement
@@ -266,8 +263,7 @@ Règles :
 - ne lance aucun SQL ;
 - n'exécute aucun code du module.
 
-Après une installation réelle, Forge trace les fichiers copiés dans
-`forge_modules.json` avec la clé `files_installed`.
+Après une installation réelle, Forge trace les fichiers copiés dans `forge_modules.json` avec la clé `files_installed`.
 
 ### Modules : Activer les routes d'un module
 
@@ -276,18 +272,15 @@ forge module:routes agenda --dry-run
 forge module:routes agenda
 ```
 
-`forge module:routes` génère un fichier de routes dédié pour un module déjà
-enregistré dans `forge_modules.json`.
+`forge module:routes` génère un fichier de routes dédié pour un module déjà enregistré dans `forge_modules.json`.
 
 ```text
 module:routes = génération d'un fichier dédié + affichage des lignes à copier
 ```
 
-Prérequis : le module doit déclarer `"routes"` dans `provides` et un chemin
-valide dans `paths.routes`.
+Prérequis : le module doit déclarer `"routes"` dans `provides` et un chemin valide dans `paths.routes`.
 
-**Forge ne modifie jamais `mvc/routes.py`** (principe 9 de la charte v2 : pas
-d'écriture invisible dans le code utilisateur).
+**Forge ne modifie jamais `mvc/routes.py`** (principe 9 de la charte v2 : pas d'écriture invisible dans le code utilisateur).
 
 La commande :
 
@@ -312,8 +305,7 @@ Règles :
 
 - le module doit être installé avant génération ;
 - `--dry-run` affiche ce qui serait créé sans modifier de fichier ;
-- si `mvc/routes_<nom>.py` existe déjà, la commande refuse et affiche un message ;
-  supprimez le fichier manuellement pour le régénérer ;
+- si `mvc/routes_<nom>.py` existe déjà, la commande refuse et affiche un message ; supprimez le fichier manuellement pour le régénérer ;
 - aucun chemin absolu, `..` ou URL n'est accepté pour `paths.routes` ;
 - Forge n'importe pas dynamiquement `routes.py` du module pendant la génération ;
 - ne copie aucun fichier d'entité, vue, contrôleur ou doc.
@@ -365,8 +357,8 @@ module.json
 → lignes à copier dans mvc/routes.py affichées
 ```
 
-Chaque étape est indépendante et explicite. Aucune étape n'en déclenche
-automatiquement une autre.
+Chaque étape est indépendante et explicite.
+Aucune étape n'en déclenche automatiquement une autre.
 
 ### Modules : Désinstaller un module
 
@@ -375,8 +367,7 @@ forge module:remove agenda --dry-run
 forge module:remove agenda
 ```
 
-`forge module:remove` désinstalle un module installé par Forge lorsque les fichiers
-et routes sont encore traçables.
+`forge module:remove` désinstalle un module installé par Forge lorsque les fichiers et routes sont encore traçables.
 
 ```text
 module:remove = retrait des fichiers inchangés + retrait des routes marquées + mise à jour du registre
@@ -402,8 +393,7 @@ Comportement sur les routes :
 | Marqueurs absents | Nettoyage manuel requis, signalé |
 | Fichier `mvc/module_routes.py` absent | Ignoré |
 
-> **Contrat explicite :** `forge module:remove` ne supprime pas `mvc/routes_<nom>.py`
-> ni les lignes que vous avez ajoutées dans `mvc/routes.py`.
+> **Contrat explicite :** `forge module:remove` ne supprime pas `mvc/routes_<nom>.py` ni les lignes que vous avez ajoutées dans `mvc/routes.py`.
 > Ces éléments restent sur le disque, à retirer manuellement si souhaité.
 
 Règles :
@@ -463,7 +453,8 @@ from core.modules import (
 
 ### Modules : Sécurité de copie des fichiers
 
-`forge module:files` copie uniquement les fichiers déclarés dans les répertoires autorisés. Les garanties suivantes s'appliquent :
+`forge module:files` copie uniquement les fichiers déclarés dans les répertoires autorisés.
+Les garanties suivantes s'appliquent :
 
 - seuls les types `entities`, `controllers`, `views` et `docs` sont copiables par `module:files`, `routes`, `static`, `migrations` sont exclus ;
 - les chemins absolus sont refusés (`/etc/...`, `C:\...`) ;
@@ -522,7 +513,8 @@ Sécurité :
 | Génération des routes | `forge module:routes` | Génère `mvc/routes_<nom>.py` et affiche les lignes à ajouter dans `mvc/routes.py` |
 | Désinstallation contrôlée | `forge module:remove` | Supprime les fichiers inchangés, retire les routes marquées, met à jour le registre |
 
-Chaque étape est indépendante, explicite, et dotée d'un mode `--dry-run`. Aucune étape n'en déclenche automatiquement une autre.
+Chaque étape est indépendante, explicite, et dotée d'un mode `--dry-run`.
+Aucune étape n'en déclenche automatiquement une autre.
 
 Garanties lors de l'installation :
 
@@ -550,16 +542,21 @@ Forge ne fournit pas encore les opérations suivantes :
 #### Risques connus
 
 **La suppression contrôlée ne couvre que les fichiers traçables.**
-`forge module:remove` supprime uniquement les fichiers dont le contenu est identique à la source. Les fichiers modifiés sont conservés et signalés. Si la source est absente, les fichiers sont conservés. Après `forge module:routes`, retirer le dossier source `modules/<nom>/` sans supprimer `mvc/routes_<nom>.py` et les lignes correspondantes dans `mvc/routes.py` provoque une erreur d'import au démarrage.
+`forge module:remove` supprime uniquement les fichiers dont le contenu est identique à la source.
+Les fichiers modifiés sont conservés et signalés.
+Si la source est absente, les fichiers sont conservés.
+Après `forge module:routes`, retirer le dossier source `modules/<nom>/` sans supprimer `mvc/routes_<nom>.py` et les lignes correspondantes dans `mvc/routes.py` provoque une erreur d'import au démarrage.
 
 **Pas de rollback sur fichiers partiellement copiés.**
-Si une copie de fichiers échoue en cours d'opération, les fichiers déjà copiés ne sont pas annulés. Le registre `forge_modules.json` peut indiquer une installation partielle.
+Si une copie de fichiers échoue en cours d'opération, les fichiers déjà copiés ne sont pas annulés.
+Le registre `forge_modules.json` peut indiquer une installation partielle.
 
 **Modifications manuelles empêchent la suppression automatique future.**
 Si les fichiers copiés par `forge module:files` sont modifiés après l'installation, une éventuelle commande `forge module:remove` ne pourra pas les supprimer en toute sécurité sans risquer de perdre du code utilisateur.
 
 **Régénération refusée, suppression manuelle requise.**
-`forge module:routes` refuse de régénérer `mvc/routes_<nom>.py` si le fichier existe déjà. Supprimez-le manuellement pour le régénérer.
+`forge module:routes` refuse de régénérer `mvc/routes_<nom>.py` si le fichier existe déjà.
+Supprimez-le manuellement pour le régénérer.
 
 #### Bonnes pratiques
 

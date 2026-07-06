@@ -5,8 +5,7 @@
 ## Vue d'ensemble
 
 Forge gère les sessions HTTP via un backend de session (*session store*) configurable.
-Le backend par défaut est `MemorySessionStore`, adapté au développement et aux tests,
-sans dépendance externe.
+Le backend par défaut est `MemorySessionStore`, adapté au développement et aux tests, sans dépendance externe.
 
 Trois backends sont disponibles dans `core.sessions` :
 
@@ -74,7 +73,8 @@ Remplace intégralement les données de la session.
 
 ### `delete(session_id) -> None`
 
-Supprime la session. Sans effet si la session n'existe pas.
+Supprime la session.
+Sans effet si la session n'existe pas.
 
 ### `regenerate(session_id) -> str`
 
@@ -185,10 +185,8 @@ CREATE TABLE IF NOT EXISTS forge_sessions (
 
 ### Ce que garantit le verrou interne
 
-`MemorySessionStore` utilise un `threading.RLock` (verrou réentrant). Ce verrou
-protège l'intégralité de ses dix méthodes publiques (`create`, `get`, `set`,
-`replace`, `delete`, `regenerate`, `authenticate`, `touch_expiry`, `set_flash`,
-`get_flash`) ainsi que les opérations internes (`_cleanup`, `purge_all`).
+`MemorySessionStore` utilise un `threading.RLock` (verrou réentrant).
+Ce verrou protège l'intégralité de ses dix méthodes publiques (`create`, `get`, `set`, `replace`, `delete`, `regenerate`, `authenticate`, `touch_expiry`, `set_flash`, `get_flash`) ainsi que les opérations internes (`_cleanup`, `purge_all`).
 
 Dans un même processus Python, les garanties sont les suivantes :
 
@@ -197,19 +195,16 @@ Dans un même processus Python, les garanties sont les suivantes :
 - la suppression et la régénération sont atomiques, pas de session fantôme, pas de double suppression silencieuse ;
 - `create()` peut appeler `_cleanup()` en interne sans deadlock (propriété du `RLock` réentrant).
 
-Ces garanties sont confirmées par `tests/test_concurrency_session_001.py`, qui exécute
-50 threads en parallèle sur les opérations `create`, `get`, `set`, `delete`,
-`regenerate`, `authenticate`, `set_flash` et `get_flash`.
+Ces garanties sont confirmées par `tests/test_concurrency_session_001.py`, qui exécute 50 threads en parallèle sur les opérations `create`, `get`, `set`, `delete`, `regenerate`, `authenticate`, `set_flash` et `get_flash`.
 
 ### Ce que le verrou ne garantit pas
 
-Le verrou interne est **intra-processus uniquement**. Il ne couvre pas :
+Le verrou interne est **intra-processus uniquement**.
+Il ne couvre pas :
 
-- **le partage entre processus**, chaque worker (Gunicorn, uWSGI) a son propre espace
-  mémoire ; les sessions créées par un worker ne sont pas visibles des autres ;
+- **le partage entre processus**, chaque worker (Gunicorn, uWSGI) a son propre espace mémoire ; les sessions créées par un worker ne sont pas visibles des autres ;
 - **la persistance**, les sessions sont perdues au redémarrage du processus ;
-- **la cohérence entre instances**, plusieurs objets `MemorySessionStore` dans le même
-  programme ne partagent pas leurs données.
+- **la cohérence entre instances**, plusieurs objets `MemorySessionStore` dans le même programme ne partagent pas leurs données.
 
 ### Contextes d'usage
 
@@ -225,13 +220,10 @@ Le verrou interne est **intra-processus uniquement**. Il ne couvre pas :
 
 ### Alternatives recommandées
 
-Pour un usage persistant ou multi-worker, deux backends sont disponibles sans
-dépendance externe supplémentaire :
+Pour un usage persistant ou multi-worker, deux backends sont disponibles sans dépendance externe supplémentaire :
 
-- **`FileSessionStore`**, persiste entre les redémarrages, adapté à un seul processus
-  ou à un développement persistant local ;
-- **`MariaDbSessionStore`**, sessions partagées entre workers via MariaDB, adapté à la
-  production multi-processus.
+- **`FileSessionStore`**, persiste entre les redémarrages, adapté à un seul processus ou à un développement persistant local ;
+- **`MariaDbSessionStore`**, sessions partagées entre workers via MariaDB, adapté à la production multi-processus.
 
 ```python
 from core.sessions import MariaDbSessionStore
@@ -240,8 +232,7 @@ import core.forge as forge
 forge.configure(session_store=MariaDbSessionStore(ttl=3600))
 ```
 
-Leur documentation complète est dans la section [Backends disponibles](#backends-disponibles)
-ci-dessus.
+Leur documentation complète est dans la section [Backends disponibles](#backends-disponibles) ci-dessus.
 
 ---
 
@@ -333,7 +324,8 @@ forge.configure(session_store=DictSessionStore())
 ## Limites actuelles
 
 - **Thread-safety mémoire** : voir section [Thread-safety et limites de MemorySessionStore](#thread-safety-et-limites-de-memorysessionstore), livrée par SESSIONS-MEMORY-THREADSAFE-DOC-001.
-- **Double pile auth/session** : `core/security/session.py` (API legacy FR) et `core/auth/session.py` (API moderne EN) coexistent. La déduplication et la décision de l'API canonique sont traitées en Phase 4 (AUTH-SESSION-DEDUP-001).
+- **Double pile auth/session** : `core/security/session.py` (API legacy FR) et `core/auth/session.py` (API moderne EN) coexistent.
+  La déduplication et la décision de l'API canonique sont traitées en Phase 4 (AUTH-SESSION-DEDUP-001).
 - **Production hardening** : `MariaDbSessionStore` est fonctionnel mais sa robustesse production (reconnexion, pool, timeout) dépend de la configuration de `core.database.db`, non documentée dans ce ticket.
 - **MFA/RBAC** : non concernés par les stores de session directement.
 

@@ -1,11 +1,9 @@
 # La charte graphique
 
-**Objectif** : comprendre où sont définies les couleurs, la police et les rayons,
-et recolorer toute l'application en un seul endroit.
+**Objectif** : comprendre où sont définies les couleurs, la police et les rayons, et recolorer toute l'application en un seul endroit.
 
-**Ce que vous allez apprendre :** la charte vit dans un bloc `@theme` (Tailwind
-v4) au sein de `static/src/input.css`. Chaque token y devient un utilitaire
-Tailwind (`bg-teal`, `text-ink`, `rounded-card`...).
+**Ce que vous allez apprendre :** la charte vit dans un bloc `@theme` (Tailwind v4) au sein de `static/src/input.css`.
+Chaque token y devient un utilitaire Tailwind (`bg-teal`, `text-ink`, `rounded-card`...).
 
 ## La source unique
 
@@ -54,9 +52,8 @@ Avec `npm run watch:css` qui tourne, changez la primaire :
 }
 ```
 
-Sauvegardez, rafraîchissez `/showcase` : l'en-tête et tout ce qui utilise
-`teal` suivent, sans toucher un seul template. Remettez la valeur d'origine
-ensuite.
+Sauvegardez, rafraîchissez `/showcase` : l'en-tête et tout ce qui utilise `teal` suivent, sans toucher un seul template.
+Remettez la valeur d'origine ensuite.
 
 ??? note "À retenir"
     - Une seule source de vérité : le bloc `@theme` de `static/src/input.css`.
