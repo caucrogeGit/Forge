@@ -4,16 +4,6 @@ Cette page s'adresse à l'utilisateur **avant-garde** : celui qui veut créer un
 application avec la **dernière version de Forge poussée sur GitHub** (`main`),
 en avance sur PyPI, sans cloner le dépôt pour contribuer.
 
-Trois parcours d'installation coexistent, ne les confondez pas :
-
-- **Version stable (PyPI)** : `pipx install --pre forge-mvc`, la version
-  publiée. Voir [Poste Linux](poste-linux.md). C'est le choix par défaut, et le
-  seul recommandé pour la production.
-- **Dernière version GitHub (cette page)** : créer une application sur `main`,
-  avant publication PyPI.
-- **Contribuer au cœur** : cloner le dépôt et l'installer en éditable pour
-  modifier Forge lui-même. Voir [Contribuer au cœur de Forge](core-dev.md).
-
 !!! warning "Avant-garde = non publié"
     La branche `main` peut contenir des changements non stabilisés et non
     publiés. Utilisez ce parcours pour tester des nouveautés ou préparer une
@@ -34,6 +24,34 @@ pipx install "git+https://github.com/caucrogeGit/Forge.git@main"
 Vous récupérez ainsi le **CLI et le squelette les plus récents**, ceux de
 `main`. Vous pouvez viser une autre référence à la place de `main` : un tag, une
 branche ou un commit précis (`...Forge.git@<tag-ou-commit>`).
+
+!!! warning "Si `forge-mvc` est déjà installé"
+    Si vous avez déjà installé Forge par `pipx` (par exemple la version stable
+    PyPI), pipx refuse d'écraser l'installation existante :
+    `'forge-mvc' already seems to be installed. Pass '--force' to force installation.`
+    Ajoutez alors `--force` :
+
+    ```bash
+    pipx install --force "git+https://github.com/caucrogeGit/Forge.git@main"
+    ```
+
+    Cela remplace votre `forge` global : tous vos `forge new` suivants seront
+    basés sur GitHub. Pour revenir à la version stable PyPI :
+
+    ```bash
+    pipx install --force --pip-args="--pre" forge-mvc
+    ```
+
+!!! tip "Sans toucher à votre installation stable"
+    Pour créer un projet avant-garde ponctuel sans modifier votre `forge`
+    installé, exécutez Forge depuis GitHub de façon éphémère avec `pipx run` :
+
+    ```bash
+    pipx run --spec "git+https://github.com/caucrogeGit/Forge.git@main" forge new mon-app
+    ```
+
+    Votre `forge` global reste intact ; le projet généré est tout de même
+    épinglé sur git (son propre venv est créé normalement).
 
 Vérifiez la commande :
 
@@ -111,8 +129,9 @@ sans accès réseau ni magie cachée. Voir
 
 ---
 
-## Voir aussi
+## Autres installations de projet Forge
 
-- [Poste Linux (version stable PyPI)](poste-linux.md)
-- [Contribuer au cœur de Forge](core-dev.md)
-- [ADR-062 : source d'installation de forge new](../adr/062-forge-new-install-source.md)
+Cette page couvre l'installation sur la dernière version GitHub. D'autres façons de créer un projet Forge existent, selon votre besoin :
+
+* [Installation stable (poste Linux)](poste-linux.md) : la version publiée sur PyPI, le choix par défaut et le seul recommandé pour la production.
+* [Contribuer au cœur de Forge](core-dev.md) : installer un projet pour modifier Forge lui-même (clone du dépôt, installation éditable, validations).
