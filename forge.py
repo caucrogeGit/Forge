@@ -571,6 +571,7 @@ CORE_COMMANDS: dict[str, _CoreRunner] = {
     ),
     "schema:list": _lazy("cli.schemas.schema_list", attr="schema_list_main"),
     "schema:doctor": _lazy("cli.schemas.schema_doctor", attr="schema_doctor_main"),
+    "db:config": _lazy("cli.entities.db_config", exit_rc=True),
 }
 
 

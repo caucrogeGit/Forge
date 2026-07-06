@@ -31,7 +31,14 @@ pip install --pre forge-mvc-postgres
 ```
 
 Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
-Renseignez les accès dans `env/dev` :
+
+`forge db:config` amorce les variables du backend dans `env/example`, `env/dev` et `env/prod` (write-if-missing, sans secret ; ADR-064) :
+
+```bash
+forge db:config
+```
+
+Renseignez ensuite les valeurs dans `env/dev` (et `env/prod`) :
 
 ```env
 DB_HOST=127.0.0.1

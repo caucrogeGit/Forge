@@ -37,6 +37,7 @@ Pages publiques
   make:public-contact   Page de contact publique.
 
 Base de données
+  db:config           Amorce les variables d'environnement du backend.
   db:init             Crée la base de données depuis les entités.
   db:apply            Applique le schéma SQL.
   migration:status    Statut des migrations.

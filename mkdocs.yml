@@ -308,6 +308,7 @@ nav:
             - ADR-061 Registre d'opt-ins visible et unifié: adr/061-optin-project-registry.md
             - ADR-062 Source d'installation de forge new (git ou PyPI): adr/062-forge-new-install-source.md
             - ADR-063 Squelette, apparat qualité complet et noyau minimal (--bare): adr/063-skeleton-quality-enforcement-config.md
+            - ADR-064 Amorçage de l'environnement du backend (forge db config): adr/064-db-config-env-scaffold.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

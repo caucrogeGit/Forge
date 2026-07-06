@@ -97,6 +97,11 @@ class SQLiteBackend:
     name = "sqlite"
     dialect = SQLiteDialect()
     requires_provisioning = False
+    # Variable d'environnement lue par le backend (ADR-064) : le chemin du
+    # fichier de base. Amorcée par `forge db:config`. Sans serveur ni comptes.
+    env_template: "list[tuple[str, str]]" = [
+        ("DB_NAME", "storage/app.db"),
+    ]
 
     def get_connection(self) -> Any:
         """Ouvre une connexion SQLite sur le fichier configuré (`DB_NAME`).

@@ -54,7 +54,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "make:public-page", "make:public-list", "make:public-show",
     "make:public-form", "make:public-contact",
     # Base de données
-    "db:init", "db:apply",
+    "db:config", "db:init", "db:apply",
     "migration:status", "migration:apply", "migration:make", "migration:diff",
     # Schémas JSON
     "schema:list", "schema:doctor",

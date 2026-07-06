@@ -24,7 +24,14 @@ pip install --pre forge-mvc-mariadb
 ```
 
 Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire, contrairement aux opt-ins de route.
-Renseignez ensuite les accès dans `env/dev` (le squelette ne les pré-câble pas, ADR-060) :
+
+`forge db:config` amorce les variables du backend dans `env/example`, `env/dev` et `env/prod` (write-if-missing, annoncé, sans secret ; ADR-064) :
+
+```bash
+forge db:config
+```
+
+Renseignez ensuite les valeurs dans `env/dev` (et `env/prod`) :
 
 ```env
 DB_HOST=127.0.0.1

@@ -85,6 +85,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "make:public-form":    "Génère un formulaire public.",
     "make:public-contact": "Génère une page de contact publique.",
     # Base de données
+    "db:config":        "Amorce les variables d'environnement du backend BDD.",
     "db:init":          "Crée la base de données depuis les entités (MariaDB).",
     "migration:status": "Statut des migrations SQL.",
     "migration:apply":  "Applique les migrations en attente.",
@@ -772,6 +773,30 @@ Limites:
   - pas de live reload navigateur ni de WebSocket ;
   - ne lance pas Gunicorn automatiquement en prod ;
   - aucun changement du routeur ni du chemin WSGI.""",
+
+    "db:config": """\
+Usage:
+  forge db:config
+
+Description:
+  Amorce les variables d'environnement du backend BDD installé dans les trois
+  fichiers d'environnement du projet : env/example, env/dev et env/prod
+  (ADR-064). Le backend est découvert par son entry point (ADR-054).
+
+Effets:
+  - ajoute les clés manquantes de l'env_template du backend (write-if-missing) ;
+  - n'écrase jamais une valeur déjà renseignée ;
+  - n'écrit aucun secret : uniquement des exemples (hôte, port) ou du vide ;
+  - annonce les clés ajoutées et celles restant à renseigner.
+
+Prérequis:
+  - un backend BDD installé (pip install forge-mvc-<sgbd>) ;
+  - les fichiers env/example, env/dev, env/prod (créés par forge new).
+
+Limites:
+  - ne renseigne pas les valeurs (secrets) : à faire à la main dans env/dev
+    et env/prod ;
+  - ne provisionne pas la base : voir forge db:init.""",
 
     "db:init": """\
 Usage:

@@ -174,6 +174,11 @@ class DatabaseBackend(Protocol):
     # Vrai pour un SGBD serveur à provisionner (base + comptes via db:init,
     # ex. MariaDB) ; faux pour un backend fichier sans comptes (ex. SQLite).
     requires_provisioning: bool
+    # Variables d'environnement lues par le backend, dans l'ordre, chacune avec
+    # une valeur d'exemple ou un placeholder vide (ADR-064). `forge db:config`
+    # s'en sert pour amorcer env/example, env/dev et env/prod. Aucune valeur
+    # sensible ici : uniquement des exemples (hôte, port) ou du vide.
+    env_template: "list[tuple[str, str]]"
 
     def get_connection(self) -> Any:
         """Fournit une connexion prête à l'emploi (pool ou directe)."""

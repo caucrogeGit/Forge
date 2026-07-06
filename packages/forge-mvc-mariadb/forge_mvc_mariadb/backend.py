@@ -31,6 +31,17 @@ class MariaDBBackend:
     name = "mariadb"
     dialect = MariaDBDialect()
     requires_provisioning = True
+    # Variables d'environnement lues par le backend (ADR-064). Amorcées par
+    # `forge db:config` ; aucune valeur sensible ici (exemples ou vide).
+    env_template: "list[tuple[str, str]]" = [
+        ("DB_HOST", "127.0.0.1"),
+        ("DB_PORT", "3306"),
+        ("DB_NAME", ""),
+        ("DB_APP_LOGIN", ""),
+        ("DB_APP_PWD", ""),
+        ("DB_ADMIN_LOGIN", ""),
+        ("DB_ADMIN_PWD", ""),
+    ]
 
     def __init__(self) -> None:
         self._pool: Any = None

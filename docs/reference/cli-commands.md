@@ -112,6 +112,7 @@ forge routes:list
 
 | Commande | Rôle | Détail |
 |---|---|---|
+| `forge db:config` | amorce les variables d'environnement du backend | [db:config](../cli-entities/db_config.md) |
 | `forge db:init` | provisionne la base et le compte applicatif | [db:init](../cli-entities/db_init.md) |
 | `forge db:apply` | applique le schéma des entités (DDL) | [db:apply](../cli-entities/db_apply.md) |
 | `forge migration:status` | état des migrations SQL | [migrations](../cli-entities/migrations.md) |

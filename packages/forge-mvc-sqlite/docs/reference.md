@@ -24,7 +24,14 @@ pip install --pre forge-mvc-sqlite
 ```
 
 Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
-Indiquez le chemin du fichier de base dans `env/dev` :
+
+`forge db:config` pose `DB_NAME` (le chemin du fichier de base) dans `env/example`, `env/dev` et `env/prod` (write-if-missing ; ADR-064) :
+
+```bash
+forge db:config
+```
+
+Ajustez au besoin le chemin dans `env/dev` :
 
 ```env
 DB_NAME=storage/mon_projet.db

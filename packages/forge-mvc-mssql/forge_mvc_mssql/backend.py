@@ -119,6 +119,16 @@ class MSSQLBackend:
     name = "mssql"
     dialect = MSSQLDialect()
     requires_provisioning = True
+    # Variables d'environnement lues par le backend (ADR-064). Amorcées par
+    # `forge db:config` ; aucune valeur sensible ici (exemples ou vide).
+    env_template: "list[tuple[str, str]]" = [
+        ("DB_HOST", "127.0.0.1"),
+        ("DB_PORT", "1433"),
+        ("DB_NAME", ""),
+        ("DB_APP_LOGIN", ""),
+        ("DB_APP_PWD", ""),
+        ("DB_ODBC_DRIVER", "ODBC Driver 18 for SQL Server"),
+    ]
 
     def get_connection(self) -> Any:
         import pyodbc

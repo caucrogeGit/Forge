@@ -100,6 +100,15 @@ class PostgreSQLBackend:
     name = "postgres"
     dialect = PostgreSQLDialect()
     requires_provisioning = True
+    # Variables d'environnement lues par le backend (ADR-064). Amorcées par
+    # `forge db:config` ; aucune valeur sensible ici (exemples ou vide).
+    env_template: "list[tuple[str, str]]" = [
+        ("DB_HOST", "127.0.0.1"),
+        ("DB_PORT", "5432"),
+        ("DB_NAME", ""),
+        ("DB_APP_LOGIN", ""),
+        ("DB_APP_PWD", ""),
+    ]
 
     def get_connection(self) -> Any:
         import psycopg

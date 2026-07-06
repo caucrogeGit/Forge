@@ -11,6 +11,7 @@ nav:
       - Commande entity:validate (entity_validate.py): entity_validate.md
       - Validation sémantique (entity_semantic_validate.py): entity_semantic_validate.md
       - Codes d'erreur (entity_validation_errors.py): entity_validation_errors.md
+      - Commande db:config (db_config.py): db_config.md
       - Commande db:init (db_init.py): db_init.md
       - Commande db:apply (db_apply.py): db_apply.md
       - Commandes migration:* (migrations.py): migrations.md
