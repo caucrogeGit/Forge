@@ -809,11 +809,9 @@ Vous y verrez notamment :
 
 Commencer le parcours : [Welcome Forge](../starters/welcome-forge/index.md)
 
-## Approfondir 
+## Autres installations de projet Forge
 
-Après le parcours Welcome Forge, vous pourrez revenir vers les pages techniques selon vos besoins :
+Cette page couvre l'installation stable, depuis PyPI. D'autres façons de créer un projet Forge existent, selon votre besoin :
 
-* [Bases de données (backends)](../guide/bases-de-donnees.md) : choisir et configurer un backend (MariaDB, SQLite, PostgreSQL, SQL Server), `db:init`, comptes et migrations.
-* [Opt-ins officiels de Forge](../optins/index.md) : les extensions du framework, installées et activées à la carte.
-* [Parcours Welcome](../starters/index.md) : les parcours d'apprentissage pour prendre en main Forge pas à pas.
+* [Créer un projet sur la dernière version GitHub](github-latest.md) : pour l'utilisateur avant-garde qui veut la dernière version de Forge et de ses opt-ins poussée sur `main`, en avance sur PyPI, sans cloner le dépôt.
 * [Contribuer au cœur de Forge](core-dev.md) : installer un projet pour modifier Forge lui-même (clone du dépôt, installation éditable, validations).
