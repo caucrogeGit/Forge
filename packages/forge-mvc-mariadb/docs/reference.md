@@ -18,6 +18,11 @@ Forge n'impose aucun backend de référence.
 ??? note "2. Installation et désinstallation"
     MariaDB est client-serveur : un serveur doit être joignable (local, conteneur ou distant).
     Le pilote `mariadb` est installé avec l'opt-in.
+    L'installation se déroule en cinq étapes.
+
+    ### Installation
+
+    #### Étape 1 : Installer le paquet
 
     Depuis PyPI, la dernière version publiée :
 
@@ -32,8 +37,9 @@ Forge n'impose aucun backend de référence.
     ```
 
     Choisissez l'installation Git si vous voulez les nouveautés pas encore publiées, ou si votre projet a lui-même été créé depuis `main` (cohérence des versions).
-
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire, contrairement aux opt-ins de route.
+
+    #### Étape 2 : Amorcer l'environnement
 
     `forge db:config` amorce les variables du backend dans `env/example`, `env/dev` et `env/prod` (write-if-missing, annoncé, sans secret ; ADR-064) :
 
@@ -41,7 +47,9 @@ Forge n'impose aucun backend de référence.
     forge db:config
     ```
 
-    Renseignez ensuite les valeurs dans `env/dev` (et `env/prod`) :
+    #### Étape 3 : Renseigner les accès
+
+    Renseignez les valeurs dans `env/dev` (et `env/prod`) :
 
     ```env
     DB_NAME=mon_projet
@@ -54,9 +62,22 @@ Forge n'impose aucun backend de référence.
     ```
 
     `DB_ADMIN_*` sert au provisioning et à la DDL ; `DB_APP_*` au runtime (DML).
-    Vérifiez avec `forge doctor`, qui indique le backend résolu et l'état de la connexion ; si plusieurs backends sont installés, fixez `DB_BACKEND=mariadb`.
-    Provisionnez enfin la base et les comptes avec `forge db:init`.
 
+    #### Étape 4 : Vérifier la connexion
+
+    ```bash
+    forge doctor
+    ```
+
+    `forge doctor` indique le backend résolu et l'état de la connexion ; si plusieurs backends sont installés, fixez `DB_BACKEND=mariadb`.
+
+    #### Étape 5 : Provisionner la base
+
+    ```bash
+    forge db:init
+    ```
+
+    `forge db:init` crée la base et les comptes applicatif et d'administration.
     La progression guidée, pas à pas : [Installation de forge-mvc-mariadb](welcome/installation.md).
 
     ### Désinstallation
