@@ -19,9 +19,19 @@ Forge n'impose aucun backend de référence.
     MariaDB est client-serveur : un serveur doit être joignable (local, conteneur ou distant).
     Le pilote `mariadb` est installé avec l'opt-in.
 
+    Depuis PyPI, la dernière version publiée :
+
     ```bash
     pip install --pre forge-mvc-mariadb
     ```
+
+    Ou, pour suivre la version de développement (branche `main`, avant publication PyPI), directement depuis le dépôt Git :
+
+    ```bash
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mariadb"
+    ```
+
+    Choisissez l'installation Git si vous voulez les nouveautés pas encore publiées, ou si votre projet a lui-même été créé depuis `main` (cohérence des versions).
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire, contrairement aux opt-ins de route.
 
