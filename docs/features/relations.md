@@ -1,16 +1,23 @@
 # Relations entre entités
 
-Forge utilise un fichier global `mvc/entities/relations.json` pour décrire les relations entre entités. Ce fichier complète les JSON d'entités : les champs restent dans chaque entité, tandis que les liens entre entités sont centralisés et projetés vers un SQL explicite.
+Forge utilise un fichier global `mvc/entities/relations.json` pour décrire les relations entre entités.
+Ce fichier complète les JSON d'entités : les champs restent dans chaque entité, tandis que les liens entre entités sont centralisés et projetés vers un SQL explicite.
 
-Cette page documente le système de relations de Forge. Le format de fichier est versionné via la clé `format_version` dans `relations.json` (actuellement `1`).
+Cette page documente le système de relations de Forge.
+Le format de fichier est versionné via la clé `format_version` dans `relations.json` (actuellement `1`).
 
 ## Principe d'architecture
 
-Les entités restent dans `mvc/entities/`, chacune avec son JSON canonique et ses fichiers générés. Les relations globales restent dans `mvc/entities/relations.json`, puis Forge génère `mvc/entities/relations.sql`.
+Les entités restent dans `mvc/entities/`, chacune avec son JSON canonique et ses fichiers générés.
+Les relations globales restent dans `mvc/entities/relations.json`, puis Forge génère `mvc/entities/relations.sql`.
 
-Forge ne fournit pas d'ORM. Le SQL généré reste visible, lisible et modifiable dans l'application. Les relations décrivent des contraintes et des intentions de modèle, mais elles ne créent pas de navigation objet automatique.
+Forge ne fournit pas d'ORM.
+Le SQL généré reste visible, lisible et modifiable dans l'application.
+Les relations décrivent des contraintes et des intentions de modèle, mais elles ne créent pas de navigation objet automatique.
 
-`core/` doit rester générique. Il ne doit pas contenir de logique métier relationnelle, ni de relations propres à une application précise. Les choix métier appartiennent aux applications générées, aux starters ou aux modules générateurs.
+`core/` doit rester générique.
+Il ne doit pas contenir de logique métier relationnelle, ni de relations propres à une application précise.
+Les choix métier appartiennent aux applications générées, aux starters ou aux modules générateurs.
 
 ## Format version 1
 
@@ -91,8 +98,7 @@ La relation globale est ensuite décrite dans `mvc/entities/relations.json` :
 
 ## SQL généré
 
-Forge génère un fichier `relations.sql` contenant du SQL relationnel explicite :
-contraintes `many_to_one` et tables pivot `many_to_many`.
+Forge génère un fichier `relations.sql` contenant du SQL relationnel explicite : contraintes `many_to_one` et tables pivot `many_to_many`.
 
 ```sql
 ALTER TABLE contact
@@ -103,10 +109,8 @@ ALTER TABLE contact
     ON UPDATE CASCADE;
 ```
 
-Le fichier `relations.sql` contient les contraintes globales, typiquement des
-`ALTER TABLE ... ADD CONSTRAINT`, et les tables pivot déclaratives
-`many_to_many`. Les `CREATE TABLE` des entités normales restent dans les
-fichiers SQL des entités.
+Le fichier `relations.sql` contient les contraintes globales, typiquement des `ALTER TABLE ... ADD CONSTRAINT`, et les tables pivot déclaratives `many_to_many`.
+Les `CREATE TABLE` des entités normales restent dans les fichiers SQL des entités.
 
 ## Règles de validation
 
@@ -167,8 +171,7 @@ Depuis Forge 1.5.0, une relation `many_to_many` peut être déclarée dans `rela
 | `target_key` | Colonne FK vers la table cible dans le pivot. |
 | `pivot_fields` | Liste optionnelle de colonnes supplémentaires sur le pivot. |
 
-Si `pivot_fields` est absent, Forge génère le même pivot simple que
-REL-M2M-002.
+Si `pivot_fields` est absent, Forge génère le même pivot simple que REL-M2M-002.
 
 ### Règles de validation
 
@@ -183,8 +186,7 @@ REL-M2M-002.
 
 ### SQL généré
 
-Depuis REL-M2M-002, `forge sync:relations` génère la table pivot SQL dans
-`mvc/entities/relations.sql`.
+Depuis REL-M2M-002, `forge sync:relations` génère la table pivot SQL dans `mvc/entities/relations.sql`.
 
 Pour l'exemple précédent, le SQL généré est :
 
@@ -219,9 +221,8 @@ Les relations `many_to_many` et `many_to_one` peuvent coexister dans le même `r
 
 ### Pivot enrichi
 
-Depuis REL-PIVOT-001, une relation `many_to_many` peut déclarer des colonnes
-supplémentaires avec `pivot_fields`. Forge les ajoute uniquement dans le SQL de
-la table pivot.
+Depuis REL-PIVOT-001, une relation `many_to_many` peut déclarer des colonnes supplémentaires avec `pivot_fields`.
+Forge les ajoute uniquement dans le SQL de la table pivot.
 
 Exemple complet :
 
@@ -270,16 +271,13 @@ CREATE TABLE IF NOT EXISTS article_tag (
 );
 ```
 
-Les champs pivot ne sont pas inclus dans la clé primaire composite et Forge ne
-crée pas d'index automatique sur eux.
+Les champs pivot ne sont pas inclus dans la clé primaire composite et Forge ne crée pas d'index automatique sur eux.
 
 ### Formulaires CRUD côté source
 
-Depuis REL-M2M-003, `forge make:crud` exploite aussi les relations `many_to_many`
-où l'entité générée est la `source`.
+Depuis REL-M2M-003, `forge make:crud` exploite aussi les relations `many_to_many` où l'entité générée est la `source`.
 
-Pour l'exemple `article -> tag`, le formulaire `Article` généré contient un
-champ conceptuellement équivalent à :
+Pour l'exemple `article -> tag`, le formulaire `Article` généré contient un champ conceptuellement équivalent à :
 
 ```html
 <select name="tag_ids" multiple>
@@ -287,8 +285,8 @@ champ conceptuellement équivalent à :
 </select>
 ```
 
-Le nom du champ suit la convention `{target}_ids`. Le contrôleur généré charge
-les choix de la table cible avec du SQL explicite :
+Le nom du champ suit la convention `{target}_ids`.
+Le contrôleur généré charge les choix de la table cible avec du SQL explicite :
 
 ```sql
 SELECT id, name
@@ -296,12 +294,9 @@ FROM tag
 ORDER BY name
 ```
 
-Le champ de libellé suit la même logique que les relations `many_to_one` :
-`name`, `nom`, `title`, `titre`, `label`, `libelle`, puis premier champ texte,
-puis clé primaire si aucun champ texte n'existe.
+Le champ de libellé suit la même logique que les relations `many_to_one` : `name`, `nom`, `title`, `titre`, `label`, `libelle`, puis premier champ texte, puis clé primaire si aucun champ texte n'existe.
 
-À la création, Forge insère les lignes pivot sélectionnées après la création de
-l'entité source :
+À la création, Forge insère les lignes pivot sélectionnées après la création de l'entité source :
 
 ```sql
 INSERT INTO article_tag (article_id, tag_id)
@@ -318,13 +313,12 @@ INSERT INTO article_tag (article_id, tag_id)
 VALUES (?, ?)
 ```
 
-Seul le côté source est traité dans ce ticket. Le CRUD `Tag` ne reçoit pas
-automatiquement un champ inverse vers les articles.
+Seul le côté source est traité dans ce ticket.
+Le CRUD `Tag` ne reçoit pas automatiquement un champ inverse vers les articles.
 
 ### Affichage CRUD côté source
 
-Depuis REL-M2M-004, `forge make:crud` affiche aussi les libellés liés dans les
-pages `index.html` et `show.html` générées pour l'entité source.
+Depuis REL-M2M-004, `forge make:crud` affiche aussi les libellés liés dans les pages `index.html` et `show.html` générées pour l'entité source.
 
 Pour `article -> tag`, la liste peut afficher une colonne `Tag` :
 
@@ -332,8 +326,7 @@ Pour `article -> tag`, la liste peut afficher une colonne `Tag` :
 | --- | --- | --- |
 | Article 1 | Python, Web | Voir / Modifier / Supprimer |
 
-Le contrôleur de liste charge les libellés en une requête groupée sur les ids
-affichés :
+Le contrôleur de liste charge les libellés en une requête groupée sur les ids affichés :
 
 ```sql
 SELECT
@@ -356,16 +349,13 @@ WHERE pivot.article_id = ?
 ORDER BY tag.name
 ```
 
-L'affichage reste volontairement simple : libellés séparés par des virgules,
-état vide lisible, aucun lien automatique vers les fiches cible. Les formulaires
-create/edit et la synchronisation pivot restent ceux de REL-M2M-003.
+L'affichage reste volontairement simple : libellés séparés par des virgules, état vide lisible, aucun lien automatique vers les fiches cible.
+Les formulaires create/edit et la synchronisation pivot restent ceux de REL-M2M-003.
 
 ### Relations ordonnées (`order_column`)
 
-Depuis REL-ORDERED-001, une relation `many_to_many` peut déclarer un champ pivot
-comme colonne de tri via `order_column`. Quand ce champ est présent, les requêtes
-`list` et `show` générées par `make:crud` trient les libellés liés selon ce champ
-plutôt que par le libellé de la cible.
+Depuis REL-ORDERED-001, une relation `many_to_many` peut déclarer un champ pivot comme colonne de tri via `order_column`.
+Quand ce champ est présent, les requêtes `list` et `show` générées par `make:crud` trient les libellés liés selon ce champ plutôt que par le libellé de la cible.
 
 Règles :
 
@@ -402,9 +392,8 @@ WHERE pivot.article_id IN (...)
 ORDER BY pivot.position
 ```
 
-Sans `order_column`, l'ordre reste par défaut sur le libellé de la cible
-(`ORDER BY tag.name`). `order_column` ne modifie pas le SQL `CREATE TABLE`
-généré par `sync:relations`.
+Sans `order_column`, l'ordre reste par défaut sur le libellé de la cible (`ORDER BY tag.name`).
+`order_column` ne modifie pas le SQL `CREATE TABLE` généré par `sync:relations`.
 
 ---
 
@@ -483,10 +472,8 @@ Cette approche garde le modèle explicite : le pivot est une vraie entité, avec
 ## Exploitation dans le CRUD généré
 
 Forge 1.2.0 commence à exploiter les relations `many_to_one` dans le CRUD généré.
-Depuis REL-M2M-003, le CRUD généré exploite aussi les relations `many_to_many`
-côté source dans les formulaires create/edit.
-Depuis REL-M2M-004, les mêmes relations sont affichées côté source dans les
-listes et les fiches détail générées.
+Depuis REL-M2M-003, le CRUD généré exploite aussi les relations `many_to_many` côté source dans les formulaires create/edit.
+Depuis REL-M2M-004, les mêmes relations sont affichées côté source dans les listes et les fiches détail générées.
 
 Quand l'entité générée est le `from_entity` d'une relation, le champ FK correspondant peut être rendu comme un choix applicatif :
 
@@ -500,10 +487,9 @@ Comme `relations.json` (version 1 du format) ne contient pas encore de `label_fi
 1. premier champ texte non-PK de l'entité cible ;
 2. sinon clé primaire cible.
 
-Le support `many_to_many` reste limité au côté source, aux formulaires simples,
-à la synchronisation simple des pivots et à l'affichage texte des libellés.
-`pivot_fields` enrichit seulement le SQL généré. Il ne crée pas de navigation
-objet, pas de liens automatiques vers les cibles et pas d'ORM.
+Le support `many_to_many` reste limité au côté source, aux formulaires simples, à la synchronisation simple des pivots et à l'affichage texte des libellés.
+`pivot_fields` enrichit seulement le SQL généré.
+Il ne crée pas de navigation objet, pas de liens automatiques vers les cibles et pas d'ORM.
 
 ## Ce qui reste à venir
 

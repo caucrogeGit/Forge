@@ -8,16 +8,12 @@ Acceptée, Forge 1.0.0-beta.3 (ticket AUTH-AUDIT-VOCAB-PERIMETER-001).
 
 ## Contexte
 
-`core/auth/audit.py` déclare 20+ constantes d'événements d'audit, dont des noms
-qui font référence à MFA (`mfa.challenge.required`, `mfa.challenge.failed`, etc.)
-et à RBAC (`user_role.added`, `user_role.removed`).
+`core/auth/audit.py` déclare 20+ constantes d'événements d'audit, dont des noms qui font référence à MFA (`mfa.challenge.required`, `mfa.challenge.failed`, etc.) et à RBAC (`user_role.added`, `user_role.removed`).
 
-Un contributeur pourrait croire que ces noms constituent une pollution du core par
-les modules opt-in `forge-mvc-mfa` et `forge-mvc-rbac`. Ce n'est pas le cas.
+Un contributeur pourrait croire que ces noms constituent une pollution du core par les modules opt-in `forge-mvc-mfa` et `forge-mvc-rbac`.
+Ce n'est pas le cas.
 
-Ce document tranche la question une fois pour toutes et établit la règle
-opérationnelle qui distingue **vocabulaire d'audit générique acceptable** et
-**logique fonctionnelle interdite dans le core**.
+Ce document tranche la question une fois pour toutes et établit la règle opérationnelle qui distingue **vocabulaire d'audit générique acceptable** et **logique fonctionnelle interdite dans le core**.
 
 ---
 
@@ -25,13 +21,11 @@ opérationnelle qui distingue **vocabulaire d'audit générique acceptable** et
 
 ### Règle 1 : Le vocabulaire d'audit MFA/RBAC est assumé dans le core
 
-Les constantes de `core/auth/audit.py` sont des **noms d'événements de sécurité**,
-pas des implémentations fonctionnelles. Nommer un événement `mfa.challenge.required`
-n'intègre pas la logique TOTP dans le core. Nommer un événement `user_role.added`
-n'intègre pas le système de permissions RBAC dans le core.
+Les constantes de `core/auth/audit.py` sont des **noms d'événements de sécurité**, pas des implémentations fonctionnelles.
+Nommer un événement `mfa.challenge.required` n'intègre pas la logique TOTP dans le core.
+Nommer un événement `user_role.added` n'intègre pas le système de permissions RBAC dans le core.
 
-Ces noms servent à tracer uniformément des événements de sécurité, quel que soit
-le backend de persistance, SQL, fichier, agrégateur externe.
+Ces noms servent à tracer uniformément des événements de sécurité, quel que soit le backend de persistance, SQL, fichier, agrégateur externe.
 
 **Événements MFA acceptés dans le core :**
 
@@ -52,8 +46,7 @@ user_role.added
 user_role.removed
 ```
 
-Ces événements sont acceptés parce qu'ils décrivent des faits de sécurité
-observables sans nécessiter d'importer la logique MFA ou RBAC complète.
+Ces événements sont acceptés parce qu'ils décrivent des faits de sécurité observables sans nécessiter d'importer la logique MFA ou RBAC complète.
 
 ### Règle 2 : La logique fonctionnelle MFA/RBAC reste hors core
 
@@ -91,13 +84,11 @@ Ces imports sont légitimes dans :
 
 ### Règle 4 : `require_role` est une primitive core légère
 
-`core/security/decorators.require_role(role)` est un décorateur basé sur
-`core.security.session.user_has_role()`, il lit le rôle de la session.
-Il n'importe pas `forge_mvc_rbac` et ne constitue pas une implémentation RBAC
-complète.
+`core/security/decorators.require_role(role)` est un décorateur basé sur `core.security.session.user_has_role()`, il lit le rôle de la session.
+Il n'importe pas `forge_mvc_rbac` et ne constitue pas une implémentation RBAC complète.
 
-C'est une primitive de sécurité basique, documentée comme telle. La frontière
-est explicite :
+C'est une primitive de sécurité basique, documentée comme telle.
+La frontière est explicite :
 
 - `require_role(role)` dans `core/security/` → session-based, monolithique, core
 - `require_permission(code)` dans `forge_mvc_rbac` → RBAC fin, opt-in
@@ -111,9 +102,7 @@ est explicite :
 | ADR-004 | `core/auth/audit.py` reste dans le core (pas dans un opt-in), voir section « Décision complémentaire » |
 | ADR-008 | Architecture de l'audit auth : contrat + émission Python + table SQL latente |
 
-Ces deux ADR établissent que `core/auth/audit.py` est intentionnellement dans le
-core pour être consommé par les opt-ins (notamment `forge-mvc-mfa`) sans créer
-de dépendance circulaire.
+Ces deux ADR établissent que `core/auth/audit.py` est intentionnellement dans le core pour être consommé par les opt-ins (notamment `forge-mvc-mfa`) sans créer de dépendance circulaire.
 
 ---
 
@@ -129,9 +118,6 @@ de dépendance circulaire.
 ## Conséquences
 
 - Aucun comportement runtime n'est modifié par cet ADR.
-- Les noms d'événements MFA/RBAC dans `core/auth/audit.py` sont officiellement
-  assumés, ils ne sont pas à supprimer ni à renommer.
+- Les noms d'événements MFA/RBAC dans `core/auth/audit.py` sont officiellement assumés, ils ne sont pas à supprimer ni à renommer.
 - La frontière d'import est vérifiable par un garde-fou méta automatique.
-- Toute future constante d'événement en rapport avec MFA ou RBAC est acceptable
-  dans `core/auth/audit.py` si elle décrit un fait de sécurité sans intégrer
-  de logique fonctionnelle opt-in.
+- Toute future constante d'événement en rapport avec MFA ou RBAC est acceptable dans `core/auth/audit.py` si elle décrit un fait de sécurité sans intégrer de logique fonctionnelle opt-in.

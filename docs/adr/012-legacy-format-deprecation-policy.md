@@ -4,8 +4,7 @@
 
 **Mise à jour, Forge 1.x** (ticket `LEGACY-REMOVE-004-UPDATE-DOCS-AFTER-LEGACY-REMOVAL`).
 
-La décision initiale (dépréciation avec support temporaire) a été remplacée par la suppression
-effective du support legacy dans les tickets LEGACY-REMOVE-001A, 001B, 002 et 003.
+La décision initiale (dépréciation avec support temporaire) a été remplacée par la suppression effective du support legacy dans les tickets LEGACY-REMOVE-001A, 001B, 002 et 003.
 
 ---
 
@@ -17,23 +16,19 @@ effective du support legacy dans les tickets LEGACY-REMOVE-001A, 001B, 002 et 00
 
 ## Contexte
 
-Forge a historiquement utilisé un format interne pour les entités, dit **format legacy**,
-identifié par la clé `format_version: 1`. Ce format inclut des clés comme `sql_type`,
-`python_type`, `primary_key`, `auto_increment`, `from_entity`, `to_entity`, `foreign_key_name`.
+Forge a historiquement utilisé un format interne pour les entités, dit **format legacy**, identifié par la clé `format_version: 1`.
+Ce format inclut des clés comme `sql_type`, `python_type`, `primary_key`, `auto_increment`, `from_entity`, `to_entity`, `foreign_key_name`.
 
-Un format canonique a été introduit : `schema_version: "1.0"`, avec des types Forge abstraits
-(`string`, `integer`, `boolean`, `date`, `datetime`, `text`, `password`), sans champ `id`
-explicite, et `from`/`to`/`foreign_key` pour les relations.
+Un format canonique a été introduit : `schema_version: "1.0"`, avec des types Forge abstraits (`string`, `integer`, `boolean`, `date`, `datetime`, `text`, `password`), sans champ `id` explicite, et `from`/`to`/`foreign_key` pour les relations.
 
-L'audit LEGACY-POLICY-001 (2026-05-19) avait établi que le pipeline dépendait encore du
-format legacy. La décision initiale était de déprécier sans supprimer immédiatement.
+L'audit LEGACY-POLICY-001 (2026-05-19) avait établi que le pipeline dépendait encore du format legacy.
+La décision initiale était de déprécier sans supprimer immédiatement.
 
-Les tickets LEGACY-REMOVE-001A et 001B ont ensuite refusé les entités `format_version: 1`
-dans `build:model` et `make:crud`. Le ticket LEGACY-REMOVE-002 a refusé le format legacy
-dans `relations.json`. Le ticket LEGACY-REMOVE-003 a nettoyé les fixtures de tests restantes.
+Les tickets LEGACY-REMOVE-001A et 001B ont ensuite refusé les entités `format_version: 1` dans `build:model` et `make:crud`.
+Le ticket LEGACY-REMOVE-002 a refusé le format legacy dans `relations.json`.
+Le ticket LEGACY-REMOVE-003 a nettoyé les fixtures de tests restantes.
 
-Aucun projet réel Forge n'était à préserver, la suppression a été faite pendant la phase
-de construction du framework.
+Aucun projet réel Forge n'était à préserver, la suppression a été faite pendant la phase de construction du framework.
 
 ---
 
@@ -46,8 +41,7 @@ Le format legacy `format_version: 1` est **refusé** :
 - `build:model` refuse les entités `format_version: 1`, lève `ModelValidationError`.
 - `make:crud` refuse les entités `format_version: 1`, quitte avec `SystemExit`.
 - `relations.json` avec `format_version: 1` est refusé par `validate_relations_definition`, lève `EntityRelationsError`.
-- Les clés relationnelles legacy (`from_entity`, `to_entity`, `foreign_key_name`, `pivot_table`,
-  `source_key`, `target_key`) ne sont pas acceptées dans `relations.json`.
+- Les clés relationnelles legacy (`from_entity`, `to_entity`, `foreign_key_name`, `pivot_table`, `source_key`, `target_key`) ne sont pas acceptées dans `relations.json`.
 
 ---
 
@@ -55,12 +49,11 @@ Le format legacy `format_version: 1` est **refusé** :
 
 La décision initiale de l'ADR-012 était :
 
-> Le format legacy `format_version: 1` est déprécié. Il reste accepté temporairement
-> pour assurer la compatibilité des projets existants, mais ne doit plus être utilisé dans
-> les nouveaux développements.
+> Le format legacy `format_version: 1` est déprécié.
+> Il reste accepté temporairement pour assurer la compatibilité des projets existants, mais ne doit plus être utilisé dans les nouveaux développements.
 
-Cette décision est **remplacée**. Le support temporaire a été supprimé dans les tickets
-LEGACY-REMOVE-001A, 001B, 002 et 003.
+Cette décision est **remplacée**.
+Le support temporaire a été supprimé dans les tickets LEGACY-REMOVE-001A, 001B, 002 et 003.
 
 ---
 
@@ -80,9 +73,9 @@ LEGACY-REMOVE-001A, 001B, 002 et 003.
 
 ## Ce qui reste fonctionnel à bas niveau
 
-`validate_entity_definition()` et `normalize_entity_definition()` sont des fonctions internes
-du pipeline. Elles n'ont pas été modifiées et continuent de traiter le format interne legacy
-pour les tests de refus. Elles ne constituent pas une API utilisateur.
+`validate_entity_definition()` et `normalize_entity_definition()` sont des fonctions internes du pipeline.
+Elles n'ont pas été modifiées et continuent de traiter le format interne legacy pour les tests de refus.
+Elles ne constituent pas une API utilisateur.
 
 ---
 
@@ -90,18 +83,17 @@ pour les tests de refus. Elles ne constituent pas une API utilisateur.
 
 1. **Format obligatoire** : `schema_version: "1.0"` dans tous les fichiers d'entités.
 2. **Starters** : format canonique uniquement (migration 100 % réalisée).
-3. **Tests** : les fixtures d'entités n'utilisent plus `format_version: 1`, sauf dans les
-   tests de refus explicites (tests de régression pour `build:model` et `make:crud`).
+3. **Tests** : les fixtures d'entités n'utilisent plus `format_version: 1`, sauf dans les tests de refus explicites (tests de régression pour `build:model` et `make:crud`).
 4. **Documentation** : aucun exemple ne présente `format_version: 1` comme format utilisable.
 
 ---
 
 ## Conséquences
 
-- **Projets en `format_version: 1`** : `build:model` et `make:crud` refuseront de traiter
-  ces fichiers. Migrer via le guide `docs/entities/migration-legacy-vers-canonique.md`.
-- **`relations.json` en `format_version: 1`** : `validate_relations_definition` lèvera
-  `EntityRelationsError`. Migrer au format canonique `schema_version: "1.0"`.
+- **Projets en `format_version: 1`** : `build:model` et `make:crud` refuseront de traiter ces fichiers.
+  Migrer via le guide `docs/entities/migration-legacy-vers-canonique.md`.
+- **`relations.json` en `format_version: 1`** : `validate_relations_definition` lèvera `EntityRelationsError`.
+  Migrer au format canonique `schema_version: "1.0"`.
 - **Starters** : déjà conformes (migration 100 % réalisée dans STARTERS-MIGRATE-001 à 005).
 
 ---

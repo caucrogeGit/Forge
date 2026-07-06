@@ -1,9 +1,7 @@
 # Sécurité en production : Guide Forge
 
 Ce guide rassemble les bonnes pratiques de déploiement sécurisé de Forge.
-Il consolide les résultats des audits de sécurité réalisés lors de la Phase 4.5 :
-SECURITY-AUDIT-001, SECURITY-CSRF-AUDIT-001, SECURITY-AUTH-AUDIT-001,
-SECURITY-COOKIES-001, SECURITY-HEADERS-001, SECURITY-UPLOADS-AUDIT-001 et SECURITY-RBAC-AUDIT-001.
+Il consolide les résultats des audits de sécurité réalisés lors de la Phase 4.5 : SECURITY-AUDIT-001, SECURITY-CSRF-AUDIT-001, SECURITY-AUTH-AUDIT-001, SECURITY-COOKIES-001, SECURITY-HEADERS-001, SECURITY-UPLOADS-AUDIT-001 et SECURITY-RBAC-AUDIT-001.
 
 Voir aussi : [Déploiement](deployment.md) · [Auth/User](../features/auth.md) · RBAC · Médias
 
@@ -20,20 +18,16 @@ flowchart LR
     F -->|"SQL"| M[("MariaDB<br/>:3306")]
 ```
 
-Forge inclut un serveur HTTPS Python adapté au développement local
-(`APP_SSL_ENABLED=true`, TLS 1.2 minimum). **Ce serveur ne doit pas être exposé
-directement à Internet en production.** En mode `prod`, `APP_SSL_ENABLED=false`
-est le défaut, Forge écoute en HTTP local, Nginx termine TLS.
+Forge inclut un serveur HTTPS Python adapté au développement local (`APP_SSL_ENABLED=true`, TLS 1.2 minimum).
+**Ce serveur ne doit pas être exposé directement à Internet en production.**
+En mode `prod`, `APP_SSL_ENABLED=false` est le défaut, Forge écoute en HTTP local, Nginx termine TLS.
 
-La configuration Nginx générée par `forge deploy:init` expose un bloc HTTP :
-ajouter un bloc `listen 443 ssl` avec `ssl_certificate` / `ssl_certificate_key`
-(Let's Encrypt + Certbot recommandé) avant la mise en production.
+La configuration Nginx générée par `forge deploy:init` expose un bloc HTTP : ajouter un bloc `listen 443 ssl` avec `ssl_certificate` / `ssl_certificate_key` (Let's Encrypt + Certbot recommandé) avant la mise en production.
 
 Pourquoi HTTPS est obligatoire pour Forge :
 
 - Les cookies de session portent l'attribut `Secure`, ils ne sont transmis que via HTTPS.
-- HSTS (`Strict-Transport-Security`) est émis sur toutes les réponses, le navigateur
-  refusera les connexions HTTP après la première visite.
+- HSTS (`Strict-Transport-Security`) est émis sur toutes les réponses, le navigateur refusera les connexions HTTP après la première visite.
 - La CSP, Referrer-Policy et Permissions-Policy ont leur plein effet uniquement sur HTTPS.
 
 ---
@@ -58,29 +52,24 @@ Set-Cookie: __Host-session_id=<jeton opaque>; Path=/; HttpOnly; SameSite=Strict;
 | `Path` | `/` | Portée globale sur l'application |
 | Valeur | jeton opaque (UUID hex) | Aucune donnée sensible dans le cookie |
 
-`Secure` est actif en développement et en production. C'est un choix délibéré :
-il force l'utilisation de HTTPS même en local et évite toute régression
-si `app_env` est mal configuré.
+`Secure` est actif en développement et en production.
+C'est un choix délibéré : il force l'utilisation de HTTPS même en local et évite toute régression si `app_env` est mal configuré.
 
 ### Durée et rotation
 
 - Durée de session : `DUREE_SESSION = 3600` secondes (1 heure), gérée côté serveur.
 - À la déconnexion, `Max-Age=0` invalide le cookie immédiatement.
-- Au login, `authentifier_session()` effectue une **rotation de session** :
-  l'ancien identifiant de session est révoqué et un nouveau est émis, protection
-  contre la fixation de session.
+- Au login, `authentifier_session()` effectue une **rotation de session** : l'ancien identifiant de session est révoqué et un nouveau est émis, protection contre la fixation de session.
 
 ### Ce qui n'est pas en session
 
-Aucun mot de passe, hash, token MFA, email ni donnée personnelle sensible n'est
-stocké dans le cookie ou en session côté serveur. La session contient uniquement :
-`id`, `login`, `roles`, `permissions`, `authentifie`, `expire_a`, `csrf_token`.
+Aucun mot de passe, hash, token MFA, email ni donnée personnelle sensible n'est stocké dans le cookie ou en session côté serveur.
+La session contient uniquement : `id`, `login`, `roles`, `permissions`, `authentifie`, `expire_a`, `csrf_token`.
 
 ### Limites connues
 
-- `SameSite=Strict` peut bloquer la transmission du cookie sur les liens entrants
-  depuis des sites tiers (ex. e-mail, notification externe). À documenter dans
-  les applications qui nécessitent ce flux.
+- `SameSite=Strict` peut bloquer la transmission du cookie sur les liens entrants depuis des sites tiers (ex. e-mail, notification externe).
+  À documenter dans les applications qui nécessitent ce flux.
 
 ---
 
@@ -90,8 +79,7 @@ Résultats confirmés par SECURITY-HEADERS-001.
 
 ### Stack complète
 
-Les headers suivants sont émis sur **toutes** les réponses HTTP (200, 302, 404,
-403, fichiers statiques, réponses `/media`) par `RequestHandler._send_response()` :
+Les headers suivants sont émis sur **toutes** les réponses HTTP (200, 302, 404, 403, fichiers statiques, réponses `/media`) par `RequestHandler._send_response()` :
 
 | Header | Valeur | Rôle |
 |---|---|---|
@@ -104,11 +92,8 @@ Les headers suivants sont émis sur **toutes** les réponses HTTP (200, 302, 404
 | `Cache-Control` | `no-store` sur routes auth | Interdit la mise en cache des pages sensibles |
 
 !!! note "HSTS et reverse proxy"
-    Le tableau décrit le comportement quand Forge termine lui-même TLS
-    (serveur de développement HTTPS, `APP_SSL_ENABLED=true`).
-    Dans le déploiement de production officiel (Gunicorn derrière un reverse proxy),
-    Forge écoute en HTTP local : `wsgi.url_scheme` vaut `http`, donc Forge ne pose
-    **pas** `Strict-Transport-Security`, et c'est le reverse proxy qui l'ajoute.
+    Le tableau décrit le comportement quand Forge termine lui-même TLS (serveur de développement HTTPS, `APP_SSL_ENABLED=true`).
+    Dans le déploiement de production officiel (Gunicorn derrière un reverse proxy), Forge écoute en HTTP local : `wsgi.url_scheme` vaut `http`, donc Forge ne pose **pas** `Strict-Transport-Security`, et c'est le reverse proxy qui l'ajoute.
     Voir [Déploiement WSGI minimal](wsgi-deployment.md#41-headers-de-securite-et-hsts).
 
 ### Content-Security-Policy
@@ -135,8 +120,7 @@ APP_CSP_NONCE_ENABLED=true
 
 ### Cache-Control sur les routes auth
 
-Depuis **SECURITY-CACHE-001**, les routes d'authentification reçoivent
-automatiquement `Cache-Control: no-store` :
+Depuis **SECURITY-CACHE-001**, les routes d'authentification reçoivent automatiquement `Cache-Control: no-store` :
 
 | Route | Méthode | No-store |
 |---|---|---|
@@ -146,16 +130,13 @@ automatiquement `Cache-Control: no-store` :
 | `/login/mfa` | POST | ✅ |
 | `/logout` | POST | ✅ |
 
-Le header est ajouté dans `_send_response()` (app.py) si le chemin est dans
-`_AUTH_NO_STORE_PATHS` et si la réponse ne fixe pas déjà `Cache-Control`.
+Le header est ajouté dans `_send_response()` (app.py) si le chemin est dans `_AUTH_NO_STORE_PATHS` et si la réponse ne fixe pas déjà `Cache-Control`.
 Les fichiers statiques conservent leur propre `Cache-Control: max-age=…`.
 
 ### Limites connues
 
-- CSP sans `img-src`, `font-src`, `connect-src` explicites distincts :
-  couverts par `default-src 'self'` mais non listés séparément.
-- HSTS est émis même en HTTP local (développement) : inoffensif mais techniquement
-  redondant.
+- CSP sans `img-src`, `font-src`, `connect-src` explicites distincts : couverts par `default-src 'self'` mais non listés séparément.
+- HSTS est émis même en HTTP local (développement) : inoffensif mais techniquement redondant.
 
 ---
 
@@ -165,8 +146,8 @@ Résultats confirmés par SECURITY-CSRF-AUDIT-001.
 
 ### Mécanisme
 
-La protection CSRF est activée par défaut via `CsrfMiddleware`. Le token est
-généré à la création de session et stocké en session côté serveur.
+La protection CSRF est activée par défaut via `CsrfMiddleware`.
+Le token est généré à la création de session et stocké en session côté serveur.
 
 - Méthodes protégées : `POST`, `PUT`, `PATCH`, `DELETE`.
 - Méthodes exemptées : `GET`, `HEAD`, `OPTIONS`.
@@ -174,7 +155,9 @@ généré à la création de session et stocké en session côté serveur.
 
 ### Validation
 
-Token absent → `403`. Token invalide → `403`. Token d'une autre session → `403`.
+Token absent → `403`.
+Token invalide → `403`.
+Token d'une autre session → `403`.
 
 ```html
 <!-- Dans chaque formulaire POST -->
@@ -195,14 +178,13 @@ fetch('/api/action', {
 Une route ou un groupe peut désactiver la vérification CSRF avec `csrf=False`.
 Ce paramètre est **explicite**, aucune route n'est exempte sans déclaration.
 
-Les routes `public=True` restent protégées par CSRF sauf si `csrf=False`
-est également spécifié.
+Les routes `public=True` restent protégées par CSRF sauf si `csrf=False` est également spécifié.
 
 ### Method override
 
-Forge gère le method override `POST → DELETE/PUT/PATCH` via `_method`. Le token
-CSRF est vérifié **sur la méthode finale** après override. Un formulaire HTML
-DELETE/PUT/PATCH doit inclure le token.
+Forge gère le method override `POST → DELETE/PUT/PATCH` via `_method`.
+Le token CSRF est vérifié **sur la méthode finale** après override.
+Un formulaire HTML DELETE/PUT/PATCH doit inclure le token.
 
 ---
 
@@ -212,9 +194,8 @@ Résultats confirmés par SECURITY-AUTH-AUDIT-001.
 
 ### Journalisation des événements
 
-`log_auth_event()` (module `core.auth.audit`) est branché dans
-`auth_controller.py` et `mfa_challenge_controller.py`. Logger :
-`forge.auth.audit`.
+`log_auth_event()` (module `core.auth.audit`) est branché dans `auth_controller.py` et `mfa_challenge_controller.py`.
+Logger : `forge.auth.audit`.
 
 | Événement | Niveau | Déclencheur |
 |---|---|---|
@@ -227,15 +208,13 @@ Résultats confirmés par SECURITY-AUTH-AUDIT-001.
 
 ### Données absentes des logs
 
-Aucun mot de passe, hash, token MFA ni donnée sensible n'est émis dans les
-messages de log. `sanitize_auth_audit_metadata()` filtre les champs interdits
-avant emission. En cas d'erreur interne dans le logger, `log_auth_event()`
-avale silencieusement l'exception pour ne pas perturber le flux d'authentification.
+Aucun mot de passe, hash, token MFA ni donnée sensible n'est émis dans les messages de log.
+`sanitize_auth_audit_metadata()` filtre les champs interdits avant emission.
+En cas d'erreur interne dans le logger, `log_auth_event()` avale silencieusement l'exception pour ne pas perturber le flux d'authentification.
 
 ### Configuration des logs en production
 
-Configurer un handler `forge.auth.audit` dans le système de logging Python
-pour rediriger les événements vers le fichier de log applicatif ou syslog :
+Configurer un handler `forge.auth.audit` dans le système de logging Python pour rediriger les événements vers le fichier de log applicatif ou syslog :
 
 ```python
 import logging
@@ -246,8 +225,7 @@ logging.getLogger("forge.auth.audit").addHandler(handler)
 logging.getLogger("forge.auth.audit").setLevel(logging.INFO)
 ```
 
-Les logs d'audit ne sont pas configurés automatiquement par Forge,
-la politique de log appartient à l'application.
+Les logs d'audit ne sont pas configurés automatiquement par Forge, la politique de log appartient à l'application.
 
 ### Rate limiting
 
@@ -271,9 +249,7 @@ Résultats confirmés par SECURITY-RBAC-AUDIT-001.
 | Historique | `@require_permission(code)` | `request.permissions` (injection serveur) |
 | Auth/User | `@require_user_permission(code)` | `user_roles → roles → permissions` (DB) |
 
-Les deux systèmes sont **étanches** : `request.permissions` n'influence pas
-`@require_user_permission`, et le `user_id` Auth/User n'influence pas
-`@require_permission`.
+Les deux systèmes sont **étanches** : `request.permissions` n'influence pas `@require_user_permission`, et le `user_id` Auth/User n'influence pas `@require_permission`.
 
 ### Principe fondamental : protection serveur obligatoire
 
@@ -295,8 +271,7 @@ def delete(request, post_id):
 
 ### Helpers Jinja `can()`
 
-`make_can(request)` (système historique) et `make_auth_jinja_can(request)`
-(système Auth/User) retournent un callable `can(permission) → bool`.
+`make_can(request)` (système historique) et `make_auth_jinja_can(request)` (système Auth/User) retournent un callable `can(permission) → bool`.
 
 - Retourne toujours un `bool` (jamais `None`).
 - Avale silencieusement toute exception (échec DB, permission invalide).
@@ -311,12 +286,8 @@ def delete(request, post_id):
 
 ### Limite connue : boutons CRUD sans guard UI
 
-Les templates CRUD générés par `make:crud` (table partielle, vue show) affichent
-les boutons **Modifier** et **Supprimer** sans `{% if can() %}` conditionnel.
-La protection serveur est présente (`@require_permission` dans le contrôleur
-généré si `rbac.permissions` est déclaré), et depuis **CRUD-RBAC-UI-001**
-(livré), les templates générés incluent également des guards `{% if can() %}`
-autour de ces boutons quand `rbac.permissions` est déclaré dans la définition.
+Les templates CRUD générés par `make:crud` (table partielle, vue show) affichent les boutons **Modifier** et **Supprimer** sans `{% if can() %}` conditionnel.
+La protection serveur est présente (`@require_permission` dans le contrôleur généré si `rbac.permissions` est déclaré), et depuis **CRUD-RBAC-UI-001** (livré), les templates générés incluent également des guards `{% if can() %}` autour de ces boutons quand `rbac.permissions` est déclaré dans la définition.
 
 ---
 
@@ -326,37 +297,32 @@ Résultats confirmés par SECURITY-UPLOADS-AUDIT-001.
 
 ### Architecture de validation
 
-Tout upload transite par la chaîne :
-`validate_upload_metadata()` → `save_bytes()` → `normalize_media_path()`.
+Tout upload transite par la chaîne : `validate_upload_metadata()` → `save_bytes()` → `normalize_media_path()`.
 
 ### Anti-path-traversal
 
 `normalize_media_path()` + `os.path.commonpath()` bloquent les accès hors racine.
 La racine absolue `storage/uploads/` est vérifiée sur chaque accès.
 
-Chemins refusés : `/etc/passwd`, `../secret`, `images/../../secret`,
-null bytes, URLs (`https://...`), chemins Windows absolus.
+Chemins refusés : `/etc/passwd`, `../secret`, `images/../../secret`, null bytes, URLs (`https://...`), chemins Windows absolus.
 
 ### Extensions interdites (liste non exhaustive)
 
-`.php`, `.py`, `.html`, `.js`, `.svg`, `.sh`, `.exe`, `.env`, toute extension
-hors liste blanche est refusée. Liste blanche par défaut : `jpg`, `jpeg`, `png`,
-`webp`, `pdf`.
+`.php`, `.py`, `.html`, `.js`, `.svg`, `.sh`, `.exe`, `.env`, toute extension hors liste blanche est refusée.
+Liste blanche par défaut : `jpg`, `jpeg`, `png`, `webp`, `pdf`.
 
 ### Noms de fichiers
 
-`secure_filename()` retire le chemin (basename uniquement), remplace les
-caractères spéciaux. `generate_unique_filename()` ajoute un UUID hex, impossible
-de prédire le nom du fichier en base ou d'écraser un fichier existant.
+`secure_filename()` retire le chemin (basename uniquement), remplace les caractères spéciaux.
+`generate_unique_filename()` ajoute un UUID hex, impossible de prédire le nom du fichier en base ou d'écraser un fichier existant.
 
 ### Route `/media`
 
-GET `/media/<path>` est contrôlé par `serve_media_file()`. Le path traversal
-via l'URL est bloqué avant toute lecture. Les fichiers sont servis uniquement
-depuis `storage/uploads/`.
+GET `/media/<path>` est contrôlé par `serve_media_file()`.
+Le path traversal via l'URL est bloqué avant toute lecture.
+Les fichiers sont servis uniquement depuis `storage/uploads/`.
 
-**Ne jamais servir `storage/` directement via Nginx** sans passer par la route
-`/media` de Forge, le filtrage anti-traversal ne s'appliquerait pas.
+**Ne jamais servir `storage/` directement via Nginx** sans passer par la route `/media` de Forge, le filtrage anti-traversal ne s'appliquerait pas.
 
 ### Rate limiting upload
 
@@ -370,11 +336,10 @@ Il se branche en tête de contrôleur d'upload ; ses compteurs sont isolés de c
 
 ### Limites connues
 
-- Pas de validation de signature binaire (magic bytes) : un fichier dangereux
-  avec une extension et un Content-Type valides est accepté.
+- Pas de validation de signature binaire (magic bytes) : un fichier dangereux avec une extension et un Content-Type valides est accepté.
   Ticket futur : intégrer `python-magic` si nécessaire.
-- Tests E2E multipart couverts par `test_e2e_upload_http.py` via `Application.dispatch()`
-  (quasi-E2E, sans serveur TCP). Magic bytes non testés (ticket futur).
+- Tests E2E multipart couverts par `test_e2e_upload_http.py` via `Application.dispatch()` (quasi-E2E, sans serveur TCP).
+  Magic bytes non testés (ticket futur).
 - Pas de scan antivirus intégré.
 
 ---
@@ -388,16 +353,16 @@ storage/logs/errors.dev.jsonl   ← erreurs structurées JSON (une par ligne)
 storage/logs/errors.dev.md      ← rapport lisible par humain
 ```
 
-Ces fichiers sont **réservés au mode développement**. Ils contiennent les
-tracebacks Python complets, **ne jamais les exposer publiquement**.
+Ces fichiers sont **réservés au mode développement**.
+Ils contiennent les tracebacks Python complets, **ne jamais les exposer publiquement**.
 
 En production :
 
 - Ne pas versionner `storage/logs/`.
 - Ne pas servir `storage/` directement via Nginx.
 - Configurer `.gitignore` : `storage/logs/` doit être exclu.
-- Forge ne produit pas de fichier JSONL de logs en mode `prod`. La gestion
-  des erreurs production (syslog, Sentry, ELK) est à la charge de l'application.
+- Forge ne produit pas de fichier JSONL de logs en mode `prod`.
+  La gestion des erreurs production (syslog, Sentry, ELK) est à la charge de l'application.
 
 ---
 
@@ -479,14 +444,10 @@ FLUSH PRIVILEGES;
 
 ### Politique de stockage des secrets DB_ADMIN_* (ENV-PROD-DB-ADMIN-SECRETS-POLICY-001)
 
-**Règle stricte** : aucun mot de passe root/admin MariaDB réel ne doit
-être stocké dans `env/prod` (ou tout fichier commité).
+**Règle stricte** : aucun mot de passe root/admin MariaDB réel ne doit être stocké dans `env/prod` (ou tout fichier commité).
 
-Le **runtime applicatif Forge** (`app.py`, WSGI, dispatcher) n'utilise
-**que** `DB_APP_*`. La preuve est dans
-[`app.py`](https://github.com/caucrogeGit/Forge/blob/main/app.py) :
-l'import depuis `config` cite `DB_APP_HOST, DB_APP_PORT, DB_NAME,
-DB_APP_LOGIN, DB_APP_PWD, DB_POOL_SIZE` - `DB_ADMIN_*` n'apparaît pas.
+Le **runtime applicatif Forge** (`app.py`, WSGI, dispatcher) n'utilise **que** `DB_APP_*`.
+La preuve est dans [`app.py`](https://github.com/caucrogeGit/Forge/blob/main/app.py) : l'import depuis `config` cite `DB_APP_HOST, DB_APP_PORT, DB_NAME, DB_APP_LOGIN, DB_APP_PWD, DB_POOL_SIZE` - `DB_ADMIN_*` n'apparaît pas.
 
 | Variable | Utilisée par | Stockée où en production ? |
 |---|---|---|
@@ -518,21 +479,15 @@ export $(grep -v '^#' env/db-admin.local | xargs)
 forge db:init
 ```
 
-Une fois `forge db:init` exécuté et le compte applicatif créé, les
-variables `DB_ADMIN_*` ne sont plus nécessaires côté serveur de runtime, elles peuvent être absentes ou vides dans `env/prod`. Voir
-[`deploy-advanced.md`](deploy-advanced.md) §138 : « Les credentials
-admin (`DB_ADMIN_*`) servent uniquement lors des migrations, les
-supprimer de `env/prod` après `db:init` si vous n'en avez plus besoin. »
+Une fois `forge db:init` exécuté et le compte applicatif créé, les variables `DB_ADMIN_*` ne sont plus nécessaires côté serveur de runtime, elles peuvent être absentes ou vides dans `env/prod`.
+Voir [`deploy-advanced.md`](deploy-advanced.md) §138 : « Les credentials admin (`DB_ADMIN_*`) servent uniquement lors des migrations, les supprimer de `env/prod` après `db:init` si vous n'en avez plus besoin. »
 
-Cette politique est verrouillée par
-[`tests/meta/test_env_prod_db_admin_policy_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/meta/test_env_prod_db_admin_policy_001.py).
+Cette politique est verrouillée par [`tests/meta/test_env_prod_db_admin_policy_001.py`](https://github.com/caucrogeGit/Forge/blob/main/tests/meta/test_env_prod_db_admin_policy_001.py).
 
 ### Tests E2E MariaDB
 
-Les tests E2E MariaDB (`test_e2e_mariadb.py`) ne s'exécutent que si
-`FORGE_E2E_MARIADB=1` est défini. Le nom de la base **doit commencer par
-`forge_e2e_`**, vérification appliquée pour empêcher l'exécution accidentelle
-sur une base de production.
+Les tests E2E MariaDB (`test_e2e_mariadb.py`) ne s'exécutent que si `FORGE_E2E_MARIADB=1` est défini.
+Le nom de la base **doit commencer par `forge_e2e_`**, vérification appliquée pour empêcher l'exécution accidentelle sur une base de production.
 
 **Ne jamais pointer les tests E2E vers une base de production.**
 
@@ -549,8 +504,7 @@ sur une base de production.
 | `DB_APP_LOGIN` | compte de dev | compte applicatif restreint |
 | Session store | Mémoire (défaut) | Fichier ou MariaDB recommandé |
 
-En production, Forge doit être lancé avec `--env prod` (ou `APP_ENV=prod` dans
-`env/prod`) pour désactiver les comportements de développement.
+En production, Forge doit être lancé avec `--env prod` (ou `APP_ENV=prod` dans `env/prod`) pour désactiver les comportements de développement.
 
 ---
 

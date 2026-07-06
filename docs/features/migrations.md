@@ -1,15 +1,13 @@
 # Migrations SQL
 
-Forge utilise des migrations SQL versionnées pour faire évoluer le schéma de la
-base applicative.
+Forge utilise des migrations SQL versionnées pour faire évoluer le schéma de la base applicative.
 
 Le principe reste volontairement explicite :
 
 - le SQL reste visible dans `mvc/migrations/` ;
 - Forge n'ajoute pas d'ORM ;
 - le développeur relit les migrations avant application ;
-- Forge assiste la création et le suivi, mais n'applique rien sans commande
-  explicite.
+- Forge assiste la création et le suivi, mais n'applique rien sans commande explicite.
 
 ## Initialiser le suivi
 
@@ -17,9 +15,8 @@ Le principe reste volontairement explicite :
 forge db:init
 ```
 
-Cette commande prépare la base applicative et crée aussi la table technique
-`forge_migrations` avec `CREATE TABLE IF NOT EXISTS`. Cette table enregistre les
-migrations déjà appliquées.
+Cette commande prépare la base applicative et crée aussi la table technique `forge_migrations` avec `CREATE TABLE IF NOT EXISTS`.
+Cette table enregistre les migrations déjà appliquées.
 
 ## Créer une migration vide
 
@@ -61,8 +58,7 @@ Forge concatène les fichiers :
 mvc/entities/*/*.sql
 ```
 
-Les fichiers sont inclus dans l'ordre alphabétique des chemins, avec un
-séparateur lisible avant chaque bloc SQL.
+Les fichiers sont inclus dans l'ordre alphabétique des chemins, avec un séparateur lisible avant chaque bloc SQL.
 
 ## Voir l'état des migrations
 
@@ -70,8 +66,7 @@ séparateur lisible avant chaque bloc SQL.
 forge migration:status
 ```
 
-La commande compare les fichiers locaux dans `mvc/migrations/` avec les lignes
-présentes dans `forge_migrations`.
+La commande compare les fichiers locaux dans `mvc/migrations/` avec les lignes présentes dans `forge_migrations`.
 
 Statuts possibles :
 
@@ -88,14 +83,13 @@ Statuts possibles :
 forge migration:apply
 ```
 
-Forge applique uniquement les migrations `PENDING`, dans l'ordre croissant de
-version, puis enregistre chaque application dans `forge_migrations`.
+Forge applique uniquement les migrations `PENDING`, dans l'ordre croissant de version, puis enregistre chaque application dans `forge_migrations`.
 
 La commande refuse l'application si une migration est `CHANGED` ou `MISSING`.
 
 !!! warning "DDL MariaDB"
-    MariaDB ne garantit pas un rollback complet des DDL. Forge s'arrête au
-    premier échec, mais ne prétend pas annuler ce que MariaDB a déjà exécuté.
+    MariaDB ne garantit pas un rollback complet des DDL.
+    Forge s'arrête au premier échec, mais ne prétend pas annuler ce que MariaDB a déjà exécuté.
     Relisez les migrations SQL avant application.
 
 ## Comparer une entité avec la base
@@ -104,8 +98,7 @@ La commande refuse l'application si une migration est `CHANGED` ou `MISSING`.
 forge migration:diff --entity Contact
 ```
 
-Forge compare le JSON canonique de l'entité avec les colonnes réelles de la
-table MariaDB.
+Forge compare le JSON canonique de l'entité avec les colonnes réelles de la table MariaDB.
 
 Cette commande est strictement en lecture seule :
 
@@ -130,8 +123,7 @@ Statuts du diff :
 forge migration:make add_contact_fields --from-diff Contact
 ```
 
-Forge réutilise le diff de schéma et génère une migration seulement dans les cas
-prudenciels.
+Forge réutilise le diff de schéma et génère une migration seulement dans les cas prudenciels.
 
 Cas autorisés :
 
@@ -161,8 +153,7 @@ forge migration:status
 forge migration:apply
 ```
 
-Ce workflow convient pour poser un premier schéma lisible à partir des SQL
-d'entités générés.
+Ce workflow convient pour poser un premier schéma lisible à partir des SQL d'entités générés.
 
 ## Workflow : évolution prudente
 
@@ -174,9 +165,6 @@ forge migration:status
 forge migration:apply
 ```
 
-Ce workflow convient pour ajouter des colonnes déclarées dans le JSON mais
-encore absentes de la base.
+Ce workflow convient pour ajouter des colonnes déclarées dans le JSON mais encore absentes de la base.
 
-Pour modifier un type, supprimer une colonne, changer une contrainte, ajouter un
-index ou gérer une clé étrangère, créez une migration manuelle et relisez le SQL
-avant application.
+Pour modifier un type, supprimer une colonne, changer une contrainte, ajouter un index ou gérer une clé étrangère, créez une migration manuelle et relisez le SQL avant application.

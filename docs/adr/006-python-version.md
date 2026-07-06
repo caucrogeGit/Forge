@@ -8,12 +8,10 @@ Acceptée
 
 ## Contexte
 
-Forge cible actuellement Python 3.11+ comme version minimale. Python 3.11
-sera en fin de vie en octobre 2027, mais Python 3.12 est disponible depuis
-octobre 2023 et apporte des améliorations substantielles.
+Forge cible actuellement Python 3.11+ comme version minimale.
+Python 3.11 sera en fin de vie en octobre 2027, mais Python 3.12 est disponible depuis octobre 2023 et apporte des améliorations substantielles.
 
-La décision de la version minimale doit être prise avant la phase 14.3 car
-elle impacte :
+La décision de la version minimale doit être prise avant la phase 14.3 car elle impacte :
 
 - la syntaxe autorisée dans le code de Forge (type hints, f-strings, etc.) ;
 - les outils de packaging (`pyproject.toml`, `python_requires`) ;
@@ -41,28 +39,21 @@ Concrètement :
 
 4. La documentation d'installation et les starters référencent Python 3.12+.
 
-5. Python 3.11 reste fonctionnel avec Forge 1.x, cette décision ne s'applique
-   qu'à Forge 1.0.
+5. Python 3.11 reste fonctionnel avec Forge 1.x, cette décision ne s'applique qu'à Forge 1.0.
 
 ---
 
 ## Conséquences
 
 - Les développeurs sur Python 3.11 devront rester sur Forge 1.x ou migrer.
-- Le guide de migration `MIGRATION-GUIDE-001` documentera la contrainte
-  de version Python.
+- Le guide de migration `MIGRATION-GUIDE-001` documentera la contrainte de version Python.
 - La matrice CI est simplifiée (2 versions au lieu de 3+).
-- Forge peut exploiter les améliorations de performance de Python 3.12 (meilleur
-  GIL, interpréteur plus rapide).
+- Forge peut exploiter les améliorations de performance de Python 3.12 (meilleur GIL, interpréteur plus rapide).
 
 ---
 
 ## Alternatives considérées
 
-**Python 3.11+.** Conserverait la compatibilité maximale mais bloque
-l'utilisation des nouvelles syntaxes et laisse Forge supporter une version
-Python proche de sa fin de vie.
+**Python 3.11+.** Conserverait la compatibilité maximale mais bloque l'utilisation des nouvelles syntaxes et laisse Forge supporter une version Python proche de sa fin de vie.
 
-**Python 3.13+.** Trop restrictif au moment de la release de Forge 1.0 ;
-3.13 est récent et beaucoup d'environnements de production sont encore sur
-3.12.
+**Python 3.13+.** Trop restrictif au moment de la release de Forge 1.0 ; 3.13 est récent et beaucoup d'environnements de production sont encore sur 3.12.

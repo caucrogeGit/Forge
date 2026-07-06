@@ -1,13 +1,11 @@
 # Autocomplétion VS Code avec les schémas JSON
 
-VS Code peut utiliser les schémas JSON Forge pour aider à remplir les fichiers
-d'entités et de relations. Cette aide est optionnelle : Forge ne dépend pas de
-VS Code pour valider un projet.
+VS Code peut utiliser les schémas JSON Forge pour aider à remplir les fichiers d'entités et de relations.
+Cette aide est optionnelle : Forge ne dépend pas de VS Code pour valider un projet.
 
 !!! tip "Vue d'ensemble"
     Le `.vscode/settings.json` versionné par le projet associe déjà ces schémas.
-    Voir [Environnement VS Code de Forge](../install/vscode-environnement.md)
-    pour la liste complète des extensions et de la configuration.
+    Voir [Environnement VS Code de Forge](../install/vscode-environnement.md) pour la liste complète des extensions et de la configuration.
 
 ---
 
@@ -20,10 +18,8 @@ VS Code lit un schéma JSON et, pour chaque fichier associé :
 - propose les valeurs `enum` attendues ;
 - signale les types JSON invalides.
 
-**VS Code ne remplace pas `forge entity:validate`.** La validation structurelle
-que VS Code peut apporter reste partielle ; les règles sémantiques de Forge
-(entités inconnues, collisions, doublons, cohérence entre champs et index)
-sont vérifiées uniquement par la CLI.
+**VS Code ne remplace pas `forge entity:validate`.**
+La validation structurelle que VS Code peut apporter reste partielle ; les règles sémantiques de Forge (entités inconnues, collisions, doublons, cohérence entre champs et index) sont vérifiées uniquement par la CLI.
 
 ---
 
@@ -63,8 +59,7 @@ Déclarer le schéma dans ce fichier :
 }
 ```
 
-Le chemin `../../../schemas/entity.schema.json` remonte trois niveaux depuis
-`mvc/entities/article/` jusqu'à la racine du projet.
+Le chemin `../../../schemas/entity.schema.json` remonte trois niveaux depuis `mvc/entities/article/` jusqu'à la racine du projet.
 
 ### Exemple : `relations.json`
 
@@ -76,15 +71,14 @@ Le chemin `../../../schemas/entity.schema.json` remonte trois niveaux depuis
 }
 ```
 
-Le chemin `../../schemas/relations.schema.json` remonte deux niveaux depuis
-`mvc/entities/`.
+Le chemin `../../schemas/relations.schema.json` remonte deux niveaux depuis `mvc/entities/`.
 
 ---
 
 ## Méthode 2 : associer les schémas dans `.vscode/settings.json`
 
-L'association globale évite de modifier chaque fichier JSON. Elle se place dans
-`.vscode/settings.json` à la racine du projet.
+L'association globale évite de modifier chaque fichier JSON.
+Elle se place dans `.vscode/settings.json` à la racine du projet.
 
 ### Configuration de base
 
@@ -107,14 +101,12 @@ L'association globale évite de modifier chaque fichier JSON. Elle se place dans
 }
 ```
 
-> **Note** : si `relations.json` correspond aussi au motif `/mvc/entities/**/*.json`,
-> l'entrée spécifique à `relations.json` doit rester **avant** l'entrée générique.
+> **Note** : si `relations.json` correspond aussi au motif `/mvc/entities/**/*.json`, l'entrée spécifique à `relations.json` doit rester **avant** l'entrée générique.
 > L'ordre des entrées dans `json.schemas` détermine quelle association prend effet.
 
 ### Variante prudente (sous-dossiers)
 
-Pour cibler explicitement les entités dans des sous-dossiers et éviter de
-sélectionner `relations.json` via le motif générique :
+Pour cibler explicitement les entités dans des sous-dossiers et éviter de sélectionner `relations.json` via le motif générique :
 
 ```json
 {
@@ -172,8 +164,8 @@ Avec un schéma associé, VS Code peut signaler :
 
 ## Ce que VS Code ne remplace pas
 
-VS Code valide principalement la **structure** des fichiers JSON. `forge entity:validate`
-valide en plus les **règles sémantiques** que le JSON Schema ne peut pas exprimer :
+VS Code valide principalement la **structure** des fichiers JSON.
+`forge entity:validate` valide en plus les **règles sémantiques** que le JSON Schema ne peut pas exprimer :
 
 - relation vers une entité inexistante dans `mvc/entities/` ;
 - doublon de table entre deux entités ;
@@ -203,9 +195,8 @@ python forge.py rbac:validate       # validation du contrat RBAC (optionnel)
 | `schemas/rbac.schema.json` | structure de `mvc/security/rbac.json` |
 | `schemas/common.schema.json` | définitions partagées (réutilisées par les autres schémas) |
 
-Les schémas sont autonomes : Forge n'a pas besoin d'Internet pour valider un
-projet. Les `$id` commençant par `https://forge-mvc.dev/` sont des identifiants
-logiques, pas des URL résolues en ligne.
+Les schémas sont autonomes : Forge n'a pas besoin d'Internet pour valider un projet.
+Les `$id` commençant par `https://forge-mvc.dev/` sont des identifiants logiques, pas des URL résolues en ligne.
 
 ---
 
@@ -213,14 +204,10 @@ logiques, pas des URL résolues en ligne.
 
 Les schémas Forge déclarent **JSON Schema Draft 2020-12**.
 
-Selon la version de VS Code et de son moteur JSON intégré, certaines règles
-avancées (comme `$dynamicRef` ou certains mots-clés d'annotation) peuvent être
-plus ou moins bien prises en compte. La validation officielle reste donc
-`forge entity:validate`.
+Selon la version de VS Code et de son moteur JSON intégré, certaines règles avancées (comme `$dynamicRef` ou certains mots-clés d'annotation) peuvent être plus ou moins bien prises en compte.
+La validation officielle reste donc `forge entity:validate`.
 
-En pratique, les règles de base, types, `enum`, propriétés requises,
-`additionalProperties: false`, sont bien reconnues par les versions récentes
-de VS Code.
+En pratique, les règles de base, types, `enum`, propriétés requises, `additionalProperties: false`, sont bien reconnues par les versions récentes de VS Code.
 
 ---
 
@@ -269,8 +256,7 @@ Ces commandes vérifient des règles que le JSON Schema ne peut pas exprimer :
 
 ### VS Code ne signale pas d'erreur dans un fichier JSON Forge
 
-1. Vérifier que le dossier ouvert dans VS Code est **la racine du projet Forge**
-   (celui qui contient `mvc/`, `schemas/`, `.vscode/`).
+1. Vérifier que le dossier ouvert dans VS Code est **la racine du projet Forge** (celui qui contient `mvc/`, `schemas/`, `.vscode/`).
 2. Vérifier que `.vscode/settings.json` existe et contient `json.schemas`.
 3. Vérifier que les schémas existent : `schemas/entity.schema.json`, etc.
    → `python forge.py schema:doctor`
@@ -278,16 +264,14 @@ Ces commandes vérifient des règles que le JSON Schema ne peut pas exprimer :
 
 ### VS Code signale une erreur mais `entity:validate` ne trouve rien
 
-VS Code valide la structure JSON Schema. Certaines erreurs structurelles sont
-détectables uniquement par le schéma (ex : clé inconnue, type incorrect).
-Si l'erreur est dans une propriété non couverte sémantiquement, elle peut
-apparaître dans VS Code mais pas dans `entity:validate`, ou inversement.
+VS Code valide la structure JSON Schema.
+Certaines erreurs structurelles sont détectables uniquement par le schéma (ex : clé inconnue, type incorrect).
+Si l'erreur est dans une propriété non couverte sémantiquement, elle peut apparaître dans VS Code mais pas dans `entity:validate`, ou inversement.
 
 Les deux outils sont complémentaires, utiliser les deux.
 
 ### Le schéma RBAC n'est pas reconnu dans VS Code
 
-Le fichier `mvc/security/rbac.json` est optionnel. S'il n'existe pas,
-VS Code n'a rien à valider. S'il existe et que VS Code ne l'associe pas,
-vérifier que le chemin exact est `mvc/security/rbac.json`
-(pas `mvc/security/rbac.schema.json` ou un autre nom).
+Le fichier `mvc/security/rbac.json` est optionnel.
+S'il n'existe pas, VS Code n'a rien à valider.
+S'il existe et que VS Code ne l'associe pas, vérifier que le chemin exact est `mvc/security/rbac.json` (pas `mvc/security/rbac.schema.json` ou un autre nom).

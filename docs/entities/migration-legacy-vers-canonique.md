@@ -1,13 +1,13 @@
 # Convertir un ancien projet Forge vers le JSON canonique
 
 !!! danger "Le format legacy est refusé"
-    Le format `format_version: 1` n'est plus accepté. `build:model` et `make:crud` lèvent
-    une erreur si un fichier d'entité ou de relations utilise l'ancien format.
+    Le format `format_version: 1` n'est plus accepté.
+    `build:model` et `make:crud` lèvent une erreur si un fichier d'entité ou de relations utilise l'ancien format.
     Ce guide sert à convertir manuellement les anciens fichiers avant utilisation.
 
-Ce guide s'adresse aux projets dont les fichiers JSON utilisent encore l'ancien format
-(`format_version: 1`). Il explique la conversion manuelle vers le format canonique
-(`schema_version: "1.0"`), désormais obligatoire. Il ne modifie pas le core Forge.
+Ce guide s'adresse aux projets dont les fichiers JSON utilisent encore l'ancien format (`format_version: 1`).
+Il explique la conversion manuelle vers le format canonique (`schema_version: "1.0"`), désormais obligatoire.
+Il ne modifie pas le core Forge.
 
 ---
 
@@ -19,8 +19,7 @@ Rechercher les fichiers legacy dans votre projet :
 grep -RInE 'format_version|sql_type|python_type|primary_key|auto_increment|from_entity|to_entity|foreign_key_name' mvc/entities
 ```
 
-Si des occurrences apparaissent, les fichiers concernés sont en format legacy et doivent
-être migrés.
+Si des occurrences apparaissent, les fichiers concernés sont en format legacy et doivent être migrés.
 
 Vérifier ensuite avec la validation canonique :
 
@@ -131,8 +130,7 @@ Un fichier legacy ne passe pas cette validation, c'est attendu et normal avant m
 | `DECIMAL(p, s)` | `decimal` | `precision: p, scale: s` |
 | `VARCHAR(n)` (mot de passe) | `password` | `max_length: n` |
 
-Les types `python_type` (`str`, `int`, `bool`, etc.) sont tous supprimés, Forge les dérive
-automatiquement du type canonique lors de la génération.
+Les types `python_type` (`str`, `int`, `bool`, etc.) sont tous supprimés, Forge les dérive automatiquement du type canonique lors de la génération.
 
 ---
 
@@ -140,9 +138,8 @@ automatiquement du type canonique lors de la génération.
 
 ### PK technique (`*Id`)
 
-Dans les anciens projets, la clé primaire était souvent nommée `ContactId`, `UtilisateurId`,
-`VilleId`, etc. Dans le format canonique, Forge génère une colonne technique `Id`
-automatiquement, elle n'est pas à déclarer dans les champs.
+Dans les anciens projets, la clé primaire était souvent nommée `ContactId`, `UtilisateurId`, `VilleId`, etc.
+Dans le format canonique, Forge génère une colonne technique `Id` automatiquement, elle n'est pas à déclarer dans les champs.
 
 **Si du code applicatif référence l'ancienne PK, il doit être mis à jour** :
 
@@ -163,15 +160,14 @@ grep -RInE 'row\["\w+Id"\]|utilisateur\["\w+Id"\]|contact\["\w+Id"\]' mvc/
 
 ### FK métier (`ville_id`, `cours_id`, etc.)
 
-Les colonnes qui sont des **clés étrangères métier** (ex. `ville_id`, `cours_id`) ne sont
-**pas** la PK de l'entité, elles restent dans les champs et ne changent pas de nom.
+Les colonnes qui sont des **clés étrangères métier** (ex. `ville_id`, `cours_id`) ne sont **pas** la PK de l'entité, elles restent dans les champs et ne changent pas de nom.
 
 ```json
 { "name": "ville_id", "type": "integer", "nullable": true }
 ```
 
-La colonne générée reste `ville_id`. Le code applicatif `row["ville_id"]` n'a pas besoin
-d'être modifié.
+La colonne générée reste `ville_id`.
+Le code applicatif `row["ville_id"]` n'a pas besoin d'être modifié.
 
 ---
 
@@ -261,23 +257,19 @@ Le format canonique `many_to_many` utilise un bloc `pivot` explicite. Les ancien
 }
 ```
 
-Le bloc `pivot` déclare explicitement la table de jointure, les deux clés étrangères,
-et les éventuels attributs métier dans `fields[]`.
+Le bloc `pivot` déclare explicitement la table de jointure, les deux clés étrangères, et les éventuels attributs métier dans `fields[]`.
 
 ---
 
 ## 7. Limites de la migration manuelle
 
-- **`default`** : les valeurs par défaut SQL peuvent ne pas être représentées dans tous
-  les types canoniques. Vérifier la documentation du type ciblé.
-- **Section `media`** : la clé racine `media` n'est pas supportée par le JSON Schema
-  canonique. Elle doit être supprimée ou transformée en champs métier séparés.
-- **`min` / `max`** : ces contraintes sont validées par le JSON Schema mais ne génèrent
-  pas forcément de contrainte `CHECK` SQL dans la version actuelle.
-- **`nullable`** : à vérifier pour chaque champ, la valeur par défaut peut différer
-  entre legacy et canonique.
-- **Code applicatif** : les modèles, contrôleurs et vues qui référencent des colonnes
-  supprimées (ex. l'ancienne PK) doivent être mis à jour manuellement.
+- **`default`** : les valeurs par défaut SQL peuvent ne pas être représentées dans tous les types canoniques.
+  Vérifier la documentation du type ciblé.
+- **Section `media`** : la clé racine `media` n'est pas supportée par le JSON Schema canonique.
+  Elle doit être supprimée ou transformée en champs métier séparés.
+- **`min` / `max`** : ces contraintes sont validées par le JSON Schema mais ne génèrent pas forcément de contrainte `CHECK` SQL dans la version actuelle.
+- **`nullable`** : à vérifier pour chaque champ, la valeur par défaut peut différer entre legacy et canonique.
+- **Code applicatif** : les modèles, contrôleurs et vues qui référencent des colonnes supprimées (ex. l'ancienne PK) doivent être mis à jour manuellement.
 - **Outil automatique** : aucun outil de migration automatique n'est fourni.
   Si ce besoin devient prioritaire, voir le ticket `LEGACY-MIGRATION-TOOL-001`.
 
@@ -303,11 +295,9 @@ pytest
 
 `entity:validate` signale toute violation du contrat JSON Schema.
 
-`build:model` confirme que le pipeline de génération accepte les nouvelles entités
-et produit des fichiers SQL et Python cohérents.
+`build:model` confirme que le pipeline de génération accepte les nouvelles entités et produit des fichiers SQL et Python cohérents.
 
-Les tests applicatifs doivent confirmer que les modèles, contrôleurs et vues ne
-référencent plus d'anciennes colonnes supprimées (ex. l'ancienne PK renommée `Id`).
+Les tests applicatifs doivent confirmer que les modèles, contrôleurs et vues ne référencent plus d'anciennes colonnes supprimées (ex. l'ancienne PK renommée `Id`).
 
 ---
 

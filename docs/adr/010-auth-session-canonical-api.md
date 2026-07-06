@@ -12,8 +12,7 @@ Acceptée
 
 ## Contexte
 
-Forge dispose de deux piles parallèles pour la gestion des sessions et de
-l'authentification :
+Forge dispose de deux piles parallèles pour la gestion des sessions et de l'authentification :
 
 **`core.auth.session`**, API moderne, typée, en anglais :
 
@@ -27,8 +26,7 @@ l'authentification :
 | `is_authenticated(request)` | Vérifie la présence de `_auth_user_id` |
 | `@login_required` | Décorateur contrôleur, 401 ou redirect |
 
-Cette pile est compatible avec `AuthUser`, le protocole `SessionStore` (Phase 3)
-et tous les modules opt-in (`forge-mvc-mfa`, `forge-mvc-rbac`).
+Cette pile est compatible avec `AuthUser`, le protocole `SessionStore` (Phase 3) et tous les modules opt-in (`forge-mvc-mfa`, `forge-mvc-rbac`).
 
 **`core.security.session`**, API legacy, en français/anglais mixte :
 
@@ -46,23 +44,18 @@ et tous les modules opt-in (`forge-mvc-mfa`, `forge-mvc-rbac`).
 | `set_flash(session_id, message, level)` | Stocke un message flash |
 | `get_flash(session_id)` | Lit et supprime le message flash |
 
-Cette pile est utilisée par `mvc/controllers/auth_controller.py`,
-`mvc/controllers/mfa_challenge_controller.py`, `mvc/helpers/flash.py`,
-`core/security/decorators.py`, `core/security/middleware.py`, plusieurs
-starters et certains modules opt-in.
+Cette pile est utilisée par `mvc/controllers/auth_controller.py`, `mvc/controllers/mfa_challenge_controller.py`, `mvc/helpers/flash.py`, `core/security/decorators.py`, `core/security/middleware.py`, plusieurs starters et certains modules opt-in.
 
 ### Interdépendance actuelle
 
-`core.auth.session._resolve_request_session()` appelle en interne
-`core.security.session.get_session` / `get_session_id` comme fallback.
-`forge-mvc-mfa` importe les deux piles. `forge-mvc-rbac` importe
-principalement `core.auth.session`.
+`core.auth.session._resolve_request_session()` appelle en interne `core.security.session.get_session` / `get_session_id` comme fallback.
+`forge-mvc-mfa` importe les deux piles.
+`forge-mvc-rbac` importe principalement `core.auth.session`.
 
 ### Décision ADR-001 (historique)
 
-ADR-001 a déjà établi que `core.auth` est l'API officielle pour les nouveaux
-projets Forge 1.x. ADR-010 formalise cette décision pour la série 1.0.x
-(numérotation interne renommée) et pose le cadre de la transition.
+ADR-001 a déjà établi que `core.auth` est l'API officielle pour les nouveaux projets Forge 1.x.
+ADR-010 formalise cette décision pour la série 1.0.x (numérotation interne renommée) et pose le cadre de la transition.
 
 ---
 
@@ -70,30 +63,27 @@ projets Forge 1.x. ADR-010 formalise cette décision pour la série 1.0.x
 
 **1. `core.auth.session` est l'API canonique.**
 
-Tout nouveau code Forge, tout nouveau starter, tout nouveau module opt-in et
-toute nouvelle documentation doit référencer `core.auth.session`.
+Tout nouveau code Forge, tout nouveau starter, tout nouveau module opt-in et toute nouvelle documentation doit référencer `core.auth.session`.
 
 **2. `core.security.session` est l'API legacy.**
 
-Elle reste fonctionnelle et non modifiée jusqu'à la livraison de
-`AUTH-SESSION-LEGACY-DEPRECATION-001`. Elle ne doit pas être étendue.
+Elle reste fonctionnelle et non modifiée jusqu'à la livraison de `AUTH-SESSION-LEGACY-DEPRECATION-001`.
+Elle ne doit pas être étendue.
 
 **3. `core.auth.session` expose les fonctions de session bas niveau via `_resolve_request_session`.**
 
-Les opérations HTTP bas niveau (`create_session`, `get_session_id`, `set_flash`,
-`get_flash`) restent dans `core.security.session` jusqu'à la déduplication
-effective. La décision de quelles fonctions migrer appartient à
-`AUTH-SESSION-DEDUP-001`.
+Les opérations HTTP bas niveau (`create_session`, `get_session_id`, `set_flash`, `get_flash`) restent dans `core.security.session` jusqu'à la déduplication effective.
+La décision de quelles fonctions migrer appartient à `AUTH-SESSION-DEDUP-001`.
 
 **4. Aucun warning n'est émis à l'import de `core.security.session`.**
 
 L'import de `core.security.session` ne doit pas émettre de `DeprecationWarning`.
-Les warnings seront ajoutés **uniquement à l'appel** des fonctions legacy, dans
-le ticket `AUTH-SESSION-LEGACY-DEPRECATION-001`.
+Les warnings seront ajoutés **uniquement à l'appel** des fonctions legacy, dans le ticket `AUTH-SESSION-LEGACY-DEPRECATION-001`.
 
 **5. `@login_required` (core.auth.session) remplace `@require_auth` (core.security.decorators).**
 
-`@require_auth` est legacy. Les nouveaux contrôleurs utilisent `@login_required`.
+`@require_auth` est legacy.
+Les nouveaux contrôleurs utilisent `@login_required`.
 
 ---
 
@@ -101,10 +91,8 @@ le ticket `AUTH-SESSION-LEGACY-DEPRECATION-001`.
 
 - Le code existant (`mvc/`, starters) continue de fonctionner sans modification.
 - Les nouveaux projets générés après cette ADR utilisent `core.auth.session`.
-- Les modules opt-in (`forge-mvc-rbac`, `forge-mvc-mfa`) qui importent déjà
-  `core.auth.session` sont conformes.
-- Les imports `core.security.session` dans `forge-mvc-rbac.rbac` et
-  `forge-mvc-mfa.mfa` seront migrés dans `AUTH-SESSION-DEDUP-001`.
+- Les modules opt-in (`forge-mvc-rbac`, `forge-mvc-mfa`) qui importent déjà `core.auth.session` sont conformes.
+- Les imports `core.security.session` dans `forge-mvc-rbac.rbac` et `forge-mvc-mfa.mfa` seront migrés dans `AUTH-SESSION-DEDUP-001`.
 
 ---
 
@@ -130,8 +118,7 @@ DeprecationWarning uniquement à l'appel des fonctions legacy.
 Cette étape appartient exclusivement à AUTH-SESSION-LEGACY-DEPRECATION-001.
 ```
 
-Cette règle protège les projets qui importent `core.security.session` sans
-l'utiliser directement (via des imports intermédiaires dans le core).
+Cette règle protège les projets qui importent `core.security.session` sans l'utiliser directement (via des imports intermédiaires dans le core).
 
 ---
 
@@ -140,8 +127,7 @@ l'utiliser directement (via des imports intermédiaires dans le core).
 **Ticket** : `AUTH-SESSION-LEGACY-DEPRECATION-001`
 **Date** : 2026-05-16
 
-Les fonctions legacy suivantes de `core.security.session` émettent désormais un
-`DeprecationWarning` à l'appel, avec le chemin canonique à utiliser :
+Les fonctions legacy suivantes de `core.security.session` émettent désormais un `DeprecationWarning` à l'appel, avec le chemin canonique à utiliser :
 
 | Fonction dépréciée | API canonique à utiliser |
 |---|---|
@@ -150,21 +136,15 @@ Les fonctions legacy suivantes de `core.security.session` émettent désormais u
 | `is_authenticated(request)` | `core.auth.session.is_authenticated(request)` |
 | `get_user(request)` | `core.auth.session.current_user(request, user_loader)` |
 
-**Fonctions infrastructure conservées sans warning** : `get_session_id`,
-`get_session`, `delete_session`, `regenerate_session`, `user_has_role`,
-`set_flash`, `get_flash`, pas d'équivalent canonique direct ou utilisées
-en interne par le framework.
+**Fonctions infrastructure conservées sans warning** : `get_session_id`, `get_session`, `delete_session`, `regenerate_session`, `user_has_role`, `set_flash`, `get_flash`, pas d'équivalent canonique direct ou utilisées en interne par le framework.
 
 **Propriétés garanties** :
 - L'import de `core.security.session` n'émet aucun `DeprecationWarning`.
-- Les fonctions dépréciées continuent à fonctionner, la migration est
-  progressive, non cassante.
+- Les fonctions dépréciées continuent à fonctionner, la migration est progressive, non cassante.
 - `stacklevel=2` : le warning pointe vers le code appelant.
-- `user_has_role` ne cascade pas le warning de `get_user` (refactorisé
-  pour lire le store directement).
+- `user_has_role` ne cascade pas le warning de `get_user` (refactorisé pour lire le store directement).
 
-La suppression effective et la migration des usages applicatifs appartiennent
-aux tickets 4.4 (`STARTER-AUTH-MODERNIZE-001`) et suivants.
+La suppression effective et la migration des usages applicatifs appartiennent aux tickets 4.4 (`STARTER-AUTH-MODERNIZE-001`) et suivants.
 
 ---
 
@@ -173,26 +153,19 @@ aux tickets 4.4 (`STARTER-AUTH-MODERNIZE-001`) et suivants.
 **Ticket** : `AUTH-SESSION-COMPATIBILITY-BRIDGE-001`
 **Date** : 2026-05-16
 
-La divergence de clés de session (`_auth_user_id` vs `authenticated + user`)
-rendait les deux piles mutuellement opaques. Le ticket 4.2b a livré un pont de
-lecture bidirectionnel :
+La divergence de clés de session (`_auth_user_id` vs `authenticated + user`) rendait les deux piles mutuellement opaques.
+Le ticket 4.2b a livré un pont de lecture bidirectionnel :
 
-**`core.auth.session.get_authenticated_user_id`** reconnaît les sessions legacy :
-si `_auth_user_id` est absent mais que `authenticated=True` et `user.id` sont
-présents (session créée par `authenticate_session`), l'identifiant est retourné.
+**`core.auth.session.get_authenticated_user_id`** reconnaît les sessions legacy : si `_auth_user_id` est absent mais que `authenticated=True` et `user.id` sont présents (session créée par `authenticate_session`), l'identifiant est retourné.
 
-**`core.security.session.is_authenticated`** reconnaît les sessions canoniques :
-si les clés legacy sont absentes mais que `_auth_user_id` est un entier positif
-(session créée par `login_user`), la session est considérée authentifiée.
+**`core.security.session.is_authenticated`** reconnaît les sessions canoniques : si les clés legacy sont absentes mais que `_auth_user_id` est un entier positif (session créée par `login_user`), la session est considérée authentifiée.
 
 **Propriétés garanties** :
 - Aucune écriture dans la session à la lecture, pas de pollution de clés.
 - L'expiration est étendue dans les deux cas.
-- Pas d'import circulaire : `core.security.session` utilise la clé littérale
-  `"_auth_user_id"` sans importer `core.auth.session`.
+- Pas d'import circulaire : `core.security.session` utilise la clé littérale `"_auth_user_id"` sans importer `core.auth.session`.
 
-Ce pont ferme les constats **FND-AUTH-001** et **FND-AUTH-002** du tracker
-post-audit 2026-05.
+Ce pont ferme les constats **FND-AUTH-001** et **FND-AUTH-002** du tracker post-audit 2026-05.
 
 ---
 

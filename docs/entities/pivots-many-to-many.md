@@ -1,6 +1,7 @@
 # Tables pivot many-to-many
 
-Une relation `many_to_many` dans Forge passe par une **table pivot** explicite. Cette table relie deux entités sans que l'une ou l'autre ne porte de clé étrangère directe vers l'autre.
+Une relation `many_to_many` dans Forge passe par une **table pivot** explicite.
+Cette table relie deux entités sans que l'une ou l'autre ne porte de clé étrangère directe vers l'autre.
 
 La table pivot est :
 
@@ -91,20 +92,23 @@ Un pivot peut porter des informations propres à la relation :
 
 ## Pourquoi un id technique ?
 
-Forge impose un `id INT NOT NULL AUTO_INCREMENT` sur toutes les tables pivot. Ce choix est délibéré :
+Forge impose un `id INT NOT NULL AUTO_INCREMENT` sur toutes les tables pivot.
+Ce choix est délibéré :
 
 - **extensibilité**, si la relation doit porter des attributs métier, l'`id` technique est déjà là ;
 - **homogénéité**, toutes les tables générées par Forge ont la même structure de clé primaire ;
 - **références externes**, un `id` stable permet de référencer une ligne pivot depuis d'autres tables ou API ;
 - **évolution sans migration destructive**, transformer un pivot sans attributs en pivot avec attributs ne nécessite pas de changer la clé primaire.
 
-Le couple `from_key / to_key` reste **unique** grâce à `unique_pair: true`. Les deux décisions coexistent et se complètent.
+Le couple `from_key / to_key` reste **unique** grâce à `unique_pair: true`.
+Les deux décisions coexistent et se complètent.
 
 ---
 
 ## Contrainte unique sur la paire
 
-`unique_pair: true` ajoute une contrainte `UNIQUE (from_key, to_key)` sur la table pivot. Elle empêche de créer deux fois la même association.
+`unique_pair: true` ajoute une contrainte `UNIQUE (from_key, to_key)` sur la table pivot.
+Elle empêche de créer deux fois la même association.
 
 Exemple : un même article ne peut pas être associé deux fois au même tag dans `article_tag`.
 
@@ -129,9 +133,8 @@ Les champs pivot utilisent les **types Forge** autorisés par `field.schema.json
 
 Les clés optionnelles sont les mêmes que pour les champs d'entité : `required`, `nullable`, `unique`, `max_length`, `precision`, `scale`, `default`, `choices`…
 
-La règle nullable / required est la même que pour les `fields[]` d'entité (ADR-013) :
-un champ `pivot.fields[]` est **nullable par défaut**. `required: true` rend le champ `NOT NULL`
-et est prioritaire sur `nullable: true`.
+La règle nullable / required est la même que pour les `fields[]` d'entité (ADR-013) : un champ `pivot.fields[]` est **nullable par défaut**.
+`required: true` rend le champ `NOT NULL` et est prioritaire sur `nullable: true`.
 
 ---
 
@@ -206,14 +209,14 @@ CREATE TABLE IF NOT EXISTS project_user (
 );
 ```
 
-Le SQL est une **projection générée** depuis `relations.json`. Ne pas le modifier manuellement, il sera écrasé à la prochaine exécution de `build:model`.
+Le SQL est une **projection générée** depuis `relations.json`.
+Ne pas le modifier manuellement, il sera écrasé à la prochaine exécution de `build:model`.
 
 ---
 
 ## Générer un sous-CRUD Pivot advanced
 
-Quand un pivot porte des attributs métier (`position`, `note`, `role`…), un sous-CRUD
-relationnel dédié peut être généré avec :
+Quand un pivot porte des attributs métier (`position`, `note`, `role`…), un sous-CRUD relationnel dédié peut être généré avec :
 
 ```bash
 python forge.py make:pivot-crud Article tags
@@ -235,26 +238,19 @@ Elle ne modifie pas `make:crud` et ne branche pas automatiquement les routes.
 
 ## Pivot advanced : attributs métier complets
 
-Quand un pivot porte des attributs métier significatifs (`position`, `note`,
-`role`…) et que `make:crud` est insuffisant ou bloqué, consultez la
-documentation dédiée :
+Quand un pivot porte des attributs métier significatifs (`position`, `note`, `role`…) et que `make:crud` est insuffisant ou bloqué, consultez la documentation dédiée :
 
 **Pivot advanced, tables pivot avec attributs**
 
-Elle couvre la déclaration du contrat, la génération du sous-CRUD avec
-`make:pivot-crud`, l'utilisation de `PivotAdvancedService` et la gestion
-des erreurs UX.
+Elle couvre la déclaration du contrat, la génération du sous-CRUD avec `make:pivot-crud`, l'utilisation de `PivotAdvancedService` et la gestion des erreurs UX.
 
 ---
 
 ## Limites actuelles
 
 - Les attributs pivot sont validés par `forge entity:validate` et générés en SQL.
-- `make:crud` **refuse** de générer le CRUD si un champ pivot est `required: true` ou
-  `nullable: false`. Ces champs sont `NOT NULL` en base mais ne peuvent pas être renseignés
-  par la synchronisation d'IDs générée. Pour utiliser ces champs, rendez-les nullable ou
-  utilisez un module CRUD pivot dédié (voir ticket `PIVOT-CRUD-004`).
-- Le CRUD avancé pour créer, modifier ou supprimer des lignes pivot avec attributs n'est
-  pas encore couvert par `make:crud`, les vues générées traitent la relation mais pas les
-  attributs supplémentaires.
+- `make:crud` **refuse** de générer le CRUD si un champ pivot est `required: true` ou `nullable: false`.
+  Ces champs sont `NOT NULL` en base mais ne peuvent pas être renseignés par la synchronisation d'IDs générée.
+  Pour utiliser ces champs, rendez-les nullable ou utilisez un module CRUD pivot dédié (voir ticket `PIVOT-CRUD-004`).
+- Le CRUD avancé pour créer, modifier ou supprimer des lignes pivot avec attributs n'est pas encore couvert par `make:crud`, les vues générées traitent la relation mais pas les attributs supplémentaires.
 - `forge entity:validate` reste la validation officielle avant toute génération.

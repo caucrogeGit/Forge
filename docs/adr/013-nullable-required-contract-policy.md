@@ -14,8 +14,7 @@ Acceptée, Forge 1.x (ticket `NULLABLE-CONTRACT-002-DECIDE-NULLABLE-REQUIRED-RUL
 
 ## Contexte
 
-L'audit NULLABLE-CONTRACT-001 a révélé trois incohérences dans le comportement de `nullable`
-et `required` entre `fields[]` d'entité et `pivot.fields[]` :
+L'audit NULLABLE-CONTRACT-001 a révélé trois incohérences dans le comportement de `nullable` et `required` entre `fields[]` d'entité et `pivot.fields[]` :
 
 1. **Défaut absent** : entité → `NOT NULL` ; pivot → `NULL` ; `field.schema.json` dit `default: true`.
 2. **`required: false` sans `nullable`** : entité → `NOT NULL` ; pivot → `NULL`.
@@ -97,22 +96,22 @@ if field.get("required") is True:
   La règle retenue respecte ce défaut.
 - **Cohérence entre entité et pivot** : les deux contextes partagent `field.schema.json`.
   La règle doit être identique.
-- **`required` comme signal SQL** : `required: true` signifie "obligatoire", ce qui implique
-  `NOT NULL`. Le laisser contredire par `nullable: true` est contre-intuitif.
-- **Optionnel par défaut** : un champ non marqué `required` ou `nullable: false` est
-  naturellement optionnel (`NULL`).
+- **`required` comme signal SQL** : `required: true` signifie "obligatoire", ce qui implique `NOT NULL`.
+  Le laisser contredire par `nullable: true` est contre-intuitif.
+- **Optionnel par défaut** : un champ non marqué `required` ou `nullable: false` est naturellement optionnel (`NULL`).
 
 ### Pourquoi rejeter les autres options
 
 **Option A (conserver le comportement actuel)** : entérine trois incohérences sans règle.
-Les correctifs futurs seraient imprévisibles. Rejetée.
+Les correctifs futurs seraient imprévisibles.
+Rejetée.
 
 **Option C (NOT NULL par défaut partout)** : contredit `field.schema.json` (`default: true`).
-Imposerait de modifier le schéma. Rejetée.
+Imposerait de modifier le schéma.
+Rejetée.
 
-**Option D partielle (nullable gagne sur required)** : laisser `nullable: true` écraser
-`required: true` est surprenant, un champ obligatoire en formulaire peut accepter NULL
-en base. Rejetée.
+**Option D partielle (nullable gagne sur required)** : laisser `nullable: true` écraser `required: true` est surprenant, un champ obligatoire en formulaire peut accepter NULL en base.
+Rejetée.
 
 ---
 
@@ -133,22 +132,20 @@ La correction sera apportée dans **NULLABLE-CONTRACT-003**.
 
 ### Sur la documentation (non corrigée dans ce ticket)
 
-- `entity-schema.md` dit `nullable: défaut true`, c'est correct selon la règle retenue,
-  mais le comportement runtime actuel est `False`. À corriger dans **NULLABLE-DOC-FIX-001**
-  pour préciser l'écart temporaire.
-- `pivots-many-to-many.md` ne précise pas la priorité de `required`. À corriger dans
-  **NULLABLE-DOC-FIX-001**.
+- `entity-schema.md` dit `nullable: défaut true`, c'est correct selon la règle retenue, mais le comportement runtime actuel est `False`.
+  À corriger dans **NULLABLE-DOC-FIX-001** pour préciser l'écart temporaire.
+- `pivots-many-to-many.md` ne précise pas la priorité de `required`.
+  À corriger dans **NULLABLE-DOC-FIX-001**.
 
 ### Sur les tests (non modifiés dans ce ticket)
 
-`test_build_model_canonical_normalizer.py::TestConstraints::test_default_nullable_is_false`
-teste le comportement actuel (déviant). Ce test devra être mis à jour dans
-**NULLABLE-CONTRACT-003** pour refléter la règle officielle (absent → NULL).
+`test_build_model_canonical_normalizer.py::TestConstraints::test_default_nullable_is_false` teste le comportement actuel (déviant).
+Ce test devra être mis à jour dans **NULLABLE-CONTRACT-003** pour refléter la règle officielle (absent → NULL).
 
 ### Sur les starters et fixtures
 
-Les starters sont déjà en format canonique avec `nullable` explicite sur les champs
-concernés. Aucun impact attendu sur les starters existants lors de la correction runtime.
+Les starters sont déjà en format canonique avec `nullable` explicite sur les champs concernés.
+Aucun impact attendu sur les starters existants lors de la correction runtime.
 
 ---
 

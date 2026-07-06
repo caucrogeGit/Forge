@@ -2,58 +2,48 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Premier contact avec Forge : du chemin le plus court entre une requête
-HTTP et une réponse texte. Sans base de données. Sans entité. Sans
-template Jinja2. Sans CRUD.
+Premier contact avec Forge : du chemin le plus court entre une requête HTTP et une réponse texte.
+Sans base de données.
+Sans entité.
+Sans template Jinja2.
+Sans CRUD.
 
-Ce parcours suit l'ordre pédagogique du starter d'entrée
-[Bonjour Forge](../starters/welcome-forge/debutant/welcome.md) :
+Ce parcours suit l'ordre pédagogique du starter d'entrée [Bonjour Forge](../starters/welcome-forge/debutant/welcome.md) :
 
 ```text
 forge run → route → contrôleur → Request → Response.text(...)
 ```
 
 !!! tip "Forge n'est pas encore installé ?"
-    Commencez par le parcours d'installation :
-    [VM Debian vierge](../install/vm-debian.md),
-    [poste Linux (pipx)](../install/poste-linux.md),
-    [depuis GitHub](../install/github.md),
-    [Windows + WSL (parcours complet)](../install/windows-wsl.md).
+    Commencez par le parcours d'installation : [VM Debian vierge](../install/vm-debian.md), [poste Linux (pipx)](../install/poste-linux.md), [depuis GitHub](../install/github.md), [Windows + WSL (parcours complet)](../install/windows-wsl.md).
 
 ---
 
 ## 1. Lancer Forge avec `forge run`
 
-Une fois Forge installé et un projet créé (`forge new mon-projet`), la
-commande officielle de développement est :
+Une fois Forge installé et un projet créé (`forge new mon-projet`), la commande officielle de développement est :
 
 ```bash
 forge run
 ```
 
-`forge run` lit `APP_ENV` (défaut `dev`), démarre le serveur de
-développement et active l'autoreload : `python app.py` est redémarré
-automatiquement dès qu'un fichier applicatif change. Pour désactiver
-l'autoreload (chemin legacy) :
+`forge run` lit `APP_ENV` (défaut `dev`), démarre le serveur de développement et active l'autoreload : `python app.py` est redémarré automatiquement dès qu'un fichier applicatif change.
+Pour désactiver l'autoreload (chemin legacy) :
 
 ```bash
 forge run --no-reload
 ```
 
-En production (`APP_ENV=prod`), `forge run` refuse de démarrer le
-serveur intégré et affiche la stratégie WSGI recommandée, voir
-[Déploiement WSGI minimal](../deployment/wsgi-deployment.md).
+En production (`APP_ENV=prod`), `forge run` refuse de démarrer le serveur intégré et affiche la stratégie WSGI recommandée, voir [Déploiement WSGI minimal](../deployment/wsgi-deployment.md).
 
-Une fois le serveur démarré, ouvrez `https://localhost:8000/welcome`
-dans votre navigateur.
+Une fois le serveur démarré, ouvrez `https://localhost:8000/welcome` dans votre navigateur.
 
 ---
 
 ## 2. Comprendre la route
 
-Toutes les routes Forge sont déclarées **explicitement** dans
-`mvc/routes.py`. Aucune découverte automatique, aucune convention
-cachée :
+Toutes les routes Forge sont déclarées **explicitement** dans `mvc/routes.py`.
+Aucune découverte automatique, aucune convention cachée :
 
 ```python
 # mvc/routes.py
@@ -64,17 +54,15 @@ with router.group("", public=True) as public:
     public.add("GET", "/welcome/greet", WelcomeController.greet, name="welcome-greet")
 ```
 
-Chaque ligne associe une méthode HTTP et un chemin à une méthode de
-contrôleur. Ce qui est dans `mvc/routes.py` est exactement ce qui est
-routé.
+Chaque ligne associe une méthode HTTP et un chemin à une méthode de contrôleur.
+Ce qui est dans `mvc/routes.py` est exactement ce qui est routé.
 
 ---
 
 ## 3. Comprendre le contrôleur
 
-Un contrôleur Forge est une classe Python qui reçoit une `Request` et
-retourne une `Response`. Les méthodes sont statiques, typées et
-explicites :
+Un contrôleur Forge est une classe Python qui reçoit une `Request` et retourne une `Response`.
+Les méthodes sont statiques, typées et explicites :
 
 ```python
 from core.http.request import Request
@@ -88,10 +76,7 @@ class WelcomeController(BaseController):
         ...
 ```
 
-Les annotations `request: Request -> Response` sont systématiques pour
-que Pylance/VS Code propose l'autocomplétion sur `request.query(...)`,
-`request.form(...)`, `request.json(...)`, `request.file(...)`,
-`request.route(...)` et `request.header(...)` sans import manuel.
+Les annotations `request: Request -> Response` sont systématiques pour que Pylance/VS Code propose l'autocomplétion sur `request.query(...)`, `request.form(...)`, `request.json(...)`, `request.file(...)`, `request.route(...)` et `request.header(...)` sans import manuel.
 Voir [Convention HTTP inspectable](../reference/http.md).
 
 ---
@@ -123,8 +108,7 @@ Navigateur → GET /welcome → Router → WelcomeController.index(request) → 
 
 ## 5. Utiliser `request.query(...)`
 
-`request.query("name", default="Forge")` retourne la première valeur
-du paramètre `?name=...`, ou la valeur par défaut.
+`request.query("name", default="Forge")` retourne la première valeur du paramètre `?name=...`, ou la valeur par défaut.
 
 ```python
 @staticmethod
@@ -181,11 +165,8 @@ Une fois ce premier contact assimilé :
 | Toutes les commandes CLI | [Commandes CLI](../reference/cli-commands.md) |
 
 !!! info "Ne sautez pas directement vers le CRUD Contacts"
-    Le starter `Contacts CRUD` est l'**étape 9** d'une progression de
-    neuf paliers. Plusieurs notions intermédiaires (vue Jinja2, route
-    dynamique, formulaire POST, validation, SQL) méritent leurs propres
-    starters, voir la
-    [progression recommandée](../starters/index.md#progression-recommandee).
+    Le starter `Contacts CRUD` est l'**étape 9** d'une progression de neuf paliers.
+    Plusieurs notions intermédiaires (vue Jinja2, route dynamique, formulaire POST, validation, SQL) méritent leurs propres starters, voir la [progression recommandée](../starters/index.md#progression-recommandee).
 
 ---
 

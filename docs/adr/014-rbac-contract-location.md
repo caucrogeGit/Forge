@@ -14,36 +14,27 @@ Accepté, Forge 1.x (ticket `RBAC-CONTRACT-001-DEFINE-SEPARATE-RBAC-CONTRACT`).
 
 ## Contexte
 
-Le ticket ENTITY-SCHEMA-RBAC-001 a conclu que `rbac` ne doit pas être intégré dans
-`entity.schema.json`. La raison : le schéma d'entité canonique doit rester centré
-sur la structure de données (champs, types, index, options). RBAC relève de la
-sécurité applicative, non du modèle de données.
+Le ticket ENTITY-SCHEMA-RBAC-001 a conclu que `rbac` ne doit pas être intégré dans `entity.schema.json`.
+La raison : le schéma d'entité canonique doit rester centré sur la structure de données (champs, types, index, options).
+RBAC relève de la sécurité applicative, non du modèle de données.
 
-Le format interne de génération (`validation.py`) accepte déjà `rbac` comme
-attribut de définition d'entité, permettant à `make:crud` de générer des guards
-`@require_permission` dans les contrôleurs et `{% if can() %}` dans les templates.
-Cette intégration fonctionne et est testée (56 tests passent), mais via le format
-interne uniquement, pas via le format canonique.
+Le format interne de génération (`validation.py`) accepte déjà `rbac` comme attribut de définition d'entité, permettant à `make:crud` de générer des guards `@require_permission` dans les contrôleurs et `{% if can() %}` dans les templates.
+Cette intégration fonctionne et est testée (56 tests passent), mais via le format interne uniquement, pas via le format canonique.
 
-La question ouverte après ENTITY-SCHEMA-RBAC-001 : **où doit vivre la configuration
-RBAC dans un projet Forge ?**
+La question ouverte après ENTITY-SCHEMA-RBAC-001 : **où doit vivre la configuration RBAC dans un projet Forge ?**
 
 ---
 
 ## Problème
 
-1. La configuration RBAC dispersée entité par entité (clé `rbac` dans chaque fichier
-   d'entité) couple la définition du modèle de données et les règles d'autorisation.
+1. La configuration RBAC dispersée entité par entité (clé `rbac` dans chaque fichier d'entité) couple la définition du modèle de données et les règles d'autorisation.
 
-2. `entity.schema.json` utilise `additionalProperties: false`, il ne peut pas
-   accueillir `rbac` sans modification délibérée.
+2. `entity.schema.json` utilise `additionalProperties: false`, il ne peut pas accueillir `rbac` sans modification délibérée.
 
-3. Le module `forge-mvc-rbac` est opt-in. Coupler sa configuration au schéma d'entité
-   de base obligerait tous les projets Forge à connaître la structure RBAC même sans
-   installer le module.
+3. Le module `forge-mvc-rbac` est opt-in.
+   Coupler sa configuration au schéma d'entité de base obligerait tous les projets Forge à connaître la structure RBAC même sans installer le module.
 
-4. Un contrat RBAC doit couvrir des notions absentes du schéma d'entité : rôles,
-   politiques multi-entités, héritages de permissions.
+4. Un contrat RBAC doit couvrir des notions absentes du schéma d'entité : rôles, politiques multi-entités, héritages de permissions.
 
 ---
 
@@ -53,9 +44,8 @@ RBAC dans un projet Forge ?**
 
 **La configuration RBAC vivra dans un fichier séparé : `mvc/security/rbac.json`.**
 
-Ce fichier est distinct du répertoire `mvc/entities/`. Il appartient à la zone
-de sécurité applicative du projet, aux côtés des autres fichiers de configuration
-de sécurité.
+Ce fichier est distinct du répertoire `mvc/entities/`.
+Il appartient à la zone de sécurité applicative du projet, aux côtés des autres fichiers de configuration de sécurité.
 
 ---
 
@@ -99,8 +89,8 @@ Fichier : `mvc/security/rbac.json`
 }
 ```
 
-Ce format est **documentaire uniquement** dans ce ticket. Il n'est pas encore
-validé par un JSON Schema ni lu par le runtime Forge.
+Ce format est **documentaire uniquement** dans ce ticket.
+Il n'est pas encore validé par un JSON Schema ni lu par le runtime Forge.
 
 ---
 
@@ -119,12 +109,10 @@ validé par un JSON Schema ni lu par le runtime Forge.
 ## Conséquences
 
 - `entity.schema.json` reste inchangé (`additionalProperties: false`, pas de `rbac`).
-- Le format interne de génération (`validation.py`) continue d'accepter `rbac` dans
-  les définitions d'entités, il reste un détail d'implémentation du pipeline CLI.
+- Le format interne de génération (`validation.py`) continue d'accepter `rbac` dans les définitions d'entités, il reste un détail d'implémentation du pipeline CLI.
 - `make:crud` continue de lire `rbac` depuis la définition interne, sans changement.
 - Aucun runtime n'est modifié dans ce ticket.
-- Le fichier `mvc/security/rbac.json` n'est pas encore créé ni lu, c'est la
-  décision d'architecture, pas l'implémentation.
+- Le fichier `mvc/security/rbac.json` n'est pas encore créé ni lu, c'est la décision d'architecture, pas l'implémentation.
 
 ---
 

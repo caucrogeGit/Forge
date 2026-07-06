@@ -1,18 +1,16 @@
 # Configurer les comptes MariaDB d'un projet Forge
 
-Ce document fixe la direction recommandée pour configurer MariaDB dans un
-projet Forge. Il complète [Préparer MariaDB](mariadb.md) (installation et
-initialisation) en détaillant la **séparation des comptes**.
+Ce document fixe la direction recommandée pour configurer MariaDB dans un projet Forge.
+Il complète [Préparer MariaDB](mariadb.md) (installation et initialisation) en détaillant la **séparation des comptes**.
 
-L'objectif est de ne pas utiliser `root` comme utilisateur applicatif, ni même
-comme compte courant dans `env/dev`. Forge distingue clairement :
+L'objectif est de ne pas utiliser `root` comme utilisateur applicatif, ni même comme compte courant dans `env/dev`.
+Forge distingue clairement :
 
 - `root`, administration serveur MariaDB, secours uniquement ;
 - `forge_admin`, administration du projet Forge ;
 - `forge_app`, utilisateur applicatif utilisé par l'application au runtime.
 
-Cette séparation évite de donner à l'application des droits trop larges, et
-correspond au check **Sécurité prod** de [`forge doctor`](../deployment/production-checklist.md).
+Cette séparation évite de donner à l'application des droits trop larges, et correspond au check **Sécurité prod** de [`forge doctor`](../deployment/production-checklist.md).
 
 ---
 
@@ -55,19 +53,16 @@ sudo mariadb
 
 ### `forge_admin`
 
-Compte technique utilisé par Forge pour administrer la base du projet. Il peut :
-créer la base, créer/ajuster l'utilisateur applicatif `forge_app`, créer et
-modifier les tables, appliquer les migrations, créer les index, gérer les
-contraintes.
+Compte technique utilisé par Forge pour administrer la base du projet.
+Il peut : créer la base, créer/ajuster l'utilisateur applicatif `forge_app`, créer et modifier les tables, appliquer les migrations, créer les index, gérer les contraintes.
 
 Il ne doit **pas** recevoir tous les droits globaux de MariaDB.
 
 ### `forge_app`
 
-Utilisateur de l'application au runtime. Il peut uniquement lire, insérer,
-modifier et supprimer des données. Il ne doit **pas** pouvoir : créer des
-utilisateurs, supprimer des tables, modifier la structure, administrer
-MariaDB, ni accéder aux autres bases.
+Utilisateur de l'application au runtime.
+Il peut uniquement lire, insérer, modifier et supprimer des données.
+Il ne doit **pas** pouvoir : créer des utilisateurs, supprimer des tables, modifier la structure, administrer MariaDB, ni accéder aux autres bases.
 
 ---
 
@@ -93,8 +88,7 @@ DB_APP_PWD=mot_de_passe_long_app_local
 DB_POOL_SIZE=5
 ```
 
-Les mots de passe doivent être propres au projet et ne pas être réutilisés
-ailleurs.
+Les mots de passe doivent être propres au projet et ne pas être réutilisés ailleurs.
 
 ---
 
@@ -137,9 +131,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE
 GRANT ALL PRIVILEGES ON *.* TO 'forge_admin'@'localhost' WITH GRANT OPTION;
 ```
 
-Cette commande est trop large : elle donne à `forge_admin` un pouvoir proche
-de `root`. Pour Forge, ce n'est pas nécessaire, `forge_admin` doit administrer
-la base du projet, pas tout le serveur MariaDB.
+Cette commande est trop large : elle donne à `forge_admin` un pouvoir proche de `root`.
+Pour Forge, ce n'est pas nécessaire, `forge_admin` doit administrer la base du projet, pas tout le serveur MariaDB.
 
 ---
 
@@ -161,8 +154,7 @@ Droit global minimal nécessaire pour créer l'utilisateur applicatif :
 GRANT CREATE USER ON *.* TO 'forge_admin'@'localhost';
 ```
 
-Ce droit global est à surveiller : utile pour `forge db:init`, il ne doit pas
-être confondu avec un accès root complet.
+Ce droit global est à surveiller : utile pour `forge db:init`, il ne doit pas être confondu avec un accès root complet.
 
 ---
 
@@ -174,8 +166,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE
   TO 'forge_app'@'localhost';
 ```
 
-`forge_app` ne doit **pas** recevoir : `CREATE`, `ALTER`, `DROP`, `INDEX`,
-`REFERENCES`, `CREATE USER`, `GRANT OPTION`.
+`forge_app` ne doit **pas** recevoir : `CREATE`, `ALTER`, `DROP`, `INDEX`, `REFERENCES`, `CREATE USER`, `GRANT OPTION`.
 
 ---
 
@@ -240,8 +231,7 @@ Mettre ensuite `env/dev` à jour.
 
 ## 12. Supprimer proprement les comptes d'un projet
 
-À utiliser seulement si le projet doit être détruit, **supprime la base et
-les comptes** :
+À utiliser seulement si le projet doit être détruit, **supprime la base et les comptes** :
 
 ```sql
 DROP USER IF EXISTS 'forge_app'@'localhost';
@@ -260,10 +250,9 @@ forge_admin  → utilisé uniquement pendant les migrations
 forge_app    → utilisé par l'application en production
 ```
 
-Après application des migrations, l'application tourne uniquement avec
-`forge_app`. On peut même ne pas stocker le mot de passe `forge_admin` dans le
-fichier d'environnement courant de l'application, mais le réserver à une
-procédure d'exploitation. Voir la
+Après application des migrations, l'application tourne uniquement avec `forge_app`.
+On peut même ne pas stocker le mot de passe `forge_admin` dans le fichier d'environnement courant de l'application, mais le réserver à une procédure d'exploitation.
+Voir la
 [checklist de production](../deployment/production-checklist.md).
 
 ---

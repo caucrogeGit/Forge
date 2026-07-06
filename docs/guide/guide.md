@@ -2,15 +2,13 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Forge est un framework web MVC Python avec HTTPS natif, SQL explicite, templates Jinja2 et génération déterministe du modèle. Ce guide part d'un environnement Forge déjà installé et aboutit à un premier projet fonctionnel avec CRUD généré.
+Forge est un framework web MVC Python avec HTTPS natif, SQL explicite, templates Jinja2 et génération déterministe du modèle.
+Ce guide part d'un environnement Forge déjà installé et aboutit à un premier projet fonctionnel avec CRUD généré.
 
 Pour la référence complète (contrôleurs, formulaires, sécurité, CLI), voir [Référence API et CLI](../reference/api.md).
 
 !!! tip "Forge n'est pas encore installé ?"
-    Commencez par le parcours adapté dans le menu Installation :
-    [VM Debian vierge](../install/vm-debian.md), [poste Linux (pipx)](../install/poste-linux.md),
-    [GitHub](../install/github.md), [mode développement](../install/core-dev.md)
-    ou [préparation MariaDB](../install/mariadb.md).
+    Commencez par le parcours adapté dans le menu Installation : [VM Debian vierge](../install/vm-debian.md), [poste Linux (pipx)](../install/poste-linux.md), [GitHub](../install/github.md), [mode développement](../install/core-dev.md) ou [préparation MariaDB](../install/mariadb.md).
 
 ---
 
@@ -26,9 +24,11 @@ cd MonProjet
 source .venv/bin/activate
 ```
 
-Un profil peut être précisé avec `--profile` (`minimal`, `standard`, `dynamic`, `multilingual`), le profil par défaut est `standard`. Voir [Profils de projet](../features/profiles.md).
+Un profil peut être précisé avec `--profile` (`minimal`, `standard`, `dynamic`, `multilingual`), le profil par défaut est `standard`.
+Voir [Profils de projet](../features/profiles.md).
 
-`forge new` fait tout automatiquement : clonage du squelette, environnement virtuel Python, installation des dépendances, compilation du CSS Tailwind officiel (si npm est présent) et génération des certificats SSL. Un dépôt Git propre est initialisé.
+`forge new` fait tout automatiquement : clonage du squelette, environnement virtuel Python, installation des dépendances, compilation du CSS Tailwind officiel (si npm est présent) et génération des certificats SSL.
+Un dépôt Git propre est initialisé.
 
 Il reste deux choses manuelles : **renseigner les mots de passe MariaDB** dans `env/dev`, puis lancer `forge db:init`.
 
@@ -56,7 +56,8 @@ forge doctor
 
 ### 2. Configurer `env/dev`
 
-`forge new` crée `env/dev` depuis `env/example` avec `APP_NAME` et `DB_NAME` déjà renseignés. Il reste à renseigner les mots de passe MariaDB :
+`forge new` crée `env/dev` depuis `env/example` avec `APP_NAME` et `DB_NAME` déjà renseignés.
+Il reste à renseigner les mots de passe MariaDB :
 
 ```env
 # Compte admin MariaDB - utilisé uniquement par forge db:init
@@ -101,14 +102,10 @@ DB_APP_PWD=<mot_de_passe_applicatif>
 forge db:init
 ```
 
-Crée la base `DB_NAME`, l'utilisateur `DB_APP_LOGIN`, applique les droits
-nécessaires et prépare la table technique `forge_migrations`. Cette table
-sert au suivi des migrations SQL versionnées. `forge migration:make` crée un
-fichier SQL vide, copie le SQL généré d'une entité avec `--from-entity`,
-concatène toutes les entités avec `--from-entities`, ou génère un SQL prudent
-depuis un diff avec `--from-diff`. `forge migration:status` affiche l'état,
-`forge migration:diff --entity Contact` compare le JSON avec les colonnes
-MariaDB, et `forge migration:apply` applique les migrations en attente.
+Crée la base `DB_NAME`, l'utilisateur `DB_APP_LOGIN`, applique les droits nécessaires et prépare la table technique `forge_migrations`.
+Cette table sert au suivi des migrations SQL versionnées.
+`forge migration:make` crée un fichier SQL vide, copie le SQL généré d'une entité avec `--from-entity`, concatène toutes les entités avec `--from-entities`, ou génère un SQL prudent depuis un diff avec `--from-diff`.
+`forge migration:status` affiche l'état, `forge migration:diff --entity Contact` compare le JSON avec les colonnes MariaDB, et `forge migration:apply` applique les migrations en attente.
 
 Voir aussi : [Migrations SQL](../features/migrations.md).
 
@@ -121,7 +118,8 @@ Voir aussi : [Migrations SQL](../features/migrations.md).
 forge make:entity Contact
 ```
 
-La commande lance l'assistant interactif. Pour un usage scriptable :
+La commande lance l'assistant interactif.
+Pour un usage scriptable :
 
 ```bash
 forge make:entity Contact --no-input
@@ -214,7 +212,11 @@ mvc/views/contact/form.html
 !!! tip "Génération non destructive"
     Si un fichier existe déjà, il est marqué `[PRÉSERVÉ]` et non touché.
 
-Les pages liste générées incluent une recherche GET `q` côté serveur sur les champs texte simples de l'entité, avec SQL `LIKE` paramétré et conservation de `q` dans la pagination. Elles incluent aussi un tri simple par colonne, sécurisé par allowlist, une pagination serveur avec taille de page fixe, et des états vides contextuels quand aucune ligne n'est affichée après recherche ou filtres. La table et la pagination sont isolées dans `_table.html` et `_pagination.html`, puis regroupées par `_results.html`. Le formulaire de recherche, les liens de pagination et les formulaires de suppression reçoivent une amélioration HTMX optionnelle : avec HTMX, seul le bloc `#crud-results` est remplacé ; sans HTMX, les formulaires GET/POST et les liens `href` fonctionnent en HTML classique. Les suppressions gardent le champ CSRF et n'utilisent pas `hx-delete`.
+Les pages liste générées incluent une recherche GET `q` côté serveur sur les champs texte simples de l'entité, avec SQL `LIKE` paramétré et conservation de `q` dans la pagination.
+Elles incluent aussi un tri simple par colonne, sécurisé par allowlist, une pagination serveur avec taille de page fixe, et des états vides contextuels quand aucune ligne n'est affichée après recherche ou filtres.
+La table et la pagination sont isolées dans `_table.html` et `_pagination.html`, puis regroupées par `_results.html`.
+Le formulaire de recherche, les liens de pagination et les formulaires de suppression reçoivent une amélioration HTMX optionnelle : avec HTMX, seul le bloc `#crud-results` est remplacé ; sans HTMX, les formulaires GET/POST et les liens `href` fonctionnent en HTML classique.
+Les suppressions gardent le champ CSRF et n'utilisent pas `hx-delete`.
 
 ### 7. Déclarer les routes
 
@@ -236,7 +238,8 @@ with router.group("/contact") as g:
 ```
 
 !!! warning "Ordre des routes"
-    `/new` doit être déclaré avant `/{id}`. Sinon le routeur capture `new` comme identifiant.
+    `/new` doit être déclaré avant `/{id}`.
+    Sinon le routeur capture `new` comme identifiant.
 
 Vérifier les routes déclarées :
 

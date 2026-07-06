@@ -1,7 +1,6 @@
 # Déploiement avancé Forge
 
-Ce guide couvre le déploiement complet d'une application Forge en production :
-préparation du projet, configuration serveur, cycle de mise à jour et validation.
+Ce guide couvre le déploiement complet d'une application Forge en production : préparation du projet, configuration serveur, cycle de mise à jour et validation.
 
 !!! tip "Guides complémentaires"
     - [Déploiement](deployment.md), commandes `forge deploy:init` / `forge deploy:check` et fichiers générés.
@@ -86,9 +85,8 @@ Vérifier l'environnement cible :
 forge deploy:check
 ```
 
-`forge deploy:check` vérifie Python, les variables DB, le module `mariadb`,
-les dossiers `storage/` et les fichiers `deploy/` générés. La commande échoue
-si une erreur bloquante est détectée.
+`forge deploy:check` vérifie Python, les variables DB, le module `mariadb`, les dossiers `storage/` et les fichiers `deploy/` générés.
+La commande échoue si une erreur bloquante est détectée.
 
 ---
 
@@ -153,9 +151,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON mon_app_db.* TO 'mon_app_user'@'localhos
 FLUSH PRIVILEGES;
 ```
 
-L'utilisateur applicatif (`mon_app_user`) n'a que les droits nécessaires à
-l'application. Il ne peut pas `CREATE TABLE`, `DROP TABLE` ni accéder à
-d'autres bases.
+L'utilisateur applicatif (`mon_app_user`) n'a que les droits nécessaires à l'application.
+Il ne peut pas `CREATE TABLE`, `DROP TABLE` ni accéder à d'autres bases.
 
 ### Initialiser les tables
 
@@ -169,8 +166,8 @@ export $(grep -v '^#' env/db-admin.local | xargs)
 forge db:init
 ```
 
-N'exécutez `forge db:init` **qu'une seule fois** par environnement. Cette
-commande crée les tables depuis les fichiers `.sql` des entités.
+N'exécutez `forge db:init` **qu'une seule fois** par environnement.
+Cette commande crée les tables depuis les fichiers `.sql` des entités.
 
 Pour les migrations ultérieures (mêmes secrets admin chargés au préalable) :
 
@@ -182,8 +179,7 @@ forge db:apply
 ```
 
 !!! danger "Ne jamais tester sur la base de production"
-    Utilisez un environnement de staging distinct avec une base séparée pour
-    valider les migrations avant de les appliquer en production.
+    Utilisez un environnement de staging distinct avec une base séparée pour valider les migrations avant de les appliquer en production.
 
 ---
 
@@ -290,19 +286,20 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ### HSTS
 
-L'en-tête `Strict-Transport-Security` indique aux navigateurs de n'utiliser
-que HTTPS pour ce domaine. Activez-le uniquement quand HTTPS est stable et
-opérationnel, retirez-le temporairement lors d'une migration de domaine.
+L'en-tête `Strict-Transport-Security` indique aux navigateurs de n'utiliser que HTTPS pour ce domaine.
+Activez-le uniquement quand HTTPS est stable et opérationnel, retirez-le temporairement lors d'une migration de domaine.
 
 ---
 
 ## Fichiers statiques
 
-Forge sert le dossier `static/` par défaut. En production, deux stratégies :
+Forge sert le dossier `static/` par défaut.
+En production, deux stratégies :
 
 ### Stratégie A : Forge sert `static/`
 
-Aucune configuration supplémentaire. Nginx relaie toutes les requêtes vers Forge.
+Aucune configuration supplémentaire.
+Nginx relaie toutes les requêtes vers Forge.
 Convient aux projets à faible trafic.
 
 ### Stratégie B : Nginx sert `static/` directement
@@ -315,20 +312,17 @@ location /static/ {
 }
 ```
 
-Convient aux projets à trafic élevé, Nginx sert les fichiers statiques sans
-passer par Python.
+Convient aux projets à trafic élevé, Nginx sert les fichiers statiques sans passer par Python.
 
 !!! danger "Ne jamais exposer le projet brut"
     Ne configurez pas Nginx pour servir `/srv/forge/mon_app/` directement.
-    Les chemins `env/`, `storage/logs/`, `.git/` ou les fichiers `.py`
-    ne doivent jamais être accessibles depuis Internet.
+    Les chemins `env/`, `storage/logs/`, `.git/` ou les fichiers `.py` ne doivent jamais être accessibles depuis Internet.
 
 ---
 
 ## Uploads et médias
 
-Les fichiers uploadés sont stockés dans `storage/uploads/` (configurable via
-`UPLOAD_ROOT` dans `env/prod`).
+Les fichiers uploadés sont stockés dans `storage/uploads/` (configurable via `UPLOAD_ROOT` dans `env/prod`).
 
 ### Règles fondamentales
 
@@ -373,15 +367,17 @@ Forge écrit des logs de diagnostic dans `storage/logs/` :
 - `errors.dev.md`, rapport lisible
 
 !!! warning "Logs en production"
-    Ces fichiers sont conçus pour le développement. En production :
+    Ces fichiers sont conçus pour le développement.
+    En production :
     - Ne les exposez pas via Nginx
     - Ne les lisez pas comme source de vérité opérationnelle
     - Préférez `journalctl` pour la supervision
 
 ### Protéger `storage/logs/`
 
-`storage/` ne doit pas être accessible via Nginx. Si vous avez ajouté un
-alias `storage/`, retirez-le. Vérifiez avec :
+`storage/` ne doit pas être accessible via Nginx.
+Si vous avez ajouté un alias `storage/`, retirez-le.
+Vérifiez avec :
 
 ```bash
 curl -I https://example.com/storage/logs/errors.dev.jsonl
@@ -392,8 +388,7 @@ curl -I https://example.com/storage/logs/errors.dev.jsonl
 
 ## Sécurité production
 
-Les garanties de sécurité de Forge sont documentées dans
-[Sécurité en production](production-security.md) :
+Les garanties de sécurité de Forge sont documentées dans [Sécurité en production](production-security.md) :
 
 - CSRF actif sur toutes les routes POST non explicitement opt-out
 - Cookies `HttpOnly`, `SameSite=Strict`, `Secure` (activé automatiquement quand `X-Forwarded-Proto: https`)
@@ -441,8 +436,8 @@ cp /srv/forge/mon_app/env/prod /backup/mon_app/config/env_prod_$(date +%Y%m%d)
 
 ### Tester la restauration
 
-Une sauvegarde non testée n'est pas une sauvegarde. Testez périodiquement la
-restauration dans un environnement isolé.
+Une sauvegarde non testée n'est pas une sauvegarde.
+Testez périodiquement la restauration dans un environnement isolé.
 
 ---
 
@@ -479,8 +474,7 @@ sudo journalctl -u forge-app -n 20
 ```
 
 !!! warning "Avant de passer à une version majeure"
-    Consultez le [Guide de migration](../features/migration-guide.md) et la
-    [Matrice de compatibilité](../release/compatibility.md) avant toute mise à jour majeure.
+    Consultez le [Guide de migration](../features/migration-guide.md) et la [Matrice de compatibilité](../release/compatibility.md) avant toute mise à jour majeure.
 
 ---
 
@@ -528,7 +522,8 @@ Causes fréquentes :
 
 ### Erreur 502 Bad Gateway
 
-Nginx ne peut pas joindre Forge. Vérifiez :
+Nginx ne peut pas joindre Forge.
+Vérifiez :
 
 ```bash
 sudo systemctl status forge-app    # service actif ?
@@ -552,8 +547,8 @@ chmod 750 storage/logs/
 
 ### Cookies non envoyés (session perdue)
 
-Vérifiez que Nginx transmet `X-Forwarded-Proto: https`. Forge active
-`Secure` sur les cookies uniquement quand ce header est présent.
+Vérifiez que Nginx transmet `X-Forwarded-Proto: https`.
+Forge active `Secure` sur les cookies uniquement quand ce header est présent.
 
 ```nginx
 proxy_set_header X-Forwarded-Proto https;
@@ -583,8 +578,7 @@ sudo journalctl -u forge-app --since today
 ls -la storage/logs/
 ```
 
-Si `storage/logs/` est vide, Forge n'a pas encore rencontré d'erreur ou le
-dossier n'a pas les permissions correctes.
+Si `storage/logs/` est vide, Forge n'a pas encore rencontré d'erreur ou le dossier n'a pas les permissions correctes.
 
 ---
 

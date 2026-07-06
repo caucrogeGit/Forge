@@ -1,9 +1,8 @@
 # Décisions d'architecture (ADR)
 
-Les *Architecture Decision Records* documentent les décisions structurantes
-de Forge. Chaque ADR a **force décisionnelle** : à lire avant toute
-proposition qui le concerne. Un nouvel ADR est requis pour toute décision
-structurante (`docs/adr/<numéro>-<sujet>.md`).
+Les *Architecture Decision Records* documentent les décisions structurantes de Forge.
+Chaque ADR a **force décisionnelle** : à lire avant toute proposition qui le concerne.
+Un nouvel ADR est requis pour toute décision structurante (`docs/adr/<numéro>-<sujet>.md`).
 
 | Numéro | Sujet |
 |---|---|

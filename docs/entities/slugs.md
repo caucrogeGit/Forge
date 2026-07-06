@@ -1,16 +1,14 @@
 # Slugs
 
-Un **slug** est un identifiant URL-safe lisible (`/articles/premier-contact`
-plutôt que `/articles/42`). Forge en fait un **type de champ de premier rang**,
-généré depuis un champ source, avec une colonne `VARCHAR(180) UNIQUE` et une
-validation officielle. Décision : [ADR-017](../adr/017-slug-type.md).
+Un **slug** est un identifiant URL-safe lisible (`/articles/premier-contact` plutôt que `/articles/42`).
+Forge en fait un **type de champ de premier rang**, généré depuis un champ source, avec une colonne `VARCHAR(180) UNIQUE` et une validation officielle.
+Décision : [ADR-017](../adr/017-slug-type.md).
 
 ---
 
 ## Déclarer un champ slug
 
-Dans le JSON canonique de l'entité, un slug **auto-généré** depuis un champ
-source :
+Dans le JSON canonique de l'entité, un slug **auto-généré** depuis un champ source :
 
 ```json
 {
@@ -33,29 +31,24 @@ source :
 
 ## Comportement généré (`forge make:crud`)
 
-Avec un `source`, le slug est **auto-généré**, l'utilisateur ne le saisit
-jamais :
+Avec un `source`, le slug est **auto-généré**, l'utilisateur ne le saisit jamais :
 
 - **Formulaire** : le champ slug est **absent** (on saisit `titre`).
-- **Création** : le contrôleur calcule `slug = slugify(titre)` via le module
-  canonique `core.http.slug` (accents translittérés, espaces → tirets,
-  minuscules) : « Écrire avec Forge ! » → `ecrire-avec-forge`.
-- **Édition** : le slug est **stable**, il n'est pas régénéré quand le titre
-  change (les URLs publiques ne se cassent pas). Il est exclu de l'`UPDATE`.
+- **Création** : le contrôleur calcule `slug = slugify(titre)` via le module canonique `core.http.slug` (accents translittérés, espaces → tirets, minuscules) : « Écrire avec Forge ! » → `ecrire-avec-forge`.
+- **Édition** : le slug est **stable**, il n'est pas régénéré quand le titre change (les URLs publiques ne se cassent pas).
+  Il est exclu de l'`UPDATE`.
 - **Unicité** : la contrainte `UNIQUE` garantit qu'aucun doublon n'est stocké.
 
 ### Sans `source` (saisie manuelle)
 
-Un champ `{"type": "slug"}` **sans** `source` est saisi à la main dans le
-formulaire et validé par `SlugField` (`core.http.slug.is_valid_slug` :
-minuscules, chiffres, tirets internes, path-safe).
+Un champ `{"type": "slug"}` **sans** `source` est saisi à la main dans le formulaire et validé par `SlugField` (`core.http.slug.is_valid_slug` : minuscules, chiffres, tirets internes, path-safe).
 
 ---
 
 ## Routing public par slug
 
-Le modèle généré expose un lookup `get_<entité>_by_<slug>()`. La route reste
-**écrite explicitement** par vous (philosophie Forge, pas de magie cachée) :
+Le modèle généré expose un lookup `get_<entité>_by_<slug>()`.
+La route reste **écrite explicitement** par vous (philosophie Forge, pas de magie cachée) :
 
 ```python
 # mvc/routes.py
@@ -75,8 +68,7 @@ article = get_article_by_slug(slug)
 
 Reportées **après 1.0** (voir ADR-017) :
 
-- pas de **suffixe automatique** (`mon-article-2`) en cas de collision, un
-  doublon est rejeté ; choisissez un titre différent ;
+- pas de **suffixe automatique** (`mon-article-2`) en cas de collision, un doublon est rejeté ; choisissez un titre différent ;
 - pas d'**historique des slugs** (`slug_history`) ni de **redirection 301** ;
 - pas de slugs multilingues, ni de sitemap.
 
