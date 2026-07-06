@@ -2,15 +2,7 @@
 APP_NAME=Forge
 APP_ROUTES_MODULE=mvc.routes
 
-# Base de données.
-# Le cœur est agnostique BDD (ADR-054) et le squelette est livré SANS backend
-# (ADR-060). Choisissez un backend, installez-le, puis renseignez ici ses
-# variables de connexion selon sa documentation. Exemples :
-#   - forge-mvc-sqlite  : un chemin de fichier, sans serveur ni comptes ;
-#   - forge-mvc-mariadb : hôte, port, comptes d'administration (DB_ADMIN_*)
-#     et applicatif (DB_APP_*), base, jeu de caractères (voir sa doc).
-# forge new ne pré-remplit aucune de ces variables : elles appartiennent au
-# backend, pas au squelette.
+# Base de données : installez un backend, puis lancez « forge db:config ».
 
 # Upload
 # Le noyau ne garde que le plafond de corps multipart (ADR-032).
