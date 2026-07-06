@@ -30,7 +30,7 @@ Découvert automatiquement ; si plusieurs backends : `DB_BACKEND=mariadb`. Un se
 
 ## À retenir
 
-- backend de production de référence, client-serveur, pool de connexions ;
+- backend de production, client-serveur, pool de connexions ;
 - `requires_provisioning=True` : `db:init` crée base + compte via `DB_ADMIN_*` ;
 - dialecte : `INT AUTO_INCREMENT`, `ENGINE=InnoDB`, `utf8mb4`, index inline, backticks ;
 - runtime limité au DML (`DB_APP_*`) ;

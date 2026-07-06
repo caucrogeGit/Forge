@@ -40,9 +40,9 @@ pip install --pre forge-mvc-sqlite
 
 Documentation : [backend SQLite](../sqlite/index.md) et sa [progression pas à pas](../sqlite/welcome/installation.md).
 
-## 4. MariaDB, production de référence
+## 4. MariaDB, serveur de production
 
-MariaDB est le backend de production de référence de Forge, au-dessus d'un serveur MariaDB, avec un pool de connexions.
+MariaDB est un backend de production pour Forge, au-dessus d'un serveur MariaDB, avec un pool de connexions.
 `forge db:init` provisionne la base et le compte applicatif avec les identifiants d'administration (`DB_ADMIN_*`, ADR-033).
 
 ```bash
@@ -76,7 +76,7 @@ Documentation : [backend SQL Server](../mssql/index.md).
 
 !!! tip "Aide au choix"
     - Vous débutez, prototypez ou testez : **SQLite** (aucun serveur).
-    - Vous visez la production : **MariaDB** (backend de référence, éprouvé).
+    - Vous visez la production : **MariaDB** (client-serveur, éprouvé).
     - Vous avez une contrainte PostgreSQL ou SQL Server : les backends existent en **Alpha**, à valider sur votre environnement.
 
 Le passage d'un backend à l'autre se fait en changeant l'opt-in installé et la configuration de connexion ; le code applicatif (modèles, SQL, contrôleurs) ne change pas.

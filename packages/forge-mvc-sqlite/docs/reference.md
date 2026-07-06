@@ -14,7 +14,28 @@ Le cœur sait générer du SQL et piloter `db:init` / `db:apply` / `migration:*`
 
 SQLite est **sans serveur** : la base est un simple fichier (`DB_NAME`). C'est le choix idéal en développement, en test et pour l'onboarding.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation
+
+SQLite est **sans serveur** : la base est un simple fichier local, sans serveur à joindre ni comptes à créer.
+Le module `sqlite3` fait partie de la bibliothèque standard de Python, donc aucune dépendance externe.
+
+```bash
+pip install --pre forge-mvc-sqlite
+```
+
+Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
+Indiquez le chemin du fichier de base dans `env/dev` :
+
+```env
+DB_NAME=storage/mon_projet.db
+```
+
+`forge doctor` confirme le backend résolu (`sqlite`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=sqlite`.
+`forge db:init` crée alors le fichier et la table technique `forge_migrations` : aucun serveur n'est contacté.
+
+La progression guidée, pas à pas : [Installation de forge-mvc-sqlite](welcome/installation.md).
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -30,7 +51,7 @@ SQLite est **sans serveur** : la base est un simple fichier (`DB_NAME`). C'est l
 | Décision d'architecture | ADR-054 (cœur agnostique BDD) |
 | Installation | `pip install --pre forge-mvc-sqlite` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires du backend.
 
@@ -38,7 +59,7 @@ Le diagramme de classe montre comment le cœur consomme le backend.
 
 Le diagramme de séquence montre la résolution du backend puis une requête.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que le cœur résout un `DatabaseBackend` par entry point, et que `forge-mvc-sqlite` le fournit avec son dialecte.
 
@@ -83,7 +104,7 @@ classDiagram
 - le dialecte traduit les types et la DDL en SQL SQLite ;
 - la base est un fichier, pas un service.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre la découverte du backend puis une requête applicative.
 
@@ -109,7 +130,7 @@ sequenceDiagram
 - la connexion est adaptée au format attendu par le cœur ;
 - aucune étape réseau : c'est un fichier local.
 
-## 4. Ce que fournit le backend
+## 5. Ce que fournit le backend
 
 | Élément | Rôle |
 |---|---|
@@ -120,7 +141,7 @@ sequenceDiagram
 
 L'API que vous utilisez reste celle du cœur : `db:init`, `db:apply`, `migration:*`, et `core.database.db` dans le code.
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -131,7 +152,7 @@ L'API que vous utilisez reste celle du cœur : `db:init`, `db:apply`, `migration
 | Faire évoluer le schéma | `forge migration:make` / `migration:apply` |
 | Lire/écrire en code | `core.database.db` |
 
-## 6. Exemple d'utilisation
+## 7. Exemple d'utilisation
 
 ```bash
 pip install --pre forge-mvc-sqlite     # seul backend installé
@@ -153,7 +174,7 @@ Le code applicatif ne sait pas qu'il parle à SQLite : il utilise la couche BDD 
     - `db:init` crée le fichier, `db:apply` applique le schéma ;
     - le code utilise `core.database.db`, pas `sqlite3`.
 
-## 7. Sans serveur, exclusif, et dialecte
+## 8. Sans serveur, exclusif, et dialecte
 
 SQLite n'a pas de serveur : `requires_provisioning=False`, donc `db:init` ne crée ni compte ni base distante, il prépare le fichier et la table `forge_migrations`.
 

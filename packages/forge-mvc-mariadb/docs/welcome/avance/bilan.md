@@ -11,7 +11,7 @@ Vous comprenez le dialecte MariaDB et son exploitation en production.
 
 ## Points clés
 
-- MariaDB = backend de production de référence, client-serveur ;
+- MariaDB = backend de production, client-serveur ;
 - deux comptes (admin / applicatif), DML strict au runtime ;
 - un seul backend par projet (ADR-054).
 

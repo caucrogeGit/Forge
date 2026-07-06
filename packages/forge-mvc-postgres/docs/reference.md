@@ -19,7 +19,33 @@ Le cœur génère le SQL et pilote les commandes BDD ; un backend les fait parle
 
 Particularité technique : Forge génère des paramètres `?` ; l'adaptateur les **traduit** en `%s` (format psycopg) à l'exécution.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation
+
+!!! warning "Backend Alpha"
+    PostgreSQL est un backend **Alpha** : le dialecte et l'adaptateur sont testés, mais l'intégration sur un vrai serveur reste à valider. À réserver aux essais, pas encore à la production.
+
+PostgreSQL est **client-serveur** : un serveur doit être joignable. Le pilote est `psycopg` (v3).
+
+```bash
+pip install --pre forge-mvc-postgres
+```
+
+Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
+Renseignez les accès dans `env/dev` :
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_NAME=mon_projet
+DB_APP_LOGIN=mon_projet
+DB_APP_PWD=...
+```
+
+`forge doctor` confirme le backend résolu (`postgres`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=postgres`.
+
+La progression guidée, pas à pas : [Installation de forge-mvc-postgres](welcome/installation.md).
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -37,7 +63,7 @@ Particularité technique : Forge génère des paramètres `?` ; l'adaptateur les
 | Décision d'architecture | ADR-054 |
 | Installation | `pip install --pre forge-mvc-postgres` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires du backend.
 
@@ -45,7 +71,7 @@ Le diagramme de classe montre l'adaptateur et le dialecte.
 
 Le diagramme de séquence montre la traduction des paramètres à l'exécution.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que le backend enveloppe `psycopg` pour répondre au contrat du cœur, en traduisant les paramètres.
 
@@ -94,7 +120,7 @@ classDiagram
 - le dialecte gère `BIGSERIAL` et les `CREATE INDEX` séparés ;
 - `psycopg` est importé paresseusement (l'usage du dialecte ne le requiert pas).
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre une requête traduite à l'exécution.
 
@@ -120,7 +146,7 @@ sequenceDiagram
 - `lastrowid` est obtenu via `SELECT lastval()` ;
 - le SQL généré reste celui de Forge, juste adapté au format psycopg.
 
-## 4. Ce que fournit le backend
+## 5. Ce que fournit le backend
 
 | Élément | Rôle |
 |---|---|
@@ -130,7 +156,7 @@ sequenceDiagram
 | `PostgreSQLDialect` | `BIGSERIAL`, `CREATE INDEX` séparés, guillemets doubles, `information_schema` |
 | Entry point | `forge_mvc.db_backend = postgres` |
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -140,7 +166,7 @@ sequenceDiagram
 | Appliquer le schéma | `forge db:apply` (sur une base existante) |
 | Faire évoluer le schéma | `forge migration:*` |
 
-## 6. Exemple d'utilisation (Alpha)
+## 7. Exemple d'utilisation (Alpha)
 
 ```bash
 # 1. Préparer base et rôle à la main (provisioning CLI non câblé)
@@ -164,7 +190,7 @@ Le code applicatif utilise `core.database.db`, comme avec tout autre backend.
     - `db:apply` / `migration:*` fonctionnent sur la base existante ;
     - `?` est traduit en `%s` automatiquement.
 
-## 7. Statut Alpha et limites
+## 8. Statut Alpha et limites
 
 Le dialecte (types, DDL) et la traduction des paramètres sont testés unitairement. L'**intégration** sur un vrai serveur reste à valider côté projet.
 

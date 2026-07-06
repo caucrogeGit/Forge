@@ -28,8 +28,8 @@ L'opt-in `forge-mvc-deploy` génère `wsgi.py`, la configuration Nginx et l'unit
 
     Ne committez jamais `DB_*` : `env/dev` et `env/prod` sont ignorés par Git.
 
-!!! note "Backend de référence"
-    MariaDB est le backend de production par défaut ; son dialecte est la référence à laquelle les autres se comparent.
+!!! note "Backend de production éprouvé"
+    MariaDB est un backend de production mûr et complet, premier backend historique de Forge. Le cœur reste agnostique BDD (ADR-054) : le choix du backend appartient au développeur, aucun n'est imposé comme référence.
 
 ## Après cette étape
 

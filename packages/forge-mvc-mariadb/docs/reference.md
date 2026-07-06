@@ -2,9 +2,9 @@
 
 Ce document explique ce que fait l'opt-in `forge-mvc-mariadb`, ce qu'il expose, et comment on s'en sert.
 
-`forge-mvc-mariadb` est le **backend de base de données de production de référence** de Forge : il fait fonctionner la couche BDD du cœur au-dessus d'un serveur MariaDB, via un pool de connexions.
+`forge-mvc-mariadb` est **un** backend de base de données **de production** pour Forge : il fait fonctionner la couche BDD du cœur au-dessus d'un serveur MariaDB, via un pool de connexions.
 
-Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend installé par un entry point, et n'en utilise **qu'un seul** par projet.
+Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend installé par un entry point, et n'en utilise **qu'un seul** par projet, au choix du développeur (MariaDB, SQLite, PostgreSQL ou SQL Server). Forge n'impose aucun backend de référence.
 
 ## 1. Rôle du module
 
@@ -12,9 +12,37 @@ Le cœur génère le SQL et pilote `db:init` / `db:apply` / `migration:*`, mais 
 
 `forge-mvc-mariadb` fournit ce backend : un pool de connexions MariaDB adapté aux attentes du cœur (curseur lignes-dict, `lastrowid`, `autocommit`), un dialecte SQL MariaDB, et le **provisioning** de la base et des comptes par `db:init`.
 
-MariaDB est **client-serveur** : un serveur doit être joignable. C'est le choix par défaut en production.
+MariaDB est **client-serveur** : un serveur doit être joignable. C'est un choix éprouvé pour la production.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation
+
+MariaDB est client-serveur : un serveur doit être joignable (local, conteneur ou distant).
+Le pilote `mariadb` est installé avec l'opt-in.
+
+```bash
+pip install --pre forge-mvc-mariadb
+```
+
+Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire, contrairement aux opt-ins de route.
+Renseignez ensuite les accès dans `env/dev` (le squelette ne les pré-câble pas, ADR-060) :
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=mon_projet
+DB_APP_LOGIN=mon_projet
+DB_APP_PWD=...
+DB_ADMIN_LOGIN=root
+DB_ADMIN_PWD=...
+```
+
+`DB_ADMIN_*` sert au provisioning et à la DDL ; `DB_APP_*` au runtime (DML).
+Vérifiez avec `forge doctor`, qui indique le backend résolu et l'état de la connexion ; si plusieurs backends sont installés, fixez `DB_BACKEND=mariadb`.
+Provisionnez enfin la base et les comptes avec `forge db:init`.
+
+La progression guidée, pas à pas : [Installation de forge-mvc-mariadb](welcome/installation.md).
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -31,7 +59,7 @@ MariaDB est **client-serveur** : un serveur doit être joignable. C'est le choix
 | Décision d'architecture | ADR-054 (cœur agnostique BDD) |
 | Installation | `pip install --pre forge-mvc-mariadb` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires du backend.
 
@@ -39,7 +67,7 @@ Le diagramme de classe montre comment le cœur consomme le backend.
 
 Le diagramme de séquence montre le provisioning puis une requête runtime.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que le cœur résout un `DatabaseBackend` par entry point, et que `forge-mvc-mariadb` le fournit avec son pool et son dialecte.
 
@@ -87,7 +115,7 @@ classDiagram
 - la connexion d'administration (`DB_ADMIN_*`) sert le provisioning et la DDL ;
 - le dialecte traduit types et DDL en SQL MariaDB.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre le provisioning par `db:init`, puis une requête runtime.
 
@@ -117,7 +145,7 @@ sequenceDiagram
 - le runtime utilise le compte applicatif `DB_APP_*` (DML strict) ;
 - la séparation des comptes suit l'ADR-033.
 
-## 4. Ce que fournit le backend
+## 5. Ce que fournit le backend
 
 | Élément | Rôle |
 |---|---|
@@ -129,7 +157,7 @@ sequenceDiagram
 
 L'API que vous utilisez reste celle du cœur : `db:init`, `db:apply`, `migration:*`, et `core.database.db`.
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -140,7 +168,7 @@ L'API que vous utilisez reste celle du cœur : `db:init`, `db:apply`, `migration
 | Faire évoluer le schéma | `forge migration:make` / `migration:apply` |
 | Lire/écrire en code | `core.database.db` (compte `DB_APP_*`) |
 
-## 6. Exemple d'utilisation
+## 7. Exemple d'utilisation
 
 Configurer l'environnement (`env/dev`), puis :
 
@@ -164,7 +192,7 @@ Le code applicatif ne sait pas qu'il parle à MariaDB : il utilise la couche BDD
     - `DB_APP_*` pour le runtime (DML) ;
     - le code utilise `core.database.db`, pas `mariadb`.
 
-## 7. Serveur, comptes et dialecte
+## 8. Serveur, comptes et dialecte
 
 MariaDB est client-serveur : un serveur doit être joignable. `forge doctor` aide à diagnostiquer la connexion.
 

@@ -19,7 +19,34 @@ Le cœur génère le SQL et pilote les commandes BDD ; un backend les fait parle
 
 Bonne nouvelle côté paramètres : `pyodbc` utilise nativement les `?` de Forge, donc aucune traduction.
 
-## 2. Vue d'ensemble rapide
+## 2. Installation
+
+!!! warning "Backend Alpha"
+    SQL Server est un backend **Alpha** : le dialecte et l'adaptateur sont testés, mais l'intégration sur un vrai serveur reste à valider. À réserver aux essais, pas encore à la production.
+
+SQL Server est **client-serveur** : un serveur doit être joignable. Le pilote est `pyodbc`, qui requiert un pilote ODBC système.
+
+```bash
+pip install --pre forge-mvc-mssql
+```
+
+Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
+Renseignez les accès dans `env/dev` :
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=1433
+DB_NAME=mon_projet
+DB_APP_LOGIN=mon_projet
+DB_APP_PWD=...
+DB_ODBC_DRIVER=ODBC Driver 18 for SQL Server
+```
+
+`forge doctor` confirme le backend résolu (`mssql`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=mssql`.
+
+La progression guidée, pas à pas : [Installation de forge-mvc-mssql](welcome/installation.md).
+
+## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -38,7 +65,7 @@ Bonne nouvelle côté paramètres : `pyodbc` utilise nativement les `?` de Forge
 | Décision d'architecture | ADR-054 |
 | Installation | `pip install --pre forge-mvc-mssql` |
 
-## 3. Schémas UML
+## 4. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires du backend.
 
@@ -46,7 +73,7 @@ Le diagramme de classe montre l'adaptateur et le dialecte.
 
 Le diagramme de séquence montre une requête via pyodbc.
 
-### 3.1 Diagramme de classe
+### 4.1 Diagramme de classe
 
 Le diagramme de classe montre que le backend enveloppe `pyodbc` pour répondre au contrat du cœur.
 
@@ -89,7 +116,7 @@ classDiagram
 - le dialecte gère `IDENTITY`, les crochets et les formes gardées ;
 - `pyodbc` est importé paresseusement et requiert un pilote ODBC système.
 
-### 3.2 Diagramme de séquence
+### 4.2 Diagramme de séquence
 
 Le diagramme de séquence montre une requête runtime via pyodbc.
 
@@ -115,7 +142,7 @@ sequenceDiagram
 - `lastrowid` est obtenu via `SELECT SCOPE_IDENTITY()` ;
 - un pilote ODBC doit être installé sur la machine.
 
-## 4. Ce que fournit le backend
+## 5. Ce que fournit le backend
 
 | Élément | Rôle |
 |---|---|
@@ -124,7 +151,7 @@ sequenceDiagram
 | `MSSQLDialect` | `BIGINT IDENTITY(1,1)`, crochets, `CREATE INDEX` gardés, `INFORMATION_SCHEMA` |
 | Entry point | `forge_mvc.db_backend = mssql` |
 
-## 5. Contextes d'utilisation
+## 6. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -135,7 +162,7 @@ sequenceDiagram
 | Appliquer le schéma | `forge db:apply` (sur une base existante) |
 | Faire évoluer le schéma | `forge migration:*` |
 
-## 6. Exemple d'utilisation (Alpha)
+## 7. Exemple d'utilisation (Alpha)
 
 ```sql
 -- 1. Préparer base et login à la main (provisioning CLI non câblé)
@@ -161,7 +188,7 @@ Le code applicatif utilise `core.database.db`, comme avec tout autre backend.
     - `db:apply` / `migration:*` fonctionnent sur la base existante ;
     - `?` est natif (pyodbc), pas de traduction.
 
-## 7. Statut Alpha, ODBC et dialecte
+## 8. Statut Alpha, ODBC et dialecte
 
 Le dialecte Transact-SQL est testé unitairement ; l'**intégration** sur un vrai serveur reste à valider côté projet.
 
