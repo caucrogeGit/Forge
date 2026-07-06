@@ -191,7 +191,8 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
     **Objectif :** Configurer l'identité Git globale du poste avant la création des commits.
 
     !!! warning "Attention"
-        `forge new` peut créer un commit initial. Si Git n'a pas d'identité configurée, ce commit peut échouer.
+        `forge new` peut créer un commit initial.
+        Si Git n'a pas d'identité configurée, ce commit peut échouer.
 
     Cette configuration identifie l'auteur des commits sur la machine.
     Elle est globale et ne concerne pas encore un projet précis.
@@ -331,7 +332,8 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     **Objectif :** Publier le dépôt Git local du projet sur GitHub sans quitter la procédure principale.
 
     !!! warning "Attention"
-        Le dépôt GitHub doit être vide au moment du premier push. Un README, un `.gitignore` ou une licence créés sur GitHub peuvent provoquer une divergence d'historique.
+        Le dépôt GitHub doit être vide au moment du premier push.
+        Un README, un `.gitignore` ou une licence créés sur GitHub peuvent provoquer une divergence d'historique.
 
     Cette étape associe le dépôt Git local du projet Forge à un dépôt GitHub distant.
 
@@ -363,7 +365,8 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
         Si Git indique que le dossier n'est pas encore un dépôt, revenez à l'étape précédente pour initialiser le dépôt local avant de continuer.
 
-        Cette étape ne recrée pas le dépôt Git local. Elle vérifie simplement qu'il est prêt à être relié à GitHub.
+        Cette étape ne recrée pas le dépôt Git local.
+        Elle vérifie simplement qu'il est prêt à être relié à GitHub.
 
     ??? note "4.2 Choisir le protocole GitHub"
         GitHub peut être utilisé avec deux protocoles.
@@ -377,7 +380,9 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
         La suite de cette procédure utilise donc SSH comme chemin principal.
 
-        Si vous choisissez HTTPS, utilisez l'URL HTTPS du dépôt à la place de l'URL SSH. GitHub ne s'authentifie pas avec le mot de passe du compte pour les opérations Git en HTTPS. Il faut utiliser un jeton d'accès personnel lorsque Git demande le mot de passe.
+        Si vous choisissez HTTPS, utilisez l'URL HTTPS du dépôt à la place de l'URL SSH.
+        GitHub ne s'authentifie pas avec le mot de passe du compte pour les opérations Git en HTTPS.
+        Il faut utiliser un jeton d'accès personnel lorsque Git demande le mot de passe.
 
     ??? note "4.3 Vérifier l'authentification SSH GitHub"
         Avant de pousser le projet, GitHub doit reconnaître la machine depuis laquelle vous travaillez.
@@ -452,7 +457,8 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
         Le dépôt GitHub doit être vide.
 
-        Si GitHub crée un README ou une licence, il crée aussi un commit distant. Ce commit peut bloquer le premier push car l'historique distant et l'historique local ne sont pas les mêmes.
+        Si GitHub crée un README ou une licence, il crée aussi un commit distant.
+        Ce commit peut bloquer le premier push car l'historique distant et l'historique local ne sont pas les mêmes.
 
         Après création du dépôt, copiez l'URL SSH :
 
@@ -557,7 +563,8 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
             Pour `Username`, indiquez votre nom d'utilisateur GitHub.
 
-            Pour `Password`, n'indiquez pas le mot de passe du compte GitHub. Utilisez un jeton d'accès personnel GitHub.
+            Pour `Password`, n'indiquez pas le mot de passe du compte GitHub.
+            Utilisez un jeton d'accès personnel GitHub.
 
             Si l'authentification échoue, vérifiez :
 
@@ -709,7 +716,8 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     ---
 
     !!! success "Validation attendue"
-        `forge doctor` ne signale aucun blocage. Les avertissements ne sont pas bloquants.
+        `forge doctor` ne signale aucun blocage.
+        Les avertissements ne sont pas bloquants.
 
 ??? info "6. Lancer le serveur de développement"
     Objectif : démarrer le serveur Forge en mode développement et ouvrir le projet dans le navigateur.
@@ -740,8 +748,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     forge run
     ```
 
-    Ouvrez le projet dans le navigateur en utilisant le port configuré
-    (HTTPS de développement, certificat auto-signé généré par `forge new`) :
+    Ouvrez le projet dans le navigateur en utilisant le port configuré (HTTPS de développement, certificat auto-signé généré par `forge new`) :
 
     ```text
     https://127.0.0.1:8000
@@ -811,7 +818,8 @@ Commencer le parcours : [Welcome Forge](../starters/welcome-forge/index.md)
 
 ## Autres installations de projet Forge
 
-Cette page couvre l'installation stable, depuis PyPI. D'autres façons de créer un projet Forge existent, selon votre besoin :
+Cette page couvre l'installation stable, depuis PyPI.
+D'autres façons de créer un projet Forge existent, selon votre besoin :
 
 * [Créer un projet sur la dernière version GitHub](github-latest.md) : pour l'utilisateur avant-garde qui veut la dernière version de Forge et de ses opt-ins poussée sur `main`, en avance sur PyPI, sans cloner le dépôt.
 * [Contribuer au cœur de Forge](core-dev.md) : installer un projet pour modifier Forge lui-même (clone du dépôt, installation éditable, validations).
