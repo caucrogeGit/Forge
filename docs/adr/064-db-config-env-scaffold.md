@@ -54,6 +54,14 @@ Une nouvelle commande `forge db:config` :
 C'est ce qui rend légitime l'écriture dans `env/example`, versionné : le gabarit documente les clés attendues sans exposer aucune valeur sensible.
 Le développeur renseigne ensuite les valeurs réelles dans `env/dev` et `env/prod` (ignorés par Git).
 
+### 2 bis. `db:config --remove` retire ces variables (désinstallation)
+
+Symétriquement (charte n°10 : une API publique est un contrat de complétude), `forge db:config --remove` retire des trois fichiers les clés de l'`env_template` du backend.
+
+- Elle ne touche qu'à ces clés, jamais d'autres `DB_*`.
+- Elle **annonce** les clés retirées et **prévient** que les valeurs renseignées (secrets) sont perdues : le retrait est plus destructif que l'ajout, qui ne posait que des placeholders.
+- Elle se lance **avant** `pip uninstall forge-mvc-<sgbd>`, tant que le backend est encore résolvable par son entry point.
+
 ### 3. `db:init` reste focalisé sur le provisioning
 
 `db:init` ne change pas : il provisionne la base et les comptes (`DB_ADMIN_*`).

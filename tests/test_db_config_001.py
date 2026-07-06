@@ -17,6 +17,7 @@ from cli.entities.db_config import (
     _key_present,
     _value_is_empty,
     configure_backend_env,
+    remove_backend_env,
 )
 
 
@@ -87,6 +88,35 @@ def test_fichier_env_absent_est_ignore(fake_backend, tmp_path):
     configure_backend_env(root)  # ne lève pas
     assert not (root / "env" / "prod").exists()
     assert _key_present((root / "env" / "dev").read_text(encoding="utf-8"), "DB_HOST")
+
+
+# ── Retrait symétrique (forge db:config --remove) ────────────────────────────
+
+def test_remove_retire_les_cles_des_trois_fichiers(fake_backend, tmp_path):
+    root = _project(tmp_path)
+    configure_backend_env(root)
+    remove_backend_env(root)
+    for name in ENV_FILES:
+        content = (root / "env" / name).read_text(encoding="utf-8")
+        for key, _ in _FakeBackend.env_template:
+            assert not _key_present(content, key), f"{key} aurait dû être retiré de env/{name}"
+
+
+def test_remove_preserve_les_autres_cles(fake_backend, tmp_path):
+    root = _project(tmp_path, "APP_NAME=Demo\nAPP_PORT=8000\nDB_AUTRE=garde\n")
+    configure_backend_env(root)
+    remove_backend_env(root)
+    dev = (root / "env" / "dev").read_text(encoding="utf-8")
+    assert "APP_NAME=Demo" in dev          # clé hors backend préservée
+    assert "APP_PORT=8000" in dev
+    assert "DB_AUTRE=garde" in dev          # DB_* hors env_template préservée
+
+
+def test_remove_idempotent_sans_config(fake_backend, tmp_path):
+    root = _project(tmp_path)
+    remove_backend_env(root)  # rien à retirer, ne lève pas
+    dev = (root / "env" / "dev").read_text(encoding="utf-8")
+    assert "DB_HOST" not in dev
 
 
 # ── Conformité du contrat : les backends installés exposent env_template ──────

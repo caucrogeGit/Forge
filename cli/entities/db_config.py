@@ -107,9 +107,81 @@ def _report(
             print("\nConfiguration complète. Étape suivante : forge db:init")
 
 
+def _remove_block(content: str, name: str, keys: set[str]) -> tuple[str, list[tuple[str, bool]]]:
+    """Retire les lignes des `keys` et l'en-tête du backend du texte.
+
+    Retourne `(nouveau_texte, retirées)`, `retirées` = liste de `(clé, avait_une_valeur)`.
+    """
+    header = f"# Base de données (forge-mvc-{name})"
+    removed: list[tuple[str, bool]] = []
+    kept: list[str] = []
+    for line in content.splitlines(keepends=True):
+        match = re.match(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*=(.*)$", line)
+        if match is not None and match.group(1) in keys:
+            removed.append((match.group(1), match.group(2).strip() != ""))
+            continue
+        if line.strip() == header:
+            continue
+        kept.append(line)
+    return "".join(kept), removed
+
+
+def remove_backend_env(project_root: Path) -> int:
+    """Retire des fichiers d'environnement les clés du backend installé (ADR-064).
+
+    Symétrique de `configure_backend_env` : ne retire que les clés de
+    l'`env_template` du backend, jamais d'autres `DB_*`. Les valeurs renseignées
+    sont perdues (l'utilisateur en est averti).
+    """
+    from core.database.backend import get_backend
+
+    backend = get_backend()
+    name: str = getattr(backend, "name", "")
+    template: list[tuple[str, str]] = list(getattr(backend, "env_template", []))
+    if not template:
+        print(f"Le backend « {name} » ne déclare aucune variable d'environnement.")
+        return 0
+
+    keys = {k for k, _ in template}
+    env_dir = project_root / "env"
+    removed: dict[str, list[tuple[str, bool]]] = {}
+
+    for env_name in ENV_FILES:
+        path = env_dir / env_name
+        if not path.exists():
+            continue
+        new_content, gone = _remove_block(path.read_text(encoding="utf-8"), name, keys)
+        if gone:
+            path.write_text(new_content, encoding="utf-8")
+            removed[env_name] = gone
+
+    _report_removal(name, removed)
+    return 0
+
+
+def _report_removal(name: str, removed: dict[str, list[tuple[str, bool]]]) -> None:
+    print(f"Backend « {name} » — retrait de la configuration (ADR-064).\n")
+    if not removed:
+        print("Aucune clé du backend n'était présente dans les fichiers d'environnement.")
+        return
+    for env_name in ENV_FILES:
+        if env_name in removed:
+            gone = removed[env_name]
+            keys = ", ".join(k for k, _ in gone)
+            lost = [k for k, had_value in gone if had_value]
+            line = f"Retiré de env/{env_name} : {keys}"
+            if lost:
+                line += f" (valeurs perdues : {', '.join(lost)})"
+            print(line)
+    print(f"\nLe backend n'est plus configuré. Désinstallation : pip uninstall forge-mvc-{name}")
+
+
 def main(argv: "list[str] | None" = None) -> int:
     # L'aide `--help` est servie par le dispatcher central (HELP_TEXTS_RICH).
+    args = list(argv) if argv is not None else []
     try:
+        if "--remove" in args:
+            return remove_backend_env(Path.cwd())
         return configure_backend_env(Path.cwd())
     except RuntimeError as exc:
         # Aucun backend installé, ou plusieurs sans DB_BACKEND (ADR-054) : le

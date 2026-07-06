@@ -54,12 +54,16 @@ La progression guidée, pas à pas : [Installation de forge-mvc-postgres](welcom
 
 ### Désinstallation
 
+Retirez d'abord la configuration des fichiers d'environnement, puis le paquet :
+
 ```bash
+forge db:config --remove
 pip uninstall forge-mvc-postgres
 ```
 
-Un backend n'a pas de commande `disable` : il est découvert par entry point (ADR-054), donc retirer le paquet suffit à ce que le cœur ne le voie plus.
-Pensez aussi à retirer les variables `DB_*` d'`env/dev` et `env/prod`, et, si besoin, à supprimer la base et le compte créés par `db:init`.
+`db:config --remove` retire les clés `DB_*` posées par `db:config` des trois fichiers d'environnement (les valeurs renseignées sont perdues ; ADR-064).
+Un backend n'a pas de commande `disable` : découvert par entry point (ADR-054), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
+Si besoin, supprimez aussi la base et le compte créés par `db:init`.
 
 ## 3. Vue d'ensemble rapide
 

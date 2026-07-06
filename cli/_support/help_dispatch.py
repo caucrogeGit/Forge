@@ -776,18 +776,25 @@ Limites:
 
     "db:config": """\
 Usage:
-  forge db:config
+  forge db:config [--remove]
 
 Description:
   Amorce les variables d'environnement du backend BDD installé dans les trois
   fichiers d'environnement du projet : env/example, env/dev et env/prod
   (ADR-064). Le backend est découvert par son entry point (ADR-054).
+  Avec --remove, fait l'inverse : retire ces variables (à la désinstallation).
 
 Effets:
   - ajoute les clés manquantes de l'env_template du backend (write-if-missing) ;
   - n'écrase jamais une valeur déjà renseignée ;
   - n'écrit aucun secret : uniquement des exemples (hôte, port) ou du vide ;
   - annonce les clés ajoutées et celles restant à renseigner.
+
+Option --remove:
+  - retire des trois fichiers les clés de l'env_template du backend ;
+  - ne touche qu'à ces clés, jamais d'autres DB_* ;
+  - annonce les clés retirées et prévient des valeurs renseignées perdues ;
+  - à lancer avant `pip uninstall forge-mvc-<sgbd>`.
 
 Prérequis:
   - un backend BDD installé (pip install forge-mvc-<sgbd>) ;
