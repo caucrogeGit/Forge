@@ -2,8 +2,6 @@
 APP_NAME=Forge
 APP_ROUTES_MODULE=mvc.routes
 
-# Base de données : installez un backend, puis lancez « forge db:config ».
-
 # Upload
 # Le noyau ne garde que le plafond de corps multipart (ADR-032).
 # UPLOAD_ROOT et UPLOAD_ALLOWED_* sont lues par l'opt-in forge-mvc-files.
