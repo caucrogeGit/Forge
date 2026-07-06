@@ -119,6 +119,56 @@ def test_remove_idempotent_sans_config(fake_backend, tmp_path):
     assert "DB_HOST" not in dev
 
 
+# ── Commentaires de l'env_template (entrées « # ... ») ───────────────────────
+
+class _CommentedBackend:
+    name = "mariadb"
+    env_template = [
+        ("# Serveur.", ""),
+        ("DB_HOST", "127.0.0.1"),
+        ("DB_PORT", "3306"),
+        ("# Compte applicatif.", ""),
+        ("DB_APP_LOGIN", ""),
+        ("DB_APP_PWD", ""),
+    ]
+
+
+@pytest.fixture
+def commented_backend(monkeypatch):
+    import core.database.backend as backend_mod
+    monkeypatch.setattr(backend_mod, "get_backend", lambda: _CommentedBackend())
+
+
+def test_commentaires_rendus_dans_le_bloc(commented_backend, tmp_path):
+    root = _project(tmp_path)
+    configure_backend_env(root)
+    dev = (root / "env" / "dev").read_text(encoding="utf-8")
+    assert "# Serveur." in dev
+    assert "# Compte applicatif." in dev
+    # Les commentaires ne sont pas traités comme des clés.
+    assert not _key_present(dev, "# Serveur.")
+    assert _key_present(dev, "DB_HOST") and _key_present(dev, "DB_APP_LOGIN")
+
+
+def test_commentaires_idempotents(commented_backend, tmp_path):
+    root = _project(tmp_path)
+    configure_backend_env(root)
+    configure_backend_env(root)
+    dev = (root / "env" / "dev").read_text(encoding="utf-8")
+    assert dev.count("# Serveur.") == 1          # pas de ré-ajout au 2e passage
+    assert dev.count("DB_HOST=") == 1
+
+
+def test_remove_retire_aussi_les_commentaires(commented_backend, tmp_path):
+    root = _project(tmp_path, "APP_NAME=Demo\n# Mon commentaire perso\n")
+    configure_backend_env(root)
+    remove_backend_env(root)
+    dev = (root / "env" / "dev").read_text(encoding="utf-8")
+    assert "# Serveur." not in dev               # commentaire du backend retiré
+    assert "# Compte applicatif." not in dev
+    assert "# Mon commentaire perso" in dev       # commentaire hors backend préservé
+
+
 # ── Conformité du contrat : les backends installés exposent env_template ──────
 
 def test_backends_installes_exposent_env_template():

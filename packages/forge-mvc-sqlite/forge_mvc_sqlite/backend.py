@@ -100,6 +100,7 @@ class SQLiteBackend:
     # Variable d'environnement lue par le backend (ADR-064) : le chemin du
     # fichier de base. Amorcée par `forge db:config`. Sans serveur ni comptes.
     env_template: "list[tuple[str, str]]" = [
+        ("# Chemin du fichier de base SQLite, relatif à la racine du projet (sans serveur ni comptes).", ""),
         ("DB_NAME", "storage/app.db"),
     ]
 

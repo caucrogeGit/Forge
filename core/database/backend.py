@@ -178,6 +178,9 @@ class DatabaseBackend(Protocol):
     # une valeur d'exemple ou un placeholder vide (ADR-064). `forge db:config`
     # s'en sert pour amorcer env/example, env/dev et env/prod. Aucune valeur
     # sensible ici : uniquement des exemples (hôte, port) ou du vide.
+    # Une entrée dont la clé commence par « # » est une ligne de commentaire,
+    # rendue verbatim dans le bloc pour documenter les variables (sa valeur est
+    # ignorée) ; elle n'est ni détectée comme clé présente ni renseignée.
     env_template: "list[tuple[str, str]]"
 
     def get_connection(self) -> Any:

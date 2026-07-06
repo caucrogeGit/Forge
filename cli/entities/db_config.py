@@ -23,6 +23,16 @@ from pathlib import Path
 ENV_FILES = ("example", "dev", "prod")
 
 
+def _is_comment(key: str) -> bool:
+    """Vrai si l'entrée d'`env_template` est une ligne de commentaire (clé ``# ...``).
+
+    Un backend peut intercaler des commentaires dans son `env_template` pour
+    documenter ses variables (ADR-064) : ils sont rendus verbatim dans le bloc et
+    ignorés par la détection de présence, le rapport et le retrait.
+    """
+    return key.lstrip().startswith("#")
+
+
 def _key_present(content: str, key: str) -> bool:
     """Vrai si `key` est déjà déclarée (ligne ``KEY=...``) dans le texte."""
     return re.search(rf"(?m)^\s*{re.escape(key)}\s*=", content) is not None
@@ -34,10 +44,23 @@ def _value_is_empty(content: str, key: str) -> bool:
     return match is not None and match.group(1).strip() == ""
 
 
-def _append_block(content: str, name: str, missing: list[tuple[str, str]]) -> str:
-    """Ajoute les clés manquantes sous un en-tête, en fin de fichier."""
+def _append_block(
+    content: str,
+    name: str,
+    template: list[tuple[str, str]],
+    missing: set[str],
+) -> str:
+    """Ajoute les clés manquantes sous un en-tête, en fin de fichier.
+
+    Les commentaires de l'`env_template` (entrées ``# ...``) sont rendus verbatim ;
+    les clés déjà présentes sont omises, seules celles de `missing` sont écrites.
+    """
     lines = [f"# Base de données (forge-mvc-{name})"]
-    lines += [f"{key}={value}" for key, value in missing]
+    for key, value in template:
+        if _is_comment(key):
+            lines.append(key)
+        elif key in missing:
+            lines.append(f"{key}={value}")
     block = "\n".join(lines) + "\n"
     prefix = content.rstrip("\n")
     return f"{prefix}\n\n{block}" if prefix else block
@@ -67,10 +90,16 @@ def configure_backend_env(project_root: Path) -> int:
             absent_files.append(env_name)
             continue
         content = path.read_text(encoding="utf-8")
-        missing = [(k, v) for k, v in template if not _key_present(content, k)]
+        missing = [
+            k for k, _ in template
+            if not _is_comment(k) and not _key_present(content, k)
+        ]
         if missing:
-            path.write_text(_append_block(content, name, missing), encoding="utf-8")
-            added[env_name] = [k for k, _ in missing]
+            path.write_text(
+                _append_block(content, name, template, set(missing)),
+                encoding="utf-8",
+            )
+            added[env_name] = missing
 
     _report(name, template, env_dir, added, absent_files)
     return 0
@@ -99,7 +128,7 @@ def _report(
     dev_path = env_dir / "dev"
     if dev_path.exists():
         dev = dev_path.read_text(encoding="utf-8")
-        to_fill = [k for k, _ in template if _value_is_empty(dev, k)]
+        to_fill = [k for k, _ in template if not _is_comment(k) and _value_is_empty(dev, k)]
         if to_fill:
             print(f"\nÀ renseigner dans env/dev (et env/prod) : {', '.join(to_fill)}")
             print("Puis : forge db:init")
@@ -107,10 +136,17 @@ def _report(
             print("\nConfiguration complète. Étape suivante : forge db:init")
 
 
-def _remove_block(content: str, name: str, keys: set[str]) -> tuple[str, list[tuple[str, bool]]]:
-    """Retire les lignes des `keys` et l'en-tête du backend du texte.
+def _remove_block(
+    content: str,
+    name: str,
+    keys: set[str],
+    comments: set[str],
+) -> tuple[str, list[tuple[str, bool]]]:
+    """Retire les lignes des `keys`, l'en-tête et les commentaires du backend.
 
     Retourne `(nouveau_texte, retirées)`, `retirées` = liste de `(clé, avait_une_valeur)`.
+    Seuls les commentaires posés par le backend (issus de son `env_template`) sont
+    retirés ; les autres commentaires du fichier sont préservés.
     """
     header = f"# Base de données (forge-mvc-{name})"
     removed: list[tuple[str, bool]] = []
@@ -120,7 +156,8 @@ def _remove_block(content: str, name: str, keys: set[str]) -> tuple[str, list[tu
         if match is not None and match.group(1) in keys:
             removed.append((match.group(1), match.group(2).strip() != ""))
             continue
-        if line.strip() == header:
+        stripped = line.strip()
+        if stripped == header or stripped in comments:
             continue
         kept.append(line)
     return "".join(kept), removed
@@ -142,7 +179,8 @@ def remove_backend_env(project_root: Path) -> int:
         print(f"Le backend « {name} » ne déclare aucune variable d'environnement.")
         return 0
 
-    keys = {k for k, _ in template}
+    keys = {k for k, _ in template if not _is_comment(k)}
+    comments = {k for k, _ in template if _is_comment(k)}
     env_dir = project_root / "env"
     removed: dict[str, list[tuple[str, bool]]] = {}
 
@@ -150,7 +188,7 @@ def remove_backend_env(project_root: Path) -> int:
         path = env_dir / env_name
         if not path.exists():
             continue
-        new_content, gone = _remove_block(path.read_text(encoding="utf-8"), name, keys)
+        new_content, gone = _remove_block(path.read_text(encoding="utf-8"), name, keys, comments)
         if gone:
             path.write_text(new_content, encoding="utf-8")
             removed[env_name] = gone
