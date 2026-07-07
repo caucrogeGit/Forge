@@ -272,5 +272,4 @@ Forge n'impose aucun backend de référence.
 
 ## Voir aussi
 
-- [Progression MariaDB](welcome/installation.md) : apprendre le backend pas à pas.
-- [ADR-054](https://forgemvc.com/docs/forge/adr/054-database-backend-optins/) : cœur agnostique BDD.
+- [Welcome-MariaDB](welcome/installation.md) : apprendre le backend pas à pas.
