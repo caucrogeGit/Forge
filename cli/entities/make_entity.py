@@ -669,7 +669,10 @@ def build_entity_manual(entity_name: str, snake: str) -> str:
 
 
 def build_entity_init(entity_name: str) -> str:
-    return f"from .{to_snake(entity_name)} import {entity_name}\n"
+    # Alias redondant `as` : ré-export explicite (PEP 484), reconnu par ruff, donc
+    # pas de F401 « imported but unused » dans le __init__.py d'entité (FORGE-7).
+    snake = to_snake(entity_name)
+    return f"from .{snake} import {entity_name} as {entity_name}\n"
 
 
 def ensure_file(path: Path, content: str, created: list[Path], skipped: list[Path]) -> None:

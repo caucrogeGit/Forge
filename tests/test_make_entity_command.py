@@ -215,3 +215,10 @@ def test_make_entity_interactive_can_ask_for_entity_name(monkeypatch: pytest.Mon
     entity_json = json.loads((tmp_path / "mvc" / "entities" / "contact" / "contact.json").read_text(encoding="utf-8"))
     assert entity_json["name"] == "Contact"
     assert entity_json["fields"][0]["name"] == "titre"
+
+
+def test_build_entity_init_reexport_explicite():
+    # FORGE-7 : le __init__.py d'entité ré-exporte via un alias redondant
+    # (from .x import X as X), reconnu comme ré-export explicite -> pas de F401.
+    init = make_entity.build_entity_init("Contact")
+    assert init == "from .contact import Contact as Contact\n"
