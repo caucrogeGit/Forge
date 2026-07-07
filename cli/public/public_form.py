@@ -187,7 +187,7 @@ def build_public_form_new_method(spec: PublicFormSpec) -> str:
         '                "fields": FORM_FIELDS,\n',
         '                "errors": {},\n',
         '                "form_data": {},\n',
-        '                "flash_html": render_flash_html(request),\n',
+        '                "flash": get_flash(get_session_id(request)),\n',
         "            },\n",
         "            request=request,\n",
         "        )\n",
@@ -213,7 +213,7 @@ def build_public_form_create_method(spec: PublicFormSpec) -> str:
         '                    "fields": FORM_FIELDS,\n',
         '                    "errors": errors,\n',
         '                    "form_data": form_data,\n',
-        '                    "flash_html": "",\n',
+        '                    "flash": None,\n',
         "                },\n",
         "                request=request,\n",
         "            )\n",
@@ -249,7 +249,7 @@ def build_public_form_controller(spec: PublicFormSpec) -> str:
         "from core.http.request import Request\n",
         "from core.http.response import Response\n",
         "from core.mvc.controller.base_controller import BaseController\n",
-        "from mvc.helpers.flash import render_flash_html\n",
+        "from core.security.session import get_flash, get_session_id\n",
         "\n",
         "\n",
         f'INSERT_PUBLIC_FORM = "{_build_insert_sql(spec)}"\n',
@@ -271,7 +271,7 @@ def build_public_form_template(spec: PublicFormSpec) -> str:
         "",
         f"{{% block {PUBLIC_CONTENT_BLOCK} %}}",
         '<section class="mx-auto max-w-2xl px-6 py-12">',
-        "    {% if flash_html %}{{ flash_html | safe }}{% endif %}",
+        '    {% from "components/ui.html" import flash_messages %}{{ flash_messages(flash) }}',
         f'    <h1 class="text-3xl font-bold text-gray-900">{title}</h1>',
         f'    <form method="post" action="{spec.route_path}" class="mt-8 space-y-6">',
         '        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
@@ -413,7 +413,7 @@ def _ensure_form_controller(controller_path: Path, spec: PublicFormSpec) -> tupl
         content, "from core.mvc.controller.base_controller import BaseController"
     )
     content, _ = _ensure_import(
-        content, "from mvc.helpers.flash import render_flash_html"
+        content, "from core.security.session import get_flash, get_session_id"
     )
     content, _ = _ensure_insert_constant(content, spec)
     content, _ = _ensure_form_fields_constant(content, spec)

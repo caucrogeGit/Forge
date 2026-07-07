@@ -601,7 +601,7 @@ class TestBuildControllerShowEditMedia:
     def test_sans_media_context_show_inchange(self):
         entity = _entity()
         code = build_controller(entity)
-        assert '"hebergement": hebergement, "flash_html": render_flash_html(request)' in code
+        assert '"hebergement": hebergement, "flash": get_flash(get_session_id(request))' in code
 
     def test_pas_de_bouton_suppression_media_genere(self):
         entity = _entity(media=[_media_image(name="cover")])

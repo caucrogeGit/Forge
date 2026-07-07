@@ -586,7 +586,10 @@ def test_base_html_utilise_block_content(tmp_path):
 
 def test_controller_importe_flash(tmp_path):
     code = build_controller(_CONTACT_JSON)
-    assert "from mvc.helpers.flash import render_flash_html" in code
+    # FORGE-1 : le flash est lu via le cœur (get_flash) et rendu par la macro
+    # flash_messages ; plus d'import vers un helper mvc.helpers.flash jamais fourni.
+    assert "from core.security.session import get_flash, get_session_id" in code
+    assert "mvc.helpers.flash" not in code
 
 
 def test_controller_importe_form(tmp_path):

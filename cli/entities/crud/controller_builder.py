@@ -197,7 +197,7 @@ def _render_bulk_delete(ctx: _ControllerContext) -> list[str]:
         "        if not ids:",
         f'            return BaseController.redirect_with_flash(request, "/{snake}", "Aucun élément sélectionné.")',
         f'        return BaseController.render("{snake}/bulk_delete_confirm.html",',
-        '            context={"ids": ids, "count": len(ids), "flash_html": render_flash_html(request)},',
+        '            context={"ids": ids, "count": len(ids), "flash": get_flash(get_session_id(request))},',
         "            request=request)",
     ]
     return bulk_delete_lines
@@ -369,7 +369,7 @@ def _render_show(ctx: _ControllerContext) -> list[str]:
         )
     for relation in many_to_many_relations or []:
         show_lines.append(f'        {relation.show_context_key} = {relation.show_labels_function}({pk_name})')
-    ctx_items = [f'"{snake}": {snake}', '"flash_html": render_flash_html(request)']
+    ctx_items = [f'"{snake}": {snake}', '"flash": get_flash(get_session_id(request))']
     ctx_items += [f'"{relation.show_context_key}": {relation.show_context_key}' for relation in many_to_many_relations or []]
     ctx_items += [f'"{e["name"]}_media": {e["name"]}_media' for e in show_singles]
     ctx_items += [f'"{e["name"]}_media_list": {e["name"]}_media_list' for e in show_multiples]
@@ -724,7 +724,7 @@ def _render_list_context(ctx: _ControllerContext, pk_col: str) -> list[str]:
         "                \"pagination\": pagination,",
         "                \"empty_context\": empty_context,",
         "                \"relation_filters\": relation_filters,",
-        "                \"flash_html\": render_flash_html(request),",
+        "                \"flash\": get_flash(get_session_id(request)),",
     ])
     for relation in ctx.m2m:
         list_context_lines.append(
@@ -779,7 +779,7 @@ def _render_preamble(
     lines.extend([
         ")",
         f"from mvc.forms.{snake}_form import {entity}Form",
-        "from mvc.helpers.flash import render_flash_html",
+        "from core.security.session import get_flash, get_session_id",
     ])
     if ctrl_media_entries:
         _has_single   = any(not e.get("multiple", False) for e in ctrl_media_entries)

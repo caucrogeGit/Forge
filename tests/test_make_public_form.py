@@ -224,11 +224,13 @@ def test_form_controller_importe_get_connection():
     assert "from core.database.connection import get_connection, close_connection" in controller
 
 
-def test_form_controller_importe_render_flash_html():
+def test_form_controller_importe_flash_du_coeur():
     spec = build_public_form_spec(DEMANDE_JSON)
     controller = build_public_form_controller(spec)
 
-    assert "from mvc.helpers.flash import render_flash_html" in controller
+    # FORGE-1 : flash lu depuis le cœur, plus d'import mvc.helpers.flash.
+    assert "from core.security.session import get_flash, get_session_id" in controller
+    assert "mvc.helpers.flash" not in controller
 
 
 def test_form_controller_contient_methode_new():
@@ -237,7 +239,7 @@ def test_form_controller_contient_methode_new():
 
     assert "def new(request: Request) -> Response:" in controller
     assert "FORM_FIELDS" in controller
-    assert "render_flash_html(request)" in controller
+    assert "get_flash(get_session_id(request))" in controller
 
 
 def test_form_controller_contient_methode_create():
@@ -372,8 +374,9 @@ def test_form_template_affiche_flash():
     spec = build_public_form_spec(DEMANDE_JSON)
     template = build_public_form_template(spec)
 
-    assert "flash_html" in template
-    assert "flash_html | safe" in template
+    # FORGE-1 : rendu du flash par la macro du squelette, plus de flash_html | safe.
+    assert "flash_messages(flash)" in template
+    assert 'import flash_messages' in template
 
 
 def test_form_template_pas_htmx_ni_alpine():

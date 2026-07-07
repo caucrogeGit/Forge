@@ -49,9 +49,8 @@ def build_layout() -> str:
     </nav>
 
     <main class="max-w-5xl mx-auto mt-8 px-4">
-        {% if flash_html %}
-            {{ flash_html | safe }}
-        {% endif %}
+        {% from "components/ui.html" import flash_messages %}
+        {{ flash_messages(flash) }}
         {% block content %}
         {% endblock %}
     </main>

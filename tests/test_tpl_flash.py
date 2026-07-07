@@ -147,12 +147,15 @@ def test_layouts_conservent_scripts_block():
         assert "{% block scripts %}{% endblock %}" in _read(layout)
 
 
-# --- make:crud non modifié ---
+# --- make:crud : flash via la macro du squelette (FORGE-1) ---
 
 
-def test_make_crud_flash_html_inchange():
+def test_make_crud_flash_via_macro():
+    # FORGE-1 : make:crud passe le dict flash (get_flash) au contexte, rendu par la
+    # macro flash_messages ; plus de helper render_flash_html jamais fourni.
     src = _read(Path("cli/entities/make_crud.py"))
-    assert '"flash_html": render_flash_html(request)' in src
+    assert '"flash": get_flash(get_session_id(request))' in src
+    assert "render_flash_html" not in src
 
 
 def test_aucune_cle_i18n_flash_ajoutee():
