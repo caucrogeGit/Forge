@@ -900,7 +900,8 @@ def _connect_db():
     except Exception as exc:
         raise MigrationError(
             "Connexion d'administration impossible. "
-            "Vérifiez DB_ADMIN_* / DB_NAME dans env/dev."
+            "Vérifiez DB_ADMIN_* / DB_NAME dans env/dev.\n"
+            f"  Cause : {exc}"
         ) from exc
 
 

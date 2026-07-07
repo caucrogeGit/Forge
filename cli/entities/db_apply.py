@@ -140,7 +140,8 @@ def _connect_db():
         raise DbApplyError(
             "Connexion d'administration impossible. "
             "La base du projet n'est peut-être pas préparée. Lancez d'abord `forge db:init` "
-            "ou vérifiez DB_ADMIN_* / DB_NAME dans env/dev."
+            "ou vérifiez DB_ADMIN_* / DB_NAME dans env/dev.\n"
+            f"  Cause : {exc}"
         ) from exc
 
 

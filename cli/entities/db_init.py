@@ -287,7 +287,8 @@ def _connect_admin():
     except Exception as exc:
         raise DbInitError(
             "Connexion d'administration impossible. "
-            "Vérifiez DB_ADMIN_* dans env/dev."
+            "Vérifiez DB_ADMIN_* dans env/dev.\n"
+            f"  Cause : {exc}"
         ) from exc
 
 
