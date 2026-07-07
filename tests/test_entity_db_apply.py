@@ -146,6 +146,24 @@ def test_collect_sql_files_orders_entities_then_relations(tmp_path: Path):
     ]
 
 
+def test_collect_sql_files_inclut_models_sql(tmp_path: Path):
+    # FORGE-3 : le SQL applicatif de mvc/models/sql (ex. socle auth:init) est
+    # appliqué, après les entités et relations, en ordre alphabétique interne.
+    root = tmp_path / "mvc" / "entities"
+    (root / "contact").mkdir(parents=True)
+    models_sql = tmp_path / "mvc" / "models" / "sql"
+    models_sql.mkdir(parents=True)
+    (models_sql / "users.sql").write_text("CREATE TABLE users (Id INT);\n", encoding="utf-8")
+    (models_sql / "auth_tokens.sql").write_text("CREATE TABLE auth_tokens (Id INT);\n", encoding="utf-8")
+    files = collect_sql_files(root)
+    assert [item.path.as_posix() for item in files] == [
+        (root / "contact" / "contact.sql").as_posix(),
+        (root / "relations.sql").as_posix(),
+        (models_sql / "auth_tokens.sql").as_posix(),
+        (models_sql / "users.sql").as_posix(),
+    ]
+
+
 def test_verify_sql_files_rejects_missing_or_empty_entity_sql(tmp_path: Path):
     root = tmp_path / "mvc" / "entities"
     (root / "contact").mkdir(parents=True)

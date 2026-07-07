@@ -73,6 +73,13 @@ def collect_sql_files(entities_root: Path) -> list[SqlFileToApply]:
     ):
         entity_files.append(SqlFileToApply(path=entity_dir / f"{entity_dir.name}.sql", required=True))
     entity_files.append(SqlFileToApply(path=entities_root / "relations.sql", required=False))
+    # FORGE-3 : appliquer aussi le SQL applicatif de mvc/models/sql/*.sql (par
+    # exemple le socle produit par `forge auth:init`), qui n'était jamais scanné.
+    # Appliqué après les entités et les relations ; ordre alphabétique interne.
+    models_sql_dir = entities_root.parent / "models" / "sql"
+    if models_sql_dir.is_dir():
+        for sql_path in sorted(models_sql_dir.glob("*.sql"), key=lambda path: path.name):
+            entity_files.append(SqlFileToApply(path=sql_path, required=False))
     return entity_files
 
 
