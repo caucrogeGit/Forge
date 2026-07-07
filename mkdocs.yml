@@ -312,6 +312,7 @@ nav:
             - ADR-065 Le squelette à la racine, paquet Python distinct: adr/065-skeleton-top-level-package.md
             - ADR-066 Contrat d'environnement BDD, DB_HOST/DB_PORT partagés: adr/066-db-host-port-unification.md
             - ADR-067 db:init génère le SQL de provisioning par défaut: adr/067-db-init-provisioning-sql.md
+            - ADR-068 Routes applicatives par contrôleur dans mvc/routes/: adr/068-per-controller-routes-package.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
