@@ -13,7 +13,7 @@ Elle réutilise entièrement la mécanique de `make:public-page` :
 
 - elle écrit un gabarit Jinja sous `mvc/views/public/contact.html` ;
 - elle ajoute une méthode `contact` au contrôleur `mvc/controllers/public_pages_controller.py` ;
-- elle déclare une route publique `GET /contact` dans `mvc/routes.py`.
+- elle déclare une route publique `GET /contact` dans `mvc/routes/__init__.py`.
 
 Le gabarit affiche des coordonnées (email, téléphone, adresse) à travers le helper `trans()`, prêtes à être renseignées.
 Contrairement à `make:public-form`, cette page n'insère pas de données : elle présente des informations de contact.
@@ -31,7 +31,7 @@ Le gabarit suit le mode write-if-new ; le contrôleur et les routes sont complé
 | Rôle | générer une page de contact publique (vue, contrôleur, route) |
 | Entrées | aucune (slug fixe `contact`) |
 | Sorties | un gabarit de contact, une méthode `contact`, une route `GET /contact` |
-| Fichiers touchés | `mvc/views/public/contact.html`, `mvc/controllers/public_pages_controller.py`, `mvc/routes.py` |
+| Fichiers touchés | `mvc/views/public/contact.html`, `mvc/controllers/public_pages_controller.py`, `mvc/routes/__init__.py` |
 | Mode Forge | génère (write-if-new pour le gabarit), complète par insertion le contrôleur et les routes |
 | ADR | ADR-051 (insertion dans le contrôleur des pages publiques), ADR-029 (convention de routes) |
 

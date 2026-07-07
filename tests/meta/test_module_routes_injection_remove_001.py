@@ -119,7 +119,7 @@ def test_module_install_does_not_write_mvc_routes(tmp_path, monkeypatch):
     )
     (module_dir / "routes.py").write_text("def register_routes(router): pass\n", encoding="utf-8")
 
-    app_routes = tmp_path / "mvc" / "routes.py"
+    app_routes = tmp_path / "mvc" / "routes" / "__init__.py"
     app_routes.parent.mkdir(parents=True, exist_ok=True)
     original = "from core.http.router import Router\nrouter = Router()\n"
     app_routes.write_text(original, encoding="utf-8")

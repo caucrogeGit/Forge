@@ -69,8 +69,8 @@ def _prepare_project(root: Path, definition: dict = HEBERGEMENT_JSON) -> Path:
         "{% block scripts %}{% endblock %}\n",
         encoding="utf-8",
     )
-    (root / "mvc" / "routes.py").parent.mkdir(parents=True, exist_ok=True)
-    (root / "mvc" / "routes.py").write_text(
+    (root / "mvc" / "routes" / "__init__.py").parent.mkdir(parents=True, exist_ok=True)
+    (root / "mvc" / "routes" / "__init__.py").write_text(
         "from core.http.router import Router\n"
         "\n"
         "router = Router()\n",
@@ -120,7 +120,7 @@ def test_make_public_list_ajoute_route_publique_idempotente(tmp_path):
     make_public_list("Hebergement", output_root=tmp_path)
     make_public_list("Hebergement", output_root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes.py")
+    routes = _read(tmp_path, "mvc/routes/__init__.py")
     assert "from mvc.controllers.public_hebergements_controller import PublicHebergementsController" in routes
     assert 'public.add("GET", "/hebergements", PublicHebergementsController.index, name="public_hebergements-index")' in routes
     assert routes.count('"/hebergements"') == 1
@@ -207,7 +207,7 @@ def test_make_public_list_reste_independant_de_make_crud(tmp_path):
         [
             _read(tmp_path, "mvc/views/public/hebergements/index.html"),
             _read(tmp_path, "mvc/controllers/public_hebergements_controller.py"),
-            _read(tmp_path, "mvc/routes.py"),
+            _read(tmp_path, "mvc/routes/__init__.py"),
         ]
     )
     assert "make_crud" not in generated

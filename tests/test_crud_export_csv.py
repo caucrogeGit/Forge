@@ -9,7 +9,7 @@ from cli.entities.crud.context import CrudManyToOneRelation
 from cli.entities.crud.controller_builder import build_controller
 from cli.entities.crud.model_builder import build_model
 from cli.entities.crud.views_builder import build_index_view
-from cli.entities.make_crud import _route_block
+from cli.entities.make_crud import build_routes_file
 
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
 
@@ -92,7 +92,7 @@ def _index_html(definition=None, relations=None):
 
 
 def _routes(definition=None):
-    return _route_block(definition or _entity_simple())
+    return build_routes_file(definition or _entity_simple())
 
 
 def _roadmap():

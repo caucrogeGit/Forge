@@ -36,7 +36,7 @@ def test_registry_squelette_identique_au_template():
 
 
 def test_routes_squelette_appelle_register_optins():
-    routes = (SKELETON / "mvc" / "routes.py").read_text(encoding="utf-8")
+    routes = (SKELETON / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
     assert "from optins.registry import register_optins" in routes
     assert "register_optins(router)" in routes
 

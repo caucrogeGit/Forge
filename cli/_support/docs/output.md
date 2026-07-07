@@ -104,14 +104,14 @@ Les exemples suivants montrent l'usage typique depuis une commande de générati
 from cli._support import output as out
 
 print(out.created("mvc/models/contact.py"))
-print(out.preserved("mvc/routes.py", detail="déjà présent"))
+print(out.preserved("mvc/routes/__init__.py", detail="déjà présent"))
 ```
 
 Sortie produite sur `stdout` :
 
 ```text
 [CRÉÉ]      mvc/models/contact.py
-[PRÉSERVÉ]  mvc/routes.py  déjà présent
+[PRÉSERVÉ]  mvc/routes/__init__.py  déjà présent
 ```
 
 Composer un tag personnalisé avec `tag` :

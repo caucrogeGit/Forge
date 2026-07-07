@@ -14,7 +14,7 @@ Elle réalise trois actions complémentaires :
 
 - elle écrit un gabarit Jinja sous `mvc/views/public/<slug>.html` ;
 - elle ajoute une méthode de rendu au contrôleur `mvc/controllers/public_pages_controller.py` ;
-- elle déclare une route publique `GET /<slug>` dans `mvc/routes.py`.
+- elle déclare une route publique `GET /<slug>` dans `mvc/routes/__init__.py`.
 
 Le nom passé en argument est réduit à un slug d'URL par le module canonique `core.http.slug` (ADR-017).
 Les chemins (`/`, `\`, `..`) sont refusés explicitement, pour ne pas créer une page à partir d'un chemin comme `../admin`.
@@ -33,7 +33,7 @@ Le contrôleur et les routes sont complétés par insertion, sans destruction de
 | Rôle | générer une page statique publique (vue, contrôleur, route) |
 | Entrées | un nom de page (réduit à un slug d'URL) |
 | Sorties | un gabarit, une méthode de contrôleur, une route publique |
-| Fichiers touchés | `mvc/views/public/<slug>.html`, `mvc/controllers/public_pages_controller.py`, `mvc/routes.py` |
+| Fichiers touchés | `mvc/views/public/<slug>.html`, `mvc/controllers/public_pages_controller.py`, `mvc/routes/__init__.py` |
 | Mode Forge | génère (write-if-new pour le gabarit), complète par insertion le contrôleur et les routes |
 | ADR | ADR-051 (insertion d'une méthode dans le contrôleur des pages publiques), ADR-017 (slug), ADR-029 (convention de routes) |
 

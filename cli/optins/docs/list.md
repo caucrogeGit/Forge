@@ -8,7 +8,7 @@ Elle affiche l'état local des opt-ins connus dans un projet Forge, en lecture s
 `opt-in:list` affiche l'état local des opt-ins connus dans le projet courant.
 Elle est strictement en lecture seule : elle ne crée, ne modifie et n'installe rien.
 
-Elle inspecte seulement le texte de quelques fichiers connus (`optins/` et `mvc/routes.py`).
+Elle inspecte seulement le texte de quelques fichiers connus (`optins/` et `mvc/routes/__init__.py`).
 Elle n'importe aucun paquet `forge_mvc_*` : elle ne lit que le catalogue statique.
 Il n'y a pas de discovery magique : seuls les opt-ins de *kind* `route` (`iot`, `video`, `audio`) reçoivent une couche `optins/<name>/`, et seul leur état projet est analysé par lecture de fichiers.
 Les opt-ins `library` et `crosscutting` n'ont pas de couche projet : ils sont listés avec leur kind, sans état projet.
@@ -48,7 +48,7 @@ sequenceDiagram
     Catalog-->>List: opt-ins groupés par destination
     loop opt-in de kind route
         List->>FS: lit optins/<name>/routes.py
-        List->>FS: lit mvc/routes.py
+        List->>FS: lit mvc/routes/__init__.py
         FS-->>List: présence de register_optins(router)
         List->>List: déduit absent / partiel / activé
     end
@@ -60,7 +60,7 @@ sequenceDiagram
 
 - la commande lit le catalogue, puis inspecte le projet courant ;
 - elle distingue trois états pour les opt-ins routiers : `absent`, `partiel`, `activé` ;
-- l'état `partiel` signale une couche `optins/<name>/` présente mais non branchée dans `mvc/routes.py` ;
+- l'état `partiel` signale une couche `optins/<name>/` présente mais non branchée dans `mvc/routes/__init__.py` ;
 - elle n'écrit jamais rien et termine toujours avec le code de sortie `0`.
 
 ## 4. API publique
@@ -105,7 +105,7 @@ Sécurité et accès
 Médias et fichiers
   iot       activé
             structure : optins/iot/
-            routes    : register_optins(router) présent dans mvc/routes.py
+            routes    : register_optins(router) présent dans mvc/routes/__init__.py
   video     absent
             conseil   : forge opt-in:enable video --apply
 

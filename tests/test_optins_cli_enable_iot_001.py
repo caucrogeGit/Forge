@@ -190,8 +190,8 @@ class TestErrors:
 class TestAmbiguousRoutesNotModified:
     def test_ambiguous_routes_py_not_modified(self, tmp_path, capsys):
         mvc = tmp_path / "mvc"
-        mvc.mkdir()
-        routes = mvc / "routes.py"
+        (mvc / "routes").mkdir(parents=True)
+        routes = mvc / "routes" / "__init__.py"
         # Pas de `router = Router()` → structure non reconnue.
         routes.write_text("def register(router):\n    pass\n", encoding="utf-8")
         enable_optin("iot", apply=True, project_root=tmp_path, package_check=_PKG_OK)

@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposée (2026-07-07).
+Acceptée (2026-07-07).
 
 ## Contexte
 

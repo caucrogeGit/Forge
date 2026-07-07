@@ -13,7 +13,7 @@ Cycle testé :
   2  module:install  — forge_modules.json créé avec les métadonnées
   3  module:files    — contrôleur copié dans mvc/controllers/
   4  module:routes   — mvc/routes_<module>.py généré (explicite)
-                       mvc/routes.py non modifié
+                       mvc/routes/__init__.py non modifié
   5  module:remove   — fichiers supprimés, registre nettoyé
   6  Préservation    — fichiers modifiés conservés lors de la suppression
   7  project:check + project:audit passent après installation complète
@@ -64,7 +64,7 @@ def _scaffold_minimal_project(root: Path) -> None:
     (root / "mvc" / "views").mkdir(parents=True)
     (root / "mvc" / "entities").mkdir(parents=True)
     _write(
-        root / "mvc" / "routes.py",
+        root / "mvc" / "routes" / "__init__.py",
         "from core.http.router import Router\nrouter = Router()\n",
     )
     _write(
@@ -244,11 +244,11 @@ class TestModuleRoutes:
 
     def test_app_routes_not_modified(self):
         original = "from core.http.router import Router\nrouter = Router()\n"
-        content = (self.root / "mvc" / "routes.py").read_text(encoding="utf-8")
+        content = (self.root / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
         assert content == original
 
     def test_app_routes_has_no_bridge_import(self):
-        content = (self.root / "mvc" / "routes.py").read_text(encoding="utf-8")
+        content = (self.root / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
         assert "module_routes" not in content
 
 
@@ -276,7 +276,7 @@ class TestModuleRemove:
         assert (self.root / "mvc" / f"routes_{_MODULE_NAME}.py").exists()
 
     def test_app_routes_router_preserved(self):
-        content = (self.root / "mvc" / "routes.py").read_text(encoding="utf-8")
+        content = (self.root / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
         assert "Router()" in content
 
 

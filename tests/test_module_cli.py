@@ -548,7 +548,7 @@ def test_module_files_ne_modifie_pas_routes(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     _write_files_module(tmp_path)
     cmd_module_install(["agenda", "--path", "modules"])
-    routes = tmp_path / "mvc" / "routes.py"
+    routes = tmp_path / "mvc" / "routes" / "__init__.py"
     module_routes = tmp_path / "mvc" / "module_routes.py"
     routes.parent.mkdir(parents=True)
     routes.write_text("# routes\n", encoding="utf-8")
@@ -582,7 +582,7 @@ def _write_routes_module(tmp_path: Path, *, provides_routes: bool = True) -> Pat
 
 
 def _write_routes_py(tmp_path: Path) -> None:
-    routes = tmp_path / "mvc" / "routes.py"
+    routes = tmp_path / "mvc" / "routes" / "__init__.py"
     routes.parent.mkdir(parents=True, exist_ok=True)
     routes.write_text(
         "from core.http.router import Router\n\nrouter = Router()\n",

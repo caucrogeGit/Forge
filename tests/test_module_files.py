@@ -234,7 +234,7 @@ def test_installation_ne_modifie_pas_routes(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     module_dir = _write_module(tmp_path)
     registry_path = _install(tmp_path, module_dir)
-    routes = tmp_path / "mvc" / "routes.py"
+    routes = tmp_path / "mvc" / "routes" / "__init__.py"
     module_routes = tmp_path / "mvc" / "module_routes.py"
     routes.parent.mkdir(parents=True)
     routes.write_text("# routes\n", encoding="utf-8")

@@ -72,7 +72,7 @@ WHEEL_REQUIRED = [
     f"{SK}/requirements.txt",
     f"{SK}/package.json",
     f"{SK}/env/example",
-    f"{SK}/mvc/routes.py",
+    f"{SK}/mvc/routes/__init__.py",
     f"{SK}/mvc/controllers/home_controller.py",
     f"{SK}/mvc/views/home/index.html",
     f"{SK}/mvc/views/errors/404.html",

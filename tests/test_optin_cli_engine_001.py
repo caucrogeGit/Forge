@@ -35,7 +35,7 @@ def _setup_enabled_iot(root: Path) -> Path:
         p.write_text(content, encoding="utf-8")
     registry, _ = _register_in_registry(REGISTRY, "iot")
     (root / "optins" / "registry.py").write_text(registry, encoding="utf-8")
-    routes = root / "mvc" / "routes.py"
+    routes = root / "mvc" / "routes" / "__init__.py"
     routes.parent.mkdir(parents=True, exist_ok=True)
     routes.write_text(
         "from core.http.router import Router\n"

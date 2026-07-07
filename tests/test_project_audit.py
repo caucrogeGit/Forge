@@ -45,7 +45,7 @@ def _minimal_project(root: Path) -> None:
     (mvc / "controllers").mkdir(parents=True)
     (mvc / "views").mkdir(parents=True)
     (mvc / "entities").mkdir(parents=True)
-    _write(mvc / "routes.py", "from core.http.router import Router\nrouter = Router()\n")
+    _write(mvc / "routes" / "__init__.py", "from core.http.router import Router\nrouter = Router()\n")
     _write(mvc / "entities" / "relations.json",
            json.dumps({"schema_version": "1.0", "relations": []}))
     _write(mvc / "views" / "base.html", "<html></html>")
@@ -200,7 +200,7 @@ def test_audit_entities_nu_sans_relations(tmp_path):
 # ── audit_project_routes ──────────────────────────────────────────────────────
 
 def test_audit_routes_ok(tmp_path):
-    _write(tmp_path / "mvc" / "routes.py",
+    _write(tmp_path / "mvc" / "routes" / "__init__.py",
            "from core.http.router import Router\nrouter = Router()\n")
     results = audit_project_routes(tmp_path)
     assert any(r.status == "ok" and "syntaxe" in r.detail for r in results)
@@ -213,19 +213,19 @@ def test_audit_routes_absent(tmp_path):
 
 
 def test_audit_routes_vide(tmp_path):
-    _write(tmp_path / "mvc" / "routes.py", "   \n")
+    _write(tmp_path / "mvc" / "routes" / "__init__.py", "   \n")
     results = audit_project_routes(tmp_path)
     assert any(r.status == "warn" and "vide" in r.detail for r in results)
 
 
 def test_audit_routes_syntax_error(tmp_path):
-    _write(tmp_path / "mvc" / "routes.py", "def f(\n")
+    _write(tmp_path / "mvc" / "routes" / "__init__.py", "def f(\n")
     results = audit_project_routes(tmp_path)
     assert any(r.status == "fail" and "syntaxe" in r.detail for r in results)
 
 
 def test_audit_routes_sans_router(tmp_path):
-    _write(tmp_path / "mvc" / "routes.py", "x = 1\n")
+    _write(tmp_path / "mvc" / "routes" / "__init__.py", "x = 1\n")
     results = audit_project_routes(tmp_path)
     assert any(r.status == "warn" and "router" in r.detail for r in results)
 
@@ -395,7 +395,7 @@ def test_run_project_audit_projet_minimal(tmp_path):
 
 def test_run_project_audit_ne_modifie_pas_fichiers(tmp_path):
     _minimal_project(tmp_path)
-    routes = tmp_path / "mvc" / "routes.py"
+    routes = tmp_path / "mvc" / "routes" / "__init__.py"
     before = routes.read_text(encoding="utf-8")
     run_project_audit(tmp_path, "2.2.0")
     assert routes.read_text(encoding="utf-8") == before

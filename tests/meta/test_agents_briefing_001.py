@@ -33,7 +33,7 @@ def test_cible_une_application_pas_le_framework():
     [
         "forge make:entity",
         "forge doctor",
-        "mvc/routes.py",
+        "mvc/routes/__init__.py",
         "core.database.db",
         "CSRF",
         "_base.py",          # règle de préservation du code utilisateur

@@ -3,7 +3,7 @@
 
 Axe **activation** (−) : inverse exact d'``opt-in:enable``. Retire la couche de
 câblage ``optins/<name>/`` créée par ``enable`` et débranche
-``register_optins`` de ``mvc/routes.py``. Laisse le **package installé**
+``register_optins`` de ``mvc/routes/__init__.py``. Laisse le **package installé**
 (présence) : pour désinstaller, voir ``opt-in:remove``.
 
 dry-run par défaut, ``--apply`` pour écrire. Garde §9 : un fichier modifié
@@ -30,7 +30,7 @@ from cli.optins.enable import (
 )
 from cli.optins.registry_format import read_enabled_optins, remove_optin_entry
 
-_ROUTES_REL = "mvc/routes.py"
+_ROUTES_REL = "mvc/routes/__init__.py"
 
 
 def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
@@ -77,7 +77,7 @@ def disable_optin(name: str, *, apply: bool, project_root: Path) -> int:
 
     # 2. Retirer l'opt-in du registre partagé : entrée ENABLED_OPTINS + câblage
     #    de route. Le registre (optins/registry.py, optins/__init__.py) et le
-    #    câblage de mvc/routes.py restent des fichiers permanents du squelette
+    #    câblage de mvc/routes/__init__.py restent des fichiers permanents du squelette
     #    (ADR-061) : jamais supprimés, même quand plus aucun opt-in n'est inscrit.
     new_registry = registry_content
     if registry_content:

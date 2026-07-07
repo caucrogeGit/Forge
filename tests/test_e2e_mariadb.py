@@ -125,7 +125,7 @@ def _scaffold_project(root: Path) -> None:
     (root / "mvc" / "views").mkdir(parents=True)
     (root / "mvc" / "entities").mkdir(parents=True)
     _write(
-        root / "mvc" / "routes.py",
+        root / "mvc" / "routes" / "__init__.py",
         "from core.http.router import Router\nrouter = Router()\n",
     )
 

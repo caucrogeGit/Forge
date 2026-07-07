@@ -33,7 +33,7 @@ Le gabarit suit le mode write-if-new ; le contrôleur et la route sont complét�
 | Rôle | générer une fiche publique détaillée pour une entité |
 | Entrées | un nom d'entité ; la définition JSON validée `mvc/entities/<snake>/<snake>.json` |
 | Sorties | un gabarit de fiche, une méthode `show`, une route `GET /<pluriel>/{id}` |
-| Fichiers touchés | `mvc/views/public/<pluriel>/show.html`, `mvc/controllers/public_<pluriel>_controller.py`, `mvc/routes.py` |
+| Fichiers touchés | `mvc/views/public/<pluriel>/show.html`, `mvc/controllers/public_<pluriel>_controller.py`, `mvc/routes/__init__.py` |
 | Mode Forge | lit la définition d'entité, génère (write-if-new), complète par insertion |
 | ADR | ADR-029 (convention de routes) |
 

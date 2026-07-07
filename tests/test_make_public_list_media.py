@@ -107,8 +107,8 @@ def _prepare_media_project(root: Path, definition: dict) -> Path:
         "{% block scripts %}{% endblock %}\n",
         encoding="utf-8",
     )
-    (root / "mvc" / "routes.py").parent.mkdir(parents=True, exist_ok=True)
-    (root / "mvc" / "routes.py").write_text(
+    (root / "mvc" / "routes" / "__init__.py").parent.mkdir(parents=True, exist_ok=True)
+    (root / "mvc" / "routes" / "__init__.py").write_text(
         "from core.http.router import Router\n\nrouter = Router()\n",
         encoding="utf-8",
     )

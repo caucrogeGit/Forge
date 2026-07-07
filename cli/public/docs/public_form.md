@@ -35,7 +35,7 @@ Le gabarit suit le mode write-if-new ; le contrôleur et les routes sont complé
 | Rôle | générer un formulaire public d'enregistrement pour une entité |
 | Entrées | un nom d'entité ; la définition JSON validée `mvc/entities/<snake>/<snake>.json` |
 | Sorties | un gabarit de formulaire, un contrôleur avec `new` et `create`, deux routes |
-| Fichiers touchés | `mvc/views/public/<pluriel>/form.html`, `mvc/controllers/public_<pluriel>_controller.py`, `mvc/routes.py` |
+| Fichiers touchés | `mvc/views/public/<pluriel>/form.html`, `mvc/controllers/public_<pluriel>_controller.py`, `mvc/routes/__init__.py` |
 | Mode Forge | lit la définition d'entité, génère (write-if-new pour le gabarit), complète par insertion |
 | ADR | ADR-013 (nullable / required), ADR-029 (convention de routes) |
 

@@ -627,7 +627,7 @@ Description:
   Nom canonique du branchement d'un opt-in (ADR-016). Branche un opt-in
   **localement** dans le projet courant en créant la couche `optins/`
   (registre explicite + dossier de l'opt-in). Le branchement reste
-  explicite : `mvc/routes.py` appelle `register_optins(router)` →
+  explicite : `mvc/routes/__init__.py` appelle `register_optins(router)` →
   `optins/registry.py` → `optins/<name>/routes.py`. Aucune découverte
   automatique.
 
@@ -675,7 +675,7 @@ Usage:
 Description:
   Axe activation (−), inverse exact d'`opt-in:enable`. Retire la couche de
   câblage `optins/<name>/` et débranche `register_optins(router)` de
-  `mvc/routes.py`. **Laisse le package installé** (voir `opt-in:remove`).
+  `mvc/routes/__init__.py`. **Laisse le package installé** (voir `opt-in:remove`).
 
 Comportement:
   - **dry-run par défaut** : sans `--apply`, affiche ce qui serait retiré ;
@@ -1097,7 +1097,7 @@ Effets (write-if-new — aucun fichier existant n'est écrasé) :
     layouts/public.html) ;
   - crée ou complète mvc/controllers/public_pages_controller.py avec une
     méthode <slug>() ;
-  - insère la route GET /<slug> dans mvc/routes.py (public, sans CSRF) ;
+  - insère la route GET /<slug> dans mvc/routes/__init__.py (public, sans CSRF) ;
   - n'écrase ni le template, ni la méthode, ni la route si déjà présents.
 
 Options:
@@ -1122,7 +1122,7 @@ Effets (write-if-new — aucun fichier existant n'est écrasé) :
     publics ;
   - crée mvc/views/public/<plural>/list.html (template Jinja2 paginé) ;
   - ajoute la méthode liste publique au contrôleur correspondant ;
-  - insère la route GET /<plural> dans mvc/routes.py.
+  - insère la route GET /<plural> dans mvc/routes/__init__.py.
 
 Prérequis:
   - l'entité <Entite> doit exister (forge make:entity <Entite>).
@@ -1148,7 +1148,7 @@ Effets (write-if-new — aucun fichier existant n'est écrasé) :
     publics ;
   - crée mvc/views/public/<plural>/show.html (template fiche) ;
   - ajoute la méthode fiche publique au contrôleur correspondant ;
-  - insère la route GET /<plural>/<id> dans mvc/routes.py.
+  - insère la route GET /<plural>/<id> dans mvc/routes/__init__.py.
 
 Prérequis:
   - l'entité <Entite> doit exister.
@@ -1175,7 +1175,7 @@ Effets (write-if-new — aucun fichier existant n'est écrasé) :
     {{ csrf_token }}) ;
   - ajoute la méthode formulaire (GET) et la méthode soumission (POST) au
     contrôleur ;
-  - insère les routes GET et POST /<plural>/form dans mvc/routes.py.
+  - insère les routes GET et POST /<plural>/form dans mvc/routes/__init__.py.
 
 Prérequis:
   - l'entité <Entite> doit exister ;
@@ -1204,7 +1204,7 @@ Effets (write-if-new — aucun fichier existant n'est écrasé) :
   - crée ou complète mvc/controllers/public_pages_controller.py avec la
     méthode contact() ;
   - insère la route GET /contact (et POST si applicable) dans
-    mvc/routes.py.
+    mvc/routes/__init__.py.
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.
@@ -1514,7 +1514,7 @@ Effets (7 contrôles structurels, lecture seule) :
   - structure de projet (app.py, mvc/, config.py) ;
   - config.py et variables d'environnement essentielles ;
   - entités mvc/entities/ (format, nommage) ;
-  - routes mvc/routes.py (déclaration cohérente) ;
+  - routes mvc/routes/__init__.py (déclaration cohérente) ;
   - templates mvc/views/ (arborescence attendue) ;
   - modules (registre, cohérence) ;
   - migrations mvc/migrations/ (nommage et intégrité).
@@ -1551,7 +1551,7 @@ Effets (9 familles d'audit, lecture seule) :
   - structure (arborescence, fichiers attendus) ;
   - config (config.py, env/*, variables) ;
   - entités (mvc/entities/, cohérence multi-fichiers) ;
-  - routes (mvc/routes.py, conventions) ;
+  - routes (mvc/routes/__init__.py, conventions) ;
   - templates (mvc/views/, présence des layouts) ;
   - modules (registre, fichiers, routes injectées) ;
   - migrations (nommage, séquence, intégrité) ;
@@ -1756,7 +1756,7 @@ Effets (un projet PEUT être modifié) :
         _results.html, show.html, form.html,
         bulk_delete_confirm.html ;
   - imprime le bloc de routes à insérer manuellement dans
-    mvc/routes.py ;
+    mvc/routes/__init__.py ;
   - --dry-run : calcule tout sans écrire.
 
 ATTENTION:
@@ -1765,7 +1765,7 @@ ATTENTION:
     déjà présent est PRÉSERVÉ ;
   - vérifier le diff Git après exécution ;
   - le bloc de routes affiché doit être copié manuellement dans
-    mvc/routes.py (Forge n'écrit jamais silencieusement ce fichier).
+    mvc/routes/__init__.py (Forge n'écrit jamais silencieusement ce fichier).
 
 Options:
   --dry-run     Affiche les fichiers qui seraient écrits sans rien
@@ -1823,7 +1823,7 @@ Limites:
     forge make:crud) ;
   - le runtime vit dans l'opt-in forge-mvc-pivot (forge_mvc_pivot),
     extrait du core (ADR-021) ; installer : pip install --pre forge-mvc-pivot ;
-  - ne modifie pas mvc/routes.py — le routage du sous-CRUD pivot est
+  - ne modifie pas mvc/routes/__init__.py — le routage du sous-CRUD pivot est
     à brancher manuellement.""",
 
     # ── Auth — commandes restantes (CLI-HELP-FLAGS-AUTH-COMPLETION-001) ──────
@@ -1880,8 +1880,8 @@ Effets (un projet PEUT être modifié) :
   - écrit en mode write-if-new (aucun fichier existant n'est écrasé) :
       * mvc/controllers/auth_controller.py : login_form, login, logout ;
       * mvc/views/auth/login.html          : formulaire de connexion ;
-  - affiche les routes /login (GET+POST, public) et /logout (POST) à ajouter
-    dans mvc/routes.py (Forge n'y écrit pas : charte principe 9).
+  - génère mvc/routes/auth_routes.py (register_auth_routes) et affiche le
+    branchement à ajouter dans mvc/routes/__init__.py (Forge n'y écrit pas ; ADR-068).
 
 Flux généré:
   - login : authenticate_user (loader users) + login_user + régénération de
@@ -1894,7 +1894,7 @@ Prérequis:
 
 Limites:
   - v1 : ni MFA, ni rate-limit, ni audit (voir le contrôleur de référence) ;
-  - n'écrit pas dans mvc/routes.py : les routes sont affichées, à coller.
+  - n'écrit pas dans mvc/routes/__init__.py : les routes sont affichées, à coller.
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.""",

@@ -42,7 +42,7 @@ def audit_project_structure(root: Path) -> list[AuditResult]:
     results.append(AuditResult("ok", family, "mvc/ présent"))
 
     for subpath, label, required in [
-        ("routes.py",   "mvc/routes.py",      True),
+        ("routes/__init__.py", "mvc/routes/__init__.py", True),
         ("controllers", "mvc/controllers/",   True),
         ("views",       "mvc/views/",         True),
         ("entities",    "mvc/entities/",      True),
@@ -175,28 +175,28 @@ def audit_project_entities(root: Path) -> list[AuditResult]:
 
 
 def audit_project_routes(root: Path) -> list[AuditResult]:
-    """Audite mvc/routes.py sans exécuter l'application."""
+    """Audite mvc/routes/__init__.py sans exécuter l'application."""
     results: list[AuditResult] = []
     family = "Routes"
 
-    routes_path = root / "mvc" / "routes.py"
+    routes_path = root / "mvc" / "routes" / "__init__.py"
     if not routes_path.exists():
-        results.append(AuditResult("fail", family, "mvc/routes.py absent"))
+        results.append(AuditResult("fail", family, "mvc/routes/__init__.py absent"))
         return results
 
     source = routes_path.read_text(encoding="utf-8")
     if not source.strip():
-        results.append(AuditResult("warn", family, "mvc/routes.py vide"))
+        results.append(AuditResult("warn", family, "mvc/routes/__init__.py vide"))
         return results
 
     try:
-        tree = ast.parse(source, filename="mvc/routes.py")
+        tree = ast.parse(source, filename="mvc/routes/__init__.py")
     except SyntaxError as exc:
         results.append(AuditResult("fail", family,
                                    f"syntaxe invalide ligne {exc.lineno} : {exc.msg}"))
         return results
 
-    results.append(AuditResult("ok", family, "mvc/routes.py syntaxe valide"))
+    results.append(AuditResult("ok", family, "mvc/routes/__init__.py syntaxe valide"))
 
     all_names = {
         node.id
@@ -205,7 +205,7 @@ def audit_project_routes(root: Path) -> list[AuditResult]:
     }
     if "router" not in all_names:
         results.append(AuditResult("warn", family,
-                                   "aucune variable «router» détectée dans mvc/routes.py"))
+                                   "aucune variable «router» détectée dans mvc/routes/__init__.py"))
     else:
         results.append(AuditResult("ok", family, "variable «router» déclarée"))
 

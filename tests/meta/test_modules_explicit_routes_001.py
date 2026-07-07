@@ -65,7 +65,7 @@ class TestRoutesPyNeverModified:
         module_dir = _setup_module(tmp_path)
         registry_path = _install(tmp_path, module_dir)
 
-        app_routes = tmp_path / "mvc" / "routes.py"
+        app_routes = tmp_path / "mvc" / "routes" / "__init__.py"
         app_routes.parent.mkdir(parents=True, exist_ok=True)
         original = "# Original user content\n# Should not be modified\n"
         app_routes.write_text(original, encoding="utf-8")
@@ -80,7 +80,7 @@ class TestRoutesPyNeverModified:
         module_dir = _setup_module(tmp_path)
         registry_path = _install(tmp_path, module_dir)
 
-        app_routes = tmp_path / "mvc" / "routes.py"
+        app_routes = tmp_path / "mvc" / "routes" / "__init__.py"
         app_routes.parent.mkdir(parents=True, exist_ok=True)
         original = "# user routes\n"
         app_routes.write_text(original, encoding="utf-8")

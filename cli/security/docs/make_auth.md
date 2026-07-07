@@ -9,7 +9,7 @@ Le cœur redirige les routes protégées vers `/login` (codé en dur) et fournit
 
 ## 1. Rôle
 
-`make:auth` génère un contrôleur d'authentification et une vue de login, puis affiche les routes à ajouter dans `mvc/routes.py`.
+`make:auth` génère un contrôleur d'authentification et une vue de login, puis affiche les routes à ajouter dans `mvc/routes/__init__.py`.
 
 Il se place après `auth:init` : `auth:init` crée les comptes et le SQL, `make:auth` crée l'UI et le flux.
 
@@ -20,7 +20,7 @@ Il se place après `auth:init` : `auth:init` crée les comptes et le SQL, `make:
 - `mvc/controllers/auth_controller.py` : `login_form` (GET), `login` (POST), `logout` (POST) ;
 - `mvc/views/auth/login.html` : le formulaire de connexion.
 
-Les routes ne sont pas écrites dans `mvc/routes.py` : elles sont **affichées**, à coller (charte principe 9, Forge n'écrit pas en silence un fichier utilisateur).
+Les routes ne sont pas écrites dans `mvc/routes/__init__.py` : elles sont **affichées**, à coller (charte principe 9, Forge n'écrit pas en silence un fichier utilisateur).
 
 ## 3. Le flux généré
 
@@ -37,7 +37,7 @@ Le contrôleur s'appuie sur le socle standard `users` (produit par `forge auth:i
 ## 5. Limites
 
 - version 1 sans MFA, ni rate-limit, ni audit : le contrôleur de référence `tests/fixtures/app/mvc/controllers/auth_controller.py` montre comment les ajouter ;
-- les routes sont affichées, jamais injectées dans `mvc/routes.py`.
+- les routes sont affichées, jamais injectées dans `mvc/routes/__init__.py`.
 
 ## Voir aussi
 

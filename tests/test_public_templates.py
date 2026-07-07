@@ -23,8 +23,8 @@ def _prepare_project(root: Path) -> None:
         PUBLIC_LAYOUT_PATH.read_text(encoding="utf-8"),
         encoding="utf-8",
     )
-    (root / "mvc" / "routes.py").parent.mkdir(parents=True, exist_ok=True)
-    (root / "mvc" / "routes.py").write_text(
+    (root / "mvc" / "routes" / "__init__.py").parent.mkdir(parents=True, exist_ok=True)
+    (root / "mvc" / "routes" / "__init__.py").write_text(
         "from core.http.router import Router\n"
         "\n"
         "router = Router()\n",
@@ -99,13 +99,13 @@ def test_generation_public_page_respecte_le_contrat_et_reste_idempotente(tmp_pat
     first_template = (tmp_path / "mvc" / "views" / "public" / "accueil.html").read_text(
         encoding="utf-8"
     )
-    first_routes = (tmp_path / "mvc" / "routes.py").read_text(encoding="utf-8")
+    first_routes = (tmp_path / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
     make_public_page("accueil", root=tmp_path)
 
     assert (tmp_path / "mvc" / "views" / "public" / "accueil.html").read_text(
         encoding="utf-8"
     ) == first_template
-    routes = (tmp_path / "mvc" / "routes.py").read_text(encoding="utf-8")
+    routes = (tmp_path / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
     assert routes.count('"/accueil"') == 1
     assert routes.count('name="public_pages-accueil"') == 1
     assert first_routes.count('"/accueil"') == 1

@@ -5,7 +5,7 @@ Le cœur redirige les routes protégées vers `/login` (codé en dur) et fournit
 backend d'authentification (`core.auth.session`), mais aucune route, aucun
 contrôleur ni aucune vue de login n'étaient scaffoldés. `make:auth` comble ce
 trou : il génère un contrôleur d'authentification, une vue de login, et **affiche**
-les routes à ajouter dans `mvc/routes.py` (mode « Forge affiche », charte §7 : pas
+les routes à ajouter dans `mvc/routes/__init__.py` (mode « Forge affiche », charte §7 : pas
 de réécriture silencieuse d'un fichier utilisateur).
 
 Périmètre v1 : socle standard `users` (email / password_hash / is_active, produit
@@ -139,15 +139,25 @@ AUTH_LOGIN_VIEW = '''\
 '''
 
 
+AUTH_ROUTES_FILE = '''\
+"""Routes du contrôleur AuthController (ADR-068)."""
+from core.http.router import Router
+from mvc.controllers.auth_controller import AuthController
+
+
+def register_auth_routes(router: Router) -> None:
+    # Login public (accessible sans authentification) ; logout protégé.
+    router.add("GET", "/login", AuthController.login_form, public=True, name="auth-login_form")
+    router.add("POST", "/login", AuthController.login, public=True, name="auth-login")
+    router.add("POST", "/logout", AuthController.logout, name="auth-logout")
+'''
+
+
 ROUTE_BLOCK = "\n".join([
-    "Routes à ajouter dans mvc/routes.py :",
+    "Branchement à ajouter dans mvc/routes/__init__.py :",
     "─" * 70,
-    "  from mvc.controllers.auth_controller import AuthController",
-    "",
-    "  # Login public (accessible sans authentification) ; logout protégé.",
-    '  router.add("GET",  "/login",  AuthController.login_form, public=True, name="auth-login_form")',
-    '  router.add("POST", "/login",  AuthController.login,      public=True, name="auth-login")',
-    '  router.add("POST", "/logout", AuthController.logout,     name="auth-logout")',
+    "  from mvc.routes.auth_routes import register_auth_routes",
+    "  register_auth_routes(router)",
 ])
 
 
@@ -173,6 +183,9 @@ def make_auth(root: Path | None = None) -> MakeAuthResult:
     result = MakeAuthResult(created=[], skipped=[])
     _write_if_new(base / "mvc" / "controllers" / "auth_controller.py", AUTH_CONTROLLER, result)
     _write_if_new(base / "mvc" / "views" / "auth" / "login.html", AUTH_LOGIN_VIEW, result)
+    # ADR-068 : les routes du contrôleur auth vivent dans leur propre fichier ;
+    # mvc/routes/__init__.py ne fait que les brancher (affiché ci-dessous).
+    _write_if_new(base / "mvc" / "routes" / "auth_routes.py", AUTH_ROUTES_FILE, result)
     return result
 
 

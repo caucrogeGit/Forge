@@ -4,12 +4,12 @@
 Affiche l'**état local** des opt-ins connus dans un projet Forge.
 Commande **strictement lecture seule** : elle ne crée, ne modifie et
 n'installe rien. Elle se contente d'inspecter le **texte** de quelques
-fichiers du projet (``optins/`` et ``mvc/routes.py``).
+fichiers du projet (``optins/`` et ``mvc/routes/__init__.py``).
 
 Contrat strict (chantier opt-ins) :
 
 - **aucune écriture** (ni ``optins/``, ni ``registry.py``, ni
-  ``mvc/routes.py``) ;
+  ``mvc/routes/__init__.py``) ;
 - **aucun import** de paquet opt-in (``forge_mvc_*``) ; seul le catalogue
   statique ``cli.optins.catalog`` est lu ;
 - **pas de discovery magique** : seuls les opt-ins de type ``route``
@@ -21,9 +21,9 @@ Contrat strict (chantier opt-ins) :
 
 - ``absent``  : ``optins/<name>/`` absent ;
 - ``partiel`` : ``optins/<name>/`` présent mais ``register_optins(router)``
-  absent de ``mvc/routes.py`` ;
+  absent de ``mvc/routes/__init__.py`` ;
 - ``activé``  : ``optins/<name>/`` présent **et** ``register_optins(router)``
-  présent dans ``mvc/routes.py``.
+  présent dans ``mvc/routes/__init__.py``.
 
 Les opt-ins ``library`` et ``crosscutting`` n'ont pas de couche projet :
 ils sont listés avec leur kind (sans état projet).
@@ -76,12 +76,12 @@ def detect_optin_state(project_root: Path, name: str) -> dict[str, object]:
     Retourne un dict avec ``state`` et quelques indicateurs de présence,
     sans jamais importer ni écrire quoi que ce soit. Le branchement
     ``register_optins(router)`` est partagé par tous les opt-ins (un seul
-    appel dans ``mvc/routes.py``) ; la distinction par opt-in porte sur la
+    appel dans ``mvc/routes/__init__.py``) ; la distinction par opt-in porte sur la
     présence de ``optins/<name>/``.
     """
     routes_py = project_root / "optins" / name / "routes.py"
     registry_py = project_root / "optins" / "registry.py"
-    mvc_routes = project_root / "mvc" / "routes.py"
+    mvc_routes = project_root / "mvc" / "routes" / "__init__.py"
 
     structure_present = routes_py.exists()
     registry_present = registry_py.exists()
@@ -127,12 +127,12 @@ def _print_route_optin(name: str, info: dict[str, object]) -> None:
     if info["routes_branched"]:
         print(
             "            routes    : register_optins(router) présent "
-            "dans mvc/routes.py"
+            "dans mvc/routes/__init__.py"
         )
     else:
         print(
             "            routes    : register_optins(router) absent "
-            "de mvc/routes.py"
+            "de mvc/routes/__init__.py"
         )
         print(f"            conseil   : forge opt-in:enable {name} --apply")
 

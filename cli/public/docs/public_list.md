@@ -35,7 +35,7 @@ Le gabarit et le contrôleur suivent le mode write-if-new ; la route est complé
 | Rôle | générer une liste publique paginée pour une entité |
 | Entrées | un nom d'entité ; la définition JSON validée `mvc/entities/<snake>/<snake>.json` |
 | Sorties | un gabarit de liste, un contrôleur avec `index`, une route `GET /<pluriel>` |
-| Fichiers touchés | `mvc/views/public/<pluriel>/index.html`, `mvc/controllers/public_<pluriel>_controller.py`, `mvc/routes.py` |
+| Fichiers touchés | `mvc/views/public/<pluriel>/index.html`, `mvc/controllers/public_<pluriel>_controller.py`, `mvc/routes/__init__.py` |
 | Mode Forge | lit la définition d'entité, génère (write-if-new), complète par insertion la route |
 | Dépendance optionnelle | `forge-mvc-images` (couverture et galerie quand l'entité déclare des médias) |
 | ADR | ADR-018 (images), ADR-029 (convention de routes) |

@@ -130,7 +130,7 @@ def check_mvc_structure(root: Path) -> CheckResult:
     """
     required = [
         (root / "mvc",                                 "mvc/"),
-        (root / "mvc" / "routes.py",                  "mvc/routes.py"),
+        (root / "mvc" / "routes" / "__init__.py",     "mvc/routes/__init__.py"),
         (root / "mvc" / "entities",                    "mvc/entities/"),
         (root / "mvc" / "views",                       "mvc/views/"),
         (root / "mvc" / "controllers",                 "mvc/controllers/"),
@@ -335,12 +335,12 @@ def _detect_mfa_indicators(root: Path) -> list[str]:
                 indicators.append(f"vue : {p.relative_to(root)}")
                 break
 
-    routes_file = root / "mvc" / "routes.py"
+    routes_file = root / "mvc" / "routes" / "__init__.py"
     if routes_file.exists():
         try:
             src = routes_file.read_text(encoding="utf-8").lower()
             if any(kw in src for kw in _MFA_ROUTE_KEYWORDS):
-                indicators.append("mvc/routes.py contient des routes MFA/TOTP")
+                indicators.append("mvc/routes/__init__.py contient des routes MFA/TOTP")
         except (OSError, UnicodeDecodeError):
             pass
 

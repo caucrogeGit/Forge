@@ -97,7 +97,7 @@ def test_dry_run_ne_modifie_aucun_fichier(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     module_dir = _write_module(tmp_path)
     registry_path = _install(tmp_path, module_dir)
-    app_routes = tmp_path / "mvc" / "routes.py"
+    app_routes = tmp_path / "mvc" / "routes" / "__init__.py"
     app_routes.parent.mkdir(parents=True, exist_ok=True)
     original = "from core.http.router import Router\nrouter = Router()\n"
     app_routes.write_text(original, encoding="utf-8")
@@ -123,7 +123,7 @@ def test_generation_reelle_cree_fichier_dedie(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     module_dir = _write_module(tmp_path)
     registry_path = _install(tmp_path, module_dir)
-    app_routes = tmp_path / "mvc" / "routes.py"
+    app_routes = tmp_path / "mvc" / "routes" / "__init__.py"
     app_routes.parent.mkdir(parents=True, exist_ok=True)
     original = "from core.http.router import Router\nrouter = Router()\n"
     app_routes.write_text(original, encoding="utf-8")
@@ -144,7 +144,7 @@ def test_generation_ne_modifie_pas_routes_py(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     module_dir = _write_module(tmp_path)
     registry_path = _install(tmp_path, module_dir)
-    app_routes = tmp_path / "mvc" / "routes.py"
+    app_routes = tmp_path / "mvc" / "routes" / "__init__.py"
     app_routes.parent.mkdir(parents=True, exist_ok=True)
     original = "from core.http.router import Router\nrouter = Router()\n"
     app_routes.write_text(original, encoding="utf-8")

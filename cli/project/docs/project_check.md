@@ -9,7 +9,7 @@ Contrairement à `forge doctor`, qui est tolérant, `project:check` est exigeant
 
 `forge project:check` vérifie qu'un projet respecte les conventions structurelles attendues par Forge.
 
-Elle couvre la structure (présence de `app.py`, `config.py`, `mvc/` et ses sous-dossiers), la configuration (`env/example`, `env/dev`), les entités et `relations.json`, le module `mvc/routes.py` (import réel et présence d'un objet `router`), les templates, le registre de modules et les migrations.
+Elle couvre la structure (présence de `app.py`, `config.py`, `mvc/` et ses sous-dossiers), la configuration (`env/example`, `env/dev`), les entités et `relations.json`, le module `mvc/routes/__init__.py` (import réel et présence d'un objet `router`), les templates, le registre de modules et les migrations.
 
 Chaque contrôle produit un statut `ok`, `warn`, `fail` ou `skip`.
 La commande renvoie un code de sortie non nul si au moins un contrôle est en `fail`.
@@ -41,7 +41,7 @@ Le diagramme montre l'enchaînement des contrôles stricts et le calcul du code 
 sequenceDiagram
     actor CI as CI ou développeur
     participant Check as forge project:check
-    participant Routes as import réel de mvc/routes.py
+    participant Routes as import réel de mvc/routes/__init__.py
     participant Checks as Contrôles stricts
 
     CI->>Check: forge project:check
@@ -104,7 +104,7 @@ Extrait de rapport indicatif :
 Forge project:check - 1.0.0bN
 
   [OK]    Structure - structure projet conforme
-  [OK]    Routes - mvc/routes.py valide
+  [OK]    Routes - mvc/routes/__init__.py valide
   [WARN]  Configuration - env/dev absent - seules les valeurs de env/example sont actives
 
 0 erreur, 1 avertissement(s). Projet conforme avec avertissements.
@@ -113,7 +113,7 @@ Forge project:check - 1.0.0bN
 ## 7. Détails et limites
 
 !!! warning "Import réel des routes"
-    Le contrôle des routes importe réellement `mvc/routes.py`.
+    Le contrôle des routes importe réellement `mvc/routes/__init__.py`.
     Un import qui échoue, par exemple parce qu'un opt-in n'est pas installé, devient un `fail` explicite indiquant la dépendance manquante.
 
 !!! note "Projet vierge"

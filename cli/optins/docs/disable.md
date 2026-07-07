@@ -6,7 +6,7 @@ Elle débranche localement un opt-in routier du projet, en mode dry-run par déf
 ## 1. Rôle
 
 `opt-in:disable` est l'inverse exact d'`opt-in:enable` sur l'axe activation (ADR-016).
-Pour un opt-in de *kind* `route`, elle retire la couche de câblage `optins/<name>/`, dé-référence l'opt-in de `optins/registry.py`, et débranche `register_optins(router)` de `mvc/routes.py` lorsque plus aucun opt-in n'est branché.
+Pour un opt-in de *kind* `route`, elle retire la couche de câblage `optins/<name>/`, dé-référence l'opt-in de `optins/registry.py`, et débranche `register_optins(router)` de `mvc/routes/__init__.py` lorsque plus aucun opt-in n'est branché.
 
 Elle laisse le package installé : pour désinstaller, voir `opt-in:remove`.
 Pour un opt-in non routier (`library` ou `crosscutting`), la commande n'écrit rien et affiche un conseil de retrait.
@@ -15,7 +15,7 @@ Le contrat reste strict :
 
 - dry-run par défaut : sans `--apply`, rien n'est écrit ;
 - un fichier modifié à la main par l'utilisateur est conservé, jamais supprimé en silence (principe 9) ;
-- le câblage partagé (`optins/__init__.py`, `mvc/routes.py`) n'est retiré qu'en démontage complet, quand plus aucun opt-in ne reste branché ;
+- le câblage partagé (`optins/__init__.py`, `mvc/routes/__init__.py`) n'est retiré qu'en démontage complet, quand plus aucun opt-in ne reste branché ;
 - les répertoires devenus vides sont retirés.
 
 ## 2. Vue d'ensemble rapide
@@ -28,7 +28,7 @@ Le contrat reste strict :
 | Rôle | retirer le câblage local d'un opt-in routier (sans désinstaller) |
 | Entrées | nom court de l'opt-in, option `--apply` |
 | Sorties | suppression de fichiers de `optins/<name>/` (avec `--apply`), messages d'état |
-| Fichiers touchés | `optins/<name>/...`, `optins/registry.py`, `optins/__init__.py`, `mvc/routes.py` |
+| Fichiers touchés | `optins/<name>/...`, `optins/registry.py`, `optins/__init__.py`, `mvc/routes/__init__.py` |
 | Mode Forge | Forge génère (suppression contrôlée) et affiche (conseils) |
 | ADR lié | ADR-016 |
 
@@ -57,7 +57,7 @@ sequenceDiagram
         Disable->>FS: supprime les fichiers de l'opt-in
         Disable->>FS: dé-référence iot de optins/registry.py
         opt plus aucun opt-in branché
-            Disable->>FS: retire optins/__init__.py et débranche mvc/routes.py
+            Disable->>FS: retire optins/__init__.py et débranche mvc/routes/__init__.py
         end
         Disable-->>Dev: [OK] débranché, package conservé
     end

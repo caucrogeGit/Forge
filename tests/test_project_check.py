@@ -43,7 +43,7 @@ def _minimal_project(root: Path) -> None:
     (mvc / "controllers").mkdir(parents=True)
     (mvc / "views").mkdir(parents=True)
     (mvc / "entities").mkdir(parents=True)
-    _write(mvc / "routes.py", "from core.http.router import Router\nrouter = Router()\n")
+    _write(mvc / "routes" / "__init__.py", "from core.http.router import Router\nrouter = Router()\n")
     _write(mvc / "entities" / "relations.json",
            json.dumps({"schema_version": "1.0", "relations": []}))
     _write(mvc / "views" / "base.html", "<html></html>")
@@ -83,10 +83,10 @@ def test_check_project_structure_manque_mvc(tmp_path):
 
 def test_check_project_structure_manque_routes(tmp_path):
     _minimal_project(tmp_path)
-    (tmp_path / "mvc" / "routes.py").unlink()
+    (tmp_path / "mvc" / "routes" / "__init__.py").unlink()
     r = check_project_structure(tmp_path)
     assert r.status == "fail"
-    assert "mvc/routes.py" in r.detail
+    assert "mvc/routes/__init__.py" in r.detail
 
 
 def test_check_project_structure_hors_projet(tmp_path):
@@ -203,21 +203,21 @@ def test_check_project_routes_absent(tmp_path):
 
 
 def test_check_project_routes_vide(tmp_path):
-    _write(tmp_path / "mvc" / "routes.py", "   \n")
+    _write(tmp_path / "mvc" / "routes" / "__init__.py", "   \n")
     r = check_project_routes(tmp_path)
     assert r.status == "warn"
     assert "vide" in r.detail
 
 
 def test_check_project_routes_syntax_error(tmp_path):
-    _write(tmp_path / "mvc" / "routes.py", "def f(\n")
+    _write(tmp_path / "mvc" / "routes" / "__init__.py", "def f(\n")
     r = check_project_routes(tmp_path)
     assert r.status == "fail"
     assert "syntaxe" in r.detail
 
 
 def test_check_project_routes_ok(tmp_path):
-    _write(tmp_path / "mvc" / "routes.py",
+    _write(tmp_path / "mvc" / "routes" / "__init__.py",
            "from core.http.router import Router\nrouter = Router()\n")
     r = check_project_routes(tmp_path)
     assert r.status == "ok"
@@ -234,7 +234,7 @@ class TestCheckProjectRoutesRealImport:
     def test_routes_with_unimportable_module_fails(self, tmp_path):
         """Un mvc/routes.py qui importe un module inexistant doit faire échouer le check."""
         _write(tmp_path / "mvc" / "__init__.py", "")
-        _write(tmp_path / "mvc" / "routes.py",
+        _write(tmp_path / "mvc" / "routes" / "__init__.py",
                "from un_module_qui_nexiste_pas import quelque_chose\n"
                "router = None\n")
 
@@ -245,7 +245,7 @@ class TestCheckProjectRoutesRealImport:
     def test_routes_without_router_attribute_fails(self, tmp_path):
         """Un mvc/routes.py valide syntaxiquement mais sans `router` doit faire échouer."""
         _write(tmp_path / "mvc" / "__init__.py", "")
-        _write(tmp_path / "mvc" / "routes.py",
+        _write(tmp_path / "mvc" / "routes" / "__init__.py",
                "from core.http.router import Router\n")
 
         r = check_project_routes(tmp_path)
@@ -255,7 +255,7 @@ class TestCheckProjectRoutesRealImport:
     def test_routes_valid_returns_ok(self, tmp_path):
         """Un mvc/routes.py qui s'importe correctement renvoie OK."""
         _write(tmp_path / "mvc" / "__init__.py", "")
-        _write(tmp_path / "mvc" / "routes.py",
+        _write(tmp_path / "mvc" / "routes" / "__init__.py",
                "from core.http.router import Router\n"
                "router = Router()\n")
 
@@ -265,7 +265,7 @@ class TestCheckProjectRoutesRealImport:
     def test_routes_with_syntax_error_still_caught_first(self, tmp_path):
         """Une SyntaxError doit être détectée avant la tentative d'import."""
         _write(tmp_path / "mvc" / "__init__.py", "")
-        _write(tmp_path / "mvc" / "routes.py", "def bad(:\n    pass\n")
+        _write(tmp_path / "mvc" / "routes" / "__init__.py", "def bad(:\n    pass\n")
 
         r = check_project_routes(tmp_path)
         assert r.status == "fail"
@@ -406,7 +406,7 @@ def test_run_project_check_hors_projet_retourne_fail(tmp_path):
 
 def test_run_project_check_ne_modifie_pas_les_fichiers(tmp_path):
     _minimal_project(tmp_path)
-    routes = tmp_path / "mvc" / "routes.py"
+    routes = tmp_path / "mvc" / "routes" / "__init__.py"
     before = routes.read_text(encoding="utf-8")
     run_project_check(tmp_path, "test")
     assert routes.read_text(encoding="utf-8") == before

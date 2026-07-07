@@ -19,7 +19,7 @@ PYPROJECT = SKELETON / "pyproject.toml"
 # Fichiers générés et destinés à l'édition manuelle : ils doivent arriver
 # strict-clean ET auto-vérifiants (marqueur en tête).
 EDITABLE_FILES = (
-    "mvc/routes.py",
+    "mvc/routes/__init__.py",
     "mvc/controllers/home_controller.py",
     "optins/registry.py",
 )

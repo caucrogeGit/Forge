@@ -16,7 +16,7 @@ Contrat strict (audit ``OPTINS-CLI-ENABLE-AUDIT-001``) :
 - **jamais d'écrasement silencieux** ;
 - **pas de discovery magique** : le branchement reste explicite via
   ``optins/registry.py`` ;
-- **``mvc/routes.py`` n'est PAS modifié automatiquement** : la commande
+- **``mvc/routes/__init__.py`` n'est PAS modifié automatiquement** : la commande
   affiche seulement l'instruction à ajouter ;
 - Forge Core reste indépendant des opt-ins : ce module ne fait
   qu'**écrire des fichiers texte** et vérifie la présence du paquet via
@@ -118,7 +118,7 @@ Ce dossier branche **localement** l'opt-in Forge IoT dans ce projet. Le
 code métier vit dans le paquet `forge-mvc-iot` ; ici, uniquement le
 câblage (voir `routes.py`).
 
-Le branchement est **explicite** : `mvc/routes.py` appelle
+Le branchement est **explicite** : `mvc/routes/__init__.py` appelle
 `register_optins(router)` → `optins/registry.py` → `optins/iot/routes.py`.
 Aucune découverte automatique.
 
@@ -218,7 +218,7 @@ Ce dossier branche **localement** l'opt-in Forge Video dans ce projet. Le
 code métier vit dans le paquet `forge-mvc-video` ; ici, uniquement le
 câblage (voir `routes.py`).
 
-Le branchement est **explicite** : `mvc/routes.py` appelle
+Le branchement est **explicite** : `mvc/routes/__init__.py` appelle
 `register_optins(router)` → `optins/registry.py` → `optins/video/routes.py`.
 Aucune découverte automatique.
 
@@ -278,7 +278,7 @@ Ce dossier branche **localement** l'opt-in Forge Audio dans ce projet. Le
 code métier vit dans le paquet `forge-mvc-audio` ; ici, uniquement le
 câblage (voir `routes.py`).
 
-Le branchement est **explicite** : `mvc/routes.py` appelle
+Le branchement est **explicite** : `mvc/routes/__init__.py` appelle
 `register_optins(router)` → `optins/registry.py` → `optins/audio/routes.py`.
 Aucune découverte automatique.
 
@@ -325,7 +325,7 @@ SUPPORTED_OPTINS: dict[str, dict[str, Any]] = {
 }
 
 
-# ── Branchement mvc/routes.py (insertion prudente, OPTINS-CLI-ENABLE-ROUTES-APPLY-001) ──
+# ── Branchement mvc/routes/__init__.py (insertion prudente, OPTINS-CLI-ENABLE-ROUTES-APPLY-001) ──
 #
 # Le branchement n'est appliqué QUE si la structure du fichier est
 # **reconnue** : présence de `router = Router()` (forme canonique des
@@ -334,7 +334,7 @@ SUPPORTED_OPTINS: dict[str, dict[str, Any]] = {
 # (l'idempotence repose sur la présence de l'appel `register_optins`),
 # pas de parsing AST, pas de discovery.
 
-_ROUTES_REL = "mvc/routes.py"
+_ROUTES_REL = "mvc/routes/__init__.py"
 _ROUTES_IMPORT = "from optins.registry import register_optins"
 _ROUTES_CALL = "register_optins(router)"
 _ROUTES_ANCHOR = "router = Router()"
@@ -377,7 +377,7 @@ def _print_manual_routes_instruction() -> None:
 
 
 def _branch_routes(routes_path: Path, *, apply: bool) -> None:
-    """Branche (ou propose de brancher) les opt-ins dans ``mvc/routes.py``.
+    """Branche (ou propose de brancher) les opt-ins dans ``mvc/routes/__init__.py``.
 
     Prudent : ne modifie que si la structure est reconnue
     (``router = Router()``). Idempotent : ne touche rien si l'appel
@@ -580,7 +580,7 @@ def enable_optin(
         conflict = True
 
     print("")
-    _branch_routes(project_root / "mvc" / "routes.py", apply=apply)
+    _branch_routes(project_root / "mvc" / "routes" / "__init__.py", apply=apply)
 
     print("")
     if not apply:

@@ -19,8 +19,8 @@ def _prepare_project(root: Path) -> None:
         "{% block content %}{% endblock %}\n",
         encoding="utf-8",
     )
-    (root / "mvc" / "routes.py").parent.mkdir(parents=True, exist_ok=True)
-    (root / "mvc" / "routes.py").write_text(
+    (root / "mvc" / "routes" / "__init__.py").parent.mkdir(parents=True, exist_ok=True)
+    (root / "mvc" / "routes" / "__init__.py").write_text(
         "from core.http.router import Router\n"
         "from mvc.controllers.home_controller import HomeController\n"
         "\n"
@@ -53,7 +53,7 @@ def test_make_public_page_ajoute_route_publique(tmp_path):
 
     make_public_page("accueil", root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes.py")
+    routes = _read(tmp_path, "mvc/routes/__init__.py")
     assert "from mvc.controllers.public_pages_controller import PublicPagesController" in routes
     assert 'public.add("GET", "/accueil", PublicPagesController.accueil, name="public_pages-accueil")' in routes
     assert 'router.group("", public=True)' in routes
@@ -76,7 +76,7 @@ def test_make_public_page_ne_duplique_pas_route_existante(tmp_path):
     make_public_page("accueil", root=tmp_path)
     make_public_page("accueil", root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes.py")
+    routes = _read(tmp_path, "mvc/routes/__init__.py")
     assert routes.count('"/accueil"') == 1
     assert routes.count('name="public_pages-accueil"') == 1
 
@@ -157,7 +157,8 @@ def test_make_public_page_ninjecte_pas_si_router_seulement_en_commentaire(tmp_pa
         "{% block title %}{% endblock %}{% block content %}{% endblock %}\n",
         encoding="utf-8",
     )
-    routes_path = tmp_path / "mvc" / "routes.py"
+    routes_path = tmp_path / "mvc" / "routes" / "__init__.py"
+    routes_path.parent.mkdir(parents=True, exist_ok=True)
     routes_path.write_text(
         "from core.http.router import Router\n"
         "# pensez a creer : router = Router()\n",
@@ -179,7 +180,7 @@ def test_make_public_page_routes_resultantes_compilent(tmp_path):
 
     make_public_page("accueil", root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes.py")
+    routes = _read(tmp_path, "mvc/routes/__init__.py")
     compile(routes, "routes.py", "exec")
 
 
@@ -192,7 +193,7 @@ def test_make_public_page_reste_independante_du_crud_admin(tmp_path):
         [
             _read(tmp_path, "mvc/views/public/accueil.html"),
             _read(tmp_path, "mvc/controllers/public_pages_controller.py"),
-            _read(tmp_path, "mvc/routes.py"),
+            _read(tmp_path, "mvc/routes/__init__.py"),
         ]
     )
     assert "make:crud" not in generated

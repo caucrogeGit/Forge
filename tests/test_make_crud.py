@@ -221,7 +221,7 @@ def test_make_crud_sans_relations_json_continue_de_fonctionner(tmp_path):
 
     form_code = (tmp_path / "mvc" / "forms" / "contact_form.py").read_text(encoding="utf-8")
     form_html = (tmp_path / "mvc" / "views" / "contact" / "form.html").read_text(encoding="utf-8")
-    assert len(result.created) == 13
+    assert len(result.created) == 14
     assert "ChoiceField" not in form_code
     assert "<select" not in form_html
 
@@ -303,7 +303,7 @@ def test_dry_run_necrit_rien(tmp_path):
 def test_dry_run_rapporte_les_fichiers_prevus(tmp_path):
     result = _run("Contact", tmp_path, dry_run=True)
     assert result.dry_run is True
-    assert len(result.created) == 13
+    assert len(result.created) == 14
 
 
 def test_dry_run_sans_existants_tout_cree(tmp_path):
@@ -315,22 +315,22 @@ def test_dry_run_sans_existants_tout_cree(tmp_path):
 
 def test_bloc_routes_dans_resultat(tmp_path):
     result = _run("Contact", tmp_path)
-    assert "router.group" in result.route_block
-    assert "ContactController" in result.route_block
+    assert "register_contact_routes(router)" in result.route_block
+    assert "from mvc.routes.contact_routes" in result.route_block
 
 
 def test_new_avant_id_dans_bloc_routes(tmp_path):
-    result = _run("Contact", tmp_path)
-    pos_new = result.route_block.index("/new")
-    pos_id = result.route_block.index("/{id}")
-    assert pos_new < pos_id, "/new doit apparaître avant /{id} dans le bloc routes"
+    _run("Contact", tmp_path)
+    routes = (tmp_path / "mvc" / "routes" / "contact_routes.py").read_text(encoding="utf-8")
+    assert routes.index("/new") < routes.index("/{id}"), "/new doit apparaître avant /{id}"
 
 
 def test_toutes_les_routes_presentes(tmp_path):
-    result = _run("Contact", tmp_path)
+    _run("Contact", tmp_path)
+    routes = (tmp_path / "mvc" / "routes" / "contact_routes.py").read_text(encoding="utf-8")
     for expected in ("contact-index", "contact-new", "contact-create",
                      "contact-show", "contact-edit", "contact-update", "contact-destroy"):
-        assert expected in result.route_block, f"Route {expected!r} absente du bloc"
+        assert expected in routes, f"Route {expected!r} absente du fichier de routes"
 
 
 # ── Erreurs d'entrée ───────────────────────────────────────────────────────────
@@ -708,9 +708,10 @@ def test_form_html_csrf_token_present(tmp_path):
 
 
 def test_route_block_commentaire_test_local(tmp_path):
-    result = _run("Contact", tmp_path)
-    assert "public=True" in result.route_block
-    assert "csrf=False" in result.route_block
+    _run("Contact", tmp_path)
+    routes = (tmp_path / "mvc" / "routes" / "contact_routes.py").read_text(encoding="utf-8")
+    assert "public=True" in routes
+    assert "csrf=False" in routes
 
 
 # ── Pagination ─────────────────────────────────────────────────────────────────

@@ -36,10 +36,10 @@ Ce sous-paquet `cli/deploy` ne porte aujourd'hui que les commandes `module:*`.
 | Sorties | sortie console, registre de modules, fichiers copiés, fichier de routes généré |
 | Dossier par défaut | `modules/` (override via `--path`) |
 | Registre | `MODULE_REGISTRY_FILE` (défini par `core.modules`) |
-| Mode Forge | génère (write-if-new pour `module:files` et `module:routes`), lit (`module:list`), affiche (lignes à coller dans `mvc/routes.py`) |
+| Mode Forge | génère (write-if-new pour `module:files` et `module:routes`), lit (`module:list`), affiche (lignes à coller dans `mvc/routes/__init__.py`) |
 | ADR | ADR-043 (regroupement CLI), ADR-053 (extraction du déploiement vers `forge-mvc-deploy`) |
 
-Le module CLI ne réécrit jamais silencieusement un fichier applicatif : `module:files` refuse de remplacer un fichier existant, et `module:routes` affiche les lignes à ajouter dans `mvc/routes.py` au lieu de les insérer lui-même.
+Le module CLI ne réécrit jamais silencieusement un fichier applicatif : `module:files` refuse de remplacer un fichier existant, et `module:routes` affiche les lignes à ajouter dans `mvc/routes/__init__.py` au lieu de les insérer lui-même.
 
 ## 3. Schémas UML
 
@@ -139,7 +139,7 @@ sequenceDiagram
     Forge->>CLI: main(["module:routes", nom])
     CLI->>Core: generate_module_routes(nom)
     Core->>Projet: écrit le fichier de routes
-    CLI-->>Dev: lignes à ajouter dans mvc/routes.py
+    CLI-->>Dev: lignes à ajouter dans mvc/routes/__init__.py
 ```
 
 À retenir :
@@ -147,7 +147,7 @@ sequenceDiagram
 - `forge.py` route toute commande `module:*` vers `cli.deploy.modules.main` ;
 - la découverte et la copie de fichiers s'appuient sur le dossier `modules/` (ou `--path`) ;
 - `module:files` refuse d'écraser un fichier existant et n'écrit rien en cas de conflit ;
-- `module:routes` génère un fichier de routes puis affiche les lignes à coller à la main dans `mvc/routes.py`.
+- `module:routes` génère un fichier de routes puis affiche les lignes à coller à la main dans `mvc/routes/__init__.py`.
 
 ## 4. API publique et commandes
 
@@ -226,7 +226,7 @@ Générer le fichier de routes du module :
 forge module:routes blog
 ```
 
-À l'issue de `module:routes`, Forge affiche les lignes à recopier dans `mvc/routes.py`.
+À l'issue de `module:routes`, Forge affiche les lignes à recopier dans `mvc/routes/__init__.py`.
 Forge ne modifie pas ce fichier lui-même : il vous laisse coller les lignes.
 
 Retirer un module installé :
@@ -244,7 +244,7 @@ forge module:remove blog
 
 !!! warning "Pas d'écrasement silencieux"
     `module:files` refuse l'installation si un fichier cible existe déjà : il liste les conflits et n'écrit aucun fichier.
-    `module:routes` n'insère jamais les routes dans `mvc/routes.py` : il génère un fichier de routes dédié et affiche les lignes à ajouter à la main.
+    `module:routes` n'insère jamais les routes dans `mvc/routes/__init__.py` : il génère un fichier de routes dédié et affiche les lignes à ajouter à la main.
 
 !!! tip "Mode simulation"
     L'option `--dry-run` est disponible sur `module:install`, `module:files`, `module:routes` et `module:remove`.

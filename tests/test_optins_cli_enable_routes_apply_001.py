@@ -41,8 +41,8 @@ _CALL = "register_optins(router)"
 
 def _write_routes(tmp_path: Path, content: str) -> Path:
     mvc = tmp_path / "mvc"
-    mvc.mkdir(exist_ok=True)
-    routes = mvc / "routes.py"
+    (mvc / "routes").mkdir(parents=True, exist_ok=True)
+    routes = mvc / "routes" / "__init__.py"
     routes.write_text(content, encoding="utf-8")
     return routes
 
@@ -160,7 +160,7 @@ class TestAmbiguousOrMissingRoutes:
             "iot", apply=True, project_root=tmp_path, package_check=_PKG_OK,
         )
         out = capsys.readouterr().out
-        assert not (tmp_path / "mvc" / "routes.py").exists()
+        assert not (tmp_path / "mvc" / "routes" / "__init__.py").exists()
         assert "introuvable" in out
         assert _CALL in out  # instruction manuelle affichée
         assert rc == 0

@@ -40,7 +40,7 @@ def projet(monkeypatch, tmp_path):
 def test_projet_contient_le_squelette_applicatif(projet):
     assert (projet / "app.py").is_file()
     assert (projet / "config.py").is_file()
-    assert (projet / "mvc" / "routes.py").is_file()
+    assert (projet / "mvc" / "routes" / "__init__.py").is_file()
     assert (projet / "mvc" / "controllers" / "home_controller.py").is_file()
 
 

@@ -21,7 +21,7 @@ def test_iter_inclut_fichiers_cles_et_dotfiles():
         "app.py",
         "config.py",
         "requirements.txt",
-        "mvc/routes.py",
+        "mvc/routes/__init__.py",
         "mvc/views/home/index.html",
         ".gitignore",
         "storage/uploads/.gitkeep",

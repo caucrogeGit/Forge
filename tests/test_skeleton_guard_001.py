@@ -15,7 +15,7 @@ import pytest
 
 from skeleton import DATA_DIR, iter_skeleton_files
 
-ROUTES = DATA_DIR / "mvc" / "routes.py"
+ROUTES = DATA_DIR / "mvc" / "routes" / "__init__.py"
 HOME_CONTROLLER = DATA_DIR / "mvc" / "controllers" / "home_controller.py"
 
 # Chemins de routes qui ne doivent jamais être pré-câblés dans routes.py.

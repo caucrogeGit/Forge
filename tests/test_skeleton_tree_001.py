@@ -64,7 +64,7 @@ REQUIRED_FILES = [
     "static/favicon.png",
     "static/forge-nav.png",
     "static/src/input.css",
-    "mvc/routes.py",
+    "mvc/routes/__init__.py",
     "mvc/controllers/home_controller.py",
     "mvc/views/layouts/base.html",
     "mvc/views/components/ui.html",
@@ -127,7 +127,7 @@ def test_chemin_absent(rel):
 # ── Neutralité du contenu ────────────────────────────────────────────────────
 
 def test_routes_neutres():
-    content = (SKELETON / "mvc" / "routes.py").read_text(encoding="utf-8")
+    content = (SKELETON / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
     assert 'public.add("GET", "/", HomeController.index' in content
     # Aucune autre route pré-câblée.
     assert content.count("public.add(") == 1, "Le squelette ne câble que la route /."

@@ -182,7 +182,7 @@ def cmd_module_routes(args: list[str]) -> None:
     else:
         print(f"\nFichier de routes généré : {result.target_path}\n")
 
-    print("\nPour activer ces routes, ajoutez les lignes suivantes dans mvc/routes.py :\n")
+    print("\nPour activer ces routes, ajoutez les lignes suivantes dans mvc/routes/__init__.py :\n")
     for line in result.lines_to_add.splitlines():
         print(f"    {line}")
     print()

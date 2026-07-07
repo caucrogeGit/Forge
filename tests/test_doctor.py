@@ -190,7 +190,7 @@ def test_check_mvc_structure_partielle(tmp_path):
     (tmp_path / "mvc").mkdir()
     r = check_mvc_structure(tmp_path)
     assert r.status == "fail"
-    assert "mvc/routes.py" in r.detail
+    assert "mvc/routes/__init__.py" in r.detail
 
 
 def test_check_mvc_structure_ok(tmp_path):
@@ -198,7 +198,8 @@ def test_check_mvc_structure_ok(tmp_path):
     (mvc / "entities").mkdir(parents=True)
     (mvc / "views").mkdir()
     (mvc / "controllers").mkdir()
-    (mvc / "routes.py").write_text("", encoding="utf-8")
+    (mvc / "routes").mkdir(exist_ok=True)
+    (mvc / "routes" / "__init__.py").write_text("", encoding="utf-8")
     (mvc / "entities" / "relations.json").write_text(
         json.dumps({"schema_version": "1.0", "relations": []}), encoding="utf-8"
     )
@@ -216,7 +217,8 @@ def test_check_mvc_structure_ok_sans_relations_json(tmp_path):
     (mvc / "entities").mkdir(parents=True)
     (mvc / "views").mkdir()
     (mvc / "controllers").mkdir()
-    (mvc / "routes.py").write_text("", encoding="utf-8")
+    (mvc / "routes").mkdir(exist_ok=True)
+    (mvc / "routes" / "__init__.py").write_text("", encoding="utf-8")
     assert not (mvc / "entities" / "relations.json").exists()
     r = check_mvc_structure(tmp_path)
     assert r.status == "ok"
@@ -226,7 +228,8 @@ def test_check_mvc_structure_sans_views_et_controllers(tmp_path):
     """mvc/views/ et mvc/controllers/ sont requis."""
     mvc = tmp_path / "mvc"
     (mvc / "entities").mkdir(parents=True)
-    (mvc / "routes.py").write_text("", encoding="utf-8")
+    (mvc / "routes").mkdir(exist_ok=True)
+    (mvc / "routes" / "__init__.py").write_text("", encoding="utf-8")
     (mvc / "entities" / "relations.json").write_text(
         json.dumps({"schema_version": "1.0", "relations": []}), encoding="utf-8"
     )
@@ -660,7 +663,7 @@ def _write_mfa_controller(tmp_path: Path) -> None:
 
 
 def _write_mfa_route(tmp_path: Path) -> None:
-    routes = tmp_path / "mvc" / "routes.py"
+    routes = tmp_path / "mvc" / "routes" / "__init__.py"
     routes.parent.mkdir(parents=True, exist_ok=True)
     routes.write_text('router.get("/login/mfa/", MfaChallengeController, "index")\n',
                       encoding="utf-8")
@@ -685,7 +688,7 @@ class TestDetectMfaIndicators:
     def test_mfa_route_detected(self, tmp_path):
         _write_mfa_route(tmp_path)
         indicators = _detect_mfa_indicators(tmp_path)
-        assert any("routes.py" in i for i in indicators)
+        assert any("routes/__init__.py" in i for i in indicators)
 
     def test_mfa_import_detected(self, tmp_path):
         _write_mfa_import(tmp_path)

@@ -32,7 +32,7 @@ contournant.
 - `mvc/entities/<entite>/<entite>.sql` : schéma SQL généré.
 - `mvc/models/` et `mvc/controllers/` : modèles et contrôleurs.
 - `mvc/views/` : templates Jinja.
-- `mvc/routes.py` : déclaration explicite des routes.
+- `mvc/routes/__init__.py` : déclaration explicite des routes.
 - `config.py`, `env/` : configuration et environnements (secrets hors du dépôt).
 - `schemas/` : schémas JSON pour la validation et l'autocomplétion.
 
@@ -43,7 +43,7 @@ contournant.
   on ne bricole pas le SQL à la main.
 - **Routes** (ADR-029) : chemin `/<controleur>/<methode>` (méthode `index` au
   chemin nu), nom `<controleur>-<methode>` (avec un tiret). Les routes sont
-  montées explicitement dans `mvc/routes.py`.
+  montées explicitement dans `mvc/routes/__init__.py`.
 - **Base de données** : via `core.database.db` (`fetch_all`, `fetch_one`,
   `execute`, `insert`), avec des paramètres `?`. Jamais de valeur interpolée
   directement dans le SQL.

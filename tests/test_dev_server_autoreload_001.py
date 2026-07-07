@@ -65,7 +65,8 @@ def _make_project(tmp_path: Path) -> Path:
     (mvc / "entities" / "contact.json").write_text("{}", encoding="utf-8")
     (mvc / "migrations").mkdir()
     (mvc / "migrations" / "001_init.sql").write_text("-- noop", encoding="utf-8")
-    (mvc / "routes.py").write_text("# stub\n", encoding="utf-8")
+    (mvc / "routes").mkdir()
+    (mvc / "routes" / "__init__.py").write_text("# stub\n", encoding="utf-8")
 
     core_app = tmp_path / "core" / "app"
     core_app.mkdir(parents=True)
@@ -129,7 +130,7 @@ class TestDetection:
 
     @pytest.mark.parametrize("relative", [
         "mvc/controllers/home_controller.py",
-        "mvc/routes.py",
+        "mvc/routes/__init__.py",
         "mvc/views/home.html",
         "mvc/entities/contact.json",
         "mvc/migrations/001_init.sql",
@@ -232,7 +233,7 @@ class TestWatchedScope:
     def test_inclut_mvc_py_html_json_sql(self, tmp_path):
         root = _make_project(tmp_path)
         paths = {str(p) for p in iter_watched_files(root)}
-        assert str(root / "mvc" / "routes.py") in paths
+        assert str(root / "mvc" / "routes" / "__init__.py") in paths
         assert str(root / "mvc" / "views" / "home.html") in paths
         assert str(root / "mvc" / "entities" / "contact.json") in paths
         assert str(root / "mvc" / "migrations" / "001_init.sql") in paths
@@ -341,7 +342,7 @@ class TestSupervisorLifecycle:
         root = _make_project(tmp_path)
         reloader, spawned, _ = self._make_reloader(root)
         reloader.start()
-        reloader.restart("mvc/routes.py")
+        reloader.restart("mvc/routes/__init__.py")
         assert len(spawned) == 2
         assert spawned[0].terminate_calls == 1
         assert spawned[0].wait_calls == 1
@@ -351,7 +352,7 @@ class TestSupervisorLifecycle:
         root = _make_project(tmp_path)
         reloader, _, logs = self._make_reloader(root)
         reloader.start()
-        reloader.restart("mvc/routes.py")
+        reloader.restart("mvc/routes/__init__.py")
         joined = "\n".join(logs)
         assert "Changement détecté" in joined
         assert "Redémarrage" in joined

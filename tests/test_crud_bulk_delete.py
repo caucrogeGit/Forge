@@ -30,7 +30,7 @@ from cli.entities.make_crud import (
     build_controller,
     build_model,
     build_table_partial,
-    _route_block,
+    build_routes_file,
 )
 from cli.entities.validation import normalize_entity_definition
 
@@ -260,23 +260,23 @@ class TestTemplateConfirmation:
 
 class TestRoutes:
     def test_route_bulk_delete_presente(self):
-        bloc = _route_block(_entity_simple())
+        bloc = build_routes_file(_entity_simple())
         assert "/bulk-delete" in bloc
 
     def test_route_bulk_delete_confirm_presente(self):
-        bloc = _route_block(_entity_simple())
+        bloc = build_routes_file(_entity_simple())
         assert "/bulk-delete-confirm" in bloc
 
     def test_route_bulk_delete_est_post(self):
-        bloc = _route_block(_entity_simple())
+        bloc = build_routes_file(_entity_simple())
         assert '"POST"' in bloc and "bulk_delete" in bloc
 
     def test_route_bulk_delete_confirm_est_post(self):
-        bloc = _route_block(_entity_simple())
+        bloc = build_routes_file(_entity_simple())
         assert '"POST"' in bloc and "bulk_delete_confirm" in bloc
 
     def test_routes_existantes_intactes(self):
-        bloc = _route_block(_entity_simple())
+        bloc = build_routes_file(_entity_simple())
         assert "index" in bloc
         assert "create" in bloc
         assert "destroy" in bloc

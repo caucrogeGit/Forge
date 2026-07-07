@@ -64,8 +64,8 @@ def _make_optins_iot(root: Path) -> None:
 
 def _make_routes(root: Path, content: str) -> None:
     mvc = root / "mvc"
-    mvc.mkdir(exist_ok=True)
-    (mvc / "routes.py").write_text(content, encoding="utf-8")
+    (mvc / "routes").mkdir(parents=True, exist_ok=True)
+    (mvc / "routes" / "__init__.py").write_text(content, encoding="utf-8")
 
 
 # ── Détection d'état ─────────────────────────────────────────────────────────
@@ -119,7 +119,7 @@ class TestOutput:
         assert rc == 0
         assert "iot       partiel" in out
         assert "optins/iot/" in out
-        assert "absent de mvc/routes.py" in out
+        assert "absent de mvc/routes/__init__.py" in out
 
     def test_active_output(self, tmp_path, capsys):
         _make_optins_iot(tmp_path)
@@ -143,10 +143,10 @@ class TestReadOnly:
     def test_does_not_modify_routes(self, tmp_path, capsys):
         _make_optins_iot(tmp_path)
         _make_routes(tmp_path, _RECOGNIZED_ROUTES)
-        before = (tmp_path / "mvc" / "routes.py").read_text(encoding="utf-8")
+        before = (tmp_path / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
         list_optins(project_root=tmp_path)
         capsys.readouterr()
-        after = (tmp_path / "mvc" / "routes.py").read_text(encoding="utf-8")
+        after = (tmp_path / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
         assert before == after
 
     def test_does_not_modify_registry(self, tmp_path, capsys):

@@ -10,16 +10,18 @@ import ast
 from pathlib import Path
 
 from cli.security import make_auth as ma
-from cli.security.make_auth import AUTH_CONTROLLER, make_auth
+from cli.security.make_auth import AUTH_CONTROLLER, AUTH_ROUTES_FILE, make_auth
 
 
 def test_genere_controleur_et_vue(tmp_path: Path):
     result = make_auth(root=tmp_path)
     ctrl = tmp_path / "mvc" / "controllers" / "auth_controller.py"
     view = tmp_path / "mvc" / "views" / "auth" / "login.html"
-    assert ctrl.is_file() and view.is_file()
+    routes = tmp_path / "mvc" / "routes" / "auth_routes.py"
+    assert ctrl.is_file() and view.is_file() and routes.is_file()
     assert ctrl.as_posix() in result.created
     assert view.as_posix() in result.created
+    assert routes.as_posix() in result.created
 
 
 def test_write_if_new_preserve_l_existant(tmp_path: Path):
@@ -45,19 +47,30 @@ def test_controleur_genere_est_du_python_valide():
     ast.parse(AUTH_CONTROLLER)  # ne lève pas
 
 
-def test_bloc_routes_login_public_logout(tmp_path: Path, capsys):
-    result = make_auth(root=tmp_path)
-    block = result.route_block
-    assert '"GET",  "/login"' in block and '"POST", "/login"' in block
-    assert 'public=True' in block                     # login accessible sans auth
-    assert '"POST", "/logout"' in block
-    assert "AuthController" in block
+def test_routes_login_public_logout(tmp_path: Path):
+    # ADR-068 : les routes vivent dans mvc/routes/auth_routes.py ; le bloc affiché
+    # ne fait que brancher.
+    routes = (tmp_path / "mvc" / "routes" / "auth_routes.py")
+    make_auth(root=tmp_path)
+    assert routes.is_file()
+    content = routes.read_text(encoding="utf-8")
+    assert '"GET", "/login"' in content and '"POST", "/login"' in content
+    assert "public=True" in content                     # login accessible sans auth
+    assert '"POST", "/logout"' in content
+    assert "def register_auth_routes(router" in AUTH_ROUTES_FILE
+
+
+def test_bloc_branchement(tmp_path: Path):
+    block = make_auth(root=tmp_path).route_block
+    assert "from mvc.routes.auth_routes import register_auth_routes" in block
+    assert "register_auth_routes(router)" in block
 
 
 def test_main_affiche_routes_et_prerequis(tmp_path: Path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     ma.main(["make:auth"])
     out = capsys.readouterr().out
-    assert "Routes à ajouter dans mvc/routes.py" in out
+    assert "Branchement à ajouter dans mvc/routes/__init__.py" in out
+    assert "register_auth_routes" in out
     assert "forge auth:init" in out
     assert "[CREE]" in out

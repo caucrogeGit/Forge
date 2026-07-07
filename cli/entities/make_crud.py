@@ -101,30 +101,44 @@ from cli.entities.crud.views_builder import (  # noqa: F401
 )
 
 
-def _route_block(definition: dict[str, Any]) -> str:
+def build_routes_file(definition: dict[str, Any]) -> str:
+    """Contenu de mvc/routes/<snake>_routes.py : register_<snake>_routes(router) (ADR-068)."""
     entity = definition["entity"]
     snake = _to_snake(entity)
     ctrl = f"{entity}Controller"
 
     return "\n".join([
-        "Routes à ajouter dans mvc/routes.py :",
-        "─" * 70,
-        f"  from mvc.controllers.{snake}_controller import {ctrl}",
+        f'"""Routes du contrôleur {ctrl} (ADR-068)."""',
+        "from core.http.router import Router",
+        f"from mvc.controllers.{snake}_controller import {ctrl}",
         "",
-        "  # Routes protégées par défaut.",
-        "  # Pour un test local sans authentification :",
-        f'  # with router.group("/{snake}", public=True, csrf=False) as g:',
-        f'  with router.group("/{snake}") as g:',
-        f'      g.add("GET",  "",                       {ctrl}.index,               name="{snake}-index")',
-        f'      g.add("GET",  "/new",                   {ctrl}.new,                 name="{snake}-new")',
-        f'      g.add("POST", "/create",                {ctrl}.create,              name="{snake}-create")',
-        f'      g.add("GET",  "/show/{{id}}",             {ctrl}.show,                name="{snake}-show")',
-        f'      g.add("GET",  "/edit/{{id}}",             {ctrl}.edit,                name="{snake}-edit")',
-        f'      g.add("POST", "/update/{{id}}",           {ctrl}.update,              name="{snake}-update")',
-        f'      g.add("POST", "/destroy/{{id}}",          {ctrl}.destroy,             name="{snake}-destroy")',
-        f'      g.add("POST", "/bulk-delete",           {ctrl}.bulk_delete,         name="{snake}-bulk_delete")',
-        f'      g.add("POST", "/bulk-delete-confirm",   {ctrl}.bulk_delete_confirm, name="{snake}-bulk_delete_confirm")',
-        f'      g.add("GET",  "/export-csv",             {ctrl}.export_csv,          name="{snake}-export_csv")',
+        "",
+        f"def register_{snake}_routes(router: Router) -> None:",
+        "    # Routes protégées par défaut. Pour un test local sans authentification :",
+        f'    #   with router.group("/{snake}", public=True, csrf=False) as g:',
+        f'    with router.group("/{snake}") as g:',
+        f'        g.add("GET", "", {ctrl}.index, name="{snake}-index")',
+        f'        g.add("GET", "/new", {ctrl}.new, name="{snake}-new")',
+        f'        g.add("POST", "/create", {ctrl}.create, name="{snake}-create")',
+        f'        g.add("GET", "/show/{{id}}", {ctrl}.show, name="{snake}-show")',
+        f'        g.add("GET", "/edit/{{id}}", {ctrl}.edit, name="{snake}-edit")',
+        f'        g.add("POST", "/update/{{id}}", {ctrl}.update, name="{snake}-update")',
+        f'        g.add("POST", "/destroy/{{id}}", {ctrl}.destroy, name="{snake}-destroy")',
+        f'        g.add("POST", "/bulk-delete", {ctrl}.bulk_delete, name="{snake}-bulk_delete")',
+        f'        g.add("POST", "/bulk-delete-confirm", {ctrl}.bulk_delete_confirm, name="{snake}-bulk_delete_confirm")',
+        f'        g.add("GET", "/export-csv", {ctrl}.export_csv, name="{snake}-export_csv")',
+        "",
+    ])
+
+
+def _route_block(definition: dict[str, Any]) -> str:
+    """Deux lignes à brancher dans mvc/routes/__init__.py (ADR-068)."""
+    snake = _to_snake(definition["entity"])
+    return "\n".join([
+        "Branchement à ajouter dans mvc/routes/__init__.py :",
+        "─" * 70,
+        f"  from mvc.routes.{snake}_routes import register_{snake}_routes",
+        f"  register_{snake}_routes(router)",
     ])
 
 
@@ -277,6 +291,13 @@ def make_crud(
     _write_if_new(
         mvc / "views" / snake / "bulk_delete_confirm.html",
         build_bulk_delete_confirm_view(definition),
+        result, dry_run,
+    )
+    # ADR-068 : les routes du contrôleur vivent dans leur propre fichier ;
+    # mvc/routes/__init__.py ne fait que les brancher (bloc affiché ci-dessous).
+    _write_if_new(
+        mvc / "routes" / f"{snake}_routes.py",
+        build_routes_file(definition),
         result, dry_run,
     )
 

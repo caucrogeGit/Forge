@@ -133,7 +133,7 @@ def test_make_public_contact_cree_route(tmp_path):
 
     make_public_contact(root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes.py")
+    routes = _read(tmp_path, "mvc/routes/__init__.py")
     assert "PublicPagesController" in routes
     assert '"/contact"' in routes
     assert 'name="public_pages-contact"' in routes
@@ -145,7 +145,7 @@ def test_make_public_contact_route_idempotente(tmp_path):
 
     make_public_contact(root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes.py")
+    routes = _read(tmp_path, "mvc/routes/__init__.py")
     assert routes.count('"/contact"') == 1
     assert routes.count('name="public_pages-contact"') == 1
 

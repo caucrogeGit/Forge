@@ -20,7 +20,7 @@ def check_project_structure(root: Path) -> CheckResult:
         (root / "app.py",                  "app.py"),
         (root / "config.py",               "config.py"),
         (root / "mvc",                     "mvc/"),
-        (root / "mvc" / "routes.py",       "mvc/routes.py"),
+        (root / "mvc" / "routes" / "__init__.py", "mvc/routes/__init__.py"),
         (root / "mvc" / "controllers",     "mvc/controllers/"),
         (root / "mvc" / "views",           "mvc/views/"),
         (root / "mvc" / "entities",        "mvc/entities/"),
@@ -98,7 +98,7 @@ def check_project_entities(root: Path) -> CheckResult:
 
 
 def check_project_routes(root: Path) -> CheckResult:
-    """Vérifie mvc/routes.py par import réel (pas seulement ast.parse).
+    """Vérifie mvc/routes/__init__.py par import réel (pas seulement ast.parse).
 
     Étapes :
     1. Le fichier existe et n'est pas vide.
@@ -113,18 +113,18 @@ def check_project_routes(root: Path) -> CheckResult:
     import importlib
     import sys
 
-    routes_path = root / "mvc" / "routes.py"
+    routes_path = root / "mvc" / "routes" / "__init__.py"
     if not routes_path.exists():
         return CheckResult("fail", "Routes",
-                           "mvc/routes.py absent — restaure le fichier ou recrée le projet avec forge new")
+                           "mvc/routes/__init__.py absent — restaure le fichier ou recrée le projet avec forge new")
 
     source = routes_path.read_text(encoding="utf-8")
     if not source.strip():
         return CheckResult("warn", "Routes",
-                           "mvc/routes.py vide — déclare au moins un routeur (from core.http.router import Router)")
+                           "mvc/routes/__init__.py vide — déclare au moins un routeur (from core.http.router import Router)")
 
     try:
-        ast.parse(source, filename="mvc/routes.py")
+        ast.parse(source, filename="mvc/routes/__init__.py")
     except SyntaxError as exc:
         return CheckResult("fail", "Routes",
                            f"erreur de syntaxe ligne {exc.lineno} : {exc.msg} — corrige la ligne indiquée")
@@ -144,12 +144,12 @@ def check_project_routes(root: Path) -> CheckResult:
         module = importlib.import_module("mvc.routes")
     except ImportError as exc:
         result_to_return = CheckResult("fail", "Routes",
-                                       f"impossible d'importer mvc/routes.py — {exc}. "
+                                       f"impossible d'importer mvc/routes/__init__.py — {exc}. "
                                        f"Vérifie les imports ou installe la dépendance manquante "
                                        f"(par ex. `pip install --pre forge-mvc-mfa` pour MFA).")
     except Exception as exc:  # noqa: BLE001
         result_to_return = CheckResult("fail", "Routes",
-                                       f"erreur au chargement de mvc/routes.py — {type(exc).__name__}: {exc}")
+                                       f"erreur au chargement de mvc/routes/__init__.py — {type(exc).__name__}: {exc}")
     finally:
         for _key in [k for k in sys.modules if k == "mvc" or k.startswith("mvc.")]:
             sys.modules.pop(_key, None)
@@ -162,10 +162,10 @@ def check_project_routes(root: Path) -> CheckResult:
 
     if not hasattr(module, "router"):
         return CheckResult("fail", "Routes",
-                           "mvc/routes.py s'importe mais n'expose pas d'objet `router`. "
+                           "mvc/routes/__init__.py s'importe mais n'expose pas d'objet `router`. "
                            "Déclarer `router = Router()` au top-level.")
 
-    return CheckResult("ok", "Routes", "mvc/routes.py valide")
+    return CheckResult("ok", "Routes", "mvc/routes/__init__.py valide")
 
 
 def check_project_templates(root: Path) -> CheckResult:

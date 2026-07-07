@@ -16,13 +16,27 @@
   fournit le backend (`core.auth.session`), mais aucune route, aucun contrôleur ni
   aucune vue de login n'étaient générés. `make:auth` crée (write-if-new)
   `mvc/controllers/auth_controller.py` (`login_form`, `login`, `logout` ; flux
-  `authenticate_user` + `login_user` + régénération de session anti-fixation + cookie)
-  et `mvc/views/auth/login.html`, puis **affiche** les routes `/login` et `/logout` à
-  ajouter (Forge n'écrit pas dans `mvc/routes.py`). Cible le socle standard `users`
-  (`forge auth:init`). Version 1 sans MFA / rate-limit / audit.
+  `authenticate_user` + `login_user` + régénération de session anti-fixation + cookie),
+  `mvc/views/auth/login.html` et `mvc/routes/auth_routes.py` (ADR-068), puis
+  **affiche** le branchement à coller dans `mvc/routes/__init__.py` (Forge n'écrit pas
+  dans ce fichier utilisateur). Cible le socle standard `users` (`forge auth:init`).
+  Version 1 sans MFA / rate-limit / audit.
 
 ### Modifié
 
+- **Les routes applicatives deviennent un paquet `mvc/routes/` (ADR-068).** Le fichier
+  monolithique `mvc/routes.py` est remplacé par un paquet `mvc/routes/` : `__init__.py`
+  est la racine de composition (crée `router`, câble la route d'accueil, appelle
+  `register_optins(router)` puis, explicitement, un `register_<contrôleur>_routes(router)`
+  par contrôleur), et chaque contrôleur porte son propre `mvc/routes/<contrôleur>_routes.py`.
+  `make:crud` et `make:auth` **génèrent** le fichier de routes du contrôleur (write-if-new)
+  et **affichent** la ligne de branchement à coller dans `__init__.py` ; `make:public-page`
+  injecte sa route dans `__init__.py`. Aucune découverte automatique (charte principe 3,
+  ADR-030) : chaque branchement reste explicite et lisible. L'import
+  `importlib.import_module("mvc.routes").router` reste inchangé (un paquet expose le même
+  attribut qu'un module). Migration d'un projet existant : créer `mvc/routes/__init__.py`
+  avec le contenu de l'ancien `mvc/routes.py`, puis extraire progressivement les routes
+  par contrôleur.
 - **`forge db:init` génère le SQL de provisioning par défaut (ADR-067).** Au lieu de
   se connecter avec un compte d'administration serveur lu dans `env/`, `db:init`
   **affiche** désormais le script SQL de provisioning dérivé de `env/` (création de la

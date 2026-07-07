@@ -53,7 +53,7 @@ def _scaffold_minimal_project(root: Path) -> None:
     (root / "mvc" / "views").mkdir(parents=True)
     (root / "mvc" / "entities").mkdir(parents=True)
     _write(
-        root / "mvc" / "routes.py",
+        root / "mvc" / "routes" / "__init__.py",
         "from core.http.router import Router\nrouter = Router()\n",
     )
 
@@ -216,7 +216,7 @@ class TestFilesOutsideGeneration:
 
     def test_routes_py_preserved_after_crud_rerun(self, tmp_path):
         root = _build_project(tmp_path)
-        routes = root / "mvc" / "routes.py"
+        routes = root / "mvc" / "routes" / "__init__.py"
         marker = "# USER CUSTOM ROUTE - DO NOT REMOVE\n"
         routes.write_text(routes.read_text(encoding="utf-8") + marker, encoding="utf-8")
         _rerun_make_crud(root)

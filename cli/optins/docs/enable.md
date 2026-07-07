@@ -6,7 +6,7 @@ Elle branche localement un opt-in dans le projet courant, en mode dry-run par d�
 ## 1. Rôle
 
 `opt-in:enable` agit sur l'axe activation (ADR-016).
-Pour un opt-in de *kind* `route` (`iot`, `video`, `audio`), elle crée la couche `optins/<name>/` du projet, branche l'opt-in dans `optins/registry.py`, puis propose de brancher `register_optins(router)` dans `mvc/routes.py`.
+Pour un opt-in de *kind* `route` (`iot`, `video`, `audio`), elle crée la couche `optins/<name>/` du projet, branche l'opt-in dans `optins/registry.py`, puis propose de brancher `register_optins(router)` dans `mvc/routes/__init__.py`.
 
 Pour un opt-in non routier (`library` ou `crosscutting`), la commande n'écrit rien.
 Elle affiche un conseil d'utilisation produit par le module `guidance` (voir la page dédiée).
@@ -17,7 +17,7 @@ Le contrat est strict :
 - idempotence : fichier absent créé, présent identique signalé `[OK] déjà présent`, présent différent signalé `[WARN]` sans écriture ;
 - jamais d'écrasement silencieux (principe 9) ;
 - pas de discovery magique : le branchement reste explicite via `optins/registry.py` ;
-- `mvc/routes.py` n'est modifié que si sa structure est reconnue (`router = Router()`), sinon la commande affiche l'instruction manuelle ;
+- `mvc/routes/__init__.py` n'est modifié que si sa structure est reconnue (`router = Router()`), sinon la commande affiche l'instruction manuelle ;
 - la présence du paquet est vérifiée via `importlib.util.find_spec`, sans importer `forge_mvc_<name>`.
 
 ## 2. Vue d'ensemble rapide
@@ -30,7 +30,7 @@ Le contrat est strict :
 | Rôle | brancher un opt-in routier dans le projet (ou conseiller pour un non-routier) |
 | Entrées | nom court de l'opt-in, option `--apply` |
 | Sorties | fichiers de la couche `optins/<name>/` (avec `--apply`), messages d'état |
-| Fichiers touchés | `optins/__init__.py`, `optins/registry.py`, `optins/<name>/...`, `mvc/routes.py` |
+| Fichiers touchés | `optins/__init__.py`, `optins/registry.py`, `optins/<name>/...`, `mvc/routes/__init__.py` |
 | Mode Forge | Forge génère (write-if-new) et affiche (instructions, conseils) |
 | ADR lié | ADR-016 |
 
@@ -67,7 +67,7 @@ sequenceDiagram
 
 - la commande vérifie d'abord la présence du paquet, même en dry-run ;
 - elle écrit selon le mode write-if-new : un fichier existant différent n'est jamais écrasé ;
-- le branchement dans `optins/registry.py` et `mvc/routes.py` est explicite et idempotent ;
+- le branchement dans `optins/registry.py` et `mvc/routes/__init__.py` est explicite et idempotent ;
 - pour un opt-in non routier, aucun fichier n'est touché : seul un conseil s'affiche.
 
 ## 4. API publique

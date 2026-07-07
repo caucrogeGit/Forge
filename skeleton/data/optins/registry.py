@@ -10,7 +10,7 @@ n'est copié ici : il vit dans le `.venv`. Ce fichier est géré par
   (route, library, crosscutting, cli). Les opt-ins `route` sont aussi câblés
   dans `register_optins` ; les autres y figurent pour la visibilité.
 - `register_optins` : câble les routes des opt-ins `route` activés. Appelé
-  depuis `mvc/routes.py` :
+  depuis `mvc/routes/__init__.py` :
 
     from optins.registry import register_optins
 

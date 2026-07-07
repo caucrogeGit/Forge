@@ -27,7 +27,7 @@ APPARATUS = [
 ]
 
 # Squelette applicatif minimal (présent dans les deux modes).
-CORE = ["app.py", "config.py", "mvc/routes.py", "requirements.txt", ".gitignore"]
+CORE = ["app.py", "config.py", "mvc/routes/__init__.py", "requirements.txt", ".gitignore"]
 
 
 # ── Filtrage au niveau du squelette ──────────────────────────────────────────
@@ -89,7 +89,7 @@ def test_forge_new_bare_garde_coeur_et_guidance(monkeypatch, tmp_path):
     projet = _run_cmd_new_bare(monkeypatch, tmp_path)
     # Squelette applicatif minimal.
     assert (projet / "app.py").is_file()
-    assert (projet / "mvc" / "routes.py").is_file()
+    assert (projet / "mvc" / "routes" / "__init__.py").is_file()
     # Guidance agent (ADR-047) : posée par agents:init, pas de l'apparat qualité.
     assert (projet / "CLAUDE.md").is_file()
     assert (projet / "docs" / "adr" / "001-adopter-forge.md").is_file()

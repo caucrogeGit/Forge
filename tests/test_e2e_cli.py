@@ -48,7 +48,7 @@ def _scaffold_minimal_project(root: Path) -> None:
     (root / "mvc" / "views").mkdir(parents=True)
     (root / "mvc" / "entities").mkdir(parents=True)
     _write(
-        root / "mvc" / "routes.py",
+        root / "mvc" / "routes" / "__init__.py",
         "from core.http.router import Router\nrouter = Router()\n",
     )
 
@@ -86,7 +86,7 @@ class TestProjectStructure:
         assert (built_project / "mvc").is_dir()
 
     def test_routes_py_exists(self, built_project):
-        assert (built_project / "mvc" / "routes.py").exists()
+        assert (built_project / "mvc" / "routes" / "__init__.py").exists()
 
 
 # ── Entité ────────────────────────────────────────────────────────────────────

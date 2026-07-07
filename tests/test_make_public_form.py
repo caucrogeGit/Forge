@@ -80,8 +80,8 @@ def _prepare_form_project(root: Path, definition: dict) -> Path:
         "{% block scripts %}{% endblock %}\n",
         encoding="utf-8",
     )
-    (root / "mvc" / "routes.py").parent.mkdir(parents=True, exist_ok=True)
-    (root / "mvc" / "routes.py").write_text(
+    (root / "mvc" / "routes" / "__init__.py").parent.mkdir(parents=True, exist_ok=True)
+    (root / "mvc" / "routes" / "__init__.py").write_text(
         "from core.http.router import Router\n\nrouter = Router()\n",
         encoding="utf-8",
     )
@@ -441,7 +441,7 @@ def test_make_public_form_cree_routes(tmp_path):
 
     make_public_form("Demande", output_root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes.py")
+    routes = _read(tmp_path, "mvc/routes/__init__.py")
     assert "PublicDemandesController" in routes
     assert '"/demandes/new"' in routes
     assert '"/demandes"' in routes

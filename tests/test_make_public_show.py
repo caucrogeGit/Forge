@@ -66,7 +66,7 @@ def test_make_public_show_ajoute_route_publique_idempotente(tmp_path):
     make_public_show("Hebergement", output_root=tmp_path)
     make_public_show("Hebergement", output_root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes.py")
+    routes = _read(tmp_path, "mvc/routes/__init__.py")
     assert "from mvc.controllers.public_hebergements_controller import PublicHebergementsController" in routes
     assert 'public.add("GET", "/hebergements/{id}", PublicHebergementsController.show, name="public_hebergements-show")' in routes
     assert routes.count('"/hebergements/{id}"') == 1
@@ -96,7 +96,7 @@ def test_make_public_show_necrase_pas_controleur_existant_non_reconnu(tmp_path):
     assert controller.read_text(encoding="utf-8") == "# controleur manuel\n"
     assert "mvc/controllers/public_hebergements_controller.py" in result.preserved
     assert result.warnings
-    assert "public_hebergements_controller" not in _read(tmp_path, "mvc/routes.py")
+    assert "public_hebergements_controller" not in _read(tmp_path, "mvc/routes/__init__.py")
 
 
 def test_make_public_show_genere_requete_sql_visible():
@@ -154,7 +154,7 @@ def test_make_public_show_reste_independant_de_make_crud(tmp_path):
         [
             _read(tmp_path, "mvc/views/public/hebergements/show.html"),
             _read(tmp_path, "mvc/controllers/public_hebergements_controller.py"),
-            _read(tmp_path, "mvc/routes.py"),
+            _read(tmp_path, "mvc/routes/__init__.py"),
         ]
     )
     assert "make_crud" not in generated
