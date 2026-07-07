@@ -311,6 +311,7 @@ nav:
             - ADR-064 Amorçage de l'environnement du backend (forge db config): adr/064-db-config-env-scaffold.md
             - ADR-065 Le squelette à la racine, paquet Python distinct: adr/065-skeleton-top-level-package.md
             - ADR-066 Contrat d'environnement BDD, DB_HOST/DB_PORT partagés: adr/066-db-host-port-unification.md
+            - ADR-067 db:init génère le SQL de provisioning par défaut: adr/067-db-init-provisioning-sql.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
