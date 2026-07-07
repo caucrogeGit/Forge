@@ -22,6 +22,7 @@ import argparse
 import getpass
 from dataclasses import dataclass
 import importlib
+import importlib.util
 import sys
 from pathlib import Path
 from collections.abc import Callable
@@ -276,17 +277,37 @@ def cmd_auth_init(args: list[str], root: Path | None = None) -> None:
     root = root or Path.cwd()
     sql_dir = root / _SQL_DIR
     sql_dir.mkdir(parents=True, exist_ok=True)
+
+    # Socle de base : ne dépend que du cœur (core.auth), toujours applicable seul.
     _write_if_new(sql_dir / "users.sql", USERS_SQL)
     _write_if_new(sql_dir / "auth_tokens.sql", AUTH_TOKENS_SQL)
-    _write_if_new(sql_dir / "auth_mfa_factors.sql", AUTH_MFA_FACTORS_SQL)
-    _write_if_new(sql_dir / "auth_mfa_recovery_codes.sql", AUTH_MFA_RECOVERY_CODES_SQL)
-    _write_if_new(sql_dir / "user_roles.sql", USER_ROLES_SQL)
     _write_if_new(sql_dir / "auth_audit_log.sql", AUTH_AUDIT_LOG_SQL)
     _write_if_new(sql_dir / "auth_rate_limit_attempts.sql", AUTH_RATE_LIMIT_ATTEMPTS_SQL)
 
+    # FORGE-4 : les ponts vers un opt-in ne sont écrits que si l'opt-in est
+    # installé. Leur SQL référence des tables de l'opt-in (user_roles -> roles du
+    # RBAC, MFA -> forge-mvc-mfa) ; l'émettre sans l'opt-in rend le socle
+    # inapplicable d'un bloc (FK vers une table absente).
+    skipped: list[str] = []
+    if _optin_installed("forge_mvc_mfa"):
+        _write_if_new(sql_dir / "auth_mfa_factors.sql", AUTH_MFA_FACTORS_SQL)
+        _write_if_new(sql_dir / "auth_mfa_recovery_codes.sql", AUTH_MFA_RECOVERY_CODES_SQL)
+    else:
+        skipped.append("MFA (forge-mvc-mfa) : auth_mfa_factors.sql, auth_mfa_recovery_codes.sql")
+    if _optin_installed("forge_mvc_rbac"):
+        _write_if_new(sql_dir / "user_roles.sql", USER_ROLES_SQL)
+    else:
+        skipped.append("RBAC (forge-mvc-rbac) : user_roles.sql")
+
     print()
     print(out.info("Commande suivante :"))
-    print(out.info("  forge db:apply  # pour créer les tables Auth/User optionnelles"))
+    print(out.info("  forge db:apply  # pour créer les tables Auth/User"))
+    if skipped:
+        print()
+        print(out.info("Ponts opt-in non écrits (opt-in non installé) :"))
+        for item in skipped:
+            print(out.info(f"  - {item}"))
+        print(out.info("Installez l'opt-in puis relancez `forge auth:init` pour ajouter son pont."))
 
 
 def _sql_path(root: Path, filename: str) -> Path:
@@ -296,6 +317,14 @@ def _sql_path(root: Path, filename: str) -> Path:
 def _import_has_attr(module_name: str, attr_name: str) -> bool:
     module = importlib.import_module(module_name)
     return hasattr(module, attr_name)
+
+
+def _optin_installed(module_name: str) -> bool:
+    """Vrai si l'opt-in (paquet) est installé, sans l'importer (FORGE-4)."""
+    try:
+        return importlib.util.find_spec(module_name) is not None
+    except (ImportError, ValueError):
+        return False
 
 
 def _load_env_and_configure_forge(root: Path) -> None:

@@ -130,6 +130,34 @@ def test_auth_init_does_not_modify_rbac(tmp_path):
     assert "mvc/models/sql/user_roles.sql" in generated_paths
 
 
+def test_auth_init_ponts_optin_skippes_si_absents(tmp_path, monkeypatch, capsys):
+    # FORGE-4 : sans les opt-ins mfa/rbac, leurs ponts SQL (FK vers roles/mfa) ne
+    # sont pas écrits ; le socle de base l'est, et le skip est annoncé.
+    import cli.security.auth as auth
+    monkeypatch.setattr(auth, "_optin_installed", lambda name: False)
+    auth.cmd_auth_init([], root=tmp_path)
+    generated = {p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*") if p.is_file()}
+    assert "mvc/models/sql/users.sql" in generated
+    assert "mvc/models/sql/auth_tokens.sql" in generated
+    assert "mvc/models/sql/auth_audit_log.sql" in generated
+    assert "mvc/models/sql/auth_rate_limit_attempts.sql" in generated
+    assert "mvc/models/sql/user_roles.sql" not in generated
+    assert "mvc/models/sql/auth_mfa_factors.sql" not in generated
+    assert "mvc/models/sql/auth_mfa_recovery_codes.sql" not in generated
+    assert "non installé" in capsys.readouterr().out
+
+
+def test_auth_init_ponts_optin_ecrits_si_presents(tmp_path, monkeypatch):
+    # Symétrique : opt-ins présents, les ponts sont écrits.
+    import cli.security.auth as auth
+    monkeypatch.setattr(auth, "_optin_installed", lambda name: True)
+    auth.cmd_auth_init([], root=tmp_path)
+    generated = {p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*") if p.is_file()}
+    assert "mvc/models/sql/user_roles.sql" in generated
+    assert "mvc/models/sql/auth_mfa_factors.sql" in generated
+    assert "mvc/models/sql/auth_mfa_recovery_codes.sql" in generated
+
+
 def test_auth_user_existing_contract_stays_compatible():
     user = AuthUser(id=1, email="a@b.com", password_hash="hash")
     assert user.is_active is True
