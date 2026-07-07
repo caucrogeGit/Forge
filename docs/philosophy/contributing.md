@@ -228,7 +228,7 @@ Un test comportemental fort rend son test méta complémentaire optionnel, pas l
 - `test_forge_help_safe_flag_001.py`, vérifie via subprocess que `--help` n'exécute aucune logique métier ;
 - `test_modules_explicit_routes_001.py`, génère réellement des routes dans un répertoire temporaire ;
 - `test_doctor_mfa_warning_001.py`, appelle `check_mfa_dependency` avec un environnement contrôlé et vérifie le message retourné ;
-- `test_module_routes_injection_remove_001.py`, appelle `install_module_manifest` et vérifie que `mvc/routes.py` n'est pas touché.
+- `test_module_routes_injection_remove_001.py`, appelle `install_module_manifest` et vérifie que `mvc/routes/__init__.py` n'est pas touché.
 
 ### Politique de rotation des tests méta
 

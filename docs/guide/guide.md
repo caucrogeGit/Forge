@@ -218,9 +218,9 @@ Les suppressions gardent le champ CSRF et n'utilisent pas `hx-delete`.
 
 ### 7. Déclarer les routes
 
-`forge make:crud` affiche le bloc de routes à ajouter dans `mvc/routes.py`, il ne l'écrit jamais automatiquement.
+`forge make:crud` affiche le bloc de routes à ajouter dans `mvc/routes/__init__.py`, il ne l'écrit jamais automatiquement.
 
-Copier le bloc affiché dans `mvc/routes.py` :
+Copier le bloc affiché dans `mvc/routes/__init__.py` :
 
 ```python
 from mvc.controllers.contact_controller import ContactController
@@ -316,7 +316,7 @@ flowchart TD
     E --> F["forge db:apply"]
     F --> G["forge make:crud --dry-run"]
     G --> H["forge make:crud"]
-    H --> I["Copier les routes dans mvc/routes.py"]
+    H --> I["Copier les routes dans mvc/routes/__init__.py"]
     I --> J["python app.py"]
     J --> K["forge routes:list"]
 ```
@@ -353,4 +353,4 @@ Pour les commandes avancées et la référence complète des paramètres, voir [
 | erreur de compilation Python | outils de build absents | `sudo apt install build-essential pkg-config libmariadb-dev` |
 | `forge doctor` signale des FAIL | configuration incomplète | lire les messages FAIL et corriger |
 | table absente après `db:apply` | `build:model` non lancé avant | relancer `forge build:model` puis `forge db:apply` |
-| routes absentes dans `routes:list` | bloc de routes non copié | copier le bloc affiché par `forge make:crud` dans `mvc/routes.py` |
+| routes absentes dans `routes:list` | bloc de routes non copié | copier le bloc affiché par `forge make:crud` dans `mvc/routes/__init__.py` |

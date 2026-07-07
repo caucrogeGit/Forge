@@ -82,7 +82,7 @@ Nous donnons à ces deux écritures un vrai retour utilisateur : un message de c
     Inchangé : le flash réutilise les routes existantes (aucune route nouvelle).
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.note_controller import NoteController

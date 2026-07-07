@@ -262,7 +262,7 @@ Les fichiers de `Contact` suivent le même schéma (`contact_controller.py`, `co
     Si `forge make:crud` est relancé sur une entité existante, il refuse sans l'option `--force`.
     Votre code est en sécurité.
 
-Les routes sont ajoutées automatiquement dans `mvc/routes.py`.
+Les routes sont ajoutées automatiquement dans `mvc/routes/__init__.py`.
 
 ---
 

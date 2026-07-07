@@ -4,7 +4,7 @@
 
 **Ce que vous allez apprendre :**{ .intro-label } rendre un gabarit avec `BaseController.render(...)`, qui passe la requête au moteur de template et renvoie la page HTML.
 
-`WelcomeController` porte déjà `index` et `hello` (paliers précédents), et `mvc/routes.py` déclare `/welcome` et `/welcome/hello`.
+`WelcomeController` porte déjà `index` et `hello` (paliers précédents), et `mvc/routes/__init__.py` déclare `/welcome` et `/welcome/hello`.
 
 Nous ajoutons une méthode, une route et un gabarit.
 
@@ -33,10 +33,10 @@ Nous ajoutons une méthode, une route et un gabarit.
     Le contrôleur reste mince : il choisit le gabarit, le gabarit gère l'affichage.
 
 ??? note "Routes"
-    Ajoutez la route dans le groupe public de `mvc/routes.py` :
+    Ajoutez la route dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

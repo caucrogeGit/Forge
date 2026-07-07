@@ -290,7 +290,7 @@ Ces fichiers sont créés une fois puis jamais réécrasés par Forge :
 | `mvc/models/<E>.py` | `forge make:entity` |
 | `mvc/forms/<E>_form.py` | `forge make:crud` |
 | `mvc/views/<E>/*.html` | `forge make:crud` |
-| `mvc/routes.py` | `forge new` |
+| `mvc/routes/__init__.py` | `forge new` |
 | `static/` (fichiers utilisateur) | manuellement |
 
 **Principe :** `make:entity` et `make:crud` refusent d'écraser un fichier existant. Cette garantie est couverte par les tests E2E (`E2E-NON-OVERWRITE-001`).

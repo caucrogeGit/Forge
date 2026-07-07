@@ -4,7 +4,7 @@
 
 **Ce que vous allez apprendre :**{ .intro-label } nettoyer une valeur avec `.strip()` et renvoyer une réponse d'erreur avec un statut HTTP `422` quand la saisie est vide.
 
-`WelcomeController` porte déjà les méthodes des paliers précédents, et `mvc/routes.py` déclare les routes jusqu'à `/welcome/form`.
+`WelcomeController` porte déjà les méthodes des paliers précédents, et `mvc/routes/__init__.py` déclare les routes jusqu'à `/welcome/form`.
 
 Nous ajoutons deux méthodes, deux routes et un gabarit.
 
@@ -47,10 +47,10 @@ Nous ajoutons deux méthodes, deux routes et un gabarit.
     | `status=422` | « Contenu non traitable » : signale au client que la donnée est invalide, sans planter ni accepter une valeur fausse. |
 
 ??? note "Routes"
-    Ajoutez les deux routes (`GET` et `POST`) dans le groupe public de `mvc/routes.py` :
+    Ajoutez les deux routes (`GET` et `POST`) dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

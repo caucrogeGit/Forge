@@ -88,7 +88,7 @@ La route `/note` ne change toujours pas.
     Inchangé : la pagination passe par la *query string* `?page=N` sur `/note`.
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.note_controller import NoteController

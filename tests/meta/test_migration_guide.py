@@ -214,7 +214,7 @@ class TestFichiersGeneres:
 
     def test_routes_preservees(self):
         text = _text()
-        assert "routes.py" in text
+        assert "mvc/routes/__init__.py" in text
 
     def test_non_overwrite_mentionne(self):
         text = _text().lower()

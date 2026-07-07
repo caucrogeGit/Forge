@@ -93,9 +93,9 @@ Cette page récapitule les trois notions acquises, puis montre l'état final com
             return Response.json({"articles": articles})
     ```
 
-??? note "État final de mvc/routes.py"
+??? note "État final de mvc/routes/__init__.py"
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.article_controller import ArticleController

@@ -50,10 +50,10 @@ Il se poursuit ensuite avec un `MessageController`, qui introduit les formulaire
     | `Response.text(...)` | Construit une réponse en texte brut, sans vue HTML ni moteur de rendu. |
 
 ??? note "Route"
-    Dans `mvc/routes.py`, ajoutez l'import du contrôleur puis la route `/welcome` à l'intérieur du groupe public déjà présent :
+    Dans `mvc/routes/__init__.py`, ajoutez l'import du contrôleur puis la route `/welcome` à l'intérieur du groupe public déjà présent :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

@@ -42,11 +42,11 @@ Une fois le serveur démarré, ouvrez `https://localhost:8000/welcome` dans votr
 
 ## 2. Comprendre la route
 
-Toutes les routes Forge sont déclarées **explicitement** dans `mvc/routes.py`.
+Toutes les routes Forge sont déclarées **explicitement** dans `mvc/routes/__init__.py`.
 Aucune découverte automatique, aucune convention cachée :
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.welcome_controller import WelcomeController
 
 with router.group("", public=True) as public:
@@ -55,7 +55,7 @@ with router.group("", public=True) as public:
 ```
 
 Chaque ligne associe une méthode HTTP et un chemin à une méthode de contrôleur.
-Ce qui est dans `mvc/routes.py` est exactement ce qui est routé.
+Ce qui est dans `mvc/routes/__init__.py` est exactement ce qui est routé.
 
 ---
 

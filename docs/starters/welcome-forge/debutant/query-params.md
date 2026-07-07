@@ -4,7 +4,7 @@
 
 **Ce que vous allez apprendre :**{ .intro-label } récupérer une valeur de la chaîne de requête avec `request.query("name", default=...)`, avec une valeur de repli quand le paramètre est absent.
 
-Votre `WelcomeController` possède déjà la méthode `index` (palier précédent), et `mvc/routes.py` déclare la route `/welcome`.
+Votre `WelcomeController` possède déjà la méthode `index` (palier précédent), et `mvc/routes/__init__.py` déclare la route `/welcome`.
 
 Nous y ajoutons une méthode et une route.
 
@@ -37,10 +37,10 @@ Nous y ajoutons une méthode et une route.
     La valeur retournée est toujours de type `str` ; une conversion (entier, date) reste à votre charge dans le contrôleur.
 
 ??? note "Routes"
-    Ajoutez la route dans le groupe public de `mvc/routes.py` :
+    Ajoutez la route dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

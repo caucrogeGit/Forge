@@ -4,7 +4,7 @@
 
 **Ce que vous allez apprendre :**{ .intro-label } afficher les données de la requête avec `Response.debug(request.data)`, une aide pédagogique disponible en environnement de développement.
 
-`WelcomeController` porte déjà les méthodes des paliers précédents, et `mvc/routes.py` déclare les routes correspondantes jusqu'à `/welcome/article/{id}`.
+`WelcomeController` porte déjà les méthodes des paliers précédents, et `mvc/routes/__init__.py` déclare les routes correspondantes jusqu'à `/welcome/article/{id}`.
 
 Nous ajoutons une méthode et une route.
 
@@ -33,10 +33,10 @@ Nous ajoutons une méthode et une route.
     Cette aide n'est active qu'en environnement de développement (`APP_ENV=dev`) ; en production elle répond `404`, pour ne jamais exposer les données d'une requête.
 
 ??? note "Routes"
-    Ajoutez la route dans le groupe public de `mvc/routes.py` :
+    Ajoutez la route dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

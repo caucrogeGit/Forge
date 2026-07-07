@@ -14,7 +14,7 @@ Cette page regroupe les questions fréquentes retirées de la landing page. La l
 - un modèle applicatif ;
 - un formulaire ;
 - les vues Jinja2 `index`, `show` et `form` ;
-- les indications de routes à ajouter dans `mvc/routes.py`.
+- les indications de routes à ajouter dans `mvc/routes/__init__.py`.
 
 Le code généré reste lisible et modifiable. Forge ne cherche pas à cacher le fonctionnement du CRUD.
 
@@ -22,7 +22,7 @@ Le code généré reste lisible et modifiable. Forge ne cherche pas à cacher le
 
 ## Pourquoi les routes ne sont-elles pas injectées automatiquement partout ?
 
-Parce que les routes sont une décision applicative. Forge peut générer ou afficher le bloc prêt à intégrer, mais le développeur doit garder la main sur l'organisation de `mvc/routes.py`.
+Parce que les routes sont une décision applicative. Forge peut générer ou afficher le bloc prêt à intégrer, mais le développeur doit garder la main sur l'organisation de `mvc/routes/__init__.py`.
 
 Cette règle évite les injections silencieuses et rend la structure du projet plus facile à auditer.
 

@@ -237,7 +237,7 @@ def register_api_routes(router):
                 csrf=False)
 ```
 
-Les routes HTML restent dans `mvc/routes.py`.
+Les routes HTML restent dans `mvc/routes/__init__.py`.
 Les deux fichiers partagent le même routeur mais sont séparés organisationnellement.
 
 Le flag `api=True` est déclaratif, il identifie les routes API sans modifier leur comportement.

@@ -123,10 +123,10 @@ Ces deux écritures doivent rester atomiques, d'où la transaction.
     ```
 
 ??? note "Routes"
-    Déclarez les deux routes dans `mvc/routes.py` :
+    Déclarez les deux routes dans `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.article_controller import ArticleController

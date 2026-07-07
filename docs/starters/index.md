@@ -95,5 +95,5 @@ Pour choisir un profil : [Profils de projet](../features/profiles.md).
 Un starter se suit **à la main**, palier par palier : chaque palier indique le contrôleur, la vue et la route à créer.
 
 !!! note "Les starters ne se génèrent pas"
-    Forge ne génère pas les starters et n'écrit jamais dans votre `mvc/routes.py`.
+    Forge ne génère pas les starters et n'écrit jamais dans votre `mvc/routes/__init__.py`.
     Vous créez vous-même chaque fichier et ajoutez chaque route, en suivant la documentation du palier (voir [ADR-035](../adr/035-starters-manual-not-generated.md)).

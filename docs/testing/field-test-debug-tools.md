@@ -83,13 +83,13 @@ forge project:audit
 
 ### `forge routes:list`
 
-**Objectif :** affiche les routes déclarées dans `mvc/routes.py`.
+**Objectif :** affiche les routes déclarées dans `mvc/routes/__init__.py`.
 
 **Quand l'utiliser :** quand une page ne répond pas, quand une URL semble absente, ou quand une route est supposée exister.
 
 **Ce que le testeur doit copier :** la sortie complète + la route attendue.
 
-**À ne pas faire :** modifier `mvc/routes.py` sans le documenter dans le retour.
+**À ne pas faire :** modifier `mvc/routes/__init__.py` sans le documenter dans le retour.
 
 ```bash
 forge routes:list

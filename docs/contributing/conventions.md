@@ -263,7 +263,7 @@ Origine : `LANG-MIGRATION-001`.
 
 ### C.6 : Validation précoce des arguments critiques (anti-erreur-différée)
 
-Une entrée publique du cœur appelée par le code applicatif (contrôleur, `mvc/routes.py`, boot) doit **valider tôt** ses arguments positionnels critiques, avec un `TypeError` au message **actionnable**, plutôt que de laisser passer une valeur invalide qui ne casse que plus loin.
+Une entrée publique du cœur appelée par le code applicatif (contrôleur, `mvc/routes/__init__.py`, boot) doit **valider tôt** ses arguments positionnels critiques, avec un `TypeError` au message **actionnable**, plutôt que de laisser passer une valeur invalide qui ne casse que plus loin.
 
 Motivation : l'**erreur différée**.
 Une valeur fautive fabriquée à un endroit (ex. `Response("texte")` : le 1er argument positionnel est le `status`) mais consommée ailleurs (l'envoi de la réponse) produit un traceback qui pointe le **point de consommation**, pas le code fautif.

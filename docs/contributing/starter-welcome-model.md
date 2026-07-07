@@ -130,7 +130,7 @@ Ouvrez `https://localhost:8000/<route>` → <résultat attendu>.
 
 ## Les routes
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 …
 ```
 

@@ -119,10 +119,10 @@ C'est un nouveau besoin (un formulaire, une route POST, du CSRF), donc deux nouv
     Le `<form>` est en `method="post"` et embarque le **jeton CSRF** : toute écriture est protégée.
 
 ??? note "Routes"
-    Déclarez les deux routes dans `mvc/routes.py` :
+    Déclarez les deux routes dans `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.note_controller import NoteController

@@ -62,7 +62,7 @@ class ShowcaseController(BaseController):
         )
 ```
 
-Déclarez la route dans `mvc/routes.py` (groupe public) :
+Déclarez la route dans `mvc/routes/__init__.py` (groupe public) :
 
 ```python
 public.add("GET", "/showcase", ShowcaseController.index, name="showcase-index")

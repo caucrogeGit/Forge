@@ -73,7 +73,7 @@ Nous y écrivons maintenant **notre propre** état : un compteur de visites, lu 
     Inchangé : le compteur vit dans la session, pas dans une route nouvelle.
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.note_controller import NoteController

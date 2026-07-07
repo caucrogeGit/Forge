@@ -72,7 +72,7 @@ Le texte doit être opérationnel, pas scolaire.
 Exemple :
 
 > Dans Forge, une route relie une méthode HTTP et une URL à une méthode de contrôleur.
-> Le fichier des routes applicatives est `mvc/routes.py`.
+> Le fichier des routes applicatives est `mvc/routes/__init__.py`.
 > Le contrôleur appartient à l’application et se trouve dans `mvc/controllers/`.
 
 ---
@@ -126,7 +126,7 @@ Exemple :
 
 Présenter chaque élément utile.
 
-### `mvc/routes.py`
+### `mvc/routes/__init__.py`
 
 - **Rôle :** déclarer les routes de l’application.
 - **Nature :** fichier applicatif.

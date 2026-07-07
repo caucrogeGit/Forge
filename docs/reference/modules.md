@@ -259,7 +259,7 @@ Règles :
 - refuse d'écraser un fichier existant ;
 - `--dry-run` affiche les copies prévues sans écrire ;
 - ignore les caches, fichiers temporaires et dossiers cachés ;
-- ne modifie pas `mvc/routes.py` ;
+- ne modifie pas `mvc/routes/__init__.py` ;
 - ne lance aucun SQL ;
 - n'exécute aucun code du module.
 
@@ -280,12 +280,12 @@ module:routes = génération d'un fichier dédié + affichage des lignes à copi
 
 Prérequis : le module doit déclarer `"routes"` dans `provides` et un chemin valide dans `paths.routes`.
 
-**Forge ne modifie jamais `mvc/routes.py`** (principe 9 de la charte v2 : pas d'écriture invisible dans le code utilisateur).
+**Forge ne modifie jamais `mvc/routes/__init__.py`** (principe 9 de la charte v2 : pas d'écriture invisible dans le code utilisateur).
 
 La commande :
 
 1. Crée `mvc/routes_<nom>.py` (fichier dédié par module, write-if-new) ;
-2. Affiche sur stdout les lignes à ajouter dans `mvc/routes.py`.
+2. Affiche sur stdout les lignes à ajouter dans `mvc/routes/__init__.py`.
 
 ```python
 # Contenu généré dans mvc/routes_agenda.py :
@@ -294,7 +294,7 @@ from modules.agenda.routes import register_routes as register_agenda_routes
 __all__ = ["register_agenda_routes"]
 ```
 
-Pour activer les routes, ajoutez dans `mvc/routes.py` :
+Pour activer les routes, ajoutez dans `mvc/routes/__init__.py` :
 
 ```python
 from mvc.routes_agenda import register_agenda_routes
@@ -354,7 +354,7 @@ module.json
 → fichiers copiés dans mvc/ et docs/modules/
 → forge module:routes
 → mvc/routes_<nom>.py généré (fichier dédié par module)
-→ lignes à copier dans mvc/routes.py affichées
+→ lignes à copier dans mvc/routes/__init__.py affichées
 ```
 
 Chaque étape est indépendante et explicite.
@@ -393,7 +393,7 @@ Comportement sur les routes :
 | Marqueurs absents | Nettoyage manuel requis, signalé |
 | Fichier `mvc/module_routes.py` absent | Ignoré |
 
-> **Contrat explicite :** `forge module:remove` ne supprime pas `mvc/routes_<nom>.py` ni les lignes que vous avez ajoutées dans `mvc/routes.py`.
+> **Contrat explicite :** `forge module:remove` ne supprime pas `mvc/routes_<nom>.py` ni les lignes que vous avez ajoutées dans `mvc/routes/__init__.py`.
 > Ces éléments restent sur le disque, à retirer manuellement si souhaité.
 
 Règles :
@@ -510,7 +510,7 @@ Sécurité :
 | Découverte | `forge module:list` | Scanne un dossier, liste les modules valides et invalides |
 | Enregistrement | `forge module:install` | Valide le manifeste, inscrit le module dans `forge_modules.json` |
 | Copie des fichiers | `forge module:files` | Copie les fichiers déclarés dans `mvc/` et `docs/modules/` |
-| Génération des routes | `forge module:routes` | Génère `mvc/routes_<nom>.py` et affiche les lignes à ajouter dans `mvc/routes.py` |
+| Génération des routes | `forge module:routes` | Génère `mvc/routes_<nom>.py` et affiche les lignes à ajouter dans `mvc/routes/__init__.py` |
 | Désinstallation contrôlée | `forge module:remove` | Supprime les fichiers inchangés, retire les routes marquées, met à jour le registre |
 
 Chaque étape est indépendante, explicite, et dotée d'un mode `--dry-run`.
@@ -522,7 +522,7 @@ Garanties lors de l'installation :
 - aucun code du module n'est exécuté pendant l'installation ;
 - les chemins absolus, `..` et URL sont refusés à toutes les étapes ;
 - les fichiers copiés sont tracés dans `forge_modules.json` avec la clé `files_installed` ;
-- `forge module:routes` génère `mvc/routes_<nom>.py` et affiche les lignes à ajouter dans `mvc/routes.py`, il ne modifie jamais `mvc/routes.py`.
+- `forge module:routes` génère `mvc/routes_<nom>.py` et affiche les lignes à ajouter dans `mvc/routes/__init__.py`, il ne modifie jamais `mvc/routes/__init__.py`.
 
 #### Ce qui n'est pas encore supporté
 
@@ -545,7 +545,7 @@ Forge ne fournit pas encore les opérations suivantes :
 `forge module:remove` supprime uniquement les fichiers dont le contenu est identique à la source.
 Les fichiers modifiés sont conservés et signalés.
 Si la source est absente, les fichiers sont conservés.
-Après `forge module:routes`, retirer le dossier source `modules/<nom>/` sans supprimer `mvc/routes_<nom>.py` et les lignes correspondantes dans `mvc/routes.py` provoque une erreur d'import au démarrage.
+Après `forge module:routes`, retirer le dossier source `modules/<nom>/` sans supprimer `mvc/routes_<nom>.py` et les lignes correspondantes dans `mvc/routes/__init__.py` provoque une erreur d'import au démarrage.
 
 **Pas de rollback sur fichiers partiellement copiés.**
 Si une copie de fichiers échoue en cours d'opération, les fichiers déjà copiés ne sont pas annulés.
@@ -564,7 +564,7 @@ Supprimez-le manuellement pour le régénérer.
 - Versionner `forge_modules.json` pour garder la traçabilité des modules installés.
 - Ne pas modifier les fichiers copiés par `forge module:files` si vous souhaitez garder la possibilité de supprimer ou mettre à jour le module proprement.
 - Conserver le dossier `modules/<nom>/` tant que ses routes sont actives dans l'application.
-- Ajouter manuellement les lignes affichées par `forge module:routes` dans `mvc/routes.py` après génération.
+- Ajouter manuellement les lignes affichées par `forge module:routes` dans `mvc/routes/__init__.py` après génération.
 
 #### Tickets futurs
 

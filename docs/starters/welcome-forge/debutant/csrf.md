@@ -65,10 +65,10 @@ Vous allez donc garantir une session pour obtenir un jeton non vide, puis le pla
     ```
 
 ??? note "Routes"
-    Ajoutez la route `/welcome/csrf` dans le groupe public de `mvc/routes.py` :
+    Ajoutez la route `/welcome/csrf` dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

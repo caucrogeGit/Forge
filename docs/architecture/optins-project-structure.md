@@ -23,7 +23,7 @@ Donner à un projet Forge un **lieu unique, explicite et lisible** pour voir et 
 - quelles **migrations** ils utilisent ;
 - quels **starters** leur sont liés ;
 - quelle **documentation locale** existe ;
-- comment ils sont branchés dans `mvc/routes.py`.
+- comment ils sont branchés dans `mvc/routes/__init__.py`.
 
 C'est l'équivalent Forge, volontairement simple et sans magie, de ce que les **bundles** apportent dans Symfony, mais aligné sur la charte Forge (pas d'écriture invisible, refus de la magie cachée, une seule façon officielle de faire).
 
@@ -49,7 +49,7 @@ Aucune inspection automatique de `site-packages`, aucun chargement implicite au 
 Raisons (charte v2) :
 
 - **Refuser la magie cachée** (§3) : un opt-in actif doit être visible dans le code du projet, pas deviné à l'exécution.
-- **Pas d'écriture invisible** (§9) : Forge ne réécrit pas silencieusement `mvc/routes.py`.
+- **Pas d'écriture invisible** (§9) : Forge ne réécrit pas silencieusement `mvc/routes/__init__.py`.
 - **Une seule façon officielle** (§11) : le branchement passe toujours par `optins/registry.py`, appelé explicitement.
 
 Conséquence directe : **Forge Core ne dépend pas des opt-ins et ne les charge pas automatiquement.**
@@ -113,7 +113,7 @@ def register_optins(router) -> None:
     register_iot(router)
 ```
 
-Le projet appelle `register_optins` explicitement dans `mvc/routes.py` (toujours présent, sans effet tant qu'aucun opt-in `route` n'est activé) :
+Le projet appelle `register_optins` explicitement dans `mvc/routes/__init__.py` (toujours présent, sans effet tant qu'aucun opt-in `route` n'est activé) :
 
 ```python
 from optins.registry import register_optins
@@ -238,5 +238,5 @@ Ne sont **pas** faits ici :
 - `OPTINS-CLI-ENABLE-AUDIT-001` (**livré**), cadre la future commande `forge optin:enable` : voir l'[audit `forge optin:enable`](optins-cli-enable-audit.md) (commande cible, idempotence, dry-run, gestion des conflits, sans discovery ni écrasement silencieux).
 - `OPTINS-CLI-ENABLE-IOT-001` (**livré**), implémente `forge optin:enable iot` (dry-run par défaut, `--apply`, idempotent).
   Voir la [référence CLI](../reference/cli-commands.md#opt-ins-branchement-projet).
-- `OPTINS-CLI-ENABLE-ROUTES-APPLY-001` (**livré**), `--apply` branche `mvc/routes.py` **si la structure est reconnue** (`router = Router()`), sinon `[WARN]` + instruction manuelle (aucune modification).
+- `OPTINS-CLI-ENABLE-ROUTES-APPLY-001` (**livré**), `--apply` branche `mvc/routes/__init__.py` **si la structure est reconnue** (`router = Router()`), sinon `[WARN]` + instruction manuelle (aucune modification).
 - `OPTINS-CLI-LIST-001` (**livré**), `forge optin:list`, commande **lecture seule** qui affiche l'état local des opt-ins `route` (`absent` / `partiel` / `activé` pour `iot`, `video`, `audio`) et liste les opt-ins `library` / `crosscutting` avec leur kind, sans rien créer ni modifier.

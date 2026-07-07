@@ -122,9 +122,9 @@ Cette page récapitule les huit notions acquises, puis montre l'état final comp
             return BaseController.redirect("/note", request=request, flash="Note supprimée.")
     ```
 
-??? note "État final de mvc/routes.py"
+??? note "État final de mvc/routes/__init__.py"
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.note_controller import NoteController

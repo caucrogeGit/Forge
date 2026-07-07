@@ -208,7 +208,7 @@ Exemple de classification :
 
 | Élément | Nature | Action autorisée |
 |---|---|---|
-| `mvc/routes.py` | applicatif | modifiable |
+| `mvc/routes/__init__.py` | applicatif | modifiable |
 | `mvc/controllers/` | applicatif | modifiable |
 | `mvc/views/` | applicatif | modifiable |
 | `mvc/entities/` | applicatif canonique | modifiable selon procédure |

@@ -43,19 +43,19 @@ def test_guide_mentions_dedicated_routes_file():
 
 
 def test_guide_mentions_explicit_lines_in_mvc_routes():
-    """Le guide doit expliquer que le développeur ajoute les lignes dans mvc/routes.py."""
+    """Le guide doit expliquer que le développeur ajoute les lignes dans mvc/routes/__init__.py."""
     src = _read(MODULE_AUTHOR_GUIDE)
-    assert "mvc/routes.py" in src, (
-        "docs/philosophy/module-author-guide.md doit mentionner mvc/routes.py"
+    assert "mvc/routes/__init__.py" in src, (
+        "docs/philosophy/module-author-guide.md doit mentionner mvc/routes/__init__.py"
     )
 
 
 def test_guide_states_no_automatic_injection():
-    """Le guide doit préciser que Forge ne modifie pas mvc/routes.py automatiquement."""
+    """Le guide doit préciser que Forge ne modifie pas mvc/routes/__init__.py automatiquement."""
     src = _read(MODULE_AUTHOR_GUIDE)
     assert "ne modifie" in src or "pas automatiquement" in src or "manuellement" in src, (
         "docs/philosophy/module-author-guide.md doit indiquer que Forge ne modifie pas "
-        "mvc/routes.py automatiquement"
+        "mvc/routes/__init__.py automatiquement"
     )
 
 

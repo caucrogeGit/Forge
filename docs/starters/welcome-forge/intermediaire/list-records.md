@@ -127,10 +127,10 @@ Voir [Préparer MariaDB](../../../install/mariadb.md) si ce n'est pas déjà fai
     La vue **boucle** sur la liste avec `{% for note in notes %}` et gère le cas d'une table vide avec `{% if notes %}`.
 
 ??? note "Routes"
-    Ajoutez l'import du contrôleur et la route `/note` dans `mvc/routes.py` :
+    Ajoutez l'import du contrôleur et la route `/note` dans `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.note_controller import NoteController

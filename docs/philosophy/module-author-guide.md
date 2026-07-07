@@ -152,14 +152,14 @@ def register_routes(router):
 
 ### Génération du fichier de routes dédié
 
-`forge module:routes mon_module` génère un fichier `mvc/routes_mon_module.py` **sans modifier** `mvc/routes.py` :
+`forge module:routes mon_module` génère un fichier `mvc/routes_mon_module.py` **sans modifier** `mvc/routes/__init__.py` :
 
 ```python
 # mvc/routes_mon_module.py (généré par Forge - régénérable)
 """Routes du module Forge "mon_module".
 
 Fichier genere par `forge module:routes mon_module`. Regenerable.
-Pour activer ces routes, ajoutez dans mvc/routes.py :
+Pour activer ces routes, ajoutez dans mvc/routes/__init__.py :
 
     from mvc.routes_mon_module import register_mon_module_routes
     register_mon_module_routes(router)
@@ -169,34 +169,34 @@ from modules.mon_module.routes import register_routes as register_mon_module_rou
 __all__ = ["register_mon_module_routes"]
 ```
 
-### Branchement explicite dans mvc/routes.py
+### Branchement explicite dans mvc/routes/__init__.py
 
-La commande affiche les deux lignes à ajouter manuellement dans `mvc/routes.py` :
+La commande affiche les deux lignes à ajouter manuellement dans `mvc/routes/__init__.py` :
 
 ```python
-# À ajouter manuellement dans mvc/routes.py
+# À ajouter manuellement dans mvc/routes/__init__.py
 from mvc.routes_mon_module import register_mon_module_routes
 register_mon_module_routes(router)
 ```
 
-**Forge ne modifie jamais `mvc/routes.py` automatiquement.**
+**Forge ne modifie jamais `mvc/routes/__init__.py` automatiquement.**
 Le branchement est visible, lisible, modifiable et réversible.
 
 ### Comportement de module:install
 
 `forge module:install` enregistre le module dans `forge_modules.json`.
-Il **ne génère pas** de fichier de routes et **n'écrit pas** dans `mvc/routes.py`.
+Il **ne génère pas** de fichier de routes et **n'écrit pas** dans `mvc/routes/__init__.py`.
 
 ### Comportement de module:routes
 
-`forge module:routes` génère `mvc/routes_<module>.py` et affiche les lignes à copier dans `mvc/routes.py`.
-Il **ne modifie pas** `mvc/routes.py`.
+`forge module:routes` génère `mvc/routes_<module>.py` et affiche les lignes à copier dans `mvc/routes/__init__.py`.
+Il **ne modifie pas** `mvc/routes/__init__.py`.
 
 ### Comportement de module:remove
 
 `forge module:remove` supprime les fichiers copiés par `module:files` et nettoie le registre.
 
-Pour les routes, **Forge ne supprime pas `mvc/routes_<module>.py`** ni les lignes que vous avez ajoutées dans `mvc/routes.py`.
+Pour les routes, **Forge ne supprime pas `mvc/routes_<module>.py`** ni les lignes que vous avez ajoutées dans `mvc/routes/__init__.py`.
 Ces fichiers restent sur le disque après la suppression, à retirer manuellement.
 
 !!! note "Compatibilité arrière"
@@ -210,7 +210,7 @@ Migration recommandée :
 
 1. Générer `mvc/routes_<module>.py` avec `forge module:routes <nom>`.
 2. Vérifier le contenu du fichier généré.
-3. Ajouter manuellement les deux lignes dans `mvc/routes.py`.
+3. Ajouter manuellement les deux lignes dans `mvc/routes/__init__.py`.
 4. Supprimer manuellement l'ancien bloc dans `mvc/module_routes.py` si nécessaire.
 5. Relancer les tests.
 
@@ -265,7 +265,7 @@ forge module:install mon_module
 forge module:files mon_module
 
 # 4. Générer le fichier de routes (uniquement si le module fournit des routes)
-#    Puis ajouter manuellement les lignes affichées dans mvc/routes.py
+#    Puis ajouter manuellement les lignes affichées dans mvc/routes/__init__.py
 forge module:routes mon_module
 ```
 
@@ -276,7 +276,7 @@ forge module:routes mon_module
 | `forge module:list` | Scanne `modules/` et affiche les modules valides et invalides |
 | `forge module:install <nom>` | Enregistre le module dans `forge_modules.json` |
 | `forge module:files <nom>` | Copie les fichiers dans le projet, trace les chemins dans `forge_modules.json` |
-| `forge module:routes <nom>` | Génère `mvc/routes_<nom>.py` et affiche les lignes à ajouter dans `mvc/routes.py` |
+| `forge module:routes <nom>` | Génère `mvc/routes_<nom>.py` et affiche les lignes à ajouter dans `mvc/routes/__init__.py` |
 | `forge module:remove <nom>` | Supprime les fichiers non modifiés, nettoie le registre (`mvc/routes_<nom>.py` à retirer manuellement) |
 
 Toutes ces commandes acceptent `--dry-run` pour simuler l'opération sans rien écrire.
@@ -329,7 +329,7 @@ Concrètement :
 
 Le registre `forge_modules.json` est nettoyé.
 Les fichiers copiés par `module:files` sont supprimés s'ils n'ont pas été modifiés.
-`mvc/routes_<module>.py` et les lignes ajoutées dans `mvc/routes.py` restent sur le disque, à retirer manuellement si souhaité.
+`mvc/routes_<module>.py` et les lignes ajoutées dans `mvc/routes/__init__.py` restent sur le disque, à retirer manuellement si souhaité.
 
 ---
 

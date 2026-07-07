@@ -51,7 +51,7 @@ Le modèle généré expose un lookup `get_<entité>_by_<slug>()`.
 La route reste **écrite explicitement** par vous (philosophie Forge, pas de magie cachée) :
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 with router.group("", public=True) as public:
     public.add("GET", "/articles/{slug}", ArticleController.show_public, name="article_public")
 ```

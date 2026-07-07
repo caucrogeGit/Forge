@@ -47,10 +47,10 @@ Nous l'exposons maintenant à des clients (front JavaScript, script, autre servi
     Une vraie application le garderait secret (hors du code versionné) et le renouvellerait.
 
 ??? note "Routes"
-    Déclarez la route `/article/api-index` dans `mvc/routes.py` :
+    Déclarez la route `/article/api-index` dans `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.article_controller import ArticleController

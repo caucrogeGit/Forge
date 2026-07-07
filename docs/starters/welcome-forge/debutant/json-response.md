@@ -4,7 +4,7 @@
 
 **Ce que vous allez apprendre :**{ .intro-label } produire une réponse JSON avec `Response.json({...})`, utile pour une API ou un échange machine à machine.
 
-`WelcomeController` porte déjà les méthodes des paliers précédents, et `mvc/routes.py` déclare les routes jusqu'à `/welcome/debug`.
+`WelcomeController` porte déjà les méthodes des paliers précédents, et `mvc/routes/__init__.py` déclare les routes jusqu'à `/welcome/debug`.
 
 Nous ajoutons une méthode et une route.
 
@@ -39,10 +39,10 @@ Nous ajoutons une méthode et une route.
     C'est la réponse adaptée à une API : un consommateur peut analyser le résultat sans extraire de données d'une page HTML.
 
 ??? note "Routes"
-    Ajoutez la route dans le groupe public de `mvc/routes.py` :
+    Ajoutez la route dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

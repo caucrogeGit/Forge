@@ -31,10 +31,10 @@ Nous ajoutons une méthode et une route avec un segment variable.
     | `request.route("id", default="inconnu")` | Lit la valeur capturée par le segment `{id}` du chemin. C'est différent de `request.query(...)` : ici la valeur est dans le chemin lui-même, pas dans la chaîne de requête après le `?`. |
 
 ??? note "Routes"
-    Ajoutez la route avec son segment `{id}` dans le groupe public de `mvc/routes.py` :
+    Ajoutez la route avec son segment `{id}` dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

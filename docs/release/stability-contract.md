@@ -35,7 +35,7 @@ Les éléments suivants sont garantis pour toute la série 1.x :
 - Le comportement des fichiers générés et préservés décrit plus bas.
 - Les imports publics documentés de `core.http`, `core.auth`, `core.security` (session, CSRF, décorateurs RBAC).
 - L'endpoint `GET /health` → `200 {"status": "ok"}`.
-- Les noms de routes applicatives écrits dans `mvc/routes.py` par le développeur.
+- Les noms de routes applicatives écrits dans `mvc/routes/__init__.py` par le développeur.
 - Le mécanisme de plugins `core.mvc.controller.register_jinja_context_provider` pour les modules opt-in.
 - L'API des modules opt-in stables (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`).
 - La compatibilité ascendante des migrations SQL générées.
@@ -50,7 +50,7 @@ Les éléments suivants sont garantis pour toute la série 1.x :
 | Structure projet | `mvc/`, `env/`, `static/`, `app.py`, `forge_profile.txt` |
 | Entités | Format JSON v1 (`entity`, `table`, `primary_key`, `fields`, `constraints`) |
 | Modèles | `*_base.py` (interface), `*.py` manuel (classe métier) |
-| Routes | `mvc/routes.py`, conventions déclaratives |
+| Routes | `mvc/routes/__init__.py`, conventions déclaratives |
 | Helpers | `core.http.helpers.html()`, `core.http.response.Response`, `core.http.request.Request` |
 | Auth | `core.auth.login`, `core.auth.logout`, `core.auth.current_user`, `core.auth.is_authenticated`, `@login_required` |
 | RBAC | `@require_role`, `@require_auth`, `@require_csrf` |
@@ -133,7 +133,7 @@ Ces fichiers sont créés par un générateur lors de la première exécution. F
 
 Forge ne modifie jamais ces fichiers sans action explicite du développeur :
 
-- `mvc/routes.py`
+- `mvc/routes/__init__.py`
 - `mvc/controllers/*.py` (après génération initiale)
 - `mvc/models/*.py` (hors `*_base.py`)
 - `mvc/views/**/*.html` (après génération initiale)

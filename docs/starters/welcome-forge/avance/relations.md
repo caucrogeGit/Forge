@@ -146,10 +146,10 @@ Voir [Préparer MariaDB](../../../install/mariadb.md) si ce n'est pas déjà fai
     ```
 
 ??? note "Routes"
-    Ajoutez l'import du contrôleur et la route `/article` dans `mvc/routes.py` :
+    Ajoutez l'import du contrôleur et la route `/article` dans `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.article_controller import ArticleController

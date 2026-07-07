@@ -76,10 +76,10 @@ Comme la liste portera désormais un formulaire, `index` doit lui fournir un **j
     Chaque ligne porte son **propre mini-formulaire** `POST` vers `/note/delete/{id}` avec le **jeton CSRF**.
 
 ??? note "Routes"
-    Déclarez la route de suppression dans `mvc/routes.py` :
+    Déclarez la route de suppression dans `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.note_controller import NoteController

@@ -159,9 +159,9 @@ Cette page récapitule les onze notions acquises, puis montre l'état final comp
             return Response.text(f"Message enregistré : {content}")
     ```
 
-??? note "État final de mvc/routes.py"
+??? note "État final de mvc/routes/__init__.py"
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

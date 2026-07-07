@@ -68,7 +68,7 @@ class TestParcoursPedagogique:
 
     def test_route_documentee(self):
         text = _text().lower()
-        assert "route" in text and "mvc/routes.py" in _text()
+        assert "route" in text and "mvc/routes/__init__.py" in _text()
 
     def test_controleur_documente(self):
         text = _text().lower()

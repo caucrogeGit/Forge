@@ -230,7 +230,7 @@ La commande :
 - génère `mvc/controllers/pivot/article_tags_pivot_controller.py` ;
 - génère `mvc/templates/pivot/article_tags/index.html` et `form.html` ;
 - n'écrase pas les fichiers existants ;
-- affiche les routes à ajouter manuellement dans `mvc/routes.py`.
+- affiche les routes à ajouter manuellement dans `mvc/routes/__init__.py`.
 
 Elle ne modifie pas `make:crud` et ne branche pas automatiquement les routes.
 

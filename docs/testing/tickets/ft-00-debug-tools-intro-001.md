@@ -138,7 +138,7 @@ Note : si aucun projet Forge n'est disponible, `forge doctor` peut être exécut
 - **Nature :** commande CLI, lecture seule.
 - **Utilisation dans ce ticket :** vérifier que les routes s'affichent sans erreur.
 - **Action autorisée :** exécuter et copier la sortie.
-- **Erreurs fréquentes :** erreur si `mvc/routes.py` est absent ou malformé.
+- **Erreurs fréquentes :** erreur si `mvc/routes/__init__.py` est absent ou malformé.
 
 ### `git status` et `git diff --check`
 
@@ -164,7 +164,7 @@ L'exemple suivant montre la forme d'une sortie de `forge doctor` pour un projet 
 [OK]  Python 3.12.x - version supportée
 [OK]  forge-mvc installé
 [OK]  env/dev présent
-[OK]  mvc/routes.py présent
+[OK]  mvc/routes/__init__.py présent
 ```
 
 Pour ce ticket, transposer avec la sortie réelle obtenue sur l'environnement de test.

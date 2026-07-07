@@ -4,7 +4,7 @@
 
 **Ce que vous allez apprendre :**{ .intro-label } insérer une donnée avec `insert(...)`, après avoir validé la saisie côté serveur comme au palier « Validation serveur ».
 
-`MessageController` possède déjà la méthode `index` (palier précédent) qui lit la table `first_sql_messages`, et `mvc/routes.py` déclare la route `/message`.
+`MessageController` possède déjà la méthode `index` (palier précédent) qui lit la table `first_sql_messages`, et `mvc/routes/__init__.py` déclare la route `/message`.
 L'import `insert` et la constante `INSERT_MESSAGE` sont déjà présents dans le contrôleur.
 
 Nous ajoutons deux méthodes, deux routes et un gabarit.
@@ -48,10 +48,10 @@ Nous ajoutons deux méthodes, deux routes et un gabarit.
     Après l'insertion, la ligne devient visible : `/message` peut désormais renvoyer un autre contenu si vous en avez enregistré un.
 
 ??? note "Routes"
-    Ajoutez les deux routes (`GET` et `POST`) dans le groupe public de `mvc/routes.py` :
+    Ajoutez les deux routes (`GET` et `POST`) dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

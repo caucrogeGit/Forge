@@ -14,7 +14,7 @@ Forge génère un squelette CRUD lisible et modifiable à partir d'une entité J
 - Le SQL reste visible dans le modèle applicatif
 - Le code généré est lisible et modifiable
 - Les fichiers existants ne sont jamais écrasés
-- `mvc/routes.py` reste un fichier manuel, Forge ne l'écrit pas
+- `mvc/routes/__init__.py` reste un fichier manuel, Forge ne l'écrit pas
 - Forge ne génère pas de repository magique ni d'ORM implicite
 
 ---
@@ -31,7 +31,7 @@ flowchart TD
     F --> G["Prévisualisation"]
     G --> H["forge make:crud Contact"]
     H --> I["Fichiers CRUD créés"]
-    I --> J["Copier les routes dans mvc/routes.py"]
+    I --> J["Copier les routes dans mvc/routes/__init__.py"]
     J --> K["forge routes:list"]
     K --> L["python app.py"]
 ```
@@ -63,7 +63,7 @@ Sortie type :
 [CRÉÉ]      mvc/views/contact/show.html
 [CRÉÉ]      mvc/views/contact/form.html
 
-Routes à ajouter dans mvc/routes.py :
+Routes à ajouter dans mvc/routes/__init__.py :
 ──────────────────────────────────────────────────────────────────────
   from mvc.controllers.contact_controller import ContactController
 
@@ -83,7 +83,7 @@ Si un fichier existe déjà, il est marqué `[PRÉSERVÉ]` et non touché. Pour 
 
 ## 3. Routes
 
-Les routes sont affichées par `forge make:crud` mais jamais injectées automatiquement. Les copier dans `mvc/routes.py` :
+Les routes sont affichées par `forge make:crud` mais jamais injectées automatiquement. Les copier dans `mvc/routes/__init__.py` :
 
 ```python
 from mvc.controllers.contact_controller import ContactController

@@ -4,7 +4,7 @@
 
 **Ce que vous allez apprendre :**{ .intro-label } afficher un formulaire, le soumettre en POST, et lire un champ avec `request.form("name", default=...)`, le POST étant protégé par le jeton CSRF du palier précédent.
 
-`WelcomeController` porte déjà les méthodes des paliers précédents, dont la méthode privée `_start_session` introduite au palier CSRF, et `mvc/routes.py` déclare les routes jusqu'à `/welcome/csrf`.
+`WelcomeController` porte déjà les méthodes des paliers précédents, dont la méthode privée `_start_session` introduite au palier CSRF, et `mvc/routes/__init__.py` déclare les routes jusqu'à `/welcome/csrf`.
 
 Nous ajoutons deux méthodes (afficher le formulaire, traiter l'envoi), deux routes et un gabarit.
 
@@ -45,10 +45,10 @@ Nous ajoutons deux méthodes (afficher le formulaire, traiter l'envoi), deux rou
     | `_start_session(request)` | Garantit une session active et renvoie un jeton CSRF non vide (méthode introduite au palier CSRF). |
 
 ??? note "Routes"
-    Ajoutez les deux routes (`GET` et `POST`) dans le groupe public de `mvc/routes.py` :
+    Ajoutez les deux routes (`GET` et `POST`) dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController

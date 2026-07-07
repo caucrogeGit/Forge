@@ -4,7 +4,7 @@
 
 **Ce que vous allez apprendre :**{ .intro-label } créer une table via une migration, puis la lire avec `fetch_one(...)` depuis un nouveau contrôleur dédié au domaine des messages.
 
-`WelcomeController` couvre tous les paliers HTTP précédents, et `mvc/routes.py` déclare ses routes jusqu'à `/welcome/validate`.
+`WelcomeController` couvre tous les paliers HTTP précédents, et `mvc/routes/__init__.py` déclare ses routes jusqu'à `/welcome/validate`.
 
 Nous abordons un nouveau domaine, la base de données : selon le principe « nouveau domaine = nouveau contrôleur », nous créons un second contrôleur, `MessageController`.
 
@@ -80,10 +80,10 @@ Nous abordons un nouveau domaine, la base de données : selon le principe « nou
     L'import `insert` et la constante `INSERT_MESSAGE` serviront au palier suivant ; ils sont déjà en place pour ne plus toucher aux imports.
 
 ??? note "Routes"
-    Ajoutez l'import du contrôleur et la route `/message` dans `mvc/routes.py` :
+    Ajoutez l'import du contrôleur et la route `/message` dans `mvc/routes/__init__.py` :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from core.http.router import Router
     from mvc.controllers.home_controller import HomeController
     from mvc.controllers.welcome_controller import WelcomeController
