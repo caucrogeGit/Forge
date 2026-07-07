@@ -347,12 +347,19 @@ class TestBuildModelFilters:
     def test_count_accepte_filters_param(self):
         entity = self._entity(_field("nom", "VARCHAR(100)", "str"))
         code = build_model(entity)
-        assert "def count_contacts(q=None, filters=None):" in code
+        assert (
+            "def count_contacts(q: str | None = None, "
+            "filters: dict[str, Any] | None = None) -> int:"
+        ) in code
 
     def test_find_accepte_filters_param(self):
         entity = self._entity(_field("nom", "VARCHAR(100)", "str"))
         code = build_model(entity)
-        assert "def find_contacts_paginated(q=None, sort=None, direction=\"asc\", limit=10, offset=0, filters=None):" in code
+        assert (
+            'def find_contacts_paginated(q: str | None = None, sort: str | None = None, '
+            'direction: str = "asc", limit: int = 10, offset: int = 0, '
+            'filters: dict[str, Any] | None = None) -> list[dict[str, Any]]:'
+        ) in code
 
     def test_count_utilise_clauses_and(self):
         entity = self._entity(_field("nom", "VARCHAR(100)", "str"))
