@@ -98,6 +98,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "rbac:audit":       "Audit de cohérence fonctionnelle de mvc/security/rbac.json.",
     # Auth
     "auth:init":        "Initialise les tables d'authentification.",
+    "make:auth":        "Scaffolde le flux de connexion (contrôleur, vue, routes).",
     "auth:doctor":      "Diagnostic du système d'authentification.",
     "auth:status":      "État des briques d'authentification installées.",
     "auth:list-sql":    "Affiche les fichiers SQL d'authentification.",
@@ -1862,6 +1863,37 @@ Limites:
   - ne crée aucun utilisateur (voir forge auth:user:create) ;
   - tous les fichiers sont opt-in : MFA, RBAC, audit, rate limit
     peuvent être omis si vous ne les utilisez pas.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+
+    "make:auth": """\
+Usage:
+  forge make:auth
+
+Description:
+  Scaffolde le flux de connexion sur le socle « users » (forge auth:init) :
+  contrôleur d'authentification et vue de login. Affiche les routes à ajouter.
+
+Effets (un projet PEUT être modifié) :
+  - écrit en mode write-if-new (aucun fichier existant n'est écrasé) :
+      * mvc/controllers/auth_controller.py : login_form, login, logout ;
+      * mvc/views/auth/login.html          : formulaire de connexion ;
+  - affiche les routes /login (GET+POST, public) et /logout (POST) à ajouter
+    dans mvc/routes.py (Forge n'y écrit pas : charte principe 9).
+
+Flux généré:
+  - login : authenticate_user (loader users) + login_user + régénération de
+    session anti-fixation + réémission du cookie ;
+  - logout : logout_user + suppression du cookie + redirection /login.
+
+Prérequis:
+  - forge auth:init puis forge db:apply (table users) ;
+  - un compte applicatif : forge auth:user:create.
+
+Limites:
+  - v1 : ni MFA, ni rate-limit, ni audit (voir le contrôleur de référence) ;
+  - n'écrit pas dans mvc/routes.py : les routes sont affichées, à coller.
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.""",

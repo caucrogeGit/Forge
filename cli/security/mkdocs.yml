@@ -6,3 +6,4 @@ docs_dir: docs
 nav:
   - Référence CLI sécurité (par module):
       - Commandes auth:* (auth.py): auth.md
+      - Commande make:auth (make_auth.py): make_auth.md

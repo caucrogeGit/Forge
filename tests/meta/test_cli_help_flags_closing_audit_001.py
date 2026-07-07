@@ -63,6 +63,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Modules
     "module:list", "module:install", "module:files", "module:routes", "module:remove",
     # Auth
+    "make:auth",
     "auth:init", "auth:doctor", "auth:status", "auth:list-sql",
     "auth:user:create", "auth:user:list", "auth:user:show",
     "auth:user:disable", "auth:user:enable", "auth:user:password",

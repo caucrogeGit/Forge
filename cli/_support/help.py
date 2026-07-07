@@ -62,6 +62,7 @@ Modules
 
 Auth / Sécurité
   auth:init                 Initialise les tables d'authentification.
+  make:auth                 Scaffolde le flux de connexion (contrôleur, vue, routes).
   auth:doctor               Diagnostic du système d'authentification.
   auth:status               État des briques d'authentification installées.
   auth:list-sql             Affiche les fichiers SQL d'authentification.

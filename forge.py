@@ -31,6 +31,7 @@ from cli.public.public_page import main as public_page_main
 from cli.public.public_show import main as public_show_main
 from cli.assets.front import main as front_main
 from cli.security.auth import main as auth_main
+from cli.security.make_auth import main as make_auth_main
 from cli.assets.i18n import main as i18n_main
 from cli.project.run import main as run_main
 from cli.project.update import main as update_main
@@ -539,6 +540,7 @@ CORE_COMMANDS: dict[str, _CoreRunner] = {
         lambda a: cmd_make_crud_main(a), min_args=2,
         label="make:crud", missing_hint=_MAKE_CRUD_HINT,
     ),
+    "make:auth": _delegate(lambda a: make_auth_main(a)),
     "make:public-page": _delegate(lambda a: public_page_main(a)),
     "make:public-list": _delegate(lambda a: public_list_main(a)),
     "make:public-show": _delegate(lambda a: public_show_main(a)),

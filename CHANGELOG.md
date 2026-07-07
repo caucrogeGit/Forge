@@ -3,6 +3,18 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **`forge make:auth`** (retour terrain, FORGE-5) : scaffolde le flux de connexion
+  qui manquait. Le cœur redirige les routes protégées vers `/login` (codé en dur) et
+  fournit le backend (`core.auth.session`), mais aucune route, aucun contrôleur ni
+  aucune vue de login n'étaient générés. `make:auth` crée (write-if-new)
+  `mvc/controllers/auth_controller.py` (`login_form`, `login`, `logout` ; flux
+  `authenticate_user` + `login_user` + régénération de session anti-fixation + cookie)
+  et `mvc/views/auth/login.html`, puis **affiche** les routes `/login` et `/logout` à
+  ajouter (Forge n'écrit pas dans `mvc/routes.py`). Cible le socle standard `users`
+  (`forge auth:init`). Version 1 sans MFA / rate-limit / audit.
+
 ### Modifié
 
 - **`forge db:init` génère le SQL de provisioning par défaut (ADR-067).** Au lieu de

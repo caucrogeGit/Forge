@@ -101,6 +101,7 @@ forge routes:list
 | Commande | Rôle | Détail |
 |---|---|---|
 | `forge make:crud` | CRUD complet (contrôleur, vues, routes) | [make:crud](../cli-entities/make_crud.md) |
+| `forge make:auth` | flux de connexion (contrôleur, vue, routes) | [make:auth](../cli-security/make_auth.md) |
 | `forge make:pivot-crud` | CRUD pour table pivot enrichie (opt-in pivot) | [catalogue opt-ins](../optins/index.md) |
 | `forge make:public-page` | page publique simple | [pages publiques](../cli-public/public_page.md) |
 | `forge make:public-list` | liste paginée | [liste publique](../cli-public/public_list.md) |
