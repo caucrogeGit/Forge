@@ -49,7 +49,8 @@ Forge n'impose aucun backend de référence.
 
     #### Étape 3 : Renseigner les accès
 
-    Renseignez les valeurs dans `env/dev` (et `env/prod`). Vous choisissez librement les deux comptes que le script de l'étape 4 créera :
+    Renseignez les valeurs dans `env/dev` (et `env/prod`).
+    Vous choisissez librement les deux comptes que le script de l'étape 4 créera :
 
     ```env
     DB_NAME=mon_projet
@@ -90,7 +91,7 @@ Forge n'impose aucun backend de référence.
     forge db:apply
     ```
 
-    `forge doctor` indique le backend résolu et l'état de la connexion (la ligne « Base de données » doit passer `[OK]`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=mariadb`.
+    `forge doctor` indique le backend résolu et l'état de la connexion (la ligne `Base de données` doit passer `[OK]`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=mariadb`.
 
     ### Désinstallation
 
