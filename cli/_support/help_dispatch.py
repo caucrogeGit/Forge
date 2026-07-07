@@ -63,6 +63,7 @@ HELP_FLAGS: frozenset[str] = frozenset({"--help", "-h"})
 HELP_DESCRIPTIONS: dict[str, str] = {
     # Projet
     "new":              "Crée un nouveau projet Forge.",
+    "skeleton:upgrade": "Ajoute au projet les fichiers du squelette manquants (write-if-new).",
     "run":              "Lance Forge (dev) ou affiche la stratégie WSGI (prod).",
     "update":           "Met à jour Forge dans l'environnement courant (.venv / pipx).",
     "doctor":           "Diagnostic large et tolérant (lecture seule).",
@@ -2067,6 +2068,30 @@ Limites:
   - ne crée AUCUNE base de données (lancer forge db:init dans le
     projet créé) ;
   - ne configure pas le déploiement (voir forge deploy:init).""",
+
+    "skeleton:upgrade": """\
+Usage:
+  forge skeleton:upgrade [--check] [--bare]
+
+Description:
+  Ajoute au projet courant les fichiers du squelette Forge qui manquent, en
+  write-if-new : aucun fichier existant n'est écrasé (aucune édition perdue).
+  Utile quand Forge évolue et enrichit le squelette (outillage, config qualité).
+
+Options:
+  --check       Liste les fichiers qui seraient ajoutés, sans rien écrire.
+  --bare        Ignore l'apparat qualité (comme forge new --bare, ADR-063).
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Effets (un projet PEUT être modifié) :
+  - copie uniquement les fichiers du squelette absents du projet ;
+  - ne modifie ni ne supprime jamais un fichier existant ;
+  - les fichiers substitués à la création (env/*) préexistent et sont préservés.
+
+Limites:
+  - n'échoue pas hors d'un projet Forge : il s'arrête proprement ;
+  - ne met pas à jour le contenu d'un fichier déjà présent (write-if-new strict) ;
+  - ne re-télécharge pas forge-mvc (un pin git inchangé exige pip --force-reinstall).""",
 
     "sync:entity": """\
 Usage:

@@ -6,3 +6,4 @@ docs_dir: docs
 nav:
   - Référence CLI commands (par module):
       - Dispatch des commandes opt-in (optin_dispatch.py): optin_dispatch.md
+      - Commande skeleton:upgrade (skeleton_upgrade.py): skeleton_upgrade.md

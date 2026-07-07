@@ -43,7 +43,7 @@ FORGE_PY = PROJECT_ROOT / "forge.py"
 # Tirée de forge.py : un grep "if command (==|in)" donne la même liste.
 ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Projet
-    "new", "run", "update", "doctor", "project:check", "project:audit", "routes:list",
+    "new", "skeleton:upgrade", "run", "update", "doctor", "project:check", "project:audit", "routes:list",
     "agents:init",
     # Entités
     "make:entity", "make:crud", "make:pivot-crud", "make:relation",

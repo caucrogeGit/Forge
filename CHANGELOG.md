@@ -5,6 +5,12 @@
 
 ### Ajouté
 
+- **`forge skeleton:upgrade`** (retour terrain, FORGE-9) : ajoute au projet courant
+  les fichiers du squelette qui lui manquent, en **write-if-new** strict (aucun
+  fichier existant modifié ou écrasé). Utile quand Forge enrichit le squelette
+  (outillage, config qualité) après la création du projet. `--check` liste ce qui
+  serait ajouté sans écrire ; `--bare` ignore l'apparat qualité (ADR-063). S'arrête
+  proprement hors d'un projet Forge.
 - **`forge make:auth`** (retour terrain, FORGE-5) : scaffolde le flux de connexion
   qui manquait. Le cœur redirige les routes protégées vers `/login` (codé en dur) et
   fournit le backend (`core.auth.session`), mais aucune route, aucun contrôleur ni

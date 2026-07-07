@@ -10,6 +10,7 @@ Forge {version} — Framework MVC Python
 
 Projet
   new <NomProjet>    Crée un nouveau projet Forge.
+  skeleton:upgrade   Ajoute au projet les fichiers du squelette manquants (write-if-new).
   run                Lance Forge (dev) ou affiche la stratégie WSGI (prod).
   update             Met à jour Forge dans l'environnement courant (.venv / pipx).
   doctor             Diagnostic large et tolérant (lecture seule).

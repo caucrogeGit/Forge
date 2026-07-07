@@ -553,6 +553,7 @@ CORE_COMMANDS: dict[str, _CoreRunner] = {
     **_group(("i18n:init", "i18n:check"), _delegate(lambda a: i18n_main(a), full=True)),
     **_group(_AUTH_COMMANDS, _delegate(lambda a: auth_main(a), full=True)),
     "agents:init": _lazy("cli.agents.cli", exit_rc=True),
+    "skeleton:upgrade": _lazy("cli.commands.skeleton_upgrade", exit_rc=True),
     "opt-in:install": _lazy("cli.optins.install", exit_rc=True),
     "opt-in:enable": _lazy("cli.optins.enable", exit_rc=True),
     "opt-in:list": _lazy("cli.optins.list", exit_rc=True),

@@ -77,6 +77,7 @@ forge routes:list
 | Commande | Rôle | Détail |
 |---|---|---|
 | `forge new` | crée un nouveau projet à partir du squelette | [Démarrer](../guide/getting-started.md) |
+| `forge skeleton:upgrade` | ajoute les fichiers du squelette manquants (write-if-new) | [skeleton:upgrade](../cli-commands/skeleton_upgrade.md) |
 | `forge run` | serveur de développement (HTTPS, autoreload) | [run](../cli-project/run.md) |
 | `forge update` | met à jour Forge dans le projet | [update](../cli-project/update.md) |
 | `forge doctor` | diagnostic large, lecture seule | [doctor](../cli-project/doctor.md) |
