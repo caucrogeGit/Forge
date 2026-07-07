@@ -5,6 +5,8 @@ Ne pas y ajouter de logique metier manuelle.
 
 from __future__ import annotations
 
+from typing import Any
+
 from datetime import datetime
 
 from core.validation import (
@@ -181,18 +183,18 @@ class MediaBase:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "MediaBase":
+    def from_dict(cls, data: dict[str, Any]) -> "MediaBase":
         return cls(
-            id=data.get("id"),
-            entity_name=data.get("entity_name"),
-            entity_id=data.get("entity_id"),
-            path=data.get("path"),
-            original_name=data.get("original_name"),
-            mime_type=data.get("mime_type"),
-            size=data.get("size"),
-            role=data.get("role"),
-            position=data.get("position"),
-            alt_text=data.get("alt_text"),
+            id=data["id"],
+            entity_name=data["entity_name"],
+            entity_id=data["entity_id"],
+            path=data["path"],
+            original_name=data["original_name"],
+            mime_type=data["mime_type"],
+            size=data["size"],
+            role=data["role"],
+            position=data["position"],
+            alt_text=data["alt_text"],
             created_at=cls._coerce_datetime(data.get("created_at")),
         )
 

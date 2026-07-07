@@ -565,7 +565,7 @@ def _render_to_dict(fields: list[dict[str, Any]]) -> str:
 def _render_from_dict(entity_name: str, fields: list[dict[str, Any]]) -> str:
     lines = [
         "    @classmethod",
-        f'    def from_dict(cls, data: dict) -> "{entity_name}Base":',
+        f'    def from_dict(cls, data: dict[str, Any]) -> "{entity_name}Base":',
         "        return cls(",
     ]
     for field in fields:
@@ -580,7 +580,9 @@ def _render_from_dict(entity_name: str, fields: list[dict[str, Any]]) -> str:
                 f'            {name}=cls._coerce_datetime(data.get("{name}")),'
             )
         else:
-            lines.append(f'            {name}=data.get("{name}"),')
+            # Accès direct (from_dict attend un dict complet) : renvoie Any, donc
+            # assignable au type du champ sans reportArgumentType (FORGE-6).
+            lines.append(f'            {name}=data["{name}"],')
     lines.extend(["        )", ""])
     return "\n".join(lines)
 
@@ -639,6 +641,7 @@ def build_entity_base(entity_definition: dict[str, Any]) -> str:
         "Ne pas y ajouter de logique metier manuelle.\n"
         '"""\n\n'
         "from __future__ import annotations\n\n"
+        "from typing import Any\n\n"
         f"{datetime_import_block}"
         "from core.validation import (\n"
         f"{import_block}\n"
