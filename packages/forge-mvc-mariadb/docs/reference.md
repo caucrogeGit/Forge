@@ -24,25 +24,25 @@ Forge n'impose aucun backend de référence.
 
     #### Étape 1 : Installer le paquet
 
-    Depuis PyPI, la dernière version publiée :
+    Deux canaux, au choix.
 
-    ```bash
-    pip install --pre forge-mvc-mariadb
-    ```
+    === "Depuis PyPI (stable)"
 
-    Ou, pour suivre la version de développement (branche `main`, avant publication PyPI), directement depuis le dépôt Git :
+        La dernière version publiée :
 
-    ```bash
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mariadb"
-    ```
+        ```bash
+        pip install --pre forge-mvc-mariadb
+        ```
 
-    Choisissez l'installation Git si vous voulez les nouveautés pas encore publiées, ou si votre projet a lui-même été créé depuis `main` (cohérence des versions).
+    === "Depuis Git (avant-garde)"
 
-    Avec l'installation Git, mettez aussi le CLI `forge-mvc` à la même version, sinon `db:config` et `db:init` peuvent être désynchronisés du backend :
+        Les nouveautés pas encore publiées, ou si votre projet a été créé depuis `main`.
+        Installez le backend **et** le CLI `forge-mvc` à la même version : sinon `db:config` et `db:init` se désynchronisent du backend.
 
-    ```bash
-    pip install --force-reinstall --no-deps "git+https://github.com/caucrogeGit/Forge.git@main"
-    ```
+        ```bash
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mariadb"
+        pip install --force-reinstall --no-deps "git+https://github.com/caucrogeGit/Forge.git@main"
+        ```
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire, contrairement aux opt-ins de route.
 
