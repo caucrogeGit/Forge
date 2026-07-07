@@ -49,31 +49,25 @@ Forge n'impose aucun backend de référence.
 
     #### Étape 3 : Renseigner les accès
 
-    Renseignez les valeurs dans `env/dev` (et `env/prod`) :
+    Renseignez les valeurs dans `env/dev` (et `env/prod`). Vous choisissez librement les deux comptes que le script de l'étape 4 créera :
 
     ```env
     DB_NAME=mon_projet
     DB_HOST=127.0.0.1
     DB_PORT=3306
-    DB_ADMIN_LOGIN=root
+    DB_ADMIN_LOGIN=mon_projet_admin
     DB_ADMIN_PWD=...
-    DB_APP_LOGIN=mon_projet
+    DB_APP_LOGIN=mon_projet_app
     DB_APP_PWD=...
     ```
 
-    `DB_ADMIN_*` sert au provisioning et à la DDL ; `DB_APP_*` au runtime (DML).
+    `DB_ADMIN_*` est le compte **propriétaire de la base du projet** (DDL : `db:apply`, migrations), pas le root du serveur.
+    `DB_APP_*` est le compte de **runtime** (DML strict).
+    Les deux sont créés par le script de l'étape 4.
 
-    #### Étape 4 : Vérifier la connexion
+    #### Étape 4 : Provisionner la base
 
-    ```bash
-    forge doctor
-    ```
-
-    `forge doctor` indique le backend résolu et l'état de la connexion ; si plusieurs backends sont installés, fixez `DB_BACKEND=mariadb`.
-
-    #### Étape 5 : Provisionner la base
-
-    `forge db:init` **affiche** le SQL de provisioning (création de la base et des deux comptes), dérivé de `env/`, sans se connecter (ADR-067) :
+    `forge db:init` **affiche** le SQL de provisioning (création de la base et des deux comptes, scellés à `DB_NAME`), dérivé de `env/`, sans se connecter (ADR-067) :
 
     ```bash
     forge db:init
@@ -87,11 +81,16 @@ Forge n'impose aucun backend de référence.
 
     Si vous disposez d'un compte d'administration serveur et préférez que Forge exécute le provisioning lui-même, utilisez `forge db:init --run`.
 
-    Créez enfin le schéma des entités :
+    #### Étape 5 : Vérifier et appliquer
+
+    La base et les comptes créés, vérifiez la connexion puis créez le schéma des entités :
 
     ```bash
+    forge doctor
     forge db:apply
     ```
+
+    `forge doctor` indique le backend résolu et l'état de la connexion (la ligne « Base de données » doit passer `[OK]`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=mariadb`.
 
     ### Désinstallation
 
