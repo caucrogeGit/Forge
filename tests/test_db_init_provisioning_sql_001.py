@@ -45,6 +45,14 @@ def test_sql_cree_la_base_en_premier():
     assert "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" in sql
 
 
+def test_sql_inclut_le_registre_forge_migrations():
+    # FORGE-2 : la table forge_migrations doit figurer dans le SQL affiché
+    # (elle ne requiert que CREATE sur la base), sinon migration:* échoue.
+    sql = generate_provisioning_sql(_cfg())
+    assert "USE `ventes`;" in sql
+    assert "CREATE TABLE IF NOT EXISTS forge_migrations" in sql
+
+
 def test_sql_deux_comptes_scelles_a_la_base():
     sql = generate_provisioning_sql(_cfg())
     # Admin : tous droits, mais SUR LA BASE seulement (jamais *.*).
