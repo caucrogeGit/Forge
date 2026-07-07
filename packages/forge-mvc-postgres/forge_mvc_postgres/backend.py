@@ -108,7 +108,7 @@ class PostgreSQLBackend:
         ("# Serveur PostgreSQL : hôte et port, partagés par les comptes admin et applicatif.", ""),
         ("DB_HOST", "127.0.0.1"),
         ("DB_PORT", "5432"),
-        ("# Compte d'administration : provisioning (db:init) et DDL (db:apply, migrations).", ""),
+        ("# Compte d'administration de la base du projet (droits sur DB_NAME, pas le superutilisateur serveur) : DDL, db:apply, migrations.", ""),
         ("DB_ADMIN_LOGIN", ""),
         ("DB_ADMIN_PWD", ""),
         ("# Compte applicatif : runtime, DML uniquement (SELECT, INSERT, UPDATE, DELETE).", ""),

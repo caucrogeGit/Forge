@@ -5,6 +5,16 @@
 
 ### Modifié
 
+- **`forge db:init` génère le SQL de provisioning par défaut (ADR-067).** Au lieu de
+  se connecter avec un compte d'administration serveur lu dans `env/`, `db:init`
+  **affiche** désormais le script SQL de provisioning dérivé de `env/` (création de la
+  base et des deux comptes, scellés à `DB_NAME`), à exécuter dans une session
+  d'administration (ex. `sudo mariadb`). `forge db:init --run` conserve l'exécution
+  automatique (opt-in), pour les contextes disposant d'un compte serveur (CI,
+  conteneurs, serveur auto-géré). Les deux modes vérifient d'abord que les variables
+  requises sont renseignées et que `DB_NAME` est un nom de base valide. Forge n'exige
+  ainsi plus jamais le root du serveur dans `env/` ; `DB_ADMIN_*` désigne le
+  propriétaire de la base du projet, pas l'administrateur du serveur.
 - **Contrat d'environnement des backends BDD unifié (ADR-066).** L'adresse du
   serveur est désormais décrite par un seul couple `DB_HOST`/`DB_PORT`, partagé par
   les connexions applicative et d'administration ; seuls les identifiants restent

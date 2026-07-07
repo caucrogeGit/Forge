@@ -86,7 +86,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "make:public-contact": "Génère une page de contact publique.",
     # Base de données
     "db:config":        "Amorce les variables d'environnement du backend BDD.",
-    "db:init":          "Crée la base de données depuis les entités (MariaDB).",
+    "db:init":          "Affiche le SQL de provisioning de la base MariaDB (--run pour exécuter).",
     "migration:status": "Statut des migrations SQL.",
     "migration:apply":  "Applique les migrations en attente.",
     "migration:diff":   "Génère un diff SQL entre entité et base.",
@@ -807,32 +807,36 @@ Limites:
 
     "db:init": """\
 Usage:
-  forge db:init
+  forge db:init [--run]
 
 Description:
-  Provisionne MariaDB pour le projet Forge : base, utilisateur applicatif,
-  privilèges et table forge_migrations.
+  Prépare la base de données MariaDB du projet (base + deux comptes). Par défaut,
+  GÉNÈRE et affiche le SQL de provisioning dérivé de env/, à exécuter dans une
+  session d'administration (ex. sudo mariadb). Forge ne demande jamais le root du
+  serveur (ADR-067).
 
-Effets:
-  - se connecte à MariaDB en tant que DB_ADMIN_LOGIN ;
-  - CREATE DATABASE <DB_NAME> CHARACTER SET <DB_CHARSET> si la base est absente ;
-  - CREATE USER <DB_APP_LOGIN>@<DB_HOST> si l'utilisateur est absent ;
-  - GRANT des privilèges DB_APP_PRIVILEGES (défaut : SELECT, INSERT, UPDATE,
-    DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES) ;
-  - CREATE TABLE IF NOT EXISTS forge_migrations.
+Effets par défaut (mode affiche):
+  - lit env/dev (DB_NAME, DB_HOST, DB_ADMIN_*, DB_APP_*) ;
+  - affiche un script SQL : CREATE DATABASE, deux comptes CREATE OR REPLACE USER
+    scellés à DB_NAME (admin = DDL du schéma, applicatif = DML), FLUSH PRIVILEGES ;
+  - ne se connecte pas et n'exécute rien.
+
+Avec --run (mode exécution):
+  - exécute directement le provisioning ; suppose que DB_ADMIN_* a les droits
+    serveur (CREATE DATABASE, CREATE USER, GRANT). Destiné à la CI, aux conteneurs
+    et aux serveurs auto-gérés.
+
+Vérification préalable (dans les deux modes):
+  - s'arrête si DB_NAME, DB_ADMIN_LOGIN, DB_ADMIN_PWD, DB_APP_LOGIN ou DB_APP_PWD
+    sont absents ou vides (amorcez-les avec forge db:config) ;
+  - s'arrête si DB_NAME n'est pas un nom de base valide.
 
 Prérequis:
-  - MariaDB joignable sur DB_HOST:DB_PORT ;
-  - DB_ADMIN_LOGIN avec droits CREATE DATABASE, CREATE USER et GRANT ;
-  - variables DB_NAME, DB_APP_LOGIN, DB_APP_PWD, DB_HOST définies dans
-    env/dev ou env/prod.
-
-Limites:
-  - ne modifie ni le mot de passe ni les droits d'un utilisateur existant ;
-  - refuse de continuer si DB_APP_LOGIN existe pour un autre hôte ;
-  - n'efface aucune table ni aucune donnée.
+  - un serveur MariaDB joignable ;
+  - env/dev renseigné.
 
 Options:
+  --run         Exécute le provisioning au lieu d'afficher le SQL.
   -h, --help    Affiche cette aide sans exécuter la commande.""",
 
     "mail:init": """\

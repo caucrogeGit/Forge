@@ -73,11 +73,25 @@ Forge n'impose aucun backend de référence.
 
     #### Étape 5 : Provisionner la base
 
+    `forge db:init` **affiche** le SQL de provisioning (création de la base et des deux comptes), dérivé de `env/`, sans se connecter (ADR-067) :
+
     ```bash
     forge db:init
     ```
 
-    `forge db:init` crée la base et les comptes applicatif et d'administration.
+    Collez le script affiché dans une session d'administration MariaDB (Forge ne demande jamais le root du serveur) :
+
+    ```bash
+    sudo mariadb
+    ```
+
+    Si vous disposez d'un compte d'administration serveur et préférez que Forge exécute le provisioning lui-même, utilisez `forge db:init --run`.
+
+    Créez enfin le schéma des entités :
+
+    ```bash
+    forge db:apply
+    ```
 
     ### Désinstallation
 
