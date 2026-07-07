@@ -4,7 +4,7 @@ Ce document explique ce que fait l'opt-in `forge-mvc-mariadb`, ce qu'il expose, 
 
 `forge-mvc-mariadb` est **un** backend de base de données **de production** pour Forge : il fait fonctionner la couche BDD du cœur au-dessus d'un serveur MariaDB, via un pool de connexions.
 
-Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend installé par un entry point, et n'en utilise **qu'un seul** par projet, au choix du développeur (MariaDB, SQLite, PostgreSQL ou SQL Server).
+Le cœur de Forge est agnostique BDD ([ADR-054](/docs/forge/adr/054-database-backend-optins/)) : il découvre le backend installé par un entry point, et n'en utilise **qu'un seul** par projet, au choix du développeur (MariaDB, SQLite, PostgreSQL ou SQL Server).
 Forge n'impose aucun backend de référence.
 
 ??? note "1. Rôle du module"
@@ -41,7 +41,7 @@ Forge n'impose aucun backend de référence.
 
     #### Étape 2 : Amorcer l'environnement
 
-    `forge db:config` amorce les variables du backend dans `env/example`, `env/dev` et `env/prod` (write-if-missing, annoncé, sans secret ; ADR-064) :
+    `forge db:config` amorce les variables du backend dans `env/example`, `env/dev` et `env/prod` (write-if-missing, annoncé, sans secret ; [ADR-064](/docs/forge/adr/064-db-config-env-scaffold/)) :
 
     ```bash
     forge db:config
@@ -68,7 +68,7 @@ Forge n'impose aucun backend de référence.
 
     #### Étape 4 : Provisionner la base
 
-    `forge db:init` **affiche** le SQL de provisioning (création de la base et des deux comptes, scellés à `DB_NAME`), dérivé de `env/`, sans se connecter (ADR-067) :
+    `forge db:init` **affiche** le SQL de provisioning (création de la base et des deux comptes, scellés à `DB_NAME`), dérivé de `env/`, sans se connecter ([ADR-067](/docs/forge/adr/067-db-init-provisioning-sql/)) :
 
     ```bash
     forge db:init
@@ -102,8 +102,8 @@ Forge n'impose aucun backend de référence.
     pip uninstall forge-mvc-mariadb
     ```
 
-    `db:config --remove` retire les clés `DB_*` posées par `db:config` des trois fichiers d'environnement (les valeurs renseignées sont perdues ; ADR-064).
-    Un backend n'a pas de commande `disable` : découvert par entry point (ADR-054), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
+    `db:config --remove` retire les clés `DB_*` posées par `db:config` des trois fichiers d'environnement (les valeurs renseignées sont perdues ; [ADR-064](/docs/forge/adr/064-db-config-env-scaffold/)).
+    Un backend n'a pas de commande `disable` : découvert par entry point ([ADR-054](/docs/forge/adr/054-database-backend-optins/)), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
     Si besoin, supprimez aussi la base et le compte créés par `db:init`.
 
 ??? note "3. Vue d'ensemble rapide"
@@ -111,15 +111,15 @@ Forge n'impose aucun backend de référence.
     |---|---|
     | Paquet | `forge-mvc-mariadb` |
     | Module | `forge_mvc_mariadb` |
-    | Catégorie | Bases de données (ADR-055) |
+    | Catégorie | Bases de données ([ADR-055](/docs/forge/adr/055-optin-categories/)) |
     | Couche | backend BDD opt-in **exclusif** (un seul par projet) |
     | Dépend de | `forge-mvc`, `mariadb` (pilote), un serveur MariaDB |
     | Découverte | entry point `forge_mvc.db_backend` nommé `mariadb` |
     | Sélection | automatique si seul installé ; sinon `DB_BACKEND=mariadb` |
     | Provisioning | **oui** : `db:init` crée base + compte via `DB_ADMIN_*` |
-    | Comptes | `DB_ADMIN_*` (DDL, migrations) et `DB_APP_*` (runtime, DML) (ADR-033) |
+    | Comptes | `DB_ADMIN_*` (DDL, migrations) et `DB_APP_*` (runtime, DML) ([ADR-033](/docs/forge/adr/033-migrations-admin-credentials/)) |
     | Connexions | pool thread-safe |
-    | Décision d'architecture | ADR-054 (cœur agnostique BDD) |
+    | Décision d'architecture | [ADR-054](/docs/forge/adr/054-database-backend-optins/) (cœur agnostique BDD) |
     | Installation | `pip install --pre forge-mvc-mariadb` |
 
 ??? note "4. Schémas UML"
@@ -205,7 +205,7 @@ Forge n'impose aucun backend de référence.
     - `db:init` provisionne base et compte avec `DB_ADMIN_*` ;
     - `db:apply` et les migrations utilisent aussi le compte admin (DDL) ;
     - le runtime utilise le compte applicatif `DB_APP_*` (DML strict) ;
-    - la séparation des comptes suit l'ADR-033.
+    - la séparation des comptes suit l'[ADR-033](/docs/forge/adr/033-migrations-admin-credentials/).
 
 ??? note "5. Ce que fournit le backend"
     | Élément | Rôle |
@@ -255,7 +255,7 @@ Forge n'impose aucun backend de référence.
     MariaDB est client-serveur : un serveur doit être joignable.
     `forge doctor` aide à diagnostiquer la connexion.
 
-    Deux comptes séparent les responsabilités (ADR-033) : `DB_ADMIN_*` pour la structure, `DB_APP_*` (DML strict) pour le runtime, ce qui limite les droits de l'application en exécution.
+    Deux comptes séparent les responsabilités ([ADR-033](/docs/forge/adr/033-migrations-admin-credentials/)) : `DB_ADMIN_*` pour la structure, `DB_APP_*` (DML strict) pour le runtime, ce qui limite les droits de l'application en exécution.
 
     !!! warning "Provisioning et droits"
         `db:init` a besoin de `DB_ADMIN_*` avec les droits de créer une base, un utilisateur et d'accorder des privilèges.
@@ -268,7 +268,7 @@ Forge n'impose aucun backend de référence.
         Le SQL généré reste lisible (principe 5).
 
     !!! note "Indépendance du cœur"
-        Le cœur de Forge ne dépend pas de `forge-mvc-mariadb` : il le découvre par entry point (ADR-054).
+        Le cœur de Forge ne dépend pas de `forge-mvc-mariadb` : il le découvre par entry point ([ADR-054](/docs/forge/adr/054-database-backend-optins/)).
 
 ## Voir aussi
 
