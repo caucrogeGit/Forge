@@ -37,6 +37,13 @@ Forge n'impose aucun backend de référence.
     ```
 
     Choisissez l'installation Git si vous voulez les nouveautés pas encore publiées, ou si votre projet a lui-même été créé depuis `main` (cohérence des versions).
+
+    Avec l'installation Git, mettez aussi le CLI `forge-mvc` à la même version, sinon `db:config` et `db:init` peuvent être désynchronisés du backend :
+
+    ```bash
+    pip install --force-reinstall --no-deps "git+https://github.com/caucrogeGit/Forge.git@main"
+    ```
+
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire, contrairement aux opt-ins de route.
 
     #### Étape 2 : Amorcer l'environnement
