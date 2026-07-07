@@ -100,8 +100,8 @@ def test_limit_et_offset_viennent_de_pagination_core():
 def test_model_count_et_find_paginated_conservent_limit_offset():
     code = build_model(CONTACT)
 
-    assert "def count_contacts(q=None, filters=None):" in code
-    assert 'def find_contacts_paginated(q=None, sort=None, direction="asc", limit=10, offset=0, filters=None):' in code
+    assert "def count_contacts(q: str | None = None, filters: dict[str, Any] | None = None) -> int:" in code
+    assert 'def find_contacts_paginated(q: str | None = None, sort: str | None = None, direction: str = "asc", limit: int = 10, offset: int = 0, filters: dict[str, Any] | None = None) -> list[dict[str, Any]]:' in code
     assert "LIMIT ? OFFSET ?" in code
     assert "params.extend([limit, offset])" in code
 

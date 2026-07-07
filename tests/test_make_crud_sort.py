@@ -123,7 +123,7 @@ def test_order_by_utilise_allowlist_de_colonnes():
     code = build_model(CONTACT)
 
     assert '_ALLOWED_SORT = {"nom": "Nom", "email": "Email", "id": "Id"}' in code
-    assert "sort_col = _ALLOWED_SORT.get(sort, _DEFAULT_SORT)" in code
+    assert 'sort_col = _ALLOWED_SORT.get(sort or "", _DEFAULT_SORT)' in code
     assert 'ORDER BY " + sort_col + " " + sort_dir' in code
 
 
@@ -132,7 +132,7 @@ def test_sort_pas_concatene_directement_depuis_get():
 
     assert '" + sort + "' not in code
     assert ".format(sort" not in code
-    assert "sort_col = _ALLOWED_SORT.get(sort, _DEFAULT_SORT)" in code
+    assert 'sort_col = _ALLOWED_SORT.get(sort or "", _DEFAULT_SORT)' in code
 
 
 def test_direction_pas_concatenee_directement_depuis_get():

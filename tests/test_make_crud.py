@@ -915,7 +915,7 @@ def test_allowed_sort_ne_contient_pas_champs_arbitraires(tmp_path):
 
 def test_tri_utilise_whitelist(tmp_path):
     code = build_model(_CONTACT_JSON)
-    assert "_ALLOWED_SORT.get(sort, _DEFAULT_SORT)" in code
+    assert '_ALLOWED_SORT.get(sort or "", _DEFAULT_SORT)' in code
 
 
 def test_direction_invalide_ne_devient_pas_desc_par_defaut(tmp_path):

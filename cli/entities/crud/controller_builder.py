@@ -769,7 +769,7 @@ def _render_preamble(
         "from core.mvc.controller import BaseController",
         "from core.mvc.view.pagination import Pagination",
         f"from mvc.models.{snake}_model import (",
-        f"    get_{plural}, get_{snake}_by_id, add_{snake}, update_{snake}, delete_{snake}, bulk_delete_{plural},",
+        f"    get_{snake}_by_id, add_{snake}, update_{snake}, delete_{snake}, bulk_delete_{plural},",
         f"    count_{plural}, find_{plural}_paginated, find_{plural}_for_export,",
     ]
     if choice_imports:

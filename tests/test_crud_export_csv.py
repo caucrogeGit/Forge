@@ -166,11 +166,11 @@ class TestModele:
     def test_find_for_export_accept_q_sort_direction_filters(self):
         m = _model()
         idx = m.find("def find_articles_for_export")
-        signature = m[idx: idx + 100]
-        assert "q=" in signature
-        assert "sort=" in signature
-        assert "direction=" in signature
-        assert "filters=" in signature
+        signature = m[idx: idx + 200]
+        assert "q: str | None" in signature
+        assert "sort: str | None" in signature
+        assert "direction: str" in signature
+        assert "filters: dict" in signature
 
     def test_export_limit_avant_find_for_export(self):
         m = _model()
