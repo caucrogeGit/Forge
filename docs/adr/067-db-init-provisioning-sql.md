@@ -36,8 +36,6 @@ dérivé de `env/`, sans se connecter ni exiger de droits serveur.
   (`DB_NAME`, `DB_HOST`, `DB_CHARSET`, `DB_COLLATION`, `DB_ADMIN_LOGIN/PWD`,
   `DB_APP_LOGIN/PWD`) et écrit sur la sortie standard le script à exécuter dans une
   session d'administration MariaDB (typiquement `sudo mariadb`).
-  Si la configuration est incomplète (`DB_NAME` ou identifiants vides), la commande
-  s'arrête avec une erreur explicite.
 - **`forge db:init --run`** (opt-in, mode « agit ») : exécute directement le
   provisioning, pour les contextes qui disposent d'un compte d'administration
   serveur et veulent une commande unique (CI, conteneurs, serveur auto-géré, tests
@@ -46,6 +44,25 @@ dérivé de `env/`, sans se connecter ni exiger de droits serveur.
 
 Le défaut est ainsi le comportement **sûr et explicite** ; l'exécution automatique
 devient un choix conscient (principe « sécuriser par défaut »).
+
+### Vérification préalable
+
+Dans les **deux modes**, avant toute génération ou exécution, `db:init` vérifie que
+les variables requises sont **renseignées** (présentes et non vides) dans `env/dev` :
+`DB_NAME`, `DB_ADMIN_LOGIN`, `DB_ADMIN_PWD`, `DB_APP_LOGIN`, `DB_APP_PWD`.
+(`DB_HOST`, `DB_PORT`, `DB_CHARSET` et `DB_COLLATION` ont des valeurs par défaut et
+ne sont pas exigées.)
+
+Si l'une manque ou est vide, la commande s'arrête **sans rien produire ni exécuter**
+et affiche la liste précise des clés à renseigner, en rappelant `forge db:config`
+pour les amorcer, puis `env/dev` pour saisir les valeurs.
+
+`db:init` vérifie en outre que `DB_NAME` est un **nom de base valide** : non vide,
+au plus 64 caractères, sans les caractères interdits par MariaDB dans un nom de base
+(`/`, `\`, `.`, caractère nul ou de contrôle) ni espace en tête ou en fin. Un nom
+invalide arrête la commande avec un message expliquant la règle et la valeur fautive,
+avant toute génération ou exécution. Les autres caractères (dont le trait d'union)
+restent admis : Forge protège l'identifiant par des accents graves (`` ` ``).
 
 ### Script généré
 
