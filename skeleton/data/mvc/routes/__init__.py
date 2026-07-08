@@ -17,6 +17,7 @@ router = Router()
 
 with router.group("", public=True) as public:
     public.add("GET", "/", HomeController.index, name="home-index")
+    public.add("GET", "/charte", HomeController.charte, name="home-charte")
 
 # Routes des opt-ins « route » activés (ADR-061).
 register_optins(router)

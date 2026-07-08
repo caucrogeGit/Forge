@@ -5,6 +5,12 @@
 
 ### Ajouté
 
+- **Page de référence de la charte graphique dans le squelette (`/charte`).** Le squelette
+  livre `mvc/views/charte.html`, une page servable (câblée sur `/charte`) qui montre le thème
+  « Accessible chaleureux » livré par défaut : palette, typographie, boutons, badges, alertes
+  et champs de formulaire. Elle sert de référence visible et rappelle que les tokens (couleurs,
+  polices, rayons) s'éditent dans `static/src/input.css` (source unique, `@theme` Tailwind) pour
+  reskinner toute l'application. Seules la landing (`/`) et cette page restent pré-câblées.
 - **`forge entity:doc`** : vue globale des entités et de leurs relations, produite à
   partir des contrats du projet (`mvc/entities/*.json` et `relations.json`). Sortie
   Markdown : un tableau par entité (champs, colonnes, types, nullable, PK, unicité),

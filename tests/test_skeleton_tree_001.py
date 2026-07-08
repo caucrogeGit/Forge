@@ -129,8 +129,10 @@ def test_chemin_absent(rel):
 def test_routes_neutres():
     content = (SKELETON / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
     assert 'public.add("GET", "/", HomeController.index' in content
-    # Aucune autre route pré-câblée.
-    assert content.count("public.add(") == 1, "Le squelette ne câble que la route /."
+    # Seules les pages de référence Forge (landing et charte graphique) sont
+    # pré-câblées : aucune route applicative (auth, welcome, CRUD...).
+    assert 'public.add("GET", "/charte", HomeController.charte' in content
+    assert content.count("public.add(") == 2, "Le squelette ne câble que / et /charte."
 
 
 def test_home_controller_rend_home_neutre():
