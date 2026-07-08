@@ -54,6 +54,13 @@ class ValidatedRelation:
     to_python_type: str
     on_delete: str
     on_update: str
+    # FORGE-12/13/14 : la colonne FK est portée par relations.sql quand elle n'est
+    # pas déclarée comme champ d'entité. `from_column_sql_type` reprend le type exact
+    # de la PK visée (ex. BIGINT UNSIGNED) pour que la contrainte soit applicable.
+    from_column_sql_type: str = ""
+    fk_nullable: bool = True
+    fk_index: bool = True
+    fk_owned: bool = False
 
 
 @dataclass(frozen=True)
@@ -199,7 +206,20 @@ def generate_relations_sql(relations: list[ValidatedRelation | ValidatedCanonica
     blocks: list[str] = []
     for relation in relations:
         if isinstance(relation, ValidatedRelation):
-            blocks.append(
+            statements: list[str] = []
+            if relation.fk_owned:
+                # FORGE-12/14 : créer la colonne FK au type exact de la PK visée,
+                # avant la contrainte (même ALTER TABLE impossible car ordre requis).
+                null_sql = "NULL" if relation.fk_nullable else "NOT NULL"
+                statements.append(
+                    "\n".join(
+                        [
+                            f"ALTER TABLE {relation.from_table}",
+                            f"    ADD COLUMN {relation.from_column} {relation.from_column_sql_type} {null_sql};",
+                        ]
+                    )
+                )
+            statements.append(
                 "\n".join(
                     [
                         f"ALTER TABLE {relation.from_table}",
@@ -211,6 +231,12 @@ def generate_relations_sql(relations: list[ValidatedRelation | ValidatedCanonica
                     ]
                 )
             )
+            if relation.fk_owned and relation.fk_index:
+                idx_name = f"idx_{relation.from_table}_{relation.from_column}"
+                statements.append(
+                    f"CREATE INDEX {idx_name} ON {relation.from_table} ({relation.from_column});"
+                )
+            blocks.append("\n".join(statements))
         else:
             blocks.append(_generate_canonical_m2m_sql(relation))
     if not blocks:
@@ -624,21 +650,37 @@ def _validate_relation_item_canonical(
     to_field_name = to_pk["name"]
     to_column = to_pk["column"]
     to_python_type = to_pk["python_type"]
+    to_pk_sql_type = to_pk["sql_type"]
+
+    fk_nullable = bool(relation.get("nullable", True))
+    fk_index = bool(relation.get("index", True))
 
     from_field_match = next(
         (f for f in from_entity["fields"] if f.get("column") == foreign_key or f.get("name") == foreign_key),
         None,
     )
     if from_field_match is not None:
+        # Colonne FK déjà déclarée comme champ d'entité : relations.sql ne pose que
+        # la contrainte (l'entité porte la colonne et son type).
         from_field_name = from_field_match["name"]
         from_python_type = from_field_match["python_type"]
+        from_column = from_field_match["column"]
+        from_column_sql_type = from_field_match["sql_type"]
+        fk_owned = False
         if from_python_type != to_python_type:
             _add_issue(issues, path, "from et to doivent avoir des types Python compatibles")
         if on_delete_sql == "SET NULL" and not from_field_match.get("nullable", False):
             _add_issue(issues, f"{path}.on_delete", "SET NULL requiert un from_field nullable")
     else:
+        # Flux officiel (FORGE-12/13/14) : la FK n'est pas un champ d'entité ;
+        # relations.sql crée la colonne au type EXACT de la PK visée, puis la contrainte.
         from_field_name = foreign_key
         from_python_type = to_python_type
+        from_column = foreign_key
+        from_column_sql_type = to_pk_sql_type
+        fk_owned = True
+        if on_delete_sql == "SET NULL" and not fk_nullable:
+            _add_issue(issues, f"{path}.on_delete", "SET NULL requiert une FK nullable")
 
     constraint_name = f"fk_{from_table}_{foreign_key}"
 
@@ -649,7 +691,7 @@ def _validate_relation_item_canonical(
         from_entity=from_entity_name,
         from_table=from_table,
         from_field=from_field_name,
-        from_column=foreign_key,
+        from_column=from_column,
         from_python_type=from_python_type,
         to_entity=to_entity_name,
         to_table=to_table,
@@ -658,6 +700,10 @@ def _validate_relation_item_canonical(
         to_python_type=to_python_type,
         on_delete=on_delete_sql,
         on_update="RESTRICT",
+        from_column_sql_type=from_column_sql_type,
+        fk_nullable=fk_nullable,
+        fk_index=fk_index,
+        fk_owned=fk_owned,
     )
 
 

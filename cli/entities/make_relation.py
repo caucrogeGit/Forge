@@ -339,6 +339,11 @@ def main(argv: list[str] | None = None) -> None:
 
     print("[OK] Relation ajoutée dans mvc/entities/relations.json")
     print("[INFO] Lancez ensuite forge sync:relations pour régénérer mvc/entities/relations.sql.")
+    if relation.get("type") == "many_to_one" and relation.get("foreign_key"):
+        print(
+            f"[INFO] La colonne FK {relation['foreign_key']} et son index sont générés dans "
+            "relations.sql (au type de la PK visée) ; ne l'ajoutez pas à la main dans l'entité."
+        )
 
 
 if __name__ == "__main__":

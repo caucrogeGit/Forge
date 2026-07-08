@@ -100,6 +100,24 @@ La relation globale est ensuite décrite dans `mvc/entities/relations.json` :
 
 Forge génère un fichier `relations.sql` contenant du SQL relationnel explicite : contraintes `many_to_one` et tables pivot `many_to_many`.
 
+Quand la colonne FK n'est **pas** déclarée comme champ de l'entité source (flux recommandé), `relations.sql` la crée lui-même, au type exact de la clé primaire visée, avant de poser la contrainte, puis un index :
+
+```sql
+ALTER TABLE classe
+    ADD COLUMN annee_scolaire_id BIGINT UNSIGNED NULL;
+ALTER TABLE classe
+    ADD CONSTRAINT fk_classe_annee_scolaire_id
+    FOREIGN KEY (annee_scolaire_id)
+    REFERENCES annee_scolaire (Id)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT;
+CREATE INDEX idx_classe_annee_scolaire_id ON classe (annee_scolaire_id);
+```
+
+Reprendre le type exact de la PK visée (ici `BIGINT UNSIGNED`) est indispensable : une colonne FK signée (`BIGINT`) serait refusée par MariaDB, dont la clé primaire auto-incrémentée est `BIGINT UNSIGNED`.
+
+Si la colonne FK est au contraire déclarée comme champ de l'entité source, `relations.sql` ne pose que la contrainte (l'entité porte déjà la colonne et son type) :
+
 ```sql
 ALTER TABLE contact
     ADD CONSTRAINT fk_contact_ville
@@ -109,7 +127,7 @@ ALTER TABLE contact
     ON UPDATE CASCADE;
 ```
 
-Le fichier `relations.sql` contient les contraintes globales, typiquement des `ALTER TABLE ... ADD CONSTRAINT`, et les tables pivot déclaratives `many_to_many`.
+Le fichier `relations.sql` contient donc les colonnes FK portées par les relations, les contraintes globales et les tables pivot déclaratives `many_to_many`.
 Les `CREATE TABLE` des entités normales restent dans les fichiers SQL des entités.
 
 ## Règles de validation

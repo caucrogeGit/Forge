@@ -72,6 +72,14 @@
   ce qui corrige aussi le lien de modification (concaténation Jinja `'/x/edit/' ~ obj.pk`). La
   variante `danger` est ajoutée à la macro. Un garde-fou vérifie que tout composant Jinja
   référencé par les vues générées existe bien dans le squelette livré par `forge new`.
+- **Relation `many_to_one` inapplicable sur MariaDB (retour terrain, FORGE-12 / FORGE-13 / FORGE-14).**
+  `generate_relations_sql` n'émettait que la contrainte `ADD CONSTRAINT ... FOREIGN KEY`, jamais
+  la colonne FK (FORGE-12), avec un nom incohérent entre l'entité (PascalCase) et la contrainte
+  (snake_case, FORGE-13) et un type incompatible avec la PK visée `BIGINT UNSIGNED` (FORGE-14) :
+  MariaDB refusait la contrainte (errno 150). Désormais, quand la colonne FK n'est pas déclarée
+  comme champ d'entité, `relations.sql` la crée lui-même (`ADD COLUMN`) au type exact de la PK
+  visée, avec le même nom dans la colonne et la contrainte, puis un index, avant la contrainte.
+  Le schéma d'une relation `many_to_one` est ainsi applicable de bout en bout sans SQL manuel.
 
 ## [1.0.0-rc.2] - 2026-07-01
 
