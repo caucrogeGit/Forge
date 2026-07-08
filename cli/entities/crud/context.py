@@ -55,6 +55,11 @@ class CrudManyToOneRelation:
     target_label_column: str
     choices_function: str
     choices_key: str
+    # Portés par la relation quand la FK n'est pas un champ d'entité déclaré :
+    # make:crud injecte alors un champ synthétique pour que le formulaire (select)
+    # et le modèle (INSERT/UPDATE) gèrent la FK comme un champ ordinaire (FORGE-12+).
+    fk_nullable: bool = True
+    fk_sql_type: str = ""
 
 
 @dataclass(frozen=True)

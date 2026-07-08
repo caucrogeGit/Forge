@@ -88,6 +88,8 @@ def _load_crud_many_to_one_relations(
                 target_label_column=label_field["column"],
                 choices_function=f"get_{target_snake}_choices",
                 choices_key=f"{field_name}_choices",
+                fk_nullable=relation.fk_nullable,
+                fk_sql_type=relation.from_column_sql_type,
             )
         )
     return crud_relations

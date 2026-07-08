@@ -154,6 +154,36 @@ def _write_if_new(path: Path, content: str, result: MakeCrudResult, dry_run: boo
         result.created.append(path)
 
 
+def _inject_relation_fk_fields(
+    definition: dict[str, Any],
+    relations: list[CrudManyToOneRelation],
+) -> None:
+    """Injecte un champ synthétique pour chaque FK many_to_one portée par la relation.
+
+    Quand la colonne FK n'est pas déclarée comme champ d'entité (flux officiel,
+    FORGE-12+), la colonne est créée par `relations.sql`. Pour que le CRUD généré la
+    gère comme un champ ordinaire, on ajoute ici un champ à la définition : le
+    formulaire produit alors un `RelationField` (select), et le modèle inclut la
+    colonne dans INSERT/UPDATE (la valeur choisie est persistée).
+    """
+    existing = {f["name"] for f in definition["fields"]}
+    for rel in relations:
+        if rel.field_name in existing:
+            continue
+        definition["fields"].append({
+            "name": rel.field_name,
+            "column": rel.field_column,
+            "python_type": "int",
+            "sql_type": rel.fk_sql_type or "BIGINT UNSIGNED",
+            "nullable": rel.fk_nullable,
+            "primary_key": False,
+            "auto_increment": False,
+            "constraints": {},
+            "unique": False,
+        })
+        existing.add(rel.field_name)
+
+
 # ── Entrée principale ─────────────────────────────────────────────────────────
 
 def make_crud(
@@ -212,6 +242,10 @@ def make_crud(
     except (json.JSONDecodeError, EntityRelationsError, EntityDefinitionError, ValueError) as exc:
         print(out.error(str(exc)))
         raise SystemExit(1)
+
+    # FORGE-12+ : une FK portée par la relation (non déclarée comme champ) devient un
+    # champ synthétique, pour que le formulaire (select) et le modèle la persistent.
+    _inject_relation_fk_fields(definition, relations)
 
     result = MakeCrudResult(dry_run=dry_run)
 

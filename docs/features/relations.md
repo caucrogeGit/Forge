@@ -428,7 +428,7 @@ Le système de relations ne supporte pas encore directement :
 - saisie, édition ou affichage des champs `pivot_fields` dans le CRUD ;
 - attach/detach applicatif dédié aux pivots enrichis.
 
-Depuis Forge 1.2.0, `forge make:crud` génère automatiquement un `<select>` pour les champs FK déclarés dans `relations.json`, voir la section *Exploitation dans le CRUD généré* ci-dessous.
+Depuis Forge 1.2.0, `forge make:crud` génère automatiquement un `<select>` pour les relations `many_to_one` de `relations.json`, que la colonne FK soit un champ d'entité ou portée par la relation, voir la section *Exploitation dans le CRUD généré* ci-dessous.
 
 ## Pivot explicite
 
@@ -499,6 +499,8 @@ Quand l'entité générée est le `from_entity` d'une relation, le champ FK corr
 - la vue `form.html` utilise un `<select>` ;
 - le contrôleur fournit les choix au formulaire ;
 - le modèle généré charge les choix depuis la table cible avec du SQL visible.
+
+La colonne FK n'a pas besoin d'être déclarée comme champ de l'entité source : quand la relation la porte (voir *SQL généré*), `make:crud` l'ajoute automatiquement au formulaire (le `<select>`) et au modèle (colonne présente dans `INSERT` et `UPDATE`), de sorte que la valeur choisie est bien persistée.
 
 Comme `relations.json` (version 1 du format) ne contient pas encore de `label_field`, Forge choisit le libellé affiché avec un fallback simple :
 

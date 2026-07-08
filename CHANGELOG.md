@@ -80,6 +80,10 @@
   comme champ d'entité, `relations.sql` la crée lui-même (`ADD COLUMN`) au type exact de la PK
   visée, avec le même nom dans la colonne et la contrainte, puis un index, avant la contrainte.
   Le schéma d'une relation `many_to_one` est ainsi applicable de bout en bout sans SQL manuel.
+  Côté CRUD, `make:crud` injecte un champ synthétique pour cette FK portée par la relation :
+  le formulaire généré propose un `<select>` de l'entité liée et le modèle persiste la valeur
+  choisie (colonne présente dans `INSERT` et `UPDATE`), sans qu'il faille déclarer la FK comme
+  champ d'entité.
 
 ## [1.0.0-rc.2] - 2026-07-01
 
