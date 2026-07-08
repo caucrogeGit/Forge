@@ -24,6 +24,7 @@ from cli.entities.make_relation import main as make_relation_main
 from cli.entities.make_crud import cmd_make_crud_main
 from cli.entities.model import main as model_main
 from cli.entities.entity_validate import main as entity_validate_main
+from cli.entities.entity_doc import main as entity_doc_main
 from cli.public.public_contact import main as public_contact_main
 from cli.public.public_form import main as public_form_main
 from cli.public.public_list import main as public_list_main
@@ -548,6 +549,7 @@ CORE_COMMANDS: dict[str, _CoreRunner] = {
     "make:public-contact": _delegate(lambda a: public_contact_main(a)),
     "make:relation": _delegate(lambda a: make_relation_main(a)),
     "entity:validate": _delegate(lambda a: entity_validate_main(a)),
+    "entity:doc": _delegate(lambda a: entity_doc_main(a)),
     "sync:entity": _delegate(lambda a: model_main(a), full=True),
     "js:init": _delegate(lambda a: front_main(a), full=True),
     **_group(("i18n:init", "i18n:check"), _delegate(lambda a: i18n_main(a), full=True)),

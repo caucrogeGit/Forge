@@ -91,6 +91,7 @@ forge routes:list
 |---|---|---|
 | `forge make:entity` | crée le JSON d'une entité | [make:entity](../cli-entities/make_entity.md) |
 | `forge entity:validate` | valide les contrats JSON d'entités | [entity:validate](../cli-entities/entity_validate.md) |
+| `forge entity:doc` | documente entités et relations (Markdown + Mermaid) | [entity:doc](../cli-entities/entity_doc.md) |
 | `forge build:model` | génère les modèles Python depuis le JSON | [build:model](../cli-entities/model.md) |
 | `forge sync:entity` | synchronise entité et modèle généré | [modèle](../cli-entities/model.md) |
 | `forge make:relation` | déclare une relation entre entités | [make:relation](../cli-entities/make_relation.md) |

@@ -47,7 +47,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "agents:init",
     # Entités
     "make:entity", "make:crud", "make:pivot-crud", "make:relation",
-    "entity:validate",
+    "entity:validate", "entity:doc",
     "sync:entity", "sync:relations",
     "build:model", "check:model",
     # Pages publiques

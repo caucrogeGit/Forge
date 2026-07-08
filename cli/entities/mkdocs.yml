@@ -9,6 +9,7 @@ nav:
       - Commande make:crud (make_crud.py): make_crud.md
       - Commande make:relation (make_relation.py): make_relation.md
       - Commande entity:validate (entity_validate.py): entity_validate.md
+      - Commande entity:doc (entity_doc.py): entity_doc.md
       - Validation sémantique (entity_semantic_validate.py): entity_semantic_validate.md
       - Codes d'erreur (entity_validation_errors.py): entity_validation_errors.md
       - Commande db:config (db_config.py): db_config.md

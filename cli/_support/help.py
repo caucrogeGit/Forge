@@ -25,6 +25,7 @@ Entités
   make:pivot-crud    Génère un sous-CRUD dédié pour un pivot avec attributs.
   make:relation      Déclare une relation entre entités.
   entity:validate    Valide les entités et relations contre les schémas JSON.
+  entity:doc         Documente entités et relations (Markdown + diagramme Mermaid).
   sync:entity        Régénère les fichiers modèles.
   sync:relations     Régénère relations.sql.
   build:model        Régénère tous les modèles Python.

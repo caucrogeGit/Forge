@@ -5,6 +5,13 @@
 
 ### Ajouté
 
+- **`forge entity:doc`** : vue globale des entités et de leurs relations, produite à
+  partir des contrats du projet (`mvc/entities/*.json` et `relations.json`). Sortie
+  Markdown : un tableau par entité (champs, colonnes, types, nullable, PK, unicité),
+  la liste des relations avec leur cardinalité (`N:1`, `N:N`) et un diagramme Mermaid
+  `erDiagram` qui se rend dans GitHub et MkDocs. Affiche sur stdout par défaut (mode
+  « Forge affiche ») ; `--output <fichier>` écrit le résultat. Lecture seule des
+  contrats, sans backend BDD ni connexion : documente le modèle déclaré, pas la base.
 - **`forge skeleton:upgrade`** (retour terrain, FORGE-9) : ajoute au projet courant
   les fichiers du squelette qui lui manquent, en **write-if-new** strict (aucun
   fichier existant modifié ou écrasé). Utile quand Forge enrichit le squelette

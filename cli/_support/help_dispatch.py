@@ -75,6 +75,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "make:crud":        "Génère un CRUD complet (liste, fiche, formulaires).",
     "make:pivot-crud":  "Génère un sous-CRUD dédié pour un pivot avec attributs.",
     "entity:validate":  "Valide les entités et relations contre les schémas JSON.",
+    "entity:doc":       "Documente entités et relations (Markdown + diagramme Mermaid).",
     "sync:entity":      "Régénère les fichiers modèles d'une entité.",
     "sync:relations":   "Régénère mvc/entities/relations.sql.",
     "build:model":      "Régénère tous les modèles Python depuis leurs entités JSON.",
@@ -1658,6 +1659,38 @@ Limites:
     artefacts Python/SQL ;
   - ne valide pas le schéma JSON Forge lui-même (voir forge
     schema:doctor).""",
+
+    "entity:doc": """\
+Usage:
+  forge entity:doc [--output <fichier>]
+
+Description:
+  Produit une vue globale des entités et de leurs relations à partir des
+  contrats du projet (mvc/entities/*.json et relations.json), en Markdown :
+  un tableau par entité, la liste des relations avec leur cardinalité, et
+  un diagramme Mermaid erDiagram. Aucun backend BDD ni connexion requis.
+
+Effets:
+  - lit mvc/entities/*/*.json et mvc/entities/relations.json ;
+  - par défaut, AFFICHE le Markdown sur stdout (rien n'est écrit) ;
+  - avec --output, écrit le résultat dans le fichier indiqué
+    (écrasement annoncé si le fichier existait).
+
+Options:
+  --output <f>  Écrit la doc dans <f> au lieu de l'afficher.
+  -h, --help    Affiche cette aide sans exécuter la commande.
+
+Prérequis:
+  - être à la racine d'un projet Forge (mvc/entities/ existe).
+
+Codes de retour:
+  0  documentation produite
+  1  mvc/entities/ absent, contrat invalide, ou --output sans chemin
+
+Limites:
+  - documente les contrats DÉCLARÉS, pas la base réelle (pas
+    d'introspection) ;
+  - lecture seule des contrats ; n'écrit que le fichier de --output.""",
 
     "build:model": """\
 Usage:
