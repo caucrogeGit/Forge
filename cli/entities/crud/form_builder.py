@@ -33,7 +33,11 @@ def _form_field_code(
     form_field = cast("dict[str, Any]", f.get("form") or {}).get("field")
 
     if relation is not None:
-        args = [f'label="{label}"', f'target="{relation.target_entity}"', f"required={required}", f'choices_key="{relation.choices_key}"']
+        # Le select porte sur l'entité liée, pas sur un identifiant : on retire le
+        # suffixe `_id` du nom de colonne pour le libellé (annee_scolaire_id -> « Annee scolaire »).
+        fk_name = f["name"]
+        rel_label = _humanize(fk_name[:-3] if fk_name.endswith("_id") else fk_name)
+        args = [f'label="{rel_label}"', f'target="{relation.target_entity}"', f"required={required}", f'choices_key="{relation.choices_key}"']
         if nullable:
             args.append("empty_value=None")
         return f'RelationField({", ".join(args)})', None

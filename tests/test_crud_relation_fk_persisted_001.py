@@ -73,6 +73,13 @@ def test_fk_rendered_as_relation_select_in_form(tmp_path):
     assert 'target="AnneeScolaire"' in form
 
 
+def test_fk_select_label_strips_id_suffix(tmp_path):
+    # Le select porte sur l'entité liée : le libellé retire le suffixe `_id`.
+    _, form = _classe_crud(tmp_path)
+    assert 'RelationField(label="Annee scolaire"' in form
+    assert "Annee scolaire id" not in form
+
+
 def test_injection_is_idempotent_and_skips_declared_field(tmp_path):
     # Un second passage n'ajoute pas de doublon (le champ existe déjà).
     ents = _project(tmp_path)

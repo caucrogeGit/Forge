@@ -996,7 +996,7 @@ def test_many_to_one_genere_relationfield(tmp_path):
 
     form_code = (tmp_path / "mvc" / "forms" / "contact_form.py").read_text(encoding="utf-8")
     assert "RelationField" in form_code
-    assert 'ville_id = RelationField(label="Ville id", target="Ville", required=False, choices_key="ville_id_choices", empty_value=None)' in form_code
+    assert 'ville_id = RelationField(label="Ville", target="Ville", required=False, choices_key="ville_id_choices", empty_value=None)' in form_code
 
 
 def test_many_to_one_genere_select_dans_form_html(tmp_path):
