@@ -38,11 +38,20 @@ Forge n'impose aucun backend de référence.
 
         Les nouveautés pas encore publiées, ou si votre projet a été créé depuis `main`.
         Installez le backend **et** le CLI `forge-mvc` à la même version : sinon `db:config` et `db:init` se désynchronisent du backend.
+        Ces commandes s'installent **dans le venv du projet** : activez-le d'abord.
 
         ```bash
+        source .venv/bin/activate
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mariadb"
         pip install --force-reinstall --no-deps "git+https://github.com/caucrogeGit/Forge.git@main"
         ```
+
+        !!! warning "Erreur « externally-managed-environment » ?"
+
+            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+            `pip` les refuse alors, pour ne pas écraser les paquets gérés par `apt`.
+            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+            Le venv de projet créé par `forge new` n'est pas concerné : il n'a pas ce verrou.
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire, contrairement aux opt-ins de route.
 
