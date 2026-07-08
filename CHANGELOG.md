@@ -58,6 +58,20 @@
   projet existant remplace `DB_APP_HOST`/`DB_ADMIN_HOST` par `DB_HOST` et les ports
   correspondants par `DB_PORT`.
 
+### Corrigé
+
+- **Login impossible sur MariaDB/SQLite : `is_active` (int 0/1) refusé (retour terrain, FORGE-10).**
+  Les backends SQL renvoient la colonne `BOOLEAN` / `tinyint(1)` en entier `0/1` ; le
+  contrat `normalize_auth_user` exigeait un `bool` strict et levait avant la vérification
+  du mot de passe, si bien que `authenticate_user` renvoyait `None` (login toujours refusé,
+  même avec le bon mot de passe). La normalisation accepte désormais `0/1` et les coerce en
+  `bool` ; les autres types restent refusés.
+- **`make:crud` : `500` au rendu (`TemplateNotFound: components/button.html`) (retour terrain, FORGE-11).**
+  Les vues générées incluaient `components/button.html`, absent du squelette : le bouton est
+  la macro `button` de `components/ui.html`. Les vues importent et appellent désormais la macro,
+  ce qui corrige aussi le lien de modification (concaténation Jinja `'/x/edit/' ~ obj.pk`). La
+  variante `danger` est ajoutée à la macro. Un garde-fou vérifie que tout composant Jinja
+  référencé par les vues générées existe bien dans le squelette livré par `forge new`.
 
 ## [1.0.0-rc.2] - 2026-07-01
 
