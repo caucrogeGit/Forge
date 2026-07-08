@@ -70,7 +70,7 @@ class TestIndexViewGuard:
     def test_avec_rbac_bouton_entre_guard_et_endif(self):
         html = build_index_view(_DEFN_SIMPLE, rbac=_RBAC_FULL)
         idx_if = html.index("{% if can('contacts.create') %}")
-        idx_btn = html.index("components/button.html")
+        idx_btn = html.index("button(", idx_if)
         idx_endif = html.index("{% endif %}", idx_if)
         assert idx_if < idx_btn < idx_endif
 
@@ -156,7 +156,7 @@ class TestShowViewGuard:
     def test_avec_rbac_edit_entre_guard_et_endif(self):
         html = build_show_view(_DEFN_SIMPLE, rbac=_RBAC_FULL)
         idx_if = html.index("{% if can('contacts.edit') %}")
-        idx_btn = html.index("components/button.html", idx_if)
+        idx_btn = html.index("button(", idx_if)
         idx_endif = html.index("{% endif %}", idx_if)
         assert idx_if < idx_btn < idx_endif
 

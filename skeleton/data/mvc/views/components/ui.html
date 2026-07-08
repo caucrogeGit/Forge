@@ -15,7 +15,8 @@
 {%- set styles = {
   "primary":   "text-ink bg-forge hover:bg-forge-dark active:translate-y-px",
   "secondary": "text-forge bg-forge-soft border border-forge-border hover:bg-forge-border",
-  "ghost":     "text-ink bg-transparent border border-field hover:border-forge"
+  "ghost":     "text-ink bg-transparent border border-field hover:border-forge",
+  "danger":    "text-white bg-red-600 hover:bg-red-700 active:translate-y-px"
 } -%}
 {%- set cls = "inline-flex items-center justify-center font-semibold transition rounded-[10px] px-[21px] py-3 text-sm "
    ~ (styles.get(variant) or styles["primary"]) ~ " " ~ extra -%}

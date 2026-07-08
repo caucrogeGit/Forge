@@ -97,15 +97,14 @@ def build_index_view(
         "{% endif %}{% endfor %}"
     )
     _nouveau_btn = [
-        f"    {{% with href='/{snake}/new', variant='primary', label='Nouveau {snake}' %}}",
-        '    {% include "components/button.html" %}',
-        "    {% endwith %}",
+        f"    {{{{ button(label='Nouveau {snake}', variant='primary', href='/{snake}/new') }}}}",
     ]
     if create_perm:
         _nouveau_btn = [f"    {{% if can('{create_perm}') %}}"] + _nouveau_btn + ["    {% endif %}"]
     lines: list[str] = [
         '{% extends "layouts/app.html" %}',
         "{% block content %}",
+        '{% from "components/ui.html" import button %}',
         '<div class="flex justify-between items-center mb-6">',
         f'    <h1 class="text-2xl font-bold text-gray-800">Liste des {plural}</h1>',
         *_nouveau_btn,
@@ -440,9 +439,7 @@ def build_show_view(
     delete_perm = perms.get("delete")
 
     _edit_btn = [
-        f"        {{% with href='/{snake}/edit/{{{{ {snake}.{pk_col} }}}}', variant='primary', label=trans('crud.edit') %}}",
-        '        {% include "components/button.html" %}',
-        "        {% endwith %}",
+        f"        {{{{ button(label=trans('crud.edit'), variant='primary', href='/{snake}/edit/' ~ {snake}.{pk_col}) }}}}",
     ]
     if edit_perm:
         _edit_btn = [f"        {{% if can('{edit_perm}') %}}"] + _edit_btn + ["        {% endif %}"]
@@ -450,6 +447,7 @@ def build_show_view(
     lines: list[str] = [
         '{% extends "layouts/app.html" %}',
         "{% block content %}",
+        '{% from "components/ui.html" import button %}',
         '<div class="flex justify-between items-center mb-6">',
         f'    <h1 class="text-2xl font-bold text-gray-800">Détail {snake}</h1>',
         '    <div class="space-x-2">',
@@ -537,9 +535,7 @@ def build_show_view(
     _delete_form = [
         f'<form method="post" action="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}" class="mt-4" onsubmit="return confirm(\'{{{{ trans("crud.confirm_delete") }}}}\')">',
         '    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
-        "    {% with type='submit', variant='danger', label=trans('crud.delete') %}",
-        '    {% include "components/button.html" %}',
-        "    {% endwith %}",
+        "    {{ button(label=trans('crud.delete'), variant='danger', type='submit') }}",
         "</form>",
     ]
     if delete_perm:
@@ -765,6 +761,7 @@ def build_form_view(
     lines: list[str] = [
         '{% extends "layouts/app.html" %}',
         "{% block content %}",
+        '{% from "components/ui.html" import button %}',
         '<div class="flex justify-between items-center mb-6">',
         '    <h1 class="text-2xl font-bold text-gray-800">{{ titre }}</h1>',
         f"    <a href=\"/{snake}\" class=\"text-gray-600 hover:underline\">← {{{{ trans('common.back') }}}}</a>",
@@ -783,12 +780,8 @@ def build_form_view(
 
     lines += [
         '        <div class="flex gap-4 pt-2">',
-        "            {% with type='submit', variant='primary', label=trans('common.save') %}",
-        '            {% include "components/button.html" %}',
-        "            {% endwith %}",
-        f"            {{% with href='/{snake}', variant='secondary', label=trans('common.cancel') %}}",
-        '            {% include "components/button.html" %}',
-        "            {% endwith %}",
+        "            {{ button(label=trans('common.save'), variant='primary', type='submit') }}",
+        f"            {{{{ button(label=trans('common.cancel'), variant='secondary', href='/{snake}') }}}}",
         "        </div>",
         "    </form>",
         "</div>",

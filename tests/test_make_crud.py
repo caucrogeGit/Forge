@@ -1393,7 +1393,7 @@ def test_aucune_cle_metier_dans_catalogue():
 
 def test_index_bouton_creer_utilise_composant():
     html = build_index_view(_CONTACT_JSON)
-    assert "components/button.html" in html
+    assert "import button" in html
     assert "variant='primary'" in html
 
 
@@ -1404,7 +1404,7 @@ def test_index_bouton_creer_label_entity_specifique():
 
 def test_show_bouton_modifier_utilise_composant():
     html = build_show_view(_CONTACT_JSON)
-    assert "components/button.html" in html
+    assert "import button" in html
     assert "variant='primary'" in html
 
 

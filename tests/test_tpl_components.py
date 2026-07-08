@@ -91,14 +91,16 @@ def test_composants_ne_referencent_pas_les_layouts():
 # --- make:crud : seul button.html est référencé (TPL-003) ---
 
 
-def test_make_crud_utilise_uniquement_button_dans_components():
-    src = _read(Path("cli/entities/make_crud.py"))
-    assert 'components/button.html' in src
+def test_make_crud_utilise_la_macro_button_de_ui():
+    # FORGE-11 : le bouton est la macro `button` de components/ui.html,
+    # pas un fichier components/button.html (qui n'existe pas dans le squelette).
+    src = _read(Path("cli/entities/crud/views_builder.py"))
+    assert 'from "components/ui.html" import button' in src
 
 
 def test_make_crud_ne_reference_pas_autres_composants():
-    src = _read(Path("cli/entities/make_crud.py"))
-    for name in ("alert.html", "form_field.html", "table.html", "badge.html", "pagination.html"):
+    src = _read(Path("cli/entities/crud/views_builder.py"))
+    for name in ("alert.html", "form_field.html", "table.html", "badge.html", "pagination.html", "button.html"):
         assert f"components/{name}" not in src
 
 

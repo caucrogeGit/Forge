@@ -19,7 +19,7 @@ Les fichiers existants ne sont jamais écrasés ([PRÉSERVÉ]).
 Les routes sont affichées sur stdout, jamais injectées automatiquement.
 
 Patterns présents dans les vues et contrôleurs générés (via les sous-modules) :
-    - components/button.html          (build_layout, build_show_view, build_form_view, build_index_view)
+    - macro button de components/ui.html  (build_show_view, build_form_view, build_index_view)
     - "flash": get_flash(get_session_id(request))   (build_controller, rendu via la macro flash_messages)
     - hx-get, hx-post, hx-target     (build_pagination_partial, build_index_view, build_table_partial)
     - /static/tailwind.css            (build_layout)
