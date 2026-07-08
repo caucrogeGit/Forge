@@ -1,0 +1,11 @@
+{#
+  Barre de navigation du projet, intégrée par layouts/base.html
+  (bloc `nav`, via {% include "partials/nav.html" ignore missing %}).
+
+  Ajoutez ici vos liens de navigation, par exemple :
+    <a href="/classes" class="hover:text-forge transition">Classes</a>
+
+  Le bouton Connexion / Déconnexion apparaît automatiquement dès que
+  `forge make:auth` a généré partials/auth_nav.html (inclus ci-dessous).
+#}
+{% include "partials/auth_nav.html" ignore missing %}

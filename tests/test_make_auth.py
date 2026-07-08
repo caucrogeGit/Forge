@@ -100,8 +100,8 @@ def test_partial_nav_conditionnel_login_logout():
 
 def test_bloc_nav_affiche(tmp_path: Path):
     block = make_auth(root=tmp_path).nav_block
-    assert '{% include "partials/auth_nav.html" %}' in block
-    assert "block nav" in block
+    assert 'partials/auth_nav.html' in block
+    assert "partials/nav.html" in block  # intégré automatiquement, rien à câbler
 
 
 def test_main_affiche_bloc_nav(tmp_path: Path, monkeypatch, capsys):
@@ -109,6 +109,17 @@ def test_main_affiche_bloc_nav(tmp_path: Path, monkeypatch, capsys):
     ma.main(["make:auth"])
     out = capsys.readouterr().out
     assert 'include "partials/auth_nav.html"' in out
+
+
+def test_skeleton_nav_integre_auth_nav_automatiquement():
+    # base.html inclut partials/nav.html, qui inclut partials/auth_nav.html
+    # (ignore missing) : le bouton généré par make:auth apparaît dans la nav sans
+    # éditer base.html, et rien ne casse si make:auth n'a pas encore été lancé.
+    views = Path("skeleton/data/mvc/views")
+    base = (views / "layouts" / "base.html").read_text(encoding="utf-8")
+    nav = (views / "partials" / "nav.html").read_text(encoding="utf-8")
+    assert '{% include "partials/nav.html" ignore missing %}' in base
+    assert '{% include "partials/auth_nav.html" ignore missing %}' in nav
 
 
 def test_render_injecte_is_authenticated():

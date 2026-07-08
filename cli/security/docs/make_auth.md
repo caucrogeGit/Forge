@@ -22,10 +22,9 @@ Il se place après `auth:init` : `auth:init` crée les comptes et le SQL, `make:
 - `mvc/routes/auth_routes.py` : les routes du contrôleur ;
 - `mvc/views/partials/auth_nav.html` : le bouton Connexion / Déconnexion pour la barre de navigation.
 
-Deux branchements sont **affichés**, à coller (charte principe 9, Forge n'écrit pas en silence un fichier utilisateur) :
+Le branchement des routes est **affiché**, à coller dans `mvc/routes/__init__.py` (charte principe 9, Forge n'écrit pas en silence un fichier utilisateur).
 
-- le branchement des routes dans `mvc/routes/__init__.py` ;
-- l'`{% include "partials/auth_nav.html" %}` dans le `{% block nav %}` de `layouts/base.html`.
+Le bouton de navigation, lui, s'intègre **automatiquement** : le squelette livre `partials/nav.html` (inclus par le `{% block nav %}` de `layouts/base.html`), qui inclut `partials/auth_nav.html` avec `ignore missing`. Dès que `make:auth` a généré `auth_nav.html`, le bouton apparaît dans la nav, sans éditer `base.html`.
 
 Le partial affiche « Connexion » (lien vers `/login`) pour un visiteur, ou « Déconnexion » (POST vers `/logout`) pour un utilisateur connecté. Il s'appuie sur `is_authenticated`, injecté dans tout template par `BaseController.render`.
 

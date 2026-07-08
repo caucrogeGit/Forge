@@ -41,10 +41,11 @@
   En plus du contrôleur, de la vue de login et des routes, `make:auth` génère désormais
   `mvc/views/partials/auth_nav.html` : un bouton conditionnel « Connexion » (lien vers `/login`
   pour un visiteur) ou « Déconnexion » (POST vers `/logout` pour un utilisateur connecté), stylé
-  via la macro `button`. Il **affiche** l'`{% include "partials/auth_nav.html" %}` à coller dans
-  le `{% block nav %}` de `layouts/base.html` (charte §7, pas de réécriture silencieuse). Pour
-  rendre l'état d'authentification disponible partout, `BaseController.render` injecte désormais
-  `is_authenticated` dans le contexte de tout template (comme `csrf_token`).
+  via la macro `button`. Le bouton s'intègre **automatiquement** à la barre de navigation : le
+  squelette livre `partials/nav.html` (inclus par le `{% block nav %}` de `layouts/base.html`),
+  qui inclut `partials/auth_nav.html` avec `ignore missing` ; aucune édition de `base.html`.
+  Pour rendre l'état d'authentification disponible partout, `BaseController.render` injecte
+  désormais `is_authenticated` dans le contexte de tout template (comme `csrf_token`).
 - **Scaffold cohérent : les vues générées s'appuient sur le layout partagé `layouts/base.html` (retour terrain).**
   Le squelette livre un `base.html` complet (header, navigation, footer, charte « Accessible
   chaleureux »), mais les générateurs le contournaient : `make:crud` produisait son propre

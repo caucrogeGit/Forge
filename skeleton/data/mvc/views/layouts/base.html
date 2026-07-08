@@ -33,7 +33,7 @@
                 {{ app_name }}
             </a>
             <nav class="flex items-center gap-6 text-sm font-medium text-muted">
-                {% block nav %}{% endblock %}
+                {% block nav %}{% include "partials/nav.html" ignore missing %}{% endblock %}
             </nav>
         </div>
     </header>

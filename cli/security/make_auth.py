@@ -6,10 +6,11 @@ backend d'authentification (`core.auth.session`), mais aucune route, aucun
 contrôleur ni aucune vue de login n'étaient scaffoldés. `make:auth` comble ce
 trou : il génère un contrôleur d'authentification, une vue de login, un partial de
 bouton Connexion/Déconnexion pour la nav (`partials/auth_nav.html`), et **affiche** les
-lignes à ajouter dans `mvc/routes/__init__.py` (les routes) et dans le `{% block nav %}`
-de `layouts/base.html` (l'include du bouton) : mode « Forge affiche », charte §7, pas de
-réécriture silencieuse d'un fichier utilisateur. Le bouton s'appuie sur `is_authenticated`,
-injecté dans tout template par `BaseController.render`.
+routes à ajouter dans `mvc/routes/__init__.py` (mode « Forge affiche », charte §7). Le
+bouton s'intègre **automatiquement** à la barre de nav : `layouts/base.html` inclut
+`partials/nav.html`, qui inclut `partials/auth_nav.html` (`ignore missing`) ; aucune
+édition de `base.html` n'est requise. Le bouton s'appuie sur `is_authenticated`, injecté
+dans tout template par `BaseController.render`.
 
 Périmètre v1 : socle standard `users` (email / password_hash / is_active, produit
 par `forge auth:init`), avec défense anti-fixation de session (régénération +
@@ -161,9 +162,11 @@ ROUTE_BLOCK = "\n".join([
 
 
 NAV_BLOCK = "\n".join([
-    "Bouton nav à ajouter dans le {% block nav %} de mvc/views/layouts/base.html :",
+    "Bouton Connexion / Déconnexion : partials/auth_nav.html est intégré",
+    "automatiquement par partials/nav.html (barre de nav du squelette). Rien à câbler.",
+    "Si vous avez retiré cet include de partials/nav.html, remettez la ligne :",
     "─" * 70,
-    '  {% include "partials/auth_nav.html" %}',
+    '  {% include "partials/auth_nav.html" ignore missing %}',
 ])
 
 
