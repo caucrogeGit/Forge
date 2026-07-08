@@ -39,6 +39,10 @@ class BaseController:
             ctx = dict(context) if context else {}
             if "csrf_token" not in ctx:
                 ctx["csrf_token"] = BaseController.csrf_token(request)
+            # État d'authentification exposé à tout template (barre de nav, etc.).
+            if "is_authenticated" not in ctx:
+                from core.auth.session import is_authenticated as _is_authenticated
+                ctx["is_authenticated"] = _is_authenticated(request)
             from core.mvc.controller.registry import iter_jinja_context_providers
             for _provider in iter_jinja_context_providers():
                 ctx.update(_provider(request))

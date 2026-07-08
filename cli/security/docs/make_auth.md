@@ -18,9 +18,16 @@ Il se place après `auth:init` : `auth:init` crée les comptes et le SQL, `make:
 Écriture en mode write-if-new (aucun fichier existant n'est écrasé) :
 
 - `mvc/controllers/auth_controller.py` : `login_form` (GET), `login` (POST), `logout` (POST) ;
-- `mvc/views/auth/login.html` : le formulaire de connexion.
+- `mvc/views/auth/login.html` : le formulaire de connexion ;
+- `mvc/routes/auth_routes.py` : les routes du contrôleur ;
+- `mvc/views/partials/auth_nav.html` : le bouton Connexion / Déconnexion pour la barre de navigation.
 
-Les routes ne sont pas écrites dans `mvc/routes/__init__.py` : elles sont **affichées**, à coller (charte principe 9, Forge n'écrit pas en silence un fichier utilisateur).
+Deux branchements sont **affichés**, à coller (charte principe 9, Forge n'écrit pas en silence un fichier utilisateur) :
+
+- le branchement des routes dans `mvc/routes/__init__.py` ;
+- l'`{% include "partials/auth_nav.html" %}` dans le `{% block nav %}` de `layouts/base.html`.
+
+Le partial affiche « Connexion » (lien vers `/login`) pour un visiteur, ou « Déconnexion » (POST vers `/logout`) pour un utilisateur connecté. Il s'appuie sur `is_authenticated`, injecté dans tout template par `BaseController.render`.
 
 ## 3. Le flux généré
 

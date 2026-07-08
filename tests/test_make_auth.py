@@ -10,7 +10,12 @@ import ast
 from pathlib import Path
 
 from cli.security import make_auth as ma
-from cli.security.make_auth import AUTH_CONTROLLER, AUTH_ROUTES_FILE, make_auth
+from cli.security.make_auth import (
+    AUTH_CONTROLLER,
+    AUTH_NAV_PARTIAL,
+    AUTH_ROUTES_FILE,
+    make_auth,
+)
 
 
 def test_genere_controleur_et_vue(tmp_path: Path):
@@ -74,3 +79,41 @@ def test_main_affiche_routes_et_prerequis(tmp_path: Path, monkeypatch, capsys):
     assert "register_auth_routes" in out
     assert "forge auth:init" in out
     assert "[CREE]" in out
+
+
+# ── Bouton nav Connexion / Déconnexion ───────────────────────────────────────
+
+def test_genere_partial_nav(tmp_path: Path):
+    result = make_auth(root=tmp_path)
+    nav = tmp_path / "mvc" / "views" / "partials" / "auth_nav.html"
+    assert nav.is_file()
+    assert nav.as_posix() in result.created
+
+
+def test_partial_nav_conditionnel_login_logout():
+    # Visiteur -> Connexion (/login) ; connecté -> Déconnexion (POST /logout).
+    assert "is_authenticated" in AUTH_NAV_PARTIAL
+    assert '"Connexion"' in AUTH_NAV_PARTIAL and 'href="/login"' in AUTH_NAV_PARTIAL
+    assert '"Déconnexion"' in AUTH_NAV_PARTIAL and 'action="/logout"' in AUTH_NAV_PARTIAL
+    assert 'name="csrf_token"' in AUTH_NAV_PARTIAL
+
+
+def test_bloc_nav_affiche(tmp_path: Path):
+    block = make_auth(root=tmp_path).nav_block
+    assert '{% include "partials/auth_nav.html" %}' in block
+    assert "block nav" in block
+
+
+def test_main_affiche_bloc_nav(tmp_path: Path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    ma.main(["make:auth"])
+    out = capsys.readouterr().out
+    assert 'include "partials/auth_nav.html"' in out
+
+
+def test_render_injecte_is_authenticated():
+    # Contrat dont dépend le bouton nav : BaseController.render expose is_authenticated
+    # à tout template (comme csrf_token).
+    src = Path("core/mvc/controller/base_controller.py").read_text(encoding="utf-8")
+    assert '"is_authenticated"' in src
+    assert "is_authenticated(request)" in src

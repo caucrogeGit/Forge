@@ -4,9 +4,12 @@
 Le cœur redirige les routes protégées vers `/login` (codé en dur) et fournit le
 backend d'authentification (`core.auth.session`), mais aucune route, aucun
 contrôleur ni aucune vue de login n'étaient scaffoldés. `make:auth` comble ce
-trou : il génère un contrôleur d'authentification, une vue de login, et **affiche**
-les routes à ajouter dans `mvc/routes/__init__.py` (mode « Forge affiche », charte §7 : pas
-de réécriture silencieuse d'un fichier utilisateur).
+trou : il génère un contrôleur d'authentification, une vue de login, un partial de
+bouton Connexion/Déconnexion pour la nav (`partials/auth_nav.html`), et **affiche** les
+lignes à ajouter dans `mvc/routes/__init__.py` (les routes) et dans le `{% block nav %}`
+de `layouts/base.html` (l'include du bouton) : mode « Forge affiche », charte §7, pas de
+réécriture silencieuse d'un fichier utilisateur. Le bouton s'appuie sur `is_authenticated`,
+injecté dans tout template par `BaseController.render`.
 
 Périmètre v1 : socle standard `users` (email / password_hash / is_active, produit
 par `forge auth:init`), avec défense anti-fixation de session (régénération +
@@ -134,6 +137,21 @@ def register_auth_routes(router: Router) -> None:
 '''
 
 
+AUTH_NAV_PARTIAL = '''\
+{# Bouton Connexion / Déconnexion pour la barre de navigation.
+   `is_authenticated` est injecté dans tout template par BaseController.render. #}
+{% from "components/ui.html" import button %}
+{% if is_authenticated %}
+<form method="post" action="/logout">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    {{ button("Déconnexion", variant="secondary", type="submit") }}
+</form>
+{% else %}
+{{ button("Connexion", variant="primary", href="/login") }}
+{% endif %}
+'''
+
+
 ROUTE_BLOCK = "\n".join([
     "Branchement à ajouter dans mvc/routes/__init__.py :",
     "─" * 70,
@@ -142,11 +160,19 @@ ROUTE_BLOCK = "\n".join([
 ])
 
 
+NAV_BLOCK = "\n".join([
+    "Bouton nav à ajouter dans le {% block nav %} de mvc/views/layouts/base.html :",
+    "─" * 70,
+    '  {% include "partials/auth_nav.html" %}',
+])
+
+
 @dataclass
 class MakeAuthResult:
     created: list[str]
     skipped: list[str]
     route_block: str = ROUTE_BLOCK
+    nav_block: str = NAV_BLOCK
 
 
 def _write_if_new(path: Path, content: str, result: MakeAuthResult) -> None:
@@ -167,6 +193,8 @@ def make_auth(root: Path | None = None) -> MakeAuthResult:
     # ADR-068 : les routes du contrôleur auth vivent dans leur propre fichier ;
     # mvc/routes/__init__.py ne fait que les brancher (affiché ci-dessous).
     _write_if_new(base / "mvc" / "routes" / "auth_routes.py", AUTH_ROUTES_FILE, result)
+    # Bouton Connexion/Déconnexion pour la nav ; l'include est affiché (charte §7).
+    _write_if_new(base / "mvc" / "views" / "partials" / "auth_nav.html", AUTH_NAV_PARTIAL, result)
     return result
 
 
@@ -185,6 +213,8 @@ def main(argv: list[str] | None = None) -> None:
         print(f"[PRESERVE] {path}")
     print()
     print(result.route_block)
+    print()
+    print(result.nav_block)
     print()
     print("Prérequis : forge auth:init puis forge db:apply (table users).")
     print("Créez un compte : forge auth:user:create")
