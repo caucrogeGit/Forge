@@ -502,6 +502,10 @@ Quand l'entité générée est le `from_entity` d'une relation, le champ FK corr
 
 La colonne FK n'a pas besoin d'être déclarée comme champ de l'entité source : quand la relation la porte (voir *SQL généré*), `make:crud` l'ajoute automatiquement au formulaire (le `<select>`) et au modèle (colonne présente dans `INSERT` et `UPDATE`), de sorte que la valeur choisie est bien persistée.
 
+La liste **et** la fiche détail affichent le **libellé** de l'entité liée (pas l'identifiant brut) : `SELECT_ALL` et `SELECT_BY_ID` joignent la table cible pour exposer une colonne `<fk>_label`.
+
+Pour appliquer le schéma des relations via une migration, `forge migration:make <nom> --from-entity <Entite> --with-relations` (ou `--from-entities --with-relations`) inclut le SQL des relations après les `CREATE TABLE`.
+
 Comme `relations.json` (version 1 du format) ne contient pas encore de `label_field`, Forge choisit le libellé affiché avec un fallback simple :
 
 1. premier champ texte non-PK de l'entité cible ;

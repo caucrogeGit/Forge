@@ -1,4 +1,5 @@
 import hashlib
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -646,7 +647,7 @@ def test_cli_make_from_entity_passes_entity_to_creator(monkeypatch, capsys, tmp_
     captured = {}
     created = tmp_path / "mvc" / "migrations" / "20260502221530_create_contacts.sql"
 
-    def fake_make_migration_file(name, *, from_entity=None, from_entities=False, from_diff=None):
+    def fake_make_migration_file(name, *, from_entity=None, from_entities=False, from_diff=None, with_relations=False):
         captured["name"] = name
         captured["from_entity"] = from_entity
         captured["from_entities"] = from_entities
@@ -671,7 +672,7 @@ def test_cli_make_from_entities_passes_flag_to_creator(monkeypatch, capsys, tmp_
     captured = {}
     created = tmp_path / "mvc" / "migrations" / "20260502230000_initial_schema.sql"
 
-    def fake_make_migration_file(name, *, from_entity=None, from_entities=False, from_diff=None):
+    def fake_make_migration_file(name, *, from_entity=None, from_entities=False, from_diff=None, with_relations=False):
         captured["name"] = name
         captured["from_entity"] = from_entity
         captured["from_entities"] = from_entities
@@ -696,7 +697,7 @@ def test_cli_make_from_diff_passes_entity_to_creator(monkeypatch, capsys, tmp_pa
     captured = {}
     created = tmp_path / "mvc" / "migrations" / "20260503101500_add_contact_fields.sql"
 
-    def fake_make_migration_file(name, *, from_entity=None, from_entities=False, from_diff=None):
+    def fake_make_migration_file(name, *, from_entity=None, from_entities=False, from_diff=None, with_relations=False):
         captured["name"] = name
         captured["from_entity"] = from_entity
         captured["from_entities"] = from_entities
@@ -715,6 +716,59 @@ def test_cli_make_from_diff_passes_entity_to_creator(monkeypatch, capsys, tmp_pa
         "from_entities": False,
         "from_diff": "Contact",
     }
+
+
+# ── FORGE-15 : migration:make --with-relations ───────────────────────────────
+
+def _setup_classe_with_relation(tmp_path: Path) -> None:
+    _write_entity_json(tmp_path, "annee_scolaire", json.dumps({
+        "schema_version": "1.0", "name": "AnneeScolaire", "table": "annee_scolaire",
+        "fields": [{"name": "libelle", "type": "string", "max_length": 50, "required": True}],
+    }))
+    _write_entity_json(tmp_path, "classe", json.dumps({
+        "schema_version": "1.0", "name": "Classe", "table": "classe",
+        "fields": [{"name": "code", "type": "string", "max_length": 30, "required": True}],
+    }))
+    _write_entity_sql(tmp_path, "classe",
+                      "CREATE TABLE classe (\n    Id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,\n"
+                      "    Code VARCHAR(30) NOT NULL,\n    PRIMARY KEY (Id)\n);\n")
+    (tmp_path / "mvc" / "entities" / "relations.json").write_text(json.dumps({
+        "schema_version": "1.0", "relations": [{
+            "type": "many_to_one", "from": "Classe", "to": "AnneeScolaire", "name": "annee_scolaire",
+            "foreign_key": "annee_scolaire_id", "on_delete": "restrict", "nullable": False, "index": True,
+        }],
+    }), encoding="utf-8")
+
+
+def test_migration_from_entity_with_relations_inclut_fk(tmp_path):
+    _setup_classe_with_relation(tmp_path)
+    path = make_migration_file(
+        "create_classe", migrations_dir=tmp_path / "mvc" / "migrations",
+        from_entity="Classe", with_relations=True, project_root=tmp_path,
+    )
+    content = path.read_text(encoding="utf-8")
+    assert "CREATE TABLE classe" in content
+    assert "ADD COLUMN annee_scolaire_id BIGINT UNSIGNED" in content
+    assert "FOREIGN KEY (annee_scolaire_id)" in content
+    # Ordre : la table avant la contrainte.
+    assert content.index("CREATE TABLE classe") < content.index("ADD CONSTRAINT")
+
+
+def test_migration_from_entity_sans_relations_omet_fk(tmp_path):
+    _setup_classe_with_relation(tmp_path)
+    path = make_migration_file(
+        "create_classe", migrations_dir=tmp_path / "mvc" / "migrations",
+        from_entity="Classe", project_root=tmp_path,
+    )
+    assert "ADD CONSTRAINT" not in path.read_text(encoding="utf-8")
+
+
+def test_migration_with_relations_exige_une_source(tmp_path):
+    with pytest.raises(MigrationError, match="with-relations"):
+        make_migration_file(
+            "x", migrations_dir=tmp_path / "mvc" / "migrations",
+            with_relations=True, project_root=tmp_path,
+        )
 
 
 def test_schema_diff_reports_table_missing():

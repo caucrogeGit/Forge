@@ -122,6 +122,8 @@ Invocation :
 | `forge migration:apply` | applique les migrations en attente |
 | `forge migration:apply --dry-run` | prévisualise l'application |
 | `forge migration:make <nom>` | crée un fichier de migration |
+| `forge migration:make <nom> --from-entity <Entite> [--with-relations]` | migration depuis le SQL d'une entité, avec option les relations (FK) |
+| `forge migration:make <nom> --from-entities [--with-relations]` | migration depuis toutes les entités, avec option les relations |
 | `forge migration:make <nom> --from-diff <Entite>` | crée une migration depuis un diff d'entité |
 | `forge migration:diff --entity <Entite>` | affiche le diff SQL entre l'entité et la base |
 

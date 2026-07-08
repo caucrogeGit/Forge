@@ -254,7 +254,7 @@ def build_model(
         "from core.database.db import fetch_one, fetch_all, execute, insert",
         "",
         f'SELECT_ALL   = "{_build_select_base(table, relations)} ORDER BY {"" if not relations else table + "."}{pk_col}"',
-        f'SELECT_BY_ID = "SELECT * FROM {table} WHERE {pk_col} = ?"',
+        f'SELECT_BY_ID = "{_build_select_base(table, relations)} WHERE {"" if not relations else table + "."}{pk_col} = ?"',
         f'INSERT       = "INSERT INTO {table} ({insert_cols}) VALUES ({insert_placeholders})"',
         f'UPDATE       = {update_constant}',
         f'DELETE       = "DELETE FROM {table} WHERE {pk_col} = ?"',

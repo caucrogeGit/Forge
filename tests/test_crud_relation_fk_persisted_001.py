@@ -17,6 +17,7 @@ from pathlib import Path
 from cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
 from cli.entities.crud.form_builder import build_form
 from cli.entities.crud.model_builder import build_model
+from cli.entities.crud.views_builder import build_show_view
 from cli.entities.crud.relations_loader import _load_crud_many_to_one_relations
 from cli.entities.make_crud import _inject_relation_fk_fields
 from cli.entities.validation import validate_entity_definition
@@ -78,6 +79,22 @@ def test_fk_select_label_strips_id_suffix(tmp_path):
     _, form = _classe_crud(tmp_path)
     assert 'RelationField(label="Annee scolaire"' in form
     assert "Annee scolaire id" not in form
+
+
+def test_fk_affichee_en_libelle_dans_la_fiche(tmp_path):
+    # FORGE-16 : la fiche détail montre le libellé lié (via JOIN), pas l'id brut.
+    ents = _project(tmp_path)
+    raw = json.loads((ents / "classe" / "classe.json").read_text(encoding="utf-8"))
+    definition = validate_entity_definition(normalize_canonical_entity_for_model_build(raw), source="classe")
+    relations = _load_crud_many_to_one_relations(definition, ents)
+    _inject_relation_fk_fields(definition, relations)
+    show = build_show_view(definition, relations)
+    model = build_model(definition, relations)
+    assert "annee_scolaire_id_label" in show
+    assert "{{ classe.annee_scolaire_id }}" not in show
+    # SELECT_BY_ID joint la table liée pour disposer du libellé.
+    select_by_id = [ln for ln in model.splitlines() if ln.startswith("SELECT_BY_ID")][0]
+    assert "LEFT JOIN annee_scolaire" in select_by_id
 
 
 def test_injection_is_idempotent_and_skips_declared_field(tmp_path):

@@ -275,6 +275,7 @@ def make_migration_file(
     from_entity: str | None = None,
     from_entities: bool = False,
     from_diff: str | None = None,
+    with_relations: bool = False,
     project_root: Path | None = None,
     db: Any = None,
     database: str | None = None,
@@ -283,6 +284,10 @@ def make_migration_file(
     if sum(1 for enabled in sources if enabled) > 1:
         raise MigrationError(
             "Utilisez une seule source : --from-entity, --from-entities ou --from-diff."
+        )
+    if with_relations and not (from_entities or from_entity is not None):
+        raise MigrationError(
+            "--with-relations exige --from-entity <Entite> ou --from-entities."
         )
     slug = slugify_migration_name(name)
     version = (now or datetime.now()).strftime("%Y%m%d%H%M%S")
@@ -294,8 +299,12 @@ def make_migration_file(
     root = project_root or Path.cwd()
     if from_entities:
         content = _migration_file_template_from_entities(version, slug, root)
+        if with_relations:
+            content += _relations_sql_block(root)
     elif from_entity is not None:
         content = _migration_file_template_from_entity(version, slug, from_entity, root)
+        if with_relations:
+            content += _relations_sql_block(root, from_entity=from_entity)
     elif from_diff is not None:
         content = _migration_file_template_from_diff(
             version,
@@ -482,6 +491,8 @@ def main(argv: list[str] | None = None) -> None:
             print("  --from-entity <Entite>   SQL depuis le fichier .sql de l'entité")
             print("  --from-entities          SQL depuis toutes les entités")
             print("  --from-diff <Entite>     SQL depuis le diff entité/base")
+            print("  --with-relations         Ajoute le SQL des relations (FK, index)")
+            print("                           après les CREATE TABLE (tables puis contraintes)")
         elif cmd == "migration:status":
             print("Usage : forge migration:status")
             print()
@@ -565,11 +576,13 @@ def _run_make_command(args: list[str]) -> None:
     from_entity = None
     from_entities = False
     from_diff = None
-    if len(args) == 4 and args[2] == "--from-entity":
-        from_entity = args[3]
-    elif len(args) == 4 and args[2] == "--from-diff":
-        from_diff = args[3]
-    elif len(args) == 3 and args[2] == "--from-entities":
+    with_relations = "--with-relations" in args
+    core = [a for a in args[2:] if a != "--with-relations"]
+    if len(core) == 2 and core[0] == "--from-entity":
+        from_entity = core[1]
+    elif len(core) == 2 and core[0] == "--from-diff":
+        from_diff = core[1]
+    elif core == ["--from-entities"]:
         from_entities = True
     if from_diff is not None:
         _assert_migration_contracts_valid(Path.cwd() / "mvc" / "entities")
@@ -579,6 +592,7 @@ def _run_make_command(args: list[str]) -> None:
             from_entity=from_entity,
             from_entities=from_entities,
             from_diff=from_diff,
+            with_relations=with_relations,
         )
     except MigrationNoChange as exc:
         print(str(exc))
@@ -677,6 +691,44 @@ def _migration_file_template(version: str, name: str) -> str:
         "--     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY\n"
         "-- );\n"
     )
+
+
+def _relations_sql_block(project_root: Path, *, from_entity: str | None = None) -> str:
+    """SQL des relations (ADR-068 : ADD COLUMN + FOREIGN KEY + INDEX) à insérer
+    après les CREATE TABLE d'une migration (FORGE-15).
+
+    Régénéré depuis `mvc/entities/relations.json` (source de vérité), filtré sur les
+    relations dont l'entité source est `from_entity` quand il est fourni (migration
+    d'une seule entité), sinon toutes (migration de toutes les entités). Retourne une
+    chaîne vide s'il n'y a pas de relations.
+    """
+    from cli.entities.relations import (
+        generate_relations_sql,
+        validate_relations_definition,
+    )
+
+    entities_root = project_root / "mvc" / "entities"
+    relations_path = entities_root / "relations.json"
+    if not relations_path.exists():
+        return ""
+    raw = json.loads(relations_path.read_text(encoding="utf-8"))
+    validated = validate_relations_definition(
+        raw, source=str(relations_path), entities_root=entities_root
+    )
+    if from_entity is not None:
+        validated = [r for r in validated if r.from_entity == from_entity]
+    sql = generate_relations_sql(validated).strip()
+    if not sql:
+        return ""
+    return "\n".join([
+        "",
+        "-- ============================================================",
+        "-- Relations : colonnes FK, contraintes, index (mvc/entities/relations.sql)",
+        "-- ============================================================",
+        "",
+        sql,
+        "",
+    ])
 
 
 def _migration_file_template_from_entity(
@@ -831,11 +883,19 @@ def entity_sql_file_paths(*, project_root: Path | None = None) -> list[Path]:
 
 
 def _is_valid_make_args(args: list[str]) -> bool:
-    if len(args) == 2:
+    rest = args[2:]
+    if not rest:
         return True
-    if len(args) == 3:
-        return args[2] == "--from-entities"
-    return len(args) == 4 and args[2] in {"--from-entity", "--from-diff"}
+    with_relations = rest[-1] == "--with-relations"
+    core = rest[:-1] if with_relations else rest
+    if core == ["--from-entities"]:
+        return True
+    if len(core) == 2 and core[0] == "--from-entity":
+        return True
+    if len(core) == 2 and core[0] == "--from-diff":
+        # --with-relations n'a pas de sens sur un diff (déjà un delta ciblé).
+        return not with_relations
+    return False
 
 
 def _is_valid_diff_args(args: list[str]) -> bool:

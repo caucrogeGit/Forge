@@ -390,6 +390,7 @@ def build_pagination_partial(definition: dict[str, Any]) -> str:
 
 def build_show_view(
     definition: dict[str, Any],
+    relations: list[CrudManyToOneRelation] | None = None,
     many_to_many_relations: list[CrudManyToManyRelation] | None = None,
     rbac: dict[str, Any] | None = None,
 ) -> str:
@@ -398,6 +399,7 @@ def build_show_view(
     pk = _pk_field(definition)
     pk_col = pk["column"]
     non_pk = _non_pk_fields(definition)
+    relations_by_field = {r.field_name: r for r in (relations or [])}
     perms = (rbac or {}).get("permissions", {})
     edit_perm = perms.get("edit")
     delete_perm = perms.get("delete")
@@ -424,12 +426,20 @@ def build_show_view(
         '<div class="bg-white shadow rounded p-6 space-y-4">',
     ]
     for f in non_pk:
-        label = _humanize(f["name"])
-        fcol = f["column"]
+        fname = f["name"]
+        relation = relations_by_field.get(fname)
+        if relation is not None:
+            # FK portée par une relation : affiche le libellé de l'entité liée
+            # (via le JOIN de SELECT_BY_ID), pas l'identifiant brut.
+            label = _humanize(fname[:-3] if fname.endswith("_id") else fname)
+            value_expr = f"{snake}.{relation.field_name}_label"
+        else:
+            label = _humanize(fname)
+            value_expr = f"{snake}.{f['column']}"
         lines += [
             "    <div>",
             f'        <p class="text-sm text-gray-500">{label}</p>',
-            f'        <p class="text-gray-800">{{{{ {snake}.{fcol} }}}}</p>',
+            f'        <p class="text-gray-800">{{{{ {value_expr} }}}}</p>',
             "    </div>",
         ]
     for relation in many_to_many_relations or []:

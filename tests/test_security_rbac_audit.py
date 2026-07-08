@@ -447,7 +447,7 @@ class TestLacuneTemplatesCrud:
                 },
             ],
         }
-        html = build_show_view(defn, [])
+        html = build_show_view(defn, many_to_many_relations=[])
         assert "{% if can(" not in html
 
     def test_controller_genere_avec_rbac_protege_action_delete(self):

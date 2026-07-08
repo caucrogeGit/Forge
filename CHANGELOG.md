@@ -93,6 +93,15 @@
 
 ### Corrigé
 
+- **Chaîne applicative des relations : migration et affichage (retour terrain, FORGE-15 / FORGE-16).**
+  `migration:make` reçoit une option `--with-relations` (valide avec `--from-entity` ou
+  `--from-entities`) : après les `CREATE TABLE`, la migration inclut le SQL des relations
+  (`ADD COLUMN` + `FOREIGN KEY` + `INDEX`) régénéré depuis `relations.json`, dans l'ordre
+  tables puis contraintes (FORGE-15). Côté `make:crud`, la fiche détail (`show.html`) affiche
+  désormais le **libellé** de l'entité liée au lieu de l'identifiant brut : `SELECT_BY_ID`
+  joint la table cible comme la liste (FORGE-16). Le reste de FORGE-16 (select dans le
+  formulaire, FK persistée dans `INSERT`/`UPDATE`, libellé en liste) était déjà couvert par
+  l'intégration CRUD des relations.
 - **Login impossible sur MariaDB/SQLite : `is_active` (int 0/1) refusé (retour terrain, FORGE-10).**
   Les backends SQL renvoient la colonne `BOOLEAN` / `tinyint(1)` en entier `0/1` ; le
   contrat `normalize_auth_user` exigeait un `bool` strict et levait avant la vérification

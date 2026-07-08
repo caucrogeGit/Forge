@@ -308,7 +308,7 @@ def make_crud(
     )
     _write_if_new(
         mvc / "views" / snake / "show.html",
-        build_show_view(definition, many_to_many_relations, rbac=rbac),
+        build_show_view(definition, relations, many_to_many_relations, rbac=rbac),
         result, dry_run,
     )
     _write_if_new(
