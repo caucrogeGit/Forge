@@ -58,7 +58,6 @@ Sortie type :
 [CRÉÉ]      mvc/controllers/contact_controller.py
 [CRÉÉ]      mvc/models/contact_model.py
 [CRÉÉ]      mvc/forms/contact_form.py
-[CRÉÉ]      mvc/views/layouts/app.html
 [CRÉÉ]      mvc/views/contact/index.html
 [CRÉÉ]      mvc/views/contact/show.html
 [CRÉÉ]      mvc/views/contact/form.html
@@ -285,19 +284,18 @@ Le contrôleur généré lit les paramètres GET `page`, `q`, `sort`, `direction
 
 ## 6. Vues générées
 
-`forge make:crud` crée un layout applicatif et trois vues :
+`forge make:crud` crée trois vues qui étendent le layout partagé du squelette :
 
 ```text
-mvc/views/layouts/app.html   ← layout Jinja2 (créé si absent)
 mvc/views/contact/index.html ← liste
 mvc/views/contact/show.html  ← détail
 mvc/views/contact/form.html  ← création et modification
 ```
 
-Les vues héritent du layout :
+Les vues héritent du layout `layouts/base.html` (livré par le squelette : nav, footer, charte) :
 
 ```jinja2
-{% extends "layouts/app.html" %}
+{% extends "layouts/base.html" %}
 
 {% block content %}
     ...
@@ -322,7 +320,7 @@ Les fichiers générés sont des points de départ, ils sont lisibles et à adap
 | `contact_form.py` | Ajouter `ChoiceField`, validations croisées via `clean()`, remplacer les `StringField` de type `DATE` |
 | `contact_model.py` | Ajouter des requêtes métier, des jointures, de la pagination |
 | `contact/index.html` | Ajouter des colonnes, la pagination, le tri |
-| `layouts/app.html` | Menu de navigation, nom de l'application, styles |
+| `layouts/base.html` | Menu de navigation, footer, nom de l'application, styles (layout partagé du squelette) |
 
 !!! tip "Régénération partielle"
     Pour régénérer un seul fichier modifié, le supprimer puis relancer `forge make:crud Contact`.

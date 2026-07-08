@@ -151,8 +151,10 @@ class TestCrudGenerated:
     def test_view_pagination_partial_exists(self, built_project):
         assert (built_project / "mvc" / "views" / _ENTITY_SNAKE / "_pagination.html").exists()
 
-    def test_layout_app_html_exists(self, built_project):
-        assert (built_project / "mvc" / "views" / "layouts" / "app.html").exists()
+    def test_views_extend_base_layout(self, built_project):
+        # make:crud ne génère plus de layout : les vues étendent base.html (squelette).
+        index = built_project / "mvc" / "views" / _ENTITY_SNAKE / "index.html"
+        assert '{% extends "layouts/base.html" %}' in index.read_text(encoding="utf-8")
 
 
 # ── project:check ─────────────────────────────────────────────────────────────

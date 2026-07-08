@@ -207,7 +207,7 @@ class TestTemplateConfirmation:
 
     def test_extends_layout(self):
         html = build_bulk_delete_confirm_view(_entity_simple())
-        assert '{% extends "layouts/app.html" %}' in html
+        assert '{% extends "layouts/base.html" %}' in html
 
     def test_form_confirmation_present(self):
         html = build_bulk_delete_confirm_view(_entity_simple())

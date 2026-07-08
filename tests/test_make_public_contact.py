@@ -12,7 +12,7 @@ from tests.test_make_public_page import _prepare_project, _read
 def test_contact_template_etend_layout_public():
     template = build_contact_template()
 
-    assert '{% extends "layouts/public.html" %}' in template
+    assert '{% extends "layouts/base.html" %}' in template
 
 
 def test_contact_template_utilise_bloc_title():
@@ -113,7 +113,7 @@ def test_make_public_contact_cree_template(tmp_path):
     make_public_contact(root=tmp_path)
 
     template = _read(tmp_path, "mvc/views/public/contact.html")
-    assert '{% extends "layouts/public.html" %}' in template
+    assert '{% extends "layouts/base.html" %}' in template
     assert "trans('public.contact.title')" in template
 
 

@@ -97,45 +97,26 @@ class AuthController(BaseController):
 
 
 AUTH_LOGIN_VIEW = '''\
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion</title>
-    <link rel="icon" href="/static/favicon.png" type="image/png">
-    <link rel="stylesheet" href="/static/tailwind.css">
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="bg-white rounded shadow p-8 w-full max-w-sm">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Connexion</h1>
+{% extends "layouts/base.html" %}
+{% from "components/forms.html" import field, submit %}
+{% from "components/ui.html" import alert %}
+{% block title %}Connexion{% endblock %}
+{% block content %}
+<div class="max-w-sm mx-auto">
+    <h1 class="text-[28px] font-extrabold tracking-tight mb-6 text-center">Connexion</h1>
 
-        {% if erreur %}
-        <p class="text-red-600 text-sm mb-4">{{ erreur }}</p>
-        {% endif %}
+    {% if erreur %}
+    <div class="mb-4">{{ alert(erreur, level="error") }}</div>
+    {% endif %}
 
-        <form method="POST" action="/login" class="space-y-4">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" name="email" required autofocus
-                    class="mt-1 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Mot de passe</label>
-                <input type="password" name="password" required
-                    class="mt-1 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-                Se connecter
-            </button>
-        </form>
-    </div>
-</body>
-</html>
+    <form method="POST" action="/login" class="space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        {{ field(name="email", label="Email", type="email", required=True) }}
+        {{ field(name="password", label="Mot de passe", type="password", required=True) }}
+        {{ submit(label="Se connecter") }}
+    </form>
+</div>
+{% endblock %}
 '''
 
 

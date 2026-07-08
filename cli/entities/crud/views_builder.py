@@ -23,43 +23,6 @@ from cli.entities.crud.utils import (
 )
 
 
-def build_layout() -> str:
-    return """\
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ titre | default("Application") }}</title>
-    <link rel="icon" href="/static/favicon.ico" sizes="any">
-    <link rel="icon" href="/static/favicon.png" type="image/png">
-    <link rel="stylesheet" href="/static/tailwind.css">
-</head>
-<body class="bg-gray-100 min-h-screen">
-
-    <nav class="bg-blue-700 text-white px-6 py-4 shadow flex justify-between items-center">
-        <a href="/" class="text-xl font-bold">Application</a>
-        <form method="post" action="/logout" style="display:inline">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-            <button type="submit"
-                class="text-sm bg-blue-800 hover:bg-blue-900 px-3 py-1 rounded cursor-pointer">
-                Déconnexion
-            </button>
-        </form>
-    </nav>
-
-    <main class="max-w-5xl mx-auto mt-8 px-4">
-        {% from "components/ui.html" import flash_messages %}
-        {{ flash_messages(flash) }}
-        {% block content %}
-        {% endblock %}
-    </main>
-
-</body>
-</html>
-"""
-
-
 def build_form_errors_partial() -> str:
     return """\
 {% if form and form.errors %}
@@ -102,9 +65,10 @@ def build_index_view(
     if create_perm:
         _nouveau_btn = [f"    {{% if can('{create_perm}') %}}"] + _nouveau_btn + ["    {% endif %}"]
     lines: list[str] = [
-        '{% extends "layouts/app.html" %}',
+        '{% extends "layouts/base.html" %}',
         "{% block content %}",
-        '{% from "components/ui.html" import button %}',
+        '{% from "components/ui.html" import button, flash_messages %}',
+        "{{ flash_messages(flash) }}",
         '<div class="flex justify-between items-center mb-6">',
         f'    <h1 class="text-2xl font-bold text-gray-800">Liste des {plural}</h1>',
         *_nouveau_btn,
@@ -445,9 +409,10 @@ def build_show_view(
         _edit_btn = [f"        {{% if can('{edit_perm}') %}}"] + _edit_btn + ["        {% endif %}"]
 
     lines: list[str] = [
-        '{% extends "layouts/app.html" %}',
+        '{% extends "layouts/base.html" %}',
         "{% block content %}",
-        '{% from "components/ui.html" import button %}',
+        '{% from "components/ui.html" import button, flash_messages %}',
+        "{{ flash_messages(flash) }}",
         '<div class="flex justify-between items-center mb-6">',
         f'    <h1 class="text-2xl font-bold text-gray-800">Détail {snake}</h1>',
         '    <div class="space-x-2">',
@@ -759,9 +724,10 @@ def build_form_view(
     )
 
     lines: list[str] = [
-        '{% extends "layouts/app.html" %}',
+        '{% extends "layouts/base.html" %}',
         "{% block content %}",
-        '{% from "components/ui.html" import button %}',
+        '{% from "components/ui.html" import button, flash_messages %}',
+        "{{ flash_messages(flash) }}",
         '<div class="flex justify-between items-center mb-6">',
         '    <h1 class="text-2xl font-bold text-gray-800">{{ titre }}</h1>',
         f"    <a href=\"/{snake}\" class=\"text-gray-600 hover:underline\">← {{{{ trans('common.back') }}}}</a>",
@@ -796,8 +762,10 @@ def build_bulk_delete_confirm_view(definition: dict[str, Any]) -> str:
     snake = _to_snake(entity)
 
     lines: list[str] = [
-        '{% extends "layouts/app.html" %}',
+        '{% extends "layouts/base.html" %}',
         "{% block content %}",
+        '{% from "components/ui.html" import flash_messages %}',
+        "{{ flash_messages(flash) }}",
         '<div class="max-w-xl mx-auto">',
         '    <h1 class="text-2xl font-bold text-gray-800 mb-4">Confirmer la suppression</h1>',
         '    <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">',

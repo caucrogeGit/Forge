@@ -22,7 +22,7 @@ Patterns présents dans les vues et contrôleurs générés (via les sous-module
     - macro button de components/ui.html  (build_show_view, build_form_view, build_index_view)
     - "flash": get_flash(get_session_id(request))   (build_controller, rendu via la macro flash_messages)
     - hx-get, hx-post, hx-target     (build_pagination_partial, build_index_view, build_table_partial)
-    - /static/tailwind.css            (build_layout)
+    - extends layouts/base.html       (build_index_view, build_show_view, build_form_view)
     - trans(                          (build_show_view, build_form_view, build_index_view)
 """
 
@@ -89,7 +89,6 @@ from cli.entities.crud.form_builder import (  # noqa: F401
 from cli.entities.crud.model_builder import build_model  # noqa: F401
 from cli.entities.crud.controller_builder import build_controller  # noqa: F401
 from cli.entities.crud.views_builder import (  # noqa: F401
-    build_layout,
     build_form_errors_partial,
     build_index_view,
     build_results_partial,
@@ -278,11 +277,6 @@ def make_crud(
     _write_if_new(
         mvc / "forms" / f"{snake}_form.py",
         form_code,
-        result, dry_run,
-    )
-    _write_if_new(
-        mvc / "views" / "layouts" / "app.html",
-        build_layout(),
         result, dry_run,
     )
     _write_if_new(

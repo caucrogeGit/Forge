@@ -94,7 +94,7 @@ def test_make_public_list_genere_template_public_de_liste(tmp_path):
     make_public_list("Hebergement", output_root=tmp_path)
 
     template = _read(tmp_path, "mvc/views/public/hebergements/index.html")
-    assert '{% extends "layouts/public.html" %}' in template
+    assert '{% extends "layouts/base.html" %}' in template
     assert "{% block title %}Hebergements{% endblock %}" in template
     assert "{% block content %}" in template
     assert "{% block scripts %}{% endblock %}" in template

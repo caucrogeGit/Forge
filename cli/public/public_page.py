@@ -14,7 +14,7 @@ TEMPLATE_DIR = Path("mvc/views/public")
 CONTROLLER_PATH = Path("mvc/controllers/public_pages_controller.py")
 # ADR-068 : le routage est un package ; l'injection cible la racine de composition.
 ROUTES_PATH = Path("mvc/routes") / "__init__.py"
-PUBLIC_LAYOUT = "layouts/public.html"
+PUBLIC_LAYOUT = "layouts/base.html"
 PUBLIC_TITLE_BLOCK = "title"
 PUBLIC_CONTENT_BLOCK = "content"
 PUBLIC_SCRIPTS_BLOCK = "scripts"

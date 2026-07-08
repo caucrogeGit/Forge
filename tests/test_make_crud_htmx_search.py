@@ -115,7 +115,7 @@ def test_results_partial_contient_table_et_pagination_sans_layout():
     assert '{% include "contact/_table.html" %}' in html
     assert '{% include "contact/_pagination.html" %}' in html
     assert "extends" not in html
-    assert "layouts/app.html" not in html
+    assert "layouts/base.html" not in html
 
 
 def test_make_crud_genere_results_partial_et_index_l_inclut(tmp_path):

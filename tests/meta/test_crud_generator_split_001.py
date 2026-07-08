@@ -169,7 +169,6 @@ def test_crud_views_builder_importable():
     assert hasattr(mod, "build_index_view")
     assert hasattr(mod, "build_show_view")
     assert hasattr(mod, "build_form_view")
-    assert hasattr(mod, "build_layout")
 
 
 # ── Roadmap ───────────────────────────────────────────────────────────────────

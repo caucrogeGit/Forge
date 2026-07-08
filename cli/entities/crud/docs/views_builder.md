@@ -15,8 +15,7 @@ C'est la brique d'affichage appelée par `make:crud`.
 
 | Symbole | Rôle |
 |---|---|
-| `build_layout()` | mise en page de l'application |
-| `build_index_view(...)` | vue liste |
+| `build_index_view(...)` | vue liste (étend `layouts/base.html`) |
 | `build_show_view(...)` | vue fiche |
 | `build_form_view(...)` | vue formulaire |
 | `build_table_partial(...)` / `build_results_partial(...)` / `build_pagination_partial(...)` | fragments de liste |

@@ -49,7 +49,6 @@ from cli.entities.crud.form_builder import (
 from cli.entities.crud.model_builder import build_model
 from cli.entities.crud.controller_builder import build_controller
 from cli.entities.crud.views_builder import (
-    build_layout,
     build_form_errors_partial,
     build_index_view,
     build_results_partial,
@@ -100,7 +99,6 @@ __all__ = [
     # controller_builder
     "build_controller",
     # views_builder
-    "build_layout",
     "build_form_errors_partial",
     "build_index_view",
     "build_results_partial",

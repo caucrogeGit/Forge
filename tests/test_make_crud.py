@@ -24,7 +24,6 @@ from cli.entities.make_crud import (
     build_form,
     build_form_view,
     build_index_view,
-    build_layout,
     build_model,
     build_pagination_partial,
     build_show_view,
@@ -196,11 +195,6 @@ def test_form_genere(tmp_path):
     assert (tmp_path / "mvc" / "forms" / "contact_form.py").exists()
 
 
-def test_layout_genere(tmp_path):
-    _run("Contact", tmp_path)
-    assert (tmp_path / "mvc" / "views" / "layouts" / "app.html").exists()
-
-
 def test_index_html_genere(tmp_path):
     _run("Contact", tmp_path)
     assert (tmp_path / "mvc" / "views" / "contact" / "index.html").exists()
@@ -221,7 +215,7 @@ def test_make_crud_sans_relations_json_continue_de_fonctionner(tmp_path):
 
     form_code = (tmp_path / "mvc" / "forms" / "contact_form.py").read_text(encoding="utf-8")
     form_html = (tmp_path / "mvc" / "views" / "contact" / "form.html").read_text(encoding="utf-8")
-    assert len(result.created) == 14
+    assert len(result.created) == 13
     assert "ChoiceField" not in form_code
     assert "<select" not in form_html
 
@@ -265,18 +259,6 @@ def test_non_ecrasement_form(tmp_path):
     assert form_path.read_text(encoding="utf-8") == "# existant"
 
 
-def test_non_ecrasement_layout(tmp_path):
-    entities_root = _make_entity(tmp_path, _CONTACT_DISK)
-    layout_path = tmp_path / "mvc" / "views" / "layouts" / "app.html"
-    layout_path.parent.mkdir(parents=True, exist_ok=True)
-    layout_path.write_text("<!-- existant -->", encoding="utf-8")
-
-    result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
-
-    assert layout_path in result.preserved
-    assert layout_path.read_text(encoding="utf-8") == "<!-- existant -->"
-
-
 def test_non_ecrasement_vue_index(tmp_path):
     entities_root = _make_entity(tmp_path, _CONTACT_DISK)
     index_path = tmp_path / "mvc" / "views" / "contact" / "index.html"
@@ -296,14 +278,13 @@ def test_dry_run_necrit_rien(tmp_path):
     assert not (tmp_path / "mvc" / "controllers" / "contact_controller.py").exists()
     assert not (tmp_path / "mvc" / "models" / "contact_model.py").exists()
     assert not (tmp_path / "mvc" / "forms" / "contact_form.py").exists()
-    assert not (tmp_path / "mvc" / "views" / "layouts" / "app.html").exists()
     assert not (tmp_path / "mvc" / "views" / "contact" / "index.html").exists()
 
 
 def test_dry_run_rapporte_les_fichiers_prevus(tmp_path):
     result = _run("Contact", tmp_path, dry_run=True)
     assert result.dry_run is True
-    assert len(result.created) == 14
+    assert len(result.created) == 13
 
 
 def test_dry_run_sans_existants_tout_cree(tmp_path):
@@ -542,32 +523,19 @@ def test_max_length_dans_form_varchar(tmp_path):
 
 # ── Layout Jinja2 ──────────────────────────────────────────────────────────────
 
-def test_layout_contient_extends_block(tmp_path):
-    layout = build_layout()
-    assert "{% block content %}" in layout
-    assert "{% endblock %}" in layout
-
-
-def test_vues_etendent_layout(tmp_path):
+def test_vues_etendent_base_layout(tmp_path):
+    # Les vues générées s'appuient sur le layout partagé du squelette (base.html),
+    # qui porte la nav, le footer et la charte ; make:crud ne génère plus de layout.
     for builder in (build_index_view, build_show_view, build_form_view):
         html = builder(_CONTACT_JSON)
-        assert '{% extends "layouts/app.html" %}' in html, (
+        assert '{% extends "layouts/base.html" %}' in html, (
             f"{builder.__name__} ne contient pas l'extension de layout"
         )
 
 
-def test_layout_contient_csrf_logout(tmp_path):
-    layout = build_layout()
-    assert "csrf_token" in layout
-    assert "/logout" in layout
-
-
-def test_vues_utilisent_block_content_coherent_avec_layout(tmp_path):
+def test_vues_redefinissent_block_content(tmp_path):
     block_content = "{% block content %}"
     block_contenu = "{% block contenu %}"
-    layout = build_layout()
-    assert block_content in layout, "Le layout généré doit déclarer block content"
-    assert block_contenu not in layout, "Le layout ne doit pas utiliser l'ancien bloc 'contenu'"
     for builder in (build_index_view, build_show_view, build_form_view):
         html = builder(_CONTACT_JSON)
         assert block_content in html, f"{builder.__name__} doit redéfinir block content"

@@ -200,15 +200,6 @@ class TestMakeCrudRerun:
         _rerun_make_crud(root)
         assert marker in view.read_text(encoding="utf-8")
 
-    def test_layout_with_user_code_preserved(self, tmp_path):
-        root = _build_project(tmp_path)
-        layout = root / "mvc" / "views" / "layouts" / "app.html"
-        marker = "<!-- USER LAYOUT CUSTOMIZATION - DO NOT REMOVE -->"
-        layout.write_text(layout.read_text(encoding="utf-8") + marker, encoding="utf-8")
-        _rerun_make_crud(root)
-        assert marker in layout.read_text(encoding="utf-8")
-
-
 # ── Fichiers hors périmètre de génération ─────────────────────────────────────
 
 class TestFilesOutsideGeneration:

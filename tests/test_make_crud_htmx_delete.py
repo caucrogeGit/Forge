@@ -90,7 +90,7 @@ def test_destroy_hx_ne_rend_pas_index_complet():
 
     assert '"contact/_results.html"' in destroy_block
     assert '"contact/index.html"' not in destroy_block
-    assert 'layouts/app.html' not in destroy_block
+    assert 'layouts/base.html' not in destroy_block
 
 
 def test_destroy_reutilise_contexte_liste_sans_modifier_pagination_sql():

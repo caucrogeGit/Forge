@@ -42,7 +42,7 @@ def test_make_public_page_genere_template_public(tmp_path):
     make_public_page("accueil", root=tmp_path)
 
     template = _read(tmp_path, "mvc/views/public/accueil.html")
-    assert '{% extends "layouts/public.html" %}' in template
+    assert '{% extends "layouts/base.html" %}' in template
     assert "{% block title %}Accueil{% endblock %}" in template
     assert "{% block content %}" in template
     assert "trans('public.page.generated')" in template
