@@ -36,8 +36,10 @@ def _validate_fields(
     if not isinstance(password_hash, str) or not password_hash:
         raise InvalidAuthUserError("password_hash doit etre une chaine non vide")
 
-    if not isinstance(is_active, bool):
-        raise InvalidAuthUserError("is_active doit etre un booleen")
+    # Les backends SQL (MariaDB, SQLite) renvoient une colonne BOOLEAN / tinyint(1)
+    # sous forme d'entier 0/1 : on l'accepte ici, la normalisation coerce en bool.
+    if not (isinstance(is_active, bool) or (isinstance(is_active, int) and is_active in (0, 1))):
+        raise InvalidAuthUserError("is_active doit etre un booleen ou un entier 0/1")
 
 
 def validate_auth_user_contract(data: Any) -> None:
@@ -82,7 +84,8 @@ def normalize_auth_user(data: Any) -> AuthUser:
         id=data["id"],
         email=data["email"].strip(),
         password_hash=data["password_hash"],
-        is_active=data.get("is_active", True),
+        # Coerce l'entier 0/1 des backends SQL en bool (voir _validate_fields).
+        is_active=bool(data.get("is_active", True)),
         created_at=data.get("created_at"),
         updated_at=data.get("updated_at"),
     )

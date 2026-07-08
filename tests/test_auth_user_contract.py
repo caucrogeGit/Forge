@@ -90,9 +90,19 @@ def test_is_active_is_bool():
     assert isinstance(user.is_active, bool)
 
 
-def test_validate_rejects_non_bool_is_active():
-    with pytest.raises(InvalidAuthUserError, match="is_active"):
-        validate_auth_user_contract({"id": 1, "email": "a@b.com", "password_hash": "h", "is_active": 1})
+def test_validate_accepts_sql_boolean_is_active():
+    # FORGE-10 : les backends SQL renvoient BOOLEAN / tinyint(1) en entier 0/1.
+    validate_auth_user_contract({"id": 1, "email": "a@b.com", "password_hash": "h", "is_active": 1})
+    validate_auth_user_contract({"id": 1, "email": "a@b.com", "password_hash": "h", "is_active": 0})
+
+
+def test_validate_rejects_non_boolean_is_active():
+    # Au-delà de bool et 0/1, tout est refusé (chaîne, float, entier hors 0/1, None).
+    for bad in ("1", 2, 1.5, None):
+        with pytest.raises(InvalidAuthUserError, match="is_active"):
+            validate_auth_user_contract(
+                {"id": 1, "email": "a@b.com", "password_hash": "h", "is_active": bad}
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -135,10 +145,12 @@ def test_normalize_trims_email():
     assert user.email == "bob@example.com"
 
 
-def test_normalize_rejects_is_active_from_int():
-    data = {"id": 1, "email": "a@b.com", "password_hash": "h", "is_active": 1}
-    with pytest.raises(InvalidAuthUserError, match="is_active"):
-        normalize_auth_user(data)
+def test_normalize_coerces_int_is_active_to_bool():
+    # FORGE-10 : 0/1 des backends SQL sont normalisés en bool strict.
+    active = normalize_auth_user({"id": 1, "email": "a@b.com", "password_hash": "h", "is_active": 1})
+    assert active.is_active is True
+    inactive = normalize_auth_user({"id": 1, "email": "a@b.com", "password_hash": "h", "is_active": 0})
+    assert inactive.is_active is False
 
 
 def test_normalize_passes_created_at_and_updated_at():

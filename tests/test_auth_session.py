@@ -58,6 +58,27 @@ def test_authenticate_user_accepts_normalizable_dict():
     assert user.email == "admin@example.test"
 
 
+def test_authenticate_user_accepts_sql_int_is_active():
+    # FORGE-10 : MariaDB/SQLite renvoient is_active (BOOLEAN/tinyint(1)) en int 0/1.
+    # Le login échouait car normalize_auth_user refusait l'int avant la vérif du mot de passe.
+    password_hash = hash_password("secret123")
+    loader = lambda email: {  # noqa: E731
+        "id": 1, "email": email, "password_hash": password_hash, "is_active": 1,
+    }
+    user = authenticate_user("admin@example.test", "secret123", loader)
+    assert isinstance(user, AuthUser)
+    assert user.is_active is True
+
+
+def test_authenticate_user_refuses_sql_int_is_active_zero():
+    # is_active=0 (int) doit être traité comme inactif, pas comme une erreur de contrat.
+    password_hash = hash_password("secret123")
+    loader = lambda email: {  # noqa: E731
+        "id": 1, "email": email, "password_hash": password_hash, "is_active": 0,
+    }
+    assert authenticate_user("admin@example.test", "secret123", loader) is None
+
+
 def test_authenticate_user_returns_none_if_loader_returns_none():
     assert authenticate_user("missing@example.test", "secret123", lambda email: None) is None
 
