@@ -63,7 +63,7 @@
   {{ _label(name, label, required) }}
   <select id="{{ name }}" name="{{ name }}"{% if required %} required{% endif %} class="{{ _input_base }} {{ _border(error) }}">
     {% for value, text in options %}
-    <option value="{{ value }}"{% if value == selected %} selected{% endif %}>{{ text }}</option>
+    <option value="{{ value }}"{% if value|string == selected|string %} selected{% endif %}>{{ text }}</option>
     {% endfor %}
   </select>
   {{ _hint(error, help="") }}

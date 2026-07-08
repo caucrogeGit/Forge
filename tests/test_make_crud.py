@@ -363,8 +363,8 @@ def test_pk_exclue_du_form_html(tmp_path):
 
 def test_champs_non_pk_dans_form_html(tmp_path):
     html = build_form_view(_CONTACT_JSON)
-    assert 'name="nom"' in html
-    assert 'name="email"' in html
+    assert "field(name='nom'" in html
+    assert "field(name='email'" in html
 
 
 def test_champs_non_pk_dans_index_html(tmp_path):
@@ -513,7 +513,7 @@ def test_datetime_devient_datetimefield(tmp_path):
 
 def test_text_est_textarea_dans_form_html(tmp_path):
     html = build_form_view(_PRODUIT_JSON)
-    assert "<textarea" in html
+    assert "textarea_field(name=" in html
 
 
 def test_max_length_dans_form_varchar(tmp_path):
@@ -911,12 +911,12 @@ _RESERVATION_JSON = {
 
 def test_form_html_email_type_email(tmp_path):
     html = build_form_view(_RESERVATION_JSON)
-    assert 'type="email"' in html
+    assert "type='email'" in html
 
 
 def test_form_html_telephone_type_tel(tmp_path):
     html = build_form_view(_RESERVATION_JSON)
-    assert 'type="tel"' in html
+    assert "type='tel'" in html
 
 
 def test_form_html_mobile_type_tel(tmp_path):
@@ -932,22 +932,22 @@ def test_form_html_mobile_type_tel(tmp_path):
 
 def test_form_html_url_type_url(tmp_path):
     html = build_form_view(_RESERVATION_JSON)
-    assert 'type="url"' in html
+    assert "type='url'" in html
 
 
 def test_form_html_date_type_date(tmp_path):
     html = build_form_view(_RESERVATION_JSON)
-    assert 'type="date"' in html
+    assert "type='date'" in html
 
 
 def test_form_html_text_long_textarea(tmp_path):
     html = build_form_view(_RESERVATION_JSON)
-    assert "<textarea" in html
+    assert "textarea_field(name=" in html
 
 
 def test_form_html_int_type_number(tmp_path):
     html = build_form_view(_PRODUIT_JSON)
-    assert 'type="number"' in html
+    assert "type='number'" in html
 
 
 # ── Relations many_to_one dans le CRUD généré ─────────────────────────────────
@@ -978,8 +978,7 @@ def test_many_to_one_genere_select_dans_form_html(tmp_path):
     make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
 
     html = (tmp_path / "mvc" / "views" / "contact" / "form.html").read_text(encoding="utf-8")
-    assert "<select" in html
-    assert 'name="ville_id"' in html
+    assert "select_field(name='ville_id'" in html
     assert "form.options.ville_id_choices" in html
 
 

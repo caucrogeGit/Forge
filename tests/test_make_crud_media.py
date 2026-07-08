@@ -244,7 +244,7 @@ class TestBuildFormViewMedia:
     def test_champs_sql_et_media_dans_vue(self):
         entity = _entity(media=[_media_image()])
         html = build_form_view(entity)
-        assert 'name="nom"' in html
+        assert "field(name='nom'" in html
         assert 'type="file"' in html
 
     def test_sans_media_form_method_post_simple(self):

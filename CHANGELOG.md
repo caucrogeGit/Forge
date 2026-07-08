@@ -31,6 +31,18 @@
 
 ### Modifié
 
+- **Scaffold cohérent : les vues générées s'appuient sur le layout partagé `layouts/base.html` (retour terrain).**
+  Le squelette livre un `base.html` complet (header, navigation, footer, charte « Accessible
+  chaleureux »), mais les générateurs le contournaient : `make:crud` produisait son propre
+  `app.html` (sans footer), `make:auth` une page de login autonome, et `public:*` étendaient un
+  `layouts/public.html` jamais livré (`TemplateNotFound` latent). Désormais toutes les vues
+  générées (`make:crud`, `make:auth`, `public:*`) étendent `layouts/base.html` : header, nav,
+  footer et charte partout, et le trou `public.html` disparaît. `make:crud` ne génère plus de
+  layout. De plus, les formulaires générés (`form.html` et la vue de login) utilisent les macros
+  de `components/forms.html` (`field`, `textarea_field`, `select_field`, `checkbox`, `submit`) :
+  champs homogènes, libellés (le select de relation retire le suffixe `_id`), états d'erreur et
+  style de la charte. Même esprit que les correctifs FORGE-1 (flash) et FORGE-11 (button) :
+  utiliser ce que le squelette fournit au lieu de le réinventer.
 - **Les routes applicatives deviennent un paquet `mvc/routes/` (ADR-068).** Le fichier
   monolithique `mvc/routes.py` est remplacé par un paquet `mvc/routes/` : `__init__.py`
   est la racine de composition (crée `router`, câble la route d'accueil, appelle

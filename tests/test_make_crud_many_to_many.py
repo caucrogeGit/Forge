@@ -221,8 +221,8 @@ def test_relations_many_to_one_et_champs_classiques_restent_supportes(tmp_path):
     form_html = _read(tmp_path, "mvc/views/article/form.html")
 
     assert "RelationField" in form_code
-    assert 'name="category_id"' in form_html
-    assert 'name="title"' in form_html
+    assert "select_field(name='category_id'" in form_html
+    assert "field(name='title'" in form_html
     assert 'name="tag_ids"' in form_html
 
 

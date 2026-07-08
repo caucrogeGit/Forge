@@ -528,69 +528,29 @@ def _render_form_fields(
         python_type = f.get("python_type", "str")
         relation = relations_by_field.get(fname)
 
-        _cls = 'class="mt-1 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"'
         if relation is not None:
-            lines += [
-                "        <div>",
-                f'            <label class="block text-sm font-medium text-gray-700">{label}</label>',
-                "            <select",
-                f'                name="{fname}"',
-                f"                {_cls}",
-                "            >",
-            ]
-            if f.get("nullable", False):
-                lines.append('                <option value="">—</option>')
-            lines += [
-                f"                {{% for value, label in form.options.{relation.choices_key} %}}",
-                f"                <option value=\"{{{{ value }}}}\" {{{{ 'selected' if form.value('{fname}')|string == value|string else '' }}}}>{{{{ label }}}}</option>",
-                "                {% endfor %}",
-                "            </select>",
-                f"            {{% if form.has_error('{fname}') %}}",
-                f"            <p class=\"text-red-600 text-sm mt-1\">{{{{ form.error('{fname}') }}}}</p>",
-                "            {% endif %}",
-                "        </div>",
-            ]
+            # Le select porte sur l'entité liée : libellé sans le suffixe _id.
+            rel_label = _humanize(fname[:-3] if fname.endswith("_id") else fname)
+            lines.append(
+                f"        {{{{ select_field(name='{fname}', label='{rel_label}', "
+                f"options=form.options.{relation.choices_key}, selected=form.value('{fname}'), "
+                f"error=form.error('{fname}')) }}}}"
+            )
         elif _is_textarea(f):
-            lines += [
-                "        <div>",
-                f'            <label class="block text-sm font-medium text-gray-700">{label}</label>',
-                "            <textarea",
-                f'                name="{fname}"',
-                f"                {_cls}",
-                f"                rows=\"4\">{{{{ form.value('{fname}') }}}}</textarea>",
-                f"            {{% if form.has_error('{fname}') %}}",
-                f"            <p class=\"text-red-600 text-sm mt-1\">{{{{ form.error('{fname}') }}}}</p>",
-                "            {% endif %}",
-                "        </div>",
-            ]
+            lines.append(
+                f"        {{{{ textarea_field(name='{fname}', label='{label}', "
+                f"value=form.value('{fname}'), error=form.error('{fname}')) }}}}"
+            )
         elif python_type == "bool":
-            lines += [
-                '        <div class="flex items-center gap-2">',
-                "            <input",
-                '                type="checkbox"',
-                f'                name="{fname}"',
-                '                value="1"',
-                f"                {{{{ 'checked' if form.value('{fname}') else '' }}}}",
-                "            >",
-                f'            <label class="text-sm font-medium text-gray-700">{label}</label>',
-                "        </div>",
-            ]
+            lines.append(
+                f"        {{{{ checkbox(name='{fname}', label='{label}', checked=form.value('{fname}')) }}}}"
+            )
         else:
             html_type = _html_input_type(f)
-            lines += [
-                "        <div>",
-                f'            <label class="block text-sm font-medium text-gray-700">{label}</label>',
-                "            <input",
-                f'                type="{html_type}"',
-                f'                name="{fname}"',
-                f"                value=\"{{{{ form.value('{fname}') }}}}\"",
-                f"                {_cls}",
-                "            >",
-                f"            {{% if form.has_error('{fname}') %}}",
-                f"            <p class=\"text-red-600 text-sm mt-1\">{{{{ form.error('{fname}') }}}}</p>",
-                "            {% endif %}",
-                "        </div>",
-            ]
+            lines.append(
+                f"        {{{{ field(name='{fname}', label='{label}', type='{html_type}', "
+                f"value=form.value('{fname}'), error=form.error('{fname}')) }}}}"
+            )
     return lines
 
 
@@ -727,6 +687,7 @@ def build_form_view(
         '{% extends "layouts/base.html" %}',
         "{% block content %}",
         '{% from "components/ui.html" import button, flash_messages %}',
+        '{% from "components/forms.html" import field, textarea_field, select_field, checkbox %}',
         "{{ flash_messages(flash) }}",
         '<div class="flex justify-between items-center mb-6">',
         '    <h1 class="text-2xl font-bold text-gray-800">{{ titre }}</h1>',
