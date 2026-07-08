@@ -1624,6 +1624,20 @@ Objectif : une seule façon officielle de construire un starter, et des pages de
 
 ---
 
+## Chantier issu du retour terrain RéférenCiel (2026-07)
+
+Banc d'essai RéférenCiel Manager (ADR-005 / ADR-009). Le ticket 01 (FORGE-1 à FORGE-9)
+et le ticket 02 (FORGE-10 : login refusé sur MariaDB car `is_active` int `0/1` rejeté par
+`normalize_auth_user` ; FORGE-11 : `500` au rendu CRUD, `components/button.html` inexistant,
+le bouton étant la macro de `components/ui.html`) sont livrés. Reste un chantier de cohérence
+documentaire découvert pendant FORGE-11 :
+
+| Ticket | État | Rôle |
+|---|---|---|
+| `DOC-COMPONENTS-MACROS-REALIGN-001` | **ouvert** ([issue #4](https://github.com/caucrogeGit/Forge/issues/4)) | Aligner `docs/features/front.md` (section « Composants Jinja ») et `tests/fixtures/app/mvc/views/components/` sur le seul système réellement livré par le squelette : quatre fichiers de macros groupées (`ui`, `data`, `forms`, `interactive`), au lieu de l'ancien modèle par fichier includable (`button.html`, `alert.html`, `table.html`, ...). Racine commune de FORGE-1 (flash) et FORGE-11 (button). Met à jour les garde-fous documentaires (`test_tpl_doc`, `test_tpl_components`). Sévérité Moyenne : documentation trompeuse, pas de crash runtime (le générateur est déjà corrigé). |
+
+---
+
 ## Règle de mise à jour des roadmaps
 
 À partir de la séparation des roadmaps (DOC-ROADMAP-SPLIT-001) :
