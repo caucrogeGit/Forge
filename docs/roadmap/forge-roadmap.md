@@ -1638,6 +1638,20 @@ documentaire découvert pendant FORGE-11 :
 
 ---
 
+## Chantier : extraction du moteur d'entités (ADR-070)
+
+Le moteur d'entités (`cli/entities` : génération et modélisation, provisioning
+`db:*`, pivot enrichi) est extrait du cœur vers l'opt-in `forge-mvc-entities`
+(voir ADR-070). Phases 0 à 6 livrées ; suites ouvertes :
+
+| Ticket | État | Rôle |
+|---|---|---|
+| `ENTITIES-SESSIONS-MARIADB-LEAK-001` | **ouvert** | Fuite d'agnosticisme repérée pendant l'extraction : `core/sessions/mariadb_store.py` est un store de session **spécifique MariaDB** encore dans le cœur « agnostique BDD » (ADR-054). L'aligner sur le contrat de backend (déplacer le store vers l'opt-in de backend concerné, ou l'exprimer via le contrat `Dialect`/`DbBackend`), pour que le cœur ne référence aucun SGBD nommé. Sévérité Faible : fonctionne, mais contredit ADR-054. |
+| `ENTITIES-TESTS-RELOCATE-001` | **ouvert** | Relocaliser la suite de tests du moteur d'entités (encore sous `tests/`) dans `packages/forge-mvc-entities/tests/`, puis reclasser `forge_mvc_entities` de `CORE_DEPS` vers `OPTIN_MODULES` (avec `importorskip`) dans `test_pytest_core_only_contract_001`. Actuellement classé en dépendance de test du cœur à titre transitoire (ADR-070 phase 5). |
+| `ENTITIES-GIT-MODE-PIN-001` | **ouvert** | En mode avant-garde (ADR-062, CLI installé depuis git), `forge new` épingle `forge-mvc` sur git mais laisse `forge-mvc-entities` sur son pin PyPI : aligner l'épinglage du moteur d'entités sur la même source git pour éviter un mélange git/PyPI. |
+
+---
+
 ## Règle de mise à jour des roadmaps
 
 À partir de la séparation des roadmaps (DOC-ROADMAP-SPLIT-001) :
