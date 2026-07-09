@@ -39,7 +39,7 @@ pyright>=1.1.400
 -e ./packages/forge-mvc-iot
 -e ./packages/forge-mvc-video
 -e ./packages/forge-mvc-audio
--e ./packages/forge-mvc-pivot
+-e ./packages/forge-mvc-entities
 -e ./packages/forge-mvc-mail
 -e ./packages/forge-mvc-i18n
 -e ./packages/forge-mvc-qrcode

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import fnmatch
 import os
+import re
 import tomllib
 from pathlib import Path
 import pytest
@@ -11,6 +12,26 @@ import pytest
 pytestmark = pytest.mark.meta
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_requirements_dev_couvre_tous_les_paquets():
+    """requirements-dev.txt (install éditable en CI) liste exactement les
+    dossiers packages/forge-mvc-* — ni paquet fantôme (retiré mais encore listé,
+    casse l'install CI), ni paquet oublié. Garde-fou anti-dérive après
+    ajout/retrait de paquet (ex. ADR-070)."""
+    listed = {
+        m.group(1)
+        for line in (ROOT / "requirements-dev.txt").read_text(encoding="utf-8").splitlines()
+        if (m := re.match(r"-e \./packages/(forge-mvc-[a-z0-9-]+)\s*$", line.strip()))
+    }
+    dirs = {
+        p.name for p in (ROOT / "packages").iterdir()
+        if p.is_dir() and p.name.startswith("forge-mvc-")
+    }
+    fantomes = sorted(listed - dirs)
+    oublies = sorted(dirs - listed)
+    assert not fantomes, f"requirements-dev.txt liste des paquets absents : {fantomes}"
+    assert not oublies, f"paquets non listés dans requirements-dev.txt : {oublies}"
 
 
 def _load_pyproject() -> dict:
