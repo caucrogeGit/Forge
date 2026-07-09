@@ -39,13 +39,14 @@
 
 - **`make:auth` génère un bouton Connexion / Déconnexion pour la barre de navigation (retour terrain).**
   En plus du contrôleur, de la vue de login et des routes, `make:auth` génère désormais
-  `mvc/views/partials/auth_nav.html` : un bouton conditionnel « Connexion » (lien vers `/login`
-  pour un visiteur) ou « Déconnexion » (POST vers `/logout` pour un utilisateur connecté), stylé
-  via la macro `button`. Le bouton s'intègre **automatiquement** à la barre de navigation : le
-  squelette livre `partials/nav.html` (inclus par le `{% block nav %}` de `layouts/base.html`),
-  qui inclut `partials/auth_nav.html` avec `ignore missing` ; aucune édition de `base.html`.
-  Pour rendre l'état d'authentification disponible partout, `BaseController.render` injecte
-  désormais `is_authenticated` dans le contexte de tout template (comme `csrf_token`).
+  un bouton conditionnel « Connexion » (lien vers `/login` pour un visiteur) ou « Déconnexion »
+  (POST vers `/logout` pour un utilisateur connecté), stylé via la macro `button`. Le bouton est
+  **injecté** dans la barre de navigation `partials/nav.html` (incluse par le `{% block nav %}`
+  de `layouts/base.html`), de façon **chirurgicale et idempotente** : le squelette livre `nav.html`
+  avec un ancrage `{# forge:auth-nav #}` où `make:auth` insère le bloc sans toucher aux liens
+  ajoutés par le développeur (même mécanisme qu'`opt-in:enable`). Pour rendre l'état
+  d'authentification disponible partout, `BaseController.render` injecte désormais
+  `is_authenticated` dans le contexte de tout template (comme `csrf_token`).
 - **Scaffold cohérent : les vues générées s'appuient sur le layout partagé `layouts/base.html` (retour terrain).**
   Le squelette livre un `base.html` complet (header, navigation, footer, charte « Accessible
   chaleureux »), mais les générateurs le contournaient : `make:crud` produisait son propre

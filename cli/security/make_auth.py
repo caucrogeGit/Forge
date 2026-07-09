@@ -4,13 +4,14 @@
 Le cœur redirige les routes protégées vers `/login` (codé en dur) et fournit le
 backend d'authentification (`core.auth.session`), mais aucune route, aucun
 contrôleur ni aucune vue de login n'étaient scaffoldés. `make:auth` comble ce
-trou : il génère un contrôleur d'authentification, une vue de login, un partial de
-bouton Connexion/Déconnexion pour la nav (`partials/auth_nav.html`), et **affiche** les
-routes à ajouter dans `mvc/routes/__init__.py` (mode « Forge affiche », charte §7). Le
-bouton s'intègre **automatiquement** à la barre de nav : `layouts/base.html` inclut
-`partials/nav.html`, qui inclut `partials/auth_nav.html` (`ignore missing`) ; aucune
-édition de `base.html` n'est requise. Le bouton s'appuie sur `is_authenticated`, injecté
-dans tout template par `BaseController.render`.
+trou : il génère un contrôleur d'authentification, une vue de login, **affiche** les
+routes à ajouter dans `mvc/routes/__init__.py` (mode « Forge affiche », charte §7), et
+**injecte** le bouton Connexion/Déconnexion dans la barre de nav. L'injection est
+chirurgicale et idempotente : `layouts/base.html` inclut `partials/nav.html`, qui porte
+un ancrage `{# forge:auth-nav #}` ; make:auth y insère le bloc bouton sans toucher aux
+autres liens (même principe qu'`opt-in:enable` qui injecte par ancrage dans routes/registry).
+Sans ancrage, il n'écrit pas et affiche le bloc à coller. Le bouton s'appuie sur
+`is_authenticated`, injecté dans tout template par `BaseController.render`.
 
 Périmètre v1 : socle standard `users` (email / password_hash / is_active, produit
 par `forge auth:init`), avec défense anti-fixation de session (régénération +
@@ -138,9 +139,13 @@ def register_auth_routes(router: Router) -> None:
 '''
 
 
-AUTH_NAV_PARTIAL = '''\
-{# Bouton Connexion / Déconnexion pour la barre de navigation.
-   `is_authenticated` est injecté dans tout template par BaseController.render. #}
+# Ancrage et marqueurs pour l'injection chirurgicale du bouton dans partials/nav.html
+# (même principe qu'opt-in:enable qui injecte par ancrage dans routes/registry).
+AUTH_NAV_ANCHOR = "{# forge:auth-nav #}"
+AUTH_NAV_START = "{# forge:auth-nav:start #}"
+
+AUTH_NAV_BLOCK = '''\
+{# forge:auth-nav:start #}
 {% from "components/ui.html" import button %}
 {% if is_authenticated %}
 <form method="post" action="/logout">
@@ -150,7 +155,18 @@ AUTH_NAV_PARTIAL = '''\
 {% else %}
 {{ button("Connexion", variant="primary", href="/login") }}
 {% endif %}
-'''
+{# forge:auth-nav:end #}'''
+
+
+# Contenu de partials/nav.html quand le projet n'en a pas (ancien squelette).
+NAV_DEFAULT = (
+    "{#\n"
+    "  Barre de navigation du projet, intégrée par layouts/base.html.\n"
+    "  Ajoutez ici vos liens de navigation.\n"
+    "#}\n"
+    + AUTH_NAV_ANCHOR + "\n"
+    + AUTH_NAV_BLOCK + "\n"
+)
 
 
 ROUTE_BLOCK = "\n".join([
@@ -161,12 +177,12 @@ ROUTE_BLOCK = "\n".join([
 ])
 
 
+# Affiché uniquement en repli, si partials/nav.html n'a pas l'ancrage.
 NAV_BLOCK = "\n".join([
-    "Bouton Connexion / Déconnexion : partials/auth_nav.html est intégré",
-    "automatiquement par partials/nav.html (barre de nav du squelette). Rien à câbler.",
-    "Si vous avez retiré cet include de partials/nav.html, remettez la ligne :",
+    "partials/nav.html n'a pas l'ancrage {# forge:auth-nav #} : ajoutez vous-même",
+    "le bouton dans votre barre de nav (base.html inclut partials/nav.html) :",
     "─" * 70,
-    '  {% include "partials/auth_nav.html" ignore missing %}',
+    AUTH_NAV_BLOCK,
 ])
 
 
@@ -174,8 +190,10 @@ NAV_BLOCK = "\n".join([
 class MakeAuthResult:
     created: list[str]
     skipped: list[str]
+    modified: list[str]
     route_block: str = ROUTE_BLOCK
     nav_block: str = NAV_BLOCK
+    nav_needs_manual: bool = False
 
 
 def _write_if_new(path: Path, content: str, result: MakeAuthResult) -> None:
@@ -188,16 +206,40 @@ def _write_if_new(path: Path, content: str, result: MakeAuthResult) -> None:
     result.created.append(rel)
 
 
+def _integrate_auth_nav(nav_path: Path, result: MakeAuthResult) -> None:
+    """Injecte le bouton Connexion/Déconnexion dans partials/nav.html, de façon
+    chirurgicale et idempotente (par ancrage `{# forge:auth-nav #}`), en préservant
+    les liens que l'utilisateur y a ajoutés. Absent : le fichier est créé. Déjà
+    injecté : rien. Sans ancrage : on n'écrit pas, on affiche (repli, charte §7).
+    """
+    rel = nav_path.as_posix()
+    if not nav_path.exists():
+        nav_path.parent.mkdir(parents=True, exist_ok=True)
+        nav_path.write_text(NAV_DEFAULT, encoding="utf-8")
+        result.created.append(rel)
+        return
+    content = nav_path.read_text(encoding="utf-8")
+    if AUTH_NAV_START in content:
+        result.skipped.append(rel)  # déjà intégré
+        return
+    if AUTH_NAV_ANCHOR in content:
+        new = content.replace(AUTH_NAV_ANCHOR, AUTH_NAV_ANCHOR + "\n" + AUTH_NAV_BLOCK, 1)
+        nav_path.write_text(new, encoding="utf-8")
+        result.modified.append(rel)
+        return
+    result.nav_needs_manual = True
+
+
 def make_auth(root: Path | None = None) -> MakeAuthResult:
     base = root or Path.cwd()
-    result = MakeAuthResult(created=[], skipped=[])
+    result = MakeAuthResult(created=[], skipped=[], modified=[])
     _write_if_new(base / "mvc" / "controllers" / "auth_controller.py", AUTH_CONTROLLER, result)
     _write_if_new(base / "mvc" / "views" / "auth" / "login.html", AUTH_LOGIN_VIEW, result)
     # ADR-068 : les routes du contrôleur auth vivent dans leur propre fichier ;
     # mvc/routes/__init__.py ne fait que les brancher (affiché ci-dessous).
     _write_if_new(base / "mvc" / "routes" / "auth_routes.py", AUTH_ROUTES_FILE, result)
-    # Bouton Connexion/Déconnexion pour la nav ; l'include est affiché (charte §7).
-    _write_if_new(base / "mvc" / "views" / "partials" / "auth_nav.html", AUTH_NAV_PARTIAL, result)
+    # Bouton Connexion/Déconnexion injecté dans la barre de nav (chirurgical, ancré).
+    _integrate_auth_nav(base / "mvc" / "views" / "partials" / "nav.html", result)
     return result
 
 
@@ -212,12 +254,15 @@ def main(argv: list[str] | None = None) -> None:
     result = make_auth()
     for path in result.created:
         print(f"[CREE] {path}")
+    for path in result.modified:
+        print(f"[MODIFIE] {path}")
     for path in result.skipped:
         print(f"[PRESERVE] {path}")
     print()
     print(result.route_block)
-    print()
-    print(result.nav_block)
+    if result.nav_needs_manual:
+        print()
+        print(result.nav_block)
     print()
     print("Prérequis : forge auth:init puis forge db:apply (table users).")
     print("Créez un compte : forge auth:user:create")
