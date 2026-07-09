@@ -314,6 +314,7 @@ nav:
             - ADR-067 db:init génère le SQL de provisioning par défaut: adr/067-db-init-provisioning-sql.md
             - ADR-068 Routes applicatives par contrôleur dans mvc/routes/: adr/068-per-controller-routes-package.md
             - ADR-069 Clé étrangère de première classe (type foreign_key): adr/069-foreign-key-field-type.md
+            - ADR-070 Extraction du moteur d'entités (forge-mvc-entities): adr/070-entities-engine-extraction.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
