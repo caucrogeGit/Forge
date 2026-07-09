@@ -6,7 +6,7 @@
 ### Ajouté
 
 - **Page de référence de la charte graphique dans le squelette (`/charte`).** Le squelette
-  livre `mvc/views/charte.html`, une page servable (câblée sur `/charte`) qui montre le thème
+  livre `mvc/views/pages/charte.html`, une page servable (câblée sur `/charte`) qui montre le thème
   « Accessible chaleureux » livré par défaut : palette, typographie, boutons, badges, alertes
   et champs de formulaire. Elle sert de référence visible et rappelle que les tokens (couleurs,
   polices, rayons) s'éditent dans `static/src/input.css` (source unique, `@theme` Tailwind) pour

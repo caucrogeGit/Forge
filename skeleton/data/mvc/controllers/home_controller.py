@@ -14,4 +14,4 @@ class HomeController(BaseController):
     def charte(request: Request) -> Response:
         # Page de référence de la charte graphique (thème « Accessible chaleureux »).
         # Les tokens s'éditent dans static/src/input.css ; cette page montre le résultat.
-        return BaseController.render("charte.html", request=request)
+        return BaseController.render("pages/charte.html", request=request)
