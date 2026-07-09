@@ -10,8 +10,8 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities.make_crud import make_crud, _to_snake
-from cli.entities.relations import (
+from forge_mvc_entities.make_crud import make_crud, _to_snake
+from forge_mvc_entities.relations import (
     EntityRelationsError,
     validate_relations_definition,
 )

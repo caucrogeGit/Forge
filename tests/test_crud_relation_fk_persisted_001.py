@@ -14,13 +14,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
-from cli.entities.crud.form_builder import build_form
-from cli.entities.crud.model_builder import build_model
-from cli.entities.crud.views_builder import build_show_view
-from cli.entities.crud.relations_loader import _load_crud_many_to_one_relations
-from cli.entities.make_crud import _inject_relation_fk_fields
-from cli.entities.validation import validate_entity_definition
+from forge_mvc_entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
+from forge_mvc_entities.crud.form_builder import build_form
+from forge_mvc_entities.crud.model_builder import build_model
+from forge_mvc_entities.crud.views_builder import build_show_view
+from forge_mvc_entities.crud.relations_loader import _load_crud_many_to_one_relations
+from forge_mvc_entities.make_crud import _inject_relation_fk_fields
+from forge_mvc_entities.validation import validate_entity_definition
 
 
 def _project(tmp_path: Path) -> Path:

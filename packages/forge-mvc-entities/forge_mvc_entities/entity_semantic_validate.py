@@ -29,7 +29,7 @@ from typing import Any, cast
 import keyword
 from dataclasses import dataclass
 
-from cli.entities.entity_validation_errors import (
+from forge_mvc_entities.entity_validation_errors import (
     FORGE_ENTITY_DUPLICATE_FIELD,
     FORGE_ENTITY_DUPLICATE_TABLE,
     FORGE_ENTITY_INVALID_INDEX,

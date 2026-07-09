@@ -121,7 +121,7 @@ class TestCrudGenerator:
     """`forge make:crud` produit un contrôleur typé."""
 
     def _build_controller(self) -> str:
-        from cli.entities.crud.controller_builder import build_controller
+        from forge_mvc_entities.crud.controller_builder import build_controller
         definition = {
             "entity": "Contact",
             "table": "contact",

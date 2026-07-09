@@ -1,6 +1,6 @@
 import pytest
 
-from cli.entities.validation import (
+from forge_mvc_entities.validation import (
     EntityDefinitionError,
     normalize_entity_definition,
     validate_entity_definition,

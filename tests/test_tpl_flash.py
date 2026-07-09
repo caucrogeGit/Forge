@@ -153,7 +153,7 @@ def test_layouts_conservent_scripts_block():
 def test_make_crud_flash_via_macro():
     # FORGE-1 : make:crud passe le dict flash (get_flash) au contexte, rendu par la
     # macro flash_messages ; plus de helper render_flash_html jamais fourni.
-    src = _read(Path("cli/entities/make_crud.py"))
+    src = _read(Path("packages/forge-mvc-entities/forge_mvc_entities/make_crud.py"))
     assert '"flash": get_flash(get_session_id(request))' in src
     assert "render_flash_html" not in src
 

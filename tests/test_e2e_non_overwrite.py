@@ -18,9 +18,9 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities.make_crud import cmd_make_crud_main, make_crud
-from cli.entities.make_entity import main as make_entity_main
-from cli.entities.model import sync_entity
+from forge_mvc_entities.make_crud import cmd_make_crud_main, make_crud
+from forge_mvc_entities.make_entity import main as make_entity_main
+from forge_mvc_entities.model import sync_entity
 from cli.project.project_audit import run_project_audit
 from cli.project.project_check import run_project_check
 

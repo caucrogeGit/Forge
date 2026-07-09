@@ -30,7 +30,7 @@ def test_introspection_sqlite_via_pragma(
 ) -> None:
     _use_sqlite(tmp_path, monkeypatch)
     from core.database import backend as backend_module
-    from cli.entities import migrations
+    from forge_mvc_entities import migrations
 
     backend_module.reset_backend()
     try:
@@ -59,7 +59,7 @@ def test_runner_lit_forge_migrations_sqlite(
 ) -> None:
     _use_sqlite(tmp_path, monkeypatch)
     from core.database import backend as backend_module
-    from cli.entities import migrations
+    from forge_mvc_entities import migrations
 
     backend_module.reset_backend()
     try:

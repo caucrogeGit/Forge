@@ -11,7 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from cli.entities.entity_doc import build_entity_doc, main
+from forge_mvc_entities.entity_doc import build_entity_doc, main
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 FORGE_PY = _REPO_ROOT / "forge.py"

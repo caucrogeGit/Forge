@@ -3,7 +3,7 @@
 Ce document décrit les codes d'erreur stables émis par `forge entity:validate`.
 Ce sont des constantes Python, pas une commande.
 
-Le module correspondant est `cli.entities.entity_validation_errors`.
+Le module correspondant est `forge_mvc_entities.entity_validation_errors`.
 
 ## 1. Rôle
 
@@ -22,7 +22,7 @@ La stabilité de ces codes est un contrat : ils ne changent pas au gré des évo
 | Élément | Valeur |
 |---|---|
 | Commande forge | aucune (constantes consommées par `entity:validate`) |
-| Module Python | `cli.entities.entity_validation_errors` |
+| Module Python | `forge_mvc_entities.entity_validation_errors` |
 | Catégorie | validation du modèle de données |
 | Rôle | exposer les codes d'erreur stables de validation |
 | Entrées | aucune |
@@ -87,7 +87,7 @@ Les codes sont regroupés par famille.
 Référencer un code stable dans un test :
 
 ```python
-from cli.entities.entity_validation_errors import (
+from forge_mvc_entities.entity_validation_errors import (
     FORGE_ENTITY_DUPLICATE_FIELD,
     ALL_CODES,
 )

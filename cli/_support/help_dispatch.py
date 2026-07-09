@@ -1344,7 +1344,7 @@ Limites:
 
     # ── Migrations (CLI-HELP-FLAGS-MIGRATIONS-001) ───────────────────────────
     # migration:make est déjà couvert par une aide native (--help détaillé
-    # dans cli/entities/migrations.py:458-487), hors périmètre de
+    # dans forge_mvc_entities/migrations.py:458-487), hors périmètre de
     # ce ticket.
 
     "migration:status": """\

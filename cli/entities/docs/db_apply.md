@@ -3,7 +3,7 @@
 Ce document décrit la commande `forge db:apply`.
 Elle applique à la base le schéma SQL généré à partir du modèle d'entités.
 
-Le module correspondant est `cli.entities.db_apply`.
+Le module correspondant est `forge_mvc_entities.db_apply`.
 
 ## 1. Rôle
 
@@ -19,7 +19,7 @@ Le SQL reste visible et inspectable (principe 5).
 | Élément | Valeur |
 |---|---|
 | Commande forge | `forge db:apply` |
-| Module Python | `cli.entities.db_apply` |
+| Module Python | `forge_mvc_entities.db_apply` |
 | Catégorie | base de données |
 | Rôle | appliquer le schéma SQL du modèle à la base |
 | Entrées | fichiers SQL générés sous `mvc/entities/`, config du projet |

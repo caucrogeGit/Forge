@@ -280,13 +280,13 @@ def test_unknown_option_exits_with_error():
 
 def test_entity_validate_not_broken():
     """schema:list ne doit pas casser entity:validate."""
-    from cli.entities.entity_validate import main as entity_validate_main
+    from forge_mvc_entities.entity_validate import main as entity_validate_main
     assert callable(entity_validate_main)
 
 
 def test_entity_validate_still_runs(tmp_path):
     """entity:validate sur un projet vide doit terminer sans lever d'exception inattendue."""
-    from cli.entities.entity_validate import main as entity_validate_main
+    from forge_mvc_entities.entity_validate import main as entity_validate_main
     entities_dir = tmp_path / "mvc" / "entities"
     entities_dir.mkdir(parents=True)
     out = StringIO()

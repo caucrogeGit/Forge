@@ -68,7 +68,7 @@ SENSITIVE_ONLY_JSON = {
 
 def _prepare_form_project(root: Path, definition: dict) -> Path:
     snake = definition["entity"].lower()
-    from cli.entities.make_crud import _to_snake
+    from forge_mvc_entities.make_crud import _to_snake
     snake = _to_snake(definition["entity"])
     entity_dir = root / "mvc" / "entities" / snake
     entity_dir.mkdir(parents=True, exist_ok=True)

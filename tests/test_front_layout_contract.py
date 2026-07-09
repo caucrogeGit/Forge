@@ -51,7 +51,7 @@ def test_standard_layouts_do_not_add_dynamic_behaviors():
 
 
 def test_make_crud_templates_do_not_inject_front_behaviors():
-    make_crud = _read(Path("cli/entities/make_crud.py"))
+    make_crud = _read(Path("packages/forge-mvc-entities/forge_mvc_entities/make_crud.py"))
 
     assert "/static/vendor/htmx/htmx.min.js" not in make_crud
     assert "/static/vendor/alpine/alpine.min.js" not in make_crud

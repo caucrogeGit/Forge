@@ -10,8 +10,8 @@ import types
 
 import pytest
 
-from cli.entities import db_init
-from cli.entities.db_init import (
+from forge_mvc_entities import db_init
+from forge_mvc_entities.db_init import (
     DEFAULT_APP_PRIVILEGES,
     DbInitError,
     ProvisioningEnv,

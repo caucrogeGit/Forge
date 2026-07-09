@@ -55,8 +55,8 @@ class TestPivotRemovedFromCore:
         )
 
     def test_no_make_pivot_crud_in_cli(self):
-        assert not Path("cli/entities/make_pivot_crud.py").exists(), (
-            "cli/entities/make_pivot_crud.py aurait du etre supprime"
+        assert not Path("packages/forge-mvc-entities/forge_mvc_entities/make_pivot_crud.py").exists(), (
+            "packages/forge-mvc-entities/forge_mvc_entities/make_pivot_crud.py aurait du etre supprime"
         )
 
     def test_old_service_import_fails(self):
@@ -65,14 +65,14 @@ class TestPivotRemovedFromCore:
 
     def test_old_generator_import_fails(self):
         with pytest.raises(ImportError):
-            import cli.entities.make_pivot_crud  # noqa: F401
+            import forge_mvc_entities.make_pivot_crud  # noqa: F401
 
 
 class TestNoCorePivotImportsRemain:
     @pytest.mark.parametrize("forbidden_import", [
         "from core.pivot_advanced",
         "import core.pivot_advanced",
-        "cli.entities.make_pivot_crud",
+        "forge_mvc_entities.make_pivot_crud",
     ])
     def test_no_forbidden_imports(self, forbidden_import):
         this_file = Path(__file__).resolve()

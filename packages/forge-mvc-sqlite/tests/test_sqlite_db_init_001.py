@@ -20,7 +20,7 @@ def test_db_init_serverless_cree_forge_migrations(
 ) -> None:
     monkeypatch.setenv("DB_BACKEND", "sqlite")
     from core.database import backend as backend_module
-    from cli.entities import db_init
+    from forge_mvc_entities import db_init
 
     db_path = tmp_path / "app.db"
     # ADR-060 : le backend lit le chemin du fichier dans DB_NAME (env). En réel,

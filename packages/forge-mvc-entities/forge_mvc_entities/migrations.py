@@ -13,10 +13,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
-from cli.entities.db_apply import split_sql_statements
-from cli.entities.make_entity import sql_default_literal, to_snake, validate_entity_name
-from cli.entities.validation import validate_entity_definition
+from forge_mvc_entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
+from forge_mvc_entities.db_apply import split_sql_statements
+from forge_mvc_entities.make_entity import sql_default_literal, to_snake, validate_entity_name
+from forge_mvc_entities.validation import validate_entity_definition
 from cli.project.project_config import ProjectConfigError, load_project_config
 
 MIGRATIONS_DIR = Path("mvc") / "migrations"
@@ -526,7 +526,7 @@ def main(argv: list[str] | None = None) -> None:
 
 def _assert_migration_contracts_valid(entities_root: Path) -> None:
     """Vérifie les contrats JSON Schema avant génération/comparaison. Dégradation douce si jsonschema absent."""
-    from cli.entities.entity_validate import collect_entity_validation_results
+    from forge_mvc_entities.entity_validate import collect_entity_validation_results
     results = collect_entity_validation_results(entities_root)
     if results is not None and results["errors"]:
         print("[ERREUR] Les entités Forge sont invalides.")
@@ -702,7 +702,7 @@ def _relations_sql_block(project_root: Path, *, from_entity: str | None = None) 
     d'une seule entité), sinon toutes (migration de toutes les entités). Retourne une
     chaîne vide s'il n'y a pas de relations.
     """
-    from cli.entities.relations import (
+    from forge_mvc_entities.relations import (
         generate_relations_sql,
         validate_relations_definition,
     )
@@ -949,7 +949,7 @@ def _connect_db():
     if not backend.requires_provisioning:
         # Backend sans serveur (SQLite, ADR-054) : migrations appliquées
         # directement sur le fichier via le backend actif.
-        from cli.entities.serverless_db import configure_serverless_db
+        from forge_mvc_entities.serverless_db import configure_serverless_db
 
         configure_serverless_db()
         return backend.get_connection()

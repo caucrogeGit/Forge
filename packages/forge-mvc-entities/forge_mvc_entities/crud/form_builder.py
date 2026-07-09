@@ -5,8 +5,8 @@
 from __future__ import annotations
 from typing import Any, cast
 
-from cli.entities.crud.context import CrudManyToOneRelation
-from cli.entities.crud.utils import (
+from forge_mvc_entities.crud.context import CrudManyToOneRelation
+from forge_mvc_entities.crud.utils import (
     _FORM_FIELD_CLASS_MAP,
     _FORM_FIELD_STR_CONSTRAINTS,
     _humanize,

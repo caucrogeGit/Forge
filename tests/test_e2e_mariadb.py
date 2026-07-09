@@ -93,8 +93,8 @@ except Exception as _conn_err:  # noqa: BLE001 — toute erreur = base indisponi
 
 # ── Imports Forge ─────────────────────────────────────────────────────────────
 
-from cli.entities.db_apply import apply_model_sql
-from cli.entities.make_entity import main as make_entity_main
+from forge_mvc_entities.db_apply import apply_model_sql
+from forge_mvc_entities.make_entity import main as make_entity_main
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 

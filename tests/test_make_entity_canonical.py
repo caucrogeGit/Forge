@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities import make_entity
-from cli.entities.make_entity import build_entity_json_canonical
+from forge_mvc_entities import make_entity
+from forge_mvc_entities.make_entity import build_entity_json_canonical
 
 
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -55,7 +55,7 @@ def test_canonical_fields_not_empty():
 
 def test_canonical_placeholder_field_type_is_forge_type():
     result = build_entity_json_canonical("Article")
-    from cli.entities.make_entity import FORGE_TYPES
+    from forge_mvc_entities.make_entity import FORGE_TYPES
     assert result["fields"][0]["type"] in FORGE_TYPES
 
 
@@ -91,7 +91,7 @@ def test_no_input_json_validates_against_schema(monkeypatch, tmp_path):
     monkeypatch.chdir(tmp_path)
     make_entity.main(["Article", "--no-input"])
 
-    from cli.entities.entity_validate import collect_entity_validation_results
+    from forge_mvc_entities.entity_validate import collect_entity_validation_results
     entities_root = tmp_path / "mvc" / "entities"
     results = collect_entity_validation_results(entities_root)
     assert results is not None

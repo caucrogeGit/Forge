@@ -3,7 +3,7 @@
 Ce document décrit la commande `forge make:entity`.
 Elle génère la définition JSON canonique d'une entité Forge, ainsi que les fichiers Python de cette entité.
 
-Le module correspondant est `cli.entities.make_entity`.
+Le module correspondant est `forge_mvc_entities.make_entity`.
 
 ## 1. Rôle
 
@@ -23,7 +23,7 @@ Toutes les écritures suivent le mode write-if-new : Forge ne réécrit jamais u
 | Élément | Valeur |
 |---|---|
 | Commande forge | `forge make:entity <NomEntite> [--no-input]` |
-| Module Python | `cli.entities.make_entity` |
+| Module Python | `forge_mvc_entities.make_entity` |
 | Catégorie | génération du modèle de données |
 | Rôle | créer la définition d'une entité et ses fichiers Python |
 | Entrées | nom d'entité (PascalCase), réponses interactives ou `--no-input` |
@@ -111,7 +111,7 @@ forge make:entity Contact --no-input
 Construction de la définition canonique par code :
 
 ```python
-from cli.entities.make_entity import build_entity_json_canonical
+from forge_mvc_entities.make_entity import build_entity_json_canonical
 
 definition = build_entity_json_canonical("Contact")
 print(definition["name"])   # Contact

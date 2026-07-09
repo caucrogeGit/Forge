@@ -1,8 +1,8 @@
 """Tests pour la métadonnée top-level 'media' dans les JSON d'entité (MEDIA-012)."""
 import pytest
 
-from cli.entities.make_entity import build_entity_base, build_entity_sql
-from cli.entities.validation import (
+from forge_mvc_entities.make_entity import build_entity_base, build_entity_sql
+from forge_mvc_entities.validation import (
     EntityDefinitionError,
     normalize_entity_definition,
     validate_entity_definition,

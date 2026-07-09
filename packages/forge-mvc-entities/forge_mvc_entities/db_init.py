@@ -236,7 +236,7 @@ def _init_serverless(backend: Any) -> list[str]:
     Aucune base ni aucun compte à provisionner : on garantit la connexion
     (fichier créé au besoin) et la table technique forge_migrations.
     """
-    from cli.entities.serverless_db import configure_serverless_db
+    from forge_mvc_entities.serverless_db import configure_serverless_db
 
     configure_serverless_db()
 

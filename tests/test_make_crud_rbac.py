@@ -7,8 +7,8 @@ import json
 import pytest
 pytest.importorskip("forge_mvc_rbac")
 
-from cli.entities.make_crud import build_controller, make_crud
-from cli.entities.validation import (
+from forge_mvc_entities.make_crud import build_controller, make_crud
+from forge_mvc_entities.validation import (
     EntityDefinitionError,
     validate_entity_definition,
 )

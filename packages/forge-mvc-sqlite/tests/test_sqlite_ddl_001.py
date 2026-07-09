@@ -18,10 +18,10 @@ pytest.importorskip("forge_mvc_sqlite")
 
 
 def _build_create_table() -> str:
-    from cli.entities.canonical_model_normalizer import (
+    from forge_mvc_entities.canonical_model_normalizer import (
         normalize_canonical_entity_for_model_build,
     )
-    from cli.entities.make_entity import build_entity_sql
+    from forge_mvc_entities.make_entity import build_entity_sql
 
     entity = {
         "name": "Contact",

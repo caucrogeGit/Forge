@@ -10,9 +10,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
-from cli.entities.make_relation import _inject_fk_field_into_entity
-from cli.entities.relations import generate_relations_sql, validate_relations_definition
+from forge_mvc_entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
+from forge_mvc_entities.make_relation import _inject_fk_field_into_entity
+from forge_mvc_entities.relations import generate_relations_sql, validate_relations_definition
 
 
 def _entity(name: str, table: str, fields: list[dict]) -> dict:

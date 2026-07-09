@@ -6,11 +6,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, cast
 
-from cli.entities.crud.context import (
+from forge_mvc_entities.crud.context import (
     CrudManyToOneRelation,
     CrudManyToManyRelation,
 )
-from cli.entities.crud.utils import (
+from forge_mvc_entities.crud.utils import (
     _filter_fields,
     _humanize,
     _is_bool_sql,
@@ -21,7 +21,7 @@ from cli.entities.crud.utils import (
     _relation_by_field,
     _to_snake,
 )
-from cli.entities.crud.context import _with_permission
+from forge_mvc_entities.crud.context import _with_permission
 
 
 def _media_upload_call(mfield: str, var: str, variants: object) -> str:
@@ -35,7 +35,7 @@ def _media_upload_call(mfield: str, var: str, variants: object) -> str:
     if mfield == "image":
         return f'save_image_upload({var}, "images", variants={variants})'
     return f'save_upload({var}, "documents")'
-from cli.entities.crud.relations_loader import (
+from forge_mvc_entities.crud.relations_loader import (
     _unique_choice_relations,
     _unique_many_to_many_choice_relations,
 )

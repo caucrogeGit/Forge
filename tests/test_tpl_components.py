@@ -94,12 +94,12 @@ def test_composants_ne_referencent_pas_les_layouts():
 def test_make_crud_utilise_la_macro_button_de_ui():
     # FORGE-11 : le bouton est la macro `button` de components/ui.html,
     # pas un fichier components/button.html (qui n'existe pas dans le squelette).
-    src = _read(Path("cli/entities/crud/views_builder.py"))
+    src = _read(Path("packages/forge-mvc-entities/forge_mvc_entities/crud/views_builder.py"))
     assert 'from "components/ui.html" import button' in src
 
 
 def test_make_crud_ne_reference_pas_autres_composants():
-    src = _read(Path("cli/entities/crud/views_builder.py"))
+    src = _read(Path("packages/forge-mvc-entities/forge_mvc_entities/crud/views_builder.py"))
     for name in ("alert.html", "form_field.html", "table.html", "badge.html", "pagination.html", "button.html"):
         assert f"components/{name}" not in src
 

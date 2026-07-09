@@ -4,11 +4,11 @@ Les 25 tests `db` existants couvrent la couche d'accès, `db:apply`, les
 transactions, les FK et le slug, mais deux chemins critiques n'étaient validés
 qu'en mock :
 
-- `forge db:init` (`cli.entities.db_init.init_project_database`) : création de la
+- `forge db:init` (`forge_mvc_entities.db_init.init_project_database`) : création de la
   base, du compte applicatif et des GRANT, plus le mode dégradé `CREATE USER IF
   NOT EXISTS` quand l'admin n'a pas SELECT sur `mysql.user` (ADR-033, DB-INIT-
   MYSQL-USER-GRANT-001) ;
-- le runner de migrations (`cli.entities.migrations.apply_pending_migrations`) :
+- le runner de migrations (`forge_mvc_entities.migrations.apply_pending_migrations`) :
   application réelle, idempotence, refus des états incohérents (CHANGED /
   MISSING) et rollback transactionnel réel quand le SQL d'une migration échoue.
 
@@ -27,9 +27,9 @@ from typing import Any
 
 import pytest
 
-from cli.entities import db_init
-from cli.entities import migrations as mig
-from cli.entities.db_init import FORGE_MIGRATIONS_TABLE_SQL
+from forge_mvc_entities import db_init
+from forge_mvc_entities import migrations as mig
+from forge_mvc_entities.db_init import FORGE_MIGRATIONS_TABLE_SQL
 
 pytestmark = pytest.mark.db
 

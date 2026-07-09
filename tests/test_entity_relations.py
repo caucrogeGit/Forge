@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities.relations import (
+from forge_mvc_entities.relations import (
     EntityRelationsError,
     ValidatedRelation,
     generate_relations_sql,

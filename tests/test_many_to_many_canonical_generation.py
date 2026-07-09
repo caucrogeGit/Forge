@@ -12,8 +12,8 @@ from typing import Any
 
 import pytest
 
-from cli.entities import make_relation
-from cli.entities.relations import (
+from forge_mvc_entities import make_relation
+from forge_mvc_entities.relations import (
     EntityRelationsError,
     ValidatedCanonicalManyToManyRelation,
     generate_relations_sql,

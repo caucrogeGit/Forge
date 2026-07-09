@@ -3,7 +3,7 @@
 Ce document décrit la commande `forge make:relation`.
 Elle déclare une relation entre deux entités dans le document de relations du projet.
 
-Le module correspondant est `cli.entities.make_relation`.
+Le module correspondant est `forge_mvc_entities.make_relation`.
 
 ## 1. Rôle
 
@@ -20,7 +20,7 @@ Pour une relation `many_to_one`, elle **injecte aussi** la clé étrangère comm
 | Élément | Valeur |
 |---|---|
 | Commande forge | `forge make:relation` |
-| Module Python | `cli.entities.make_relation` |
+| Module Python | `forge_mvc_entities.make_relation` |
 | Catégorie | génération du modèle de données |
 | Rôle | déclarer une relation entre entités |
 | Entrées | réponses interactives (type, entités, actions) |

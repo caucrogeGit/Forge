@@ -3,7 +3,7 @@
 Ce document décrit la commande `forge entity:doc`.
 Elle produit une vue globale des entités et de leurs relations à partir des contrats du projet.
 
-Le module correspondant est `cli.entities.entity_doc`.
+Le module correspondant est `forge_mvc_entities.entity_doc`.
 
 ## 1. Rôle
 
@@ -18,7 +18,7 @@ Par défaut, la commande affiche le Markdown sur la sortie standard ; `--output`
 | Élément | Valeur |
 |---|---|
 | Commande forge | `forge entity:doc [--output <fichier>]` |
-| Module Python | `cli.entities.entity_doc` |
+| Module Python | `forge_mvc_entities.entity_doc` |
 | Catégorie | inspection du modèle de données |
 | Rôle | documenter entités et relations (tableaux + diagramme) |
 | Entrées | fichiers d'entités et `relations.json` du projet |

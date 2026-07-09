@@ -10,13 +10,13 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities.relations import (
+from forge_mvc_entities.relations import (
     EntityRelationsError,
     ValidatedRelation,
     generate_relations_sql,
     validate_relations_definition,
 )
-from cli.entities.model import sync_relations
+from forge_mvc_entities.model import sync_relations
 
 
 # ---------------------------------------------------------------------------
@@ -367,7 +367,7 @@ def test_canonical_m2m_sql_sqlite_executes(monkeypatch):
     import sqlite3
 
     from core.database import backend as backend_module
-    from cli.entities.relations import (
+    from forge_mvc_entities.relations import (
         ValidatedCanonicalManyToManyRelation,
         _generate_canonical_m2m_sql,
     )

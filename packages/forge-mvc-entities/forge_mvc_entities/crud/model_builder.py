@@ -5,11 +5,11 @@
 from __future__ import annotations
 from typing import Any, cast
 
-from cli.entities.crud.context import (
+from forge_mvc_entities.crud.context import (
     CrudManyToOneRelation,
     CrudManyToManyRelation,
 )
-from cli.entities.crud.utils import (
+from forge_mvc_entities.crud.utils import (
     _filter_fields,
     _is_generated,
     _non_pk_fields,
@@ -17,7 +17,7 @@ from cli.entities.crud.utils import (
     _text_search_fields,
     _to_snake,
 )
-from cli.entities.crud.relations_loader import (
+from forge_mvc_entities.crud.relations_loader import (
     _build_select_base,
     _unique_choice_relations,
     _unique_many_to_many_choice_relations,

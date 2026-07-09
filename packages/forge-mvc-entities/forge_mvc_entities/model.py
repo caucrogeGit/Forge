@@ -8,11 +8,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
-from cli.entities.canonical_model_normalizer import (
+from forge_mvc_entities.canonical_model_normalizer import (
     CanonicalNormalizationError,
     normalize_canonical_entity_for_model_build,
 )
-from cli.entities.make_entity import (
+from forge_mvc_entities.make_entity import (
     build_entity_base,
     build_entity_init,
     build_entity_manual,
@@ -21,14 +21,14 @@ from cli.entities.make_entity import (
     validate_entity_name,
 )
 import cli._support.output as out
-from cli.entities.relations import (
+from forge_mvc_entities.relations import (
     EntityRelationsError,
     ValidatedCanonicalManyToManyRelation,
     ValidatedRelation,
     generate_relations_sql,
     validate_relations_definition,
 )
-from cli.entities.validation import EntityDefinitionError, validate_entity_definition
+from forge_mvc_entities.validation import EntityDefinitionError, validate_entity_definition
 
 
 @dataclass
@@ -98,7 +98,7 @@ def sync_entity(entities_root: Path, entity_name: str) -> tuple[Path, Path]:
 
 def _assert_contracts_valid(entities_root: Path) -> None:
     """Vérifie les contrats JSON Schema avant génération. Dégradation douce si jsonschema absent."""
-    from cli.entities.entity_validate import collect_entity_validation_results
+    from forge_mvc_entities.entity_validate import collect_entity_validation_results
     results = collect_entity_validation_results(entities_root)
     if results is not None and results["errors"]:
         raise ModelValidationError([

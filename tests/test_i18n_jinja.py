@@ -88,7 +88,7 @@ def test_aucun_catalogue_en_ou_es(tmp_path):
 
 
 def test_make_crud_utilise_trans_depuis_i18n_009():
-    src = (Path(__file__).resolve().parent.parent / "cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
+    src = (Path(__file__).resolve().parent.parent / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "make_crud.py").read_text(encoding="utf-8")
     assert "trans(" in src
 
 

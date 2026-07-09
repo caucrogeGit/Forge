@@ -59,7 +59,7 @@ class TestCrudGeneratorEmitsCanonical:
     """Vérifie que le générateur CRUD produit du code utilisant l'API canonique."""
 
     def test_generated_model_import_line(self):
-        from cli.entities.crud.model_builder import build_model
+        from forge_mvc_entities.crud.model_builder import build_model
 
         definition = {
             "entity": "Article",
@@ -75,7 +75,7 @@ class TestCrudGeneratorEmitsCanonical:
         assert "close_connection" not in code
 
     def test_generated_model_no_cursor_execute(self):
-        from cli.entities.crud.model_builder import build_model
+        from forge_mvc_entities.crud.model_builder import build_model
 
         definition = {
             "entity": "Tag",
@@ -91,7 +91,7 @@ class TestCrudGeneratorEmitsCanonical:
         assert ".fetchall(" not in code
 
     def test_generated_get_uses_fetch_all(self):
-        from cli.entities.crud.model_builder import build_model
+        from forge_mvc_entities.crud.model_builder import build_model
 
         definition = {
             "entity": "Produit",
@@ -106,7 +106,7 @@ class TestCrudGeneratorEmitsCanonical:
         assert "fetch_one(SELECT_BY_ID" in code
 
     def test_generated_add_auto_inc_uses_insert(self):
-        from cli.entities.crud.model_builder import build_model
+        from forge_mvc_entities.crud.model_builder import build_model
 
         definition = {
             "entity": "Produit",
@@ -120,7 +120,7 @@ class TestCrudGeneratorEmitsCanonical:
         assert "return insert(INSERT," in code
 
     def test_generated_delete_uses_execute(self):
-        from cli.entities.crud.model_builder import build_model
+        from forge_mvc_entities.crud.model_builder import build_model
 
         definition = {
             "entity": "Produit",
@@ -134,7 +134,7 @@ class TestCrudGeneratorEmitsCanonical:
         assert "execute(DELETE," in code
 
     def test_generated_bulk_delete_uses_execute(self):
-        from cli.entities.crud.model_builder import build_model
+        from forge_mvc_entities.crud.model_builder import build_model
 
         definition = {
             "entity": "Produit",

@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities import make_relation
-from cli.entities.make_entity import main as make_entity_main
+from forge_mvc_entities import make_relation
+from forge_mvc_entities.make_entity import main as make_entity_main
 
 
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -221,7 +221,7 @@ def test_relations_json_validates_against_schema(monkeypatch, tmp_path):
     pytest.importorskip("jsonschema")
     _run_make_relation(monkeypatch, tmp_path, _ANSWERS_DEFAULTS_ONLY)
 
-    from cli.entities.entity_validate import collect_entity_validation_results
+    from forge_mvc_entities.entity_validate import collect_entity_validation_results
     results = collect_entity_validation_results(tmp_path / "mvc" / "entities")
     assert results is not None
     assert results["errors"] == [], f"Erreurs de schema : {results['errors']}"
@@ -253,7 +253,7 @@ def test_entity_validate_passes_after_make_relation(monkeypatch, tmp_path):
     }
     (entities_dir / "relations.json").write_text(json.dumps(relations, indent=2) + "\n", encoding="utf-8")
 
-    from cli.entities.entity_validate import collect_entity_validation_results
+    from forge_mvc_entities.entity_validate import collect_entity_validation_results
     results = collect_entity_validation_results(entities_dir)
     assert results is not None
     assert results["errors"] == []
@@ -286,7 +286,7 @@ def test_build_model_does_not_crash_with_canonical_relations(monkeypatch, tmp_pa
     }
     (entities_dir / "relations.json").write_text(json.dumps(relations, indent=2) + "\n", encoding="utf-8")
 
-    from cli.entities.model import build_model
+    from forge_mvc_entities.model import build_model
     result = build_model(entities_dir)
     assert result is not None
 

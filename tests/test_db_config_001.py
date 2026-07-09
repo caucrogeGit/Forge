@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities.db_config import (
+from forge_mvc_entities.db_config import (
     ENV_FILES,
     _key_present,
     _value_is_empty,

@@ -3,8 +3,8 @@ import types
 
 import pytest
 
-from cli.entities import db_init
-from cli.entities.db_init import DbInitError, init_project_database, load_db_init_config
+from forge_mvc_entities import db_init
+from forge_mvc_entities.db_init import DbInitError, init_project_database, load_db_init_config
 
 
 FORGE_MIGRATIONS_SQL = db_init.FORGE_MIGRATIONS_TABLE_SQL
@@ -492,7 +492,7 @@ def test_load_db_init_config_reads_custom_db_app_privileges(monkeypatch, tmp_pat
 
 
 def test_load_db_init_config_rejects_invalid_privilege(monkeypatch, tmp_path):
-    from cli.entities.db_init import DbInitError
+    from forge_mvc_entities.db_init import DbInitError
 
     fake_config = _fake_config()
     fake_config.DB_APP_PRIVILEGES = "SELECT,TRUNCATE"

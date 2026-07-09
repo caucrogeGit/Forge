@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import pytest
 
-from cli.entities.canonical_model_normalizer import (
+from forge_mvc_entities.canonical_model_normalizer import (
     CanonicalNormalizationError,
     normalize_canonical_entity_for_model_build,
 )
@@ -426,13 +426,13 @@ class TestLegacyCompatibility:
     """Vérifie que la sortie passe normalize_entity_definition() sans erreur."""
 
     def test_simple_entity_passes_legacy_validator(self):
-        from cli.entities.validation import normalize_entity_definition
+        from forge_mvc_entities.validation import normalize_entity_definition
         result = _normalize(_entity(fields=[_field("title", "string", max_length=255)]))
         normalized = normalize_entity_definition(result)
         assert normalized["entity"] == "Article"
 
     def test_all_types_pass_legacy_validator(self):
-        from cli.entities.validation import normalize_entity_definition
+        from forge_mvc_entities.validation import normalize_entity_definition
         fields = [
             _field("title", "string", max_length=100),
             _field("body", "text"),
@@ -452,7 +452,7 @@ class TestLegacyCompatibility:
         assert normalized["entity"] == "Article"
 
     def test_timestamps_pass_legacy_validator(self):
-        from cli.entities.validation import normalize_entity_definition
+        from forge_mvc_entities.validation import normalize_entity_definition
         result = _normalize(_entity(
             fields=[_field("title", "string", max_length=100)],
             options={"timestamps": True},

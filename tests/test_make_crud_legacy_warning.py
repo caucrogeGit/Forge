@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities.make_crud import make_crud
+from forge_mvc_entities.make_crud import make_crud
 
 _LEGACY_RELATIONS = {"format_version": 1, "relations": []}
 _CANONICAL_RELATIONS = {"schema_version": "1.0", "relations": []}

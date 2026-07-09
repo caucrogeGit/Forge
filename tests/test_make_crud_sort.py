@@ -1,6 +1,6 @@
 """Tests du tri simple genere par forge make:crud."""
 
-from cli.entities.make_crud import (
+from forge_mvc_entities.make_crud import (
     CrudManyToManyRelation,
     CrudManyToOneRelation,
     build_controller,

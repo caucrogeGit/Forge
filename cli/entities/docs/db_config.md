@@ -3,7 +3,7 @@
 Ce document décrit la commande `forge db:config`.
 Elle amorce les variables d'environnement du backend BDD installé dans les fichiers d'environnement du projet.
 
-Le module correspondant est `cli.entities.db_config`.
+Le module correspondant est `forge_mvc_entities.db_config`.
 
 ## 1. Rôle
 
@@ -18,7 +18,7 @@ La commande ne provisionne pas la base : ce rôle revient à `forge db:init`.
 | Élément | Valeur |
 |---|---|
 | Commande forge | `forge db:config` |
-| Module Python | `cli.entities.db_config` |
+| Module Python | `forge_mvc_entities.db_config` |
 | Catégorie | base de données |
 | Rôle | amorcer les variables d'environnement du backend |
 | Entrées | backend installé (son `env_template`), fichiers `env/*` |

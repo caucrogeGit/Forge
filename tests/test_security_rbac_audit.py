@@ -390,7 +390,7 @@ class TestLacuneTemplatesCrud:
     """
 
     def test_table_partial_sans_rbac_pas_de_guard_edit(self):
-        from cli.entities.crud.views_builder import build_table_partial
+        from forge_mvc_entities.crud.views_builder import build_table_partial
 
         defn = {
             "entity": "Post",
@@ -414,7 +414,7 @@ class TestLacuneTemplatesCrud:
         assert "{% if can(" not in html
 
     def test_table_partial_sans_rbac_pas_de_guard_delete(self):
-        from cli.entities.crud.views_builder import build_table_partial
+        from forge_mvc_entities.crud.views_builder import build_table_partial
 
         defn = {
             "entity": "Post",
@@ -433,7 +433,7 @@ class TestLacuneTemplatesCrud:
         assert "{% if can(" not in html
 
     def test_show_view_sans_rbac_pas_de_guard(self):
-        from cli.entities.crud.views_builder import build_show_view
+        from forge_mvc_entities.crud.views_builder import build_show_view
 
         defn = {
             "entity": "Post",
@@ -452,7 +452,7 @@ class TestLacuneTemplatesCrud:
 
     def test_controller_genere_avec_rbac_protege_action_delete(self):
         """Confirme que le contrôleur protège bien delete côté serveur."""
-        from cli.entities.crud.controller_builder import build_controller
+        from forge_mvc_entities.crud.controller_builder import build_controller
 
         defn = {
             "entity": "Post",
@@ -476,8 +476,8 @@ class TestLacuneTemplatesCrud:
         Résumé de la lacune : UI ouverte (pas de guard can()) mais
         serveur protégé (@require_permission). Les deux faits coexistent.
         """
-        from cli.entities.crud.views_builder import build_table_partial
-        from cli.entities.crud.controller_builder import build_controller
+        from forge_mvc_entities.crud.views_builder import build_table_partial
+        from forge_mvc_entities.crud.controller_builder import build_controller
 
         defn = {
             "entity": "Post",

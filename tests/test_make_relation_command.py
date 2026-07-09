@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities import make_relation
+from forge_mvc_entities import make_relation
 
 
 def _configure_roots(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Path:

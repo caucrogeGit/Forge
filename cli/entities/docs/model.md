@@ -3,7 +3,7 @@
 Ce document décrit l'orchestration du modèle d'entités.
 Le module porte les commandes `build:model`, `check:model`, `sync:entity` et `sync:relations`.
 
-Le module correspondant est `cli.entities.model`.
+Le module correspondant est `forge_mvc_entities.model`.
 
 ## 1. Rôle
 
@@ -23,7 +23,7 @@ Un mode `--dry-run` permet de prévisualiser `build:model` sans écrire.
 | Élément | Valeur |
 |---|---|
 | Commandes forge | `forge build:model [--dry-run]`, `forge check:model`, `forge sync:entity <NomEntite>`, `forge sync:relations` |
-| Module Python | `cli.entities.model` |
+| Module Python | `forge_mvc_entities.model` |
 | Catégorie | génération du modèle de données |
 | Rôle | régénérer modèles et SQL, vérifier leur cohérence |
 | Entrées | entités JSON du projet, `relations.json` |

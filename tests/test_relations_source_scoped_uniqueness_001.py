@@ -14,8 +14,8 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities.make_relation import _ensure_no_obvious_duplicates
-from cli.entities.relations import EntityRelationsError, validate_relations_definition
+from forge_mvc_entities.make_relation import _ensure_no_obvious_duplicates
+from forge_mvc_entities.relations import EntityRelationsError, validate_relations_definition
 
 
 def _entities(tmp_path: Path, *names_tables: tuple[str, str]) -> Path:

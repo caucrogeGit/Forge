@@ -1,20 +1,20 @@
 # pyright: strict
 # pyright: reportPrivateUsage=false
-"""cli.entities.crud — CRUD generator submodules.
+"""forge_mvc_entities.crud — CRUD generator submodules.
 
 Re-exports all public symbols for backward compatibility.
 """
 
 from __future__ import annotations
 
-from cli.entities.crud.context import (
+from forge_mvc_entities.crud.context import (
     _RBAC_ACTION_TO_METHOD,
     _with_permission,
     MakeCrudResult,
     CrudManyToOneRelation,
     CrudManyToManyRelation,
 )
-from cli.entities.crud.utils import (
+from forge_mvc_entities.crud.utils import (
     _FORM_FIELD_CLASS_MAP,
     _FORM_FIELD_STR_CONSTRAINTS,
     _HTML_TYPE_FROM_FORM_FIELD,
@@ -31,7 +31,7 @@ from cli.entities.crud.utils import (
     _media_form_fields,
     _relation_by_field,
 )
-from cli.entities.crud.relations_loader import (
+from forge_mvc_entities.crud.relations_loader import (
     _PREFERRED_LABEL_NAMES,
     _entity_definition_by_relation_name,
     _load_crud_many_to_one_relations,
@@ -41,14 +41,14 @@ from cli.entities.crud.relations_loader import (
     _unique_choice_relations,
     _unique_many_to_many_choice_relations,
 )
-from cli.entities.crud.form_builder import (
+from forge_mvc_entities.crud.form_builder import (
     _form_field_code,
     _form_imports,
     build_form,
 )
-from cli.entities.crud.model_builder import build_model
-from cli.entities.crud.controller_builder import build_controller
-from cli.entities.crud.views_builder import (
+from forge_mvc_entities.crud.model_builder import build_model
+from forge_mvc_entities.crud.controller_builder import build_controller
+from forge_mvc_entities.crud.views_builder import (
     build_form_errors_partial,
     build_index_view,
     build_results_partial,

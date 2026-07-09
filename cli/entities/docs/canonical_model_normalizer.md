@@ -2,7 +2,7 @@
 
 Ce document décrit le normaliseur qui traduit une entité du format canonique vers la structure interne attendue par `build:model`.
 
-Le module correspondant est `cli.entities.canonical_model_normalizer`.
+Le module correspondant est `forge_mvc_entities.canonical_model_normalizer`.
 
 ## 1. Rôle
 
@@ -20,7 +20,7 @@ Il ne modifie aucun fichier source.
 | Élément | Valeur |
 |---|---|
 | Commande forge | aucune (brique interne de `build:model`) |
-| Module Python | `cli.entities.canonical_model_normalizer` |
+| Module Python | `forge_mvc_entities.canonical_model_normalizer` |
 | Catégorie | génération du modèle de données |
 | Rôle | traduire une entité canonique en structure interne |
 | Entrées | une entité canonique (dict) |
@@ -80,7 +80,7 @@ sequenceDiagram
 Normaliser une entité canonique avant génération :
 
 ```python
-from cli.entities.canonical_model_normalizer import (
+from forge_mvc_entities.canonical_model_normalizer import (
     normalize_canonical_entity_for_model_build,
     CanonicalNormalizationError,
 )

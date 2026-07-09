@@ -1,5 +1,5 @@
 # pyright: strict
-"""cli/entities/db_config.py — `forge db:config` (ADR-064).
+"""forge_mvc_entities/db_config.py — `forge db:config` (ADR-064).
 
 Amorce les variables d'environnement du backend BDD installé dans les fichiers
 d'environnement du projet : ``env/example``, ``env/dev`` et ``env/prod``.

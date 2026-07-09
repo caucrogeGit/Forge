@@ -313,7 +313,7 @@ def test_cmd_option_inconnue_exit_1(tmp_path, capsys):
 
 
 def test_make_crud_non_modifie():
-    from cli.entities import make_crud as mc_mod
+    from forge_mvc_entities import make_crud as mc_mod
     import inspect
     src = inspect.getsource(mc_mod)
     assert "make:pivot-crud" not in src

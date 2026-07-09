@@ -158,7 +158,7 @@ def check_model_entities(root: Path) -> CheckResult:
                            "aucune entité — état nominal d'un projet vierge ; "
                            "crée-en une avec forge make:entity <Nom>")
 
-    from cli.entities.model import ModelValidationError, check_model
+    from forge_mvc_entities.model import ModelValidationError, check_model
     try:
         sources, _ = check_model(entities_root)
         return CheckResult("ok", "Entités", f"{len(sources)} entité(s) valide(s)")

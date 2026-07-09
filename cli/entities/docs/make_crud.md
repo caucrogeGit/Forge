@@ -3,7 +3,7 @@
 Ce document décrit la commande `forge make:crud`.
 Elle génère un CRUD complet à partir d'une entité déjà définie.
 
-Le module correspondant est `cli.entities.make_crud`.
+Le module correspondant est `forge_mvc_entities.make_crud`.
 
 ## 1. Rôle
 
@@ -13,14 +13,14 @@ Elle génère du SQL visible et du code lisible, sans magie cachée (principes 3
 Toutes les écritures suivent le mode write-if-new : un fichier existant n'est jamais écrasé (principe 9).
 Le mode `--dry-run` permet de prévisualiser les fichiers qui seraient créés, sans rien écrire.
 
-La logique de construction est déléguée aux constructeurs du sous-paquet `cli/entities/crud/`.
+La logique de construction est déléguée aux constructeurs du sous-paquet `packages/forge-mvc-entities/forge_mvc_entities/crud/`.
 
 ## 2. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
 | Commande forge | `forge make:crud <NomEntite> [--dry-run]` |
-| Module Python | `cli.entities.make_crud` |
+| Module Python | `forge_mvc_entities.make_crud` |
 | Catégorie | génération du modèle de données |
 | Rôle | générer un CRUD complet pour une entité existante |
 | Entrées | nom d'entité, option `--dry-run` |
@@ -40,7 +40,7 @@ sequenceDiagram
     actor Dev as Développeur
     participant Forge as forge make:crud
     participant Crud as make_crud(...)
-    participant Builders as cli.entities.crud
+    participant Builders as forge_mvc_entities.crud
     participant Fs as Système de fichiers
 
     Dev->>Forge: forge make:crud Contact [--dry-run]
@@ -58,7 +58,7 @@ sequenceDiagram
 
 À retenir :
 
-- la génération est déléguée aux constructeurs de `cli.entities.crud` ;
+- la génération est déléguée aux constructeurs de `forge_mvc_entities.crud` ;
 - `--dry-run` affiche les fichiers prévus sans écrire ;
 - chaque fichier déjà présent est préservé, jamais écrasé ;
 - le résultat distingue les fichiers créés des fichiers préservés.

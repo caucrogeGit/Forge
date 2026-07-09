@@ -305,7 +305,7 @@ def test_template_form_mentionne_champs_pivot(generated):
 # ── Neutralité make:crud ──────────────────────────────────────────────────────
 
 def test_make_crud_ne_reference_pas_pivot_ux():
-    from cli.entities import make_crud as mc_mod
+    from forge_mvc_entities import make_crud as mc_mod
     import inspect
     src = inspect.getsource(mc_mod)
     assert "PivotConstraintError" not in src

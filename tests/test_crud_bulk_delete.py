@@ -25,14 +25,14 @@ from __future__ import annotations
 
 import pytest
 
-from cli.entities.make_crud import (
+from forge_mvc_entities.make_crud import (
     build_bulk_delete_confirm_view,
     build_controller,
     build_model,
     build_table_partial,
     build_routes_file,
 )
-from cli.entities.validation import normalize_entity_definition
+from forge_mvc_entities.validation import normalize_entity_definition
 
 
 # ---------------------------------------------------------------------------

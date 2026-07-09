@@ -49,6 +49,12 @@ CORE_DEPS = {
     "skeleton",
     "tests",
     "forge_mvc_testing",  # infra de test partagée dev-only (ADR-041)
+    # ADR-070 (extraction en cours) : le moteur d'entités a quitté `cli/entities`
+    # pour l'opt-in `forge-mvc-entities`, installé en éditable dans le monorepo
+    # (toujours sur le sys.path en test, comme PIL ci-dessus). Ses tests vivent
+    # encore dans `tests/` ; ils migrent dans le paquet en phase 6, où
+    # `forge_mvc_entities` sera reclassé en OPTIN_MODULES avec importorskip.
+    "forge_mvc_entities",
     "tools",
     "app",      # app.py racine (fichier applicatif exemple)
     "config",   # config.py racine (configuration applicative exemple)

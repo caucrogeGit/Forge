@@ -3,7 +3,7 @@
 Ce document décrit la famille de commandes `forge migration:*`.
 Elle gère les migrations SQL du projet : statut, application, création et diff.
 
-Le module correspondant est `cli.entities.migrations`.
+Le module correspondant est `forge_mvc_entities.migrations`.
 
 ## 1. Rôle
 
@@ -25,7 +25,7 @@ Le SQL des migrations reste visible, écrit à la main ou généré explicitemen
 | Élément | Valeur |
 |---|---|
 | Commandes forge | `forge migration:status`, `forge migration:apply [--dry-run]`, `forge migration:make <nom>`, `forge migration:diff --entity <Entite>` |
-| Module Python | `cli.entities.migrations` |
+| Module Python | `forge_mvc_entities.migrations` |
 | Catégorie | base de données |
 | Rôle | suivre, créer et appliquer les migrations SQL |
 | Entrées | fichiers de migration, entités, état de la base |

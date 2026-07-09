@@ -89,7 +89,7 @@ class TestSingleSource:
 
     def test_migration_slug_stays_separate(self):
         # slugify_migration_name (snake_case, filenames) reste distinct (ADR-017 D1).
-        src = (PROJECT_ROOT / "cli" / "entities" / "migrations.py").read_text(encoding="utf-8")
+        src = (PROJECT_ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "migrations.py").read_text(encoding="utf-8")
         assert "def slugify_migration_name" in src
 
     def test_slugfield_delegates_to_core_slug(self):

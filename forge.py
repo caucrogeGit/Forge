@@ -16,15 +16,15 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 from cli.project.install_source import forge_mvc_git_spec, pin_forge_mvc_to_git
-from cli.entities.db_apply import main as db_apply_main
-from cli.entities.db_init import main as db_init_main
-from cli.entities.migrations import main as migrations_main
-from cli.entities.make_entity import main as make_entity_main
-from cli.entities.make_relation import main as make_relation_main
-from cli.entities.make_crud import cmd_make_crud_main
-from cli.entities.model import main as model_main
-from cli.entities.entity_validate import main as entity_validate_main
-from cli.entities.entity_doc import main as entity_doc_main
+from forge_mvc_entities.db_apply import main as db_apply_main
+from forge_mvc_entities.db_init import main as db_init_main
+from forge_mvc_entities.migrations import main as migrations_main
+from forge_mvc_entities.make_entity import main as make_entity_main
+from forge_mvc_entities.make_relation import main as make_relation_main
+from forge_mvc_entities.make_crud import cmd_make_crud_main
+from forge_mvc_entities.model import main as model_main
+from forge_mvc_entities.entity_validate import main as entity_validate_main
+from forge_mvc_entities.entity_doc import main as entity_doc_main
 from cli.public.public_contact import main as public_contact_main
 from cli.public.public_form import main as public_form_main
 from cli.public.public_list import main as public_list_main
@@ -576,7 +576,7 @@ CORE_COMMANDS: dict[str, _CoreRunner] = {
     ),
     "schema:list": _lazy("cli.schemas.schema_list", attr="schema_list_main"),
     "schema:doctor": _lazy("cli.schemas.schema_doctor", attr="schema_doctor_main"),
-    "db:config": _lazy("cli.entities.db_config", exit_rc=True),
+    "db:config": _lazy("forge_mvc_entities.db_config", exit_rc=True),
 }
 
 

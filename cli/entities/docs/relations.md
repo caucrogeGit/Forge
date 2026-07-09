@@ -2,7 +2,7 @@
 
 Ce document décrit la validation et la génération des relations globales entre entités.
 
-Le module correspondant est `cli.entities.relations`.
+Le module correspondant est `forge_mvc_entities.relations`.
 
 ## 1. Rôle
 
@@ -16,7 +16,7 @@ Le SQL produit reste visible et inspectable (principe 5).
 | Élément | Valeur |
 |---|---|
 | Commande forge | aucune directe (brique de `sync:relations` et `build:model`) |
-| Module Python | `cli.entities.relations` |
+| Module Python | `forge_mvc_entities.relations` |
 | Catégorie | génération du modèle de données |
 | Rôle | valider les relations et générer leur SQL |
 | Entrées | définitions d'entités et `relations.json` |

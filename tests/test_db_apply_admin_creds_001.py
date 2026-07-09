@@ -17,7 +17,7 @@ def test_load_migration_db_config_ne_porte_que_la_base(monkeypatch):
     # ADR-060 : les identifiants d'administration sont lus par le backend depuis
     # DB_ADMIN_*. Le loader ne porte plus que le nom de la base cible ; il
     # n'expose aucun identifiant (ni admin ni app).
-    from cli.entities import migrations
+    from forge_mvc_entities import migrations
 
     fake = types.SimpleNamespace(
         DB_HOST="dbhost", DB_PORT=1,
@@ -37,7 +37,7 @@ def test_load_migration_db_config_ne_porte_que_la_base(monkeypatch):
 
 def test_load_db_apply_config_ne_porte_que_la_base(monkeypatch):
     # ADR-060 : idem db:apply, le loader ne porte plus que la base cible.
-    from cli.entities import db_apply
+    from forge_mvc_entities import db_apply
 
     fake = types.SimpleNamespace(
         DB_HOST="dbhost", DB_PORT=1,
@@ -58,7 +58,7 @@ def test_load_db_apply_config_ne_porte_que_la_base(monkeypatch):
 def test_db_apply_et_migrations_passent_par_admin_connection():
     """Garde-fou ADR-033/ADR-060 : le DDL emprunte la connexion d'administration
     (get_admin_connection, qui lit DB_ADMIN_*), jamais get_connection (DB_APP_*)."""
-    from cli.entities import db_apply, migrations
+    from forge_mvc_entities import db_apply, migrations
 
     for module in (db_apply, migrations):
         src = Path(module.__file__).read_text(encoding="utf-8")
@@ -69,7 +69,7 @@ def test_db_apply_et_migrations_passent_par_admin_connection():
 
 def test_db_init_default_app_privileges_dml_only():
     """forge_app n'est plus provisionné avec du DDL par défaut (ADR-033)."""
-    from cli.entities import db_init
+    from forge_mvc_entities import db_init
 
     assert set(db_init.DEFAULT_APP_PRIVILEGES) == {"SELECT", "INSERT", "UPDATE", "DELETE"}
     for ddl in ("CREATE", "ALTER", "DROP", "INDEX", "REFERENCES"):
@@ -80,7 +80,7 @@ def test_db_init_default_app_privileges_dml_only():
 
 def test_db_init_still_connects_as_admin():
     """db:init reste en connexion d'administration (get_admin_connection lit DB_ADMIN_*)."""
-    from cli.entities import db_init
+    from forge_mvc_entities import db_init
 
     src = Path(db_init.__file__).read_text(encoding="utf-8")
     assert "get_admin_connection(" in src

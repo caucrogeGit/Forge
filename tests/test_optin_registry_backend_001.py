@@ -40,7 +40,7 @@ def test_set_backend_sans_affectation_inchange():
 def test_db_init_inscrit_backend_dans_registry(tmp_path, monkeypatch):
     pytest.importorskip("forge_mvc_sqlite")
     from core.database import backend as backend_module
-    from cli.entities import db_init
+    from forge_mvc_entities import db_init
 
     (tmp_path / "optins").mkdir()
     (tmp_path / "optins" / "registry.py").write_text(REGISTRY_TEMPLATE, encoding="utf-8")
@@ -69,7 +69,7 @@ def test_db_init_inscrit_backend_dans_registry(tmp_path, monkeypatch):
 def test_db_init_sans_registre_ne_plante_pas(tmp_path, monkeypatch):
     pytest.importorskip("forge_mvc_sqlite")
     from core.database import backend as backend_module
-    from cli.entities import db_init
+    from forge_mvc_entities import db_init
 
     db_path = tmp_path / "app.db"
     monkeypatch.chdir(tmp_path)  # pas de optins/registry.py

@@ -12,11 +12,11 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities.canonical_model_normalizer import (
+from forge_mvc_entities.canonical_model_normalizer import (
     normalize_canonical_entity_for_model_build,
 )
-from cli.entities.crud.form_builder import build_form
-from cli.entities.validation import validate_entity_definition
+from forge_mvc_entities.crud.form_builder import build_form
+from forge_mvc_entities.validation import validate_entity_definition
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 

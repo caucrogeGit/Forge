@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from cli.entities.model import ModelValidationError, check_model
+from forge_mvc_entities.model import ModelValidationError, check_model
 from cli.project.project_config import ProjectConfigError, load_project_config
 
 
@@ -135,7 +135,7 @@ def _connect_db():
     if not backend.requires_provisioning:
         # Backend sans serveur (SQLite, ADR-054) : pas de comptes admin, on
         # applique le SQL directement sur le fichier via le backend actif.
-        from cli.entities.serverless_db import configure_serverless_db
+        from forge_mvc_entities.serverless_db import configure_serverless_db
 
         configure_serverless_db()
         return backend.get_connection()

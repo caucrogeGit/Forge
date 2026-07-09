@@ -3,7 +3,7 @@
 Ce document décrit la validation canonique d'une définition d'entité.
 C'est une brique de validation interne réutilisée par les commandes de génération et de modèle.
 
-Le module correspondant est `cli.entities.validation`.
+Le module correspondant est `forge_mvc_entities.validation`.
 
 ## 1. Rôle
 
@@ -23,7 +23,7 @@ Quand des problèmes sont détectés, il les agrège dans une seule exception `E
 | Élément | Valeur |
 |---|---|
 | Commande forge | aucune directe (brique utilisée par les commandes du modèle) |
-| Module Python | `cli.entities.validation` |
+| Module Python | `forge_mvc_entities.validation` |
 | Catégorie | validation du modèle de données |
 | Rôle | valider et normaliser une définition d'entité canonique |
 | Entrées | une définition d'entité (dict JSON) |
@@ -115,7 +115,7 @@ Valider une définition d'entité chargée depuis un fichier JSON :
 
 ```python
 import json
-from cli.entities.validation import (
+from forge_mvc_entities.validation import (
     validate_entity_definition,
     EntityDefinitionError,
 )

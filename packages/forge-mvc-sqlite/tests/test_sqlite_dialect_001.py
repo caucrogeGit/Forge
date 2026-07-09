@@ -40,7 +40,7 @@ def test_normaliseur_produit_des_types_sqlite(monkeypatch: pytest.MonkeyPatch) -
     """Bout en bout : sous DB_BACKEND=sqlite, le normaliseur émet des types SQLite."""
     monkeypatch.setenv("DB_BACKEND", "sqlite")
     from core.database import backend as backend_module
-    from cli.entities.canonical_model_normalizer import (
+    from forge_mvc_entities.canonical_model_normalizer import (
         normalize_canonical_entity_for_model_build,
     )
 

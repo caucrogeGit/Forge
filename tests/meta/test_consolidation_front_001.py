@@ -198,20 +198,20 @@ def test_layout_ne_charge_pas_alpine_automatiquement(layout_path):
 
 def test_make_crud_genere_hx_get_pour_pagination():
     """make_crud génère hx-get pour la pagination (amélioration progressive)."""
-    content = (ROOT / "cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
+    content = (ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "make_crud.py").read_text(encoding="utf-8")
     assert "hx-get" in content
 
 
 def test_make_crud_genere_hx_post_pour_suppression():
     """make_crud génère hx-post pour la suppression (pas hx-delete, compatibilité max)."""
-    content = (ROOT / "cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
+    content = (ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "make_crud.py").read_text(encoding="utf-8")
     assert "hx-post" in content
     assert "hx-delete" not in content
 
 
 def test_make_crud_genere_hx_target():
     """make_crud génère hx-target pour cibler les résultats HTMX."""
-    content = (ROOT / "cli" / "entities" / "make_crud.py").read_text(encoding="utf-8")
+    content = (ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "make_crud.py").read_text(encoding="utf-8")
     assert "hx-target" in content
 
 

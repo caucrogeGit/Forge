@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from cli.entities.make_crud import make_crud, _to_snake
+from forge_mvc_entities.make_crud import make_crud, _to_snake
 
 
 MEMBER_CANONICAL = {

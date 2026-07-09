@@ -6,12 +6,12 @@
 from __future__ import annotations
 from typing import Any, cast
 
-from cli.entities.crud.context import CrudManyToOneRelation
+from forge_mvc_entities.crud.context import CrudManyToOneRelation
 
 # Source unique de _to_snake (principe 11) : re-export depuis validation, qui
 # en porte la définition canonique. Les modules CRUD continuent de l'importer
-# depuis ce module (`from cli.entities.crud.utils import _to_snake`).
-from cli.entities.validation import _to_snake as _to_snake  # noqa: F401
+# depuis ce module (`from forge_mvc_entities.crud.utils import _to_snake`).
+from forge_mvc_entities.validation import _to_snake as _to_snake  # noqa: F401
 
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────

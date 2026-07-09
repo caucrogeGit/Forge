@@ -13,7 +13,7 @@ destiné aux routes publiques (`/articles/premier-contact`). Ce module est la
 Dépendances **stdlib uniquement** (`unicodedata`, `re`) — runtime minimal de
 Forge ; pas de `python-slugify`/`unidecode`.
 
-À ne pas confondre avec ``cli.entities.migrations.slugify_migration_name``,
+À ne pas confondre avec ``forge_mvc_entities.migrations.slugify_migration_name``,
 qui produit des **noms de fichiers de migration** en snake_case (`_`), pas des
 URLs (ADR-017 D1).
 """

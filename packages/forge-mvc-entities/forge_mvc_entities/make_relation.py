@@ -14,14 +14,14 @@ import sys
 from pathlib import Path
 from typing import Any, Callable, cast
 
-from cli.entities.make_entity import entities_dir, to_snake
-from cli.entities.relations import (
+from forge_mvc_entities.make_entity import entities_dir, to_snake
+from forge_mvc_entities.relations import (
     ALLOWED_RELATION_TYPES,
     EntityRelationsError,
     load_entity_definitions,
     validate_relations_definition,
 )
-from cli.entities.validation import EntityDefinitionError
+from forge_mvc_entities.validation import EntityDefinitionError
 
 ALLOWED_ACTIONS_CANONICAL = {"restrict", "cascade", "set_null", "no_action"}
 

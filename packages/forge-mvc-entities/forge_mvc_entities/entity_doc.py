@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from cli.entities.relations import (
+from forge_mvc_entities.relations import (
     ValidatedCanonicalManyToManyRelation,
     ValidatedRelation,
     load_entity_definitions,

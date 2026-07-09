@@ -3,7 +3,7 @@
 Ce document décrit la validation sémantique des entités et des relations.
 C'est la seconde passe de `forge entity:validate`, après la validation structurelle JSON Schema.
 
-Le module correspondant est `cli.entities.entity_semantic_validate`.
+Le module correspondant est `forge_mvc_entities.entity_semantic_validate`.
 
 ## 1. Rôle
 
@@ -23,7 +23,7 @@ Chaque problème détecté est rapporté avec un code stable `FORGE_*`, le fichi
 | Élément | Valeur |
 |---|---|
 | Commande forge | aucune directe (passe de `forge entity:validate`) |
-| Module Python | `cli.entities.entity_semantic_validate` |
+| Module Python | `forge_mvc_entities.entity_semantic_validate` |
 | Catégorie | validation du modèle de données |
 | Rôle | contrôler la cohérence sémantique des entités et relations |
 | Entrées | entités structurellement valides, `relations.json` éventuel |
@@ -103,7 +103,7 @@ sequenceDiagram
 Appel direct de la passe sémantique sur des entités déjà valides :
 
 ```python
-from cli.entities.entity_semantic_validate import validate_semantic
+from forge_mvc_entities.entity_semantic_validate import validate_semantic
 
 errors = validate_semantic(
     valid_entities=[("Contact.json", contact_data)],

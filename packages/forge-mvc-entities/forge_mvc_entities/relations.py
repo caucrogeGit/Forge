@@ -10,11 +10,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
-from cli.entities.canonical_model_normalizer import (
+from forge_mvc_entities.canonical_model_normalizer import (
     CanonicalNormalizationError,
     normalize_canonical_entity_for_model_build,
 )
-from cli.entities.validation import EntityDefinitionError, validate_entity_definition
+from forge_mvc_entities.validation import EntityDefinitionError, validate_entity_definition
 
 
 ALLOWED_RELATION_TYPES = {"many_to_one", "many_to_many"}

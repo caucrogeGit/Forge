@@ -57,7 +57,7 @@ def _setup_entities(tmp_path: Path, entity_data: dict) -> Path:
 # ── Projet valide — la génération doit réussir ───────────────────────────────
 
 def test_valid_project_build_succeeds(tmp_path):
-    from cli.entities.model import BuildModelResult, build_model
+    from forge_mvc_entities.model import BuildModelResult, build_model
 
     entities_root = _setup_entities(tmp_path, _VALID_CANONICAL)
     result = build_model(entities_root)
@@ -66,7 +66,7 @@ def test_valid_project_build_succeeds(tmp_path):
 
 
 def test_valid_project_generates_model(tmp_path):
-    from cli.entities.model import build_model
+    from forge_mvc_entities.model import build_model
 
     entities_root = _setup_entities(tmp_path, _VALID_CANONICAL)
     build_model(entities_root)
@@ -79,7 +79,7 @@ def test_valid_project_generates_model(tmp_path):
 # ── Projet invalide — la génération doit être bloquée ────────────────────────
 
 def test_invalid_schema_build_raises(tmp_path):
-    from cli.entities.model import ModelValidationError, build_model
+    from forge_mvc_entities.model import ModelValidationError, build_model
 
     entities_root = _setup_entities(tmp_path, _INVALID_SCHEMA)
 
@@ -88,7 +88,7 @@ def test_invalid_schema_build_raises(tmp_path):
 
 
 def test_invalid_schema_no_files_generated(tmp_path):
-    from cli.entities.model import ModelValidationError, build_model
+    from forge_mvc_entities.model import ModelValidationError, build_model
 
     entities_root = _setup_entities(tmp_path, _INVALID_SCHEMA)
 
@@ -100,7 +100,7 @@ def test_invalid_schema_no_files_generated(tmp_path):
 
 
 def test_invalid_schema_message_contains_entity_validate_advice(tmp_path):
-    from cli.entities.model import ModelValidationError, build_model
+    from forge_mvc_entities.model import ModelValidationError, build_model
 
     entities_root = _setup_entities(tmp_path, _INVALID_SCHEMA)
 
@@ -111,7 +111,7 @@ def test_invalid_schema_message_contains_entity_validate_advice(tmp_path):
 
 
 def test_invalid_schema_message_is_short(tmp_path):
-    from cli.entities.model import ModelValidationError, build_model
+    from forge_mvc_entities.model import ModelValidationError, build_model
 
     entities_root = _setup_entities(tmp_path, _INVALID_SCHEMA)
 
@@ -124,7 +124,7 @@ def test_invalid_schema_message_is_short(tmp_path):
 
 
 def test_invalid_schema_no_python_traceback(tmp_path):
-    from cli.entities.model import ModelValidationError, build_model
+    from forge_mvc_entities.model import ModelValidationError, build_model
 
     entities_root = _setup_entities(tmp_path, _INVALID_SCHEMA)
 
@@ -137,7 +137,7 @@ def test_invalid_schema_no_python_traceback(tmp_path):
 # ── Dépôt réel — non-régression ──────────────────────────────────────────────
 
 def test_real_repo_build_model_succeeds():
-    from cli.entities.model import build_model
+    from forge_mvc_entities.model import build_model
 
     entities_root = PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "entities"
     result = build_model(entities_root, dry_run=True)
@@ -160,7 +160,7 @@ def test_real_repo_entity_validate_valid():
 
 def test_entity_validate_still_detailed(tmp_path):
     """collect_entity_validation_results retourne les erreurs complètes."""
-    from cli.entities.entity_validate import collect_entity_validation_results
+    from forge_mvc_entities.entity_validate import collect_entity_validation_results
 
     entities_root = _setup_entities(tmp_path, _INVALID_SCHEMA)
     results = collect_entity_validation_results(entities_root)

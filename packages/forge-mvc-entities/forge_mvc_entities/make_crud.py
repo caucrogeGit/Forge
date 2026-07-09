@@ -32,14 +32,14 @@ from typing import Any, cast
 import json
 from pathlib import Path
 
-from cli.entities.canonical_model_normalizer import (
+from forge_mvc_entities.canonical_model_normalizer import (
     CanonicalNormalizationError,
     normalize_canonical_entity_for_model_build,
 )
-from cli.entities.relations import (
+from forge_mvc_entities.relations import (
     EntityRelationsError,
 )
-from cli.entities.validation import (
+from forge_mvc_entities.validation import (
     EntityDefinitionError,
     validate_entity_definition,
 )
@@ -47,14 +47,14 @@ import cli._support.output as out
 
 # ── Re-exports from submodules (backward compatibility) ───────────────────────
 
-from cli.entities.crud.context import (  # noqa: F401
+from forge_mvc_entities.crud.context import (  # noqa: F401
     _RBAC_ACTION_TO_METHOD,
     _with_permission,
     MakeCrudResult,
     CrudManyToOneRelation,
     CrudManyToManyRelation,
 )
-from cli.entities.crud.utils import (  # noqa: F401
+from forge_mvc_entities.crud.utils import (  # noqa: F401
     _FORM_FIELD_CLASS_MAP,
     _FORM_FIELD_STR_CONSTRAINTS,
     _HTML_TYPE_FROM_FORM_FIELD,
@@ -71,7 +71,7 @@ from cli.entities.crud.utils import (  # noqa: F401
     _media_form_fields,
     _relation_by_field,
 )
-from cli.entities.crud.relations_loader import (  # noqa: F401
+from forge_mvc_entities.crud.relations_loader import (  # noqa: F401
     _PREFERRED_LABEL_NAMES,
     _entity_definition_by_relation_name,
     _load_crud_many_to_one_relations,
@@ -81,14 +81,14 @@ from cli.entities.crud.relations_loader import (  # noqa: F401
     _unique_choice_relations,
     _unique_many_to_many_choice_relations,
 )
-from cli.entities.crud.form_builder import (  # noqa: F401
+from forge_mvc_entities.crud.form_builder import (  # noqa: F401
     _form_field_code,
     _form_imports,
     build_form,
 )
-from cli.entities.crud.model_builder import build_model  # noqa: F401
-from cli.entities.crud.controller_builder import build_controller  # noqa: F401
-from cli.entities.crud.views_builder import (  # noqa: F401
+from forge_mvc_entities.crud.model_builder import build_model  # noqa: F401
+from forge_mvc_entities.crud.controller_builder import build_controller  # noqa: F401
+from forge_mvc_entities.crud.views_builder import (  # noqa: F401
     build_form_errors_partial,
     build_index_view,
     build_results_partial,
@@ -197,7 +197,7 @@ def make_crud(
     Raises:
         SystemExit : si les contrats sont invalides, l'entité est introuvable ou le JSON invalide.
     """
-    from cli.entities.entity_validate import collect_entity_validation_results
+    from forge_mvc_entities.entity_validate import collect_entity_validation_results
     results = collect_entity_validation_results(entities_root)
     if results is not None and results["errors"]:
         print(out.error("Les entités Forge sont invalides."))

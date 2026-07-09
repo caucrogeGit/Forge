@@ -16,7 +16,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from cli.entities.make_crud import (
+from forge_mvc_entities.make_crud import (
     build_form_view,
     build_index_view,
     build_show_view,

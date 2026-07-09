@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities.make_crud import (
+from forge_mvc_entities.make_crud import (
     MakeCrudResult,
     build_controller,
     build_form,
@@ -489,7 +489,7 @@ def test_date_devient_datefield(tmp_path):
 
 
 def test_date_dans_imports(tmp_path):
-    from cli.entities.make_crud import _form_imports, _non_pk_fields
+    from forge_mvc_entities.make_crud import _form_imports, _non_pk_fields
     fields = _non_pk_fields(_EVENEMENT_JSON)
     imports = _form_imports(fields)
     assert "DateField" in imports
@@ -921,7 +921,7 @@ def test_form_html_telephone_type_tel(tmp_path):
 
 def test_form_html_mobile_type_tel(tmp_path):
     """Le champ 'mobile' doit aussi produire type=tel."""
-    from cli.entities.make_crud import _html_input_type
+    from forge_mvc_entities.make_crud import _html_input_type
     def _f(name):
         return {"name": name, "column": name.capitalize(), "python_type": "str",
                 "sql_type": "VARCHAR(20)", "nullable": True, "primary_key": False,

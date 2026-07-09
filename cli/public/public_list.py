@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Any, cast
 
 import cli._support.output as out
-from cli.entities.make_crud import _pk_field, _to_snake
-from cli.entities.validation import validate_entity_definition
+from forge_mvc_entities.make_crud import _pk_field, _to_snake
+from forge_mvc_entities.validation import validate_entity_definition
 from cli.public.public_page import (
     PUBLIC_CONTENT_BLOCK,
     PUBLIC_LAYOUT,

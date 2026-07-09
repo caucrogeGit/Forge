@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities import migrations as M
+from forge_mvc_entities import migrations as M
 
 
 def _fake_migration(tmp_path: Path) -> M.MigrationFile:

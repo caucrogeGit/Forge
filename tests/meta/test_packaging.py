@@ -91,7 +91,10 @@ def test_find_packages_couvre_cli_et_integrations():
     patterns = data["tool"]["setuptools"]["packages"]["find"]["include"]
     found = _simulate_find_packages(patterns)
 
-    for pkg in ("cli", "cli.entities", "integrations", "integrations.jinja2"):
+    # Note (ADR-070) : `cli.entities` n'est plus un sous-paquet du cœur (moteur
+    # d'entités extrait vers l'opt-in forge-mvc-entities, qui a son propre
+    # pyproject). Le packaging du cœur couvre cli et integrations.
+    for pkg in ("cli", "integrations", "integrations.jinja2"):
         assert pkg in found, f"{pkg} absent du packaging."
 
 

@@ -425,7 +425,7 @@ def test_schema_list_not_broken():
 
 
 def test_entity_validate_not_broken():
-    from cli.entities.entity_validate import main as entity_validate_main
+    from forge_mvc_entities.entity_validate import main as entity_validate_main
     assert callable(entity_validate_main)
 
 

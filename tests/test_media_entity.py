@@ -5,10 +5,10 @@ from pathlib import Path
 import pytest
 pytest.importorskip("forge_mvc_files")
 from forge_mvc_files.storage import normalize_media_path
-from cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
-from cli.entities.make_entity import build_entity_base, build_entity_sql
-from cli.entities.model import build_model
-from cli.entities.validation import validate_entity_definition
+from forge_mvc_entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
+from forge_mvc_entities.make_entity import build_entity_base, build_entity_sql
+from forge_mvc_entities.model import build_model
+from forge_mvc_entities.validation import validate_entity_definition
 
 
 MEDIA_JSON = Path("tests/fixtures/app/mvc/entities/media/media.json")

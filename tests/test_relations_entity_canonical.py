@@ -113,7 +113,7 @@ def test_entity_validate_json_no_relations_errors():
 def test_build_model_still_works_with_canonical_relations(tmp_path):
     """build:model fonctionne avec relations.json canonique (liste vide)."""
     import shutil
-    from cli.entities.model import build_model
+    from forge_mvc_entities.model import build_model
 
     entities_root = tmp_path / "mvc" / "entities"
     shutil.copytree(PROJECT_ROOT / "tests" / "fixtures" / "app" / "mvc" / "entities", entities_root)

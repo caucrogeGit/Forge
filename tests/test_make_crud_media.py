@@ -1,8 +1,8 @@
 """Tests pour la génération de champs média dans make:crud (MEDIA-013–016)."""
 import pytest
 
-from cli.entities.validation import normalize_entity_definition
-from cli.entities.make_crud import (
+from forge_mvc_entities.validation import normalize_entity_definition
+from forge_mvc_entities.make_crud import (
     _form_imports,
     _media_form_fields,
     build_form,
@@ -1044,7 +1044,7 @@ class TestChaineCompleteMediaV2:
     # ---- Aucune colonne SQL pour les médias ----
 
     def test_sql_sans_colonne_media(self):
-        from cli.entities.make_entity import build_entity_sql
+        from forge_mvc_entities.make_entity import build_entity_sql
         sql = build_entity_sql(_entity_complet())
         assert "cover" not in sql
         assert "brochure" not in sql

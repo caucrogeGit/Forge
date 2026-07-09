@@ -16,13 +16,13 @@ Vérifie les critères d'acceptation du ticket CRUD-FILTER-HTMX-001 :
 """
 from __future__ import annotations
 
-from cli.entities.make_crud import (
+from forge_mvc_entities.make_crud import (
     CrudManyToOneRelation,
     build_index_view,
     build_pagination_partial,
     build_table_partial,
 )
-from cli.entities.validation import normalize_entity_definition
+from forge_mvc_entities.validation import normalize_entity_definition
 
 
 # ---------------------------------------------------------------------------
@@ -276,7 +276,7 @@ class TestFallbackSansHTMX:
         assert 'id="crud-results"' in html
 
     def test_results_partial_inclut_table_et_pagination(self):
-        from cli.entities.make_crud import build_results_partial
+        from forge_mvc_entities.make_crud import build_results_partial
         html = build_results_partial(_entity_with_filter())
         assert 'contact/_table.html' in html
         assert 'contact/_pagination.html' in html

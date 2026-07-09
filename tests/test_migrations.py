@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities import migrations
-from cli.entities.migrations import (
+from forge_mvc_entities import migrations
+from forge_mvc_entities.migrations import (
     ActualColumn,
     AppliedMigration,
     ExpectedColumn,

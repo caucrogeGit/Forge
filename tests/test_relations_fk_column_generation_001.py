@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from cli.entities.relations import (
+from forge_mvc_entities.relations import (
     _validate_relation_item_canonical,
     generate_relations_sql,
     validate_relations_definition,

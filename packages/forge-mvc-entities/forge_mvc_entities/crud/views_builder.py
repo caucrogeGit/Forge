@@ -5,11 +5,11 @@
 from __future__ import annotations
 from typing import Any
 
-from cli.entities.crud.context import (
+from forge_mvc_entities.crud.context import (
     CrudManyToOneRelation,
     CrudManyToManyRelation,
 )
-from cli.entities.crud.utils import (
+from forge_mvc_entities.crud.utils import (
     _filter_fields,
     _humanize,
     _is_bool_sql,

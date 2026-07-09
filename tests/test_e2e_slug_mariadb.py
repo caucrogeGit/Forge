@@ -94,12 +94,12 @@ except Exception as _conn_err:  # noqa: BLE001 — toute erreur = base indisponi
 # ── Imports Forge (pipeline réel) ─────────────────────────────────────────────
 
 from core.http.slug import slugify
-from cli.entities.canonical_model_normalizer import (
+from forge_mvc_entities.canonical_model_normalizer import (
     normalize_canonical_entity_for_model_build,
 )
-from cli.entities.db_apply import apply_model_sql
-from cli.entities.make_entity import build_entity_sql
-from cli.entities.validation import validate_entity_definition
+from forge_mvc_entities.db_apply import apply_model_sql
+from forge_mvc_entities.make_entity import build_entity_sql
+from forge_mvc_entities.validation import validate_entity_definition
 
 # ── Entité de test : Article avec slug auto-généré depuis title ───────────────
 

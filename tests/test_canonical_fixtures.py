@@ -47,7 +47,7 @@ def tmp_project(tmp_path_factory):
 @pytest.fixture(scope="module")
 def built_project(tmp_project):
     """Lance build:model une fois sur le projet temporaire et retourne entities_root."""
-    from cli.entities.model import build_model
+    from forge_mvc_entities.model import build_model
     build_model(tmp_project)
     return tmp_project
 
@@ -155,7 +155,7 @@ def test_relations_has_pivot_with_fields():
 
 def test_entity_validate_passes(tmp_project):
     pytest.importorskip("jsonschema")
-    from cli.entities.entity_validate import collect_entity_validation_results
+    from forge_mvc_entities.entity_validate import collect_entity_validation_results
     results = collect_entity_validation_results(tmp_project)
     assert results is not None
     assert results["errors"] == [], f"Erreurs de validation : {results['errors']}"
@@ -165,7 +165,7 @@ def test_entity_validate_passes(tmp_project):
 # ── build:model sur copie temporaire ─────────────────────────────────────────
 
 def test_build_model_succeeds(built_project):
-    from cli.entities.model import BuildModelResult, build_model
+    from forge_mvc_entities.model import BuildModelResult, build_model
     result = build_model(built_project)
     assert isinstance(result, BuildModelResult)
 

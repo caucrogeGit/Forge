@@ -25,7 +25,15 @@ _RELATIONS_SCHEMA_ID = "https://forge-mvc.dev/schemas/relations.schema.json"
 
 
 def _schemas_dir() -> Path:
-    return Path(__file__).resolve().parent.parent / "schemas"
+    # Les schemas d'entites/relations sont des *contrats du coeur* (ADR-058,
+    # source canonique unique `cli/schemas/`), consommes par le moteur d'entites
+    # extrait en opt-in (ADR-070). On les localise via le paquet `cli.schemas`,
+    # livre avec `forge-mvc` dont cet opt-in depend.
+    import cli.schemas
+
+    schemas_pkg = cli.schemas.__file__
+    assert schemas_pkg is not None
+    return Path(schemas_pkg).resolve().parent
 
 
 def _build_registry() -> "tuple[Any, Any]":
@@ -283,7 +291,7 @@ def collect_entity_validation_results(entities_root: Path) -> dict[str, Any] | N
         import jsonschema as jsonschema  # noqa: F401
     except ImportError:
         return None
-    from cli.entities.entity_validation_errors import (
+    from forge_mvc_entities.entity_validation_errors import (
         FORGE_ENTITY_SCHEMA_INVALID,
         FORGE_RELATION_SCHEMA_INVALID,
     )
@@ -356,8 +364,8 @@ def collect_entity_validation_results(entities_root: Path) -> dict[str, Any] | N
 
 
 def main(args: list[str] | None = None) -> None:
-    from cli.entities.entity_semantic_validate import validate_semantic
-    from cli.entities.entity_validation_errors import (
+    from forge_mvc_entities.entity_semantic_validate import validate_semantic
+    from forge_mvc_entities.entity_validation_errors import (
         FORGE_ENTITY_JSON_INVALID,
         FORGE_ENTITY_SCHEMA_INVALID,
         FORGE_ENTITY_SCHEMA_MISSING,

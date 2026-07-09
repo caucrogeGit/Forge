@@ -3,7 +3,7 @@
 Ce document décrit la commande `forge entity:validate`.
 Elle valide les fichiers d'entités et de relations d'un projet en deux passes complémentaires.
 
-Le module correspondant est `cli.entities.entity_validate`.
+Le module correspondant est `forge_mvc_entities.entity_validate`.
 
 ## 1. Rôle
 
@@ -23,7 +23,7 @@ La commande produit une sortie lisible par défaut, ou une sortie machine stable
 | Élément | Valeur |
 |---|---|
 | Commande forge | `forge entity:validate [--json]` |
-| Module Python | `cli.entities.entity_validate` |
+| Module Python | `forge_mvc_entities.entity_validate` |
 | Catégorie | validation du modèle de données |
 | Rôle | valider entités et relations (structure puis sémantique) |
 | Entrées | fichiers d'entités et `relations.json` du projet |

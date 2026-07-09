@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from cli.entities import db_apply
-from cli.entities.db_apply import (
+from forge_mvc_entities import db_apply
+from forge_mvc_entities.db_apply import (
     DbApplyError,
     apply_model_sql,
     collect_sql_files,

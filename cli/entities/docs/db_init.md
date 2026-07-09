@@ -3,7 +3,7 @@
 Ce document décrit la commande `forge db:init`.
 Elle provisionne la base de données du projet : création de la base et du compte applicatif.
 
-Le module correspondant est `cli.entities.db_init`.
+Le module correspondant est `forge_mvc_entities.db_init`.
 
 ## 1. Rôle
 
@@ -21,7 +21,7 @@ Sur un backend sans serveur (SQLite, ADR-054), il n'y a pas de provisioning de c
 | Élément | Valeur |
 |---|---|
 | Commande forge | `forge db:init` |
-| Module Python | `cli.entities.db_init` |
+| Module Python | `forge_mvc_entities.db_init` |
 | Catégorie | base de données |
 | Rôle | créer la base et le compte applicatif du projet |
 | Entrées | configuration du projet, identifiants `DB_ADMIN_*` |

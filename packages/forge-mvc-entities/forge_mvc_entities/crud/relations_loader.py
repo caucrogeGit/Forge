@@ -9,16 +9,16 @@ import json
 from pathlib import Path
 from typing import Any
 
-from cli.entities.relations import (
+from forge_mvc_entities.relations import (
     ValidatedCanonicalManyToManyRelation,
     load_entity_definitions,
     validate_relations_definition,
 )
-from cli.entities.crud.context import (
+from forge_mvc_entities.crud.context import (
     CrudManyToOneRelation,
     CrudManyToManyRelation,
 )
-from cli.entities.crud.utils import (
+from forge_mvc_entities.crud.utils import (
     _pk_field,
     _to_snake,
     _text_label_fields,

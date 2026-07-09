@@ -606,13 +606,13 @@ class TestCsrfFormulairesGeneres:
 
     def test_views_builder_new_contient_csrf_token(self):
         """La vue 'new' générée par views_builder contient un champ csrf_token caché."""
-        source = (ROOT / "cli" / "entities" / "crud" / "views_builder.py")
+        source = (ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "crud" / "views_builder.py")
         text = source.read_text(encoding="utf-8")
         assert 'name="csrf_token"' in text
 
     def test_views_builder_edit_contient_csrf_token(self):
         """La vue 'edit' générée par views_builder contient un champ csrf_token caché."""
-        source = (ROOT / "cli" / "entities" / "crud" / "views_builder.py")
+        source = (ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "crud" / "views_builder.py")
         text = source.read_text(encoding="utf-8")
         # Plusieurs occurrences — au moins deux (new + edit)
         occurrences = text.count('name="csrf_token"')
@@ -622,7 +622,7 @@ class TestCsrfFormulairesGeneres:
 
     def test_views_builder_delete_contient_csrf_token(self):
         """La vue de suppression générée contient un champ csrf_token."""
-        source = (ROOT / "cli" / "entities" / "crud" / "views_builder.py")
+        source = (ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "crud" / "views_builder.py")
         text = source.read_text(encoding="utf-8")
         # Au moins 3 occurrences (new, edit, delete)
         occurrences = text.count('name="csrf_token"')
@@ -632,7 +632,7 @@ class TestCsrfFormulairesGeneres:
 
     def test_views_builder_csrf_value_templated(self):
         """Le token est injecté via {{ csrf_token }} (valeur dynamique, pas hardcodée)."""
-        source = (ROOT / "cli" / "entities" / "crud" / "views_builder.py")
+        source = (ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "crud" / "views_builder.py")
         text = source.read_text(encoding="utf-8")
         assert 'value="{{ csrf_token }}"' in text
 
@@ -644,7 +644,7 @@ class TestCsrfFormulairesGeneres:
 
     def test_views_builder_csrf_input_hidden(self):
         """Le champ csrf_token est de type hidden."""
-        source = (ROOT / "cli" / "entities" / "crud" / "views_builder.py")
+        source = (ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "crud" / "views_builder.py")
         text = source.read_text(encoding="utf-8")
         # Recherche le pattern complet input type hidden avec csrf_token
         assert re.search(r'type="hidden"[^>]*name="csrf_token"'

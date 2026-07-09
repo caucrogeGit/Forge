@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 import cli._support.output as out
-from cli.entities.validation import (
+from forge_mvc_entities.validation import (
     EntityDefinitionError,
     normalize_entity_definition,
     validate_entity_definition,
@@ -711,7 +711,7 @@ def main(argv: list[str] | None = None) -> None:
     json_source = str(entity_dir / f"{snake}.json")
 
     try:
-        from cli.entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
+        from forge_mvc_entities.canonical_model_normalizer import normalize_canonical_entity_for_model_build
         legacy = normalize_canonical_entity_for_model_build(entity_definition)
         normalized_definition = validate_entity_definition(legacy, source=json_source)
     except (EntityDefinitionError, ValueError) as exc:

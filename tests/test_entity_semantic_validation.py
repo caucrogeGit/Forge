@@ -49,7 +49,7 @@ FORGE_PY = PROJECT_ROOT / "forge.py"
 
 pytest.importorskip("jsonschema", reason="jsonschema non installé")
 
-from cli.entities.entity_semantic_validate import SemanticError, validate_semantic  # noqa: E402
+from forge_mvc_entities.entity_semantic_validate import SemanticError, validate_semantic  # noqa: E402
 
 
 # ── Fixtures communes ─────────────────────────────────────────────────────────

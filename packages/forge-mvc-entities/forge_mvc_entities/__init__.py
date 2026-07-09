@@ -8,10 +8,15 @@ validation, `build:model`, generation de migrations, `make:crud`, provisioning
 (herites de `forge-mvc-pivot`, absorbe par cet opt-in).
 
 Cet opt-in depend du contrat `Dialect` expose par le coeur (`core.database`),
-jamais d'un backend concret : il reste independant du SGBD.
+jamais d'un backend concret : il reste independant du SGBD. Il consomme aussi les
+schemas d'entites/relations, qui restent des *contrats du coeur* (`cli.schemas`,
+ADR-058), a l'image du contrat `Dialect`.
 
-Le scaffold (ADR-070, phase 1) n'expose pas encore d'API : les modules du moteur
-d'entites y sont deplaces dans les phases suivantes.
+L'API du paquet est faite de ses sous-modules (un par commande : `make_entity`,
+`make_relation`, `make_crud`, `model`, `entity_validate`, `entity_doc`,
+`migrations`, `db_apply`, `db_init`, `db_config`, ...) et de leurs fonctions
+publiques (`validation.validate_entity_definition`,
+`relations.validate_relations_definition`, ...). On importe le sous-module voulu.
 """
 from __future__ import annotations
 
