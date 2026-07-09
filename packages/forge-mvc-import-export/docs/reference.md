@@ -18,10 +18,35 @@ Pour l'export, `to_csv` rend des lignes en texte CSV, l'inverse de `parse_csv`, 
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-import-export
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-import-export"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-import-export
 forge opt-in:enable import-export
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install import-export` affiche la commande `pip` sans l'exécuter.
@@ -36,7 +61,11 @@ pip uninstall forge-mvc-import-export
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove import-export` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -51,7 +80,7 @@ pip uninstall forge-mvc-import-export
 | Exception | `CsvImportError` |
 | Installation | `pip install --pre forge-mvc-import-export` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -59,7 +88,7 @@ Le diagramme de classe montre les fonctions, les specs et le rapport.
 
 Le diagramme de séquence montre un import validé ligne par ligne.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que `import_rows` valide selon des `FieldSpec`, insère via une fonction **fournie**, et renvoie un `ImportReport`.
 
@@ -113,7 +142,7 @@ classDiagram
 - les lignes fautives deviennent des `RowError` (numéro, champ, message) ;
 - le résultat est un `ImportReport` (importées + erreurs).
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre un import CSV de bout en bout.
 
@@ -144,7 +173,7 @@ sequenceDiagram
 - l'insertion réelle est déléguée à l'application (le SQL lui appartient) ;
 - `partial=True` permet d'insérer les valides même s'il y a des erreurs.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -159,7 +188,7 @@ sequenceDiagram
 
 `insert` est une fonction `dict -> object` fournie par l'application (elle exécute le SQL d'insertion de votre modèle).
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -170,9 +199,9 @@ sequenceDiagram
 | Exporter des données | `to_csv(rows, columns)` |
 | Coercer des valeurs | `coerce_int`, `coerce_float`, `coerce_bool` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Importer un CSV
+### 8.1 Importer un CSV
 
 ```python
 from forge_mvc_import_export import parse_csv, import_rows, FieldSpec, coerce_int
@@ -192,7 +221,7 @@ print(report.imported, "lignes importées,", len(report.errors), "erreurs")
 
 Le SQL d'insertion vit dans votre code ; l'opt-in valide et orchestre.
 
-### 7.2 Exporter en CSV
+### 8.2 Exporter en CSV
 
 ```python
 from forge_mvc_import_export import to_csv
@@ -206,7 +235,7 @@ csv_text = to_csv(rows, columns=["nom", "age"])
     - import : `parse_csv` puis `import_rows(specs, insert)` -> `ImportReport` ;
     - export : `to_csv(rows, columns)`.
 
-## 8. Validation, rapport et frontière
+## 9. Validation, rapport et frontière
 
 La validation est par champ (`FieldSpec`) : champ requis manquant ou coercition impossible produit un `RowError` précis (numéro de ligne, champ, message).
 
@@ -231,4 +260,4 @@ Par défaut, l'import est tout-ou-rien sur les lignes valides rapportées ; `par
 - [Moteur d'import (engine.py)](references/engine.md) : `import_rows`, `FieldSpec`, `ImportReport`.
 - [Export programmatique (csv_writer.py)](references/export.md) : `to_csv`.
 - [Erreurs (errors.py)](references/errors.md) : `CsvImportError`.
-- [Progression Import/Export](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Import/Export](welcome/debutant/import-welcome.md) : apprendre l'opt-in pas à pas.

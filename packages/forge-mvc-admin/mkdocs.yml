@@ -8,7 +8,6 @@ nav:
   - Référence: reference.md
   - Contrat de ressource: resources.md
   - Progression Admin:
-      - Installation: welcome/installation.md
       - Débutant:
           - Voir le tableau de bord: welcome/debutant/admin-welcome.md
           - Déclarer une ressource: welcome/debutant/admin-resource.md

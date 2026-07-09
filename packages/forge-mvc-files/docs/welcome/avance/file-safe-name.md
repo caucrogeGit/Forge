@@ -8,7 +8,7 @@ Objectif : transformer un nom de fichier utilisateur **arbitraire** en un nom **
 Premier palier du **niveau avancé** de la progression files.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-files` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-files` installé.
 
 ## Ce que ce starter montre
 

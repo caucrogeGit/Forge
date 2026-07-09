@@ -37,13 +37,14 @@ Forge n'impose aucun backend de référence.
     === "Depuis Git (avant-garde)"
 
         Les nouveautés pas encore publiées, ou si votre projet a été créé depuis `main`.
-        Installez le backend **et** le CLI `forge-mvc` à la même version : sinon `db:config` et `db:init` se désynchronisent du backend.
+        Installez le CLI `forge-mvc` **et** le backend à la même version : sinon `db:config` et `db:init` se désynchronisent du backend.
+        On installe le **cœur d'abord** (depuis git, avec ses dépendances), puis le backend : celui-ci trouve alors le cœur git déjà en place et n'a pas besoin d'une version publiée sur PyPI.
         Ces commandes s'installent **dans le venv du projet** : activez-le d'abord.
 
         ```bash
         source .venv/bin/activate
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mariadb"
-        pip install --force-reinstall --no-deps "git+https://github.com/caucrogeGit/Forge.git@main"
         ```
 
         !!! warning "Erreur « externally-managed-environment » ?"
@@ -122,7 +123,20 @@ Forge n'impose aucun backend de référence.
     Un backend n'a pas de commande `disable` : découvert par entry point ([ADR-054](/docs/forge/adr/054-database-backend-optins/)), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
     Si besoin, supprimez aussi la base et le compte créés par `db:init`.
 
-??? note "3. Vue d'ensemble rapide"
+??? note "3. Commandes"
+
+    Ce backend n'ajoute aucune commande : il est découvert par l'entry point `forge_mvc.db_backend` et fournit, au runtime, un dialecte SQL et un adaptateur de connexion.
+    Les commandes de base de données que vous utilisez avec lui sont fournies par le moteur d'entités (`forge-mvc-entities`) :
+
+    | Commande | Rôle | Exemple |
+    |---|---|---|
+    | `db:config` | Amorce les variables du backend dans `env/*` (write-if-missing). | `forge db:config` |
+    | `db:init` | Affiche le SQL de provisioning ; `--run` l'exécute. | `forge db:init --run` |
+    | `db:apply` | Applique le SQL des entités à la base. | `forge db:apply` |
+    | `migration:make` | Génère une migration depuis l'écart de schéma. | `forge migration:make` |
+    | `migration:apply` | Applique les migrations en attente. | `forge migration:apply` |
+
+??? note "4. Vue d'ensemble rapide"
     | Élément | Valeur |
     |---|---|
     | Paquet | `forge-mvc-mariadb` |
@@ -138,14 +152,14 @@ Forge n'impose aucun backend de référence.
     | Décision d'architecture | [ADR-054](/docs/forge/adr/054-database-backend-optins/) (cœur agnostique BDD) |
     | Installation | `pip install --pre forge-mvc-mariadb` |
 
-??? note "4. Schémas UML"
+??? note "5. Schémas UML"
     Les deux schémas suivants montrent deux vues complémentaires du backend.
 
     Le diagramme de classe montre comment le cœur consomme le backend.
 
     Le diagramme de séquence montre le provisioning puis une requête runtime.
 
-    ### 4.1 Diagramme de classe
+    ### 5.1 Diagramme de classe
 
     Le diagramme de classe montre que le cœur résout un `DatabaseBackend` par entry point, et que `forge-mvc-mariadb` le fournit avec son pool et son dialecte.
 
@@ -193,7 +207,7 @@ Forge n'impose aucun backend de référence.
     - la connexion d'administration (`DB_ADMIN_*`) sert le provisioning et la DDL ;
     - le dialecte traduit types et DDL en SQL MariaDB.
 
-    ### 4.2 Diagramme de séquence
+    ### 5.2 Diagramme de séquence
 
     Le diagramme de séquence montre le provisioning par `db:init`, puis une requête runtime.
 
@@ -223,7 +237,7 @@ Forge n'impose aucun backend de référence.
     - le runtime utilise le compte applicatif `DB_APP_*` (DML strict) ;
     - la séparation des comptes suit l'[ADR-033](/docs/forge/adr/033-migrations-admin-credentials/).
 
-??? note "5. Ce que fournit le backend"
+??? note "6. Ce que fournit le backend"
     | Élément | Rôle |
     |---|---|
     | `MariaDBBackend` | implémente le contrat `DatabaseBackend` (pool + connexion admin) |
@@ -234,7 +248,7 @@ Forge n'impose aucun backend de référence.
 
     L'API que vous utilisez reste celle du cœur : `db:init`, `db:apply`, `migration:*`, et `core.database.db`.
 
-??? note "6. Contextes d'utilisation"
+??? note "7. Contextes d'utilisation"
     | Besoin | Élément |
     |---|---|
     | Backend de production | installer `forge-mvc-mariadb` + un serveur MariaDB |
@@ -244,7 +258,7 @@ Forge n'impose aucun backend de référence.
     | Faire évoluer le schéma | `forge migration:make` / `migration:apply` |
     | Lire/écrire en code | `core.database.db` (compte `DB_APP_*`) |
 
-??? note "7. Exemple d'utilisation"
+??? note "8. Exemple d'utilisation"
     Configurer l'environnement (`env/dev`), puis :
 
     ```bash
@@ -267,7 +281,7 @@ Forge n'impose aucun backend de référence.
         - `DB_APP_*` pour le runtime (DML) ;
         - le code utilise `core.database.db`, pas `mariadb`.
 
-??? note "8. Serveur, comptes et dialecte"
+??? note "9. Serveur, comptes et dialecte"
     MariaDB est client-serveur : un serveur doit être joignable.
     `forge doctor` aide à diagnostiquer la connexion.
 
@@ -288,4 +302,4 @@ Forge n'impose aucun backend de référence.
 
 ## Voir aussi
 
-- [Welcome-MariaDB](welcome/installation.md) : apprendre le backend pas à pas.
+- [Welcome-MariaDB](welcome/debutant/mariadb-welcome.md) : apprendre le backend pas à pas.

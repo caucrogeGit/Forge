@@ -19,10 +19,35 @@ La vérification du contenu est une **sécurité** : on confirme que les octets 
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-images
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-images"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-images
 forge opt-in:enable images
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install images` affiche la commande `pip` sans l'exécuter.
@@ -37,7 +62,11 @@ pip uninstall forge-mvc-images
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove images` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -54,7 +83,7 @@ pip uninstall forge-mvc-images
 | Décision d'architecture | ADR-018 (remplace `forge-mvc-media`) |
 | Installation | `pip install --pre forge-mvc-images` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -62,7 +91,7 @@ Le diagramme de classe montre les deux couches et leurs dépendances.
 
 Le diagramme de séquence montre l'enregistrement d'une image puis l'affichage d'une galerie.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que le traitement s'appuie sur `forge-mvc-files` et Pillow, et que la couche médias persiste des associations via un exécuteur **injecté**.
 
@@ -118,7 +147,7 @@ classDiagram
 - Pillow sert à vérifier et redimensionner, pas le cœur ;
 - l'écriture et le service passent par `forge-mvc-files`.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre un upload d'image relié à une entité, puis l'affichage de sa galerie.
 
@@ -151,7 +180,7 @@ sequenceDiagram
 - l'association média / entité est persistée par la couche médias ;
 - la galerie et la couverture se lisent par entité.
 
-## 5. API publique
+## 6. API publique
 
 ### Traitement d'image
 
@@ -175,7 +204,7 @@ sequenceDiagram
 | `media_url` | `media_url(path) -> str` | URL publique d'un média |
 | autres | `update_media_alt_text`, `update_media_position`, `delete_media`, `get_media_record` | gestion fine |
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -187,9 +216,9 @@ sequenceDiagram
 | Choisir une couverture | `get_cover_media(...)` |
 | Construire l'URL d'un média | `media_url(path)` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Recevoir une image et la relier à une entité
+### 8.1 Recevoir une image et la relier à une entité
 
 ```python
 from forge_mvc_images import save_image_upload, attach_media_to_entity
@@ -203,7 +232,7 @@ def add_photo(request):
 
 `save_image_upload` vérifie le contenu, écrit l'original et génère les variantes.
 
-### 7.2 Afficher la galerie d'une entité
+### 8.2 Afficher la galerie d'une entité
 
 ```python
 from forge_mvc_images import get_media_gallery, get_cover_media
@@ -218,7 +247,7 @@ cover = get_cover_media("article", 7)
     - traitement : `save_image_upload` (vérifie, écrit, variantes) ;
     - médias : `attach_media_to_entity`, `get_media_gallery`, `get_cover_media`.
 
-## 8. Sécurité, variantes et dépendances
+## 9. Sécurité, variantes et dépendances
 
 `verify_image_content` confirme que les octets sont une vraie image avant toute écriture, et protège contre les bombes de décompression.
 
@@ -245,4 +274,4 @@ Les variantes (miniature, medium) sont définies par `IMAGE_VARIANT_SIZES` ; l'o
 - [Dépôt de médias (media_repository.py)](references/media_repository.md) : associations média / entité.
 - [Galerie (media_gallery.py)](references/media_gallery.md) : galerie, couverture, URLs.
 - [Guide média](media.md) : vue d'ensemble applicative.
-- [Progression Images](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Images](welcome/debutant/images-welcome.md) : apprendre l'opt-in pas à pas.

@@ -7,7 +7,7 @@ Objectif : localiser un statut **par son nom** dans un jeu de statuts.
 Troisième palier du **niveau débutant** de la progression workflow.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-workflow` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-workflow` installé.
 
 ## Ce que ce starter montre
 

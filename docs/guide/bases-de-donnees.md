@@ -38,7 +38,7 @@ C'est le moyen le plus simple de démarrer et de tester un projet Forge.
 pip install --pre forge-mvc-sqlite
 ```
 
-Documentation : [backend SQLite](../sqlite/index.md) et sa [progression pas à pas](../sqlite/welcome/installation.md).
+Documentation : [backend SQLite](../sqlite/index.md) et sa [progression pas à pas](../sqlite/welcome/debutant/sqlite-welcome.md).
 
 ## 4. MariaDB, serveur de production
 
@@ -49,7 +49,7 @@ MariaDB est un backend de production pour Forge, au-dessus d'un serveur MariaDB,
 pip install --pre forge-mvc-mariadb
 ```
 
-Documentation : [backend MariaDB](../mariadb/index.md) et sa [progression pas à pas](../mariadb/welcome/installation.md).
+Documentation : [backend MariaDB](../mariadb/index.md) et sa [progression pas à pas](../mariadb/welcome/debutant/mariadb-welcome.md).
 Pour installer le serveur et les comptes, voir aussi [Préparer MariaDB](../install/mariadb.md).
 
 ## 5. PostgreSQL (Alpha)

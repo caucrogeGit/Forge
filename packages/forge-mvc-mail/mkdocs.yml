@@ -14,7 +14,6 @@ nav:
       - Journal des envois (log.py): references/log.md
       - Erreurs (exceptions.py): references/exceptions.md
   - Progression Mail:
-      - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge Mail: welcome/debutant/mail-welcome.md
           - Composer un message: welcome/debutant/mail-message.md

@@ -1,5 +1,8 @@
 # Premier QR Code
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-qrcode` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-qrcode`.
 
 **Ce que vous allez apprendre :** la génération de QR Codes repose sur une classe `QrCode`.

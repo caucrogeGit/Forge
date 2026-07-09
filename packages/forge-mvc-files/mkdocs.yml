@@ -10,7 +10,6 @@ nav:
       - Primitives de stockage (storage.py): references/storage.md
       - Rate-limit d'upload (rate_limit.py): references/rate_limit.md
   - Progression Files:
-      - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge Files: welcome/debutant/files-welcome.md
           - Stocker un document: welcome/debutant/file-store.md

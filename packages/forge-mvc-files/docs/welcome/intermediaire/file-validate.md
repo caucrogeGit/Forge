@@ -13,7 +13,7 @@ Ce palier nomme la règle qui rejette.
 Premier palier du **niveau intermédiaire** de la progression files.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-files` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-files` installé.
 
 ## Ce que ce starter montre
 

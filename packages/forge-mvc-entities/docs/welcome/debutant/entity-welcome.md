@@ -1,5 +1,8 @@
 # Welcome Entités
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-entities` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le **moteur d'entités**, l'opt-in `forge-mvc-entities`.
 
 **Ce que vous allez apprendre :** une **entité** est décrite par un contrat JSON explicite, versionné avec votre code.
@@ -9,7 +12,7 @@ Rien n'est caché : vous lisez et versionnez la description, Forge se contente d
 Premier palier du **niveau débutant** de la progression Entités.
 
 !!! note "Module opt-in"
-    Cette progression suppose `forge-mvc-entities` installé (palier « Installation »).
+    Cette progression suppose `forge-mvc-entities` installé.
     Moteur à **SQL visible** : aucun ORM, les requêtes et le schéma restent lisibles.
 
 ## Qu'est-ce qu'une entité dans Forge

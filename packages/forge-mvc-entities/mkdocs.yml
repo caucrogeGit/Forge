@@ -4,7 +4,8 @@
 site_name: entities
 docs_dir: docs
 nav:
-  - Moteur d'entités (référence par module):
+  - Moteur d'entités (référence): reference.md
+  - Référence par module:
       - Commande make:entity (make_entity.py): modules/make_entity.md
       - Commande make:crud (make_crud.py): modules/make_crud.md
       - Commande make:relation (make_relation.py): modules/make_relation.md
@@ -28,12 +29,10 @@ nav:
       - Builders de vues (views_builder.py): modules/crud/views_builder.md
       - Chargeur de relations (relations_loader.py): modules/crud/relations_loader.md
       - Helpers de champs (utils.py): modules/crud/utils.md
-  - Pivot enrichi (référence):
-      - Vue d'ensemble: reference.md
+  - Pivot enrichi (détail):
       - Service pivot (service.py): references/service.md
       - Générateur de sous-CRUD (make_pivot_crud.py): references/make_pivot_crud.md
   - Progression Entités:
-      - Installation: welcome/installation.md
       - Débutant (modéliser et générer):
           - Welcome Entités: welcome/debutant/entity-welcome.md
           - Déclarer une entité: welcome/debutant/entity-make.md

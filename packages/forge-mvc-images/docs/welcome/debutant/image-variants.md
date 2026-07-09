@@ -9,8 +9,7 @@ C'est une transformation de chaîne **pure** : aucune écriture, aucune base de 
 Troisième palier du **niveau débutant** de la progression images.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation »
-    de ce parcours).
+    Ce starter suppose `forge-mvc-images` installé.
 
 ## Ce que ce starter montre
 

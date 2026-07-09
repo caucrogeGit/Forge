@@ -18,10 +18,35 @@ Son périmètre est **borné** : c'est un audit applicatif, pas un SIEM de cyber
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-audit
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-audit"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-audit
 forge opt-in:enable audit
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install audit` affiche la commande `pip` sans l'exécuter.
@@ -36,7 +61,15 @@ pip uninstall forge-mvc-audit
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove audit` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-audit` ajoute une commande :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `audit:init` | Crée la table `audit_log` (DDL fournie). | `forge audit:init` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -52,7 +85,7 @@ pip uninstall forge-mvc-audit
 | Cadre | ADR-008 (Forge fournit la table et le helper) |
 | Installation | `pip install --pre forge-mvc-audit` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -60,7 +93,7 @@ Le diagramme de classe montre l'API, l'entrée renvoyée et la table.
 
 Le diagramme de séquence montre l'écriture puis la relecture d'une trace.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que le module écrit dans la table `audit_log` au travers d'un exécuteur **injecté** et renvoie des `AuditEntry` typés.
 
@@ -118,7 +151,7 @@ classDiagram
 - `get_audit_log` renvoie des `AuditEntry` typés ;
 - le module n'ouvre jamais de connexion : il reçoit un exécuteur.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre un `record_audit` suivi d'un `get_audit_log` filtré.
 
@@ -147,7 +180,7 @@ sequenceDiagram
 - les filtres (`actor`, `action`, `target_type`, `target_id`) sont optionnels ;
 - `limit` est plafonné à `MAX_LIMIT`.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -163,7 +196,7 @@ Le paramètre `action` est obligatoire : c'est une chaîne applicative (par exem
 
 Le paramètre `db` est l'exécuteur de base de données ; omis, il utilise le backend BDD actif.
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -175,9 +208,9 @@ Le paramètre `db` est l'exécuteur de base de données ; omis, il utilise le ba
 | Filtrer le journal | `actor=`, `action=`, `target_type=`, `target_id=` |
 | Créer la table | `CREATE_TABLE_SQL` ou `forge audit:init` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Tracer une action
+### 8.1 Tracer une action
 
 ```python
 from forge_mvc_audit import record_audit
@@ -191,7 +224,7 @@ record_audit(
 )
 ```
 
-### 7.2 Relire et filtrer le journal
+### 8.2 Relire et filtrer le journal
 
 ```python
 from forge_mvc_audit import get_audit_log
@@ -211,7 +244,7 @@ for entry in sur_les_notes:
     - `record_audit` pour écrire une trace ;
     - `get_audit_log` pour relire, avec des filtres optionnels.
 
-## 8. Périmètre, validation et injection
+## 9. Périmètre, validation et injection
 
 L'action est obligatoire et non vide ; sinon `record_audit` lève `AuditError`.
 
@@ -237,4 +270,4 @@ L'action est obligatoire et non vide ; sinon `record_audit` lève `AuditError`.
 - [Le journal d'audit (store.py)](references/store.md) : détail des fonctions et du SQL.
 - [Initialisation (audit:init)](references/cli.md) : création de la table.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `AuditError`.
-- [Progression Audit](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Audit](welcome/debutant/audit-welcome.md) : apprendre l'opt-in pas à pas.

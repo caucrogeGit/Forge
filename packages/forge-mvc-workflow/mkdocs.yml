@@ -10,7 +10,6 @@ nav:
       - Transitions (transitions.py): references/transitions.md
       - Helpers Jinja (jinja.py): references/jinja.md
   - Progression Workflow:
-      - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge Workflow: welcome/debutant/workflow-welcome.md
           - Nom de statut: welcome/debutant/workflow-status.md

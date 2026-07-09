@@ -8,7 +8,7 @@ Objectif : comprendre ce qu'est un **code de permission** et comment Forge le no
 Deuxième palier du **niveau débutant** de la progression RBAC.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-rbac` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-rbac` installé.
 
 ## Ce que ce starter montre
 

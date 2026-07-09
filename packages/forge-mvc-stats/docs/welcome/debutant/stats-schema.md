@@ -8,7 +8,7 @@ Fidèle à la charte (principe 5), Forge Stats n'a **pas d'ORM** : on lit le sch
 Troisième palier du **niveau débutant** de la progression stats.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-stats` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-stats` installé.
 
 ## Ce que ce starter montre
 

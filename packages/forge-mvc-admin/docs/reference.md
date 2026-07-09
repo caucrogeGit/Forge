@@ -18,10 +18,35 @@ Le câblage reste **explicite** : on enregistre les ressources et on branche les
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-admin
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-admin"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-admin
 forge opt-in:enable admin
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in se greffe ensuite dans vos flux : décorateurs, starter).
 `forge opt-in:install admin` affiche la commande `pip` sans l'exécuter.
@@ -36,7 +61,16 @@ pip uninstall forge-mvc-admin
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
 `forge opt-in:remove admin` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-admin` ajoute ces commandes :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `admin:init` | Prépare la structure `mvc/admin/` (write-if-new). | `forge admin:init` |
+| `admin:doctor` | Vérifie la cohérence des ressources avec les contrats d'entité (lecture seule). | `forge admin:doctor` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -52,7 +86,7 @@ pip uninstall forge-mvc-admin
 | Exceptions | `AdminError`, `AdminResourceError`, `AdminRegistryError` |
 | Installation | `pip install --pre forge-mvc-admin` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -60,7 +94,7 @@ Le diagramme de classe montre la ressource, le registre et le branchement.
 
 Le diagramme de séquence montre l'affichage d'une liste administrée.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que des `AdminResource` sont enregistrées dans un `AdminRegistry`, que `register_admin_routes` lit pour brancher le `AdminController`.
 
@@ -107,7 +141,7 @@ classDiagram
 - `register_admin_routes` branche le contrôleur sur le routeur ;
 - le contrôleur produit les écrans CRUD à partir des ressources.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre l'affichage d'une liste, sécurisé.
 
@@ -134,7 +168,7 @@ sequenceDiagram
 - le contrôleur s'appuie sur la ressource pour savoir quoi afficher ;
 - les templates du back-office sont embarqués (ADR-046).
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -146,14 +180,7 @@ sequenceDiagram
 | `AdminController` | classe | contrôleur des écrans CRUD |
 | `AdminError`, `AdminResourceError`, `AdminRegistryError` | exceptions | erreurs |
 
-### Commandes CLI
-
-| Commande | Rôle |
-|---|---|
-| `forge admin:init` | prépare la structure `mvc/admin/` (write-if-new) |
-| `forge admin:doctor` | vérifie la cohérence des ressources avec les contrats d'entité (lecture seule) |
-
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -163,9 +190,9 @@ sequenceDiagram
 | Exiger une permission | `register_admin_routes(router, permission="admin.access")` |
 | Vérifier la cohérence | `forge admin:doctor` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Déclarer une ressource et brancher le back-office
+### 8.1 Déclarer une ressource et brancher le back-office
 
 ```python
 # optins/admin/routes.py (couche optins du projet)
@@ -195,7 +222,7 @@ def register(router) -> None:
     - `registry.register` la collecte ;
     - `register_admin_routes` branche les écrans sécurisés.
 
-## 8. Sécurité, templates et cohérence
+## 9. Sécurité, templates et cohérence
 
 Les routes du back-office exigent une session authentifiée et protègent les écritures par CSRF ; une permission RBAC peut être requise via `permission=`.
 
@@ -215,5 +242,5 @@ Les templates du back-office sont embarqués dans le paquet et enregistrés aupr
 ## Voir aussi
 
 - [Contrat de ressource](resources.md) : détail de `AdminResource`.
-- [Progression Admin](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Admin](welcome/debutant/admin-welcome.md) : apprendre l'opt-in pas à pas.
 - `docs/roadmap/forge-admin-roadmap.md` : trajectoire du back-office.

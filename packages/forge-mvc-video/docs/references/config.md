@@ -39,4 +39,4 @@ Si `api_token` est défini, la route de lecture exige `Authorization: Bearer <to
 
 - [L'ingestion](ingest.md) et [le sondage](probe.md) : premiers consommateurs de la configuration.
 - [Le transcodage](transcode.md) : utilise `ffmpeg_bin`.
-- [Progression pédagogique Vidéo](../welcome/installation.md).
+- [Progression pédagogique Vidéo](../welcome/debutant/video-welcome.md).

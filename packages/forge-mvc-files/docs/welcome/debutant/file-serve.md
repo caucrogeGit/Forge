@@ -7,7 +7,7 @@ Objectif : **relire** un fichier stocké via `serve_media_file`, sans jamais lai
 Troisième palier du **niveau débutant** de la progression files.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-files` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-files` installé.
 
 ## Ce que ce starter montre
 

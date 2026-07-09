@@ -18,10 +18,35 @@ Il branche aussi ses **routes** de lecture sur le routeur du projet, via la couc
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-video
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-video"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-video
 forge opt-in:enable video
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
 `forge opt-in:install video` affiche la commande `pip` sans l'exécuter.
@@ -36,7 +61,19 @@ pip uninstall forge-mvc-video
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
 `forge opt-in:remove video` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-video` ajoute ces commandes :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `video:doctor` | Diagnostic (paquet, config, `ffmpeg`/`ffprobe`). | `forge video:doctor` |
+| `video:init` | Copie la migration vidéo vers `mvc/migrations/`. | `forge video:init` |
+| `video:upload` | Dépose une vidéo source. | `forge video:upload film.mov --title "Démo"` |
+| `video:process` | Transcode une vidéo (par `id` ou `--pending`). | `forge video:process --pending` |
+| `video:cleanup` | Purge les vidéos `failed` et fichiers orphelins. | `forge video:cleanup` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -53,7 +90,7 @@ pip uninstall forge-mvc-video
 | Modèle d'exécution | worker-CLI : transcodage hors requête HTTP |
 | Installation | `pip install --pre forge-mvc-video` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -61,7 +98,7 @@ Le diagramme de classe montre le pipeline, les routes et les dépendances extern
 
 Le diagramme de séquence montre l'upload, le traitement différé, puis la lecture.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que le pipeline s'appuie sur `ffmpeg` / `ffprobe` et sur `forge-mvc-files`, et que les routes se branchent explicitement sur le routeur.
 
@@ -113,7 +150,7 @@ classDiagram
 - les routes de lecture se branchent via `register_video_routes` ;
 - le stockage et le service viennent de `forge-mvc-files`.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre l'upload, le traitement par un worker, puis la lecture.
 
@@ -142,7 +179,7 @@ sequenceDiagram
 - la lecture honore l'en-tête `Range` (streaming) ;
 - une vidéo n'est lisible qu'une fois `ready`.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -156,17 +193,7 @@ sequenceDiagram
 
 Les fonctions de pipeline sont surtout appelées par les commandes `video:*` (worker), pas pendant une requête.
 
-### Commandes CLI
-
-| Commande | Rôle |
-|---|---|
-| `forge video:doctor` | diagnostic (paquet, config, `ffmpeg`/`ffprobe`) |
-| `forge video:init` | copie la migration vidéo vers `mvc/migrations/` |
-| `forge video:upload` | dépose une vidéo source (`<fichier> [--title]`) |
-| `forge video:process` | traite une vidéo (`<id>` ou `--pending`) |
-| `forge video:cleanup` | purge les vidéos `failed` et fichiers orphelins |
-
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -178,9 +205,9 @@ Les fonctions de pipeline sont surtout appelées par les commandes `video:*` (wo
 | Configurer le module | `FORGE_VIDEO_*` / `load_video_config` |
 | Nettoyer | `forge video:cleanup --apply` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Brancher les routes de lecture
+### 8.1 Brancher les routes de lecture
 
 ```python
 # optins/video/routes.py (couche optins du projet)
@@ -193,7 +220,7 @@ def register(router) -> None:
 
 `forge opt-in:enable video --apply` crée cette couche ; le branchement reste explicite.
 
-### 7.2 Traiter les vidéos en attente (worker)
+### 8.2 Traiter les vidéos en attente (worker)
 
 ```bash
 forge video:upload ma_video.mov --title "Cours 1"
@@ -209,7 +236,7 @@ Le transcodage tourne dans la commande, pas dans le serveur web.
     - traiter hors requête (`video:process`) ;
     - lire en streaming (routes branchées par `register_video_routes`).
 
-## 8. Dépendances externes et exécution différée
+## 9. Dépendances externes et exécution différée
 
 `ffmpeg` et `ffprobe` doivent être installés sur la machine ; `forge video:doctor` le vérifie.
 
@@ -232,4 +259,4 @@ Le transcodage est lourd : il se fait via `video:process` (worker-CLI), idéalem
 - [Sondage (probe.py)](references/probe.md) et [Transcodage MP4 (transcode.py)](references/transcode.md) : le pipeline.
 - [Traitement (process.py)](references/process.md) : orchestration complète.
 - [Lecture HTTP (http.py)](references/http.md) : routes et streaming.
-- [Progression Vidéo](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Vidéo](welcome/debutant/video-welcome.md) : apprendre l'opt-in pas à pas.

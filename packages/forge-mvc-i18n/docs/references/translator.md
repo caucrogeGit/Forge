@@ -81,4 +81,4 @@ Les catalogues sont **mis en cache** au premier chargement, pour ne pas relire l
 ## 9. Voir aussi
 
 - [Les erreurs i18n](exceptions.md) : `I18nError`, `TranslationCatalogError`.
-- [Progression pédagogique i18n](../welcome/installation.md) : apprendre le module pas à pas.
+- [Progression pédagogique i18n](../welcome/debutant/i18n-welcome.md) : apprendre le module pas à pas.

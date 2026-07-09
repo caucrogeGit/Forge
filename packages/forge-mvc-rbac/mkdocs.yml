@@ -15,7 +15,6 @@ nav:
   - Contrat RBAC séparé: contract.md
   - RBAC, usage applicatif: usage.md
   - Progression RBAC:
-      - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge RBAC: welcome/debutant/rbac-welcome.md
           - Code de permission: welcome/debutant/rbac-permission.md

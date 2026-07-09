@@ -1,5 +1,8 @@
 # Welcome Stats
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-stats` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-stats`.
 
 **Ce que vous allez apprendre :** Forge Stats enregistre des **événements génériques** (un nom, un libellé, une catégorie, des métadonnées) dans une table SQL.
@@ -8,7 +11,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-stats`.
 Premier palier du **niveau débutant** de la progression stats (vue d'ensemble des starters).
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-stats` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-stats` installé.
     Module à **SQL visible** : aucun ORM.
 
 ## Ce que ce starter montre

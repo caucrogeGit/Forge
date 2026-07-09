@@ -70,4 +70,4 @@ return QrCodeResponse.from_text("https://forgemvc.com", fmt="svg")
 
 - [La génération de QR Codes](generator.md) : `QrCode`, `to_png`, `to_svg`.
 - [Les erreurs](errors.md) : `QrCodeError`.
-- [Progression pédagogique QR Code](../welcome/installation.md) : apprendre le module pas à pas.
+- [Progression pédagogique QR Code](../welcome/debutant/qrcode-welcome.md) : apprendre le module pas à pas.

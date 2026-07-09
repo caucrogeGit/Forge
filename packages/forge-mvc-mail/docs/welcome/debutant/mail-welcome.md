@@ -1,14 +1,14 @@
 # Welcome Mail
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-mail` avant de commencer : voir sa [référence](../../reference.md).
+
 ## Niveau débutant : envoyer un premier email
 
 Premier contact avec l'opt-in `forge-mvc-mail`.
 Un formulaire saisit un destinataire et un message.
 Le contrôleur construit un `MailMessage` et l'envoie via `Mailer` sur un `ConsoleTransport`.
 L'email s'affiche alors dans la console du serveur, aucun serveur SMTP n'est requis.
-
-Ce palier suppose que l'opt-in est installé.
-Voir [Installer welcome-mail](../installation.md).
 
 ??? note "Contrôleur"
     Créez le fichier `mvc/controllers/mail_welcome_controller.py` :

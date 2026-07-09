@@ -28,9 +28,29 @@ Bonne nouvelle côté paramètres : `pyodbc` utilise nativement les `?` de Forge
 SQL Server est **client-serveur** : un serveur doit être joignable.
 Le pilote est `pyodbc`, qui requiert un pilote ODBC système.
 
-```bash
-pip install --pre forge-mvc-mssql
-```
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-mssql
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis backend depuis git, dans le venv du projet, à la même version (le backend trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mssql"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
 
 Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
 
@@ -55,7 +75,7 @@ DB_ODBC_DRIVER=ODBC Driver 18 for SQL Server
 
 `forge doctor` confirme le backend résolu (`mssql`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=mssql`.
 
-La progression guidée, pas à pas : [Installation de forge-mvc-mssql](welcome/installation.md).
+La progression guidée, pas à pas : [Installation de forge-mvc-mssql](welcome/debutant/mssql-welcome.md).
 
 ### Désinstallation
 
@@ -70,7 +90,20 @@ pip uninstall forge-mvc-mssql
 Un backend n'a pas de commande `disable` : découvert par entry point (ADR-054), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
 Si besoin, supprimez aussi la base et le compte créés par `db:init`.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+Ce backend n'ajoute aucune commande : il est découvert par l'entry point `forge_mvc.db_backend` et fournit, au runtime, un dialecte SQL et un adaptateur de connexion.
+Les commandes de base de données que vous utilisez avec lui sont fournies par le moteur d'entités (`forge-mvc-entities`) :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `db:config` | Amorce les variables du backend dans `env/*` (write-if-missing). | `forge db:config` |
+| `db:init` | Affiche le SQL de provisioning ; `--run` l'exécute. | `forge db:init --run` |
+| `db:apply` | Applique le SQL des entités à la base. | `forge db:apply` |
+| `migration:make` | Génère une migration depuis l'écart de schéma. | `forge migration:make` |
+| `migration:apply` | Applique les migrations en attente. | `forge migration:apply` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -89,7 +122,7 @@ Si besoin, supprimez aussi la base et le compte créés par `db:init`.
 | Décision d'architecture | ADR-054 |
 | Installation | `pip install --pre forge-mvc-mssql` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires du backend.
 
@@ -97,7 +130,7 @@ Le diagramme de classe montre l'adaptateur et le dialecte.
 
 Le diagramme de séquence montre une requête via pyodbc.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que le backend enveloppe `pyodbc` pour répondre au contrat du cœur.
 
@@ -140,7 +173,7 @@ classDiagram
 - le dialecte gère `IDENTITY`, les crochets et les formes gardées ;
 - `pyodbc` est importé paresseusement et requiert un pilote ODBC système.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre une requête runtime via pyodbc.
 
@@ -166,7 +199,7 @@ sequenceDiagram
 - `lastrowid` est obtenu via `SELECT SCOPE_IDENTITY()` ;
 - un pilote ODBC doit être installé sur la machine.
 
-## 5. Ce que fournit le backend
+## 6. Ce que fournit le backend
 
 | Élément | Rôle |
 |---|---|
@@ -175,7 +208,7 @@ sequenceDiagram
 | `MSSQLDialect` | `BIGINT IDENTITY(1,1)`, crochets, `CREATE INDEX` gardés, `INFORMATION_SCHEMA` |
 | Entry point | `forge_mvc.db_backend = mssql` |
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -186,7 +219,7 @@ sequenceDiagram
 | Appliquer le schéma | `forge db:apply` (sur une base existante) |
 | Faire évoluer le schéma | `forge migration:*` |
 
-## 7. Exemple d'utilisation (Alpha)
+## 8. Exemple d'utilisation (Alpha)
 
 ```sql
 -- 1. Préparer base et login à la main (provisioning CLI non câblé)
@@ -212,7 +245,7 @@ Le code applicatif utilise `core.database.db`, comme avec tout autre backend.
     - `db:apply` / `migration:*` fonctionnent sur la base existante ;
     - `?` est natif (pyodbc), pas de traduction.
 
-## 8. Statut Alpha, ODBC et dialecte
+## 9. Statut Alpha, ODBC et dialecte
 
 Le dialecte Transact-SQL est testé unitairement ; l'**intégration** sur un vrai serveur reste à valider côté projet.
 
@@ -231,5 +264,5 @@ SQL Server n'a pas `IF NOT EXISTS` pour les tables : le dialecte émet des **for
 
 ## Voir aussi
 
-- [Progression SQL Server](welcome/installation.md) : apprendre le backend pas à pas.
+- [Progression SQL Server](welcome/debutant/mssql-welcome.md) : apprendre le backend pas à pas.
 - [ADR-054](https://forgemvc.com/docs/forge/adr/054-database-backend-optins/) : cœur agnostique BDD.

@@ -19,7 +19,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 ## Par où commencer
 
 - [Référence](reference.md) : rôle, contrat, dialecte, statut Alpha.
-- [Progression PostgreSQL](welcome/installation.md) : apprendre le backend pas à pas.
+- [Progression PostgreSQL](welcome/debutant/postgres-welcome.md) : apprendre le backend pas à pas.
 
 ## Installation
 

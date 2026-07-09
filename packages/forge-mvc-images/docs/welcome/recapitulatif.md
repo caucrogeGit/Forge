@@ -4,7 +4,7 @@ Récapitulatif des paliers de la progression *Welcome Images* et des API du modu
 
 !!! note "Module opt-in"
     Toute cette progression suppose `forge-mvc-images` installé.
-    Le paquet dépend de `forge-mvc-files` et il est publié sur PyPI depuis `1.0.0-beta.13` (`pip install --pre forge-mvc-images`, palier « Installation »
+    Le paquet dépend de `forge-mvc-files` et il est publié sur PyPI depuis `1.0.0-beta.13` (`pip install --pre forge-mvc-images`
     en tête de parcours).
     Le cœur de Forge reste autonome.
 

@@ -90,4 +90,4 @@ Deux règles de lecture protègent contre les valeurs douteuses :
 - [Ingestion d'un fichier audio](ingest.md) : le premier consommateur de `AudioConfig`.
 - [Sondage d'un audio](probe.md) : utilise `ffprobe_bin` et `max_duration_seconds`.
 - [Transcodage en MP3](transcode.md) : utilise `ffmpeg_bin`.
-- [Progression pédagogique Audio](../welcome/installation.md) : apprendre le module pas à pas.
+- [Progression pédagogique Audio](../welcome/debutant/audio-welcome.md) : apprendre le module pas à pas.

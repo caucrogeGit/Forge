@@ -7,7 +7,6 @@ nav:
   - Présentation: index.md
   - Référence: reference.md
   - Progression SQL Server:
-      - Installation: welcome/installation.md
       - Débutant:
           - Préparer la base: welcome/debutant/mssql-welcome.md
           - Appliquer une entité: welcome/debutant/mssql-apply.md

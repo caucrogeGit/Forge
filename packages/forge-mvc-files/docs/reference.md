@@ -18,10 +18,35 @@ La **validation pure** (extension, MIME, taille) reste dans le cœur (`core.form
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-files
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-files"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-files
 forge opt-in:enable files
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install files` affiche la commande `pip` sans l'exécuter.
@@ -36,7 +61,16 @@ pip uninstall forge-mvc-files
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove files` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-files` ajoute ces commandes :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `upload:init` | Initialise les dossiers de stockage d'upload. | `forge upload:init` |
+| `media:init` | Initialise les dossiers de stockage média. | `forge media:init` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -53,7 +87,7 @@ pip uninstall forge-mvc-files
 | Décisions d'architecture | ADR-019 (extraction), ADR-020 (primitives) |
 | Installation | `pip install --pre forge-mvc-files` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -61,7 +95,7 @@ Le diagramme de classe montre l'API d'upload, les primitives de stockage et la h
 
 Le diagramme de séquence montre l'enregistrement d'un upload puis sa relecture.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que `save_upload` valide (via le cœur), écrit via les primitives de stockage, et renvoie un `SavedUpload` ; `serve_media_file` produit une `Response` du cœur.
 
@@ -118,7 +152,7 @@ classDiagram
 - `serve_media_file` ressort le fichier en `Response`, avec HTTP Range ;
 - toute anomalie d'upload lève une sous-classe de `UploadError`.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre un upload de formulaire puis l'affichage du média.
 
@@ -151,7 +185,7 @@ sequenceDiagram
 - `serve_media_file` répond `206 Partial Content` si la requête envoie un `Range` ;
 - le chemin servi est validé pour rester sous la racine de stockage.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -170,7 +204,7 @@ sequenceDiagram
 
 `file` est un objet d'upload duck-typé (champ multipart, fichier Python, wrapper applicatif).
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -182,9 +216,9 @@ sequenceDiagram
 | Limiter les uploads abusifs | `is_upload_rate_limited(...)` |
 | Gérer un upload refusé | intercepter `UploadError` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Enregistrer un upload depuis un contrôleur
+### 8.1 Enregistrer un upload depuis un contrôleur
 
 ```python
 from core.http.request import Request
@@ -201,7 +235,7 @@ def upload(request: Request) -> Response:
     return Response.text(f"Reçu : {saved.path} ({saved.size} octets)")
 ```
 
-### 7.2 Servir un fichier (avec HTTP Range)
+### 8.2 Servir un fichier (avec HTTP Range)
 
 ```python
 from forge_mvc_files import serve_media_file
@@ -220,7 +254,7 @@ En passant `request`, le service honore l'en-tête `Range` et répond `206 Parti
     - `save_upload` pour entrer (valide, sécurise, écrit) ;
     - `serve_media_file` pour sortir (streaming, Range).
 
-## 8. Sécurité, stockage et validation
+## 9. Sécurité, stockage et validation
 
 Les noms de fichiers fournis par le navigateur ne sont jamais utilisés tels quels : `secure_filename` neutralise les chemins (anti-traversal).
 
@@ -247,4 +281,4 @@ Le chemin servi par `serve_media_file` est validé pour rester sous `UPLOAD_ROOT
 - [Upload générique (manager.py)](references/manager.md) : détail de `save_upload` / `serve_media_file`.
 - [Primitives de stockage (storage.py)](references/storage.md) : anti-traversal, écriture bas niveau (ADR-020).
 - [Rate-limit d'upload (rate_limit.py)](references/rate_limit.md) : limiter le débit.
-- [Progression Files](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Files](welcome/debutant/files-welcome.md) : apprendre l'opt-in pas à pas.

@@ -11,7 +11,6 @@ nav:
       - Chiffrement des secrets (secret_crypto.py): references/secret_crypto.md
       - Protection anti-rejeu (totp_replay.py): references/totp_replay.md
   - Progression MFA:
-      - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge MFA: welcome/debutant/mfa-welcome.md
           - Secret TOTP et QR: welcome/debutant/mfa-secret.md

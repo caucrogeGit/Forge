@@ -8,7 +8,7 @@ Ce qui n'est **pas** déclaré est interdit (fermé par défaut).
 Premier palier du **niveau intermédiaire** de la progression workflow.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-workflow` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-workflow` installé.
 
 ## Ce que ce starter montre
 

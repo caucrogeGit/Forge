@@ -9,7 +9,7 @@ Objectif : comprendre le **nom d'événement** et comment Forge le normalise et 
 Deuxième palier du **niveau débutant** de la progression stats.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-stats` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-stats` installé.
 
 ## Ce que ce starter montre
 

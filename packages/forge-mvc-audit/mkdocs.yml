@@ -11,7 +11,6 @@ nav:
       - Initialisation (audit:init): references/cli.md
       - Erreurs (errors.py): references/errors.md
   - Progression Audit:
-      - Installation: welcome/installation.md
       - Débutant:
           - Première trace: welcome/debutant/audit-welcome.md
           - Relire les traces: welcome/debutant/audit-read.md

@@ -73,4 +73,4 @@ Ces constantes sont les en-têtes `Content-Type` posés par la réponse HTTP (vo
 
 - [La réponse HTTP](response.md) : `QrCodeResponse`, servir un QR Code depuis un contrôleur.
 - [Les erreurs](errors.md) : `QrCodeError`.
-- [Progression pédagogique QR Code](../welcome/installation.md) : apprendre le module pas à pas.
+- [Progression pédagogique QR Code](../welcome/debutant/qrcode-welcome.md) : apprendre le module pas à pas.

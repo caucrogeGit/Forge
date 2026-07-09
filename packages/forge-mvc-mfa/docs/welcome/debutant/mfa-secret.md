@@ -7,7 +7,7 @@ Objectif : générer le **secret** TOTP et l'URI `otpauth://` que lit une applic
 Deuxième palier du **niveau débutant** de la progression MFA.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-mfa` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-mfa` installé.
     Aucune clé de chiffrement requise ici : le secret n'est pas encore stocké.
 
 ## Ce que ce starter montre

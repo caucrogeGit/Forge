@@ -11,7 +11,6 @@ nav:
       - Initialisation (settings:init): references/cli.md
       - Erreurs (errors.py): references/errors.md
   - Progression Settings:
-      - Installation: welcome/installation.md
       - Débutant:
           - Premier paramètre: welcome/debutant/settings-welcome.md
           - Écrire et lire: welcome/debutant/settings-set-get.md

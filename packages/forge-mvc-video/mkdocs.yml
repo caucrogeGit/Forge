@@ -15,7 +15,6 @@ nav:
       - Traitement (process.py): references/process.md
       - Lecture HTTP (http.py): references/http.md
   - Progression Vidéo:
-      - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge Vidéo: welcome/debutant/video-welcome.md
           - Lister les vidéos: welcome/debutant/video-list.md

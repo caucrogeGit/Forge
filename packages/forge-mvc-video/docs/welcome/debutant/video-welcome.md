@@ -1,5 +1,8 @@
 # Welcome Vidéo
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-video` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-video` et sa configuration.
 
 **Ce que vous allez apprendre :** vérifier que le module vidéo répond, et **inspecter sa configuration** avec `load_video_config`, en **masquant le token**.

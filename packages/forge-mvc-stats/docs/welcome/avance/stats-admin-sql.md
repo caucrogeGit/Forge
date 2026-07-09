@@ -8,7 +8,7 @@ SQL visible, filtres paramétrés.
 Premier palier du **niveau avancé** de la progression stats.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-stats` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-stats` installé.
 
 ## Ce que ce starter montre
 

@@ -7,7 +7,6 @@ nav:
   - Présentation: index.md
   - Référence: reference.md
   - Progression Testing:
-      - Installation: welcome/installation.md
       - Débutant:
           - Premier test: welcome/debutant/testing-welcome.md
           - Corps et JSON: welcome/debutant/testing-body.md

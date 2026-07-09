@@ -7,7 +7,7 @@ Objectif : supprimer un fichier stocké avec `delete_media_file`, sans jamais so
 Troisième palier du **niveau intermédiaire** de la progression files.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-files` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-files` installé.
 
 ## Ce que ce starter montre
 

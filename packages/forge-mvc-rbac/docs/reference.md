@@ -18,10 +18,35 @@ Il propose **trois niveaux**, qui ne sont pas trois façons de faire la même ch
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-rbac
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-rbac"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-rbac
 forge opt-in:enable rbac
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in se greffe ensuite dans vos flux : décorateurs, starter).
 `forge opt-in:install rbac` affiche la commande `pip` sans l'exécuter.
@@ -36,7 +61,16 @@ pip uninstall forge-mvc-rbac
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
 `forge opt-in:remove rbac` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-rbac` ajoute ces commandes :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `rbac:validate` | Valide `mvc/security/rbac.json` contre le schéma. | `forge rbac:validate` |
+| `rbac:audit` | Audit de cohérence fonctionnelle du contrat. | `forge rbac:audit` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -53,7 +87,7 @@ pip uninstall forge-mvc-rbac
 | Décisions d'architecture | ADR-014 (emplacement du contrat), ADR-056 (schéma + outillage) |
 | Installation | `pip install --pre forge-mvc-rbac` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -61,7 +95,7 @@ Le diagramme de classe montre les trois gardes, le contrat et le helper Jinja.
 
 Le diagramme de séquence montre une route protégée par le contrat.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre les trois gardes selon la source des permissions, et le contrat RBAC chargé depuis un fichier.
 
@@ -113,7 +147,7 @@ classDiagram
 - `require_permission` lit des permissions déjà chargées (bas niveau) ;
 - `can()` expose la même logique aux templates.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre une route protégée par le contrat RBAC.
 
@@ -142,7 +176,7 @@ sequenceDiagram
 - une permission manquante renvoie 403 (jamais un accès par défaut) ;
 - le contrat décrit qui peut quoi, hors du code.
 
-## 5. API publique
+## 6. API publique
 
 ### Trois gardes de route (selon le contexte)
 
@@ -167,14 +201,7 @@ sequenceDiagram
 | `Role`, `Permission`, `PermissionDenied` | modèle RBAC |
 | `make_can`, `make_auth_jinja_can`, `make_auth_jinja_context_with_can` | helper `can()` pour les templates |
 
-### Commandes CLI
-
-| Commande | Rôle |
-|---|---|
-| `forge rbac:validate` | valide `mvc/security/rbac.json` contre le schéma |
-| `forge rbac:audit` | audit de cohérence fonctionnelle du contrat |
-
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -185,9 +212,9 @@ sequenceDiagram
 | Décrire les droits | `mvc/security/rbac.json` |
 | Vérifier le contrat | `forge rbac:validate` / `forge rbac:audit` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Protéger une route par le contrat (recommandé)
+### 8.1 Protéger une route par le contrat (recommandé)
 
 ```python
 from forge_mvc_rbac import require_contract_permission
@@ -200,7 +227,7 @@ def update(request):
 
 Les droits sont décrits dans `mvc/security/rbac.json`, pas codés en dur.
 
-### 7.2 Conditionner l'affichage dans un template
+### 8.2 Conditionner l'affichage dans un template
 
 ```html
 {% if can("article.update") %}
@@ -217,7 +244,7 @@ Les droits sont décrits dans `mvc/security/rbac.json`, pas codés en dur.
     - base (`require_user_permission`) : permissions de l'utilisateur connecté ;
     - bas niveau (`require_permission`) : permissions déjà chargées.
 
-## 8. Contrat, sécurité et validation
+## 9. Contrat, sécurité et validation
 
 Le contrat `mvc/security/rbac.json` décrit les rôles et les permissions, séparément du schéma d'entité (ADR-014).
 Son schéma `rbac.schema.json` est embarqué par cet opt-in (ADR-056).
@@ -237,7 +264,7 @@ Son schéma `rbac.schema.json` est embarqué par cet opt-in (ADR-056).
 !!! note "Indépendance du cœur"
     Le cœur de Forge ne dépend pas de `forge-mvc-rbac` ; le provider Jinja `can()` se branche au chargement du paquet (mécanisme de loader, ADR-046).
 
-## 9. RBAC léger core ou RBAC complet opt-in ?
+## 10. RBAC léger core ou RBAC complet opt-in ?
 
 Forge distingue deux niveaux d'autorisation :
 
@@ -285,4 +312,4 @@ La dépendance va dans un seul sens : `forge-mvc-rbac` → `core`.
 - [Résolveur de permissions (resolver.py)](references/resolver.md) et [Liens utilisateur/rôle (user_rbac.py)](references/user_rbac.md).
 - [Helpers Jinja (jinja.py)](references/jinja.md) : `can()`.
 - [Contrat RBAC séparé](contract.md) et [RBAC, usage applicatif](usage.md).
-- [Progression RBAC](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression RBAC](welcome/debutant/rbac-welcome.md) : apprendre l'opt-in pas à pas.

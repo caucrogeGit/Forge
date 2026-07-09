@@ -7,7 +7,6 @@ nav:
   - Présentation: index.md
   - Référence: reference.md
   - Progression PostgreSQL:
-      - Installation: welcome/installation.md
       - Débutant:
           - Préparer la base: welcome/debutant/postgres-welcome.md
           - Appliquer une entité: welcome/debutant/postgres-apply.md

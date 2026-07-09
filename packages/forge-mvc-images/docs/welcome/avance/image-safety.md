@@ -8,7 +8,7 @@ Ce palier met la garde en scène **sans rien écrire** ni base de données.
 Troisième palier du **niveau avancé** de la progression images.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-images` installé.
     Comme images est une brique **bibliothèque** (pas de CLI `images:doctor`), ce palier joue le rôle de diagnostic de sécurité.
 
 ## Ce que ce starter montre

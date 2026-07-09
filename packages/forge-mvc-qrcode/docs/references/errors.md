@@ -43,4 +43,4 @@ Comme `QrCodeError` dérive de `ValueError`, un `except ValueError` la rattrape 
 
 - [La génération de QR Codes](generator.md) : `QrCode`, `to_png`, `to_svg`.
 - [La réponse HTTP](response.md) : `QrCodeResponse`.
-- [Progression pédagogique QR Code](../welcome/installation.md) : apprendre le module pas à pas.
+- [Progression pédagogique QR Code](../welcome/debutant/qrcode-welcome.md) : apprendre le module pas à pas.

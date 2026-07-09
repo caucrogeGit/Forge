@@ -7,7 +7,7 @@ Objectif : lire toutes les images rattachées à une entité et les **afficher e
 Deuxième palier du **niveau intermédiaire** de la progression images.
 
 !!! note "Module opt-in et table `media`"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation »)
+    Ce starter suppose `forge-mvc-images` installé
     et la table `media` appliquée (`forge migration:apply`).
     Si elle manque, la page reste **pédagogique**.
 

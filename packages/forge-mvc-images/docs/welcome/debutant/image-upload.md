@@ -8,8 +8,7 @@ Objectif : recevoir une image, **vérifier que c'en est vraiment une**, l'écrir
 Deuxième palier du **niveau débutant** de la progression images.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation »
-    de ce parcours).
+    Ce starter suppose `forge-mvc-images` installé.
     L'upload brut générique appartient à `forge-mvc-files` ; le chemin **image-aware** appartient à `forge-mvc-images`.
 
 ## Ce que ce starter montre

@@ -19,10 +19,35 @@ La livraison hors application (email, push) reste applicative, par exemple en co
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-notifications
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-notifications"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-notifications
 forge opt-in:enable notifications
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install notifications` affiche la commande `pip` sans l'exécuter.
@@ -37,7 +62,15 @@ pip uninstall forge-mvc-notifications
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove notifications` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-notifications` ajoute une commande :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `notifications:init` | Crée la table `notifications` (DDL fournie). | `forge notifications:init` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -53,7 +86,7 @@ pip uninstall forge-mvc-notifications
 | Périmètre | in-app (V1) ; livraison email/push à charge de l'application |
 | Installation | `pip install --pre forge-mvc-notifications` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -61,7 +94,7 @@ Le diagramme de classe montre l'API, l'objet renvoyé et la table.
 
 Le diagramme de séquence montre la création puis la lecture des notifications.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que le module agit sur la table `notifications` au travers d'un exécuteur **injecté** et renvoie des `Notification` typées.
 
@@ -122,7 +155,7 @@ classDiagram
 - `get_notifications` renvoie des `Notification` typées ;
 - le module n'ouvre jamais de connexion : il reçoit un exécuteur.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre un `notify` puis l'affichage des non lues d'un utilisateur.
 
@@ -153,7 +186,7 @@ sequenceDiagram
 - `mark_read` / `mark_all_read` basculent l'état lu ;
 - `unread_count` donne le nombre de non lues (pour un badge).
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -172,7 +205,7 @@ sequenceDiagram
 
 `data` est un complément libre sérialisé en JSON ; `db` est l'exécuteur, omis il utilise le backend actif.
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -185,9 +218,9 @@ sequenceDiagram
 | Marquer lu | `mark_read(id)` / `mark_all_read(recipient)` |
 | Créer la table | `CREATE_TABLE_SQL` ou `forge notifications:init` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Notifier puis afficher les non lues
+### 8.1 Notifier puis afficher les non lues
 
 ```python
 from forge_mvc_notifications import notify, get_notifications, unread_count
@@ -198,7 +231,7 @@ badge = unread_count("eleve.42")
 nouvelles = get_notifications("eleve.42", unread_only=True)
 ```
 
-### 7.2 Marquer comme lu
+### 8.2 Marquer comme lu
 
 ```python
 from forge_mvc_notifications import mark_read, mark_all_read
@@ -214,7 +247,7 @@ mark_all_read("eleve.42")         # toutes celles du destinataire
     - `get_notifications` / `unread_count` pour lire ;
     - `mark_read` / `mark_all_read` pour marquer lu.
 
-## 8. Périmètre, validation et injection
+## 9. Périmètre, validation et injection
 
 `recipient` et `message` sont obligatoires ; sinon `notify` lève `NotificationError`.
 
@@ -240,4 +273,4 @@ mark_all_read("eleve.42")         # toutes celles du destinataire
 - [Les notifications (store.py)](references/store.md) : détail des fonctions et du SQL.
 - [Initialisation (notifications:init)](references/cli.md) : création de la table.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `NotificationError`.
-- [Progression Notifications](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Notifications](welcome/debutant/notif-welcome.md) : apprendre l'opt-in pas à pas.

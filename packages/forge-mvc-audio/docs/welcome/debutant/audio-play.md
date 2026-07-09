@@ -8,7 +8,7 @@ Le code vit dans le paquet ; on ne fait que le **brancher**.
 Troisième palier du **niveau débutant** de la progression audio.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-audio` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-audio` installé.
 
 ## Ce que ce starter montre
 

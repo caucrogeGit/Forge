@@ -15,7 +15,7 @@ MariaDB est client-serveur : un serveur doit être joignable.
 ## Par où commencer
 
 - [Référence](reference.md) : rôle, contrat, dialecte, vue d'ensemble.
-- [Progression MariaDB](welcome/installation.md) : apprendre le backend pas à pas.
+- [Progression MariaDB](welcome/debutant/mariadb-welcome.md) : apprendre le backend pas à pas.
 
 ## Installation
 

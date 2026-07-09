@@ -7,7 +7,6 @@ nav:
   - Présentation: index.md
   - Référence: reference.md
   - Progression SQLite:
-      - Installation: welcome/installation.md
       - Débutant:
           - Première base: welcome/debutant/sqlite-welcome.md
           - Appliquer une entité: welcome/debutant/sqlite-apply.md

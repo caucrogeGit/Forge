@@ -1,5 +1,8 @@
 # Welcome Workflow
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-workflow` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-workflow`, une machine à états applicative.
 
 **Ce que vous allez apprendre :** un **statut** porte un nom, un libellé, une couleur, et des marqueurs `is_initial` / `is_final`.
@@ -8,7 +11,7 @@ Objectif : premier contact avec le module **opt-in** `forge-mvc-workflow`, une m
 Premier palier du **niveau débutant** de la progression workflow (vue d'ensemble des starters).
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-workflow` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-workflow` installé.
     Module **sans état** : que des fonctions pures.
 
 ## Ce que ce starter montre

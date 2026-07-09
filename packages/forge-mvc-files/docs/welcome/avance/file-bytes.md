@@ -8,7 +8,7 @@ Objectif : écrire un fichier **produit côté serveur** (rapport, export) avec 
 Troisième palier du **niveau avancé** de la progression files.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-files` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-files` installé.
 
 ## Ce que ce starter montre
 

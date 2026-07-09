@@ -22,10 +22,35 @@ L'agrégation se fait par **comptage** (ADR-037) : `count_stats_events` renvoie 
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-stats
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-stats"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-stats
 forge opt-in:enable stats
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install stats` affiche la commande `pip` sans l'exécuter.
@@ -40,7 +65,11 @@ pip uninstall forge-mvc-stats
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove stats` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -57,7 +86,7 @@ pip uninstall forge-mvc-stats
 | Décision d'architecture | ADR-037 (agrégation par comptage) |
 | Installation | `pip install --pre forge-mvc-stats` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -65,7 +94,7 @@ Le diagramme de classe montre l'événement, les fonctions et l'exécuteur injec
 
 Le diagramme de séquence montre l'enregistrement puis l'agrégation.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que toutes les fonctions reçoivent un exécuteur SQL (un callable), jamais une connexion ouverte par le module.
 
@@ -117,7 +146,7 @@ classDiagram
 - l'exécuteur SQL est passé en argument (`execute` / `fetch_all`) ;
 - rien n'est tracé sans un appel explicite à `track_event`.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre un suivi d'événement puis un comptage par dimension.
 
@@ -145,7 +174,7 @@ sequenceDiagram
 - `count_stats_events` agrège par la dimension demandée (`group_by`) ;
 - les lectures passent par `fetch_all`, fourni par l'application.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -160,7 +189,7 @@ sequenceDiagram
 
 `execute` et `fetch_all` sont des callables fournis par l'application (par exemple `db.execute`, `db.fetch_all`).
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -171,9 +200,9 @@ sequenceDiagram
 | Compter par dimension | `count_stats_events(fetch_all, group_by=...)` |
 | Créer la table | `get_stats_events_schema_sql()` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Tracer un événement
+### 8.1 Tracer un événement
 
 ```python
 import core.database.db as db
@@ -184,7 +213,7 @@ track_event(db.execute, "export.pdf", category="export", metadata={"pages": 12})
 
 L'exécuteur (`db.execute`) est passé explicitement : le module n'ouvre pas de connexion.
 
-### 7.2 Compter par catégorie
+### 8.2 Compter par catégorie
 
 ```python
 import core.database.db as db
@@ -200,7 +229,7 @@ totaux = count_stats_events(db.fetch_all, group_by="category")
     - `track_event` pour écrire ;
     - `list_stats_events` (détail) et `count_stats_events` (agrégat).
 
-## 8. Tracking explicite et exécuteur injecté
+## 9. Tracking explicite et exécuteur injecté
 
 Forge ne trace rien de lui-même : pas de middleware caché, pas de cookie, pas d'IP.
 Le développeur décide quoi compter avec `track_event`.
@@ -227,4 +256,4 @@ Les noms d'événements sont des chaînes `snake_case` définies par l'applicati
 - [Tracking (tracking.py)](references/tracking.md) : `track_event`.
 - [Affichage admin (admin.py)](references/admin.md) : lister et filtrer.
 - [Agrégation (aggregate.py)](references/aggregate.md) : compter par dimension (ADR-037).
-- [Progression Stats](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Stats](welcome/debutant/stats-welcome.md) : apprendre l'opt-in pas à pas.

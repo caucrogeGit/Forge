@@ -8,7 +8,7 @@ Au-delà du quota, la route répond `429`.
 Deuxième palier du **niveau intermédiaire** de la progression files.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-files` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-files` installé.
 
 ## Ce que ce starter montre
 

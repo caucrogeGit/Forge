@@ -1,5 +1,8 @@
 # Première tâche en file
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-jobs` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-jobs`.
 
 **Ce que vous allez apprendre :** on enfile une tâche avec `enqueue`.

@@ -1,5 +1,8 @@
 # Premier CSV
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-import-export` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-import-export`.
 
 **Ce que vous allez apprendre :** la lecture d'un CSV repose sur la fonction `parse_csv`.

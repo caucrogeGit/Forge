@@ -8,7 +8,7 @@ Deux écritures ciblées sur une ligne `media`.
 Troisième palier du **niveau intermédiaire** de la progression images.
 
 !!! note "Module opt-in et table `media`"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation »)
+    Ce starter suppose `forge-mvc-images` installé
     et la table `media` appliquée (`forge migration:apply`).
     Si elle manque, la page reste **pédagogique**.
 

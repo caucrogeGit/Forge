@@ -1,5 +1,8 @@
 # Première base SQLite
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-sqlite` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le backend **opt-in** `forge-mvc-sqlite`.
 
 **Ce que vous allez apprendre :** SQLite range la base dans un fichier.

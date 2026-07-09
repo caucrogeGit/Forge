@@ -7,7 +7,7 @@ Objectif : exposer le **diagnostic** non invasif de Forge Audio en JSON, à part
 Troisième palier du **niveau avancé** de la progression audio.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-audio` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-audio` installé.
 
 ## Ce que ce starter montre
 

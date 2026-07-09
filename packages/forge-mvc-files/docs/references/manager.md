@@ -82,4 +82,4 @@ except UploadError as err:
 
 - [Les primitives de stockage](storage.md) : écriture bas niveau et sécurité des chemins.
 - [Le rate-limit d'upload](rate_limit.md) : limiter la fréquence des envois.
-- [Progression pédagogique Files](../welcome/installation.md).
+- [Progression pédagogique Files](../welcome/debutant/files-welcome.md).

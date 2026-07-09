@@ -1,5 +1,8 @@
 # Premier paramètre
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-settings` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-settings`.
 
 **Ce que vous allez apprendre :** un paramètre applicatif est une paire clé/valeur stockée en base.

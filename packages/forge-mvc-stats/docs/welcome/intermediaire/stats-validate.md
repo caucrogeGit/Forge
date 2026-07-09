@@ -8,7 +8,7 @@ Un nom invalide lève `StatsEventError` : on refuse avant toute écriture.
 Troisième palier du **niveau intermédiaire** de la progression stats.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-stats` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-stats` installé.
 
 ## Ce que ce starter montre
 

@@ -18,10 +18,35 @@ Il reste un outil de **préparation** : il écrit des fichiers que vous relisez 
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-deploy
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-deploy"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-deploy
 forge opt-in:enable deploy
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in expose ses commandes CLI).
 `forge opt-in:install deploy` affiche la commande `pip` sans l'exécuter.
@@ -36,7 +61,16 @@ pip uninstall forge-mvc-deploy
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
 `forge opt-in:remove deploy` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-deploy` ajoute ces commandes (opt-in CLI-only) :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `deploy:init` | Génère `wsgi.py`, la config Nginx, l'unité systemd et un README (write-if-new). | `forge deploy:init` |
+| `deploy:check` | Vérifie la configuration de déploiement. | `forge deploy:check` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -51,7 +85,7 @@ pip uninstall forge-mvc-deploy
 | Décision d'architecture | ADR-053 (extraction, opt-in CLI-only) |
 | Installation | `pip install --pre forge-mvc-deploy` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -59,7 +93,7 @@ Le diagramme de classe montre les commandes et les fichiers générés.
 
 Le diagramme de séquence montre la préparation puis la pile de production servie.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre les deux commandes et les artefacts qu'elles produisent ou vérifient.
 
@@ -99,7 +133,7 @@ classDiagram
 - la pile cible est Nginx devant Gunicorn servant `wsgi:application` ;
 - aucun de ces fichiers n'est importé par l'application au runtime.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre la préparation, puis une requête servie en production.
 
@@ -131,14 +165,6 @@ sequenceDiagram
 - Gunicorn sert le callable `application` de `wsgi.py` ;
 - le serveur de développement (`python app.py`) ne sert pas la production.
 
-## 5. Commandes (API CLI)
-
-| Commande | Rôle |
-|---|---|
-| `forge deploy:init` | génère `wsgi.py`, la configuration Nginx, l'unité systemd et un README (write-if-new) |
-| `forge deploy:check` | vérifie la configuration de déploiement |
-
-Le paquet expose aussi `cmd_deploy_init`, `cmd_deploy_check` et `main` pour le dispatch CLI ; ce ne sont pas des points d'entrée applicatifs.
 
 ## 6. Contextes d'utilisation
 
@@ -194,4 +220,4 @@ Les fichiers générés sont des **points de départ** : adaptez le domaine, les
 ## Voir aussi
 
 - [Commandes deploy:* (cli/deploy.py)](references/cli.md) : détail de `deploy:init` / `deploy:check`.
-- [Progression Deploy](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Deploy](welcome/debutant/deploy-welcome.md) : apprendre l'opt-in pas à pas.

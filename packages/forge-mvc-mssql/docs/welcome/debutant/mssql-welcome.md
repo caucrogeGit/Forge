@@ -1,5 +1,8 @@
 # Préparer la base
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-mssql` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le backend **opt-in** `forge-mvc-mssql` (Alpha).
 
 **Ce que vous allez apprendre :** comme le provisioning CLI n'est pas encore câblé, on crée la base et le login à la main, puis Forge prend le relais.

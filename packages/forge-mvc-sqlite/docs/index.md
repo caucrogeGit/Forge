@@ -15,7 +15,7 @@ SQLite range toute la base dans un fichier : c'est le choix le plus simple pour 
 ## Par où commencer
 
 - [Référence](reference.md) : rôle, contrat, dialecte, vue d'ensemble.
-- [Progression SQLite](welcome/installation.md) : apprendre le backend pas à pas.
+- [Progression SQLite](welcome/debutant/sqlite-welcome.md) : apprendre le backend pas à pas.
 
 ## Installation
 

@@ -35,7 +35,6 @@ class TestPagesExist:
     @pytest.mark.parametrize(
         "page",
         [
-            "installation.md",
             "recapitulatif.md",
             "debutant/settings-welcome.md",
             "debutant/settings-set-get.md",

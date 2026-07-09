@@ -1,5 +1,8 @@
 # Welcome Images
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-images` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-images` et ce qu'il sait traiter.
 
 **Ce que vous allez apprendre :** vérifier que le module Images répond, et **inspecter ses capacités** : les formats d'image autorisés (`ALLOWED_IMAGE_EXTENSIONS`) et les tailles des variantes générées (`IMAGE_VARIANT_SIZES`).
@@ -9,7 +12,7 @@ Premier palier du **niveau débutant** de la progression images (vue d'ensemble 
 
 !!! note "Module opt-in"
     Ce starter suppose le module installé.
-    `forge-mvc-images` dépend de `forge-mvc-files` et il est publié sur PyPI depuis `1.0.0-beta.13` (`pip install --pre forge-mvc-images`, palier « Installation »
+    `forge-mvc-images` dépend de `forge-mvc-files` et il est publié sur PyPI depuis `1.0.0-beta.13` (`pip install --pre forge-mvc-images`
     de ce parcours, en tête de progression).
     Le cœur de Forge reste autonome ; l'image est une brique que l'on ajoute à la demande.
 

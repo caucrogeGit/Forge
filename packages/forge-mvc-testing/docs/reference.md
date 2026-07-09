@@ -20,9 +20,29 @@ Le plugin s'active automatiquement dès que le paquet est installé (point d'ent
 
 Infrastructure de test réservée au développement (ADR-041), listée dans `requirements-dev.txt` :
 
-```bash
-pip install forge-mvc-testing
-```
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install forge-mvc-testing
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-testing"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
 
 Le plugin pytest et `FakeRequest` sont disponibles dès l'installation.
 Ce n'est pas un opt-in applicatif : il n'y a pas d'`opt-in:enable`.
@@ -33,7 +53,11 @@ Ce n'est pas un opt-in applicatif : il n'y a pas d'`opt-in:enable`.
 pip uninstall forge-mvc-testing
 ```
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-testing` n'expose aucune commande `forge` : c'est un **plugin pytest** (point d'entrée `pytest11`) qui s'active automatiquement dès l'installation, plus l'utilitaire `FakeRequest` à importer dans les tests.
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -48,7 +72,7 @@ pip uninstall forge-mvc-testing
 | Portée | **jamais** une dépendance runtime (ADR-041) |
 | Installation | `pip install --pre forge-mvc-testing` (dev) |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires du paquet.
 
@@ -56,7 +80,7 @@ Le diagramme de classe montre `FakeRequest` et le plugin.
 
 Le diagramme de séquence montre une session pytest qui l'utilise.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que `FakeRequest` imite l'objet `Request` du cœur, et que le plugin fournit les fixtures.
 
@@ -97,7 +121,7 @@ classDiagram
 - des fixtures autouse nettoient sessions, rate-limits, etc. entre les tests ;
 - la fixture `fake_request` fabrique des requêtes factices.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre une session pytest avec le plugin actif.
 
@@ -125,7 +149,7 @@ sequenceDiagram
 - chaque test démarre d'un état propre (fixtures autouse) ;
 - on teste un contrôleur en lui passant une `FakeRequest`.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -142,7 +166,7 @@ sequenceDiagram
 
 Le plugin s'active par le point d'entrée `pytest11` : aucune configuration `conftest` n'est requise.
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -152,9 +176,9 @@ Le plugin s'active par le point d'entrée `pytest11` : aucune configuration `con
 | Partir d'un état propre | fixtures autouse (automatiques) |
 | Obtenir une requête prête | fixture `fake_request` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Tester un contrôleur
+### 8.1 Tester un contrôleur
 
 ```python
 from forge_mvc_testing import FakeRequest
@@ -167,7 +191,7 @@ def test_create_article():
     assert response.status == 200
 ```
 
-### 7.2 Via la fixture
+### 8.2 Via la fixture
 
 ```python
 def test_avec_fixture(fake_request):
@@ -183,7 +207,7 @@ Les nettoyages entre tests sont automatiques (fixtures autouse du plugin).
     - `FakeRequest` : une `Request` sans serveur HTTP ;
     - le plugin pytest : noyau configuré + état propre entre tests.
 
-## 8. Dev-only et isolation
+## 9. Dev-only et isolation
 
 Ce paquet ne sert qu'aux tests : il n'est jamais installé en production et n'est pas importé par le runtime (ADR-041).
 
@@ -202,5 +226,5 @@ Les fixtures autouse garantissent l'isolation : chaque test repart de sessions e
 
 ## Voir aussi
 
-- [Progression Testing](welcome/installation.md) : apprendre l'outillage pas à pas.
+- [Progression Testing](welcome/debutant/testing-welcome.md) : apprendre l'outillage pas à pas.
 - [ADR-041](https://forgemvc.com/docs/forge/adr/041-shared-test-support/) : infrastructure de test partagée.

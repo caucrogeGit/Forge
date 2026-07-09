@@ -7,7 +7,7 @@ Objectif : créer un facteur TOTP **pending**, puis le **confirmer** : l'enrôle
 Premier palier du **niveau intermédiaire** de la progression MFA.
 
 !!! note "Module opt-in, clé requise"
-    Ce starter suppose `forge-mvc-mfa` installé et `FORGE_MFA_SECRET_KEY` configurée (palier « Installation »).
+    Ce starter suppose `forge-mvc-mfa` installé et `FORGE_MFA_SECRET_KEY` configurée.
     Sans clé, la page reste **pédagogique**.
 
 ## Ce que ce starter montre

@@ -30,7 +30,6 @@ nav:
   - Exemple ESP32: esp32-example.md
   - Évaluation Arduino R4: arduino-r4-assessment.md
   - Progression IoT:
-      - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge IoT: welcome/debutant/iot-welcome.md
           - Lire les événements IoT: welcome/debutant/iot-events.md

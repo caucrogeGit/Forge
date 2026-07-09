@@ -65,11 +65,6 @@ class TestAvanceChain:
         assert _has("avance/bilan.md", "../recapitulatif.md")
 
 
-class TestInstallationPointsToFirstPalier:
-
-    def test_installation_links_first_debutant(self):
-        assert _has("installation.md", "debutant/qrcode-welcome.md")
-
 
 class TestForbiddenCommandsAbsent:
 

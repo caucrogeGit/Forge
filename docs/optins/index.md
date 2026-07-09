@@ -18,16 +18,16 @@ Cette page liste les opt-ins officiels par usage ; chaque nom renvoie à sa docu
 | [MFA](../mfa/reference.md) | authentification multi-facteurs (TOTP, codes de récupération) |
 | [Audit](../audit/reference.md) | journal d'audit applicatif (table `audit_log`) |
 
-## Données et persistance
+## Données et modélisation
 
 | Opt-in | Rôle |
 |--------|------|
+| [Moteur d'entités](../entities/reference.md) | génération et modélisation de la couche de données : `make:entity`, relations, `build:model`, `make:crud`, migrations, provisioning `db:*` et pivot enrichi (ADR-070) |
 | [Settings](../settings/reference.md) | paramètres applicatifs persistés en base SQL |
 | [Jobs](../jobs/reference.md) | file de tâches de fond adossée à la base SQL, sans broker |
 | [Notifications](../notifications/reference.md) | notifications in-app (table `notifications`) |
 | [Import/Export CSV](../import-export/reference.md) | import validé et export programmatique en CSV |
 | [Statistiques](../stats/reference.md) | agrégats et compteurs d'événements |
-| [Pivot](../entities/reference.md) | tables pivot enrichies (`many_to_many` avec attributs) |
 
 ## Médias et fichiers
 
@@ -62,10 +62,10 @@ Vue d'ensemble et aide au choix : [Bases de données dans Forge](../guide/bases-
 
 | Backend | Moteur | Maturité |
 |---------|--------|----------|
-| [MariaDB](../mariadb/index.md) | MariaDB / MySQL | RC |
-| [SQLite](../sqlite/index.md) | SQLite (sans serveur) | RC |
-| [PostgreSQL](../postgres/index.md) | PostgreSQL | Alpha |
-| [SQL Server](../mssql/index.md) | SQL Server | Alpha |
+| [MariaDB](../mariadb/reference.md) | MariaDB / MySQL | RC |
+| [SQLite](../sqlite/reference.md) | SQLite (sans serveur) | RC |
+| [PostgreSQL](../postgres/reference.md) | PostgreSQL | Alpha |
+| [SQL Server](../mssql/reference.md) | SQL Server | Alpha |
 
 ## Outils de développement
 

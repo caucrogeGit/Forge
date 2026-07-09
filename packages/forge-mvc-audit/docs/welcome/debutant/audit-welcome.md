@@ -1,5 +1,8 @@
 # Première action d'audit
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-audit` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-audit`.
 
 **Ce que vous allez apprendre :** enregistrer une action importante de l'application dans le journal d'audit.

@@ -1,5 +1,8 @@
 # Premier test
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-testing` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec l'outillage **dev-only** `forge-mvc-testing`.
 
 **Ce que vous allez apprendre :** `FakeRequest` imite l'objet `Request` du cœur, ce qui permet d'appeler un contrôleur sans serveur HTTP.

@@ -12,7 +12,6 @@ nav:
       - Transcodage MP3 (transcode.py): references/transcode.md
       - Lecture HTTP (http.py): references/http.md
   - Progression Audio:
-      - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge Audio: welcome/debutant/audio-welcome.md
           - Téléverser un audio: welcome/debutant/audio-upload.md

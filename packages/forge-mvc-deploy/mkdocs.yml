@@ -9,7 +9,6 @@ nav:
   - Référence (par module):
       - Commandes deploy:* (cli/deploy.py): references/cli.md
   - Progression Deploy:
-      - Installation: welcome/installation.md
       - Débutant:
           - Premier déploiement: welcome/debutant/deploy-welcome.md
           - Générer les fichiers: welcome/debutant/deploy-init.md

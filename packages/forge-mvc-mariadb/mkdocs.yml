@@ -7,7 +7,6 @@ nav:
   - Présentation: index.md
   - Référence: reference.md
   - Progression MariaDB:
-      - Installation: welcome/installation.md
       - Débutant:
           - Provisionner la base: welcome/debutant/mariadb-welcome.md
           - Appliquer une entité: welcome/debutant/mariadb-apply.md

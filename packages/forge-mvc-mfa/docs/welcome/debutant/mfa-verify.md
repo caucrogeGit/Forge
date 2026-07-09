@@ -8,7 +8,7 @@ C'est ce contrôle qui se rejoue à chaque connexion MFA.
 Troisième palier du **niveau débutant** de la progression MFA.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-mfa` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-mfa` installé.
     Aucune clé requise : on travaille sur un secret brut fourni pour la démonstration.
 
 ## Ce que ce starter montre

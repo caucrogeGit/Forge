@@ -18,10 +18,35 @@ Quand une clé manque dans la locale demandée, il bascule sur la **locale de re
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-i18n
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-i18n"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-i18n
 forge opt-in:enable i18n
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install i18n` affiche la commande `pip` sans l'exécuter.
@@ -36,7 +61,16 @@ pip uninstall forge-mvc-i18n
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove i18n` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-i18n` ajoute ces commandes (le noyau garde un repli no-op, ADR-027) :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `i18n:init` | Initialise les fichiers de traduction. | `forge i18n:init` |
+| `i18n:check` | Vérifie la complétude des traductions entre locales. | `forge i18n:check` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -54,7 +88,7 @@ pip uninstall forge-mvc-i18n
 | Décision d'architecture | ADR-027 (extraction, repli no-op du cœur) |
 | Installation | `pip install --pre forge-mvc-i18n` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -62,7 +96,7 @@ Le diagramme de classe montre le helper, les catalogues et l'exposition Jinja.
 
 Le diagramme de séquence montre la résolution d'une clé avec repli.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que `trans` lit des catalogues JSON (mis en cache) et que le renderer Jinja du cœur l'expose aux templates quand l'opt-in est présent.
 
@@ -108,7 +142,7 @@ classDiagram
 - les catalogues sont mis en cache (`clear_translation_cache` pour vider) ;
 - le helper `trans()` est exposé aux templates par le cœur quand l'opt-in est installé.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre la résolution d'une clé, avec repli sur la locale de fallback.
 
@@ -138,7 +172,7 @@ sequenceDiagram
 - en dernier recours, `trans` renvoie la clé (pas d'erreur d'affichage) ;
 - le chargement passe par un cache pour éviter de relire le fichier.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -151,14 +185,7 @@ sequenceDiagram
 | `clear_translation_cache` | `clear_translation_cache() -> None` | vide le cache des catalogues |
 | `I18nError`, `TranslationCatalogError` | exceptions | erreurs (locale invalide, catalogue illisible) |
 
-### Commandes CLI
-
-| Commande | Rôle |
-|---|---|
-| `forge i18n:init` | initialise les fichiers de traduction |
-| `forge i18n:check` | vérifie la complétude des traductions entre locales |
-
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -170,9 +197,9 @@ sequenceDiagram
 | Vérifier les manques | `forge i18n:check` |
 | Recharger après édition | `clear_translation_cache()` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Catalogue et traduction
+### 8.1 Catalogue et traduction
 
 `translations/fr.json` :
 
@@ -191,7 +218,7 @@ titre = trans("welcome.title")        # "Bienvenue"
 en = trans("welcome.title", locale="en")
 ```
 
-### 7.2 Dans un template Jinja
+### 8.2 Dans un template Jinja
 
 ```html
 <h1>{{ trans("welcome.title") }}</h1>
@@ -207,7 +234,7 @@ en = trans("welcome.title", locale="en")
     - `{{ trans("clé") }}` dans les templates ;
     - `i18n:check` pour repérer les clés manquantes.
 
-## 8. Repli, cache et intégration
+## 9. Repli, cache et intégration
 
 Le repli est en cascade : locale demandée, puis locale de fallback, puis la clé elle-même.
 
@@ -228,4 +255,4 @@ Les catalogues sont mis en cache ; après avoir édité un fichier de traduction
 
 - [Traduction (translator.py)](references/translator.md) : détail de `trans` et des locales.
 - [Erreurs (exceptions.py)](references/exceptions.md) : `I18nError`, `TranslationCatalogError`.
-- [Progression i18n](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression i18n](welcome/debutant/i18n-welcome.md) : apprendre l'opt-in pas à pas.

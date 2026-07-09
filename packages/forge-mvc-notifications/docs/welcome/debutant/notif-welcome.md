@@ -1,5 +1,8 @@
 # Première notification
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-notifications` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-notifications`.
 
 **Ce que vous allez apprendre :** une notification in-app se crée avec la fonction `notify`.

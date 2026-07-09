@@ -1,5 +1,8 @@
 # Welcome MFA
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-mfa` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-mfa`.
 
 **Ce que vous allez apprendre :** vérifier que le module répond et **inspecter ses briques** : facteurs (`TOTP`, `recovery`), statuts (`pending`/`active`/`disabled`), et la présence de la clé de chiffrement `FORGE_MFA_SECRET_KEY` (sans la révéler).
@@ -8,7 +11,7 @@ Premier palier du **niveau débutant** de la progression MFA (vue d'ensemble des
 
 !!! note "Module opt-in"
     Ce parcours décortique **chaque brique** MFA isolément, pour comprendre chaque API avant de la câbler dans votre propre flux Auth.
-    Installé via `pip install --pre forge-mvc-mfa` (palier « Installation »).
+    Installé via `pip install --pre forge-mvc-mfa`.
 
 ## Ce que ce starter montre
 

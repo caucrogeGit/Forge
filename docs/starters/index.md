@@ -41,42 +41,42 @@ Chaque opt-in a son propre parcours d'apprentissage. Suivez-le quand vous ajoute
 
 ### Sécurité et accès
 
-- [MFA](../mfa/welcome/installation.md) : ajouter l'authentification multi-facteurs (TOTP, codes de récupération).
-- [RBAC](../rbac/welcome/installation.md) : rôles et permissions déclaratives.
-- [Audit](../audit/welcome/installation.md) : journaliser les actions sensibles.
+- [MFA](../mfa/welcome/debutant/mfa-welcome.md) : ajouter l'authentification multi-facteurs (TOTP, codes de récupération).
+- [RBAC](../rbac/welcome/debutant/rbac-welcome.md) : rôles et permissions déclaratives.
+- [Audit](../audit/welcome/debutant/audit-welcome.md) : journaliser les actions sensibles.
 
 ### Données et persistance
 
-- [Settings](../settings/welcome/installation.md) : paramètres applicatifs persistés.
-- [Jobs](../jobs/welcome/installation.md) : tâches de fond adossées à la base SQL.
-- [Notifications](../notifications/welcome/installation.md) : notifications in-app.
-- [Import/Export CSV](../import-export/welcome/installation.md) : importer et exporter des données.
-- [Statistiques](../stats/welcome/installation.md) : compter et agréger des événements.
-- [Pivot](../entities/welcome/installation.md) : tables pivot enrichies `many_to_many`.
+- [Settings](../settings/welcome/debutant/settings-welcome.md) : paramètres applicatifs persistés.
+- [Jobs](../jobs/welcome/debutant/jobs-welcome.md) : tâches de fond adossées à la base SQL.
+- [Notifications](../notifications/welcome/debutant/notif-welcome.md) : notifications in-app.
+- [Import/Export CSV](../import-export/welcome/debutant/import-welcome.md) : importer et exporter des données.
+- [Statistiques](../stats/welcome/debutant/stats-welcome.md) : compter et agréger des événements.
+- [Pivot](../entities/welcome/debutant/entity-welcome.md) : tables pivot enrichies `many_to_many`.
 
 ### Médias et fichiers
 
-- [Fichiers](../files/welcome/installation.md) : upload et service de fichiers sécurisés.
-- [Images](../images/welcome/installation.md) : traitement et galeries d'images.
-- [Audio](../audio/welcome/installation.md) : upload, transcodage et lecture audio.
-- [Vidéo](../video/welcome/installation.md) : upload, transcodage et lecture vidéo.
+- [Fichiers](../files/welcome/debutant/files-welcome.md) : upload et service de fichiers sécurisés.
+- [Images](../images/welcome/debutant/images-welcome.md) : traitement et galeries d'images.
+- [Audio](../audio/welcome/debutant/audio-welcome.md) : upload, transcodage et lecture audio.
+- [Vidéo](../video/welcome/debutant/video-welcome.md) : upload, transcodage et lecture vidéo.
 
 ### Contenu et communication
 
-- [Mail](../mail/welcome/installation.md) : envoyer des courriels.
-- [i18n](../i18n/welcome/installation.md) : internationaliser l'application.
-- [QR Code](../qrcode/welcome/installation.md) : générer des QR Codes servables.
+- [Mail](../mail/welcome/debutant/mail-welcome.md) : envoyer des courriels.
+- [i18n](../i18n/welcome/debutant/i18n-welcome.md) : internationaliser l'application.
+- [QR Code](../qrcode/welcome/debutant/qrcode-welcome.md) : générer des QR Codes servables.
 
 ### Applicatif et exploitation
 
-- [Workflow](../workflow/welcome/installation.md) : statuts et transitions.
-- [Admin](../admin/welcome/installation.md) : back-office applicatif.
-- [IoT](../iot/welcome/installation.md) : recevoir et exposer des données IoT.
-- [Déploiement](../deploy/welcome/installation.md) : préparer la mise en production.
+- [Workflow](../workflow/welcome/debutant/workflow-welcome.md) : statuts et transitions.
+- [Admin](../admin/welcome/debutant/admin-welcome.md) : back-office applicatif.
+- [IoT](../iot/welcome/debutant/iot-welcome.md) : recevoir et exposer des données IoT.
+- [Déploiement](../deploy/welcome/debutant/deploy-welcome.md) : préparer la mise en production.
 
 ### Outils et infrastructure
 
-- [Infrastructure de test](../testing/welcome/installation.md) : tester Forge et ses opt-ins.
+- [Infrastructure de test](../testing/welcome/debutant/testing-welcome.md) : tester Forge et ses opt-ins.
 - [Helpers](welcome-helpers/installation.md) : raccourcis et utilitaires applicatifs.
 - [Markdown](welcome-markdown/installation.md) : rendre du contenu Markdown.
 

@@ -1,5 +1,8 @@
 # Welcome Audio
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-audio` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-audio`, une chaîne audio **sans état**.
 
 **Ce que vous allez apprendre :** vérifier que le module répond et **inspecter sa configuration** (`load_audio_config`), à savoir stockage, limites, binaires `ffprobe`/`ffmpeg`, avec le **token masqué**.
@@ -8,7 +11,7 @@ Aucune base de données.
 Premier palier du **niveau débutant** de la progression audio (vue d'ensemble des starters).
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-audio` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-audio` installé.
     `ffmpeg`/`ffprobe` sont des binaires système, requis seulement au niveau avancé.
     Le cœur de Forge reste autonome.
 

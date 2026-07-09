@@ -21,10 +21,35 @@ Il fournit aussi des **helpers Jinja** pour afficher un statut sous forme de bad
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-workflow
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-workflow"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-workflow
 forge opt-in:enable workflow
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install workflow` affiche la commande `pip` sans l'exécuter.
@@ -39,7 +64,11 @@ pip uninstall forge-mvc-workflow
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove workflow` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -55,7 +84,7 @@ pip uninstall forge-mvc-workflow
 | Décision d'architecture | ADR-004 (opt-in officiel) |
 | Installation | `pip install --pre forge-mvc-workflow` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -63,7 +92,7 @@ Le diagramme de classe montre les statuts, les transitions et les helpers.
 
 Le diagramme de séquence montre la vérification d'un changement de statut.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que les transitions relient des statuts, et que les helpers Jinja rendent un statut en badge.
 
@@ -121,7 +150,7 @@ classDiagram
 - `can_transition` répond oui/non avant d'appliquer un changement ;
 - les helpers Jinja affichent un statut sans logique dans le template.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre un changement de statut contrôlé.
 
@@ -150,7 +179,7 @@ sequenceDiagram
 - `get_available_transitions` alimente les boutons/menus de l'UI ;
 - une transition non déclarée est refusée.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -164,7 +193,7 @@ sequenceDiagram
 | helpers Jinja | `workflow_status_badge`, `workflow_status_badge_class`, `workflow_status_color`, `workflow_status_label`, `make_workflow_jinja_helpers` | affichage |
 | `WorkflowStatusError`, `WorkflowTransitionError` | exceptions | nom invalide, transition invalide |
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -174,9 +203,9 @@ sequenceDiagram
 | Valider la configuration | `validate_statuses` / `validate_transitions` |
 | Afficher un badge | `workflow_status_badge(...)` (Jinja) |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Déclarer et vérifier
+### 8.1 Déclarer et vérifier
 
 ```python
 from forge_mvc_workflow import make_status, make_transition, can_transition
@@ -195,7 +224,7 @@ if can_transition(TRANSITIONS, "brouillon", "publie"):
     article["status"] = "publie"      # l'application persiste
 ```
 
-### 7.2 Afficher un badge dans un template
+### 8.2 Afficher un badge dans un template
 
 ```html
 {{ workflow_status_badge(STATUSES, article.status) }}
@@ -210,7 +239,7 @@ if can_transition(TRANSITIONS, "brouillon", "publie"):
     - `can_transition` / `get_available_transitions` pour la logique ;
     - les helpers Jinja pour l'affichage.
 
-## 8. Persistance et validation
+## 9. Persistance et validation
 
 L'opt-in ne crée **aucune table** : le statut courant est un simple champ de votre entité, que vous mettez à jour vous-même après un `can_transition` positif.
 
@@ -236,4 +265,4 @@ L'opt-in ne crée **aucune table** : le statut courant est un simple champ de vo
 - [Statuts (status.py)](references/status.md) : `WorkflowStatus`, validation des noms.
 - [Transitions (transitions.py)](references/transitions.md) : `can_transition`, transitions disponibles.
 - [Helpers Jinja (jinja.py)](references/jinja.md) : badges et libellés.
-- [Progression Workflow](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Workflow](welcome/debutant/workflow-welcome.md) : apprendre l'opt-in pas à pas.

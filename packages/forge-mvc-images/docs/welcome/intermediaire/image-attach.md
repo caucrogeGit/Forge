@@ -9,7 +9,7 @@ Une image appartient toujours à « quelque chose ».
 Premier palier du **niveau intermédiaire** de la progression images.
 
 !!! note "Module opt-in et table `media`"
-    Ce starter suppose `forge-mvc-images` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-images` installé.
     La table `media` est créée par la **migration livrée avec le starter** : appliquez-la avec `forge migration:apply`.
     Si la table manque, la route reste **pédagogique** au lieu de planter.
 

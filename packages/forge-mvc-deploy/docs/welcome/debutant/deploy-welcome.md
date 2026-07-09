@@ -1,5 +1,8 @@
 # Premier déploiement
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-deploy` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-deploy`.
 
 **Ce que vous allez apprendre :** déployer une application Forge demande quelques fichiers de configuration toujours semblables (point d'entrée WSGI, reverse proxy Nginx, service systemd).

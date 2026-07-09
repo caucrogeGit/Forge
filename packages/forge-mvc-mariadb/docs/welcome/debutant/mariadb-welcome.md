@@ -1,5 +1,8 @@
 # Provisionner la base
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-mariadb` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le backend **opt-in** `forge-mvc-mariadb`.
 
 **Ce que vous allez apprendre :** MariaDB est un serveur ; `forge db:init` génère le SQL qui crée la base et les deux comptes, que vous exécutez dans votre session d'administration.

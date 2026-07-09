@@ -1,5 +1,8 @@
 # Welcome IoT
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-iot` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-iot` et sa configuration.
 
 **Ce que vous allez apprendre :** vérifier que le module IoT répond, et **inspecter sa configuration MQTT** avec `load_iot_config`, en **masquant le mot de passe**.

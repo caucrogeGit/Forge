@@ -18,10 +18,35 @@ Il reste fidèle à la charte : le SQL est visible, et l'exécuteur de base de d
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-settings
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-settings"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-settings
 forge opt-in:enable settings
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install settings` affiche la commande `pip` sans l'exécuter.
@@ -36,7 +61,15 @@ pip uninstall forge-mvc-settings
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove settings` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-settings` ajoute une commande :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `settings:init` | Crée la table `app_settings` (DDL fournie). | `forge settings:init` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -52,7 +85,7 @@ pip uninstall forge-mvc-settings
 | Stratégie opt-in | ADR-052 |
 | Installation | `pip install --pre forge-mvc-settings` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -60,7 +93,7 @@ Le diagramme de classe montre l'API, la table et l'exécuteur injecté.
 
 Le diagramme de séquence montre l'écriture puis la lecture d'un paramètre.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que le module agit sur la table `app_settings` au travers d'un exécuteur de base de données **fourni par l'application**, et qu'il peut lever `SettingsError`.
 
@@ -105,7 +138,7 @@ classDiagram
 - le module n'ouvre jamais de connexion : il reçoit un exécuteur ;
 - une clé invalide ou un type non supporté lève `SettingsError`.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre un `set_setting` (upsert) suivi d'un `get_setting`.
 
@@ -133,7 +166,7 @@ sequenceDiagram
 - `get_setting` recoerce la valeur selon le type stocké ;
 - `get_setting` renvoie `default` si la clé est absente.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -150,7 +183,7 @@ Le paramètre `db` est l'exécuteur de base de données.
 
 S'il est omis, le module utilise le backend BDD actif du projet.
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -161,9 +194,9 @@ S'il est omis, le module utilise le backend BDD actif du projet.
 | Créer la table | `CREATE_TABLE_SQL` ou `forge settings:init` |
 | Injecter un exécuteur de test | paramètre `db=...` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Écrire et lire un paramètre
+### 8.1 Écrire et lire un paramètre
 
 ```python
 from forge_mvc_settings import set_setting, get_setting
@@ -172,7 +205,7 @@ set_setting("school_name", "Collège Forge")
 name = get_setting("school_name", default="Sans nom")
 ```
 
-### 7.2 Valeurs typées
+### 8.2 Valeurs typées
 
 ```python
 set_setting("maintenance", True)        # bool
@@ -184,7 +217,7 @@ if get_setting("maintenance", default=False):
 
 Le type est déduit à l'écriture et restitué à la lecture : `get_setting("maintenance")` renvoie un vrai `bool`.
 
-### 7.3 Lister et supprimer
+### 8.3 Lister et supprimer
 
 ```python
 from forge_mvc_settings import get_all_settings, delete_setting
@@ -199,7 +232,7 @@ existait = delete_setting("ancienne_option")
     - `set_setting` / `get_setting` pour une clé ;
     - `get_all_settings` / `delete_setting` pour gérer l'ensemble.
 
-## 8. Clés, types et injection
+## 9. Clés, types et injection
 
 Les clés sont des chaînes ; une clé vide ou non textuelle lève `SettingsError`.
 
@@ -225,4 +258,4 @@ Seuls `str`, `int`, `bool`, `float` sont stockables ; un autre type lève `Setti
 - [Les paramètres (store.py)](references/store.md) : détail des fonctions et du SQL.
 - [Initialisation (settings:init)](references/cli.md) : création de la table.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `SettingsError`.
-- [Progression Settings](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Settings](welcome/debutant/settings-welcome.md) : apprendre l'opt-in pas à pas.

@@ -12,7 +12,6 @@ nav:
       - Export programmatique (csv_writer.py): references/export.md
       - Erreurs (errors.py): references/errors.md
   - Progression Import/Export:
-      - Installation: welcome/installation.md
       - Débutant:
           - Lire un CSV: welcome/debutant/import-welcome.md
           - Détails de la lecture: welcome/debutant/import-read.md

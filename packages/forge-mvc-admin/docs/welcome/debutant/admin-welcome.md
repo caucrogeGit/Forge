@@ -1,5 +1,8 @@
 # Débutant 1 : Voir le tableau de bord
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-admin` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : ouvrir le back-office et comprendre ce qu'il affiche au départ.
 
 ## Accéder à `/admin`

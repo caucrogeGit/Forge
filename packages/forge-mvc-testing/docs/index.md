@@ -13,7 +13,7 @@ C'est un paquet **dev-only** (ADR-041) : jamais une dépendance d'exécution, in
 ## Par où commencer
 
 - [Référence](reference.md) : rôle, contrat, fixtures, vue d'ensemble.
-- [Progression Testing](welcome/installation.md) : apprendre l'outillage pas à pas.
+- [Progression Testing](welcome/debutant/testing-welcome.md) : apprendre l'outillage pas à pas.
 
 ## Installation
 

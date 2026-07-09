@@ -12,7 +12,6 @@ nav:
       - Affichage admin (admin.py): references/admin.md
       - Agrégation (aggregate.py): references/aggregate.md
   - Progression Stats:
-      - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge Stats: welcome/debutant/stats-welcome.md
           - Nom d'événement: welcome/debutant/stats-event.md

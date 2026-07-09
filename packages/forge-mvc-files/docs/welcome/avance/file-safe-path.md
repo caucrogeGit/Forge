@@ -8,7 +8,7 @@ Ce sont les primitives que `serve_media_file` et `delete_media_file` utilisent e
 Deuxième palier du **niveau avancé** de la progression files.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-files` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-files` installé.
 
 ## Ce que ce starter montre
 

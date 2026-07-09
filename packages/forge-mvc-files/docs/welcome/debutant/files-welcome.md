@@ -1,5 +1,8 @@
 # Welcome Files
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-files` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-files`, le pipeline d'upload générique de Forge.
 
 **Ce que vous allez apprendre :** vérifier que le module répond et **inspecter sa politique** : racine de stockage (`upload_root`), extensions, types MIME et taille max autorisés.
@@ -10,7 +13,7 @@ Premier palier du **niveau débutant** de la progression files (vue d'ensemble d
 !!! note "Module opt-in et fondation"
     `forge-mvc-files` est l'upload générique extrait du core (ADR-019) ; c'est la **fondation** sur laquelle `forge-mvc-images` est bâti.
     Ce parcours en montre la façade `save_upload` (documents) puis, au niveau avancé, les **primitives** que les opt-ins média composent (ADR-020).
-    Installé depuis les sources (palier « Installation »).
+    Installé depuis les sources.
 
 ## Ce que ce starter montre
 

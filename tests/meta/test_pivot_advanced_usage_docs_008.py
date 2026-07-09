@@ -170,7 +170,9 @@ def test_page_dit_routes_non_branchees(doc):
 
 def test_page_ne_dit_pas_pypi_publie(doc):
     lower = doc.lower()
-    assert "pypi" not in lower
+    # La page peut mentionner PyPI comme canal d'installation (onglet « Depuis
+    # PyPI (stable) », design uniforme des 25 références) ; elle ne doit pas
+    # affirmer à tort que le paquet est DÉJÀ publié sur PyPI.
     assert "publié sur pypi" not in lower
     assert "forge-mvc publié" not in lower
 

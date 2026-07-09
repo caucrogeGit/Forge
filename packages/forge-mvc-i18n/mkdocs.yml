@@ -9,7 +9,6 @@ nav:
       - Traduction (translator.py): references/translator.md
       - Erreurs (exceptions.py): references/exceptions.md
   - Progression i18n:
-      - Installation: welcome/installation.md
       - Débutant:
           - Bonjour Forge i18n: welcome/debutant/i18n-welcome.md
           - Écrire un catalogue: welcome/debutant/i18n-catalog.md

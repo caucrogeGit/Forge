@@ -19,7 +19,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 ## Par où commencer
 
 - [Référence](reference.md) : rôle, contrat, dialecte, statut Alpha.
-- [Progression SQL Server](welcome/installation.md) : apprendre le backend pas à pas.
+- [Progression SQL Server](welcome/debutant/mssql-welcome.md) : apprendre le backend pas à pas.
 
 ## Installation
 

@@ -1,5 +1,8 @@
 # Welcome i18n
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-i18n` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-i18n`.
 
 **Ce que vous allez apprendre :** l'internationalisation de Forge repose sur des **catalogues JSON** (un fichier par locale) et un helper `trans(clé, locale)`.

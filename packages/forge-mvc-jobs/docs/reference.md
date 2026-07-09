@@ -19,10 +19,35 @@ La file est une table SQL ; le worker est un simple process Python.
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-jobs
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-jobs"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-jobs
 forge opt-in:enable jobs
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install jobs` affiche la commande `pip` sans l'exécuter.
@@ -37,7 +62,15 @@ pip uninstall forge-mvc-jobs
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove jobs` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-jobs` ajoute une commande :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `jobs:init` | Crée la table `jobs` (DDL fournie). | `forge jobs:init` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -52,7 +85,7 @@ pip uninstall forge-mvc-jobs
 | Contrainte | runtime synchrone (WSGI), sans broker ni async |
 | Installation | `pip install --pre forge-mvc-jobs` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -60,7 +93,7 @@ Le diagramme de classe montre l'API, l'état d'une tâche et la table.
 
 Le diagramme de séquence montre les deux côtés : l'enfilage dans la requête, le traitement dans le worker.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que le module agit sur la table `jobs` au travers d'un exécuteur **injecté**, et que le worker appelle des `JobHandler` fournis par l'application.
 
@@ -122,7 +155,7 @@ classDiagram
 - le traitement appelle un `JobHandler` que l'application a enregistré ;
 - une tâche échouée est ré-essayée jusqu'à `max_attempts`, sinon marquée `failed`.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre l'enfilage côté requête, puis le traitement côté worker.
 
@@ -155,7 +188,7 @@ sequenceDiagram
 - `process_one` traite une tâche, `drain` vide la file, `run_worker` boucle ;
 - un gestionnaire manquant marque la tâche `failed`.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -175,7 +208,7 @@ sequenceDiagram
 
 `db` est l'exécuteur ; omis, il utilise le backend BDD actif.
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -188,9 +221,9 @@ sequenceDiagram
 | Superviser | `pending_count()`, `get_job(id)` |
 | Créer la table | `CREATE_TABLE_SQL` ou `forge jobs:init` |
 
-## 7. Exemples d'utilisation
+## 8. Exemples d'utilisation
 
-### 7.1 Enfiler depuis un contrôleur
+### 8.1 Enfiler depuis un contrôleur
 
 ```python
 from core.http.request import Request
@@ -205,7 +238,7 @@ def send(request: Request) -> Response:
 
 La requête répond tout de suite ; le travail se fera dans le worker.
 
-### 7.2 Le worker (process séparé)
+### 8.2 Le worker (process séparé)
 
 ```python
 from forge_mvc_jobs import run_worker
@@ -225,7 +258,7 @@ if __name__ == "__main__":
     - côté requête : `enqueue` ;
     - côté worker : `drain` (cron) ou `run_worker` (persistant), avec vos `handlers`.
 
-## 8. Ré-essais, files et injection
+## 9. Ré-essais, files et injection
 
 Une tâche échouée est ré-essayée tant que `attempts < max_attempts`, sinon marquée `failed` (avec `last_error`).
 
@@ -251,4 +284,4 @@ Plusieurs files nommées coexistent via le paramètre `queue` (par exemple `"ema
 - [La file (queue.py)](references/queue.md) : détail des fonctions et du SQL.
 - [Initialisation (jobs:init)](references/cli.md) : création de la table.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `JobError`.
-- [Progression Jobs](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Jobs](welcome/debutant/jobs-welcome.md) : apprendre l'opt-in pas à pas.

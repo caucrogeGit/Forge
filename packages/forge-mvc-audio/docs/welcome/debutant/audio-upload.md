@@ -8,7 +8,7 @@ Il retourne un dict `{uuid, title, original_path, size_bytes, mime_type}`.
 Deuxième palier du **niveau débutant** de la progression audio.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-audio` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-audio` installé.
     Aucun `ffmpeg`/`ffprobe` n'est requis ici.
 
 ## Ce que ce starter montre

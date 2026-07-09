@@ -1,5 +1,8 @@
 # Welcome RBAC
 
+!!! note "Prérequis : installer l'opt-in"
+    Installez `forge-mvc-rbac` avant de commencer : voir sa [référence](../../reference.md).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-rbac` et son **contrat déclaratif**.
 
 **Ce que vous allez apprendre :** Forge sépare les **rôles** (qui on est) des **permissions** (ce qu'on a le droit de faire), déclarés dans un contrat `mvc/security/rbac.json` (ADR-014).
@@ -9,7 +12,7 @@ Premier palier du **niveau débutant** de la progression RBAC (vue d'ensemble de
 
 !!! note "Module opt-in"
     Ce starter livre un contrat de démonstration (`mvc/security/rbac.json`) et l'inspecte.
-    Installé via `pip install --pre forge-mvc-rbac` (palier « Installation »).
+    Installé via `pip install --pre forge-mvc-rbac`.
 
 ## Ce que ce starter montre
 

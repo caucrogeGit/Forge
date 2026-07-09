@@ -24,10 +24,35 @@ Le code applicatif ne change pas.
 
 ### Installation
 
+=== "Depuis PyPI (stable)"
+
+    La dernière version publiée :
+
+    ```bash
+    pip install --pre forge-mvc-mail
+    ```
+
+=== "Depuis Git (avant-garde)"
+
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mail"
+    ```
+
+    !!! warning "Erreur « externally-managed-environment » ?"
+
+        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+Puis activez l'opt-in :
+
 ```bash
-pip install --pre forge-mvc-mail
 forge opt-in:enable mail
 ```
+
 
 `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
 `forge opt-in:install mail` affiche la commande `pip` sans l'exécuter.
@@ -42,7 +67,19 @@ pip uninstall forge-mvc-mail
 `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
 `forge opt-in:remove mail` affiche la commande `pip uninstall` sans l'exécuter.
 
-## 3. Vue d'ensemble rapide
+## 3. Commandes
+
+`forge-mvc-mail` ajoute ces commandes (entry point `forge_mvc.commands`) :
+
+| Commande | Rôle | Exemple |
+|---|---|---|
+| `mail:init` | Crée les dossiers, templates d'exemple et la DDL `mail_log` (idempotent). | `forge mail:init` |
+| `mail:doctor` | Diagnostique la configuration (OK/WARN/FAIL/SKIP). | `forge mail:doctor` |
+| `mail:test` | Envoie un mail de test via le transport configuré. | `forge mail:test --to vous@exemple.com` |
+| `mail:render` | Rend un gabarit sans envoi (prévisualisation). | `forge mail:render bienvenue --context ctx.json` |
+| `mail:logs` | Derniers enregistrements de `mail_log`. | `forge mail:logs --limit 20` |
+
+## 4. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
@@ -60,7 +97,7 @@ pip uninstall forge-mvc-mail
 | Décisions d'architecture | ADR-022 (extraction), ADR-031 (config via environnement) |
 | Installation | `pip install --pre forge-mvc-mail` |
 
-## 4. Schémas UML
+## 5. Schémas UML
 
 Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -68,7 +105,7 @@ Le diagramme de classe montre le mailer, les transports et le message.
 
 Le diagramme de séquence montre un envoi de bout en bout.
 
-### 4.1 Diagramme de classe
+### 5.1 Diagramme de classe
 
 Le diagramme de classe montre que le `Mailer` envoie un `MailMessage` via un `BaseTransport` interchangeable et renvoie un `TransportResult`.
 
@@ -119,7 +156,7 @@ classDiagram
 - changer de transport ne change pas le code applicatif ;
 - `from_config` construit le `Mailer` depuis `MAIL_*`.
 
-### 4.2 Diagramme de séquence
+### 5.2 Diagramme de séquence
 
 Le diagramme de séquence montre un envoi via le transport configuré.
 
@@ -145,7 +182,7 @@ sequenceDiagram
 - le résultat est un `TransportResult` (succès et détail) ;
 - en cas d'échec SMTP, `MailSendError` est interceptée en `TransportResult(success=False)`.
 
-## 5. API publique
+## 6. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
@@ -159,7 +196,7 @@ sequenceDiagram
 | `MailLogger`, `MailLogRecord` | classes | journal des envois |
 | exceptions | `MailError`, `MailConfigurationError`, `MailSendError`, `MailTemplateError`, `MailValidationError` | erreurs |
 
-## 6. Contextes d'utilisation
+## 7. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
@@ -171,7 +208,7 @@ sequenceDiagram
 | Vérifier la configuration | `forge mail:doctor` |
 | Relire les envois | `forge mail:logs` |
 
-## 7. Configuration (`MAIL_*`)
+## 8. Configuration (`MAIL_*`)
 
 Le mail est lu directement depuis l'environnement (ADR-031), sans passer par le noyau.
 
@@ -205,17 +242,6 @@ Les défauts s'appliquent quand une variable est absente.
 | `log` | Écrit un fichier `.eml` dans `storage/mail/`. **Défaut en développement.** |
 | `smtp` | Connexion SMTP réelle via `smtplib`. À n'utiliser qu'avec un vrai serveur. |
 
-## 8. Commandes CLI
-
-| Commande | Rôle |
-|---|---|
-| `forge mail:init` | crée `mvc/mail/templates/`, `storage/mail/`, la DDL `mail_log` (idempotent) |
-| `forge mail:doctor` | diagnostic de la configuration (statuts `OK`/`WARN`/`FAIL`/`SKIP`) |
-| `forge mail:test --to vous@exemple.com` | envoie un mail de test via le transport configuré |
-| `forge mail:render <template> [--context ctx.json]` | rend un gabarit sans envoi (prévisualisation) |
-| `forge mail:logs [--limit N]` | derniers enregistrements de `mail_log` (si `MAIL_LOG_ENABLED=true`) |
-
-Un gabarit `bienvenue` se compose de `bienvenue_subject.txt` et `bienvenue_text.txt` (obligatoires), `bienvenue_html.html` (optionnel), dans `mvc/mail/templates/`.
 
 ## 9. Envoi par code
 
@@ -311,4 +337,4 @@ La table `mail_log` (optionnelle, `MAIL_LOG_ENABLED=true`) trace les envois sans
 - [Mailer (mailer.py)](references/mailer.md) : envoi et journalisation.
 - [Rendu de gabarits (templates.py)](references/templates.md) : `MailTemplateRenderer`.
 - [Journal des envois (log.py)](references/log.md) et [Erreurs (exceptions.py)](references/exceptions.md).
-- [Progression Mail](welcome/installation.md) : apprendre l'opt-in pas à pas.
+- [Progression Mail](welcome/debutant/mail-welcome.md) : apprendre l'opt-in pas à pas.

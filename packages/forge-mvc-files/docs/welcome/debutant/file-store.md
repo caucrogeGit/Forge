@@ -8,7 +8,7 @@ C'est exactement la primitive qu'`forge-mvc-images` réutilise pour son chemin d
 Deuxième palier du **niveau débutant** de la progression files.
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-files` installé (palier « Installation »).
+    Ce starter suppose `forge-mvc-files` installé.
 
 ## Ce que ce starter montre
 
