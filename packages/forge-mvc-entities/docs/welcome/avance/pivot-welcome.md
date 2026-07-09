@@ -1,23 +1,23 @@
-# Welcome Pivot
+# Le pivot enrichi
 
-Objectif : premier contact avec le module **opt-in** `forge-mvc-pivot`.
+Objectif : premier contact avec le **pivot enrichi** du moteur d'entités.
 
 **Ce que vous allez apprendre :** un pivot **enrichi** est une association `many_to_many` dont la table de liaison **porte des attributs**.
 Entre un `Article` et un `Tag`, la table `article_tag` peut stocker une `position` (ordre du tag sur l'article) et un drapeau `epingle` (tag mis en avant).
 C'est précisément ce que `PivotAdvancedService` rend explicite et sûr.
 
-Premier palier du **niveau débutant** de la progression pivot (vue d'ensemble des starters).
+Premier palier du **niveau avancé** de la progression Entités : au-delà des relations `many_to_one` vues en débutant, on modélise ici une relation qui porte sa propre donnée.
 
-!!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-pivot` installé (palier « Installation »).
-    Module à **SQL visible** : aucun ORM, les requêtes restent lisibles.
+!!! note "Toujours le même opt-in"
+    Le pivot enrichi fait partie de `forge-mvc-entities` (il n'y a plus de paquet séparé).
+    Moteur à **SQL visible** : aucun ORM, les requêtes restent lisibles.
 
 ## Pivot ordinaire vs pivot enrichi
 
 | Cas | Outil | Table de liaison |
 |-----|-------|------------------|
 | `Article` ↔ `Tag` sans donnée sur la relation | `many_to_many` simple | deux colonnes de clés seulement |
-| `Article` ↔ `Tag` avec `position`, `epingle` | **pivot enrichi** (`forge-mvc-pivot`) | clés **+ colonnes d'attributs** |
+| `Article` ↔ `Tag` avec `position`, `epingle` | **pivot enrichi** (`forge-mvc-entities`) | clés **+ colonnes d'attributs** |
 
 Dès que la relation **elle-même** porte une donnée, le pivot enrichi s'impose.
 

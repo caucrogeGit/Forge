@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS article_tag (
 
 !!! tip "Unicité de la paire"
     La clé primaire composite est la **vraie** garantie d'unicité.
-    Le service propose en complément un contrôle applicatif (`unique_pair`), vu au niveau avancé, mais la contrainte SQL reste la défense de fond.
+    Le service propose en complément un contrôle applicatif (`unique_pair`), vu quelques paliers plus loin, mais la contrainte SQL reste la défense de fond.
 
 ## La correspondance service ↔ table
 
@@ -51,6 +51,6 @@ Le service écrit et lit **exactement** ces colonnes, jamais d'autres.
 ## Après ce starter
 
 Vous comprenez le stockage.
-Faisons le **bilan** du niveau débutant.
+Passons à la manipulation des associations.
 
-[Bilan du niveau débutant](bilan.md)
+[Continuer : attacher une association](pivot-attach.md)

@@ -6,7 +6,7 @@ Objectif : créer une association pivot **avec ses attributs**.
 On lui donne l'`article_id`, le `tag_id` et un dictionnaire d'attributs (`position`, `epingle`).
 Seuls les champs déclarés dans la liste blanche sont acceptés.
 
-Premier palier du **niveau intermédiaire**.
+Suite du **niveau avancé** : après le modèle, la manipulation des associations.
 
 !!! note "Module opt-in : SQL visible"
     En production, le service délègue à `core.database.db` (`execute`, `fetch_one`…).
@@ -60,7 +60,7 @@ class PivotAttachController(BaseController):
 
 !!! warning "Doublon de paire"
     Tel quel, attacher deux fois la même paire crée deux lignes (ou échoue sur la clé primaire SQL).
-    Pour refuser le doublon **avant** l'`INSERT`, on active `unique_pair`, au niveau avancé.
+    Pour refuser le doublon **avant** l'`INSERT`, on active `unique_pair`, quelques paliers plus loin.
 
 ## La route
 

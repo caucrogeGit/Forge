@@ -32,19 +32,25 @@ nav:
       - Vue d'ensemble: reference.md
       - Service pivot (service.py): references/service.md
       - Générateur de sous-CRUD (make_pivot_crud.py): references/make_pivot_crud.md
-  - Progression Pivot:
+  - Progression Entités:
       - Installation: welcome/installation.md
-      - Débutant:
-          - Bonjour Forge Pivot: welcome/debutant/pivot-welcome.md
-          - Générer le sous-CRUD: welcome/debutant/pivot-make.md
-          - Le schéma SQL: welcome/debutant/pivot-schema.md
+      - Débutant (modéliser et générer):
+          - Welcome Entités: welcome/debutant/entity-welcome.md
+          - Déclarer une entité: welcome/debutant/entity-make.md
+          - Relier deux entités: welcome/debutant/relation-make.md
+          - Générer le SQL et le modèle: welcome/debutant/build-model.md
+          - Générer le CRUD: welcome/debutant/crud-make.md
           - Bilan débutant: welcome/debutant/bilan.md
-      - Intermédiaire:
-          - Attacher une association: welcome/intermediaire/pivot-attach.md
-          - Modifier et détacher: welcome/intermediaire/pivot-update.md
-          - Lister les associations: welcome/intermediaire/pivot-list.md
+      - Intermédiaire (faire évoluer):
+          - Les migrations: welcome/intermediaire/migrations.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
-      - Avancé:
+      - Avancé (pivot enrichi):
+          - Le pivot enrichi: welcome/avance/pivot-welcome.md
+          - Générer le sous-CRUD: welcome/avance/pivot-make.md
+          - Le schéma SQL: welcome/avance/pivot-schema.md
+          - Attacher une association: welcome/avance/pivot-attach.md
+          - Modifier et détacher: welcome/avance/pivot-update.md
+          - Lister les associations: welcome/avance/pivot-list.md
           - Contraintes de champ: welcome/avance/pivot-constraints.md
           - Unicité de la paire: welcome/avance/pivot-unique.md
           - Erreurs de formulaire: welcome/avance/pivot-form.md

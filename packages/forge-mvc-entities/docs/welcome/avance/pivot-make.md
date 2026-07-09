@@ -6,7 +6,7 @@ Objectif : produire un sous-CRUD dédié au pivot enrichi avec `forge make:pivot
 Il **affiche** le code à coller (contrôleur, templates, routes) sans réécrire vos fichiers (charte principe 9).
 
 !!! note "Module opt-in"
-    Ce starter suppose `forge-mvc-pivot` installé.
+    Ce starter suppose `forge-mvc-entities` installé.
     Module à **SQL visible**.
 
 ## Pourquoi une commande dédiée ?
@@ -41,7 +41,7 @@ Les **fichiers nouveaux** sont créés ; les routes à ajouter dans `mvc/routes.
 ### Comprendre ce code
 
 - Le générateur produit un sous-CRUD : lister les tags d'un article, en attacher, modifier l'attribut, détacher : exactement les opérations de pivot.
-- Le code généré s'appuie sur `PivotAdvancedService`, que vous manipulerez directement au niveau intermédiaire.
+- Le code généré s'appuie sur `PivotAdvancedService`, que vous manipulerez directement quelques paliers plus loin.
 - `--dry-run` est la bonne habitude : on lit avant d'écrire.
 
 ## À retenir

@@ -5,7 +5,7 @@ Objectif : déclarer des contraintes sur les attributs du pivot.
 **Ce que vous allez apprendre :** `PivotFieldConstraint` rend un attribut **requis** (`required=True`) ou **non nullable** (`nullable=False`).
 Le service les vérifie avant d'écrire et lève `PivotConstraintError` avec un **code** stable et le **champ** concerné.
 
-Premier palier du **niveau avancé**.
+Suite du **niveau avancé** : verrouiller l'intégrité des attributs.
 
 !!! note "Module opt-in"
     Les contraintes du service complètent (sans remplacer) celles du schéma SQL.

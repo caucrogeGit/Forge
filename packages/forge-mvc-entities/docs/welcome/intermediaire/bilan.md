@@ -1,20 +1,18 @@
-# Bilan : niveau intermédiaire (Pivot)
+# Bilan : niveau intermédiaire (Entités)
 
-Récapitulatif du **niveau intermédiaire** de la progression *Welcome Pivot*.
-Ce niveau couvre le cycle de vie d'une association : créer, modifier, supprimer, lire.
+Récapitulatif du **niveau intermédiaire** de la progression *Welcome Entités*.
+Ce niveau couvre l'évolution du schéma dans le temps, à SQL visible.
 
 ## Ce que vous avez validé
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 : [Attacher une association](pivot-attach.md) | Créer une association avec attributs (`attach`). |
-| 2 : [Modifier et détacher](pivot-update.md) | Mettre à jour les attributs (`update`) et supprimer (`detach`). |
-| 3 : [Lister les associations](pivot-list.md) | Lire les `PivotRow` d'une source (`list_for_source`). |
+| 1 : [Les migrations](migrations.md) | Provisionner la base (`db:init`), générer (`migration:make`) et appliquer (`migration:apply`) des migrations, suivre leur état. |
 
-Vous savez manipuler un pivot enrichi par le service, en SQL paramétré.
+Vous savez porter vos contrats en base et faire évoluer le schéma de façon traçable.
 
 ## Et ensuite
 
-Place au niveau **avancé** : **contraintes et intégrité**, champs requis/non nullables, unicité de la paire, et erreurs prêtes pour un formulaire.
+Place au niveau **avancé** : les **tables pivot enrichies**, une association `many_to_many` dont la table de liaison porte des attributs.
 
-[Niveau avancé : Contraintes de champ](../avance/pivot-constraints.md)
+[Niveau avancé : Bonjour le pivot enrichi](../avance/pivot-welcome.md)

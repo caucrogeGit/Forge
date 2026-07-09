@@ -1,49 +1,52 @@
-# Installation : Progression « Welcome Pivot »
+# Installation : progression « Welcome Entités »
 
-Ce préambule installe le module **opt-in** `forge-mvc-pivot` dans un projet Forge existant.
-La progression se réalise ensuite **à la main** : chaque palier décrit les fichiers à créer et le code à écrire.
+Ce préambule prépare la progression du **moteur d'entités**, l'opt-in `forge-mvc-entities`.
+La progression se réalise ensuite à la main : chaque palier décrit la commande à lancer et le code généré à observer.
 
 !!! info "Référence complète"
-    Pour l'installation détaillée du core, voir Installer Forge.
-    Pour la référence du module, voir [Tables pivot enrichies](../reference.md).
+    Pour l'installation détaillée du cœur, voir Installer Forge.
+    Pour la référence du moteur, voir [Moteur d'entités](../reference.md).
+
+## Ce que couvre cette progression
+
+Le moteur d'entités porte toute la chaîne de la couche de données.
+
+- Niveau **débutant** : déclarer une entité (`make:entity`), la relier (`make:relation`), générer son SQL et son modèle (`build:model`), puis son CRUD (`make:crud`).
+- Niveau **intermédiaire** : faire évoluer le schéma avec les migrations (`migration:make`, `migration:apply`).
+- Niveau **avancé** : les tables pivot enrichies, une association `many_to_many` qui porte des attributs.
 
 ## Prérequis
 
-- **Forge installé** (core `forge-mvc`).
+- **Forge installé** (cœur `forge-mvc`).
   Sinon, suivre d'abord Installer Forge.
 - **Python 3.12+**.
-- Aucune base de données pour ce parcours : les opérations sur la base sont démontrées via un **exécuteur injecté** de démonstration.
-  Une vraie application crée la table pivot et passe `core.database.db.execute` / `fetch_all` / `fetch_one`.
+- **Un backend de base de données** pour les paliers qui touchent la base (`build:model`, migrations, CRUD).
+  Le cœur est agnostique : installez le backend de votre choix, par exemple `pip install forge-mvc-sqlite` (fichier, sans serveur) ou `pip install forge-mvc-mariadb`.
 
-## 1. Installer le module opt-in Pivot
+## 1. Disposer d'un projet Forge
 
-`forge-mvc-pivot` est **publié sur PyPI** :
-
-```bash
-pip install --pre forge-mvc-pivot
-```
-
-## 2. Disposer d'un projet Forge
-
-La progression suppose un projet Forge déjà créé.
-Si ce n'est pas le cas, créez-en un avec :
+`forge new` installe le moteur d'entités **par défaut** : un projet neuf l'a d'emblée.
 
 ```bash
-forge new mon-projet-pivot
+forge new mon-projet-entites
 ```
 
-Aucun starter n'est généré : les fichiers du parcours se créent à la main au fil des paliers.
+Si vous partez d'un projet existant qui n'a pas le moteur, ajoutez-le :
 
-## 3. Vérifier l'installation
+```bash
+pip install --pre forge-mvc-entities
+```
+
+## 2. Vérifier l'installation
 
 ```bash
 forge doctor
 ```
 
-`forge doctor` détecte la dépendance Pivot.
+`forge doctor` détecte le moteur d'entités et les commandes qu'il fournit.
 
 ## Après l'installation
 
-Vous pouvez attaquer le premier palier, où vous découvrirez **pourquoi** un pivot enrichi diffère d'un `many_to_many` ordinaire.
+Vous pouvez attaquer le premier palier, où vous déclarez votre première entité et découvrez le contrat JSON qui la décrit.
 
-[Continuer sur le starter Welcome Pivot](debutant/pivot-welcome.md)
+[Continuer sur le starter Welcome Entités](debutant/entity-welcome.md)

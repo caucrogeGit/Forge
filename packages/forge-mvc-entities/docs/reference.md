@@ -1,56 +1,50 @@
-# Les tables pivot enrichies dans Forge (forge-mvc-pivot)
+# Les tables pivot enrichies dans Forge
 
-Ce document explique ce que fait l'opt-in `forge-mvc-pivot`, ce qu'il expose, et comment on s'en sert.
+Ce document explique le **pivot enrichi** du moteur d'entités (`forge-mvc-entities`) : ce qu'il fait, ce qu'il expose, et comment on s'en sert.
 
-`forge-mvc-pivot` gère les associations `many_to_many` **portant des attributs** : une table pivot avec des champs propres, un service de persistance, et un générateur de sous-CRUD.
+Le pivot enrichi gère les associations `many_to_many` **portant des attributs** : une table pivot avec des champs propres, un service de persistance, et un générateur de sous-CRUD.
 
-Le `many_to_many` de base (jonction simple) reste du cœur ; l'enrichi (la jonction avec des données) est cet opt-in (ADR-021).
+Le `many_to_many` de base (jonction simple) et l'enrichi (la jonction avec des données) vivent tous deux dans `forge-mvc-entities` (ADR-070, qui a absorbé l'ancien paquet `forge-mvc-pivot`, ADR-021).
 
-## 1. Rôle du module
+## 1. Rôle
 
 Certaines associations portent des informations : une inscription relie un élève et un cours, avec une note et une date.
 
-L'opt-in modélise cette jonction enrichie : `PivotAdvancedService` lit et écrit des lignes pivot (source, cible, attributs), et `forge make:pivot-crud` génère un sous-CRUD dédié pour gérer ces attributs.
+Le moteur modélise cette jonction enrichie : `PivotAdvancedService` lit et écrit des lignes pivot (source, cible, attributs), et `forge make:pivot-crud` génère un sous-CRUD dédié pour gérer ces attributs.
 
-Le contrat du bloc pivot est décrit par `pivot.schema.json`, embarqué dans le paquet depuis l'ADR-057.
+Le contrat du bloc pivot est décrit par `pivot.schema.json`, embarqué dans le paquet (hérité de l'ADR-057, désormais porté par `forge-mvc-entities`).
 
-## 2. Installation et désinstallation
+## 2. Installation
 
-### Installation
-
-```bash
-pip install --pre forge-mvc-pivot
-forge opt-in:enable pivot
-```
-
-`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
-`forge opt-in:install pivot` affiche la commande `pip` sans l'exécuter.
-
-### Désinstallation
+Le pivot enrichi fait partie du moteur d'entités : il n'y a pas de paquet ni d'activation séparés.
 
 ```bash
-forge opt-in:disable pivot
-pip uninstall forge-mvc-pivot
+forge new mon-projet        # installe forge-mvc-entities par défaut
 ```
 
-`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-`forge opt-in:remove pivot` affiche la commande `pip uninstall` sans l'exécuter.
+Dans un projet existant sans le moteur :
+
+```bash
+pip install --pre forge-mvc-entities
+```
+
+Les commandes du moteur (dont `make:pivot-crud`) sont alors découvertes automatiquement (entry point `forge_mvc.commands`, ADR-070) ; aucun `opt-in:enable` n'est requis.
 
 ## 3. Vue d'ensemble rapide
 
 | Élément | Valeur |
 |---|---|
-| Paquet | `forge-mvc-pivot` |
+| Paquet | `forge-mvc-entities` |
 | Module | `forge_mvc_entities` |
-| Catégorie | Données et modélisation (ADR-055) |
-| Couche | opt-in (brique optionnelle) |
+| Catégorie | Données et modélisation |
+| Couche | opt-in (moteur d'entités) |
 | Dépend de | `forge-mvc` et un backend BDD (ADR-054) |
 | API publique | `PivotAdvancedService`, `PivotRow`, `PivotFieldConstraint`, `PivotConstraintError`, `PivotFormError`, `pivot_error_to_form_error` |
 | Générateur | `forge make:pivot-crud` |
 | Contrat | `pivot.schema.json` (embarqué, ADR-057) |
 | Exécuteur | injecté (`fetch_one`, `fetch_all`, `execute`) |
-| Décisions d'architecture | ADR-021 (extraction), ADR-057 (schéma) |
-| Installation | `pip install --pre forge-mvc-pivot` |
+| Décisions d'architecture | ADR-021 (extraction pivot), ADR-057 (schéma), ADR-070 (fusion dans le moteur d'entités) |
+| Installation | `pip install --pre forge-mvc-entities` (ou par défaut via `forge new`) |
 
 ## 4. Schémas UML
 
@@ -228,7 +222,7 @@ Les contraintes (`required`, `nullable`) valident les attributs avant écriture 
     Le `pivot.schema.json` qui décrit le bloc pivot est embarqué par ce paquet (ADR-057) ; le cœur ne le référence plus (bloc pivot opaque côté `relations`).
 
 !!! note "Indépendance du cœur"
-    Le cœur de Forge ne dépend pas de `forge-mvc-pivot` : la dépendance va de l'opt-in vers le cœur.
+    Le cœur de Forge ne dépend pas de `forge-mvc-entities` : la dépendance va de l'opt-in vers le cœur.
 
 ## Voir aussi
 

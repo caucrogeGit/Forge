@@ -7,7 +7,7 @@ Sinon, il lève `PivotConstraintError(code="duplicate_pair")`.
 
 !!! note "Module opt-in"
     Ce contrôle applicatif est un **confort d'UX** : il donne une erreur claire avant d'écrire.
-    La garantie de fond reste la **clé primaire composite** du schéma SQL (vue au niveau débutant).
+    La garantie de fond reste la **clé primaire composite** du schéma SQL (vue au palier du schéma).
 
 ## Classes Forge utilisées
 
