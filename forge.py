@@ -16,15 +16,10 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 from cli.project.install_source import forge_mvc_git_spec, pin_forge_mvc_to_git
-from forge_mvc_entities.db_apply import main as db_apply_main
-from forge_mvc_entities.db_init import main as db_init_main
-from forge_mvc_entities.migrations import main as migrations_main
-from forge_mvc_entities.make_entity import main as make_entity_main
-from forge_mvc_entities.make_relation import main as make_relation_main
-from forge_mvc_entities.make_crud import cmd_make_crud_main
-from forge_mvc_entities.model import main as model_main
-from forge_mvc_entities.entity_validate import main as entity_validate_main
-from forge_mvc_entities.entity_doc import main as entity_doc_main
+# Le moteur d'entités (forge-mvc-entities) n'est plus importé au chargement du
+# cœur (ADR-070) : ses commandes sont gatées sur son installation (entry point
+# forge_mvc.commands + dispatch_optin), et db:init/db:apply l'importent
+# paresseusement dans leur bloc dédié ci-dessous.
 from cli.public.public_contact import main as public_contact_main
 from cli.public.public_form import main as public_form_main
 from cli.public.public_list import main as public_list_main
@@ -521,8 +516,6 @@ def _group(commands: tuple[str, ...], runner: _CoreRunner) -> dict[str, _CoreRun
     return {name: runner for name in commands}
 
 
-_MAKE_ENTITY_HINT = "indique le nom de l'entité. Exemple : forge make:entity Contact"
-_MAKE_CRUD_HINT = "indique le nom de l'entité. Exemple : forge make:crud Contact"
 _AUTH_COMMANDS = (
     "auth:init", "auth:doctor", "auth:status", "auth:list-sql",
     "auth:user:create", "auth:user:list", "auth:user:show", "auth:user:disable",
@@ -533,24 +526,15 @@ _AUTH_COMMANDS = (
 CORE_COMMANDS: dict[str, _CoreRunner] = {
     "run": _delegate(lambda a: run_main(a)),
     "update": _delegate(lambda a: update_main(a), exit_rc=True),
-    "make:entity": _delegate(
-        lambda a: make_entity_main(a), min_args=2,
-        label="make:entity", missing_hint=_MAKE_ENTITY_HINT,
-    ),
-    "make:crud": _delegate(
-        lambda a: cmd_make_crud_main(a), min_args=2,
-        label="make:crud", missing_hint=_MAKE_CRUD_HINT,
-    ),
+    # make:entity / make:crud : commandes du moteur d'entités, gatées sur
+    # forge-mvc-entities (ADR-070) — découvertes via l'entry point forge_mvc.commands.
     "make:auth": _delegate(lambda a: make_auth_main(a)),
     "make:public-page": _delegate(lambda a: public_page_main(a)),
     "make:public-list": _delegate(lambda a: public_list_main(a)),
     "make:public-show": _delegate(lambda a: public_show_main(a)),
     "make:public-form": _delegate(lambda a: public_form_main(a)),
     "make:public-contact": _delegate(lambda a: public_contact_main(a)),
-    "make:relation": _delegate(lambda a: make_relation_main(a)),
-    "entity:validate": _delegate(lambda a: entity_validate_main(a)),
-    "entity:doc": _delegate(lambda a: entity_doc_main(a)),
-    "sync:entity": _delegate(lambda a: model_main(a), full=True),
+    # make:relation, entity:*, sync:entity : moteur d'entités (ADR-070), via entry point.
     "js:init": _delegate(lambda a: front_main(a), full=True),
     **_group(("i18n:init", "i18n:check"), _delegate(lambda a: i18n_main(a), full=True)),
     **_group(_AUTH_COMMANDS, _delegate(lambda a: auth_main(a), full=True)),
@@ -566,17 +550,11 @@ CORE_COMMANDS: dict[str, _CoreRunner] = {
         _delegate(lambda a: modules_main(a), full=True),
     ),
     "docs:pdf": _lazy("cli.docs.quarkdown", attr="build_pdf", no_args=True),
-    **_group(
-        ("sync:relations", "build:model", "check:model"),
-        _delegate(lambda a: model_main(a), full=True),
-    ),
-    **_group(
-        ("migration:status", "migration:apply", "migration:make", "migration:diff"),
-        _delegate(lambda a: migrations_main(a), full=True),
-    ),
+    # sync:relations, build:model, check:model, migration:* : moteur d'entités
+    # (ADR-070), découvertes via l'entry point forge_mvc.commands.
     "schema:list": _lazy("cli.schemas.schema_list", attr="schema_list_main"),
     "schema:doctor": _lazy("cli.schemas.schema_doctor", attr="schema_doctor_main"),
-    "db:config": _lazy("forge_mvc_entities.db_config", exit_rc=True),
+    # db:config : moteur d'entités (ADR-070), via entry point forge_mvc.commands.
 }
 
 
@@ -649,23 +627,14 @@ def main() -> None:
         cmd_new(args[1], profile=profile, bare=bare)
         return
 
-    if command == "make:pivot-crud":
-        if len(args) < 3:
-            cli_fail(
-                "arguments manquants pour «forge make:pivot-crud».",
-                hint="indique l'entité source et le nom de la relation. Exemple : forge make:pivot-crud Article tags",
-            )
+    if command == "db:init":
         try:
-            from forge_mvc_entities.make_pivot_crud import cmd_make_pivot_crud_main
+            from forge_mvc_entities.db_init import main as db_init_main
         except ImportError:
             cli_fail(
                 "module forge-mvc-entities non installé.",
-                hint="installe le module opt-in : pip install --pre forge-mvc-entities",
+                hint="installe le moteur d'entités : pip install --pre forge-mvc-entities",
             )
-        cmd_make_pivot_crud_main(args[1:])
-        return
-
-    if command == "db:init":
         db_init_main([command])
         return
 
@@ -676,6 +645,13 @@ def main() -> None:
             print("Applique le SQL de toutes les entités du projet (mvc/entities/) à la base.")
             print("Requiert un backend BDD installé et une base configurée (voir forge db:init).")
             raise SystemExit(0)
+        try:
+            from forge_mvc_entities.db_apply import main as db_apply_main
+        except ImportError:
+            cli_fail(
+                "module forge-mvc-entities non installé.",
+                hint="installe le moteur d'entités : pip install --pre forge-mvc-entities",
+            )
         db_apply_main([command])
         return
 
@@ -704,6 +680,16 @@ def main() -> None:
     # dispatch, puis commandes livrées par les opt-ins.
     if dispatch_core(command, args):
         return
+
+    # make:entity / make:crud exigent le nom de l'entité en argument : on garde
+    # le conseil d'usage du cœur avant de déléguer au moteur d'entités (sinon le
+    # handler basculerait en mode interactif, ADR-070).
+    if command in ("make:entity", "make:crud") and len(args) < 2:
+        example = "Contact"
+        cli_fail(
+            f"argument manquant pour «forge {command}».",
+            hint=f"indique le nom de l'entité. Exemple : forge {command} {example}",
+        )
 
     if dispatch_optin(command, args):
         return

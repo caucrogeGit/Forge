@@ -48,7 +48,7 @@ def test_dispatch_build_model_transmet_dry_run(monkeypatch):
         captured["args"] = args
 
     monkeypatch.setattr(sys, "argv", ["forge", "build:model", "--dry-run"])
-    monkeypatch.setattr(forge, "model_main", fake_model_main)
+    monkeypatch.setattr("forge_mvc_entities.model.main", fake_model_main)
 
     forge.main()
 
@@ -62,7 +62,7 @@ def test_dispatch_build_model_sans_dry_run(monkeypatch):
         captured["args"] = args
 
     monkeypatch.setattr(sys, "argv", ["forge", "build:model"])
-    monkeypatch.setattr(forge, "model_main", fake_model_main)
+    monkeypatch.setattr("forge_mvc_entities.model.main", fake_model_main)
 
     forge.main()
 
@@ -206,7 +206,7 @@ def test_dispatch_migration_status(monkeypatch):
         captured["args"] = args
 
     monkeypatch.setattr(sys, "argv", ["forge", "migration:status"])
-    monkeypatch.setattr(forge, "migrations_main", fake_migrations_main)
+    monkeypatch.setattr("forge_mvc_entities.migrations.main", fake_migrations_main)
 
     forge.main()
 
@@ -220,7 +220,7 @@ def test_dispatch_migration_apply(monkeypatch):
         captured["args"] = args
 
     monkeypatch.setattr(sys, "argv", ["forge", "migration:apply"])
-    monkeypatch.setattr(forge, "migrations_main", fake_migrations_main)
+    monkeypatch.setattr("forge_mvc_entities.migrations.main", fake_migrations_main)
 
     forge.main()
 
@@ -234,7 +234,7 @@ def test_dispatch_migration_make(monkeypatch):
         captured["args"] = args
 
     monkeypatch.setattr(sys, "argv", ["forge", "migration:make", "create_contacts"])
-    monkeypatch.setattr(forge, "migrations_main", fake_migrations_main)
+    monkeypatch.setattr("forge_mvc_entities.migrations.main", fake_migrations_main)
 
     forge.main()
 
@@ -252,7 +252,7 @@ def test_dispatch_migration_make_from_entity(monkeypatch):
         "argv",
         ["forge", "migration:make", "create_contacts", "--from-entity", "Contact"],
     )
-    monkeypatch.setattr(forge, "migrations_main", fake_migrations_main)
+    monkeypatch.setattr("forge_mvc_entities.migrations.main", fake_migrations_main)
 
     forge.main()
 
@@ -270,7 +270,7 @@ def test_dispatch_migration_make_from_entities(monkeypatch):
         "argv",
         ["forge", "migration:make", "initial_schema", "--from-entities"],
     )
-    monkeypatch.setattr(forge, "migrations_main", fake_migrations_main)
+    monkeypatch.setattr("forge_mvc_entities.migrations.main", fake_migrations_main)
 
     forge.main()
 
@@ -288,7 +288,7 @@ def test_dispatch_migration_make_from_diff(monkeypatch):
         "argv",
         ["forge", "migration:make", "add_contact_fields", "--from-diff", "Contact"],
     )
-    monkeypatch.setattr(forge, "migrations_main", fake_migrations_main)
+    monkeypatch.setattr("forge_mvc_entities.migrations.main", fake_migrations_main)
 
     forge.main()
 
@@ -311,7 +311,7 @@ def test_dispatch_migration_diff_entity(monkeypatch):
         "argv",
         ["forge", "migration:diff", "--entity", "Contact"],
     )
-    monkeypatch.setattr(forge, "migrations_main", fake_migrations_main)
+    monkeypatch.setattr("forge_mvc_entities.migrations.main", fake_migrations_main)
 
     forge.main()
 

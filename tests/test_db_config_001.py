@@ -186,5 +186,7 @@ def test_backends_installes_exposent_env_template():
 # ── db:config est enregistrée dans le dispatch ───────────────────────────────
 
 def test_db_config_enregistree_dans_forge():
-    import forge
-    assert "db:config" in forge.CORE_COMMANDS
+    # db:config est une commande du moteur d'entites : gatee sur forge-mvc-entities,
+    # decouverte via l'entry point forge_mvc.commands (ADR-070), plus dans CORE_COMMANDS.
+    from cli.commands.optin_dispatch import all_optin_commands
+    assert "db:config" in all_optin_commands()

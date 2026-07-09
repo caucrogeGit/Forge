@@ -71,6 +71,10 @@ def test_forge_new_profile_sans_valeur_conseil(monkeypatch, capsys):
 
 # ── forge make:entity — argument manquant ─────────────────────────────────────
 
+# make:entity / make:crud sont gatées sur forge-mvc-entities (ADR-070), mais le
+# cœur garde un garde d'argument : sans nom d'entité, il conseille l'usage avant
+# de déléguer au moteur d'entités (le handler basculerait sinon en interactif).
+
 def test_forge_make_entity_sans_arg_conseil(monkeypatch, capsys):
     monkeypatch.setattr(sys, "argv", ["forge", "make:entity"])
     with pytest.raises(SystemExit) as exc_info:

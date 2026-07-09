@@ -109,8 +109,10 @@ def test_output_sans_chemin_echoue(tmp_path, monkeypatch):
 # ── Enregistrement CLI ───────────────────────────────────────────────────────
 
 def test_forge_py_dispatche_entity_doc():
-    from forge import CORE_COMMANDS
-    assert "entity:doc" in CORE_COMMANDS
+    # entity:doc est gatee sur forge-mvc-entities (ADR-070), decouverte via
+    # l'entry point forge_mvc.commands (plus cablee en dur dans forge.py).
+    from cli.commands.optin_dispatch import all_optin_commands
+    assert "entity:doc" in all_optin_commands()
 
 
 def test_forge_help_liste_entity_doc():

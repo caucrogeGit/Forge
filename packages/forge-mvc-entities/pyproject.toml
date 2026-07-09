@@ -29,6 +29,11 @@ Homepage = "https://github.com/caucrogeGit/Forge"
 Repository = "https://github.com/caucrogeGit/Forge"
 Documentation = "https://forgemvc.com/docs/forge/"
 
+# Commandes CLI découvertes par le cœur (ADR-059/070) : le moteur d'entités
+# n'est plus câblé en dur dans forge.py, il est gaté sur son installation.
+[project.entry-points."forge_mvc.commands"]
+forge_mvc_entities = "forge_mvc_entities.commands:COMMANDS"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["forge_mvc_entities*"]

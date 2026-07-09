@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Any, cast
 
 import cli._support.output as out
-from forge_mvc_entities.make_crud import _pk_field, _to_snake
-from forge_mvc_entities.validation import validate_entity_definition
+# Moteur d'entités (forge-mvc-entities) importé paresseusement dans les fonctions
+# qui en dépendent (ADR-070) : le cœur n'en dépend pas au chargement.
 from cli.public.public_page import (
     PUBLIC_CONTENT_BLOCK,
     PUBLIC_LAYOUT,
@@ -180,6 +180,8 @@ def _list_select_columns(spec: PublicListSpec) -> str:
 
 
 def load_public_list_definition(entity_name: str, *, entities_root: Path) -> dict[str, Any]:
+    from forge_mvc_entities.make_crud import _to_snake
+    from forge_mvc_entities.validation import validate_entity_definition
     snake = _to_snake(entity_name)
     json_path = entities_root / snake / f"{snake}.json"
     if not json_path.exists():
@@ -189,6 +191,7 @@ def load_public_list_definition(entity_name: str, *, entities_root: Path) -> dic
 
 
 def build_public_list_spec(definition: dict[str, Any]) -> PublicListSpec:
+    from forge_mvc_entities.make_crud import _pk_field, _to_snake
     entity = definition["entity"]
     snake = _to_snake(entity)
     plural = snake + "s"
