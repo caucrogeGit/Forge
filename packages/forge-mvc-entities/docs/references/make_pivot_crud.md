@@ -2,7 +2,7 @@
 
 Ce document décrit la déclaration d'un pivot enrichi dans `relations.json` et la commande `make:pivot-crud` qui en génère le sous-CRUD.
 
-Le fichier de code correspondant est `forge_mvc_pivot/make_pivot_crud.py`.
+Le fichier de code correspondant est `forge_mvc_entities/make_pivot_crud.py`.
 
 ## 1. À quoi sert ce module ?
 

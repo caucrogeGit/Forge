@@ -11,15 +11,15 @@ import sqlite3
 
 import pytest
 
-pytest.importorskip("forge_mvc_pivot")
-from forge_mvc_pivot import (
+pytest.importorskip("forge_mvc_entities")
+from forge_mvc_entities import (
     PivotAdvancedService,
     PivotConstraintError,
     PivotFieldConstraint,
     PivotFormError,
     pivot_error_to_form_error,
 )
-from forge_mvc_pivot.make_pivot_crud import make_pivot_crud
+from forge_mvc_entities.make_pivot_crud import make_pivot_crud
 
 
 # ── Fixture SQLite in-memory ──────────────────────────────────────────────────
@@ -123,7 +123,7 @@ def generated(tmp_path):
 # ── PivotFormError ────────────────────────────────────────────────────────────
 
 def test_pivot_form_error_importable():
-    from forge_mvc_pivot import PivotFormError
+    from forge_mvc_entities import PivotFormError
     assert PivotFormError is not None
 
 
@@ -272,7 +272,7 @@ def test_controleur_genere_importe_pivot_error_to_form_error(generated):
 
 
 def test_controleur_genere_importe_depuis_core_pivot_advanced(generated):
-    assert "from forge_mvc_pivot import" in generated["ctrl"]
+    assert "from forge_mvc_entities import" in generated["ctrl"]
     assert "PivotConstraintError" in generated["ctrl"]
     assert "pivot_error_to_form_error" in generated["ctrl"]
 

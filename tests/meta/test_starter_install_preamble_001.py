@@ -99,8 +99,8 @@ MIGRATED = {
         "welcome/",
     ),
     "welcome-pivot": (
-        PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "docs" / "welcome",
-        PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "mkdocs.yml",
+        PROJECT_ROOT / "packages" / "forge-mvc-entities" / "docs" / "welcome",
+        PROJECT_ROOT / "packages" / "forge-mvc-entities" / "mkdocs.yml",
         "welcome/",
     ),
     "welcome-audio": (

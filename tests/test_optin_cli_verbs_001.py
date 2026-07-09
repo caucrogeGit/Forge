@@ -26,7 +26,7 @@ class TestCatalog:
         assert optin_names() == [
             "admin", "audio", "audit", "deploy", "files", "i18n", "images",
             "import-export", "iot", "jobs", "mail", "mfa", "notifications",
-            "pivot", "qrcode", "rbac", "settings", "stats", "video", "workflow",
+            "qrcode", "rbac", "settings", "stats", "video", "workflow",
         ]
 
     @pytest.mark.parametrize("name", optin_names())

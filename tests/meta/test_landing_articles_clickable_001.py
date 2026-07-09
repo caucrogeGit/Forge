@@ -24,7 +24,7 @@ MIGRATED_DOC_ROOTS = {
     "workflow": PROJECT_ROOT / "packages" / "forge-mvc-workflow" / "docs",
     "mfa": PROJECT_ROOT / "packages" / "forge-mvc-mfa" / "docs",
     "files": PROJECT_ROOT / "packages" / "forge-mvc-files" / "docs",
-    "pivot": PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "docs",
+    "entities": PROJECT_ROOT / "packages" / "forge-mvc-entities" / "docs",
     "audio": PROJECT_ROOT / "packages" / "forge-mvc-audio" / "docs",
     "mail": PROJECT_ROOT / "packages" / "forge-mvc-mail" / "docs",
     "images": PROJECT_ROOT / "packages" / "forge-mvc-images" / "docs",
@@ -47,7 +47,12 @@ def _doc_source(doc_path: str) -> Path:
     """
     alias, _, rest = doc_path.partition("/")
     if alias in MIGRATED_DOC_ROOTS and rest:
-        return MIGRATED_DOC_ROOTS[alias] / f"{rest}.md"
+        # Le préfixe « entities » est partagé : doc du paquet forge-mvc-entities
+        # (welcome/reference, ADR-070) ET pages cœur docs/entities/*. On tente
+        # d'abord la doc du paquet, sinon on retombe sur la doc cœur.
+        pkg = MIGRATED_DOC_ROOTS[alias] / f"{rest}.md"
+        if pkg.exists():
+            return pkg
     return DOCS / f"{doc_path}.md"
 
 EXPECTED_DOC_PATHS = [
@@ -83,7 +88,7 @@ EXPECTED_DOC_PATHS = [
     "video/welcome/installation",
     "audio/welcome/installation",
     "mail/welcome/installation",
-    "pivot/reference",
+    "entities/welcome/installation",
     # Section Starters (13 cartes de progression)
     "starters/welcome-forge/debutant/welcome",
     "mfa/welcome/installation",

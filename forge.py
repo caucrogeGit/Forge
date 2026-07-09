@@ -656,11 +656,11 @@ def main() -> None:
                 hint="indique l'entité source et le nom de la relation. Exemple : forge make:pivot-crud Article tags",
             )
         try:
-            from forge_mvc_pivot.make_pivot_crud import cmd_make_pivot_crud_main
+            from forge_mvc_entities.make_pivot_crud import cmd_make_pivot_crud_main
         except ImportError:
             cli_fail(
-                "module forge-mvc-pivot non installé.",
-                hint="installe le module opt-in : pip install --pre forge-mvc-pivot",
+                "module forge-mvc-entities non installé.",
+                hint="installe le module opt-in : pip install --pre forge-mvc-entities",
             )
         cmd_make_pivot_crud_main(args[1:])
         return

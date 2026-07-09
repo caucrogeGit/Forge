@@ -7,11 +7,11 @@ gardées par ce test contre toute dérive :
 
 - ``skeleton/data/schemas/`` : gabarit semé dans chaque projet généré par
   ``forge new`` ; ses schémas de base sont byte-identiques au canonique ;
-- schémas de base embarqués par un opt-in pour son autonomie (``field`` et
-  ``common`` dans ``forge-mvc-pivot``, ADR-057) : identiques au canonique.
-
 Schémas extraits du cœur vers leur opt-in (absents du cœur, embarqués par le
-paquet) : ``rbac`` (ADR-056), ``pivot`` (ADR-057).
+paquet) : ``rbac`` (ADR-056), ``pivot`` (ADR-057, désormais dans
+``forge-mvc-entities`` qui a absorbé pivot, ADR-070). ``forge-mvc-entities``
+dépend du cœur : il n'embarque pas de copie des schémas de base (il lit
+``cli/schemas`` au runtime), seul ``pivot.schema.json`` lui est propre.
 """
 from __future__ import annotations
 
@@ -37,12 +37,15 @@ BASE_SCHEMAS = [
 # Schémas extraits du cœur vers leur opt-in (ADR-056/057).
 RBAC_SCHEMA = "rbac.schema.json"
 PIVOT_SCHEMA = "pivot.schema.json"
-PIVOT_PKG_SCHEMAS = ROOT / "packages" / "forge-mvc-pivot" / "forge_mvc_pivot" / "schemas"
+# pivot absorbé par forge-mvc-entities (ADR-070) : pivot.schema.json y est embarqué.
+PIVOT_PKG_SCHEMAS = ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "schemas"
 RBAC_PKG_SCHEMAS = ROOT / "packages" / "forge-mvc-rbac" / "forge_mvc_rbac" / "schemas"
 
 # Schémas de base copiés dans un opt-in pour son autonomie : doivent rester
-# identiques au canonique cli/schemas (anti-dérive, ADR-058).
-OPTIN_EMBEDDED_BASE = [
+# identiques au canonique cli/schemas (anti-dérive, ADR-058). forge-mvc-entities
+# embarque common + field aux côtés de pivot.schema.json pour que ses `$ref`
+# résolvent de façon autonome (hérité de forge-mvc-pivot, ADR-057/070).
+OPTIN_EMBEDDED_BASE: list[tuple[Path, str]] = [
     (PIVOT_PKG_SCHEMAS, "field.schema.json"),
     (PIVOT_PKG_SCHEMAS, "common.schema.json"),
 ]
@@ -104,11 +107,12 @@ def test_rbac_schema_extrait_du_coeur():
 
 def test_pivot_schema_extrait_du_coeur():
     """pivot.schema.json a quitté le cœur (ADR-057) : absent du canonique et du
-    gabarit, embarqué par l'opt-in forge-mvc-pivot."""
+    gabarit, embarqué par l'opt-in qui porte le pivot (forge-mvc-entities depuis
+    l'absorption ADR-070)."""
     for absent_dir in (CLI_SCHEMAS, SKELETON_SCHEMAS):
         assert not (absent_dir / PIVOT_SCHEMA).exists(), (
             f"{PIVOT_SCHEMA} ne doit plus être dans {absent_dir} (ADR-057)."
         )
     assert (PIVOT_PKG_SCHEMAS / PIVOT_SCHEMA).exists(), (
-        f"{PIVOT_SCHEMA} doit être embarqué par forge-mvc-pivot."
+        f"{PIVOT_SCHEMA} doit être embarqué par forge-mvc-entities (ADR-070)."
     )

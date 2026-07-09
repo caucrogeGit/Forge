@@ -14,12 +14,32 @@ ADR-058), a l'image du contrat `Dialect`.
 
 L'API du paquet est faite de ses sous-modules (un par commande : `make_entity`,
 `make_relation`, `make_crud`, `model`, `entity_validate`, `entity_doc`,
-`migrations`, `db_apply`, `db_init`, `db_config`, ...) et de leurs fonctions
-publiques (`validation.validate_entity_definition`,
+`migrations`, `db_apply`, `db_init`, `db_config`, `make_pivot_crud`, ...) et de
+leurs fonctions publiques (`validation.validate_entity_definition`,
 `relations.validate_relations_definition`, ...). On importe le sous-module voulu.
+
+L'API runtime du pivot enrichi (`many_to_many` avec attributs), absorbee de
+`forge-mvc-pivot` (ADR-021, repliee ici par ADR-070), est re-exportee a la racine
+pour l'usage applicatif (`from forge_mvc_entities import PivotAdvancedService`).
 """
 from __future__ import annotations
 
-__all__: list[str] = []
+from forge_mvc_entities.service import (
+    PivotAdvancedService,
+    PivotConstraintError,
+    PivotFieldConstraint,
+    PivotFormError,
+    PivotRow,
+    pivot_error_to_form_error,
+)
+
+__all__ = [
+    "PivotAdvancedService",
+    "PivotConstraintError",
+    "PivotFieldConstraint",
+    "PivotFormError",
+    "PivotRow",
+    "pivot_error_to_form_error",
+]
 
 __version__ = "1.0.0rc2"

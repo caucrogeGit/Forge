@@ -119,7 +119,7 @@ class TestNewElementsPresent:
         "forge-mvc-video",
         "forge-mvc-audio",
         "forge-mvc-mail",
-        "forge-mvc-pivot",
+        "forge-mvc-entities",
     ])
     def test_all_modules_mentioned(self, module_name):
         assert module_name in self.source, (

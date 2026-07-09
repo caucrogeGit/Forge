@@ -24,7 +24,7 @@ from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 
-from forge_mvc_pivot import PivotAdvancedService, PivotConstraintError
+from forge_mvc_entities import PivotAdvancedService, PivotConstraintError
 
 
 def _service() -> PivotAdvancedService:

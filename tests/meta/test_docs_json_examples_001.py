@@ -136,7 +136,7 @@ REGISTRY, SCHEMAS_BY_ID = _load_schema_registry()
 # pivot.schema.json est extrait vers l'opt-in forge-mvc-pivot (ADR-057/058) :
 # on valide les exemples pivot des docs contre le schéma embarqué par le paquet.
 PIVOT_SCHEMAS_DIR = (
-    PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "forge_mvc_pivot" / "schemas"
+    PROJECT_ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "schemas"
 )
 PIVOT_REGISTRY, PIVOT_SCHEMAS_BY_ID = _load_schema_registry(PIVOT_SCHEMAS_DIR)
 ENTITY_SCHEMA_ID = "https://forge-mvc.dev/schemas/entity.schema.json"

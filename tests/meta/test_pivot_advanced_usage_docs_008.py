@@ -14,7 +14,7 @@ pytestmark = pytest.mark.meta
 # Doc embarquée par paquet depuis l'ADR-038 (montée sous /pivot/reference/).
 # Référence éclatée en pages par-module (DOCS-PIVOT-REFERENCE-SPLIT-001) :
 # index + references/*.md. Le contenu est vérifié sur l'ensemble agrégé.
-DOC_DIR = Path("packages/forge-mvc-pivot/docs")
+DOC_DIR = Path("packages/forge-mvc-entities/docs")
 DOC_PAGE = DOC_DIR / "reference.md"
 MKDOCS = Path("mkdocs.yml")
 PIVOTS_PAGE = Path("docs/entities/pivots-many-to-many.md")
@@ -179,7 +179,7 @@ def test_page_ne_dit_pas_pypi_publie(doc):
 
 def test_mkdocs_reference_la_page(mkdocs):
     # Doc embarquée (ADR-038) : le site agrège le sous-mkdocs du paquet pivot.
-    assert "packages/forge-mvc-pivot/mkdocs.yml" in mkdocs
+    assert "packages/forge-mvc-entities/mkdocs.yml" in mkdocs
 
 
 # ── pivots-many-to-many.md ────────────────────────────────────────────────────

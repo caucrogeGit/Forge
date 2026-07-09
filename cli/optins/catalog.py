@@ -88,10 +88,6 @@ OFFICIAL_OPTINS: dict[str, OptIn] = {
         "stats", "forge-mvc-stats", "forge_mvc_stats", KIND_LIBRARY, CATEGORY_DATA,
         "Journal d'événements et agrégats par comptage (par nom ou catégorie).",
     ),
-    "pivot": OptIn(
-        "pivot", "forge-mvc-pivot", "forge_mvc_pivot", KIND_LIBRARY, CATEGORY_DATA,
-        "Tables pivot enrichies (many_to_many avec attributs) et générateur make:pivot-crud.",
-    ),
     "import-export": OptIn(
         "import-export", "forge-mvc-import-export", "forge_mvc_import_export", KIND_LIBRARY, CATEGORY_DATA,
         "Échange CSV : import (validation par champ, rapport d'erreurs) et export programmatique (to_csv).",

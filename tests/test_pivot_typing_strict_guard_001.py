@@ -17,11 +17,11 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("forge_mvc_pivot")
+pytest.importorskip("forge_mvc_entities")
 
-import forge_mvc_pivot
+import forge_mvc_entities
 
-PKG_ROOT = Path(forge_mvc_pivot.__file__).resolve().parent
+PKG_ROOT = Path(forge_mvc_entities.__file__).resolve().parent
 MARKER = "# pyright: strict"
 
 
@@ -30,7 +30,7 @@ def _has_code(text: str) -> bool:
     return any(line.strip() for line in text.splitlines())
 
 
-def test_tout_forge_mvc_pivot_est_pyright_strict():
+def test_tout_forge_mvc_entities_est_pyright_strict():
     missing: list[str] = []
     for path in sorted(PKG_ROOT.rglob("*.py")):
         if "__pycache__" in path.parts:
@@ -42,14 +42,14 @@ def test_tout_forge_mvc_pivot_est_pyright_strict():
             missing.append(path.relative_to(PKG_ROOT).as_posix())
 
     assert missing == [], (
-        f"Fichiers de forge_mvc_pivot/ sans `{MARKER}` : {missing}. "
+        f"Fichiers de forge_mvc_entities/ sans `{MARKER}` : {missing}. "
         "Tout module du paquet doit être strict (cliquet typage opt-ins)."
     )
 
 
-def test_forge_mvc_pivot_expose_py_typed():
+def test_forge_mvc_entities_expose_py_typed():
     marker = PKG_ROOT / "py.typed"
     assert marker.exists(), (
-        "forge_mvc_pivot/py.typed attendu (PEP 561) : sans lui, le paquet est "
+        "forge_mvc_entities/py.typed attendu (PEP 561) : sans lui, le paquet est "
         "vu comme non typé par pyright/mypy même installé."
     )

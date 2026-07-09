@@ -27,7 +27,7 @@ Cette page liste les opt-ins officiels par usage ; chaque nom renvoie à sa docu
 | [Notifications](../notifications/reference.md) | notifications in-app (table `notifications`) |
 | [Import/Export CSV](../import-export/reference.md) | import validé et export programmatique en CSV |
 | [Statistiques](../stats/reference.md) | agrégats et compteurs d'événements |
-| [Pivot](../pivot/reference.md) | tables pivot enrichies (`many_to_many` avec attributs) |
+| [Pivot](../entities/reference.md) | tables pivot enrichies (`many_to_many` avec attributs) |
 
 ## Médias et fichiers
 

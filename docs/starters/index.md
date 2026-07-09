@@ -52,7 +52,7 @@ Chaque opt-in a son propre parcours d'apprentissage. Suivez-le quand vous ajoute
 - [Notifications](../notifications/welcome/installation.md) : notifications in-app.
 - [Import/Export CSV](../import-export/welcome/installation.md) : importer et exporter des données.
 - [Statistiques](../stats/welcome/installation.md) : compter et agréger des événements.
-- [Pivot](../pivot/welcome/installation.md) : tables pivot enrichies `many_to_many`.
+- [Pivot](../entities/welcome/installation.md) : tables pivot enrichies `many_to_many`.
 
 ### Médias et fichiers
 

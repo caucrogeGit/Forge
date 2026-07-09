@@ -151,7 +151,6 @@ Les classifiers `Development Status` reflètent la maturité réelle de chaque p
 | `forge-mvc-video` | `4 - Beta` | Module vidéo opt-in : chaîne complète `video:upload` → `video:process` → lecture HTTP Range, + `video:cleanup` ; transcodage MP4 H.264/AAC. Publié sur PyPI depuis `1.0.0-beta.13` |
 | `forge-mvc-audio` | `4 - Beta` | Module audio opt-in **sans état** : upload, sondage (`ffprobe`), transcodage MP3 (`ffmpeg`), lecture HTTP Range, `audio:doctor`. Pas de base de données. Publié sur PyPI depuis `1.0.0-beta.13` |
 | `forge-mvc-files` | `4 - Beta` | Upload générique extrait du core (ADR-019) : écriture sécurisée, storage anti-traversal, service de fichiers, rate-limit. Publié sur PyPI depuis `1.0.0-beta.13` |
-| `forge-mvc-pivot` | `4 - Beta` | Pivot advanced extrait du core (ADR-021) : associations `many_to_many` enrichies + générateur `make:pivot-crud`. Publié sur PyPI depuis `1.0.0-beta.13` |
 | `forge-mvc-mail` | `4 - Beta` | Email opt-in extrait du core (ADR-022) : composition, transports interchangeables, templates Jinja, CLI `mail:*`. Publié sur PyPI depuis `1.0.0-beta.13` |
 | `forge-mvc-i18n` | `4 - Beta` | Internationalisation opt-in extraite du core (ADR-027) : catalogues JSON, locale par défaut et fallback, cache, helper `trans()` Jinja. Le noyau garde un repli no-op renvoyant la clé. Pas encore publié sur PyPI |
 | `forge-mvc-admin` | `4 - Beta` | Back-office applicatif opt-in : CRUD générique sur les entités déclarées, sécurité par défaut (auth + CSRF), RBAC optionnel, `admin:init` / `admin:doctor`. Chantier clôturé (suite verte), non publié sur PyPI |
@@ -406,7 +405,6 @@ La publication reste manuelle et délibérée.
 | `forge-mvc-audio` | ✅ Publié sur PyPI depuis `1.0.0-beta.13`, version alignée avec le core | `pip install --pre forge-mvc-audio` |
 | `forge-mvc-video` | ✅ Publié sur PyPI depuis `1.0.0-beta.13`, version alignée avec le core | `pip install --pre forge-mvc-video` |
 | `forge-mvc-iot` | ✅ Publié sur PyPI depuis `1.0.0-beta.12`, version alignée avec le core | `pip install --pre forge-mvc-iot` |
-| `forge-mvc-pivot` | ✅ Publié sur PyPI depuis `1.0.0-beta.13`, version alignée avec le core | `pip install --pre forge-mvc-pivot` |
 | `forge-mvc-mail` | ✅ Publié sur PyPI depuis `1.0.0-beta.13`, version alignée avec le core | `pip install --pre forge-mvc-mail` |
 | `forge-mvc-i18n` | ⏳ Pas encore publié sur PyPI (extrait du core en `1.0.0-beta.15`, ADR-027) | `pip install --pre forge-mvc-i18n` (à la publication) |
 
@@ -489,7 +487,6 @@ Les opt-ins officiels sont publiés sur PyPI avec une version synchronisée avec
 | `forge-mvc-images` | PyPI depuis `1.0.0-beta.13` | Bêta | Pillow ; dépend de `forge-mvc-files` ; voir `production-limits.md` |
 | `forge-mvc-audio` | PyPI depuis `1.0.0-beta.13` | Bêta | `ffmpeg`/`ffprobe` requis ; module sans état |
 | `forge-mvc-video` | PyPI depuis `1.0.0-beta.13` | Bêta | `ffmpeg` requis ; transcodage MP4 H.264/AAC |
-| `forge-mvc-pivot` | PyPI depuis `1.0.0-beta.13` | Bêta | Associations `many_to_many` enrichies + `make:pivot-crud` |
 | `forge-mvc-mail` | PyPI depuis `1.0.0-beta.13` | Bêta | Transports interchangeables (console, SMTP, log) |
 | `forge-mvc-i18n` | Publication à venir (extrait en `1.0.0-beta.15`) | Bêta | Catalogues JSON, fallback, cache, helper `trans()` ; repli no-op du noyau |
 

@@ -29,9 +29,10 @@ import pytest
 pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).parent.parent
-# pivot.schema.json est extrait vers l'opt-in forge-mvc-pivot (ADR-057).
+# pivot.schema.json est hors cœur (ADR-057), embarqué par forge-mvc-entities
+# qui a absorbé pivot (ADR-070).
 SCHEMA_PATH = (
-    PROJECT_ROOT / "packages" / "forge-mvc-pivot" / "forge_mvc_pivot"
+    PROJECT_ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities"
     / "schemas" / "pivot.schema.json"
 )
 

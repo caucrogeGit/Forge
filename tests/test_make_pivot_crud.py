@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-pytest.importorskip("forge_mvc_pivot")
-from forge_mvc_pivot.make_pivot_crud import (
+pytest.importorskip("forge_mvc_entities")
+from forge_mvc_entities.make_pivot_crud import (
     ResolvedPivotRelation,
     cmd_make_pivot_crud_main,
     make_pivot_crud,
@@ -291,7 +291,7 @@ def test_non_ecrasement_par_defaut(tmp_path):
 
 def test_cmd_args_manquants_exit_1(capsys):
     with pytest.raises(SystemExit) as exc_info:
-        from forge_mvc_pivot.make_pivot_crud import cmd_make_pivot_crud_main
+        from forge_mvc_entities.make_pivot_crud import cmd_make_pivot_crud_main
         cmd_make_pivot_crud_main([])
     assert exc_info.value.code == 1
 

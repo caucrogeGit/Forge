@@ -2,7 +2,7 @@
 
 Ce document décrit `PivotAdvancedService`, le service de persistance des associations pivot enrichies, ainsi que ses contraintes et ses erreurs.
 
-Le fichier de code correspondant est `forge_mvc_pivot/service.py`.
+Le fichier de code correspondant est `forge_mvc_entities/service.py`.
 
 ## 1. À quoi sert ce module ?
 
@@ -12,7 +12,7 @@ Une table pivot `many_to_many` peut porter des **attributs métier** propres à 
 ## 2. Import
 
 ```python
-from forge_mvc_pivot import (
+from forge_mvc_entities import (
     PivotAdvancedService,
     PivotFieldConstraint,
     PivotConstraintError,

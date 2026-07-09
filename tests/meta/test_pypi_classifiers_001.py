@@ -25,7 +25,6 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-video":    "Development Status :: 4 - Beta",
     "forge-mvc-audio":    "Development Status :: 4 - Beta",
     "forge-mvc-files":    "Development Status :: 4 - Beta",
-    "forge-mvc-pivot":    "Development Status :: 4 - Beta",
     "forge-mvc-mail":     "Development Status :: 4 - Beta",
     "forge-mvc-i18n":     "Development Status :: 4 - Beta",
     # forge-mvc-admin : back-office applicatif, chantier clôturé (suite verte), non publié.

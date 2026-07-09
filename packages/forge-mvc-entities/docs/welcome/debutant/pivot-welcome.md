@@ -30,7 +30,7 @@ Dès que la relation **elle-même** porte une donnée, le pivot enrichi s'impose
 
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
-| `forge_mvc_pivot.PivotAdvancedService` | Service de lecture/écriture d'un pivot enrichi. | [Pivot avancé](../../reference.md) |
+| `forge_mvc_entities.PivotAdvancedService` | Service de lecture/écriture d'un pivot enrichi. | [Pivot avancé](../../reference.md) |
 
 ## Tester
 
@@ -48,7 +48,7 @@ from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 
-from forge_mvc_pivot import PivotAdvancedService
+from forge_mvc_entities import PivotAdvancedService
 
 
 def _article_tag_service() -> PivotAdvancedService:

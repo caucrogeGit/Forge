@@ -129,9 +129,9 @@ class TestPivotFunctional:
 
 class TestPyprojectMetadata:
     def test_pyproject_version(self):
-        content = Path("packages/forge-mvc-pivot/pyproject.toml").read_text(encoding="utf-8")
+        content = Path("packages/forge-mvc-entities/pyproject.toml").read_text(encoding="utf-8")
         assert f'version = "{_CURRENT_VERSION}"' in content
 
     def test_forge_mvc_dependency_declared(self):
-        content = Path("packages/forge-mvc-pivot/pyproject.toml").read_text(encoding="utf-8")
+        content = Path("packages/forge-mvc-entities/pyproject.toml").read_text(encoding="utf-8")
         assert "forge-mvc>=" in content

@@ -1,5 +1,5 @@
 # pyright: strict
-"""forge_mvc_pivot/service.py — Service de persistance pour tables pivot avec attributs (opt-in extrait du core, ADR-021).
+"""forge_mvc_entities/service.py — Service de persistance pour tables pivot avec attributs (opt-in extrait du core, ADR-021).
 
 Permet de gérer les associations many_to_many enrichies (pivot.fields[]) sans
 modifier make:crud. Utilise le même pattern d'injection que MariaDbSessionStore :

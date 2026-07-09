@@ -41,7 +41,7 @@ pip uninstall forge-mvc-pivot
 | Élément | Valeur |
 |---|---|
 | Paquet | `forge-mvc-pivot` |
-| Module | `forge_mvc_pivot` |
+| Module | `forge_mvc_entities` |
 | Catégorie | Données et modélisation (ADR-055) |
 | Couche | opt-in (brique optionnelle) |
 | Dépend de | `forge-mvc` et un backend BDD (ADR-054) |
@@ -182,7 +182,7 @@ sequenceDiagram
 
 ```python
 import core.database.db as db
-from forge_mvc_pivot import PivotAdvancedService, PivotFieldConstraint
+from forge_mvc_entities import PivotAdvancedService, PivotFieldConstraint
 
 service = PivotAdvancedService(
     table="inscription",
