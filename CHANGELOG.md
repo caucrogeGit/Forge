@@ -95,6 +95,15 @@
 
 ### Corrigé
 
+- **Unicité des relations scopée à l'entité source (retour terrain, F24 / F25).** `make:relation`
+  et le validateur partagé (`validate_relations_definition`, donc aussi `entity:validate`,
+  `sync:relations`, `project:check`) traitaient le **nom de relation** et le **nom de colonne FK**
+  comme des identifiants **globaux** sur tout `relations.json`, rendant inexprimables les schémas
+  où plusieurs entités (cas standard des pivots) référencent la même cible. L'unicité porte
+  désormais sur le couple `(from, name)` pour l'accesseur et `(from, foreign_key)` pour la colonne :
+  `Classe.annee_scolaire` et `InscriptionEleve.annee_scolaire` (colonnes `annee_scolaire_id` dans
+  deux tables distinctes) coexistent. Les tables pivot restent globalement uniques. Les messages
+  d'erreur sont qualifiés par la source (« ... existe déjà sur Classe »).
 - **Chaîne applicative des relations : migration et affichage (retour terrain, FORGE-15 / FORGE-16).**
   `migration:make` reçoit une option `--with-relations` (valide avec `--from-entity` ou
   `--from-entities`) : après les `CREATE TABLE`, la migration inclut le SQL des relations

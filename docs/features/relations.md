@@ -141,9 +141,11 @@ Forge valide les relations avant de générer `relations.sql`.
 - Les types SQL des champs source et cible doivent être compatibles pour MariaDB.
 - `SET NULL` exige que le champ source soit nullable.
 - Les noms SQL, comme `foreign_key_name`, sont validés.
-- Les noms de relations et de contraintes doivent rester uniques.
+- Le nom de relation (`name`) est un **accesseur côté source** : il doit être unique **par entité source** (`from`), pas globalement. `Classe.annee_scolaire` et `InscriptionEleve.annee_scolaire` coexistent.
+- La clé étrangère (`foreign_key`) est une **colonne de la table source** : elle doit être unique **par table source**. `classe.annee_scolaire_id` et `inscription_eleve.annee_scolaire_id` sont deux colonnes distinctes.
+- Les tables pivot `many_to_many`, elles, restent globalement uniques (ce sont de vraies tables).
 
-Ces règles évitent de générer une contrainte SQL incohérente ou dangereuse.
+Ces règles évitent de générer une contrainte SQL incohérente ou dangereuse, tout en autorisant plusieurs entités (dont les pivots) à référencer la même cible avec des noms fidèles au modèle.
 
 ## Relations many_to_many déclaratives
 

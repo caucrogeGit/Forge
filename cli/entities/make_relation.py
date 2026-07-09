@@ -271,13 +271,17 @@ def _relation_summary(relation: dict[str, Any]) -> str:
 def _ensure_no_obvious_duplicates(relations: list[dict[str, Any]], relation: dict[str, Any], *, source: str) -> None:
     new_name = relation.get("name")
     new_fk = relation.get("foreign_key")
+    new_from = relation.get("from")
     new_pivot_table = relation.get("pivot", {}).get("table") if isinstance(relation.get("pivot"), dict) else None
     for existing in relations:
-        if existing.get("name") == new_name:
-            raise ValueError(f"{source}: une relation nommée {new_name!r} existe déjà")
+        # retour-011 : le nom (accesseur) et la clé étrangère (colonne) sont propres à
+        # l'entité source ; on ne les compare qu'entre relations de même `from`.
+        same_source = existing.get("from") == new_from
+        if same_source and existing.get("name") == new_name:
+            raise ValueError(f"{source}: une relation nommée {new_name!r} existe déjà sur {new_from}")
         existing_fk = existing.get("foreign_key")
-        if new_fk and existing_fk and existing_fk == new_fk:
-            raise ValueError(f"{source}: une clé étrangère nommée {new_fk!r} existe déjà")
+        if same_source and new_fk and existing_fk and existing_fk == new_fk:
+            raise ValueError(f"{source}: une clé étrangère nommée {new_fk!r} existe déjà sur {new_from}")
         existing_pivot = existing.get("pivot", {}).get("table") if isinstance(existing.get("pivot"), dict) else None
         if new_pivot_table and existing_pivot and existing_pivot == new_pivot_table:
             raise ValueError(f"{source}: une table pivot nommée {new_pivot_table!r} existe déjà")

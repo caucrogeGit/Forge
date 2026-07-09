@@ -153,8 +153,10 @@ def validate_relations_definition(
 
     validated_relations: list[ValidatedRelation | ValidatedCanonicalManyToManyRelation] = []
     if isinstance(data, dict) and isinstance(cast("dict[str, Any]", data).get("relations"), list):
-        seen_names: dict[str, int] = {}
-        seen_fk_names: dict[str, int] = {}
+        # Unicité scopée à l'entité source : clés (from_entity, name) et
+        # (from_entity, foreign_key) (retour-011). Les tables pivot restent globales.
+        seen_names: dict[tuple[str, str], int] = {}
+        seen_fk_names: dict[tuple[str, str], int] = {}
         seen_pivot_tables: dict[str, tuple[int, tuple[Any, ...]]] = {}
         for index, relation in enumerate(cast("dict[str, Any]", data)["relations"]):
             if not isinstance(relation, dict):
@@ -406,7 +408,7 @@ def _validate_m2m_canonical(
     relation: dict[str, Any],
     index: int,
     entity_map: dict[str, dict[str, Any]],
-    seen_names: dict[str, int],
+    seen_names: dict[tuple[str, str], int],
     seen_pivot_tables: dict[str, tuple[int, tuple[Any, ...]]],
     issues: list[RelationIssue],
 ) -> ValidatedCanonicalManyToManyRelation | None:
@@ -433,14 +435,16 @@ def _validate_m2m_canonical(
     if not _is_pascal_case(to_entity_name):
         _add_issue(issues, f"{path}.to", "doit etre un nom d'entite PascalCase valide")
 
-    if relation_name in seen_names:
+    # Nom scopé à l'entité source (retour-011, F24), comme pour les many_to_one.
+    name_key = (from_entity_name, relation_name)
+    if name_key in seen_names:
         _add_issue(
             issues,
             f"{path}.name",
-            f"doit etre unique (deja utilise par relations[{seen_names[relation_name]}].name)",
+            f"doit etre unique sur {from_entity_name} (deja utilise par relations[{seen_names[name_key]}].name)",
         )
     else:
-        seen_names[relation_name] = index
+        seen_names[name_key] = index
 
     pivot = relation["pivot"]
     if not isinstance(pivot, dict):
@@ -570,8 +574,8 @@ def _validate_relation_item_canonical(
     relation: dict[str, Any],
     index: int,
     entity_map: dict[str, dict[str, Any]],
-    seen_names: dict[str, int],
-    seen_fk_names: dict[str, int],
+    seen_names: dict[tuple[str, str], int],
+    seen_fk_names: dict[tuple[str, str], int],
     issues: list[RelationIssue],
 ) -> ValidatedRelation | None:
     """Validate a canonical many_to_one relation (schema_version 1.0) and produce a ValidatedRelation."""
@@ -611,23 +615,31 @@ def _validate_relation_item_canonical(
             f"valeur invalide : {on_delete_raw!r}. Valeurs attendues : {', '.join(sorted(_CANONICAL_ON_DELETE_TO_SQL))}",
         )
 
-    if relation_name in seen_names:
+    # Le nom de relation est un accesseur côté source (retour-011, F24) : son unicité
+    # porte sur (from, name), pas sur name seul. Classe.annee_scolaire et
+    # InscriptionEleve.annee_scolaire sont deux accesseurs distincts.
+    name_key = (from_entity_name, relation_name)
+    if name_key in seen_names:
         _add_issue(
             issues,
             f"{path}.name",
-            f"doit etre unique (deja utilise par relations[{seen_names[relation_name]}].name)",
+            f"doit etre unique sur {from_entity_name} (deja utilise par relations[{seen_names[name_key]}].name)",
         )
     else:
-        seen_names[relation_name] = index
+        seen_names[name_key] = index
 
-    if foreign_key in seen_fk_names:
+    # La clé étrangère est une colonne d'une table (F25) : son unicité porte sur
+    # (from, foreign_key). classe.annee_scolaire_id et inscription_eleve.annee_scolaire_id
+    # sont deux colonnes de deux tables distinctes.
+    fk_key = (from_entity_name, foreign_key)
+    if fk_key in seen_fk_names:
         _add_issue(
             issues,
             f"{path}.foreign_key",
-            f"doit etre unique (deja utilise par relations[{seen_fk_names[foreign_key]}].foreign_key)",
+            f"doit etre unique sur {from_entity_name} (deja utilise par relations[{seen_fk_names[fk_key]}].foreign_key)",
         )
     else:
-        seen_fk_names[foreign_key] = index
+        seen_fk_names[fk_key] = index
 
     from_entity = entity_map.get(from_entity_name)
     if from_entity is None:
