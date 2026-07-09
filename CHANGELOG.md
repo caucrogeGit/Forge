@@ -13,9 +13,11 @@
   pivot enrichi (`PivotAdvancedService`, `make:pivot-crud`) qui absorbe l'ancien `forge-mvc-pivot`.
   Le cœur ne garde que la couture runtime d'accès base (`core/database`, contrat `Dialect`,
   ADR-054) ; le nouvel opt-in dépend de ce contrat, pas d'un backend concret. Ses commandes sont
-  gatées sur son installation (entry point `forge_mvc.commands`, échec gracieux si absent), et
-  `forge new` l'installe par défaut (retirable pour une application purement web). Les schémas
-  d'entités/relations restent des contrats du cœur (`cli/schemas`, ADR-058).
+  gatées sur son installation (entry point `forge_mvc.commands`, échec gracieux si absent). Le
+  squelette est livré **sans** moteur d'entités (comme sans backend, ADR-060) : on installe
+  l'opt-in explicitement (`pip install forge-mvc-entities`) pour une application qui modélise des
+  données, le `requirements.txt` du projet le documente. Les schémas d'entités/relations restent
+  des contrats du cœur (`cli/schemas`, ADR-058).
 - **Clé étrangère de première classe : type de champ `foreign_key` (ADR-069, retour terrain).**
   Une clé étrangère se déclare désormais comme un champ d'entité : `{ "name": "annee_scolaire_id",
   "type": "foreign_key", "references": "AnneeScolaire", "required": true }`. Le normaliseur le

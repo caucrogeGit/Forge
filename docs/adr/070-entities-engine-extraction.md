@@ -42,8 +42,10 @@ Le cœur conserve le dispatcher `forge`, le cycle de vie opt-in et la couture ru
 
 ### Expérience `forge new`
 
-Pour que l'expérience d'entrée reste inchangée pour la grande majorité (qui modélise des données), `forge new` **installe `forge-mvc-entities` par défaut**, avec une option explicite pour s'en passer (application web sans couche de données).
-C'est le même schéma que le choix de backend (ADR-060) : opt-in par conception, activé par défaut par commodité.
+Le squelette est livré **sans moteur d'entités**, comme il est déjà livré sans backend (ADR-060).
+`forge new` ne l'installe pas d'office : le `requirements.txt` du projet documente l'opt-in `forge-mvc-entities` à installer quand on veut une couche de données, à côté du backend à choisir.
+Une application purement web (pages, formulaires, sessions) n'a besoin ni du moteur d'entités ni d'un backend ; une application qui modélise des données installe les deux explicitement.
+C'est le même schéma que le choix de backend : la couche de données entière (moteur + backend) est un choix assumé, pas un défaut caché.
 
 ## Conséquences
 

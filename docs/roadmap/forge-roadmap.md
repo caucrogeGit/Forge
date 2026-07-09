@@ -1648,7 +1648,7 @@ Le moteur d'entités (`cli/entities` : génération et modélisation, provisioni
 |---|---|---|
 | `ENTITIES-SESSIONS-MARIADB-LEAK-001` | **ouvert** | Fuite d'agnosticisme repérée pendant l'extraction : `core/sessions/mariadb_store.py` est un store de session **spécifique MariaDB** encore dans le cœur « agnostique BDD » (ADR-054). L'aligner sur le contrat de backend (déplacer le store vers l'opt-in de backend concerné, ou l'exprimer via le contrat `Dialect`/`DbBackend`), pour que le cœur ne référence aucun SGBD nommé. Sévérité Faible : fonctionne, mais contredit ADR-054. |
 | `ENTITIES-TESTS-RELOCATE-001` | **ouvert** | Relocaliser la suite de tests du moteur d'entités (encore sous `tests/`) dans `packages/forge-mvc-entities/tests/`, puis reclasser `forge_mvc_entities` de `CORE_DEPS` vers `OPTIN_MODULES` (avec `importorskip`) dans `test_pytest_core_only_contract_001`. Actuellement classé en dépendance de test du cœur à titre transitoire (ADR-070 phase 5). |
-| `ENTITIES-GIT-MODE-PIN-001` | **ouvert** | En mode avant-garde (ADR-062, CLI installé depuis git), `forge new` épingle `forge-mvc` sur git mais laisse `forge-mvc-entities` sur son pin PyPI : aligner l'épinglage du moteur d'entités sur la même source git pour éviter un mélange git/PyPI. |
+| `ENTITIES-GIT-MODE-DOC-001` | **ouvert** | Le squelette n'installe plus `forge-mvc-entities` d'office (opt-in explicite, comme le backend) : plus de mélange git/PyPI automatique. Reste à documenter, en mode avant-garde (ADR-062, CLI installé depuis git), que l'installation manuelle du moteur d'entités doit viser la même source git que `forge-mvc`. |
 
 ---
 

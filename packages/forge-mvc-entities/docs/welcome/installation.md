@@ -25,19 +25,24 @@ Le moteur d'entités porte toute la chaîne de la couche de données.
 
 ## 1. Disposer d'un projet Forge
 
-`forge new` installe le moteur d'entités **par défaut** : un projet neuf l'a d'emblée.
+Le squelette est livré **sans** moteur d'entités : `forge new` produit un projet web nu.
 
 ```bash
 forge new mon-projet-entites
 ```
 
-Si vous partez d'un projet existant qui n'a pas le moteur, ajoutez-le :
+## 2. Installer le moteur d'entités
+
+La couche de données est un choix explicite (comme le backend).
+Ajoutez l'opt-in au projet :
 
 ```bash
 pip install --pre forge-mvc-entities
 ```
 
-## 2. Vérifier l'installation
+Le `requirements.txt` du projet documente déjà cet opt-in ; une application purement web n'en a pas besoin.
+
+## 3. Vérifier l'installation
 
 ```bash
 forge doctor

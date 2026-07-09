@@ -3,7 +3,7 @@
 Récapitulatif des paliers de la progression *Welcome Entités* et des commandes ou API du moteur d'entités (`forge-mvc-entities`) introduites à chaque étape.
 
 !!! note "Moteur à SQL visible"
-    `forge-mvc-entities` est installé par défaut par `forge new` (opt-in du moteur d'entités).
+    `forge-mvc-entities` est l'opt-in du moteur d'entités, à installer explicitement (`pip install --pre forge-mvc-entities`), au même titre que le backend.
     Le contrat JSON est la source unique ; le SQL et le modèle en sont des projections **lisibles** (charte principe 5), aucun ORM.
 
 ## Niveau débutant : modéliser et générer

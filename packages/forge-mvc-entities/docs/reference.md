@@ -18,11 +18,7 @@ Le contrat du bloc pivot est décrit par `pivot.schema.json`, embarqué dans le 
 
 Le pivot enrichi fait partie du moteur d'entités : il n'y a pas de paquet ni d'activation séparés.
 
-```bash
-forge new mon-projet        # installe forge-mvc-entities par défaut
-```
-
-Dans un projet existant sans le moteur :
+Le squelette est livré sans moteur d'entités (comme sans backend, ADR-060) : on l'installe explicitement quand on veut une couche de données.
 
 ```bash
 pip install --pre forge-mvc-entities
@@ -44,7 +40,7 @@ Les commandes du moteur (dont `make:pivot-crud`) sont alors découvertes automat
 | Contrat | `pivot.schema.json` (embarqué, ADR-057) |
 | Exécuteur | injecté (`fetch_one`, `fetch_all`, `execute`) |
 | Décisions d'architecture | ADR-021 (extraction pivot), ADR-057 (schéma), ADR-070 (fusion dans le moteur d'entités) |
-| Installation | `pip install --pre forge-mvc-entities` (ou par défaut via `forge new`) |
+| Installation | `pip install --pre forge-mvc-entities` (opt-in explicite, non installé par `forge new`) |
 
 ## 4. Schémas UML
 
