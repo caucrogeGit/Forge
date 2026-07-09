@@ -82,6 +82,12 @@ def _build_sql_and_python_type(forge_type: str, field: dict[str, Any]) -> tuple[
             )
         return dialect.decimal_type(precision, scale), "float"
 
+    if forge_type == "foreign_key":
+        # Clé étrangère de première classe (ADR-069) : même type que la PK visée.
+        # Toutes les PK Forge sont `identity_type()` (BIGINT UNSIGNED sur MariaDB),
+        # donc une FK vers n'importe quelle entité adopte ce type, backend-agnostique.
+        return dialect.identity_type(), "int"
+
     if forge_type in _SIMPLE_PYTHON_TYPE:
         return dialect.simple_type(forge_type), _SIMPLE_PYTHON_TYPE[forge_type]
 
@@ -135,9 +141,13 @@ def _normalize_field(field: dict[str, Any]) -> dict[str, Any]:
     if "max" in field and python_type in ("int", "float"):
         constraints["max_value"] = field["max"]
 
+    # ADR-069 : une clé étrangère garde le nom de colonne snake_case fidèle au
+    # dictionnaire (annee_scolaire_id), là où un champ ordinaire est en PascalCase.
+    column = name if forge_type == "foreign_key" else _column_from_name(name)
+
     normalized: dict[str, Any] = {
         "name": name,
-        "column": _column_from_name(name),
+        "column": column,
         "sql_type": sql_type,
         "python_type": python_type,
         "nullable": nullable,
@@ -146,6 +156,10 @@ def _normalize_field(field: dict[str, Any]) -> dict[str, Any]:
         "constraints": constraints,
         "unique": bool(field.get("unique", False)),
     }
+
+    # Métadonnée de relation : l'entité cible référencée (contrat complet).
+    if forge_type == "foreign_key" and "references" in field:
+        normalized["references"] = field["references"]
 
     # Type slug : widget SlugField + longueur de colonne (ADR-017).
     if forge_type == "slug":

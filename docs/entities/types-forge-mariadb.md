@@ -27,6 +27,7 @@ Dans les JSON canoniques Forge, les champs utilisent des **types Forge**, pas de
 | `email` | `VARCHAR(255)` | `str` | longueur fixe, non configurable |
 | `password` | `VARCHAR(255)` | `str` | longueur fixe, non configurable |
 | `json` | `LONGTEXT` | `str` | contenu JSON sérialisé |
+| `foreign_key` | `BIGINT UNSIGNED` | `int` | clé étrangère ; `references` obligatoire (entité cible) ; colonne snake_case ; ADR-069 |
 
 ---
 

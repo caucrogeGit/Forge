@@ -80,7 +80,9 @@ Les clés inconnues sont **interdites** (`additionalProperties: false`).
 
 **Types Forge supportés :**
 
-`string`, `text`, `integer`, `big_integer`, `float`, `decimal`, `boolean`, `date`, `datetime`, `email`, `password`, `json`
+`string`, `text`, `integer`, `big_integer`, `float`, `decimal`, `boolean`, `date`, `datetime`, `email`, `password`, `json`, `foreign_key`
+
+Le type `foreign_key` déclare une clé étrangère : il exige la clé `references` (entité cible en PascalCase), produit une colonne snake_case et adopte le type de la clé primaire visée (`BIGINT UNSIGNED`). Voir [ADR-069](../adr/069-foreign-key-field-type.md).
 
 **Clés optionnelles :**
 

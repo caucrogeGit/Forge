@@ -30,6 +30,7 @@ SCHEMA_PATH = PROJECT_ROOT / "cli" / "schemas" / "field.schema.json"
 _ALLOWED_TYPES = frozenset({
     "string", "slug", "text", "integer", "big_integer", "float",
     "decimal", "boolean", "date", "datetime", "email", "password", "json",
+    "foreign_key",
 })
 
 _FORBIDDEN_TYPES = frozenset({"file", "image", "money", "uuid", "enum", "relation"})
@@ -119,24 +120,29 @@ class TestTypeProperty:
         )
 
 
-class TestDecimalConditional:
-    def test_if_clause_exists(self, schema):
-        assert "if" in schema, "Le schéma doit avoir une clause 'if' (contrainte decimal)."
+def _conditional_for(schema: dict, type_const: str) -> dict | None:
+    """Conditionnel `if/then` du schéma (regroupés dans `allOf`) ciblant un type."""
+    for cond in schema.get("allOf", []):
+        if cond.get("if", {}).get("properties", {}).get("type", {}).get("const") == type_const:
+            return cond
+    return None
 
-    def test_then_clause_exists(self, schema):
-        assert "then" in schema, "Le schéma doit avoir une clause 'then' (contrainte decimal)."
 
-    def test_if_targets_decimal(self, schema):
-        type_const = schema.get("if", {}).get("properties", {}).get("type", {}).get("const")
-        assert type_const == "decimal", "La clause 'if' doit cibler type='decimal'."
+class TestConditionals:
+    def test_conditionnels_regroupes_dans_allof(self, schema):
+        assert isinstance(schema.get("allOf"), list) and schema["allOf"], \
+            "Les contraintes conditionnelles vivent dans allOf."
 
-    def test_decimal_requires_precision(self, schema):
-        then_required = schema.get("then", {}).get("required", [])
-        assert "precision" in then_required, "then.required doit contenir 'precision'."
+    def test_decimal_requires_precision_and_scale(self, schema):
+        cond = _conditional_for(schema, "decimal")
+        assert cond is not None, "Conditionnel decimal manquant."
+        then_required = cond.get("then", {}).get("required", [])
+        assert "precision" in then_required and "scale" in then_required
 
-    def test_decimal_requires_scale(self, schema):
-        then_required = schema.get("then", {}).get("required", [])
-        assert "scale" in then_required, "then.required doit contenir 'scale'."
+    def test_foreign_key_requires_references(self, schema):
+        cond = _conditional_for(schema, "foreign_key")
+        assert cond is not None, "Conditionnel foreign_key manquant."
+        assert "references" in cond.get("then", {}).get("required", [])
 
 
 class TestChoicesProperty:

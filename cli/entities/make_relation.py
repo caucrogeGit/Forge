@@ -294,6 +294,36 @@ def _ensure_no_obvious_duplicates(relations: list[dict[str, Any]], relation: dic
                 raise ValueError(f"{source}: cette relation existe déjà")
 
 
+def _inject_fk_field_into_entity(
+    entities_dir_path: Path,
+    from_entity: str,
+    foreign_key: str,
+    references: str,
+    *,
+    nullable: bool,
+) -> str | None:
+    """Ajoute un champ `foreign_key` à l'entité source (ADR-069), de façon chirurgicale
+    (écriture annoncée, préserve les autres champs). Retourne le chemin modifié, ou None
+    si le champ existe déjà ou si le fichier d'entité est introuvable.
+    """
+    entity_path = entities_dir_path / to_snake(from_entity) / f"{to_snake(from_entity)}.json"
+    if not entity_path.exists():
+        return None
+    data = cast("dict[str, Any]", json.loads(entity_path.read_text(encoding="utf-8")))
+    raw_fields = data.get("fields")
+    if not isinstance(raw_fields, list):
+        return None
+    fields = cast("list[dict[str, Any]]", raw_fields)
+    if any(f.get("name") == foreign_key for f in fields):
+        return None
+    fk_field: dict[str, Any] = {"name": foreign_key, "type": "foreign_key", "references": references}
+    if not nullable:
+        fk_field["required"] = True
+    fields.append(fk_field)
+    entity_path.write_text(json.dumps(data, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    return entity_path.as_posix()
+
+
 def main(argv: list[str] | None = None) -> None:
     args = list(sys.argv[1:] if argv is None else argv)
     if args and args[0] in {"-h", "--help"}:
@@ -342,12 +372,23 @@ def main(argv: list[str] | None = None) -> None:
     relations_path.write_text(json.dumps(candidate, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
 
     print("[OK] Relation ajoutée dans mvc/entities/relations.json")
-    print("[INFO] Lancez ensuite forge sync:relations pour régénérer mvc/entities/relations.sql.")
+
+    # ADR-069 : la FK devient un champ de première classe de l'entité source.
     if relation.get("type") == "many_to_one" and relation.get("foreign_key"):
-        print(
-            f"[INFO] La colonne FK {relation['foreign_key']} et son index sont générés dans "
-            "relations.sql (au type de la PK visée) ; ne l'ajoutez pas à la main dans l'entité."
+        modified = _inject_fk_field_into_entity(
+            target_entities_dir,
+            relation["from"],
+            relation["foreign_key"],
+            relation["to"],
+            nullable=bool(relation.get("nullable", True)),
         )
+        if modified is not None:
+            print(f"[MODIFIE] {modified} (champ foreign_key {relation['foreign_key']} ajouté)")
+        else:
+            print(f"[INFO] Le champ {relation['foreign_key']} existe déjà dans l'entité {relation['from']}.")
+
+    print("[INFO] Régénérez ensuite : forge sync:entity <Entite> (colonne FK) puis")
+    print("       forge sync:relations (contrainte + index).")
 
 
 if __name__ == "__main__":

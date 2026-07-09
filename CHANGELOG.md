@@ -5,6 +5,15 @@
 
 ### Ajouté
 
+- **Clé étrangère de première classe : type de champ `foreign_key` (ADR-069, retour terrain).**
+  Une clé étrangère se déclare désormais comme un champ d'entité : `{ "name": "annee_scolaire_id",
+  "type": "foreign_key", "references": "AnneeScolaire", "required": true }`. Le normaliseur le
+  résout au type de la clé primaire visée (`BIGINT UNSIGNED` sur MariaDB, backend-agnostique) avec
+  une colonne snake_case fidèle au dictionnaire. `make:relation` **injecte** ce champ dans le JSON
+  de l'entité source (chirurgical, annoncé `[MODIFIE]`, idempotent) en plus d'écrire la relation ;
+  la FK est alors visible dans le contrat, `relations.sql` ne pose plus que la contrainte, et
+  `make:crud` la gère naturellement (plus besoin d'injection synthétique). Une relation écrite sans
+  champ FK déclaré reste supportée (repli `ADD COLUMN` de `relations.sql`).
 - **Page de référence de la charte graphique dans le squelette (`/charte`).** Le squelette
   livre `mvc/views/pages/charte.html`, une page servable (câblée sur `/charte`) qui montre le thème
   « Accessible chaleureux » livré par défaut : palette, typographie, boutons, badges, alertes

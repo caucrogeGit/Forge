@@ -13,6 +13,8 @@ Elle fonctionne en mode interactif : elle guide le choix du type de relation, de
 Elle prend en charge les relations `many_to_one` et `many_to_many` (pivot canonique).
 Elle ajoute la relation au document existant sans détruire les relations déjà déclarées (principe 9).
 
+Pour une relation `many_to_one`, elle **injecte aussi** la clé étrangère comme champ de première classe dans le JSON de l'entité source (type `foreign_key`, ADR-069), de façon chirurgicale et idempotente (écriture annoncée `[MODIFIE]`, préserve les autres champs). La colonne FK vient alors de l'entité ; `relations.sql` ne pose que la contrainte.
+
 ## 2. Vue d'ensemble rapide
 
 | Élément | Valeur |

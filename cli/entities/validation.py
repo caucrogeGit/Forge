@@ -26,6 +26,7 @@ ALLOWED_FIELD_KEYS = {
     "form",
     "list",
     "source",
+    "references",
 }
 ALLOWED_FORM_KEYS = {"field"}
 SUPPORTED_FORM_FIELD_VALUES = {

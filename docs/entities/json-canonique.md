@@ -106,7 +106,7 @@ Les schémas JSON Schema verrouillent la **forme autorisée**. Ils ne remplacent
 - `fields`, champs métier (le champ `id` est toujours ajouté automatiquement)
 - `options`, options système (`timestamps`, `soft_delete`)
 
-**Types de champs supportés :** `string`, `text`, `integer`, `big_integer`, `float`, `decimal`, `boolean`, `date`, `datetime`, `email`, `password`, `json`.
+**Types de champs supportés :** `string`, `text`, `integer`, `big_integer`, `float`, `decimal`, `boolean`, `date`, `datetime`, `email`, `password`, `json`, `foreign_key`.
 
 ---
 

@@ -27,8 +27,13 @@
         "datetime",
         "email",
         "password",
-        "json"
+        "json",
+        "foreign_key"
       ]
+    },
+    "references": {
+      "description": "Entité cible d'une clé étrangère (type foreign_key), en PascalCase. La colonne adopte le type de la clé primaire de cette entité.",
+      "$ref": "common.schema.json#/$defs/entityName"
     },
     "label": {
       "description": "Libellé affiché dans les formulaires et listes générés.",
@@ -189,11 +194,14 @@
       }
     }
   },
-  "if": {
-    "properties": {"type": {"const": "decimal"}},
-    "required": ["type"]
-  },
-  "then": {
-    "required": ["precision", "scale"]
-  }
+  "allOf": [
+    {
+      "if": {"properties": {"type": {"const": "decimal"}}, "required": ["type"]},
+      "then": {"required": ["precision", "scale"]}
+    },
+    {
+      "if": {"properties": {"type": {"const": "foreign_key"}}, "required": ["type"]},
+      "then": {"required": ["references"]}
+    }
+  ]
 }
