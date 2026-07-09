@@ -23,7 +23,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # - les backends BDD (famille exclusive, registre DB_BACKENDS, ADR-054) ;
 # - forge-mvc-testing : infrastructure de test dev-only (ADR-041).
 _DB_BACKEND_NAMES = {b.name for b in DB_BACKENDS}
-_NON_APP_PACKAGES = _DB_BACKEND_NAMES | {"testing"}
+# Extraction en cours (ADR-070) : le paquet existe (scaffold, phase 1) mais son
+# catalogage complet (kind, catégorie, câblage opt-in) est livré en phase 5.
+_SCAFFOLD_IN_PROGRESS = {"entities"}
+_NON_APP_PACKAGES = _DB_BACKEND_NAMES | {"testing"} | _SCAFFOLD_IN_PROGRESS
 
 
 def test_chaque_optin_a_une_categorie_canonique():
