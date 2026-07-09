@@ -1,10 +1,34 @@
-# Documentation embarquée du paquet forge-mvc-pivot (ADR-038).
+# Documentation embarquée du paquet forge-mvc-entities (ADR-070).
 # Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
-# Le site_name sert de préfixe d'URL : les pages sont montées sous /pivot/.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /entities/.
 site_name: entities
 docs_dir: docs
 nav:
-  - Pivot advanced (référence):
+  - Moteur d'entités (référence par module):
+      - Commande make:entity (make_entity.py): modules/make_entity.md
+      - Commande make:crud (make_crud.py): modules/make_crud.md
+      - Commande make:relation (make_relation.py): modules/make_relation.md
+      - Commande entity:validate (entity_validate.py): modules/entity_validate.md
+      - Commande entity:doc (entity_doc.py): modules/entity_doc.md
+      - Validation sémantique (entity_semantic_validate.py): modules/entity_semantic_validate.md
+      - Codes d'erreur (entity_validation_errors.py): modules/entity_validation_errors.md
+      - Commande db:config (db_config.py): modules/db_config.md
+      - Commande db:init (db_init.py): modules/db_init.md
+      - Commande db:apply (db_apply.py): modules/db_apply.md
+      - Commandes migration:* (migrations.py): modules/migrations.md
+      - Orchestration du modèle (model.py): modules/model.md
+      - Relations globales (relations.py): modules/relations.md
+      - Normaliseur canonique (canonical_model_normalizer.py): modules/canonical_model_normalizer.md
+      - Validation canonique (validation.py): modules/validation.md
+  - Générateur CRUD (par module):
+      - Contexte du générateur (context.py): modules/crud/context.md
+      - Builder de contrôleur (controller_builder.py): modules/crud/controller_builder.md
+      - Builder de modèle (model_builder.py): modules/crud/model_builder.md
+      - Builder de formulaire (form_builder.py): modules/crud/form_builder.md
+      - Builders de vues (views_builder.py): modules/crud/views_builder.md
+      - Chargeur de relations (relations_loader.py): modules/crud/relations_loader.md
+      - Helpers de champs (utils.py): modules/crud/utils.md
+  - Pivot enrichi (référence):
       - Vue d'ensemble: reference.md
       - Service pivot (service.py): references/service.md
       - Générateur de sous-CRUD (make_pivot_crud.py): references/make_pivot_crud.md

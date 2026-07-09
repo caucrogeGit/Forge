@@ -89,20 +89,20 @@ forge routes:list
 
 | Commande | Rôle | Détail |
 |---|---|---|
-| `forge make:entity` | crée le JSON d'une entité | [make:entity](../cli-entities/make_entity.md) |
-| `forge entity:validate` | valide les contrats JSON d'entités | [entity:validate](../cli-entities/entity_validate.md) |
-| `forge entity:doc` | documente entités et relations (Markdown + Mermaid) | [entity:doc](../cli-entities/entity_doc.md) |
-| `forge build:model` | génère les modèles Python depuis le JSON | [build:model](../cli-entities/model.md) |
-| `forge sync:entity` | synchronise entité et modèle généré | [modèle](../cli-entities/model.md) |
-| `forge make:relation` | déclare une relation entre entités | [make:relation](../cli-entities/make_relation.md) |
-| `forge check:model` | vérifie la cohérence des modèles | [build:model](../cli-entities/model.md) |
-| `forge sync:relations` | régénère `relations.sql` | [make:relation](../cli-entities/make_relation.md) |
+| `forge make:entity` | crée le JSON d'une entité | [make:entity](../entities/modules/make_entity.md) |
+| `forge entity:validate` | valide les contrats JSON d'entités | [entity:validate](../entities/modules/entity_validate.md) |
+| `forge entity:doc` | documente entités et relations (Markdown + Mermaid) | [entity:doc](../entities/modules/entity_doc.md) |
+| `forge build:model` | génère les modèles Python depuis le JSON | [build:model](../entities/modules/model.md) |
+| `forge sync:entity` | synchronise entité et modèle généré | [modèle](../entities/modules/model.md) |
+| `forge make:relation` | déclare une relation entre entités | [make:relation](../entities/modules/make_relation.md) |
+| `forge check:model` | vérifie la cohérence des modèles | [build:model](../entities/modules/model.md) |
+| `forge sync:relations` | régénère `relations.sql` | [make:relation](../entities/modules/make_relation.md) |
 
 ## CRUD et pages publiques
 
 | Commande | Rôle | Détail |
 |---|---|---|
-| `forge make:crud` | CRUD complet (contrôleur, vues, routes) | [make:crud](../cli-entities/make_crud.md) |
+| `forge make:crud` | CRUD complet (contrôleur, vues, routes) | [make:crud](../entities/modules/make_crud.md) |
 | `forge make:auth` | flux de connexion (contrôleur, vue, routes) | [make:auth](../cli-security/make_auth.md) |
 | `forge make:pivot-crud` | CRUD pour table pivot enrichie (opt-in pivot) | [catalogue opt-ins](../optins/index.md) |
 | `forge make:public-page` | page publique simple | [pages publiques](../cli-public/public_page.md) |
@@ -115,13 +115,13 @@ forge routes:list
 
 | Commande | Rôle | Détail |
 |---|---|---|
-| `forge db:config` | amorce les variables d'environnement du backend | [db:config](../cli-entities/db_config.md) |
-| `forge db:init` | provisionne la base et le compte applicatif | [db:init](../cli-entities/db_init.md) |
-| `forge db:apply` | applique le schéma des entités (DDL) | [db:apply](../cli-entities/db_apply.md) |
-| `forge migration:status` | état des migrations SQL | [migrations](../cli-entities/migrations.md) |
-| `forge migration:make` | crée une migration | [migrations](../cli-entities/migrations.md) |
-| `forge migration:apply` | applique les migrations | [migrations](../cli-entities/migrations.md) |
-| `forge migration:diff` | génère le SQL depuis une modification d'entité | [migrations](../cli-entities/migrations.md) |
+| `forge db:config` | amorce les variables d'environnement du backend | [db:config](../entities/modules/db_config.md) |
+| `forge db:init` | provisionne la base et le compte applicatif | [db:init](../entities/modules/db_init.md) |
+| `forge db:apply` | applique le schéma des entités (DDL) | [db:apply](../entities/modules/db_apply.md) |
+| `forge migration:status` | état des migrations SQL | [migrations](../entities/modules/migrations.md) |
+| `forge migration:make` | crée une migration | [migrations](../entities/modules/migrations.md) |
+| `forge migration:apply` | applique les migrations | [migrations](../entities/modules/migrations.md) |
+| `forge migration:diff` | génère le SQL depuis une modification d'entité | [migrations](../entities/modules/migrations.md) |
 
 Choix du moteur (SQLite, MariaDB, PostgreSQL, SQL Server) : [Bases de données](../guide/bases-de-donnees.md).
 
