@@ -39,6 +39,7 @@ from forge_mvc_entities.crud.relations_loader import (
     _unique_choice_relations,
     _unique_many_to_many_choice_relations,
 )
+from forge_mvc_entities.crud.views_namespace import entity_view_dir
 
 
 @dataclass(frozen=True)
@@ -50,6 +51,7 @@ class _ControllerContext:
     """
     entity: str
     snake: str
+    view_dir: str  # dossier de vues relatif à mvc/views/ (ADR-073), ex. "app/eleve"
     plural: str
     pk_name: str
     choice_options: list[CrudManyToOneRelation]
@@ -145,7 +147,7 @@ def _render_new(ctx: _ControllerContext) -> list[str]:
             if choice_options else
             f'        form = {entity}Form()'
         ),
-        f'        return BaseController.render("{snake}/form.html",',
+        f'        return BaseController.render("{ctx.view_dir}/form.html",',
         '            context={',
         '                "form": form,',
         f'                "action": "/{snake}/create",',
@@ -180,7 +182,7 @@ def _render_destroy(ctx: _ControllerContext) -> list[str]:
         f'        delete_{snake}({pk_name})',
         "        if _is_hx_request(request):",
         f"            context = {entity}Controller._list_context(request)",
-        f'            return BaseController.render("{snake}/_results.html", context=context, request=request)',
+        f'            return BaseController.render("{ctx.view_dir}/_results.html", context=context, request=request)',
         f'        return BaseController.redirect_with_flash(request, "/{snake}", "{entity} supprimé.")',
         "",
     ]
@@ -196,7 +198,7 @@ def _render_bulk_delete(ctx: _ControllerContext) -> list[str]:
         f"        ids = {entity}Controller._parse_bulk_ids(request)",
         "        if not ids:",
         f'            return BaseController.redirect_with_flash(request, "/{snake}", "Aucun élément sélectionné.")',
-        f'        return BaseController.render("{snake}/bulk_delete_confirm.html",',
+        f'        return BaseController.render("{ctx.view_dir}/bulk_delete_confirm.html",',
         '            context={"ids": ids, "count": len(ids), "flash": get_flash(get_session_id(request))},',
         "            request=request)",
     ]
@@ -252,7 +254,7 @@ def _render_create(ctx: _ControllerContext) -> list[str]:
         )
     create_lines += [
         "        if not form.is_valid():",
-        f'            return BaseController.validation_error("{snake}/form.html",',
+        f'            return BaseController.validation_error("{ctx.view_dir}/form.html",',
         '                context={',
         '                    "form": form,',
         f'                    "action": "/{snake}/create",',
@@ -285,7 +287,7 @@ def _render_create(ctx: _ControllerContext) -> list[str]:
                 f'                    form.fields["{mname}"].validate(_{mname}_f)',
                 f'                except Exception as _{mname}_exc:',
                 f'                    form.add_error("{mname}", getattr(_{mname}_exc, "messages", [str(_{mname}_exc)]))',
-                f'                    return BaseController.validation_error("{snake}/form.html",',
+                f'                    return BaseController.validation_error("{ctx.view_dir}/form.html",',
                 '                        context={',
                 '                            "form": form,',
                 f'                            "action": "/{snake}/create",',
@@ -374,7 +376,7 @@ def _render_show(ctx: _ControllerContext) -> list[str]:
     ctx_items += [f'"{e["name"]}_media": {e["name"]}_media' for e in show_singles]
     ctx_items += [f'"{e["name"]}_media_list": {e["name"]}_media_list' for e in show_multiples]
     show_lines += [
-        f'        return BaseController.render("{snake}/show.html",',
+        f'        return BaseController.render("{ctx.view_dir}/show.html",',
         f'            context={{{", ".join(ctx_items)}}},',
         "            request=request)",
     ]
@@ -410,7 +412,7 @@ def _render_edit(ctx: _ControllerContext) -> list[str]:
             f'        {mname}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{mrole}")'
         )
     edit_lines += [
-        f'        return BaseController.render("{snake}/form.html",',
+        f'        return BaseController.render("{ctx.view_dir}/form.html",',
         '            context={',
         (
             f'                "form": {entity}Form(_form_data_from_{snake}({snake}), **_{snake}_form_options()),'
@@ -473,7 +475,7 @@ def _render_update(ctx: _ControllerContext) -> list[str]:
             f'            {mname}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{mrole}")'
         )
     update_lines += [
-        f'            return BaseController.validation_error("{snake}/form.html",',
+        f'            return BaseController.validation_error("{ctx.view_dir}/form.html",',
         "                context={",
         '                    "form": form,',
         f'                    "action": f"/{snake}/update/{{{pk_name}}}",',
@@ -518,7 +520,7 @@ def _render_update(ctx: _ControllerContext) -> list[str]:
                 f'                    {m2name}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{m2role}")'
             )
         update_lines += [
-            f'                    return BaseController.validation_error("{snake}/form.html",',
+            f'                    return BaseController.validation_error("{ctx.view_dir}/form.html",',
             '                        context={',
             '                            "form": form,',
             f'                            "action": f"/{snake}/update/{{{pk_name}}}",',
@@ -615,13 +617,13 @@ def _render_update(ctx: _ControllerContext) -> list[str]:
 
 
 def _render_index(ctx: _ControllerContext) -> list[str]:
-    entity, snake = ctx.entity, ctx.snake
+    entity = ctx.entity
     index_lines: list[str] = [
         "",
         "    @staticmethod",
         "    def index(request: Request) -> Response:",
         f"        context = {entity}Controller._list_context(request)",
-        f'        template = "{snake}/_results.html" if _is_hx_request(request) else "{snake}/index.html"',
+        f'        template = "{ctx.view_dir}/_results.html" if _is_hx_request(request) else "{ctx.view_dir}/index.html"',
         "        return BaseController.render(template, context=context, request=request)",
     ]
     return index_lines
@@ -852,9 +854,11 @@ def build_controller(
     definition: dict[str, Any],
     relations: list[CrudManyToOneRelation] | None = None,
     many_to_many_relations: list[CrudManyToManyRelation] | None = None,
+    views_namespace: str = "",
 ) -> str:
     entity = definition["entity"]
     snake = _to_snake(entity)
+    view_dir = entity_view_dir(snake, views_namespace)
     plural = snake + "s"
     pk = _pk_field(definition)
     pk_name = pk["name"]
@@ -952,7 +956,7 @@ def build_controller(
     filter_flds = _filter_fields(definition, relations)
     relation_filter_names = set(_relation_by_field(relations))
     _ctx = _ControllerContext(
-        entity=entity, snake=snake, plural=plural, pk_name=pk_name,
+        entity=entity, snake=snake, view_dir=view_dir, plural=plural, pk_name=pk_name,
         choice_options=choice_options, generated_fields=generated_fields,
         ctrl_media_entries=ctrl_media_entries, m2m=many_to_many_relations or [],
         allowed_sort_keys_repr=allowed_sort_keys_repr,

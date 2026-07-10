@@ -21,6 +21,7 @@ from forge_mvc_entities.crud.utils import (
     _relation_by_field,
     _to_snake,
 )
+from forge_mvc_entities.crud.views_namespace import entity_view_dir
 
 
 def build_form_errors_partial() -> str:
@@ -44,9 +45,11 @@ def build_index_view(
     relations: list[CrudManyToOneRelation] | None = None,
     many_to_many_relations: list[CrudManyToManyRelation] | None = None,
     rbac: dict[str, Any] | None = None,
+    views_namespace: str = "",
 ) -> str:
     entity = definition["entity"]
     snake = _to_snake(entity)
+    view_dir = entity_view_dir(snake, views_namespace)
     plural = snake + "s"
     rel_by_field = _relation_by_field(relations)
     perms = (rbac or {}).get("permissions", {})
@@ -135,18 +138,19 @@ def build_index_view(
         "</div>",
         "",
         '<div id="crud-results">',
-        f'    {{% include "{snake}/_results.html" %}}',
+        f'    {{% include "{view_dir}/_results.html" %}}',
         "</div>",
         "{% endblock %}",
     ]
     return "\n".join(lines) + "\n"
 
 
-def build_results_partial(definition: dict[str, Any]) -> str:
+def build_results_partial(definition: dict[str, Any], views_namespace: str = "") -> str:
     snake = _to_snake(definition["entity"])
+    view_dir = entity_view_dir(snake, views_namespace)
     return "\n".join([
-        f'{{% include "{snake}/_table.html" %}}',
-        f'{{% include "{snake}/_pagination.html" %}}',
+        f'{{% include "{view_dir}/_table.html" %}}',
+        f'{{% include "{view_dir}/_pagination.html" %}}',
     ]) + "\n"
 
 

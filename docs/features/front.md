@@ -111,6 +111,51 @@ Exemple d'utilisation de `admin.html` pour une page CRUD :
 
 Tous les layouts chargent `tailwind.css` et exposent les blocs `{% block content %}` et `{% block scripts %}`.
 
+## Où vivent les vues
+
+Le dossier `mvc/views/` sépare trois natures de vues (ADR-073) :
+
+- les dossiers du **cadre**, à la racine : `layouts`, `components`, `partials`, `errors`, `home`, `pages` ;
+- les vues **publiques** sous `public/` (générées par `make:public-*`) ;
+- les vues de **l'application** sous `app/` : les vues propres à vos entités, écrites à la main ou générées par `make:crud`.
+
+```text
+mvc/views/
+├── layouts/  components/  partials/  errors/  home/  pages/   (cadre)
+├── public/          (vues publiques)
+└── app/             (vues de l'application)
+    ├── eleve/index.html
+    └── professeur/show.html
+```
+
+Le namespace `app/` désigne les vues **de l'application**, quelle que soit leur origine.
+Un contrôleur écrit à la main range ses vues sous `app/<entite>/` et les rend avec le chemin correspondant :
+
+```python
+return BaseController.render("app/eleve/index.html", request=request)
+```
+
+`forge make:crud <Entite>` produit exactement la même disposition : fichiers sous `mvc/views/app/<snake>/` et `render("app/<snake>/...")` dans le contrôleur généré.
+
+### Régler le namespace
+
+Le dossier est réglé par `APP_VIEWS_NAMESPACE` dans `config.py` :
+
+```python
+APP_VIEWS_NAMESPACE = os.getenv("APP_VIEWS_NAMESPACE", "app")
+```
+
+- `"app"` (défaut) range les vues d'application sous `mvc/views/app/`.
+- `""` rétablit la disposition **plate** historique (`mvc/views/<entite>/`).
+
+`render()` et le loader Jinja ne lisent pas ce réglage : les chemins sont littéraux, résolus relativement à `VIEWS_DIR` (`mvc/views/`).
+Seul `make:crud` le lit, au moment de la génération, pour écrire les fichiers et les `render(...)` au bon endroit.
+
+!!! note "Migration d'un projet existant"
+    Un projet créé avant ce réglage a ses vues à plat.
+    Pour rester à plat sans rien changer, ajoutez `APP_VIEWS_NAMESPACE = ""` à votre `config.py`.
+    Sans cette ligne, le prochain `make:crud` écrit sous `app/` (vos vues existantes restent où elles sont) : vous choisissez alors de migrer ou de poser `""`.
+
 ## Templates publics
 
 `forge make:public-page accueil` génère une page visiteur simple sous `mvc/views/public/accueil.html`, l'associe à une route publique `/accueil` et ajoute le handler correspondant dans `PublicPagesController`.

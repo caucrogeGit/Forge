@@ -321,6 +321,7 @@ nav:
             - ADR-070 Extraction du moteur d'entités (forge-mvc-entities): adr/070-entities-engine-extraction.md
             - ADR-071 Convention de provisioning des opt-ins BDD: adr/071-optin-db-provisioning-convention.md
             - ADR-072 Contrat des commandes CLI des opt-ins: adr/072-optin-cli-command-contract.md
+            - ADR-073 Namespace app/ des vues applicatives: adr/073-app-views-namespace.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

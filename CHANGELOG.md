@@ -59,6 +59,16 @@
 
 ### Modifié
 
+- **Vues d'application sous un namespace `mvc/views/app/` (ADR-073, retour terrain 018 F41).**
+  À l'échelle (banc d'essai à ~40 entités), la racine de `mvc/views/` mélangeait les dossiers
+  du cadre et un dossier par entité, devenant illisible. Les vues de l'application (à la main ou
+  générées) vivent désormais sous `app/`, à côté de `public/` ; les 6 dossiers du cadre restent à
+  la racine. `forge make:crud` écrit sous `mvc/views/app/<snake>/` et génère des
+  `render("app/<snake>/...")` / `{% include %}` cohérents ; `render()` et le loader Jinja sont
+  inchangés (chemins littéraux). Le dossier est réglé par `APP_VIEWS_NAMESPACE` dans `config.py`
+  (défaut `"app"` ; `""` rétablit la disposition plate historique). Projet existant : ajouter
+  `APP_VIEWS_NAMESPACE = ""` à `config.py` pour rester à plat. `make:public-*` (déjà sous
+  `public/`) est inchangé.
 - **`make:auth` génère un bouton Connexion / Déconnexion pour la barre de navigation (retour terrain).**
   En plus du contrôleur, de la vue de login et des routes, `make:auth` génère désormais
   un bouton conditionnel « Connexion » (lien vers `/login` pour un visiteur) ou « Déconnexion »

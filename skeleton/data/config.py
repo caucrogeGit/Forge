@@ -46,6 +46,13 @@ APP_ROUTES_MODULE = os.getenv("APP_ROUTES_MODULE", "mvc.routes")
 VIEWS_DIR         = os.getenv("VIEWS_DIR",         "mvc/views")
 SQL_DIR           = os.getenv("SQL_DIR",           "mvc/models/sql")
 
+# Dossier, sous VIEWS_DIR, où vivent les vues de l'application (à la main ou
+# générées par make:crud), à côté de public/ ; les dossiers du cadre (layouts,
+# components, ...) restent à la racine (ADR-073). "app" par défaut : vos vues
+# vont dans mvc/views/app/<entite>/ et vos contrôleurs rendent "app/<entite>/...".
+# Mettez "" pour ranger à plat (mvc/views/<entite>/), disposition historique.
+APP_VIEWS_NAMESPACE = os.getenv("APP_VIEWS_NAMESPACE", "app")
+
 # Upload : le noyau ne garde que le plafond de corps multipart (ADR-032).
 # UPLOAD_ROOT, UPLOAD_ALLOWED_EXTENSIONS, UPLOAD_ALLOWED_MIME_TYPES sont lues par
 # l'opt-in forge-mvc-files depuis l'environnement ; ajoutez-les à env/dev au besoin.

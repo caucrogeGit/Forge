@@ -3,17 +3,22 @@
 # pyright: reportUnusedImport=false
 """forge make:crud — génération scaffolding CRUD depuis une entité JSON Forge.
 
-Génère pour une entité donnée :
+Génère pour une entité donnée (les vues sous le namespace APP_VIEWS_NAMESPACE
+du projet, « app » par défaut ; ADR-073) :
     mvc/controllers/{snake}_controller.py
     mvc/models/{snake}_model.py
     mvc/forms/{snake}_form.py
     mvc/views/layouts/app.html
-    mvc/views/{snake}/index.html
-    mvc/views/{snake}/_table.html
-    mvc/views/{snake}/_pagination.html
-    mvc/views/{snake}/_results.html
-    mvc/views/{snake}/show.html
-    mvc/views/{snake}/form.html
+    mvc/views/app/{snake}/index.html
+    mvc/views/app/{snake}/_table.html
+    mvc/views/app/{snake}/_pagination.html
+    mvc/views/app/{snake}/_results.html
+    mvc/views/app/{snake}/show.html
+    mvc/views/app/{snake}/form.html
+
+Avec APP_VIEWS_NAMESPACE="" les vues sont écrites à plat (mvc/views/{snake}/...),
+disposition historique. Les contrôleurs et includes générés portent le même
+préfixe que les fichiers écrits (render()/loader inchangés, chemins littéraux).
 
 Les fichiers existants ne sont jamais écrasés ([PRÉSERVÉ]).
 Les routes sont affichées sur stdout, jamais injectées automatiquement.
@@ -97,6 +102,10 @@ from forge_mvc_entities.crud.views_builder import (  # noqa: F401
     build_show_view,
     build_form_view,
     build_bulk_delete_confirm_view,
+)
+from forge_mvc_entities.crud.views_namespace import (
+    entity_view_dir,
+    resolve_app_views_namespace,
 )
 
 
@@ -191,6 +200,7 @@ def make_crud(
     entities_root: Path,
     output_root: Path,
     dry_run: bool = False,
+    views_namespace: str = "",
 ) -> MakeCrudResult:
     """Génère le scaffolding CRUD pour une entité Forge.
 
@@ -205,6 +215,7 @@ def make_crud(
         raise SystemExit(1)
 
     snake = _to_snake(entity_name)
+    view_dir = entity_view_dir(snake, views_namespace)
     json_path = entities_root / snake / f"{snake}.json"
 
     if not json_path.exists():
@@ -261,7 +272,7 @@ def make_crud(
 
     _write_if_new(
         mvc / "controllers" / f"{snake}_controller.py",
-        build_controller(definition, relations, many_to_many_relations),
+        build_controller(definition, relations, many_to_many_relations, views_namespace=views_namespace),
         result, dry_run,
     )
     _write_if_new(
@@ -287,37 +298,37 @@ def make_crud(
     rbac = definition.get("rbac")
 
     _write_if_new(
-        mvc / "views" / snake / "index.html",
-        build_index_view(definition, relations, many_to_many_relations, rbac=rbac),
+        mvc / "views" / view_dir / "index.html",
+        build_index_view(definition, relations, many_to_many_relations, rbac=rbac, views_namespace=views_namespace),
         result, dry_run,
     )
     _write_if_new(
-        mvc / "views" / snake / "_table.html",
+        mvc / "views" / view_dir / "_table.html",
         build_table_partial(definition, relations, many_to_many_relations, rbac=rbac),
         result, dry_run,
     )
     _write_if_new(
-        mvc / "views" / snake / "_pagination.html",
+        mvc / "views" / view_dir / "_pagination.html",
         build_pagination_partial(definition),
         result, dry_run,
     )
     _write_if_new(
-        mvc / "views" / snake / "_results.html",
-        build_results_partial(definition),
+        mvc / "views" / view_dir / "_results.html",
+        build_results_partial(definition, views_namespace),
         result, dry_run,
     )
     _write_if_new(
-        mvc / "views" / snake / "show.html",
+        mvc / "views" / view_dir / "show.html",
         build_show_view(definition, relations, many_to_many_relations, rbac=rbac),
         result, dry_run,
     )
     _write_if_new(
-        mvc / "views" / snake / "form.html",
+        mvc / "views" / view_dir / "form.html",
         build_form_view(definition, relations, many_to_many_relations),
         result, dry_run,
     )
     _write_if_new(
-        mvc / "views" / snake / "bulk_delete_confirm.html",
+        mvc / "views" / view_dir / "bulk_delete_confirm.html",
         build_bulk_delete_confirm_view(definition),
         result, dry_run,
     )
@@ -350,6 +361,7 @@ def cmd_make_crud_main(args: list[str]) -> None:
         entities_root=Path("mvc") / "entities",
         output_root=Path("."),
         dry_run=dry_run,
+        views_namespace=resolve_app_views_namespace(),
     )
 
     for path in result.created:
