@@ -6,258 +6,258 @@ Ce document explique ce que fait l'opt-in `forge-mvc-audio`, ce qu'il expose, et
 
 Volontairement sobre : aucune base de données, aucune file de transcodage, des opérations synchrones, des fichiers retrouvés par `uuid` sur le disque.
 
-## 1. Rôle du module
+??? note "1. Rôle du module"
 
-L'opt-in couvre le cycle d'un fichier audio sans rien imposer en base : on ingère des octets, on les range sur disque sous un `uuid`, on peut les sonder (`ffprobe`), les convertir en MP3 (`ffmpeg`), et les servir.
+    L'opt-in couvre le cycle d'un fichier audio sans rien imposer en base : on ingère des octets, on les range sur disque sous un `uuid`, on peut les sonder (`ffprobe`), les convertir en MP3 (`ffmpeg`), et les servir.
 
-Il branche ses **routes** de lecture sur le routeur du projet via `register_audio_routes` (modèle opt-in de type route).
+    Il branche ses **routes** de lecture sur le routeur du projet via `register_audio_routes` (modèle opt-in de type route).
 
-Sa sobriété est un choix : pas de table SQL, pas de suivi de jobs ; tout est synchrone et le service retrouve les fichiers par `uuid`.
+    Sa sobriété est un choix : pas de table SQL, pas de suivi de jobs ; tout est synchrone et le service retrouve les fichiers par `uuid`.
 
-## 2. Installation et désinstallation
+??? note "2. Installation et désinstallation"
 
-### Installation
+    ### Installation
 
-=== "Depuis PyPI (stable)"
+    === "Depuis PyPI (stable)"
 
-    La dernière version publiée :
+        La dernière version publiée :
+
+        ```bash
+        pip install --pre forge-mvc-audio
+        ```
+
+    === "Depuis Git (avant-garde)"
+
+        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+        ```bash
+        source .venv/bin/activate
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-audio"
+        ```
+
+        !!! warning "Erreur « externally-managed-environment » ?"
+
+            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+    Puis activez l'opt-in :
 
     ```bash
-    pip install --pre forge-mvc-audio
+    forge opt-in:enable audio
     ```
 
-=== "Depuis Git (avant-garde)"
 
-    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
+    `forge opt-in:install audio` affiche la commande `pip` sans l'exécuter.
+
+    ### Désinstallation
 
     ```bash
-    source .venv/bin/activate
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-audio"
+    forge opt-in:disable audio
+    pip uninstall forge-mvc-audio
     ```
 
-    !!! warning "Erreur « externally-managed-environment » ?"
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
+    `forge opt-in:remove audio` affiche la commande `pip uninstall` sans l'exécuter.
 
-        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+??? note "3. Commandes"
 
-Puis activez l'opt-in :
+    `forge-mvc-audio` ajoute une commande :
 
-```bash
-forge opt-in:enable audio
-```
+    | Commande | Rôle | Exemple |
+    |---|---|---|
+    | `audio:doctor` | Diagnostic (paquet, config, `ffmpeg`/`ffprobe`). | `forge audio:doctor` |
 
+??? note "4. Vue d'ensemble rapide"
 
-`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
-`forge opt-in:install audio` affiche la commande `pip` sans l'exécuter.
+    | Élément | Valeur |
+    |---|---|
+    | Paquet | `forge-mvc-audio` |
+    | Module | `forge_mvc_audio` |
+    | Catégorie | Médias et fichiers (ADR-055) |
+    | Couche | opt-in de type route (couche `optins/`) |
+    | Dépend de | `forge-mvc`, et `ffmpeg` / `ffprobe` (binaires système) |
+    | API publique | `ingest_audio`, `probe_audio`, `transcode_to_mp3`, `register_audio_routes`, `load_audio_config` |
+    | Objets | `AudioConfig`, `AudioMetadata` |
+    | Configuration | `load_audio_config` (contrat `AudioConfig`) |
+    | Commandes | `audio:doctor` |
+    | Lecture | streaming HTTP Range, fichiers indexés par `uuid` |
+    | État | **sans état** : pas de base de données, opérations synchrones |
+    | Exceptions | `AudioIngestError`, `AudioProbeError`, `FfmpegError` |
+    | Installation | `pip install --pre forge-mvc-audio` |
 
-### Désinstallation
+??? note "5. Schémas UML"
 
-```bash
-forge opt-in:disable audio
-pip uninstall forge-mvc-audio
-```
+    Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
-`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
-`forge opt-in:remove audio` affiche la commande `pip uninstall` sans l'exécuter.
+    Le diagramme de classe montre les modules, les objets et les dépendances externes.
 
-## 3. Commandes
+    Le diagramme de séquence montre l'ingestion, le transcodage et la lecture.
 
-`forge-mvc-audio` ajoute une commande :
+    ### 5.1 Diagramme de classe
 
-| Commande | Rôle | Exemple |
-|---|---|---|
-| `audio:doctor` | Diagnostic (paquet, config, `ffmpeg`/`ffprobe`). | `forge audio:doctor` |
+    Le diagramme de classe montre une chaîne sans base de données : les fichiers vivent sur disque sous un `uuid`, et `ffmpeg` / `ffprobe` font le travail média.
 
-## 4. Vue d'ensemble rapide
+    ```mermaid
+    classDiagram
+        direction LR
 
-| Élément | Valeur |
-|---|---|
-| Paquet | `forge-mvc-audio` |
-| Module | `forge_mvc_audio` |
-| Catégorie | Médias et fichiers (ADR-055) |
-| Couche | opt-in de type route (couche `optins/`) |
-| Dépend de | `forge-mvc`, et `ffmpeg` / `ffprobe` (binaires système) |
-| API publique | `ingest_audio`, `probe_audio`, `transcode_to_mp3`, `register_audio_routes`, `load_audio_config` |
-| Objets | `AudioConfig`, `AudioMetadata` |
-| Configuration | `load_audio_config` (contrat `AudioConfig`) |
-| Commandes | `audio:doctor` |
-| Lecture | streaming HTTP Range, fichiers indexés par `uuid` |
-| État | **sans état** : pas de base de données, opérations synchrones |
-| Exceptions | `AudioIngestError`, `AudioProbeError`, `FfmpegError` |
-| Installation | `pip install --pre forge-mvc-audio` |
+        class ingest {
+            <<module>>
+            +ingest_audio(data, filename, title, config, uuid) dict
+        }
 
-## 5. Schémas UML
+        class probe {
+            <<module>>
+            +probe_audio(path, config, runner) AudioMetadata
+        }
 
-Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
+        class transcode {
+            <<module>>
+            +transcode_to_mp3(input_path, output_path, ...)
+        }
 
-Le diagramme de classe montre les modules, les objets et les dépendances externes.
+        class http {
+            <<module>>
+            +register_audio_routes(router, config)
+        }
 
-Le diagramme de séquence montre l'ingestion, le transcodage et la lecture.
+        class AudioMetadata {
+            <<dataclass>>
+            +float duration
+            +str codec
+            +int bitrate
+            +int channels
+        }
 
-### 5.1 Diagramme de classe
+        class ffmpeg {
+            <<binaire externe>>
+            +ffmpeg
+            +ffprobe
+        }
 
-Le diagramme de classe montre une chaîne sans base de données : les fichiers vivent sur disque sous un `uuid`, et `ffmpeg` / `ffprobe` font le travail média.
+        ingest --> Disk : range par uuid
+        probe --> ffmpeg : ffprobe
+        transcode --> ffmpeg : ffmpeg
+        probe --> AudioMetadata : renvoie
+        http --> Disk : sert par uuid (HTTP Range)
+    ```
 
-```mermaid
-classDiagram
-    direction LR
+    À retenir :
 
-    class ingest {
-        <<module>>
-        +ingest_audio(data, filename, title, config, uuid) dict
-    }
+    - aucune table : les fichiers sont rangés et retrouvés par `uuid` ;
+    - `ffprobe` sonde, `ffmpeg` transcode ;
+    - `probe_audio` renvoie un `AudioMetadata` typé ;
+    - la lecture sert le fichier par son `uuid`, en streaming.
 
-    class probe {
-        <<module>>
-        +probe_audio(path, config, runner) AudioMetadata
-    }
+    ### 5.2 Diagramme de séquence
 
-    class transcode {
-        <<module>>
-        +transcode_to_mp3(input_path, output_path, ...)
-    }
+    Le diagramme de séquence montre une ingestion suivie d'un transcodage, puis la lecture.
 
-    class http {
-        <<module>>
-        +register_audio_routes(router, config)
-    }
+    ```mermaid
+    sequenceDiagram
+        actor Op as Code applicatif
+        participant Ingest as ingest_audio
+        participant Disk as Disque (uuid)
+        participant Probe as probe_audio
+        participant Trans as transcode_to_mp3
+        participant Routes as register_audio_routes
+        actor Navigateur
 
-    class AudioMetadata {
-        <<dataclass>>
-        +float duration
-        +str codec
-        +int bitrate
-        +int channels
-    }
+        Op->>Ingest: ingest_audio(data, "cours.wav")
+        Ingest->>Disk: range le fichier sous un uuid
+        Ingest-->>Op: dict (uuid, chemin, ...)
+        Op->>Probe: probe_audio(chemin)
+        Probe-->>Op: AudioMetadata (durée, codec...)
+        Op->>Trans: transcode_to_mp3(src, dst)
+        Trans-->>Op: MP3 écrit
+        Navigateur->>Routes: GET l'audio (avec Range)
+        Routes-->>Navigateur: flux MP3 (206 Partial Content)
+    ```
 
-    class ffmpeg {
-        <<binaire externe>>
-        +ffmpeg
-        +ffprobe
-    }
+    À retenir :
 
-    ingest --> Disk : range par uuid
-    probe --> ffmpeg : ffprobe
-    transcode --> ffmpeg : ffmpeg
-    probe --> AudioMetadata : renvoie
-    http --> Disk : sert par uuid (HTTP Range)
-```
+    - l'ingestion valide et range les octets sous un `uuid` ;
+    - le sondage et le transcodage sont des appels **synchrones** ;
+    - la lecture honore l'en-tête `Range` ;
+    - rien n'est suivi en base : l'application gère ses propres références d'`uuid`.
 
-À retenir :
+??? note "6. API publique"
 
-- aucune table : les fichiers sont rangés et retrouvés par `uuid` ;
-- `ffprobe` sonde, `ffmpeg` transcode ;
-- `probe_audio` renvoie un `AudioMetadata` typé ;
-- la lecture sert le fichier par son `uuid`, en streaming.
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `ingest_audio` | `ingest_audio(data, filename, title=None, config=None, uuid=None) -> dict` | valide et range un fichier audio |
+    | `probe_audio` | `probe_audio(path, config=None, runner=None) -> AudioMetadata` | métadonnées via `ffprobe` |
+    | `transcode_to_mp3` | `transcode_to_mp3(input_path, output_path, ffmpeg_bin="ffmpeg", bitrate_kbps=192, ...)` | conversion MP3 via `ffmpeg` |
+    | `register_audio_routes` | `register_audio_routes(router, config=None) -> Any` | branche les routes de lecture |
+    | `load_audio_config` | `load_audio_config(source=None) -> AudioConfig` | charge la configuration |
+    | `AudioConfig` | dataclass | contrat de configuration |
+    | `AudioMetadata` | dataclass | durée, codec, bitrate, canaux |
+    | `AudioIngestError`, `AudioProbeError`, `FfmpegError` | exceptions | erreurs d'ingestion, de sondage, de transcodage |
 
-### 5.2 Diagramme de séquence
+??? note "7. Contextes d'utilisation"
 
-Le diagramme de séquence montre une ingestion suivie d'un transcodage, puis la lecture.
+    | Besoin | Élément |
+    |---|---|
+    | Vérifier l'installation | `forge audio:doctor` |
+    | Ingérer un fichier | `ingest_audio(data, filename)` |
+    | Lire les métadonnées | `probe_audio(path)` |
+    | Convertir en MP3 | `transcode_to_mp3(src, dst)` |
+    | Brancher la lecture | `register_audio_routes(router)` |
+    | Configurer le module | `load_audio_config(...)` |
 
-```mermaid
-sequenceDiagram
-    actor Op as Code applicatif
-    participant Ingest as ingest_audio
-    participant Disk as Disque (uuid)
-    participant Probe as probe_audio
-    participant Trans as transcode_to_mp3
-    participant Routes as register_audio_routes
-    actor Navigateur
+??? note "8. Exemples d'utilisation"
 
-    Op->>Ingest: ingest_audio(data, "cours.wav")
-    Ingest->>Disk: range le fichier sous un uuid
-    Ingest-->>Op: dict (uuid, chemin, ...)
-    Op->>Probe: probe_audio(chemin)
-    Probe-->>Op: AudioMetadata (durée, codec...)
-    Op->>Trans: transcode_to_mp3(src, dst)
-    Trans-->>Op: MP3 écrit
-    Navigateur->>Routes: GET l'audio (avec Range)
-    Routes-->>Navigateur: flux MP3 (206 Partial Content)
-```
+    ### 8.1 Ingérer puis transcoder
 
-À retenir :
+    ```python
+    from forge_mvc_audio import ingest_audio, transcode_to_mp3
 
-- l'ingestion valide et range les octets sous un `uuid` ;
-- le sondage et le transcodage sont des appels **synchrones** ;
-- la lecture honore l'en-tête `Range` ;
-- rien n'est suivi en base : l'application gère ses propres références d'`uuid`.
+    stored = ingest_audio(data, "cours.wav", title="Cours 1")
+    transcode_to_mp3(stored["path"], stored["path"].replace(".wav", ".mp3"))
+    ```
 
-## 6. API publique
+    L'ingestion range le fichier sous un `uuid` ; le transcodage est synchrone.
 
-| Élément | Signature | Rôle |
-|---|---|---|
-| `ingest_audio` | `ingest_audio(data, filename, title=None, config=None, uuid=None) -> dict` | valide et range un fichier audio |
-| `probe_audio` | `probe_audio(path, config=None, runner=None) -> AudioMetadata` | métadonnées via `ffprobe` |
-| `transcode_to_mp3` | `transcode_to_mp3(input_path, output_path, ffmpeg_bin="ffmpeg", bitrate_kbps=192, ...)` | conversion MP3 via `ffmpeg` |
-| `register_audio_routes` | `register_audio_routes(router, config=None) -> Any` | branche les routes de lecture |
-| `load_audio_config` | `load_audio_config(source=None) -> AudioConfig` | charge la configuration |
-| `AudioConfig` | dataclass | contrat de configuration |
-| `AudioMetadata` | dataclass | durée, codec, bitrate, canaux |
-| `AudioIngestError`, `AudioProbeError`, `FfmpegError` | exceptions | erreurs d'ingestion, de sondage, de transcodage |
+    ### 8.2 Brancher les routes de lecture
 
-## 7. Contextes d'utilisation
-
-| Besoin | Élément |
-|---|---|
-| Vérifier l'installation | `forge audio:doctor` |
-| Ingérer un fichier | `ingest_audio(data, filename)` |
-| Lire les métadonnées | `probe_audio(path)` |
-| Convertir en MP3 | `transcode_to_mp3(src, dst)` |
-| Brancher la lecture | `register_audio_routes(router)` |
-| Configurer le module | `load_audio_config(...)` |
-
-## 8. Exemples d'utilisation
-
-### 8.1 Ingérer puis transcoder
-
-```python
-from forge_mvc_audio import ingest_audio, transcode_to_mp3
-
-stored = ingest_audio(data, "cours.wav", title="Cours 1")
-transcode_to_mp3(stored["path"], stored["path"].replace(".wav", ".mp3"))
-```
-
-L'ingestion range le fichier sous un `uuid` ; le transcodage est synchrone.
-
-### 8.2 Brancher les routes de lecture
-
-```python
-# optins/audio/routes.py (couche optins du projet)
-from forge_mvc_audio import register_audio_routes
+    ```python
+    # optins/audio/routes.py (couche optins du projet)
+    from forge_mvc_audio import register_audio_routes
 
 
-def register(router) -> None:
-    register_audio_routes(router)
-```
+    def register(router) -> None:
+        register_audio_routes(router)
+    ```
 
-!!! tip "Aide-mémoire"
-    Une chaîne en quatre temps :
+    !!! tip "Aide-mémoire"
+        Une chaîne en quatre temps :
 
-    - `ingest_audio` pour entrer ;
-    - `probe_audio` pour inspecter ;
-    - `transcode_to_mp3` pour convertir ;
-    - `register_audio_routes` pour lire.
+        - `ingest_audio` pour entrer ;
+        - `probe_audio` pour inspecter ;
+        - `transcode_to_mp3` pour convertir ;
+        - `register_audio_routes` pour lire.
 
-## 9. Sobriété, uuid et dépendances
+??? note "9. Sobriété, uuid et dépendances"
 
-Le module est **sans état** : pas de table, pas de file de jobs.
-L'application garde elle-même la trace des `uuid` qu'elle a ingérés.
+    Le module est **sans état** : pas de table, pas de file de jobs.
+    L'application garde elle-même la trace des `uuid` qu'elle a ingérés.
 
-`ffmpeg` et `ffprobe` sont des binaires système (pas des dépendances pip) ; `forge audio:doctor` vérifie leur présence.
+    `ffmpeg` et `ffprobe` sont des binaires système (pas des dépendances pip) ; `forge audio:doctor` vérifie leur présence.
 
-!!! warning "ffmpeg / ffprobe requis"
-    Sans ces binaires, le sondage et le transcodage échouent (`AudioProbeError`, `FfmpegError`).
+    !!! warning "ffmpeg / ffprobe requis"
+        Sans ces binaires, le sondage et le transcodage échouent (`AudioProbeError`, `FfmpegError`).
 
-    Lancez `forge audio:doctor` après installation.
+        Lancez `forge audio:doctor` après installation.
 
-!!! note "Opérations synchrones"
-    Le transcodage est synchrone : pour de gros fichiers, déclenchez-le hors requête (par exemple via `forge-mvc-jobs`).
+    !!! note "Opérations synchrones"
+        Le transcodage est synchrone : pour de gros fichiers, déclenchez-le hors requête (par exemple via `forge-mvc-jobs`).
 
-    La sobriété est assumée : pas de file intégrée, pas de suivi en base.
+        La sobriété est assumée : pas de file intégrée, pas de suivi en base.
 
-!!! note "Indépendance du cœur"
-    Le cœur de Forge ne dépend pas de `forge-mvc-audio` : la dépendance va de l'opt-in vers le cœur.
+    !!! note "Indépendance du cœur"
+        Le cœur de Forge ne dépend pas de `forge-mvc-audio` : la dépendance va de l'opt-in vers le cœur.
 
 ## Voir aussi
 

@@ -9,256 +9,256 @@ Ce document explique ce que fait l'opt-in `forge-mvc-workflow`, ce qu'il expose,
 
 Il ne stocke rien lui-même : l'application garde le statut courant sur son entité ; l'opt-in dit quelles transitions sont permises.
 
-## 1. Rôle du module
+??? note "1. Rôle du module"
 
-Beaucoup d'entités ont un cycle de vie : un article passe de `brouillon` à `publié`, puis `archivé`.
+    Beaucoup d'entités ont un cycle de vie : un article passe de `brouillon` à `publié`, puis `archivé`.
 
-L'opt-in modélise ce cycle : on déclare les **statuts** et les **transitions** autorisées, puis on vérifie qu'un changement est permis avant de l'appliquer.
+    L'opt-in modélise ce cycle : on déclare les **statuts** et les **transitions** autorisées, puis on vérifie qu'un changement est permis avant de l'appliquer.
 
-Il fournit aussi des **helpers Jinja** pour afficher un statut sous forme de badge coloré, sans logique dans le template.
+    Il fournit aussi des **helpers Jinja** pour afficher un statut sous forme de badge coloré, sans logique dans le template.
 
-## 2. Installation et désinstallation
+??? note "2. Installation et désinstallation"
 
-### Installation
+    ### Installation
 
-=== "Depuis PyPI (stable)"
+    === "Depuis PyPI (stable)"
 
-    La dernière version publiée :
+        La dernière version publiée :
+
+        ```bash
+        pip install --pre forge-mvc-workflow
+        ```
+
+    === "Depuis Git (avant-garde)"
+
+        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+        ```bash
+        source .venv/bin/activate
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-workflow"
+        ```
+
+        !!! warning "Erreur « externally-managed-environment » ?"
+
+            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+    Puis activez l'opt-in :
 
     ```bash
-    pip install --pre forge-mvc-workflow
+    forge opt-in:enable workflow
     ```
 
-=== "Depuis Git (avant-garde)"
 
-    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+    `forge opt-in:install workflow` affiche la commande `pip` sans l'exécuter.
+
+    ### Désinstallation
 
     ```bash
-    source .venv/bin/activate
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-workflow"
+    forge opt-in:disable workflow
+    pip uninstall forge-mvc-workflow
     ```
 
-    !!! warning "Erreur « externally-managed-environment » ?"
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove workflow` affiche la commande `pip uninstall` sans l'exécuter.
 
-        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+??? note "3. Commandes"
 
-Puis activez l'opt-in :
+    Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-```bash
-forge opt-in:enable workflow
-```
+??? note "4. Vue d'ensemble rapide"
 
+    | Élément | Valeur |
+    |---|---|
+    | Paquet | `forge-mvc-workflow` |
+    | Module | `forge_mvc_workflow` |
+    | Catégorie | Données et modélisation (ADR-055) |
+    | Couche | opt-in (brique optionnelle) |
+    | Dépend de | `forge-mvc` |
+    | API publique | `WorkflowStatus`, `WorkflowTransition`, `make_status`, `make_transition`, `can_transition`, `get_available_transitions`, helpers Jinja |
+    | Persistance | aucune table imposée : l'application stocke le statut courant |
+    | Helpers Jinja | `workflow_status_badge`, `workflow_status_label`, `workflow_status_color` |
+    | Exceptions | `WorkflowStatusError`, `WorkflowTransitionError` |
+    | Décision d'architecture | ADR-004 (opt-in officiel) |
+    | Installation | `pip install --pre forge-mvc-workflow` |
 
-`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
-`forge opt-in:install workflow` affiche la commande `pip` sans l'exécuter.
+??? note "5. Schémas UML"
 
-### Désinstallation
+    Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
-```bash
-forge opt-in:disable workflow
-pip uninstall forge-mvc-workflow
-```
+    Le diagramme de classe montre les statuts, les transitions et les helpers.
 
-`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-`forge opt-in:remove workflow` affiche la commande `pip uninstall` sans l'exécuter.
+    Le diagramme de séquence montre la vérification d'un changement de statut.
 
-## 3. Commandes
+    ### 5.1 Diagramme de classe
 
-Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
+    Le diagramme de classe montre que les transitions relient des statuts, et que les helpers Jinja rendent un statut en badge.
 
-## 4. Vue d'ensemble rapide
+    ```mermaid
+    classDiagram
+        direction LR
 
-| Élément | Valeur |
-|---|---|
-| Paquet | `forge-mvc-workflow` |
-| Module | `forge_mvc_workflow` |
-| Catégorie | Données et modélisation (ADR-055) |
-| Couche | opt-in (brique optionnelle) |
-| Dépend de | `forge-mvc` |
-| API publique | `WorkflowStatus`, `WorkflowTransition`, `make_status`, `make_transition`, `can_transition`, `get_available_transitions`, helpers Jinja |
-| Persistance | aucune table imposée : l'application stocke le statut courant |
-| Helpers Jinja | `workflow_status_badge`, `workflow_status_label`, `workflow_status_color` |
-| Exceptions | `WorkflowStatusError`, `WorkflowTransitionError` |
-| Décision d'architecture | ADR-004 (opt-in officiel) |
-| Installation | `pip install --pre forge-mvc-workflow` |
+        class WorkflowStatus {
+            <<dataclass>>
+            +str name
+            +str label
+            +str color
+            +bool is_initial
+            +bool is_final
+        }
 
-## 5. Schémas UML
+        class WorkflowTransition {
+            <<dataclass>>
+            +str from_status
+            +str to_status
+        }
 
-Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
+        class status {
+            <<module>>
+            +make_status(...) WorkflowStatus
+            +find_status(...) WorkflowStatus
+            +validate_statuses(...)
+        }
 
-Le diagramme de classe montre les statuts, les transitions et les helpers.
+        class transitions {
+            <<module>>
+            +make_transition(from, to) WorkflowTransition
+            +can_transition(transitions, from, to) bool
+            +get_available_transitions(transitions, from) list
+            +validate_transitions(...)
+        }
 
-Le diagramme de séquence montre la vérification d'un changement de statut.
+        class jinja {
+            <<module>>
+            +workflow_status_badge(...)
+            +workflow_status_label(...)
+            +workflow_status_color(...)
+        }
 
-### 5.1 Diagramme de classe
+        transitions --> WorkflowTransition : produit
+        status --> WorkflowStatus : produit
+        WorkflowTransition --> WorkflowStatus : relie
+        jinja --> WorkflowStatus : affiche
+    ```
 
-Le diagramme de classe montre que les transitions relient des statuts, et que les helpers Jinja rendent un statut en badge.
+    À retenir :
 
-```mermaid
-classDiagram
-    direction LR
+    - un `WorkflowStatus` porte un nom, un libellé, une couleur, des marqueurs initial/final ;
+    - une `WorkflowTransition` relie un statut de départ à un statut d'arrivée ;
+    - `can_transition` répond oui/non avant d'appliquer un changement ;
+    - les helpers Jinja affichent un statut sans logique dans le template.
 
-    class WorkflowStatus {
-        <<dataclass>>
-        +str name
-        +str label
-        +str color
-        +bool is_initial
-        +bool is_final
-    }
+    ### 5.2 Diagramme de séquence
 
-    class WorkflowTransition {
-        <<dataclass>>
-        +str from_status
-        +str to_status
-    }
+    Le diagramme de séquence montre un changement de statut contrôlé.
 
-    class status {
-        <<module>>
-        +make_status(...) WorkflowStatus
-        +find_status(...) WorkflowStatus
-        +validate_statuses(...)
-    }
+    ```mermaid
+    sequenceDiagram
+        participant App as Contrôleur
+        participant WF as forge_mvc_workflow
+        participant Entity as Entité (statut stocké)
 
-    class transitions {
-        <<module>>
-        +make_transition(from, to) WorkflowTransition
-        +can_transition(transitions, from, to) bool
-        +get_available_transitions(transitions, from) list
-        +validate_transitions(...)
-    }
+        App->>WF: can_transition(TRANSITIONS, "brouillon", "publie") ?
+        alt transition autorisée
+            WF-->>App: True
+            App->>Entity: met à jour le statut = "publie"
+        else transition interdite
+            WF-->>App: False
+            App-->>App: refuse / message d'erreur
+        end
+        App->>WF: get_available_transitions(TRANSITIONS, "publie")
+        WF-->>App: transitions possibles (pour l'UI)
+    ```
 
-    class jinja {
-        <<module>>
-        +workflow_status_badge(...)
-        +workflow_status_label(...)
-        +workflow_status_color(...)
-    }
+    À retenir :
 
-    transitions --> WorkflowTransition : produit
-    status --> WorkflowStatus : produit
-    WorkflowTransition --> WorkflowStatus : relie
-    jinja --> WorkflowStatus : affiche
-```
+    - on vérifie **avant** d'écrire le nouveau statut ;
+    - l'application reste responsable de persister le statut ;
+    - `get_available_transitions` alimente les boutons/menus de l'UI ;
+    - une transition non déclarée est refusée.
 
-À retenir :
+??? note "6. API publique"
 
-- un `WorkflowStatus` porte un nom, un libellé, une couleur, des marqueurs initial/final ;
-- une `WorkflowTransition` relie un statut de départ à un statut d'arrivée ;
-- `can_transition` répond oui/non avant d'appliquer un changement ;
-- les helpers Jinja affichent un statut sans logique dans le template.
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `make_status` | `make_status(name, label="", color="", is_initial=False, is_final=False) -> WorkflowStatus` | déclare un statut |
+    | `make_transition` | `make_transition(from_status, to_status) -> WorkflowTransition` | déclare une transition |
+    | `can_transition` | `can_transition(transitions, from_name, to_name) -> bool` | transition autorisée ? |
+    | `get_available_transitions` | `get_available_transitions(transitions, from_name) -> list[WorkflowTransition]` | transitions possibles depuis un statut |
+    | `find_status` | `find_status(...) -> WorkflowStatus` | retrouve un statut par nom |
+    | `validate_statuses`, `validate_transitions` | fonctions | valident un jeu de statuts/transitions |
+    | `WorkflowStatus`, `WorkflowTransition` | dataclasses | statut et transition |
+    | helpers Jinja | `workflow_status_badge`, `workflow_status_badge_class`, `workflow_status_color`, `workflow_status_label`, `make_workflow_jinja_helpers` | affichage |
+    | `WorkflowStatusError`, `WorkflowTransitionError` | exceptions | nom invalide, transition invalide |
 
-### 5.2 Diagramme de séquence
+??? note "7. Contextes d'utilisation"
 
-Le diagramme de séquence montre un changement de statut contrôlé.
+    | Besoin | Élément |
+    |---|---|
+    | Déclarer le cycle de vie | `make_status` + `make_transition` |
+    | Autoriser un changement | `can_transition(...)` |
+    | Proposer les suites possibles | `get_available_transitions(...)` |
+    | Valider la configuration | `validate_statuses` / `validate_transitions` |
+    | Afficher un badge | `workflow_status_badge(...)` (Jinja) |
 
-```mermaid
-sequenceDiagram
-    participant App as Contrôleur
-    participant WF as forge_mvc_workflow
-    participant Entity as Entité (statut stocké)
+??? note "8. Exemples d'utilisation"
 
-    App->>WF: can_transition(TRANSITIONS, "brouillon", "publie") ?
-    alt transition autorisée
-        WF-->>App: True
-        App->>Entity: met à jour le statut = "publie"
-    else transition interdite
-        WF-->>App: False
-        App-->>App: refuse / message d'erreur
-    end
-    App->>WF: get_available_transitions(TRANSITIONS, "publie")
-    WF-->>App: transitions possibles (pour l'UI)
-```
+    ### 8.1 Déclarer et vérifier
 
-À retenir :
+    ```python
+    from forge_mvc_workflow import make_status, make_transition, can_transition
 
-- on vérifie **avant** d'écrire le nouveau statut ;
-- l'application reste responsable de persister le statut ;
-- `get_available_transitions` alimente les boutons/menus de l'UI ;
-- une transition non déclarée est refusée.
+    STATUSES = [
+        make_status("brouillon", "Brouillon", color="gray", is_initial=True),
+        make_status("publie", "Publié", color="green"),
+        make_status("archive", "Archivé", color="slate", is_final=True),
+    ]
+    TRANSITIONS = [
+        make_transition("brouillon", "publie"),
+        make_transition("publie", "archive"),
+    ]
 
-## 6. API publique
+    if can_transition(TRANSITIONS, "brouillon", "publie"):
+        article["status"] = "publie"      # l'application persiste
+    ```
 
-| Élément | Signature | Rôle |
-|---|---|---|
-| `make_status` | `make_status(name, label="", color="", is_initial=False, is_final=False) -> WorkflowStatus` | déclare un statut |
-| `make_transition` | `make_transition(from_status, to_status) -> WorkflowTransition` | déclare une transition |
-| `can_transition` | `can_transition(transitions, from_name, to_name) -> bool` | transition autorisée ? |
-| `get_available_transitions` | `get_available_transitions(transitions, from_name) -> list[WorkflowTransition]` | transitions possibles depuis un statut |
-| `find_status` | `find_status(...) -> WorkflowStatus` | retrouve un statut par nom |
-| `validate_statuses`, `validate_transitions` | fonctions | valident un jeu de statuts/transitions |
-| `WorkflowStatus`, `WorkflowTransition` | dataclasses | statut et transition |
-| helpers Jinja | `workflow_status_badge`, `workflow_status_badge_class`, `workflow_status_color`, `workflow_status_label`, `make_workflow_jinja_helpers` | affichage |
-| `WorkflowStatusError`, `WorkflowTransitionError` | exceptions | nom invalide, transition invalide |
+    ### 8.2 Afficher un badge dans un template
 
-## 7. Contextes d'utilisation
+    ```html
+    {{ workflow_status_badge(STATUSES, article.status) }}
+    ```
 
-| Besoin | Élément |
-|---|---|
-| Déclarer le cycle de vie | `make_status` + `make_transition` |
-| Autoriser un changement | `can_transition(...)` |
-| Proposer les suites possibles | `get_available_transitions(...)` |
-| Valider la configuration | `validate_statuses` / `validate_transitions` |
-| Afficher un badge | `workflow_status_badge(...)` (Jinja) |
+    `get_available_transitions(TRANSITIONS, article.status)` donne les boutons d'action à proposer.
 
-## 8. Exemples d'utilisation
+    !!! tip "Aide-mémoire"
+        Déclarer, vérifier, afficher :
 
-### 8.1 Déclarer et vérifier
+        - `make_status` / `make_transition` pour le cycle ;
+        - `can_transition` / `get_available_transitions` pour la logique ;
+        - les helpers Jinja pour l'affichage.
 
-```python
-from forge_mvc_workflow import make_status, make_transition, can_transition
+??? note "9. Persistance et validation"
 
-STATUSES = [
-    make_status("brouillon", "Brouillon", color="gray", is_initial=True),
-    make_status("publie", "Publié", color="green"),
-    make_status("archive", "Archivé", color="slate", is_final=True),
-]
-TRANSITIONS = [
-    make_transition("brouillon", "publie"),
-    make_transition("publie", "archive"),
-]
+    L'opt-in ne crée **aucune table** : le statut courant est un simple champ de votre entité, que vous mettez à jour vous-même après un `can_transition` positif.
 
-if can_transition(TRANSITIONS, "brouillon", "publie"):
-    article["status"] = "publie"      # l'application persiste
-```
+    `validate_statuses` et `validate_transitions` détectent les configurations incohérentes (statut inconnu, doublon de transition) au démarrage.
 
-### 8.2 Afficher un badge dans un template
+    !!! note "L'opt-in décide, l'application persiste"
+        `forge-mvc-workflow` répond « cette transition est-elle permise ?
+        »
+        ; il n'écrit jamais en base.
 
-```html
-{{ workflow_status_badge(STATUSES, article.status) }}
-```
+        Vous gardez la main sur le stockage du statut (champ d'entité, migration).
 
-`get_available_transitions(TRANSITIONS, article.status)` donne les boutons d'action à proposer.
+    !!! note "Affichage sans logique dans le template"
+        Les helpers Jinja produisent libellé, couleur et badge à partir d'un nom de statut.
 
-!!! tip "Aide-mémoire"
-    Déclarer, vérifier, afficher :
+        Le template reste déclaratif ; la table des statuts vit dans votre code.
 
-    - `make_status` / `make_transition` pour le cycle ;
-    - `can_transition` / `get_available_transitions` pour la logique ;
-    - les helpers Jinja pour l'affichage.
-
-## 9. Persistance et validation
-
-L'opt-in ne crée **aucune table** : le statut courant est un simple champ de votre entité, que vous mettez à jour vous-même après un `can_transition` positif.
-
-`validate_statuses` et `validate_transitions` détectent les configurations incohérentes (statut inconnu, doublon de transition) au démarrage.
-
-!!! note "L'opt-in décide, l'application persiste"
-    `forge-mvc-workflow` répond « cette transition est-elle permise ?
-    »
-    ; il n'écrit jamais en base.
-
-    Vous gardez la main sur le stockage du statut (champ d'entité, migration).
-
-!!! note "Affichage sans logique dans le template"
-    Les helpers Jinja produisent libellé, couleur et badge à partir d'un nom de statut.
-
-    Le template reste déclaratif ; la table des statuts vit dans votre code.
-
-!!! note "Indépendance du cœur"
-    Le cœur de Forge ne dépend pas de `forge-mvc-workflow` : la dépendance va de l'opt-in vers le cœur.
+    !!! note "Indépendance du cœur"
+        Le cœur de Forge ne dépend pas de `forge-mvc-workflow` : la dépendance va de l'opt-in vers le cœur.
 
 ## Voir aussi
 

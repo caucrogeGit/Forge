@@ -6,267 +6,267 @@ Ce document explique ce que fait l'opt-in `forge-mvc-notifications`, ce qu'il ex
 
 Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et les helpers, l'application décide de qui notifier et quand.
 
-## 1. Rôle du module
+??? note "1. Rôle du module"
 
-Une application a souvent besoin d'avertir un utilisateur : élève inscrit, note publiée, devoir à rendre.
+    Une application a souvent besoin d'avertir un utilisateur : élève inscrit, note publiée, devoir à rendre.
 
-L'opt-in stocke ces avis dans une table SQL (`notifications`) et expose des fonctions pour notifier, lister, compter les non lues et marquer comme lu.
+    L'opt-in stocke ces avis dans une table SQL (`notifications`) et expose des fonctions pour notifier, lister, compter les non lues et marquer comme lu.
 
-Son périmètre V1 est **in-app** : des lignes en base.
-La livraison hors application (email, push) reste applicative, par exemple en combinant ce paquet avec `forge-mvc-jobs` et `forge-mvc-mail`.
+    Son périmètre V1 est **in-app** : des lignes en base.
+    La livraison hors application (email, push) reste applicative, par exemple en combinant ce paquet avec `forge-mvc-jobs` et `forge-mvc-mail`.
 
-## 2. Installation et désinstallation
+??? note "2. Installation et désinstallation"
 
-### Installation
+    ### Installation
 
-=== "Depuis PyPI (stable)"
+    === "Depuis PyPI (stable)"
 
-    La dernière version publiée :
+        La dernière version publiée :
+
+        ```bash
+        pip install --pre forge-mvc-notifications
+        ```
+
+    === "Depuis Git (avant-garde)"
+
+        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+        ```bash
+        source .venv/bin/activate
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-notifications"
+        ```
+
+        !!! warning "Erreur « externally-managed-environment » ?"
+
+            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+    Puis activez l'opt-in :
 
     ```bash
-    pip install --pre forge-mvc-notifications
+    forge opt-in:enable notifications
     ```
 
-=== "Depuis Git (avant-garde)"
 
-    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+    `forge opt-in:install notifications` affiche la commande `pip` sans l'exécuter.
+
+    ### Désinstallation
 
     ```bash
-    source .venv/bin/activate
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-notifications"
+    forge opt-in:disable notifications
+    pip uninstall forge-mvc-notifications
     ```
 
-    !!! warning "Erreur « externally-managed-environment » ?"
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove notifications` affiche la commande `pip uninstall` sans l'exécuter.
 
-        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+??? note "3. Commandes"
 
-Puis activez l'opt-in :
+    `forge-mvc-notifications` ajoute une commande :
 
-```bash
-forge opt-in:enable notifications
-```
+    | Commande | Rôle | Exemple |
+    |---|---|---|
+    | `notifications:init` | Crée la table `notifications` (DDL fournie). | `forge notifications:init` |
 
+??? note "4. Vue d'ensemble rapide"
 
-`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
-`forge opt-in:install notifications` affiche la commande `pip` sans l'exécuter.
+    | Élément | Valeur |
+    |---|---|
+    | Paquet | `forge-mvc-notifications` |
+    | Module | `forge_mvc_notifications` |
+    | Catégorie | Communication (ADR-055) |
+    | Couche | opt-in (brique optionnelle) |
+    | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
+    | API publique | `notify`, `get_notifications`, `unread_count`, `mark_read`, `mark_all_read`, `Notification` |
+    | Table SQL | `notifications` (`TABLE_NAME`, `CREATE_TABLE_SQL`) |
+    | Limite de lecture | `MAX_LIMIT` = 1000 entrées |
+    | Exception liée | `NotificationError` si destinataire/message vide ou limite invalide |
+    | Périmètre | in-app (V1) ; livraison email/push à charge de l'application |
+    | Installation | `pip install --pre forge-mvc-notifications` |
 
-### Désinstallation
+??? note "5. Schémas UML"
 
-```bash
-forge opt-in:disable notifications
-pip uninstall forge-mvc-notifications
-```
+    Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
-`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-`forge opt-in:remove notifications` affiche la commande `pip uninstall` sans l'exécuter.
+    Le diagramme de classe montre l'API, l'objet renvoyé et la table.
 
-## 3. Commandes
+    Le diagramme de séquence montre la création puis la lecture des notifications.
 
-`forge-mvc-notifications` ajoute une commande :
+    ### 5.1 Diagramme de classe
 
-| Commande | Rôle | Exemple |
-|---|---|---|
-| `notifications:init` | Crée la table `notifications` (DDL fournie). | `forge notifications:init` |
+    Le diagramme de classe montre que le module agit sur la table `notifications` au travers d'un exécuteur **injecté** et renvoie des `Notification` typées.
 
-## 4. Vue d'ensemble rapide
+    ```mermaid
+    classDiagram
+        direction LR
 
-| Élément | Valeur |
-|---|---|
-| Paquet | `forge-mvc-notifications` |
-| Module | `forge_mvc_notifications` |
-| Catégorie | Communication (ADR-055) |
-| Couche | opt-in (brique optionnelle) |
-| Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-| API publique | `notify`, `get_notifications`, `unread_count`, `mark_read`, `mark_all_read`, `Notification` |
-| Table SQL | `notifications` (`TABLE_NAME`, `CREATE_TABLE_SQL`) |
-| Limite de lecture | `MAX_LIMIT` = 1000 entrées |
-| Exception liée | `NotificationError` si destinataire/message vide ou limite invalide |
-| Périmètre | in-app (V1) ; livraison email/push à charge de l'application |
-| Installation | `pip install --pre forge-mvc-notifications` |
+        class notifications {
+            <<module>>
+            +notify(recipient, message, type, data, db) int
+            +get_notifications(recipient, unread_only, limit, db) list
+            +unread_count(recipient, db) int
+            +mark_read(notification_id, db) bool
+            +mark_all_read(recipient, db) int
+        }
 
-## 5. Schémas UML
+        class Notification {
+            <<dataclass>>
+            +int id
+            +str recipient
+            +str type
+            +str message
+            +dict data
+            +bool read
+            +str created_at
+        }
 
-Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
+        class notifications_table {
+            <<table>>
+            +id
+            +recipient
+            +type
+            +message
+            +data
+            +read
+            +created_at
+        }
 
-Le diagramme de classe montre l'API, l'objet renvoyé et la table.
+        class DBExecutor {
+            +execute(sql, params)
+            +fetch_all(sql, params)
+        }
 
-Le diagramme de séquence montre la création puis la lecture des notifications.
+        class NotificationError {
+            <<exception>>
+        }
 
-### 5.1 Diagramme de classe
+        notifications --> DBExecutor : exécuteur injecté
+        DBExecutor --> notifications_table : lit / écrit
+        notifications --> Notification : renvoie 0..*
+        notifications ..> NotificationError : peut lever
+    ```
 
-Le diagramme de classe montre que le module agit sur la table `notifications` au travers d'un exécuteur **injecté** et renvoie des `Notification` typées.
+    À retenir :
 
-```mermaid
-classDiagram
-    direction LR
+    - le module expose cinq fonctions, pas de classe à instancier ;
+    - les avis vivent dans la table `notifications` ;
+    - `get_notifications` renvoie des `Notification` typées ;
+    - le module n'ouvre jamais de connexion : il reçoit un exécuteur.
 
-    class notifications {
-        <<module>>
-        +notify(recipient, message, type, data, db) int
-        +get_notifications(recipient, unread_only, limit, db) list
-        +unread_count(recipient, db) int
-        +mark_read(notification_id, db) bool
-        +mark_all_read(recipient, db) int
-    }
+    ### 5.2 Diagramme de séquence
 
-    class Notification {
-        <<dataclass>>
-        +int id
-        +str recipient
-        +str type
-        +str message
-        +dict data
-        +bool read
-        +str created_at
-    }
+    Le diagramme de séquence montre un `notify` puis l'affichage des non lues d'un utilisateur.
 
-    class notifications_table {
-        <<table>>
-        +id
-        +recipient
-        +type
-        +message
-        +data
-        +read
-        +created_at
-    }
+    ```mermaid
+    sequenceDiagram
+        participant App as Code applicatif
+        participant Notif as forge_mvc_notifications
+        participant DB as Exécuteur BDD
+        participant Table as notifications
 
-    class DBExecutor {
-        +execute(sql, params)
-        +fetch_all(sql, params)
-    }
+        App->>Notif: notify("eleve.42", "Note publiée", type="info")
+        Notif->>Notif: valide recipient et message
+        Notif->>DB: execute(INSERT, params)
+        DB->>Table: insère la ligne (read = false)
+        Notif-->>App: id de la notification
+        App->>Notif: get_notifications("eleve.42", unread_only=True)
+        Notif->>DB: fetch_all(SELECT filtré, params)
+        DB-->>Notif: lignes
+        Notif-->>App: list[Notification] (plus récentes d'abord)
+        App->>Notif: mark_read(id)
+        Notif->>DB: execute(UPDATE read=true)
+    ```
 
-    class NotificationError {
-        <<exception>>
-    }
+    À retenir :
 
-    notifications --> DBExecutor : exécuteur injecté
-    DBExecutor --> notifications_table : lit / écrit
-    notifications --> Notification : renvoie 0..*
-    notifications ..> NotificationError : peut lever
-```
+    - une notification est créée comme **non lue** ;
+    - `get_notifications` filtre par destinataire, et optionnellement par non lues ;
+    - `mark_read` / `mark_all_read` basculent l'état lu ;
+    - `unread_count` donne le nombre de non lues (pour un badge).
 
-À retenir :
+??? note "6. API publique"
 
-- le module expose cinq fonctions, pas de classe à instancier ;
-- les avis vivent dans la table `notifications` ;
-- `get_notifications` renvoie des `Notification` typées ;
-- le module n'ouvre jamais de connexion : il reçoit un exécuteur.
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `notify` | `notify(recipient, message, *, type="info", data=None, db=None) -> int` | crée une notification, renvoie son id |
+    | `get_notifications` | `get_notifications(recipient, *, unread_only=False, limit=50, db=None) -> list[Notification]` | liste les notifications d'un destinataire |
+    | `unread_count` | `unread_count(recipient, *, db=None) -> int` | nombre de non lues |
+    | `mark_read` | `mark_read(notification_id, *, db=None) -> bool` | marque une notification lue |
+    | `mark_all_read` | `mark_all_read(recipient, *, db=None) -> int` | marque tout lu, renvoie le nombre marqué |
+    | `Notification` | dataclass | `id`, `recipient`, `type`, `message`, `data`, `read`, `created_at` |
+    | `NotificationError` | exception (`ValueError`) | destinataire/message vide ou limite invalide |
+    | `TABLE_NAME` | `"notifications"` | nom de la table |
+    | `CREATE_TABLE_SQL` | constante SQL | création de la table |
+    | `MAX_LIMIT` | `1000` | plafond du paramètre `limit` |
 
-### 5.2 Diagramme de séquence
+    `recipient` est un identifiant applicatif (par exemple `"eleve.42"` ou un login).
 
-Le diagramme de séquence montre un `notify` puis l'affichage des non lues d'un utilisateur.
+    `data` est un complément libre sérialisé en JSON ; `db` est l'exécuteur, omis il utilise le backend actif.
 
-```mermaid
-sequenceDiagram
-    participant App as Code applicatif
-    participant Notif as forge_mvc_notifications
-    participant DB as Exécuteur BDD
-    participant Table as notifications
+??? note "7. Contextes d'utilisation"
 
-    App->>Notif: notify("eleve.42", "Note publiée", type="info")
-    Notif->>Notif: valide recipient et message
-    Notif->>DB: execute(INSERT, params)
-    DB->>Table: insère la ligne (read = false)
-    Notif-->>App: id de la notification
-    App->>Notif: get_notifications("eleve.42", unread_only=True)
-    Notif->>DB: fetch_all(SELECT filtré, params)
-    DB-->>Notif: lignes
-    Notif-->>App: list[Notification] (plus récentes d'abord)
-    App->>Notif: mark_read(id)
-    Notif->>DB: execute(UPDATE read=true)
-```
+    | Besoin | Élément |
+    |---|---|
+    | Notifier un utilisateur | `notify(recipient, message)` |
+    | Qualifier la notification | paramètre `type=...` |
+    | Joindre des données | paramètre `data=...` |
+    | Lister les notifications | `get_notifications(recipient)` |
+    | Ne montrer que les non lues | `unread_only=True` |
+    | Afficher un badge | `unread_count(recipient)` |
+    | Marquer lu | `mark_read(id)` / `mark_all_read(recipient)` |
+    | Créer la table | `CREATE_TABLE_SQL` ou `forge notifications:init` |
 
-À retenir :
+??? note "8. Exemples d'utilisation"
 
-- une notification est créée comme **non lue** ;
-- `get_notifications` filtre par destinataire, et optionnellement par non lues ;
-- `mark_read` / `mark_all_read` basculent l'état lu ;
-- `unread_count` donne le nombre de non lues (pour un badge).
+    ### 8.1 Notifier puis afficher les non lues
 
-## 6. API publique
+    ```python
+    from forge_mvc_notifications import notify, get_notifications, unread_count
 
-| Élément | Signature | Rôle |
-|---|---|---|
-| `notify` | `notify(recipient, message, *, type="info", data=None, db=None) -> int` | crée une notification, renvoie son id |
-| `get_notifications` | `get_notifications(recipient, *, unread_only=False, limit=50, db=None) -> list[Notification]` | liste les notifications d'un destinataire |
-| `unread_count` | `unread_count(recipient, *, db=None) -> int` | nombre de non lues |
-| `mark_read` | `mark_read(notification_id, *, db=None) -> bool` | marque une notification lue |
-| `mark_all_read` | `mark_all_read(recipient, *, db=None) -> int` | marque tout lu, renvoie le nombre marqué |
-| `Notification` | dataclass | `id`, `recipient`, `type`, `message`, `data`, `read`, `created_at` |
-| `NotificationError` | exception (`ValueError`) | destinataire/message vide ou limite invalide |
-| `TABLE_NAME` | `"notifications"` | nom de la table |
-| `CREATE_TABLE_SQL` | constante SQL | création de la table |
-| `MAX_LIMIT` | `1000` | plafond du paramètre `limit` |
+    notify("eleve.42", "Votre note de maths est publiée.", type="info")
 
-`recipient` est un identifiant applicatif (par exemple `"eleve.42"` ou un login).
+    badge = unread_count("eleve.42")
+    nouvelles = get_notifications("eleve.42", unread_only=True)
+    ```
 
-`data` est un complément libre sérialisé en JSON ; `db` est l'exécuteur, omis il utilise le backend actif.
+    ### 8.2 Marquer comme lu
 
-## 7. Contextes d'utilisation
+    ```python
+    from forge_mvc_notifications import mark_read, mark_all_read
 
-| Besoin | Élément |
-|---|---|
-| Notifier un utilisateur | `notify(recipient, message)` |
-| Qualifier la notification | paramètre `type=...` |
-| Joindre des données | paramètre `data=...` |
-| Lister les notifications | `get_notifications(recipient)` |
-| Ne montrer que les non lues | `unread_only=True` |
-| Afficher un badge | `unread_count(recipient)` |
-| Marquer lu | `mark_read(id)` / `mark_all_read(recipient)` |
-| Créer la table | `CREATE_TABLE_SQL` ou `forge notifications:init` |
+    mark_read(notification_id)        # une seule
+    mark_all_read("eleve.42")         # toutes celles du destinataire
+    ```
 
-## 8. Exemples d'utilisation
+    !!! tip "Aide-mémoire"
+        Écrire, lire, compter, marquer :
 
-### 8.1 Notifier puis afficher les non lues
+        - `notify` pour créer ;
+        - `get_notifications` / `unread_count` pour lire ;
+        - `mark_read` / `mark_all_read` pour marquer lu.
 
-```python
-from forge_mvc_notifications import notify, get_notifications, unread_count
+??? note "9. Périmètre, validation et injection"
 
-notify("eleve.42", "Votre note de maths est publiée.", type="info")
+    `recipient` et `message` sont obligatoires ; sinon `notify` lève `NotificationError`.
 
-badge = unread_count("eleve.42")
-nouvelles = get_notifications("eleve.42", unread_only=True)
-```
+    `limit` est borné à `MAX_LIMIT` (1000) ; une limite négative ou nulle lève `NotificationError`.
 
-### 8.2 Marquer comme lu
+    !!! warning "Création de la table"
+        Les fonctions supposent la table `notifications` présente.
 
-```python
-from forge_mvc_notifications import mark_read, mark_all_read
+        Créez-la avec `forge notifications:init` (ou exécutez `CREATE_TABLE_SQL`) avant le premier appel.
 
-mark_read(notification_id)        # une seule
-mark_all_read("eleve.42")         # toutes celles du destinataire
-```
+    !!! note "Périmètre in-app"
+        La V1 stocke des notifications **in-app** (lignes en base).
 
-!!! tip "Aide-mémoire"
-    Écrire, lire, compter, marquer :
+        Pour envoyer un email ou un push, combinez ce paquet avec `forge-mvc-jobs` (tâche de fond) et `forge-mvc-mail` : la livraison externe reste applicative.
 
-    - `notify` pour créer ;
-    - `get_notifications` / `unread_count` pour lire ;
-    - `mark_read` / `mark_all_read` pour marquer lu.
+    !!! note "SQL visible et indépendance du cœur"
+        Le module ne crée jamais de connexion : il reçoit un exécuteur (`execute`, `fetch_all`).
 
-## 9. Périmètre, validation et injection
-
-`recipient` et `message` sont obligatoires ; sinon `notify` lève `NotificationError`.
-
-`limit` est borné à `MAX_LIMIT` (1000) ; une limite négative ou nulle lève `NotificationError`.
-
-!!! warning "Création de la table"
-    Les fonctions supposent la table `notifications` présente.
-
-    Créez-la avec `forge notifications:init` (ou exécutez `CREATE_TABLE_SQL`) avant le premier appel.
-
-!!! note "Périmètre in-app"
-    La V1 stocke des notifications **in-app** (lignes en base).
-
-    Pour envoyer un email ou un push, combinez ce paquet avec `forge-mvc-jobs` (tâche de fond) et `forge-mvc-mail` : la livraison externe reste applicative.
-
-!!! note "SQL visible et indépendance du cœur"
-    Le module ne crée jamais de connexion : il reçoit un exécuteur (`execute`, `fetch_all`).
-
-    Le cœur de Forge ne dépend pas de `forge-mvc-notifications` : la dépendance va de l'opt-in vers le cœur.
+        Le cœur de Forge ne dépend pas de `forge-mvc-notifications` : la dépendance va de l'opt-in vers le cœur.
 
 ## Voir aussi
 

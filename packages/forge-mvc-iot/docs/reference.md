@@ -6,249 +6,249 @@ Ce document explique ce que fait l'opt-in `forge-mvc-iot`, ce qu'il expose, et c
 
 Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le stockage et l'API ; l'application décide de ce qu'elle fait des mesures.
 
-## 1. Rôle du module
+??? note "1. Rôle du module"
 
-Des capteurs publient des mesures sur un broker MQTT.
-L'opt-in les **écoute**, les **valide** selon un contrat, les **stocke** dans `iot_events`, puis les **expose** en JSON pour l'application.
+    Des capteurs publient des mesures sur un broker MQTT.
+    L'opt-in les **écoute**, les **valide** selon un contrat, les **stocke** dans `iot_events`, puis les **expose** en JSON pour l'application.
 
-L'écoute MQTT tourne dans un process séparé (`iot:listen`), pas dans le serveur web ; l'API HTTP, elle, se branche sur le routeur du projet (modèle opt-in de type route).
+    L'écoute MQTT tourne dans un process séparé (`iot:listen`), pas dans le serveur web ; l'API HTTP, elle, se branche sur le routeur du projet (modèle opt-in de type route).
 
-## 2. Installation et désinstallation
+??? note "2. Installation et désinstallation"
 
-### Installation
+    ### Installation
 
-=== "Depuis PyPI (stable)"
+    === "Depuis PyPI (stable)"
 
-    La dernière version publiée :
+        La dernière version publiée :
+
+        ```bash
+        pip install --pre forge-mvc-iot
+        ```
+
+    === "Depuis Git (avant-garde)"
+
+        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+        ```bash
+        source .venv/bin/activate
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-iot"
+        ```
+
+        !!! warning "Erreur « externally-managed-environment » ?"
+
+            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+    Puis activez l'opt-in :
 
     ```bash
-    pip install --pre forge-mvc-iot
+    forge opt-in:enable iot
     ```
 
-=== "Depuis Git (avant-garde)"
 
-    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
+    `forge opt-in:install iot` affiche la commande `pip` sans l'exécuter.
+
+    ### Désinstallation
 
     ```bash
-    source .venv/bin/activate
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-iot"
+    forge opt-in:disable iot
+    pip uninstall forge-mvc-iot
     ```
 
-    !!! warning "Erreur « externally-managed-environment » ?"
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
+    `forge opt-in:remove iot` affiche la commande `pip uninstall` sans l'exécuter.
 
-        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+??? note "3. Commandes"
 
-Puis activez l'opt-in :
+    `forge-mvc-iot` ajoute ces commandes :
 
-```bash
-forge opt-in:enable iot
-```
+    | Commande | Rôle | Exemple |
+    |---|---|---|
+    | `iot:doctor` | Diagnostic (paquet, config, migration, API). | `forge iot:doctor` |
+    | `iot:init` | Copie la migration IoT vers `mvc/migrations/`. | `forge iot:init` |
+    | `iot:simulate` | Publie des mesures MQTT factices (sans capteur). | `forge iot:simulate` |
+    | `iot:listen` | Écoute le broker et insère dans `iot_events`. | `forge iot:listen` |
 
+??? note "4. Vue d'ensemble rapide"
 
-`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
-`forge opt-in:install iot` affiche la commande `pip` sans l'exécuter.
+    | Élément | Valeur |
+    |---|---|
+    | Paquet | `forge-mvc-iot` |
+    | Module | `forge_mvc_iot` |
+    | Catégorie | Communication (ADR-055) |
+    | Couche | opt-in de type route (couche `optins/`) |
+    | Dépend de | `forge-mvc`, `paho-mqtt`, un backend BDD (ADR-054) |
+    | API publique | `register_iot_routes`, `load_iot_config`, `MqttSubscriber`, `IotEventRepository` |
+    | Table SQL | `iot_events` |
+    | Configuration | MQTT via `load_iot_config` (`IotConfig`) |
+    | Commandes | `iot:doctor`, `iot:init`, `iot:simulate`, `iot:listen` |
+    | Exposition | API HTTP JSON (`register_iot_routes`) |
+    | Installation | `pip install --pre forge-mvc-iot` |
 
-### Désinstallation
+??? note "5. Schémas UML"
 
-```bash
-forge opt-in:disable iot
-pip uninstall forge-mvc-iot
-```
+    Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
-`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
-`forge opt-in:remove iot` affiche la commande `pip uninstall` sans l'exécuter.
+    Le diagramme de classe montre le subscriber, le dépôt, l'API et la table.
 
-## 3. Commandes
+    Le diagramme de séquence montre le trajet d'une mesure, du capteur à l'API.
 
-`forge-mvc-iot` ajoute ces commandes :
+    ### 5.1 Diagramme de classe
 
-| Commande | Rôle | Exemple |
-|---|---|---|
-| `iot:doctor` | Diagnostic (paquet, config, migration, API). | `forge iot:doctor` |
-| `iot:init` | Copie la migration IoT vers `mvc/migrations/`. | `forge iot:init` |
-| `iot:simulate` | Publie des mesures MQTT factices (sans capteur). | `forge iot:simulate` |
-| `iot:listen` | Écoute le broker et insère dans `iot_events`. | `forge iot:listen` |
+    Le diagramme de classe montre que le `MqttSubscriber` insère via `IotEventRepository`, et que `register_iot_routes` lit ce même dépôt pour l'API.
 
-## 4. Vue d'ensemble rapide
+    ```mermaid
+    classDiagram
+        direction LR
 
-| Élément | Valeur |
-|---|---|
-| Paquet | `forge-mvc-iot` |
-| Module | `forge_mvc_iot` |
-| Catégorie | Communication (ADR-055) |
-| Couche | opt-in de type route (couche `optins/`) |
-| Dépend de | `forge-mvc`, `paho-mqtt`, un backend BDD (ADR-054) |
-| API publique | `register_iot_routes`, `load_iot_config`, `MqttSubscriber`, `IotEventRepository` |
-| Table SQL | `iot_events` |
-| Configuration | MQTT via `load_iot_config` (`IotConfig`) |
-| Commandes | `iot:doctor`, `iot:init`, `iot:simulate`, `iot:listen` |
-| Exposition | API HTTP JSON (`register_iot_routes`) |
-| Installation | `pip install --pre forge-mvc-iot` |
+        class MqttSubscriber {
+            +connect()
+            +loop_forever()
+            +handle_message(topic, payload)
+        }
 
-## 5. Schémas UML
+        class IotEventRepository {
+            +insert(...)
+            +list_recent(limit) list
+            +find_by_device(...) list
+            +count_by_device(site, device_id) int
+        }
 
-Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
+        class http {
+            <<module>>
+            +register_iot_routes(router, repository, config)
+        }
 
-Le diagramme de classe montre le subscriber, le dépôt, l'API et la table.
+        class iot_events {
+            <<table>>
+            +site
+            +device_id
+            +metric
+            +value
+            +recorded_at
+        }
 
-Le diagramme de séquence montre le trajet d'une mesure, du capteur à l'API.
+        class IotConfig {
+            +from env (MQTT)
+        }
 
-### 5.1 Diagramme de classe
+        MqttSubscriber --> IotEventRepository : insert
+        IotEventRepository --> iot_events : lit / écrit
+        http --> IotEventRepository : lit
+        MqttSubscriber --> IotConfig : se connecte avec
+    ```
 
-Le diagramme de classe montre que le `MqttSubscriber` insère via `IotEventRepository`, et que `register_iot_routes` lit ce même dépôt pour l'API.
+    À retenir :
 
-```mermaid
-classDiagram
-    direction LR
+    - le subscriber transforme un message MQTT en ligne `iot_events` ;
+    - le dépôt est la seule porte vers la table ;
+    - l'API HTTP lit le même dépôt ;
+    - la configuration MQTT vient de l'environnement (`IotConfig`).
 
-    class MqttSubscriber {
-        +connect()
-        +loop_forever()
-        +handle_message(topic, payload)
-    }
+    ### 5.2 Diagramme de séquence
 
-    class IotEventRepository {
-        +insert(...)
-        +list_recent(limit) list
-        +find_by_device(...) list
-        +count_by_device(site, device_id) int
-    }
+    Le diagramme de séquence montre une mesure du capteur jusqu'à l'API.
 
-    class http {
-        <<module>>
-        +register_iot_routes(router, repository, config)
-    }
+    ```mermaid
+    sequenceDiagram
+        actor Capteur
+        participant Broker as Broker MQTT
+        participant Listen as iot:listen (MqttSubscriber)
+        participant Repo as IotEventRepository
+        participant Table as iot_events
+        participant API as register_iot_routes
+        actor App as Application
 
-    class iot_events {
-        <<table>>
-        +site
-        +device_id
-        +metric
-        +value
-        +recorded_at
-    }
+        Capteur->>Broker: publie une mesure (topic, payload)
+        Listen->>Broker: abonné, reçoit le message
+        Listen->>Listen: valide selon le contrat
+        Listen->>Repo: insert(mesure)
+        Repo->>Table: insère la ligne
+        App->>API: GET /iot/events
+        API->>Repo: list_recent / find_by_device
+        Repo-->>API: lignes
+        API-->>App: JSON
+    ```
 
-    class IotConfig {
-        +from env (MQTT)
-    }
+    À retenir :
 
-    MqttSubscriber --> IotEventRepository : insert
-    IotEventRepository --> iot_events : lit / écrit
-    http --> IotEventRepository : lit
-    MqttSubscriber --> IotConfig : se connecte avec
-```
+    - l'écoute MQTT tourne dans un process séparé (`iot:listen`) ;
+    - chaque message valide devient une ligne `iot_events` ;
+    - un message non conforme au contrat est rejeté ;
+    - l'API HTTP expose les mesures en JSON, sans toucher au broker.
 
-À retenir :
+??? note "6. API publique"
 
-- le subscriber transforme un message MQTT en ligne `iot_events` ;
-- le dépôt est la seule porte vers la table ;
-- l'API HTTP lit le même dépôt ;
-- la configuration MQTT vient de l'environnement (`IotConfig`).
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `register_iot_routes` | `register_iot_routes(router, *, repository=None, config=None) -> None` | branche l'API HTTP JSON |
+    | `load_iot_config` | `load_iot_config(env=None) -> IotConfig` | configuration MQTT |
+    | `MqttSubscriber` | classe | abonné MQTT : `connect`, `loop_forever`, `handle_message` |
+    | `IotEventRepository` | classe | `insert`, `list_recent`, `find_by_device`, `count_by_device` |
+    | `IotConfig` | dataclass | configuration (broker, topics, TLS) |
 
-### 5.2 Diagramme de séquence
+??? note "7. Contextes d'utilisation"
 
-Le diagramme de séquence montre une mesure du capteur jusqu'à l'API.
+    | Besoin | Élément |
+    |---|---|
+    | Vérifier l'installation | `forge iot:doctor` |
+    | Préparer la table | `forge iot:init` puis `forge db:apply` |
+    | Tester sans capteur | `forge iot:simulate` |
+    | Recevoir les mesures | `forge iot:listen` (process séparé) |
+    | Exposer en JSON | `register_iot_routes(router)` |
+    | Lire par appareil | `IotEventRepository.find_by_device(...)` |
 
-```mermaid
-sequenceDiagram
-    actor Capteur
-    participant Broker as Broker MQTT
-    participant Listen as iot:listen (MqttSubscriber)
-    participant Repo as IotEventRepository
-    participant Table as iot_events
-    participant API as register_iot_routes
-    actor App as Application
+??? note "8. Exemples d'utilisation"
 
-    Capteur->>Broker: publie une mesure (topic, payload)
-    Listen->>Broker: abonné, reçoit le message
-    Listen->>Listen: valide selon le contrat
-    Listen->>Repo: insert(mesure)
-    Repo->>Table: insère la ligne
-    App->>API: GET /iot/events
-    API->>Repo: list_recent / find_by_device
-    Repo-->>API: lignes
-    API-->>App: JSON
-```
+    ### 8.1 Brancher l'API HTTP JSON
 
-À retenir :
-
-- l'écoute MQTT tourne dans un process séparé (`iot:listen`) ;
-- chaque message valide devient une ligne `iot_events` ;
-- un message non conforme au contrat est rejeté ;
-- l'API HTTP expose les mesures en JSON, sans toucher au broker.
-
-## 6. API publique
-
-| Élément | Signature | Rôle |
-|---|---|---|
-| `register_iot_routes` | `register_iot_routes(router, *, repository=None, config=None) -> None` | branche l'API HTTP JSON |
-| `load_iot_config` | `load_iot_config(env=None) -> IotConfig` | configuration MQTT |
-| `MqttSubscriber` | classe | abonné MQTT : `connect`, `loop_forever`, `handle_message` |
-| `IotEventRepository` | classe | `insert`, `list_recent`, `find_by_device`, `count_by_device` |
-| `IotConfig` | dataclass | configuration (broker, topics, TLS) |
-
-## 7. Contextes d'utilisation
-
-| Besoin | Élément |
-|---|---|
-| Vérifier l'installation | `forge iot:doctor` |
-| Préparer la table | `forge iot:init` puis `forge db:apply` |
-| Tester sans capteur | `forge iot:simulate` |
-| Recevoir les mesures | `forge iot:listen` (process séparé) |
-| Exposer en JSON | `register_iot_routes(router)` |
-| Lire par appareil | `IotEventRepository.find_by_device(...)` |
-
-## 8. Exemples d'utilisation
-
-### 8.1 Brancher l'API HTTP JSON
-
-```python
-# optins/iot/routes.py (couche optins du projet)
-from forge_mvc_iot import register_iot_routes
+    ```python
+    # optins/iot/routes.py (couche optins du projet)
+    from forge_mvc_iot import register_iot_routes
 
 
-def register(router) -> None:
-    register_iot_routes(router)
-```
+    def register(router) -> None:
+        register_iot_routes(router)
+    ```
 
-`forge opt-in:enable iot --apply` crée cette couche ; le branchement reste explicite.
+    `forge opt-in:enable iot --apply` crée cette couche ; le branchement reste explicite.
 
-### 8.2 Écouter le broker (process séparé)
+    ### 8.2 Écouter le broker (process séparé)
 
-```bash
-forge iot:init && forge db:apply     # crée la table iot_events
-forge iot:simulate                   # publie des mesures de test
-forge iot:listen                     # écoute et stocke
-```
+    ```bash
+    forge iot:init && forge db:apply     # crée la table iot_events
+    forge iot:simulate                   # publie des mesures de test
+    forge iot:listen                     # écoute et stocke
+    ```
 
-`iot:listen` tourne en service (systemd) ou en terminal dédié, pas dans le serveur web.
+    `iot:listen` tourne en service (systemd) ou en terminal dédié, pas dans le serveur web.
 
-!!! tip "Aide-mémoire"
-    Deux process, une table :
+    !!! tip "Aide-mémoire"
+        Deux process, une table :
 
-    - réception : `iot:listen` (MQTT vers `iot_events`) ;
-    - exposition : `register_iot_routes` (HTTP JSON depuis `iot_events`).
+        - réception : `iot:listen` (MQTT vers `iot_events`) ;
+        - exposition : `register_iot_routes` (HTTP JSON depuis `iot_events`).
 
-## 9. MQTT, contrat et exécution
+??? note "9. MQTT, contrat et exécution"
 
-Les messages MQTT suivent un **contrat** (site, appareil, métrique, valeur, horodatage) ; un message non conforme est rejeté à la réception.
+    Les messages MQTT suivent un **contrat** (site, appareil, métrique, valeur, horodatage) ; un message non conforme est rejeté à la réception.
 
-`paho-mqtt` est la dépendance MQTT ; TLS est géré par `mqtt/tls.py`.
+    `paho-mqtt` est la dépendance MQTT ; TLS est géré par `mqtt/tls.py`.
 
-!!! warning "L'écoute tourne à part"
-    `iot:listen` (le subscriber MQTT) s'exécute dans un **process distinct** du serveur web.
+    !!! warning "L'écoute tourne à part"
+        `iot:listen` (le subscriber MQTT) s'exécute dans un **process distinct** du serveur web.
 
-    Ne l'intégrez pas au process WSGI : le serveur doit rester disponible pour les requêtes.
+        Ne l'intégrez pas au process WSGI : le serveur doit rester disponible pour les requêtes.
 
-!!! note "Tester sans matériel"
-    `forge iot:simulate` publie des mesures factices conformes au contrat.
+    !!! note "Tester sans matériel"
+        `forge iot:simulate` publie des mesures factices conformes au contrat.
 
-    Vous pouvez ainsi valider toute la chaîne (réception, stockage, API) sans capteur réel.
+        Vous pouvez ainsi valider toute la chaîne (réception, stockage, API) sans capteur réel.
 
-!!! note "Indépendance du cœur"
-    Le cœur de Forge ne dépend pas de `forge-mvc-iot` : la dépendance va de l'opt-in vers le cœur.
+    !!! note "Indépendance du cœur"
+        Le cœur de Forge ne dépend pas de `forge-mvc-iot` : la dépendance va de l'opt-in vers le cœur.
 
 ## Voir aussi
 

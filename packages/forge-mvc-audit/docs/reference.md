@@ -6,264 +6,264 @@ Ce document explique ce que fait l'opt-in `forge-mvc-audit`, ce qu'il expose, et
 
 Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table et les helpers, l'application décide de ce qu'elle trace.
 
-## 1. Rôle du module
+??? note "1. Rôle du module"
 
-Une application a besoin de garder une trace des actions sensibles : élève créé, note modifiée, rôle changé, fichier supprimé.
+    Une application a besoin de garder une trace des actions sensibles : élève créé, note modifiée, rôle changé, fichier supprimé.
 
-L'opt-in stocke ces traces dans une table SQL (`audit_log`) et expose deux fonctions : une pour écrire une trace, une pour relire le journal.
+    L'opt-in stocke ces traces dans une table SQL (`audit_log`) et expose deux fonctions : une pour écrire une trace, une pour relire le journal.
 
-Son périmètre est **borné** : c'est un audit applicatif, pas un SIEM de cybersécurité (cohérent avec ADR-008, la décision de tracer reste applicative).
+    Son périmètre est **borné** : c'est un audit applicatif, pas un SIEM de cybersécurité (cohérent avec ADR-008, la décision de tracer reste applicative).
 
-## 2. Installation et désinstallation
+??? note "2. Installation et désinstallation"
 
-### Installation
+    ### Installation
 
-=== "Depuis PyPI (stable)"
+    === "Depuis PyPI (stable)"
 
-    La dernière version publiée :
+        La dernière version publiée :
+
+        ```bash
+        pip install --pre forge-mvc-audit
+        ```
+
+    === "Depuis Git (avant-garde)"
+
+        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+        ```bash
+        source .venv/bin/activate
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-audit"
+        ```
+
+        !!! warning "Erreur « externally-managed-environment » ?"
+
+            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+    Puis activez l'opt-in :
 
     ```bash
-    pip install --pre forge-mvc-audit
+    forge opt-in:enable audit
     ```
 
-=== "Depuis Git (avant-garde)"
 
-    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+    `forge opt-in:install audit` affiche la commande `pip` sans l'exécuter.
+
+    ### Désinstallation
 
     ```bash
-    source .venv/bin/activate
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-audit"
+    forge opt-in:disable audit
+    pip uninstall forge-mvc-audit
     ```
 
-    !!! warning "Erreur « externally-managed-environment » ?"
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove audit` affiche la commande `pip uninstall` sans l'exécuter.
 
-        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+??? note "3. Commandes"
 
-Puis activez l'opt-in :
+    `forge-mvc-audit` ajoute une commande :
 
-```bash
-forge opt-in:enable audit
-```
+    | Commande | Rôle | Exemple |
+    |---|---|---|
+    | `audit:init` | Crée la table `audit_log` (DDL fournie). | `forge audit:init` |
 
+??? note "4. Vue d'ensemble rapide"
 
-`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
-`forge opt-in:install audit` affiche la commande `pip` sans l'exécuter.
+    | Élément | Valeur |
+    |---|---|
+    | Paquet | `forge-mvc-audit` |
+    | Module | `forge_mvc_audit` |
+    | Catégorie | Sécurité et accès (ADR-055) |
+    | Couche | opt-in (brique optionnelle) |
+    | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
+    | API publique | `record_audit`, `get_audit_log`, `AuditEntry` |
+    | Table SQL | `audit_log` (`TABLE_NAME`, `CREATE_TABLE_SQL`) |
+    | Limite de lecture | `MAX_LIMIT` = 1000 entrées |
+    | Exception liée | `AuditError` si l'action est vide ou la limite invalide |
+    | Cadre | ADR-008 (Forge fournit la table et le helper) |
+    | Installation | `pip install --pre forge-mvc-audit` |
 
-### Désinstallation
+??? note "5. Schémas UML"
 
-```bash
-forge opt-in:disable audit
-pip uninstall forge-mvc-audit
-```
+    Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
-`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-`forge opt-in:remove audit` affiche la commande `pip uninstall` sans l'exécuter.
+    Le diagramme de classe montre l'API, l'entrée renvoyée et la table.
 
-## 3. Commandes
+    Le diagramme de séquence montre l'écriture puis la relecture d'une trace.
 
-`forge-mvc-audit` ajoute une commande :
+    ### 5.1 Diagramme de classe
 
-| Commande | Rôle | Exemple |
-|---|---|---|
-| `audit:init` | Crée la table `audit_log` (DDL fournie). | `forge audit:init` |
+    Le diagramme de classe montre que le module écrit dans la table `audit_log` au travers d'un exécuteur **injecté** et renvoie des `AuditEntry` typés.
 
-## 4. Vue d'ensemble rapide
+    ```mermaid
+    classDiagram
+        direction LR
 
-| Élément | Valeur |
-|---|---|
-| Paquet | `forge-mvc-audit` |
-| Module | `forge_mvc_audit` |
-| Catégorie | Sécurité et accès (ADR-055) |
-| Couche | opt-in (brique optionnelle) |
-| Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-| API publique | `record_audit`, `get_audit_log`, `AuditEntry` |
-| Table SQL | `audit_log` (`TABLE_NAME`, `CREATE_TABLE_SQL`) |
-| Limite de lecture | `MAX_LIMIT` = 1000 entrées |
-| Exception liée | `AuditError` si l'action est vide ou la limite invalide |
-| Cadre | ADR-008 (Forge fournit la table et le helper) |
-| Installation | `pip install --pre forge-mvc-audit` |
+        class audit {
+            <<module>>
+            +record_audit(action, actor, target_type, target_id, details, db) int
+            +get_audit_log(limit, actor, action, target_type, target_id, db) list
+        }
 
-## 5. Schémas UML
+        class AuditEntry {
+            <<dataclass>>
+            +int id
+            +str actor
+            +str action
+            +str target_type
+            +str target_id
+            +str details
+            +str created_at
+        }
 
-Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
+        class audit_log {
+            <<table>>
+            +id
+            +actor
+            +action
+            +target_type
+            +target_id
+            +details
+            +created_at
+        }
 
-Le diagramme de classe montre l'API, l'entrée renvoyée et la table.
+        class DBExecutor {
+            +execute(sql, params)
+            +fetch_all(sql, params)
+        }
 
-Le diagramme de séquence montre l'écriture puis la relecture d'une trace.
+        class AuditError {
+            <<exception>>
+        }
 
-### 5.1 Diagramme de classe
+        audit --> DBExecutor : exécuteur injecté
+        DBExecutor --> audit_log : lit / écrit
+        audit --> AuditEntry : renvoie 0..*
+        audit ..> AuditError : peut lever
+    ```
 
-Le diagramme de classe montre que le module écrit dans la table `audit_log` au travers d'un exécuteur **injecté** et renvoie des `AuditEntry` typés.
+    À retenir :
 
-```mermaid
-classDiagram
-    direction LR
+    - le module expose deux fonctions, pas de classe à instancier ;
+    - les traces vivent dans la table `audit_log` ;
+    - `get_audit_log` renvoie des `AuditEntry` typés ;
+    - le module n'ouvre jamais de connexion : il reçoit un exécuteur.
 
-    class audit {
-        <<module>>
-        +record_audit(action, actor, target_type, target_id, details, db) int
-        +get_audit_log(limit, actor, action, target_type, target_id, db) list
-    }
+    ### 5.2 Diagramme de séquence
 
-    class AuditEntry {
-        <<dataclass>>
-        +int id
-        +str actor
-        +str action
-        +str target_type
-        +str target_id
-        +str details
-        +str created_at
-    }
+    Le diagramme de séquence montre un `record_audit` suivi d'un `get_audit_log` filtré.
 
-    class audit_log {
-        <<table>>
-        +id
-        +actor
-        +action
-        +target_type
-        +target_id
-        +details
-        +created_at
-    }
+    ```mermaid
+    sequenceDiagram
+        participant App as Code applicatif
+        participant Audit as forge_mvc_audit
+        participant DB as Exécuteur BDD
+        participant Table as audit_log
 
-    class DBExecutor {
-        +execute(sql, params)
-        +fetch_all(sql, params)
-    }
+        App->>Audit: record_audit("note.update", actor="prof", target_id=42)
+        Audit->>Audit: valide l'action
+        Audit->>DB: execute(INSERT, params)
+        DB->>Table: insère la ligne
+        Audit-->>App: id de la trace
+        App->>Audit: get_audit_log(action="note.update", limit=20)
+        Audit->>DB: fetch_all(SELECT filtré, params)
+        DB-->>Audit: lignes
+        Audit-->>App: list[AuditEntry] (plus récentes d'abord)
+    ```
 
-    class AuditError {
-        <<exception>>
-    }
+    À retenir :
 
-    audit --> DBExecutor : exécuteur injecté
-    DBExecutor --> audit_log : lit / écrit
-    audit --> AuditEntry : renvoie 0..*
-    audit ..> AuditError : peut lever
-```
+    - `record_audit` valide l'action puis insère, et renvoie l'identifiant ;
+    - `get_audit_log` renvoie les entrées les plus récentes d'abord ;
+    - les filtres (`actor`, `action`, `target_type`, `target_id`) sont optionnels ;
+    - `limit` est plafonné à `MAX_LIMIT`.
 
-À retenir :
+??? note "6. API publique"
 
-- le module expose deux fonctions, pas de classe à instancier ;
-- les traces vivent dans la table `audit_log` ;
-- `get_audit_log` renvoie des `AuditEntry` typés ;
-- le module n'ouvre jamais de connexion : il reçoit un exécuteur.
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `record_audit` | `record_audit(action, *, actor=None, target_type=None, target_id=None, details=None, db=None) -> int` | écrit une trace, renvoie son id |
+    | `get_audit_log` | `get_audit_log(*, limit=100, actor=None, action=None, target_type=None, target_id=None, db=None) -> list[AuditEntry]` | relit le journal, filtrable |
+    | `AuditEntry` | dataclass | une entrée : `id`, `actor`, `action`, `target_type`, `target_id`, `details`, `created_at` |
+    | `AuditError` | exception (`ValueError`) | action vide ou limite invalide |
+    | `TABLE_NAME` | `"audit_log"` | nom de la table |
+    | `CREATE_TABLE_SQL` | constante SQL | création de la table |
+    | `MAX_LIMIT` | `1000` | plafond du paramètre `limit` |
 
-### 5.2 Diagramme de séquence
+    Le paramètre `action` est obligatoire : c'est une chaîne applicative (par exemple `"eleve.create"`, `"note.update"`).
 
-Le diagramme de séquence montre un `record_audit` suivi d'un `get_audit_log` filtré.
+    Le paramètre `db` est l'exécuteur de base de données ; omis, il utilise le backend BDD actif.
 
-```mermaid
-sequenceDiagram
-    participant App as Code applicatif
-    participant Audit as forge_mvc_audit
-    participant DB as Exécuteur BDD
-    participant Table as audit_log
+??? note "7. Contextes d'utilisation"
 
-    App->>Audit: record_audit("note.update", actor="prof", target_id=42)
-    Audit->>Audit: valide l'action
-    Audit->>DB: execute(INSERT, params)
-    DB->>Table: insère la ligne
-    Audit-->>App: id de la trace
-    App->>Audit: get_audit_log(action="note.update", limit=20)
-    Audit->>DB: fetch_all(SELECT filtré, params)
-    DB-->>Audit: lignes
-    Audit-->>App: list[AuditEntry] (plus récentes d'abord)
-```
+    | Besoin | Élément |
+    |---|---|
+    | Tracer une action | `record_audit("action", ...)` |
+    | Associer un acteur | paramètre `actor=...` |
+    | Désigner la cible | `target_type=...`, `target_id=...` |
+    | Ajouter un détail libre | paramètre `details=...` |
+    | Relire les dernières traces | `get_audit_log(limit=...)` |
+    | Filtrer le journal | `actor=`, `action=`, `target_type=`, `target_id=` |
+    | Créer la table | `CREATE_TABLE_SQL` ou `forge audit:init` |
 
-À retenir :
+??? note "8. Exemples d'utilisation"
 
-- `record_audit` valide l'action puis insère, et renvoie l'identifiant ;
-- `get_audit_log` renvoie les entrées les plus récentes d'abord ;
-- les filtres (`actor`, `action`, `target_type`, `target_id`) sont optionnels ;
-- `limit` est plafonné à `MAX_LIMIT`.
+    ### 8.1 Tracer une action
 
-## 6. API publique
+    ```python
+    from forge_mvc_audit import record_audit
 
-| Élément | Signature | Rôle |
-|---|---|---|
-| `record_audit` | `record_audit(action, *, actor=None, target_type=None, target_id=None, details=None, db=None) -> int` | écrit une trace, renvoie son id |
-| `get_audit_log` | `get_audit_log(*, limit=100, actor=None, action=None, target_type=None, target_id=None, db=None) -> list[AuditEntry]` | relit le journal, filtrable |
-| `AuditEntry` | dataclass | une entrée : `id`, `actor`, `action`, `target_type`, `target_id`, `details`, `created_at` |
-| `AuditError` | exception (`ValueError`) | action vide ou limite invalide |
-| `TABLE_NAME` | `"audit_log"` | nom de la table |
-| `CREATE_TABLE_SQL` | constante SQL | création de la table |
-| `MAX_LIMIT` | `1000` | plafond du paramètre `limit` |
+    record_audit(
+        "note.update",
+        actor="prof.martin",
+        target_type="note",
+        target_id=42,
+        details="note passée de 12 à 14",
+    )
+    ```
 
-Le paramètre `action` est obligatoire : c'est une chaîne applicative (par exemple `"eleve.create"`, `"note.update"`).
+    ### 8.2 Relire et filtrer le journal
 
-Le paramètre `db` est l'exécuteur de base de données ; omis, il utilise le backend BDD actif.
+    ```python
+    from forge_mvc_audit import get_audit_log
 
-## 7. Contextes d'utilisation
+    dernieres = get_audit_log(limit=20)
+    sur_les_notes = get_audit_log(action="note.update", limit=50)
 
-| Besoin | Élément |
-|---|---|
-| Tracer une action | `record_audit("action", ...)` |
-| Associer un acteur | paramètre `actor=...` |
-| Désigner la cible | `target_type=...`, `target_id=...` |
-| Ajouter un détail libre | paramètre `details=...` |
-| Relire les dernières traces | `get_audit_log(limit=...)` |
-| Filtrer le journal | `actor=`, `action=`, `target_type=`, `target_id=` |
-| Créer la table | `CREATE_TABLE_SQL` ou `forge audit:init` |
+    for entry in sur_les_notes:
+        print(entry.created_at, entry.actor, entry.details)
+    ```
 
-## 8. Exemples d'utilisation
+    `get_audit_log` renvoie des `AuditEntry`, les plus récents d'abord.
 
-### 8.1 Tracer une action
+    !!! tip "Aide-mémoire"
+        Deux fonctions, une table :
 
-```python
-from forge_mvc_audit import record_audit
+        - `record_audit` pour écrire une trace ;
+        - `get_audit_log` pour relire, avec des filtres optionnels.
 
-record_audit(
-    "note.update",
-    actor="prof.martin",
-    target_type="note",
-    target_id=42,
-    details="note passée de 12 à 14",
-)
-```
+??? note "9. Périmètre, validation et injection"
 
-### 8.2 Relire et filtrer le journal
+    L'action est obligatoire et non vide ; sinon `record_audit` lève `AuditError`.
 
-```python
-from forge_mvc_audit import get_audit_log
+    `limit` est plafonné à `MAX_LIMIT` (1000) pour éviter de charger un journal entier par mégarde.
 
-dernieres = get_audit_log(limit=20)
-sur_les_notes = get_audit_log(action="note.update", limit=50)
+    !!! warning "Création de la table"
+        Les fonctions supposent la table `audit_log` présente.
 
-for entry in sur_les_notes:
-    print(entry.created_at, entry.actor, entry.details)
-```
+        Créez-la avec `forge audit:init` (ou exécutez `CREATE_TABLE_SQL`) avant le premier appel.
 
-`get_audit_log` renvoie des `AuditEntry`, les plus récents d'abord.
+    !!! note "Périmètre borné"
+        `forge-mvc-audit` est un journal d'audit **applicatif**, pas un SIEM de cybersécurité.
 
-!!! tip "Aide-mémoire"
-    Deux fonctions, une table :
+        Il trace ce que l'application décide de tracer (ADR-008) ; il ne surveille pas le système ni le réseau.
 
-    - `record_audit` pour écrire une trace ;
-    - `get_audit_log` pour relire, avec des filtres optionnels.
+    !!! note "SQL visible et indépendance du cœur"
+        Le module ne crée jamais de connexion : il reçoit un exécuteur (`execute`, `fetch_all`).
 
-## 9. Périmètre, validation et injection
-
-L'action est obligatoire et non vide ; sinon `record_audit` lève `AuditError`.
-
-`limit` est plafonné à `MAX_LIMIT` (1000) pour éviter de charger un journal entier par mégarde.
-
-!!! warning "Création de la table"
-    Les fonctions supposent la table `audit_log` présente.
-
-    Créez-la avec `forge audit:init` (ou exécutez `CREATE_TABLE_SQL`) avant le premier appel.
-
-!!! note "Périmètre borné"
-    `forge-mvc-audit` est un journal d'audit **applicatif**, pas un SIEM de cybersécurité.
-
-    Il trace ce que l'application décide de tracer (ADR-008) ; il ne surveille pas le système ni le réseau.
-
-!!! note "SQL visible et indépendance du cœur"
-    Le module ne crée jamais de connexion : il reçoit un exécuteur (`execute`, `fetch_all`).
-
-    Le cœur de Forge ne dépend pas de `forge-mvc-audit` : la dépendance va de l'opt-in vers le cœur.
+        Le cœur de Forge ne dépend pas de `forge-mvc-audit` : la dépendance va de l'opt-in vers le cœur.
 
 ## Voir aussi
 

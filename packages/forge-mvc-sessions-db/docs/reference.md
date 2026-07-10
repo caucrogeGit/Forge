@@ -4,234 +4,234 @@
 
 Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un store fichier ; ce paquet ajoute le store BDD, partagé entre processus et persistant.
 
-## 1. Rôle du module
+??? note "1. Rôle du module"
 
-Une session Forge conserve l'état d'un visiteur entre deux requêtes (jeton CSRF, utilisateur authentifié, messages flash).
+    Une session Forge conserve l'état d'un visiteur entre deux requêtes (jeton CSRF, utilisateur authentifié, messages flash).
 
-Le store par défaut du cœur (`MemorySessionStore`) garde ces données en mémoire du processus : elles disparaissent au redémarrage et ne sont pas partagées entre workers.
+    Le store par défaut du cœur (`MemorySessionStore`) garde ces données en mémoire du processus : elles disparaissent au redémarrage et ne sont pas partagées entre workers.
 
-`DbSessionStore` stocke chaque session dans la table `forge_sessions` de la base configurée du projet, ce qui la rend partagée entre processus et durable.
+    `DbSessionStore` stocke chaque session dans la table `forge_sessions` de la base configurée du projet, ce qui la rend partagée entre processus et durable.
 
-## 2. Installation et désinstallation
+??? note "2. Installation et désinstallation"
 
-### Installation
+    ### Installation
 
-=== "Depuis PyPI (stable)"
+    === "Depuis PyPI (stable)"
 
-    La dernière version publiée :
+        La dernière version publiée :
 
-    ```bash
-    pip install --pre forge-mvc-sessions-db
+        ```bash
+        pip install --pre forge-mvc-sessions-db
+        ```
+
+    === "Depuis Git (avant-garde)"
+
+        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+        ```bash
+        source .venv/bin/activate
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-sessions-db"
+        ```
+
+        !!! warning "Erreur « externally-managed-environment » ?"
+
+            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+    Cet opt-in est une bibliothèque : on l'importe et on passe le store à `forge.configure`, il n'y a pas de câblage de routes.
+
+    ```python
+    import core.forge as forge
+    from forge_mvc_sessions_db import DbSessionStore
+
+    forge.configure(session_store=DbSessionStore(ttl=3600))
     ```
 
-=== "Depuis Git (avant-garde)"
+    `forge opt-in:install sessions-db` affiche la commande `pip` sans l'exécuter.
 
-    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    ### Désinstallation
 
     ```bash
-    source .venv/bin/activate
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-sessions-db"
+    pip uninstall forge-mvc-sessions-db
     ```
 
-    !!! warning "Erreur « externally-managed-environment » ?"
+    Le cœur revient alors à son store par défaut (`MemorySessionStore`).
+    `forge opt-in:remove sessions-db` affiche la commande `pip uninstall` sans l'exécuter.
 
-        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+??? note "3. Commandes"
 
-Cet opt-in est une bibliothèque : on l'importe et on passe le store à `forge.configure`, il n'y a pas de câblage de routes.
+    Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-```python
-import core.forge as forge
-from forge_mvc_sessions_db import DbSessionStore
+??? note "4. Vue d'ensemble rapide"
 
-forge.configure(session_store=DbSessionStore(ttl=3600))
-```
+    | Élément | Valeur |
+    |---|---|
+    | Paquet | `forge-mvc-sessions-db` |
+    | Module | `forge_mvc_sessions_db` |
+    | Catégorie | Exploitation et outillage (ADR-055) |
+    | Couche | opt-in (brique optionnelle) |
+    | Dépend de | `forge-mvc` et un backend BDD (ADR-054) |
+    | API publique | `DbSessionStore` |
+    | Table SQL | `forge_sessions` |
+    | Exécuteurs | injectés en **callables** (`fetch_one`, `execute`), défaut `core.database.db` |
+    | Contrat implémenté | `core.sessions.SessionStore` |
+    | Principe | SQL portable, horodatages calculés côté Python (pas de `NOW()` propriétaire) |
+    | Décision d'architecture | ADR-054 (backends BDD et extraction du store de session) |
+    | Installation | `pip install --pre forge-mvc-sessions-db` |
 
-`forge opt-in:install sessions-db` affiche la commande `pip` sans l'exécuter.
+??? note "5. Schémas UML"
 
-### Désinstallation
+    Le diagramme de classe montre l'implémentation du contrat ; le diagramme de séquence montre le cycle d'une session persistée.
 
-```bash
-pip uninstall forge-mvc-sessions-db
-```
+    ### 5.1 Diagramme de classe
 
-Le cœur revient alors à son store par défaut (`MemorySessionStore`).
-`forge opt-in:remove sessions-db` affiche la commande `pip uninstall` sans l'exécuter.
+    `DbSessionStore` implémente l'intégralité du contrat `SessionStore` du cœur et délègue tout son SQL à un exécuteur injecté.
 
-## 3. Commandes
+    ```mermaid
+    classDiagram
+        class SessionStore {
+            <<protocol>>
+            +create(data) str
+            +get(session_id) dict
+            +set(session_id, data) None
+            +delete(session_id) None
+            +regenerate(session_id) str
+            +cleanup_expired() int
+        }
+        class DbSessionStore {
+            -_fetch_one
+            -_execute
+            -_ttl
+            +create(data) str
+            +get(session_id) dict
+            +set(session_id, data) None
+            +replace(session_id, data) None
+            +delete(session_id) None
+            +regenerate(session_id) str
+            +authenticate(session_id, user_data, ttl) str
+            +touch_expiry(session_id, ttl) bool
+            +cleanup_expired() int
+        }
+        class forge_sessions {
+            <<table>>
+            session_id
+            data
+            expire_at
+            created_at
+            updated_at
+        }
+        SessionStore <|.. DbSessionStore : implémente
+        DbSessionStore ..> forge_sessions : lit / écrit via core.database.db
+    ```
 
-Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
+    Ce que le diagramme révèle :
 
-## 4. Vue d'ensemble rapide
+    - `DbSessionStore` respecte le contrat `SessionStore`, donc il se configure comme n'importe quel autre store ;
+    - les données vivent dans la table `forge_sessions` ;
+    - le store ne touche jamais la base directement : il passe par les exécuteurs `fetch_one` / `execute` (par défaut ceux de `core.database.db`).
 
-| Élément | Valeur |
-|---|---|
-| Paquet | `forge-mvc-sessions-db` |
-| Module | `forge_mvc_sessions_db` |
-| Catégorie | Exploitation et outillage (ADR-055) |
-| Couche | opt-in (brique optionnelle) |
-| Dépend de | `forge-mvc` et un backend BDD (ADR-054) |
-| API publique | `DbSessionStore` |
-| Table SQL | `forge_sessions` |
-| Exécuteurs | injectés en **callables** (`fetch_one`, `execute`), défaut `core.database.db` |
-| Contrat implémenté | `core.sessions.SessionStore` |
-| Principe | SQL portable, horodatages calculés côté Python (pas de `NOW()` propriétaire) |
-| Décision d'architecture | ADR-054 (backends BDD et extraction du store de session) |
-| Installation | `pip install --pre forge-mvc-sessions-db` |
+    ### 5.2 Diagramme de séquence
 
-## 5. Schémas UML
+    ```mermaid
+    sequenceDiagram
+        participant App as Application
+        participant Store as DbSessionStore
+        participant DB as core.database.db
 
-Le diagramme de classe montre l'implémentation du contrat ; le diagramme de séquence montre le cycle d'une session persistée.
+        App->>Store: create()
+        Store->>DB: INSERT forge_sessions (id, data, expire_at, created_at, updated_at)
+        App->>Store: get(session_id)
+        Store->>DB: SELECT data WHERE id = ? AND expire_at > ?
+        DB-->>Store: data JSON
+        Store-->>App: dict de session
+        App->>Store: cleanup_expired()
+        Store->>DB: DELETE WHERE expire_at < ?
+    ```
 
-### 5.1 Diagramme de classe
+    L'horodatage comparé (`?`) est calculé côté Python, jamais par une fonction SQL propriétaire.
 
-`DbSessionStore` implémente l'intégralité du contrat `SessionStore` du cœur et délègue tout son SQL à un exécuteur injecté.
+??? note "6. API publique"
 
-```mermaid
-classDiagram
-    class SessionStore {
-        <<protocol>>
-        +create(data) str
-        +get(session_id) dict
-        +set(session_id, data) None
-        +delete(session_id) None
-        +regenerate(session_id) str
-        +cleanup_expired() int
-    }
-    class DbSessionStore {
-        -_fetch_one
-        -_execute
-        -_ttl
-        +create(data) str
-        +get(session_id) dict
-        +set(session_id, data) None
-        +replace(session_id, data) None
-        +delete(session_id) None
-        +regenerate(session_id) str
-        +authenticate(session_id, user_data, ttl) str
-        +touch_expiry(session_id, ttl) bool
-        +cleanup_expired() int
-    }
-    class forge_sessions {
-        <<table>>
-        session_id
-        data
-        expire_at
-        created_at
-        updated_at
-    }
-    SessionStore <|.. DbSessionStore : implémente
-    DbSessionStore ..> forge_sessions : lit / écrit via core.database.db
-```
+    | Nom | Signature | Rôle |
+    |---|---|---|
+    | `DbSessionStore` | `DbSessionStore(fetch_one=None, execute=None, ttl=SESSION_TTL)` | Store de session BDD ; exécuteurs injectables, durée de vie en secondes |
+    | `create` | `create(data=None) -> str` | Crée une session (structure Forge standard) et retourne son identifiant |
+    | `get` | `get(session_id) -> dict | None` | Retourne les données, ou `None` si absente, expirée ou corrompue |
+    | `set` | `set(session_id, data) -> None` | Met à jour (merge) une session existante |
+    | `replace` | `replace(session_id, data) -> None` | Remplace intégralement les données (sans merge) |
+    | `delete` | `delete(session_id) -> None` | Supprime la session |
+    | `regenerate` | `regenerate(session_id) -> str` | Nouvel identifiant, données préservées (anti-fixation) |
+    | `authenticate` | `authenticate(session_id, user_data, ttl_seconds) -> str | None` | Rotation atomique vers une session authentifiée |
+    | `touch_expiry` | `touch_expiry(session_id, ttl_seconds) -> bool` | Repousse l'expiration |
+    | `cleanup_expired` | `cleanup_expired() -> int` | Supprime les sessions expirées, retourne le nombre supprimé |
 
-Ce que le diagramme révèle :
+    Le module expose aussi `set_flash` / `get_flash` pour les messages flash.
 
-- `DbSessionStore` respecte le contrat `SessionStore`, donc il se configure comme n'importe quel autre store ;
-- les données vivent dans la table `forge_sessions` ;
-- le store ne touche jamais la base directement : il passe par les exécuteurs `fetch_one` / `execute` (par défaut ceux de `core.database.db`).
+??? note "7. Contextes d'utilisation"
 
-### 5.2 Diagramme de séquence
+    | Besoin | Store recommandé |
+    |---|---|
+    | Développement local, tests | `MemorySessionStore` (cœur) |
+    | Persistance mono-processus simple | `FileSessionStore` (cœur) |
+    | Production multi-worker (Gunicorn, uWSGI) | `DbSessionStore` (cet opt-in) |
+    | Déploiement multi-nœud derrière la même base | `DbSessionStore` (cet opt-in) |
 
-```mermaid
-sequenceDiagram
-    participant App as Application
-    participant Store as DbSessionStore
-    participant DB as core.database.db
+??? note "8. Exemples d'utilisation"
 
-    App->>Store: create()
-    Store->>DB: INSERT forge_sessions (id, data, expire_at, created_at, updated_at)
-    App->>Store: get(session_id)
-    Store->>DB: SELECT data WHERE id = ? AND expire_at > ?
-    DB-->>Store: data JSON
-    Store-->>App: dict de session
-    App->>Store: cleanup_expired()
-    Store->>DB: DELETE WHERE expire_at < ?
-```
+    ### 8.1 Configurer le store
 
-L'horodatage comparé (`?`) est calculé côté Python, jamais par une fonction SQL propriétaire.
+    ```python
+    import core.forge as forge
+    from forge_mvc_sessions_db import DbSessionStore
 
-## 6. API publique
+    forge.configure(session_store=DbSessionStore(ttl=3600))
+    ```
 
-| Nom | Signature | Rôle |
-|---|---|---|
-| `DbSessionStore` | `DbSessionStore(fetch_one=None, execute=None, ttl=SESSION_TTL)` | Store de session BDD ; exécuteurs injectables, durée de vie en secondes |
-| `create` | `create(data=None) -> str` | Crée une session (structure Forge standard) et retourne son identifiant |
-| `get` | `get(session_id) -> dict | None` | Retourne les données, ou `None` si absente, expirée ou corrompue |
-| `set` | `set(session_id, data) -> None` | Met à jour (merge) une session existante |
-| `replace` | `replace(session_id, data) -> None` | Remplace intégralement les données (sans merge) |
-| `delete` | `delete(session_id) -> None` | Supprime la session |
-| `regenerate` | `regenerate(session_id) -> str` | Nouvel identifiant, données préservées (anti-fixation) |
-| `authenticate` | `authenticate(session_id, user_data, ttl_seconds) -> str | None` | Rotation atomique vers une session authentifiée |
-| `touch_expiry` | `touch_expiry(session_id, ttl_seconds) -> bool` | Repousse l'expiration |
-| `cleanup_expired` | `cleanup_expired() -> int` | Supprime les sessions expirées, retourne le nombre supprimé |
+    La table `forge_sessions` doit exister au préalable (script `mvc/models/sql/forge_sessions.sql`).
 
-Le module expose aussi `set_flash` / `get_flash` pour les messages flash.
+    ### 8.2 Nettoyer les sessions expirées
 
-## 7. Contextes d'utilisation
+    ```python
+    from forge_mvc_sessions_db import DbSessionStore
 
-| Besoin | Store recommandé |
-|---|---|
-| Développement local, tests | `MemorySessionStore` (cœur) |
-| Persistance mono-processus simple | `FileSessionStore` (cœur) |
-| Production multi-worker (Gunicorn, uWSGI) | `DbSessionStore` (cet opt-in) |
-| Déploiement multi-nœud derrière la même base | `DbSessionStore` (cet opt-in) |
+    store = DbSessionStore()
+    supprimees = store.cleanup_expired()
+    print(f"{supprimees} sessions expirées supprimées")
+    ```
 
-## 8. Exemples d'utilisation
+    À appeler depuis un cron applicatif : rien n'est planifié automatiquement.
 
-### 8.1 Configurer le store
+    ### 8.3 Tester sans base réelle
 
-```python
-import core.forge as forge
-from forge_mvc_sessions_db import DbSessionStore
+    ```python
+    from forge_mvc_sessions_db import DbSessionStore
 
-forge.configure(session_store=DbSessionStore(ttl=3600))
-```
+    rows = {}
 
-La table `forge_sessions` doit exister au préalable (script `mvc/models/sql/forge_sessions.sql`).
+    def fake_fetch_one(sql, params):
+        row = rows.get(params[0])
+        return {"data": row} if row else None
 
-### 8.2 Nettoyer les sessions expirées
+    def fake_execute(sql, params=()):
+        return 1
 
-```python
-from forge_mvc_sessions_db import DbSessionStore
+    store = DbSessionStore(fetch_one=fake_fetch_one, execute=fake_execute)
+    ```
 
-store = DbSessionStore()
-supprimees = store.cleanup_expired()
-print(f"{supprimees} sessions expirées supprimées")
-```
+    Les exécuteurs `fetch_one` / `execute` sont injectables : les tests n'ont pas besoin d'une base.
 
-À appeler depuis un cron applicatif : rien n'est planifié automatiquement.
+??? note "9. Portabilité et exécuteurs injectés"
 
-### 8.3 Tester sans base réelle
+    Le store délègue tout son SQL aux callables `fetch_one` / `execute`, qui pointent par défaut vers `core.database.db`.
 
-```python
-from forge_mvc_sessions_db import DbSessionStore
+    `core.database.db` dispatche vers le backend BDD actif (`forge-mvc-mariadb`, `forge-mvc-sqlite`, etc.), en traduisant le style de paramètres (`?`) et le dialecte.
 
-rows = {}
+    Comme les horodatages sont calculés côté Python et passés en paramètres, aucune fonction date propriétaire n'apparaît dans le SQL : le store fonctionne à l'identique sur tous les backends (ADR-054).
 
-def fake_fetch_one(sql, params):
-    row = rows.get(params[0])
-    return {"data": row} if row else None
-
-def fake_execute(sql, params=()):
-    return 1
-
-store = DbSessionStore(fetch_one=fake_fetch_one, execute=fake_execute)
-```
-
-Les exécuteurs `fetch_one` / `execute` sont injectables : les tests n'ont pas besoin d'une base.
-
-## 9. Portabilité et exécuteurs injectés
-
-Le store délègue tout son SQL aux callables `fetch_one` / `execute`, qui pointent par défaut vers `core.database.db`.
-
-`core.database.db` dispatche vers le backend BDD actif (`forge-mvc-mariadb`, `forge-mvc-sqlite`, etc.), en traduisant le style de paramètres (`?`) et le dialecte.
-
-Comme les horodatages sont calculés côté Python et passés en paramètres, aucune fonction date propriétaire n'apparaît dans le SQL : le store fonctionne à l'identique sur tous les backends (ADR-054).
-
-!!! warning "Création de la table"
-    Le store suppose la table `forge_sessions` présente.
-    Elle n'est pas créée automatiquement : appliquez le script `mvc/models/sql/forge_sessions.sql`.
+    !!! warning "Création de la table"
+        Le store suppose la table `forge_sessions` présente.
+        Elle n'est pas créée automatiquement : appliquez le script `mvc/models/sql/forge_sessions.sql`.
 
 ## Voir aussi
 

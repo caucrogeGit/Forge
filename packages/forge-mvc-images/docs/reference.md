@@ -6,267 +6,267 @@ Ce document explique ce que fait l'opt-in `forge-mvc-images`, ce qu'il expose, e
 
 Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichiers.
 
-## 1. Rôle du module
+??? note "1. Rôle du module"
 
-L'opt-in couvre deux niveaux complémentaires :
+    L'opt-in couvre deux niveaux complémentaires :
 
-- **traitement d'image** : vérifier qu'un upload est une vraie image, l'écrire, générer des variantes (miniature, medium) ;
-- **couche médias applicative** : relier une image à une entité (un article, un élève), lister une galerie, désigner une couverture.
+    - **traitement d'image** : vérifier qu'un upload est une vraie image, l'écrire, générer des variantes (miniature, medium) ;
+    - **couche médias applicative** : relier une image à une entité (un article, un élève), lister une galerie, désigner une couverture.
 
-La vérification du contenu est une **sécurité** : on confirme que les octets sont bien une image avant toute écriture (garde anti-bombe de décompression), car le type MIME annoncé est falsifiable.
+    La vérification du contenu est une **sécurité** : on confirme que les octets sont bien une image avant toute écriture (garde anti-bombe de décompression), car le type MIME annoncé est falsifiable.
 
-## 2. Installation et désinstallation
+??? note "2. Installation et désinstallation"
 
-### Installation
+    ### Installation
 
-=== "Depuis PyPI (stable)"
+    === "Depuis PyPI (stable)"
 
-    La dernière version publiée :
+        La dernière version publiée :
+
+        ```bash
+        pip install --pre forge-mvc-images
+        ```
+
+    === "Depuis Git (avant-garde)"
+
+        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+        ```bash
+        source .venv/bin/activate
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-images"
+        ```
+
+        !!! warning "Erreur « externally-managed-environment » ?"
+
+            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+    Puis activez l'opt-in :
 
     ```bash
-    pip install --pre forge-mvc-images
+    forge opt-in:enable images
     ```
 
-=== "Depuis Git (avant-garde)"
 
-    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
+    `forge opt-in:install images` affiche la commande `pip` sans l'exécuter.
+
+    ### Désinstallation
 
     ```bash
-    source .venv/bin/activate
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-images"
+    forge opt-in:disable images
+    pip uninstall forge-mvc-images
     ```
 
-    !!! warning "Erreur « externally-managed-environment » ?"
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove images` affiche la commande `pip uninstall` sans l'exécuter.
 
-        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+??? note "3. Commandes"
 
-Puis activez l'opt-in :
+    Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-```bash
-forge opt-in:enable images
-```
+??? note "4. Vue d'ensemble rapide"
 
+    | Élément | Valeur |
+    |---|---|
+    | Paquet | `forge-mvc-images` |
+    | Module | `forge_mvc_images` |
+    | Catégorie | Médias et fichiers (ADR-055) |
+    | Couche | opt-in (brique optionnelle) |
+    | Dépend de | `forge-mvc`, `forge-mvc-files`, `Pillow` |
+    | Traitement | `save_image_upload`, `save_image`, `generate_image_variants`, `verify_image_content` |
+    | Couche médias | `create_media_record`, `attach_media_to_entity`, `list_media_for_entity`, `get_media_gallery`, `get_cover_media` |
+    | Objet renvoyé | `MediaRecord` (association fichier média / entité) |
+    | Variantes | `IMAGE_VARIANT_SIZES` (miniature, medium) |
+    | Formats autorisés | `ALLOWED_IMAGE_EXTENSIONS`, `ALLOWED_IMAGE_MIME_TYPES` |
+    | Décision d'architecture | ADR-018 (remplace `forge-mvc-media`) |
+    | Installation | `pip install --pre forge-mvc-images` |
 
-`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
-`forge opt-in:install images` affiche la commande `pip` sans l'exécuter.
+??? note "5. Schémas UML"
 
-### Désinstallation
+    Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
-```bash
-forge opt-in:disable images
-pip uninstall forge-mvc-images
-```
+    Le diagramme de classe montre les deux couches et leurs dépendances.
 
-`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-`forge opt-in:remove images` affiche la commande `pip uninstall` sans l'exécuter.
+    Le diagramme de séquence montre l'enregistrement d'une image puis l'affichage d'une galerie.
 
-## 3. Commandes
+    ### 5.1 Diagramme de classe
 
-Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
+    Le diagramme de classe montre que le traitement s'appuie sur `forge-mvc-files` et Pillow, et que la couche médias persiste des associations via un exécuteur **injecté**.
 
-## 4. Vue d'ensemble rapide
+    ```mermaid
+    classDiagram
+        direction LR
 
-| Élément | Valeur |
-|---|---|
-| Paquet | `forge-mvc-images` |
-| Module | `forge_mvc_images` |
-| Catégorie | Médias et fichiers (ADR-055) |
-| Couche | opt-in (brique optionnelle) |
-| Dépend de | `forge-mvc`, `forge-mvc-files`, `Pillow` |
-| Traitement | `save_image_upload`, `save_image`, `generate_image_variants`, `verify_image_content` |
-| Couche médias | `create_media_record`, `attach_media_to_entity`, `list_media_for_entity`, `get_media_gallery`, `get_cover_media` |
-| Objet renvoyé | `MediaRecord` (association fichier média / entité) |
-| Variantes | `IMAGE_VARIANT_SIZES` (miniature, medium) |
-| Formats autorisés | `ALLOWED_IMAGE_EXTENSIONS`, `ALLOWED_IMAGE_MIME_TYPES` |
-| Décision d'architecture | ADR-018 (remplace `forge-mvc-media`) |
-| Installation | `pip install --pre forge-mvc-images` |
+        class processing {
+            <<module>>
+            +save_image_upload(file, category, variants) SavedUpload
+            +save_image(file, entity_name, entity_id, ...) MediaRecord
+            +generate_image_variants(path, root) dict
+            +verify_image_content(data) None
+        }
 
-## 5. Schémas UML
+        class media {
+            <<module>>
+            +create_media_record(entity_name, entity_id, path, ...) int
+            +attach_media_to_entity(saved_upload, entity_name, entity_id, ...) int
+            +list_media_for_entity(entity_name, entity_id, role) list
+            +get_media_gallery(...) list
+            +get_cover_media(...) dict
+        }
 
-Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
+        class MediaRecord {
+            <<dataclass>>
+            +str filename
+            +str path
+            +str category
+        }
 
-Le diagramme de classe montre les deux couches et leurs dépendances.
+        class files {
+            <<opt-in>>
+            +save_upload()
+            +serve_media_file()
+        }
 
-Le diagramme de séquence montre l'enregistrement d'une image puis l'affichage d'une galerie.
+        class Pillow {
+            <<dependance>>
+        }
 
-### 5.1 Diagramme de classe
+        processing --> files : écrit via
+        processing --> Pillow : vérifie / redimensionne
+        processing --> MediaRecord : renvoie
+        media --> files : chemins / service
+        processing ..> media : alimente
+    ```
 
-Le diagramme de classe montre que le traitement s'appuie sur `forge-mvc-files` et Pillow, et que la couche médias persiste des associations via un exécuteur **injecté**.
+    À retenir :
 
-```mermaid
-classDiagram
-    direction LR
+    - la couche traitement produit des fichiers (original + variantes) ;
+    - la couche médias relie ces fichiers à des entités ;
+    - Pillow sert à vérifier et redimensionner, pas le cœur ;
+    - l'écriture et le service passent par `forge-mvc-files`.
 
-    class processing {
-        <<module>>
-        +save_image_upload(file, category, variants) SavedUpload
-        +save_image(file, entity_name, entity_id, ...) MediaRecord
-        +generate_image_variants(path, root) dict
-        +verify_image_content(data) None
-    }
+    ### 5.2 Diagramme de séquence
 
-    class media {
-        <<module>>
-        +create_media_record(entity_name, entity_id, path, ...) int
-        +attach_media_to_entity(saved_upload, entity_name, entity_id, ...) int
-        +list_media_for_entity(entity_name, entity_id, role) list
-        +get_media_gallery(...) list
-        +get_cover_media(...) dict
-    }
+    Le diagramme de séquence montre un upload d'image relié à une entité, puis l'affichage de sa galerie.
 
-    class MediaRecord {
-        <<dataclass>>
-        +str filename
-        +str path
-        +str category
-    }
+    ```mermaid
+    sequenceDiagram
+        actor Navigateur
+        participant Ctrl as Contrôleur
+        participant Img as forge_mvc_images
+        participant Files as forge_mvc_files
+        participant DB as Exécuteur BDD
 
-    class files {
-        <<opt-in>>
-        +save_upload()
-        +serve_media_file()
-    }
+        Navigateur->>Ctrl: POST image (multipart)
+        Ctrl->>Img: save_image_upload(file)
+        Img->>Img: verify_image_content (anti-bombe)
+        Img->>Files: save_upload (écrit l'original)
+        Img->>Img: generate_image_variants (miniature, medium)
+        Img-->>Ctrl: SavedUpload
+        Ctrl->>Img: attach_media_to_entity(saved, "article", 7)
+        Img->>DB: insère l'association
+        Navigateur->>Ctrl: GET page article
+        Ctrl->>Img: get_media_gallery("article", 7)
+        Img->>DB: lit les médias liés
+        Img-->>Ctrl: galerie (URLs via media_url)
+    ```
 
-    class Pillow {
-        <<dependance>>
-    }
+    À retenir :
 
-    processing --> files : écrit via
-    processing --> Pillow : vérifie / redimensionne
-    processing --> MediaRecord : renvoie
-    media --> files : chemins / service
-    processing ..> media : alimente
-```
+    - le contenu est vérifié **avant** l'écriture disque ;
+    - les variantes sont générées à l'enregistrement ;
+    - l'association média / entité est persistée par la couche médias ;
+    - la galerie et la couverture se lisent par entité.
 
-À retenir :
+??? note "6. API publique"
 
-- la couche traitement produit des fichiers (original + variantes) ;
-- la couche médias relie ces fichiers à des entités ;
-- Pillow sert à vérifier et redimensionner, pas le cœur ;
-- l'écriture et le service passent par `forge-mvc-files`.
+    ### Traitement d'image
 
-### 5.2 Diagramme de séquence
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `save_image_upload` | `save_image_upload(file, category="images", *, variants=True) -> SavedUpload` | vérifie, écrit, génère les variantes |
+    | `save_image` | `save_image(file, *, category="images", entity_name=None, entity_id=None, usage="main", position=0, is_main=True) -> MediaRecord` | enregistre une image liée à une entité |
+    | `generate_image_variants` | `generate_image_variants(path, *, root=None) -> dict[str, str]` | génère miniature et medium |
+    | `verify_image_content` | `verify_image_content(data) -> None` | garde anti-bombe, lève si non-image |
+    | constantes | `ALLOWED_IMAGE_EXTENSIONS`, `ALLOWED_IMAGE_MIME_TYPES`, `IMAGE_VARIANT_SIZES` | formats et tailles |
 
-Le diagramme de séquence montre un upload d'image relié à une entité, puis l'affichage de sa galerie.
+    ### Couche médias applicative
 
-```mermaid
-sequenceDiagram
-    actor Navigateur
-    participant Ctrl as Contrôleur
-    participant Img as forge_mvc_images
-    participant Files as forge_mvc_files
-    participant DB as Exécuteur BDD
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `create_media_record` | `create_media_record(entity_name, entity_id, path, ..., db=None) -> int` | enregistre une association média / entité |
+    | `attach_media_to_entity` | `attach_media_to_entity(saved_upload, entity_name, entity_id, ..., db=None) -> int` | relie un `SavedUpload` à une entité |
+    | `list_media_for_entity` | `list_media_for_entity(entity_name, entity_id, role=None, ...) -> list` | liste les médias d'une entité |
+    | `get_media_gallery` | `get_media_gallery(...) -> list[dict]` | galerie d'une entité (avec URLs) |
+    | `get_cover_media` | `get_cover_media(...) -> dict \| None` | média de couverture |
+    | `media_url` | `media_url(path) -> str` | URL publique d'un média |
+    | autres | `update_media_alt_text`, `update_media_position`, `delete_media`, `get_media_record` | gestion fine |
 
-    Navigateur->>Ctrl: POST image (multipart)
-    Ctrl->>Img: save_image_upload(file)
-    Img->>Img: verify_image_content (anti-bombe)
-    Img->>Files: save_upload (écrit l'original)
-    Img->>Img: generate_image_variants (miniature, medium)
-    Img-->>Ctrl: SavedUpload
-    Ctrl->>Img: attach_media_to_entity(saved, "article", 7)
-    Img->>DB: insère l'association
-    Navigateur->>Ctrl: GET page article
-    Ctrl->>Img: get_media_gallery("article", 7)
-    Img->>DB: lit les médias liés
-    Img-->>Ctrl: galerie (URLs via media_url)
-```
+??? note "7. Contextes d'utilisation"
 
-À retenir :
+    | Besoin | Élément |
+    |---|---|
+    | Recevoir une image en sécurité | `save_image_upload(file)` |
+    | Vérifier des octets image | `verify_image_content(data)` |
+    | Générer miniature et medium | `generate_image_variants(path)` |
+    | Relier une image à une entité | `attach_media_to_entity(...)` |
+    | Afficher une galerie | `get_media_gallery(...)` |
+    | Choisir une couverture | `get_cover_media(...)` |
+    | Construire l'URL d'un média | `media_url(path)` |
 
-- le contenu est vérifié **avant** l'écriture disque ;
-- les variantes sont générées à l'enregistrement ;
-- l'association média / entité est persistée par la couche médias ;
-- la galerie et la couverture se lisent par entité.
+??? note "8. Exemples d'utilisation"
 
-## 6. API publique
+    ### 8.1 Recevoir une image et la relier à une entité
 
-### Traitement d'image
-
-| Élément | Signature | Rôle |
-|---|---|---|
-| `save_image_upload` | `save_image_upload(file, category="images", *, variants=True) -> SavedUpload` | vérifie, écrit, génère les variantes |
-| `save_image` | `save_image(file, *, category="images", entity_name=None, entity_id=None, usage="main", position=0, is_main=True) -> MediaRecord` | enregistre une image liée à une entité |
-| `generate_image_variants` | `generate_image_variants(path, *, root=None) -> dict[str, str]` | génère miniature et medium |
-| `verify_image_content` | `verify_image_content(data) -> None` | garde anti-bombe, lève si non-image |
-| constantes | `ALLOWED_IMAGE_EXTENSIONS`, `ALLOWED_IMAGE_MIME_TYPES`, `IMAGE_VARIANT_SIZES` | formats et tailles |
-
-### Couche médias applicative
-
-| Élément | Signature | Rôle |
-|---|---|---|
-| `create_media_record` | `create_media_record(entity_name, entity_id, path, ..., db=None) -> int` | enregistre une association média / entité |
-| `attach_media_to_entity` | `attach_media_to_entity(saved_upload, entity_name, entity_id, ..., db=None) -> int` | relie un `SavedUpload` à une entité |
-| `list_media_for_entity` | `list_media_for_entity(entity_name, entity_id, role=None, ...) -> list` | liste les médias d'une entité |
-| `get_media_gallery` | `get_media_gallery(...) -> list[dict]` | galerie d'une entité (avec URLs) |
-| `get_cover_media` | `get_cover_media(...) -> dict \| None` | média de couverture |
-| `media_url` | `media_url(path) -> str` | URL publique d'un média |
-| autres | `update_media_alt_text`, `update_media_position`, `delete_media`, `get_media_record` | gestion fine |
-
-## 7. Contextes d'utilisation
-
-| Besoin | Élément |
-|---|---|
-| Recevoir une image en sécurité | `save_image_upload(file)` |
-| Vérifier des octets image | `verify_image_content(data)` |
-| Générer miniature et medium | `generate_image_variants(path)` |
-| Relier une image à une entité | `attach_media_to_entity(...)` |
-| Afficher une galerie | `get_media_gallery(...)` |
-| Choisir une couverture | `get_cover_media(...)` |
-| Construire l'URL d'un média | `media_url(path)` |
-
-## 8. Exemples d'utilisation
-
-### 8.1 Recevoir une image et la relier à une entité
-
-```python
-from forge_mvc_images import save_image_upload, attach_media_to_entity
+    ```python
+    from forge_mvc_images import save_image_upload, attach_media_to_entity
 
 
-def add_photo(request):
-    saved = save_image_upload(request.file("photo"))
-    attach_media_to_entity(saved, "article", 7, role="gallery")
-    return Response.text("Photo ajoutée.")
-```
+    def add_photo(request):
+        saved = save_image_upload(request.file("photo"))
+        attach_media_to_entity(saved, "article", 7, role="gallery")
+        return Response.text("Photo ajoutée.")
+    ```
 
-`save_image_upload` vérifie le contenu, écrit l'original et génère les variantes.
+    `save_image_upload` vérifie le contenu, écrit l'original et génère les variantes.
 
-### 8.2 Afficher la galerie d'une entité
+    ### 8.2 Afficher la galerie d'une entité
 
-```python
-from forge_mvc_images import get_media_gallery, get_cover_media
+    ```python
+    from forge_mvc_images import get_media_gallery, get_cover_media
 
-gallery = get_media_gallery("article", 7)
-cover = get_cover_media("article", 7)
-```
+    gallery = get_media_gallery("article", 7)
+    cover = get_cover_media("article", 7)
+    ```
 
-!!! tip "Aide-mémoire"
-    Deux couches, un même flux :
+    !!! tip "Aide-mémoire"
+        Deux couches, un même flux :
 
-    - traitement : `save_image_upload` (vérifie, écrit, variantes) ;
-    - médias : `attach_media_to_entity`, `get_media_gallery`, `get_cover_media`.
+        - traitement : `save_image_upload` (vérifie, écrit, variantes) ;
+        - médias : `attach_media_to_entity`, `get_media_gallery`, `get_cover_media`.
 
-## 9. Sécurité, variantes et dépendances
+??? note "9. Sécurité, variantes et dépendances"
 
-`verify_image_content` confirme que les octets sont une vraie image avant toute écriture, et protège contre les bombes de décompression.
+    `verify_image_content` confirme que les octets sont une vraie image avant toute écriture, et protège contre les bombes de décompression.
 
-Les variantes (miniature, medium) sont définies par `IMAGE_VARIANT_SIZES` ; l'original est conservé tel quel.
+    Les variantes (miniature, medium) sont définies par `IMAGE_VARIANT_SIZES` ; l'original est conservé tel quel.
 
-!!! warning "Le MIME annoncé ne suffit pas"
-    Un fichier non-image peut se présenter avec une extension et un `Content-Type` d'image.
+    !!! warning "Le MIME annoncé ne suffit pas"
+        Un fichier non-image peut se présenter avec une extension et un `Content-Type` d'image.
 
-    `save_image_upload` (et `save_image`) appellent `verify_image_content` avant d'écrire : ne court-circuitez pas cette étape.
+        `save_image_upload` (et `save_image`) appellent `verify_image_content` avant d'écrire : ne court-circuitez pas cette étape.
 
-!!! note "Pillow vit dans l'opt-in"
-    `Pillow` est une dépendance de `forge-mvc-images`, retirée du cœur (ADR-018).
+    !!! note "Pillow vit dans l'opt-in"
+        `Pillow` est une dépendance de `forge-mvc-images`, retirée du cœur (ADR-018).
 
-    Le cœur ne sait pas traiter d'images ; tout l'image vit ici.
+        Le cœur ne sait pas traiter d'images ; tout l'image vit ici.
 
-!!! note "S'appuie sur forge-mvc-files"
-    L'écriture disque, le service (HTTP Range) et l'anti-traversal viennent de `forge-mvc-files`.
+    !!! note "S'appuie sur forge-mvc-files"
+        L'écriture disque, le service (HTTP Range) et l'anti-traversal viennent de `forge-mvc-files`.
 
-    `forge-mvc-images` ajoute le traitement (Pillow) et la couche applicative.
+        `forge-mvc-images` ajoute le traitement (Pillow) et la couche applicative.
 
 ## Voir aussi
 

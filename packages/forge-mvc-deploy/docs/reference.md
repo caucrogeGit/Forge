@@ -6,216 +6,216 @@ Ce document explique ce que fait l'opt-in `forge-mvc-deploy`, ce qu'il expose, e
 
 Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécution (ADR-053).
 
-## 1. Rôle du module
+??? note "1. Rôle du module"
 
-Mettre une application Forge en production demande quelques fichiers standard : un point d'entrée WSGI, une configuration de serveur web, un service système.
+    Mettre une application Forge en production demande quelques fichiers standard : un point d'entrée WSGI, une configuration de serveur web, un service système.
 
-L'opt-in **génère** ces fichiers à partir de gabarits : `wsgi.py`, une configuration Nginx, une unité systemd et un README, alignés sur le chemin de production officiel (Gunicorn).
+    L'opt-in **génère** ces fichiers à partir de gabarits : `wsgi.py`, une configuration Nginx, une unité systemd et un README, alignés sur le chemin de production officiel (Gunicorn).
 
-Il reste un outil de **préparation** : il écrit des fichiers que vous relisez et adaptez, il ne déploie pas à votre place et ne tourne pas dans le serveur.
+    Il reste un outil de **préparation** : il écrit des fichiers que vous relisez et adaptez, il ne déploie pas à votre place et ne tourne pas dans le serveur.
 
-## 2. Installation et désinstallation
+??? note "2. Installation et désinstallation"
 
-### Installation
+    ### Installation
 
-=== "Depuis PyPI (stable)"
+    === "Depuis PyPI (stable)"
 
-    La dernière version publiée :
+        La dernière version publiée :
+
+        ```bash
+        pip install --pre forge-mvc-deploy
+        ```
+
+    === "Depuis Git (avant-garde)"
+
+        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+        ```bash
+        source .venv/bin/activate
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-deploy"
+        ```
+
+        !!! warning "Erreur « externally-managed-environment » ?"
+
+            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+    Puis activez l'opt-in :
 
     ```bash
-    pip install --pre forge-mvc-deploy
+    forge opt-in:enable deploy
     ```
 
-=== "Depuis Git (avant-garde)"
 
-    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in expose ses commandes CLI).
+    `forge opt-in:install deploy` affiche la commande `pip` sans l'exécuter.
+
+    ### Désinstallation
 
     ```bash
-    source .venv/bin/activate
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-deploy"
+    forge opt-in:disable deploy
+    pip uninstall forge-mvc-deploy
     ```
 
-    !!! warning "Erreur « externally-managed-environment » ?"
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
+    `forge opt-in:remove deploy` affiche la commande `pip uninstall` sans l'exécuter.
 
-        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+??? note "3. Commandes"
 
-Puis activez l'opt-in :
+    `forge-mvc-deploy` ajoute ces commandes (opt-in CLI-only) :
 
-```bash
-forge opt-in:enable deploy
-```
+    | Commande | Rôle | Exemple |
+    |---|---|---|
+    | `deploy:init` | Génère `wsgi.py`, la config Nginx, l'unité systemd et un README (write-if-new). | `forge deploy:init` |
+    | `deploy:check` | Vérifie la configuration de déploiement. | `forge deploy:check` |
 
+??? note "4. Vue d'ensemble rapide"
 
-`opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in expose ses commandes CLI).
-`forge opt-in:install deploy` affiche la commande `pip` sans l'exécuter.
+    | Élément | Valeur |
+    |---|---|
+    | Paquet | `forge-mvc-deploy` |
+    | Module | `forge_mvc_deploy` |
+    | Catégorie | Exploitation et outillage (ADR-055) |
+    | Couche | opt-in **CLI-only** (aucune API runtime) |
+    | Dépend de | `forge-mvc` (au moment du CLI seulement) |
+    | Commandes | `deploy:init`, `deploy:check` |
+    | Génère | `wsgi.py`, configuration Nginx, unité systemd, README |
+    | Serveur de production | Gunicorn (`wsgi:application`) |
+    | Décision d'architecture | ADR-053 (extraction, opt-in CLI-only) |
+    | Installation | `pip install --pre forge-mvc-deploy` |
 
-### Désinstallation
+??? note "5. Schémas UML"
 
-```bash
-forge opt-in:disable deploy
-pip uninstall forge-mvc-deploy
-```
+    Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
-`opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
-`forge opt-in:remove deploy` affiche la commande `pip uninstall` sans l'exécuter.
+    Le diagramme de classe montre les commandes et les fichiers générés.
 
-## 3. Commandes
+    Le diagramme de séquence montre la préparation puis la pile de production servie.
 
-`forge-mvc-deploy` ajoute ces commandes (opt-in CLI-only) :
+    ### 5.1 Diagramme de classe
 
-| Commande | Rôle | Exemple |
-|---|---|---|
-| `deploy:init` | Génère `wsgi.py`, la config Nginx, l'unité systemd et un README (write-if-new). | `forge deploy:init` |
-| `deploy:check` | Vérifie la configuration de déploiement. | `forge deploy:check` |
+    Le diagramme de classe montre les deux commandes et les artefacts qu'elles produisent ou vérifient.
 
-## 4. Vue d'ensemble rapide
+    ```mermaid
+    classDiagram
+        direction LR
 
-| Élément | Valeur |
-|---|---|
-| Paquet | `forge-mvc-deploy` |
-| Module | `forge_mvc_deploy` |
-| Catégorie | Exploitation et outillage (ADR-055) |
-| Couche | opt-in **CLI-only** (aucune API runtime) |
-| Dépend de | `forge-mvc` (au moment du CLI seulement) |
-| Commandes | `deploy:init`, `deploy:check` |
-| Génère | `wsgi.py`, configuration Nginx, unité systemd, README |
-| Serveur de production | Gunicorn (`wsgi:application`) |
-| Décision d'architecture | ADR-053 (extraction, opt-in CLI-only) |
-| Installation | `pip install --pre forge-mvc-deploy` |
+        class deploy {
+            <<CLI>>
+            +deploy:init
+            +deploy:check
+        }
 
-## 5. Schémas UML
+        class artefacts {
+            <<fichiers générés>>
+            +wsgi.py
+            +nginx.conf
+            +systemd .service
+            +README
+        }
 
-Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
+        class production {
+            <<pile>>
+            +Nginx
+            +Gunicorn
+            +wsgi:application
+        }
 
-Le diagramme de classe montre les commandes et les fichiers générés.
+        deploy --> artefacts : génère (init) / vérifie (check)
+        artefacts --> production : décrivent
+    ```
 
-Le diagramme de séquence montre la préparation puis la pile de production servie.
+    À retenir :
 
-### 5.1 Diagramme de classe
+    - `deploy:init` écrit les fichiers de déploiement (write-if-new) ;
+    - `deploy:check` vérifie leur présence et leur cohérence ;
+    - la pile cible est Nginx devant Gunicorn servant `wsgi:application` ;
+    - aucun de ces fichiers n'est importé par l'application au runtime.
 
-Le diagramme de classe montre les deux commandes et les artefacts qu'elles produisent ou vérifient.
+    ### 5.2 Diagramme de séquence
 
-```mermaid
-classDiagram
-    direction LR
+    Le diagramme de séquence montre la préparation, puis une requête servie en production.
 
-    class deploy {
-        <<CLI>>
-        +deploy:init
-        +deploy:check
-    }
+    ```mermaid
+    sequenceDiagram
+        actor Op as Opérateur
+        participant CLI as forge deploy
+        participant Repo as Fichiers projet
+        actor Client
+        participant Nginx as Nginx
+        participant Gunicorn as Gunicorn
+        participant App as wsgi:application
 
-    class artefacts {
-        <<fichiers générés>>
-        +wsgi.py
-        +nginx.conf
-        +systemd .service
-        +README
-    }
+        Op->>CLI: forge deploy:init
+        CLI->>Repo: écrit wsgi.py, nginx, systemd, README
+        Op->>CLI: forge deploy:check
+        CLI-->>Op: rapport (présence / cohérence)
 
-    class production {
-        <<pile>>
-        +Nginx
-        +Gunicorn
-        +wsgi:application
-    }
+        Client->>Nginx: requête HTTPS
+        Nginx->>Gunicorn: proxy
+        Gunicorn->>App: appelle l'application WSGI
+        App-->>Client: réponse
+    ```
 
-    deploy --> artefacts : génère (init) / vérifie (check)
-    artefacts --> production : décrivent
-```
+    À retenir :
 
-À retenir :
-
-- `deploy:init` écrit les fichiers de déploiement (write-if-new) ;
-- `deploy:check` vérifie leur présence et leur cohérence ;
-- la pile cible est Nginx devant Gunicorn servant `wsgi:application` ;
-- aucun de ces fichiers n'est importé par l'application au runtime.
-
-### 5.2 Diagramme de séquence
-
-Le diagramme de séquence montre la préparation, puis une requête servie en production.
-
-```mermaid
-sequenceDiagram
-    actor Op as Opérateur
-    participant CLI as forge deploy
-    participant Repo as Fichiers projet
-    actor Client
-    participant Nginx as Nginx
-    participant Gunicorn as Gunicorn
-    participant App as wsgi:application
-
-    Op->>CLI: forge deploy:init
-    CLI->>Repo: écrit wsgi.py, nginx, systemd, README
-    Op->>CLI: forge deploy:check
-    CLI-->>Op: rapport (présence / cohérence)
-
-    Client->>Nginx: requête HTTPS
-    Nginx->>Gunicorn: proxy
-    Gunicorn->>App: appelle l'application WSGI
-    App-->>Client: réponse
-```
-
-À retenir :
-
-- la génération et la vérification sont des étapes d'**opérateur**, hors application ;
-- en production, Nginx reçoit le trafic et le passe à Gunicorn ;
-- Gunicorn sert le callable `application` de `wsgi.py` ;
-- le serveur de développement (`python app.py`) ne sert pas la production.
+    - la génération et la vérification sont des étapes d'**opérateur**, hors application ;
+    - en production, Nginx reçoit le trafic et le passe à Gunicorn ;
+    - Gunicorn sert le callable `application` de `wsgi.py` ;
+    - le serveur de développement (`python app.py`) ne sert pas la production.
 
 
-## 6. Contextes d'utilisation
+??? note "6. Contextes d'utilisation"
 
-| Besoin | Élément |
-|---|---|
-| Générer les fichiers de déploiement | `forge deploy:init` |
-| Vérifier la configuration | `forge deploy:check` |
-| Servir en production | Gunicorn sur `wsgi:application` |
-| Mettre derrière un proxy | configuration Nginx générée |
-| Gérer le service | unité systemd générée |
+    | Besoin | Élément |
+    |---|---|
+    | Générer les fichiers de déploiement | `forge deploy:init` |
+    | Vérifier la configuration | `forge deploy:check` |
+    | Servir en production | Gunicorn sur `wsgi:application` |
+    | Mettre derrière un proxy | configuration Nginx générée |
+    | Gérer le service | unité systemd générée |
 
-## 7. Exemple d'utilisation
+??? note "7. Exemple d'utilisation"
 
-```bash
-# 1. Générer les fichiers (ne réécrit pas l'existant)
-forge deploy:init
+    ```bash
+    # 1. Générer les fichiers (ne réécrit pas l'existant)
+    forge deploy:init
 
-# 2. Vérifier la cohérence
-forge deploy:check
+    # 2. Vérifier la cohérence
+    forge deploy:check
 
-# 3. Servir en production (exemple)
-.venv/bin/gunicorn wsgi:application --workers 4 --bind 127.0.0.1:8000
-```
+    # 3. Servir en production (exemple)
+    .venv/bin/gunicorn wsgi:application --workers 4 --bind 127.0.0.1:8000
+    ```
 
-Relisez et adaptez les fichiers générés (domaine, chemins, nombre de workers) avant de les mettre en service.
+    Relisez et adaptez les fichiers générés (domaine, chemins, nombre de workers) avant de les mettre en service.
 
-!!! tip "Aide-mémoire"
-    Deux commandes, une pile :
+    !!! tip "Aide-mémoire"
+        Deux commandes, une pile :
 
-    - `deploy:init` génère, `deploy:check` vérifie ;
-    - en production, Nginx devant Gunicorn servant `wsgi:application`.
+        - `deploy:init` génère, `deploy:check` vérifie ;
+        - en production, Nginx devant Gunicorn servant `wsgi:application`.
 
-## 8. CLI-only et adaptation
+??? note "8. CLI-only et adaptation"
 
-`forge-mvc-deploy` n'a pas d'API runtime : il sert uniquement à préparer le déploiement.
-Une application ne l'importe pas à l'exécution.
+    `forge-mvc-deploy` n'a pas d'API runtime : il sert uniquement à préparer le déploiement.
+    Une application ne l'importe pas à l'exécution.
 
-Les fichiers générés sont des **points de départ** : adaptez le domaine, les chemins absolus, le nombre de workers et les options TLS à votre serveur.
+    Les fichiers générés sont des **points de départ** : adaptez le domaine, les chemins absolus, le nombre de workers et les options TLS à votre serveur.
 
-!!! warning "Relire avant de déployer"
-    Les gabarits supposent une disposition standard (`.venv`, `wsgi.py` à la racine).
+    !!! warning "Relire avant de déployer"
+        Les gabarits supposent une disposition standard (`.venv`, `wsgi.py` à la racine).
 
-    Vérifiez chemins, utilisateur système, certificats et limites de taille avant la mise en service.
+        Vérifiez chemins, utilisateur système, certificats et limites de taille avant la mise en service.
 
-!!! note "Chemin de production officiel"
-    Gunicorn servant `wsgi:application`, derrière Nginx, est le chemin de production de Forge.
+    !!! note "Chemin de production officiel"
+        Gunicorn servant `wsgi:application`, derrière Nginx, est le chemin de production de Forge.
 
-    Le serveur de développement (`python app.py`) n'est pas destiné à la production.
+        Le serveur de développement (`python app.py`) n'est pas destiné à la production.
 
-!!! note "Indépendance du cœur"
-    Le cœur de Forge ne dépend pas de `forge-mvc-deploy` ; le paquet n'ajoute que des commandes CLI quand il est installé (ADR-053).
+    !!! note "Indépendance du cœur"
+        Le cœur de Forge ne dépend pas de `forge-mvc-deploy` ; le paquet n'ajoute que des commandes CLI quand il est installé (ADR-053).
 
 ## Voir aussi
 

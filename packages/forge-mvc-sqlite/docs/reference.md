@@ -6,246 +6,246 @@ Ce document explique ce que fait l'opt-in `forge-mvc-sqlite`, ce qu'il expose, e
 
 Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend installé par un entry point, et n'en utilise **qu'un seul** par projet.
 
-## 1. Rôle du module
+??? note "1. Rôle du module"
 
-Le cœur sait générer du SQL et piloter `db:init` / `db:apply` / `migration:*`, mais il ne parle à aucune base directement : c'est le rôle d'un backend.
+    Le cœur sait générer du SQL et piloter `db:init` / `db:apply` / `migration:*`, mais il ne parle à aucune base directement : c'est le rôle d'un backend.
 
-`forge-mvc-sqlite` fournit ce backend : une connexion `sqlite3` adaptée aux attentes du cœur (curseur lignes-dict, `lastrowid`, `autocommit`) et un dialecte SQL propre à SQLite.
+    `forge-mvc-sqlite` fournit ce backend : une connexion `sqlite3` adaptée aux attentes du cœur (curseur lignes-dict, `lastrowid`, `autocommit`) et un dialecte SQL propre à SQLite.
 
-SQLite est **sans serveur** : la base est un simple fichier (`DB_NAME`).
-C'est le choix idéal en développement, en test et pour l'onboarding.
+    SQLite est **sans serveur** : la base est un simple fichier (`DB_NAME`).
+    C'est le choix idéal en développement, en test et pour l'onboarding.
 
-## 2. Installation et désinstallation
+??? note "2. Installation et désinstallation"
 
-SQLite est **sans serveur** : la base est un simple fichier local, sans serveur à joindre ni comptes à créer.
-Le module `sqlite3` fait partie de la bibliothèque standard de Python, donc aucune dépendance externe.
+    SQLite est **sans serveur** : la base est un simple fichier local, sans serveur à joindre ni comptes à créer.
+    Le module `sqlite3` fait partie de la bibliothèque standard de Python, donc aucune dépendance externe.
 
-=== "Depuis PyPI (stable)"
+    === "Depuis PyPI (stable)"
 
-    La dernière version publiée :
+        La dernière version publiée :
+
+        ```bash
+        pip install --pre forge-mvc-sqlite
+        ```
+
+    === "Depuis Git (avant-garde)"
+
+        Cœur puis backend depuis git, dans le venv du projet, à la même version (le backend trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+
+        ```bash
+        source .venv/bin/activate
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-sqlite"
+        ```
+
+        !!! warning "Erreur « externally-managed-environment » ?"
+
+            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+
+
+    Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
+
+    `forge db:config` pose `DB_NAME` (le chemin du fichier de base) dans `env/example`, `env/dev` et `env/prod` (write-if-missing ; ADR-064) :
 
     ```bash
-    pip install --pre forge-mvc-sqlite
+    forge db:config
     ```
 
-=== "Depuis Git (avant-garde)"
+    Ajustez au besoin le chemin dans `env/dev` :
 
-    Cœur puis backend depuis git, dans le venv du projet, à la même version (le backend trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    ```env
+    DB_NAME=storage/mon_projet.db
+    ```
+
+    `forge doctor` confirme le backend résolu (`sqlite`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=sqlite`.
+    `forge db:init` crée alors le fichier et la table technique `forge_migrations` : aucun serveur n'est contacté.
+
+    La progression guidée, pas à pas : [Installation de forge-mvc-sqlite](welcome/debutant/sqlite-welcome.md).
+
+    ### Désinstallation
+
+    Retirez d'abord la configuration des fichiers d'environnement, puis le paquet :
 
     ```bash
-    source .venv/bin/activate
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-sqlite"
+    forge db:config --remove
+    pip uninstall forge-mvc-sqlite
     ```
 
-    !!! warning "Erreur « externally-managed-environment » ?"
+    `db:config --remove` retire les clés `DB_*` posées par `db:config` des trois fichiers d'environnement (les valeurs renseignées sont perdues ; ADR-064).
+    Un backend n'a pas de commande `disable` : découvert par entry point (ADR-054), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
+    Si besoin, supprimez aussi la base et le compte créés par `db:init`.
 
-        Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-        La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
+??? note "3. Commandes"
 
+    Ce backend n'ajoute aucune commande : il est découvert par l'entry point `forge_mvc.db_backend` et fournit, au runtime, un dialecte SQL et un adaptateur de connexion.
+    Les commandes de base de données que vous utilisez avec lui sont fournies par le moteur d'entités (`forge-mvc-entities`) :
 
-Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
+    | Commande | Rôle | Exemple |
+    |---|---|---|
+    | `db:config` | Amorce les variables du backend dans `env/*` (write-if-missing). | `forge db:config` |
+    | `db:init` | Affiche le SQL de provisioning ; `--run` l'exécute. | `forge db:init --run` |
+    | `db:apply` | Applique le SQL des entités à la base. | `forge db:apply` |
+    | `migration:make` | Génère une migration depuis l'écart de schéma. | `forge migration:make` |
+    | `migration:apply` | Applique les migrations en attente. | `forge migration:apply` |
 
-`forge db:config` pose `DB_NAME` (le chemin du fichier de base) dans `env/example`, `env/dev` et `env/prod` (write-if-missing ; ADR-064) :
+??? note "4. Vue d'ensemble rapide"
 
-```bash
-forge db:config
-```
+    | Élément | Valeur |
+    |---|---|
+    | Paquet | `forge-mvc-sqlite` |
+    | Module | `forge_mvc_sqlite` |
+    | Catégorie | Bases de données (ADR-055) |
+    | Couche | backend BDD opt-in **exclusif** (un seul par projet) |
+    | Dépend de | `forge-mvc` (et `sqlite3` de la bibliothèque standard) |
+    | Découverte | entry point `forge_mvc.db_backend` nommé `sqlite` |
+    | Sélection | automatique si seul installé ; sinon `DB_BACKEND=sqlite` |
+    | Provisioning | **aucun** (sans serveur) : `db:init` crée le fichier |
+    | Base | un fichier sur disque (chemin = `DB_NAME`) |
+    | Décision d'architecture | ADR-054 (cœur agnostique BDD) |
+    | Installation | `pip install --pre forge-mvc-sqlite` |
 
-Ajustez au besoin le chemin dans `env/dev` :
+??? note "5. Schémas UML"
 
-```env
-DB_NAME=storage/mon_projet.db
-```
+    Les deux schémas suivants montrent deux vues complémentaires du backend.
 
-`forge doctor` confirme le backend résolu (`sqlite`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=sqlite`.
-`forge db:init` crée alors le fichier et la table technique `forge_migrations` : aucun serveur n'est contacté.
+    Le diagramme de classe montre comment le cœur consomme le backend.
 
-La progression guidée, pas à pas : [Installation de forge-mvc-sqlite](welcome/debutant/sqlite-welcome.md).
+    Le diagramme de séquence montre la résolution du backend puis une requête.
 
-### Désinstallation
+    ### 5.1 Diagramme de classe
 
-Retirez d'abord la configuration des fichiers d'environnement, puis le paquet :
+    Le diagramme de classe montre que le cœur résout un `DatabaseBackend` par entry point, et que `forge-mvc-sqlite` le fournit avec son dialecte.
 
-```bash
-forge db:config --remove
-pip uninstall forge-mvc-sqlite
-```
+    ```mermaid
+    classDiagram
+        direction LR
 
-`db:config --remove` retire les clés `DB_*` posées par `db:config` des trois fichiers d'environnement (les valeurs renseignées sont perdues ; ADR-064).
-Un backend n'a pas de commande `disable` : découvert par entry point (ADR-054), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
-Si besoin, supprimez aussi la base et le compte créés par `db:init`.
+        class DatabaseBackend {
+            <<protocol, cœur>>
+            +name
+            +dialect
+            +requires_provisioning
+            +get_connection()
+        }
 
-## 3. Commandes
+        class SQLiteBackend {
+            +name = "sqlite"
+            +requires_provisioning = false
+            +get_connection() connexion
+        }
 
-Ce backend n'ajoute aucune commande : il est découvert par l'entry point `forge_mvc.db_backend` et fournit, au runtime, un dialecte SQL et un adaptateur de connexion.
-Les commandes de base de données que vous utilisez avec lui sont fournies par le moteur d'entités (`forge-mvc-entities`) :
+        class SQLiteDialect {
+            +types SQLite
+            +AUTOINCREMENT
+            +CREATE INDEX séparés
+        }
 
-| Commande | Rôle | Exemple |
-|---|---|---|
-| `db:config` | Amorce les variables du backend dans `env/*` (write-if-missing). | `forge db:config` |
-| `db:init` | Affiche le SQL de provisioning ; `--run` l'exécute. | `forge db:init --run` |
-| `db:apply` | Applique le SQL des entités à la base. | `forge db:apply` |
-| `migration:make` | Génère une migration depuis l'écart de schéma. | `forge migration:make` |
-| `migration:apply` | Applique les migrations en attente. | `forge migration:apply` |
+        class fichier {
+            <<base>>
+            +DB_NAME (fichier)
+        }
 
-## 4. Vue d'ensemble rapide
+        SQLiteBackend ..|> DatabaseBackend : implémente
+        SQLiteBackend --> SQLiteDialect : dialecte
+        SQLiteBackend --> fichier : ouvre
+    ```
 
-| Élément | Valeur |
-|---|---|
-| Paquet | `forge-mvc-sqlite` |
-| Module | `forge_mvc_sqlite` |
-| Catégorie | Bases de données (ADR-055) |
-| Couche | backend BDD opt-in **exclusif** (un seul par projet) |
-| Dépend de | `forge-mvc` (et `sqlite3` de la bibliothèque standard) |
-| Découverte | entry point `forge_mvc.db_backend` nommé `sqlite` |
-| Sélection | automatique si seul installé ; sinon `DB_BACKEND=sqlite` |
-| Provisioning | **aucun** (sans serveur) : `db:init` crée le fichier |
-| Base | un fichier sur disque (chemin = `DB_NAME`) |
-| Décision d'architecture | ADR-054 (cœur agnostique BDD) |
-| Installation | `pip install --pre forge-mvc-sqlite` |
+    À retenir :
 
-## 5. Schémas UML
+    - le cœur ne connaît que le contrat `DatabaseBackend` ;
+    - `forge-mvc-sqlite` l'implémente au-dessus de `sqlite3` ;
+    - le dialecte traduit les types et la DDL en SQL SQLite ;
+    - la base est un fichier, pas un service.
 
-Les deux schémas suivants montrent deux vues complémentaires du backend.
+    ### 5.2 Diagramme de séquence
 
-Le diagramme de classe montre comment le cœur consomme le backend.
+    Le diagramme de séquence montre la découverte du backend puis une requête applicative.
 
-Le diagramme de séquence montre la résolution du backend puis une requête.
+    ```mermaid
+    sequenceDiagram
+        participant App as Application / CLI
+        participant Core as core.database
+        participant Backend as forge-mvc-sqlite
+        participant File as fichier SQLite
 
-### 5.1 Diagramme de classe
+        App->>Core: première requête (ou db:init)
+        Core->>Core: résout l'entry point forge_mvc.db_backend
+        Core->>Backend: get_connection()
+        Backend->>File: ouvre DB_NAME
+        Backend-->>Core: connexion (lignes-dict, lastrowid)
+        Core-->>App: résultat de la requête
+    ```
 
-Le diagramme de classe montre que le cœur résout un `DatabaseBackend` par entry point, et que `forge-mvc-sqlite` le fournit avec son dialecte.
+    À retenir :
 
-```mermaid
-classDiagram
-    direction LR
+    - le backend est résolu une fois, par entry point ;
+    - s'il y a plusieurs backends installés, `DB_BACKEND` tranche ;
+    - la connexion est adaptée au format attendu par le cœur ;
+    - aucune étape réseau : c'est un fichier local.
 
-    class DatabaseBackend {
-        <<protocol, cœur>>
-        +name
-        +dialect
-        +requires_provisioning
-        +get_connection()
-    }
+??? note "6. Ce que fournit le backend"
 
-    class SQLiteBackend {
-        +name = "sqlite"
-        +requires_provisioning = false
-        +get_connection() connexion
-    }
+    | Élément | Rôle |
+    |---|---|
+    | `SQLiteBackend` | implémente le contrat `DatabaseBackend` du cœur |
+    | Adaptateur de connexion | curseur `dictionary=`, `lastrowid`, `autocommit` au-dessus de `sqlite3` |
+    | `SQLiteDialect` | types SQLite, `INTEGER PRIMARY KEY AUTOINCREMENT`, `CREATE INDEX` séparés |
+    | Entry point | `forge_mvc.db_backend = sqlite` (découverte par le cœur) |
 
-    class SQLiteDialect {
-        +types SQLite
-        +AUTOINCREMENT
-        +CREATE INDEX séparés
-    }
+    L'API que vous utilisez reste celle du cœur : `db:init`, `db:apply`, `migration:*`, et `core.database.db` dans le code.
 
-    class fichier {
-        <<base>>
-        +DB_NAME (fichier)
-    }
+??? note "7. Contextes d'utilisation"
 
-    SQLiteBackend ..|> DatabaseBackend : implémente
-    SQLiteBackend --> SQLiteDialect : dialecte
-    SQLiteBackend --> fichier : ouvre
-```
+    | Besoin | Élément |
+    |---|---|
+    | Démarrer sans installer de serveur | installer `forge-mvc-sqlite` |
+    | Forcer ce backend | `DB_BACKEND=sqlite` |
+    | Créer la base | `forge db:init` (crée le fichier) |
+    | Appliquer le schéma | `forge db:apply` |
+    | Faire évoluer le schéma | `forge migration:make` / `migration:apply` |
+    | Lire/écrire en code | `core.database.db` |
 
-À retenir :
+??? note "8. Exemple d'utilisation"
 
-- le cœur ne connaît que le contrat `DatabaseBackend` ;
-- `forge-mvc-sqlite` l'implémente au-dessus de `sqlite3` ;
-- le dialecte traduit les types et la DDL en SQL SQLite ;
-- la base est un fichier, pas un service.
+    ```bash
+    pip install --pre forge-mvc-sqlite     # seul backend installé
+    forge db:init                          # crée le fichier SQLite + forge_migrations
+    forge db:apply                         # applique le schéma des entités
+    ```
 
-### 5.2 Diagramme de séquence
+    ```python
+    import core.database.db as db
+    rows = db.fetch_all("SELECT * FROM article", ())
+    ```
 
-Le diagramme de séquence montre la découverte du backend puis une requête applicative.
+    Le code applicatif ne sait pas qu'il parle à SQLite : il utilise la couche BDD du cœur.
 
-```mermaid
-sequenceDiagram
-    participant App as Application / CLI
-    participant Core as core.database
-    participant Backend as forge-mvc-sqlite
-    participant File as fichier SQLite
+    !!! tip "Aide-mémoire"
+        Installer suffit :
 
-    App->>Core: première requête (ou db:init)
-    Core->>Core: résout l'entry point forge_mvc.db_backend
-    Core->>Backend: get_connection()
-    Backend->>File: ouvre DB_NAME
-    Backend-->>Core: connexion (lignes-dict, lastrowid)
-    Core-->>App: résultat de la requête
-```
+        - un seul backend installé est choisi automatiquement ;
+        - `db:init` crée le fichier, `db:apply` applique le schéma ;
+        - le code utilise `core.database.db`, pas `sqlite3`.
 
-À retenir :
+??? note "9. Sans serveur, exclusif, et dialecte"
 
-- le backend est résolu une fois, par entry point ;
-- s'il y a plusieurs backends installés, `DB_BACKEND` tranche ;
-- la connexion est adaptée au format attendu par le cœur ;
-- aucune étape réseau : c'est un fichier local.
+    SQLite n'a pas de serveur : `requires_provisioning=False`, donc `db:init` ne crée ni compte ni base distante, il prépare le fichier et la table `forge_migrations`.
 
-## 6. Ce que fournit le backend
+    Un seul backend BDD par projet : si plusieurs sont installés, fixez `DB_BACKEND` pour lever l'ambiguïté.
 
-| Élément | Rôle |
-|---|---|
-| `SQLiteBackend` | implémente le contrat `DatabaseBackend` du cœur |
-| Adaptateur de connexion | curseur `dictionary=`, `lastrowid`, `autocommit` au-dessus de `sqlite3` |
-| `SQLiteDialect` | types SQLite, `INTEGER PRIMARY KEY AUTOINCREMENT`, `CREATE INDEX` séparés |
-| Entry point | `forge_mvc.db_backend = sqlite` (découverte par le cœur) |
+    !!! note "Idéal en développement et en test"
+        Pas d'installation de serveur, une base = un fichier : on démarre en une commande.
 
-L'API que vous utilisez reste celle du cœur : `db:init`, `db:apply`, `migration:*`, et `core.database.db` dans le code.
+        Pour la production multi-utilisateurs, un backend serveur (MariaDB, PostgreSQL) est généralement préférable.
 
-## 7. Contextes d'utilisation
+    !!! note "Dialecte SQLite"
+        Le dialecte gère les spécificités : `INTEGER PRIMARY KEY AUTOINCREMENT`, `CREATE INDEX` en instructions séparées, affinités de types.
 
-| Besoin | Élément |
-|---|---|
-| Démarrer sans installer de serveur | installer `forge-mvc-sqlite` |
-| Forcer ce backend | `DB_BACKEND=sqlite` |
-| Créer la base | `forge db:init` (crée le fichier) |
-| Appliquer le schéma | `forge db:apply` |
-| Faire évoluer le schéma | `forge migration:make` / `migration:apply` |
-| Lire/écrire en code | `core.database.db` |
+        Le SQL généré reste lisible (principe 5).
 
-## 8. Exemple d'utilisation
-
-```bash
-pip install --pre forge-mvc-sqlite     # seul backend installé
-forge db:init                          # crée le fichier SQLite + forge_migrations
-forge db:apply                         # applique le schéma des entités
-```
-
-```python
-import core.database.db as db
-rows = db.fetch_all("SELECT * FROM article", ())
-```
-
-Le code applicatif ne sait pas qu'il parle à SQLite : il utilise la couche BDD du cœur.
-
-!!! tip "Aide-mémoire"
-    Installer suffit :
-
-    - un seul backend installé est choisi automatiquement ;
-    - `db:init` crée le fichier, `db:apply` applique le schéma ;
-    - le code utilise `core.database.db`, pas `sqlite3`.
-
-## 9. Sans serveur, exclusif, et dialecte
-
-SQLite n'a pas de serveur : `requires_provisioning=False`, donc `db:init` ne crée ni compte ni base distante, il prépare le fichier et la table `forge_migrations`.
-
-Un seul backend BDD par projet : si plusieurs sont installés, fixez `DB_BACKEND` pour lever l'ambiguïté.
-
-!!! note "Idéal en développement et en test"
-    Pas d'installation de serveur, une base = un fichier : on démarre en une commande.
-
-    Pour la production multi-utilisateurs, un backend serveur (MariaDB, PostgreSQL) est généralement préférable.
-
-!!! note "Dialecte SQLite"
-    Le dialecte gère les spécificités : `INTEGER PRIMARY KEY AUTOINCREMENT`, `CREATE INDEX` en instructions séparées, affinités de types.
-
-    Le SQL généré reste lisible (principe 5).
-
-!!! note "Indépendance du cœur"
-    Le cœur de Forge ne dépend pas de `forge-mvc-sqlite` : il le découvre par entry point (ADR-054).
+    !!! note "Indépendance du cœur"
+        Le cœur de Forge ne dépend pas de `forge-mvc-sqlite` : il le découvre par entry point (ADR-054).
 
 ## Voir aussi
 
