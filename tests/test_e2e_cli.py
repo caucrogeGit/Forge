@@ -137,23 +137,23 @@ class TestCrudGenerated:
         assert (built_project / "mvc" / "forms" / f"{_ENTITY_SNAKE}_form.py").exists()
 
     def test_view_index_exists(self, built_project):
-        assert (built_project / "mvc" / "views" / _ENTITY_SNAKE / "index.html").exists()
+        assert (built_project / "mvc" / "views" / "app" / _ENTITY_SNAKE / "index.html").exists()
 
     def test_view_show_exists(self, built_project):
-        assert (built_project / "mvc" / "views" / _ENTITY_SNAKE / "show.html").exists()
+        assert (built_project / "mvc" / "views" / "app" / _ENTITY_SNAKE / "show.html").exists()
 
     def test_view_form_exists(self, built_project):
-        assert (built_project / "mvc" / "views" / _ENTITY_SNAKE / "form.html").exists()
+        assert (built_project / "mvc" / "views" / "app" / _ENTITY_SNAKE / "form.html").exists()
 
     def test_view_table_partial_exists(self, built_project):
-        assert (built_project / "mvc" / "views" / _ENTITY_SNAKE / "_table.html").exists()
+        assert (built_project / "mvc" / "views" / "app" / _ENTITY_SNAKE / "_table.html").exists()
 
     def test_view_pagination_partial_exists(self, built_project):
-        assert (built_project / "mvc" / "views" / _ENTITY_SNAKE / "_pagination.html").exists()
+        assert (built_project / "mvc" / "views" / "app" / _ENTITY_SNAKE / "_pagination.html").exists()
 
     def test_views_extend_base_layout(self, built_project):
         # make:crud ne génère plus de layout : les vues étendent base.html (squelette).
-        index = built_project / "mvc" / "views" / _ENTITY_SNAKE / "index.html"
+        index = built_project / "mvc" / "views" / "app" / _ENTITY_SNAKE / "index.html"
         assert '{% extends "layouts/base.html" %}' in index.read_text(encoding="utf-8")
 
 

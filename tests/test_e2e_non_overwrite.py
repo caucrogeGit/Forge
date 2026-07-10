@@ -186,7 +186,7 @@ class TestMakeCrudRerun:
 
     def test_view_index_with_user_code_preserved(self, tmp_path):
         root = _build_project(tmp_path)
-        view = root / "mvc" / "views" / _ENTITY_SNAKE / "index.html"
+        view = root / "mvc" / "views" / "app" / _ENTITY_SNAKE / "index.html"
         marker = "<!-- USER CUSTOM VIEW - DO NOT REMOVE -->"
         view.write_text(view.read_text(encoding="utf-8") + marker, encoding="utf-8")
         _rerun_make_crud(root)
@@ -194,7 +194,7 @@ class TestMakeCrudRerun:
 
     def test_view_form_with_user_code_preserved(self, tmp_path):
         root = _build_project(tmp_path)
-        view = root / "mvc" / "views" / _ENTITY_SNAKE / "form.html"
+        view = root / "mvc" / "views" / "app" / _ENTITY_SNAKE / "form.html"
         marker = "<!-- USER CUSTOM TEMPLATE BLOCK - DO NOT REMOVE -->"
         view.write_text(view.read_text(encoding="utf-8") + marker, encoding="utf-8")
         _rerun_make_crud(root)
