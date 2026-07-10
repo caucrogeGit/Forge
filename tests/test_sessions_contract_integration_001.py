@@ -23,34 +23,47 @@ def store(request, tmp_path):
         return MemorySessionStore()
     if request.param == "file":
         return FileSessionStore(sessions_dir=str(tmp_path / "sessions"))
-    # db — store en mémoire simulé via callables injectés
-    _db: dict[str, dict] = {}
+    # db — store en mémoire simulé via callables injectés. Modélise la colonne
+    # `version` (concurrence optimiste, retour terrain 016 F36) : les écritures
+    # sont gardées par la version attendue (dernier paramètre).
+    import json as _json
+
+    _db: dict[str, dict] = {}  # sid -> {"data": dict, "version": int}
 
     def _fetch_one(sql, params):
         sid = params[0]
         row = _db.get(sid)
-        return {"data": __import__("json").dumps(row)} if row else None
+        if row is None:
+            return None
+        return {"data": _json.dumps(row["data"]), "version": row["version"]}
 
     def _execute(sql, params=()):
-        import json as _json
-        sql_up = sql.strip().upper()
-        if sql_up.startswith("INSERT"):
+        s = sql.strip().upper()
+        if s.startswith("INSERT"):
             sid, data_json = params[0], params[1]
-            _db[sid] = _json.loads(data_json)
-        elif sql_up.startswith("UPDATE") and "expire_at" in sql.lower():
-            # touch_expiry : data, expire, updated, sid
-            data_json, sid = params[0], params[3]
-            if sid in _db:
-                _db[sid] = _json.loads(data_json)
-        elif sql_up.startswith("UPDATE"):
-            # set/replace/flash : data, updated, sid
-            data_json, sid = params[0], params[2]
-            if sid in _db:
-                _db[sid] = _json.loads(data_json)
-        elif sql_up.startswith("DELETE"):
+            _db[sid] = {"data": _json.loads(data_json), "version": 0}
+            return 1
+        if s.startswith("UPDATE"):
+            if "EXPIRE_AT = ?" in s:  # data, expire, updated, sid, version
+                data_json, sid, expected = params[0], params[3], params[4]
+            else:  # set/replace/flash : data, updated, sid, version
+                data_json, sid, expected = params[0], params[2], params[3]
+            row = _db.get(sid)
+            if row is not None and row["version"] == expected:
+                row["data"] = _json.loads(data_json)
+                row["version"] += 1
+                return 1
+            return 0
+        if s.startswith("DELETE"):
             sid = params[0]
-            _db.pop(sid, None)
-        return 1
+            if "VERSION = ?" in s:  # DELETE gardé par version : sid, version
+                row = _db.get(sid)
+                if row is not None and row["version"] == params[1]:
+                    del _db[sid]
+                    return 1
+                return 0
+            return 1 if _db.pop(sid, None) is not None else 0
+        return 0
 
     return DbSessionStore(fetch_one=_fetch_one, execute=_execute)
 

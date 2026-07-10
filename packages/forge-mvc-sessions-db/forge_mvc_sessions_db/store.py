@@ -7,11 +7,22 @@ cœur reste `MemorySessionStore`.
 
 Agnostique du SGBD : tout le SQL passe par `core.database.db`, dispatché vers le
 backend BDD actif. Les horodatages (`created_at`, `updated_at`, comparaison
-d'expiration) sont calculés côté Python et passés en paramètres, pour éviter
-toute fonction SQL propriétaire (`NOW()` MariaDB, `GETDATE()` SQL Server,
-`datetime('now')` SQLite) et rester portable.
+d'expiration) sont calculés côté Python **en UTC** et passés en paramètres, pour
+éviter toute fonction SQL propriétaire (`NOW()` MariaDB, `GETDATE()` SQL Server,
+`datetime('now')` SQLite) et rester portable. Python est l'unique autorité des
+horodatages : le DDL ne pose pas de `DEFAULT CURRENT_TIMESTAMP` (pas de double
+horloge SGBD/Python, retour terrain 016 F37).
 
-Table requise : voir `mvc/models/sql/forge_sessions.sql`.
+Concurrence (retour terrain 016 F36) : chaque read-modify-write est protégé par
+une **concurrence optimiste** portable. La table porte une colonne `version` ;
+toute écriture est gardée par `WHERE session_id = ? AND version = ?` et
+incrémente `version`. Si `rowcount` vaut 0, un autre writer a modifié la ligne
+entre-temps : on recharge et on retente (pas de `SELECT ... FOR UPDATE`, non
+portable). Cela garantit l'absence de lost-update et l'unicité du message flash.
+
+Table requise : `forge_sessions`, à créer dans le projet avant usage (elle
+n'est pas créée automatiquement). `forge sessions:init` écrit le DDL dans
+`mvc/models/sql/forge_sessions.sql` ; `forge db:apply` l'applique.
 """
 
 from __future__ import annotations
@@ -20,10 +31,17 @@ import json
 import re
 import secrets
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Callable, cast
 
-from core.sessions.memory_store import SESSION_TTL
+# TTL par défaut du store, en secondes. Constante locale et neutre : un store
+# persistant ne tire pas son défaut du module *mémoire* du cœur (retour 016 F37).
+DEFAULT_SESSION_TTL = 3600
+
+# Tentatives d'écriture sous garde de version avant d'abandonner (retour 016 F36).
+# Un conflit exige deux écritures concurrentes sur la *même* session ; huit
+# tentatives couvrent tout scénario réaliste.
+_MAX_WRITE_RETRIES = 8
 
 _SESSION_ID_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -31,22 +49,26 @@ _SESSION_ID_RE = re.compile(r"^[0-9a-f]{64}$")
 _FetchOne = Callable[[str, "tuple[Any, ...]"], "dict[str, Any] | None"]
 _Execute = Callable[[str, "tuple[Any, ...]"], int]
 
-# ── Requêtes SQL (portables : horodatages passés en paramètres) ───────────────
+# ── Requêtes SQL (portables : horodatages passés en paramètres, garde de version) ─
 
 _SQL_INSERT = (
-    "INSERT INTO forge_sessions (session_id, data, expire_at, created_at, updated_at)"
-    " VALUES (?, ?, ?, ?, ?)"
+    "INSERT INTO forge_sessions"
+    " (session_id, data, expire_at, version, created_at, updated_at)"
+    " VALUES (?, ?, ?, 0, ?, ?)"
 )
 _SQL_SELECT = (
-    "SELECT data FROM forge_sessions WHERE session_id = ? AND expire_at > ?"
+    "SELECT data, version FROM forge_sessions WHERE session_id = ? AND expire_at > ?"
 )
 _SQL_UPDATE = (
-    "UPDATE forge_sessions SET data = ?, updated_at = ? WHERE session_id = ?"
+    "UPDATE forge_sessions SET data = ?, updated_at = ?, version = version + 1"
+    " WHERE session_id = ? AND version = ?"
 )
 _SQL_UPDATE_EXPIRY = (
-    "UPDATE forge_sessions SET data = ?, expire_at = ?, updated_at = ? WHERE session_id = ?"
+    "UPDATE forge_sessions SET data = ?, expire_at = ?, updated_at = ?, version = version + 1"
+    " WHERE session_id = ? AND version = ?"
 )
 _SQL_DELETE = "DELETE FROM forge_sessions WHERE session_id = ?"
+_SQL_DELETE_VERSIONED = "DELETE FROM forge_sessions WHERE session_id = ? AND version = ?"
 _SQL_CLEANUP = "DELETE FROM forge_sessions WHERE expire_at < ?"
 
 _DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
@@ -65,13 +87,13 @@ def _default_execute(sql: str, params: "tuple[Any, ...]" = ()) -> int:
 
 
 def _dt(unix_ts: float) -> str:
-    """Convertit un timestamp Unix en DATETIME (format canonique portable)."""
-    return datetime.fromtimestamp(unix_ts).strftime(_DATETIME_FMT)
+    """Convertit un timestamp Unix en DATETIME UTC (format canonique portable)."""
+    return datetime.fromtimestamp(unix_ts, timezone.utc).strftime(_DATETIME_FMT)
 
 
 def _now_str() -> str:
-    """Horodatage courant au même format canonique que `_dt` (comparaisons cohérentes)."""
-    return datetime.now().strftime(_DATETIME_FMT)
+    """Horodatage courant UTC, au même format que `_dt` (comparaisons cohérentes)."""
+    return datetime.now(timezone.utc).strftime(_DATETIME_FMT)
 
 
 # ── Store ─────────────────────────────────────────────────────────────────────
@@ -82,6 +104,10 @@ class DbSessionStore:
     Sessions partagées entre processus Forge. Persiste les sessions après
     redémarrage. Ne devient pas le backend par défaut.
 
+    Les read-modify-write (`set`, `replace`, `touch_expiry`, `set_flash`,
+    `get_flash`, `regenerate`, `authenticate`) sont atomiques par concurrence
+    optimiste (garde de `version` + retry), sans verrou SGBD propriétaire.
+
     Les callables fetch_one et execute sont injectables pour les tests.
     """
 
@@ -89,7 +115,7 @@ class DbSessionStore:
         self,
         fetch_one: _FetchOne | None = None,
         execute: _Execute | None = None,
-        ttl: int = SESSION_TTL,
+        ttl: int = DEFAULT_SESSION_TTL,
     ) -> None:
         self._fetch_one = fetch_one or _default_fetch_one
         self._execute = execute or _default_execute
@@ -100,9 +126,12 @@ class DbSessionStore:
     def _valid(self, session_id: str) -> bool:
         return bool(_SESSION_ID_RE.match(session_id))
 
-    def _load(self, session_id: str) -> dict[str, Any] | None:
-        """Charge et désérialise une session non expirée. Retourne None si absente,
-        expirée ou corrompue."""
+    def _load(self, session_id: str) -> tuple[dict[str, Any], int] | None:
+        """Charge une session non expirée : `(data, version)`.
+
+        Retourne None si absente, expirée ou corrompue. Une donnée corrompue
+        (JSON invalide ou non-dict) est purgée.
+        """
         row = self._fetch_one(_SQL_SELECT, (session_id, _now_str()))
         if not row:
             return None
@@ -111,7 +140,16 @@ class DbSessionStore:
         except (json.JSONDecodeError, TypeError, ValueError, KeyError):
             self._execute(_SQL_DELETE, (session_id,))
             return None
-        return cast("dict[str, Any]", data) if isinstance(data, dict) else None
+        if not isinstance(data, dict):
+            return None
+        return cast("dict[str, Any]", data), int(row["version"])
+
+    @staticmethod
+    def _conflict_error(operation: str) -> RuntimeError:
+        return RuntimeError(
+            f"forge_sessions : conflit de version persistant sur {operation}"
+            f" après {_MAX_WRITE_RETRIES} tentatives (contention anormale)."
+        )
 
     # ── API publique ─────────────────────────────────────────────────────────
 
@@ -134,17 +172,23 @@ class DbSessionStore:
         """Retourne les données de session ou None si absente, expirée ou corrompue."""
         if not self._valid(session_id):
             return None
-        return self._load(session_id)
+        loaded = self._load(session_id)
+        return loaded[0] if loaded is not None else None
 
     def set(self, session_id: str, data: dict[str, Any]) -> None:
         """Met à jour (merge) les données d'une session existante non expirée."""
         if not self._valid(session_id):
             return
-        existing = self._load(session_id)
-        if existing is None:
-            return
-        existing.update(data)
-        self._execute(_SQL_UPDATE, (json.dumps(existing), _now_str(), session_id))
+        for _ in range(_MAX_WRITE_RETRIES):
+            loaded = self._load(session_id)
+            if loaded is None:
+                return
+            existing, version = loaded
+            existing.update(data)
+            rc = self._execute(_SQL_UPDATE, (json.dumps(existing), _now_str(), session_id, version))
+            if rc >= 1:
+                return
+        raise self._conflict_error("set")
 
     def replace(self, session_id: str, data: dict[str, Any]) -> None:
         """Remplace intégralement les données d'une session existante (sans merge).
@@ -153,9 +197,15 @@ class DbSessionStore:
         """
         if not self._valid(session_id):
             return
-        if self._load(session_id) is None:
-            return
-        self._execute(_SQL_UPDATE, (json.dumps(data), _now_str(), session_id))
+        for _ in range(_MAX_WRITE_RETRIES):
+            loaded = self._load(session_id)
+            if loaded is None:
+                return
+            _, version = loaded
+            rc = self._execute(_SQL_UPDATE, (json.dumps(data), _now_str(), session_id, version))
+            if rc >= 1:
+                return
+        raise self._conflict_error("replace")
 
     def delete(self, session_id: str) -> None:
         """Supprime la session."""
@@ -165,72 +215,109 @@ class DbSessionStore:
 
     def regenerate(self, session_id: str) -> str:
         """Crée un nouveau session_id en préservant les données — protège contre la fixation."""
-        existing = {}
-        if self._valid(session_id):
-            existing = self._load(session_id) or {}
-            self._execute(_SQL_DELETE, (session_id,))
-        nouveau_id = secrets.token_hex(32)
-        expires_at = time.time() + self._ttl
-        existing["expires_at"] = expires_at
-        now = _now_str()
-        self._execute(_SQL_INSERT, (nouveau_id, json.dumps(existing), _dt(expires_at), now, now))
-        return nouveau_id
+        for _ in range(_MAX_WRITE_RETRIES):
+            existing: dict[str, Any] = {}
+            version: int | None = None
+            if self._valid(session_id):
+                loaded = self._load(session_id)
+                if loaded is not None:
+                    existing, version = loaded
+            if version is not None:
+                rc = self._execute(_SQL_DELETE_VERSIONED, (session_id, version))
+                if rc == 0:
+                    continue  # un autre writer a modifié la session : on recharge
+            nouveau_id = secrets.token_hex(32)
+            expires_at = time.time() + self._ttl
+            existing["expires_at"] = expires_at
+            now = _now_str()
+            self._execute(_SQL_INSERT, (nouveau_id, json.dumps(existing), _dt(expires_at), now, now))
+            return nouveau_id
+        raise self._conflict_error("regenerate")
 
     def authenticate(self, session_id: str, user_data: dict[str, Any], ttl_seconds: int) -> str | None:
         """Rotation atomique : invalide l'ancienne session, crée une nouvelle authentifiée."""
         if not self._valid(session_id):
             return None
-        existing = self._load(session_id)
-        if existing is None:
-            return None
-        self._execute(_SQL_DELETE, (session_id,))
-        nouveau_id = secrets.token_hex(32)
-        expires_at = time.time() + ttl_seconds
-        new_session = {
-            **existing,
-            "authenticated": True,
-            "user": user_data,
-            "csrf_token": secrets.token_hex(16),
-            "expires_at": expires_at,
-        }
-        now = _now_str()
-        self._execute(_SQL_INSERT, (nouveau_id, json.dumps(new_session), _dt(expires_at), now, now))
-        return nouveau_id
+        for _ in range(_MAX_WRITE_RETRIES):
+            loaded = self._load(session_id)
+            if loaded is None:
+                return None
+            existing, version = loaded
+            rc = self._execute(_SQL_DELETE_VERSIONED, (session_id, version))
+            if rc == 0:
+                continue  # conflit : la session a changé, on recharge
+            nouveau_id = secrets.token_hex(32)
+            expires_at = time.time() + ttl_seconds
+            new_session = {
+                **existing,
+                "authenticated": True,
+                "user": user_data,
+                "csrf_token": secrets.token_hex(16),
+                "expires_at": expires_at,
+            }
+            now = _now_str()
+            self._execute(_SQL_INSERT, (nouveau_id, json.dumps(new_session), _dt(expires_at), now, now))
+            return nouveau_id
+        raise self._conflict_error("authenticate")
 
     def touch_expiry(self, session_id: str, ttl_seconds: int) -> bool:
         """Repousse l'expiration. Retourne False si la session n'existe pas ou est expirée."""
         if not self._valid(session_id):
             return False
-        data = self._load(session_id)
-        if data is None:
-            return False
-        expires_at = time.time() + ttl_seconds
-        data["expires_at"] = expires_at
-        self._execute(_SQL_UPDATE_EXPIRY, (json.dumps(data), _dt(expires_at), _now_str(), session_id))
-        return True
+        for _ in range(_MAX_WRITE_RETRIES):
+            loaded = self._load(session_id)
+            if loaded is None:
+                return False
+            data, version = loaded
+            expires_at = time.time() + ttl_seconds
+            data["expires_at"] = expires_at
+            rc = self._execute(
+                _SQL_UPDATE_EXPIRY,
+                (json.dumps(data), _dt(expires_at), _now_str(), session_id, version),
+            )
+            if rc >= 1:
+                return True
+        raise self._conflict_error("touch_expiry")
 
     def set_flash(self, session_id: str, message: str, level: str = "success") -> bool:
         """Stocke un message flash. Retourne False si la session n'existe pas."""
         if not self._valid(session_id):
             return False
-        data = self._load(session_id)
-        if data is None:
-            return False
-        data["flash"] = {"message": message, "level": level}
-        self._execute(_SQL_UPDATE, (json.dumps(data), _now_str(), session_id))
-        return True
+        for _ in range(_MAX_WRITE_RETRIES):
+            loaded = self._load(session_id)
+            if loaded is None:
+                return False
+            data, version = loaded
+            data["flash"] = {"message": message, "level": level}
+            rc = self._execute(_SQL_UPDATE, (json.dumps(data), _now_str(), session_id, version))
+            if rc >= 1:
+                return True
+        raise self._conflict_error("set_flash")
 
     def get_flash(self, session_id: str) -> dict[str, Any] | None:
-        """Lit et supprime atomiquement le message flash. Retourne None si absent."""
+        """Lit et supprime le message flash. Retourne None si absent.
+
+        Atomique par concurrence optimiste : deux lectures concurrentes ne
+        peuvent pas obtenir le même flash. Le writer qui perd la garde de
+        version recharge ; le flash étant déjà consommé, il obtient None. Le
+        message est donc rendu **exactement une fois**.
+        """
         if not self._valid(session_id):
             return None
-        data = self._load(session_id)
-        if data is None:
-            return None
-        flash = data.pop("flash", None)
-        if flash is not None:
-            self._execute(_SQL_UPDATE, (json.dumps(data), _now_str(), session_id))
-        return flash
+        for _ in range(_MAX_WRITE_RETRIES):
+            loaded = self._load(session_id)
+            if loaded is None:
+                return None
+            data, version = loaded
+            flash = data.get("flash")
+            if flash is None:
+                return None
+            remaining = {key: value for key, value in data.items() if key != "flash"}
+            rc = self._execute(_SQL_UPDATE, (json.dumps(remaining), _now_str(), session_id, version))
+            if rc >= 1:
+                return cast("dict[str, Any]", flash)
+            # rc == 0 : lecture concurrente gagnante, on recharge (flash déjà parti).
+        return None
 
     def cleanup_expired(self) -> int:
         """Supprime les sessions expirées. Retourne le nombre de lignes supprimées."""

@@ -2,13 +2,16 @@
 
 Aucune base réelle : _FakeDB simule fetch_one / execute en mémoire via les
 callables injectables du store. Le SQL est portable (horodatages passés en
-paramètres), donc _FakeDB interprète les paramètres, pas des fonctions SQL.
+paramètres, garde de version), donc _FakeDB interprète les paramètres, pas des
+fonctions SQL. Le schéma modélise la colonne `version` (concurrence optimiste,
+retour terrain 016 F36).
 """
 
 from __future__ import annotations
 
+import json
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -24,14 +27,18 @@ _FMT = "%Y-%m-%d %H:%M:%S"
 
 
 def _ts(dt_str: str) -> float:
-    return datetime.strptime(dt_str, _FMT).timestamp()
+    return datetime.strptime(dt_str, _FMT).replace(tzinfo=timezone.utc).timestamp()
 
 
 class _FakeDB:
-    """Simule fetch_one / execute pour DbSessionStore, sans base réelle."""
+    """Simule fetch_one / execute pour DbSessionStore, sans base réelle.
+
+    Modélise la garde de version : une écriture ne s'applique que si la version
+    attendue (dernier paramètre) correspond, et incrémente alors la version.
+    """
 
     def __init__(self):
-        # {session_id: {"data": json_str, "expire_ts": float}}
+        # {session_id: {"data": json_str, "expire_ts": float, "version": int}}
         self.rows: dict[str, dict] = {}
 
     def fetch_one(self, sql: str, params: tuple) -> dict | None:
@@ -42,36 +49,47 @@ class _FakeDB:
         # SELECT ... WHERE expire_at > ? : params[1] porte le "maintenant".
         if "expire_at > ?" in sql and row["expire_ts"] <= _ts(params[1]):
             return None
-        return {"data": row["data"]}
+        return {"data": row["data"], "version": row["version"]}
 
     def execute(self, sql: str, params: tuple = ()) -> int:
         s = sql.strip()
         if s.startswith("INSERT"):
             sid, data_json, expire_dt = params[0], params[1], params[2]
-            self.rows[sid] = {"data": data_json, "expire_ts": _ts(expire_dt)}
+            self.rows[sid] = {"data": data_json, "expire_ts": _ts(expire_dt), "version": 0}
             return 1
         if s.startswith("UPDATE"):
-            if "expire_at = ?" in sql:  # touch_expiry : data, expire, updated, sid
-                data_json, expire_dt, sid = params[0], params[1], params[3]
-                if sid in self.rows:
-                    self.rows[sid]["data"] = data_json
-                    self.rows[sid]["expire_ts"] = _ts(expire_dt)
+            if "expire_at = ?" in sql:  # data, expire, updated, sid, version
+                data_json, expire_dt, sid, exp_ver = params[0], params[1], params[3], params[4]
+                row = self.rows.get(sid)
+                if row is not None and row["version"] == exp_ver:
+                    row["data"] = data_json
+                    row["expire_ts"] = _ts(expire_dt)
+                    row["version"] += 1
                     return 1
                 return 0
-            data_json, sid = params[0], params[2]  # data, updated, sid
-            if sid in self.rows:
-                self.rows[sid]["data"] = data_json
+            data_json, sid, exp_ver = params[0], params[2], params[3]  # data, updated, sid, version
+            row = self.rows.get(sid)
+            if row is not None and row["version"] == exp_ver:
+                row["data"] = data_json
+                row["version"] += 1
                 return 1
             return 0
-        if s.startswith("DELETE") and "WHERE session_id" in sql:
-            sid = params[0]
-            return 1 if self.rows.pop(sid, None) is not None else 0
         if s.startswith("DELETE") and "expire_at < ?" in sql:  # cleanup : params[0] = now
             now_ts = _ts(params[0])
             expired = [k for k, v in self.rows.items() if v["expire_ts"] <= now_ts]
             for k in expired:
                 del self.rows[k]
             return len(expired)
+        if s.startswith("DELETE") and "WHERE session_id" in sql:
+            sid = params[0]
+            if "version = ?" in sql:  # DELETE gardé par version
+                exp_ver = params[1]
+                row = self.rows.get(sid)
+                if row is not None and row["version"] == exp_ver:
+                    del self.rows[sid]
+                    return 1
+                return 0
+            return 1 if self.rows.pop(sid, None) is not None else 0
         return 0
 
 
@@ -91,7 +109,8 @@ def test_store_implements_protocol():
 def test_store_sql_has_no_proprietary_date_fn():
     for sql in (
         store_mod._SQL_INSERT, store_mod._SQL_SELECT, store_mod._SQL_UPDATE,
-        store_mod._SQL_UPDATE_EXPIRY, store_mod._SQL_DELETE, store_mod._SQL_CLEANUP,
+        store_mod._SQL_UPDATE_EXPIRY, store_mod._SQL_DELETE,
+        store_mod._SQL_DELETE_VERSIONED, store_mod._SQL_CLEANUP,
     ):
         assert "NOW()" not in sql and "GETDATE()" not in sql and "datetime('now')" not in sql
 
@@ -165,11 +184,93 @@ def test_set_unknown_is_noop():
     assert "a" * 64 not in db.rows
 
 
+def test_set_bumps_version():
+    store, db = _make_store()
+    sid = store.create()
+    assert db.rows[sid]["version"] == 0
+    store.set(sid, {"x": 1})
+    assert db.rows[sid]["version"] == 1
+
+
+def test_replace_drops_absent_keys():
+    store, _ = _make_store()
+    sid = store.create()
+    store.set(sid, {"a": 1, "b": 2})
+    store.replace(sid, {"a": 9})
+    data = store.get(sid)
+    assert data is not None and data == {"a": 9}
+
+
 def test_touch_expiry_repousse():
     store, db = _make_store(ttl=1)
     sid = store.create()
     assert store.touch_expiry(sid, 3600) is True
     assert db.rows[sid]["expire_ts"] > time.time() + 3000
+
+
+# ── Flash ─────────────────────────────────────────────────────────────────────
+
+def test_flash_set_then_get_once():
+    store, _ = _make_store()
+    sid = store.create()
+    assert store.set_flash(sid, "coucou", "info") is True
+    first = store.get_flash(sid)
+    assert first == {"message": "coucou", "level": "info"}
+    # Deuxième lecture : le flash a été consommé.
+    assert store.get_flash(sid) is None
+
+
+# ── Concurrence optimiste (F36) ───────────────────────────────────────────────
+
+def test_set_retries_on_version_conflict_without_lost_update():
+    store, db = _make_store()
+    sid = store.create()
+    real_execute = db.execute
+    state = {"raced": False}
+
+    def racing_execute(sql: str, params: tuple = ()) -> int:
+        # Au 1er UPDATE de `set`, on simule un writer concurrent qui pose une
+        # clé ET incrémente la version, périmant la garde de `set` (rc == 0).
+        if sql.strip().startswith("UPDATE") and not state["raced"]:
+            state["raced"] = True
+            row = db.rows[sid]
+            merged = json.loads(row["data"])
+            merged["concurrent"] = 1
+            row["data"] = json.dumps(merged)
+            row["version"] += 1
+            return 0
+        return real_execute(sql, params)
+
+    store._execute = racing_execute
+    store.set(sid, {"mine": 2})
+    data = store.get(sid)
+    assert data is not None
+    assert data["concurrent"] == 1  # l'écriture concurrente n'est pas perdue
+    assert data["mine"] == 2        # la nôtre est appliquée par-dessus (retry)
+
+
+def test_get_flash_returned_once_under_race():
+    store, db = _make_store()
+    sid = store.create()
+    store.set_flash(sid, "unique", "warning")
+    # Simule deux lectures concurrentes : la première consomme, la seconde perd
+    # la garde de version puis recharge (flash déjà parti).
+    winners = []
+
+    def racing_execute(sql: str, params: tuple = ()) -> int:
+        if sql.strip().startswith("UPDATE") and not winners:
+            winners.append(True)
+            # Une lecture concurrente consomme le flash avant nous.
+            row = db.rows[sid]
+            data = json.loads(row["data"])
+            data.pop("flash", None)
+            row["data"] = json.dumps(data)
+            row["version"] += 1
+            return 0
+        return _FakeDB.execute(db, sql, params)
+
+    store._execute = racing_execute
+    assert store.get_flash(sid) is None  # le concurrent l'a eu ; nous, rien
 
 
 # ── Suppression ───────────────────────────────────────────────────────────────
@@ -233,6 +334,22 @@ def test_cleanup_removes_expired_keeps_valid():
 def test_cleanup_empty_returns_zero():
     store, _ = _make_store()
     assert store.cleanup_expired() == 0
+
+
+# ── Horodatage UTC + TTL découplé (F37) ───────────────────────────────────────
+
+def test_timestamps_are_utc_based():
+    now_str = store_mod._now_str()
+    parsed = datetime.strptime(now_str, _FMT).replace(tzinfo=timezone.utc)
+    delta = abs((datetime.now(timezone.utc) - parsed).total_seconds())
+    assert delta < 5
+
+
+def test_default_ttl_is_local_constant_not_memory_store():
+    assert store_mod.__file__ is not None
+    source = Path(store_mod.__file__).read_text(encoding="utf-8")
+    assert "core.sessions.memory_store" not in source
+    assert store_mod.DEFAULT_SESSION_TTL == 3600
 
 
 # ── JSON corrompu ─────────────────────────────────────────────────────────────

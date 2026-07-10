@@ -50,24 +50,17 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
     `forge opt-in:install sessions-db` affiche la commande `pip` sans l'exécuter.
 
-    Puis créez la table `forge_sessions`, prérequis dur du module : sans elle, la première requête de session échoue par une erreur SQL.
+    Puis provisionnez la table `forge_sessions`, prérequis dur du module : sans elle, la première requête de session échoue par une erreur SQL.
 
-    Le paquet ne livre aucun script ; placez le DDL dans `mvc/models/sql/forge_sessions.sql` :
-
-    ```sql
-    CREATE TABLE IF NOT EXISTS forge_sessions (
-        session_id CHAR(64)  NOT NULL,
-        data       LONGTEXT  NOT NULL,
-        expire_at  DATETIME  NOT NULL,
-        created_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        PRIMARY KEY (session_id),
-        INDEX idx_forge_sessions_expire_at (expire_at)
-    );
+    ```bash
+    forge sessions:init
+    forge db:apply
     ```
 
-    Appliquez ensuite le schéma avec `forge db:apply`.
-    Le DDL ci-dessus est écrit pour MariaDB : adaptez les types au backend actif si nécessaire (par exemple `TEXT` au lieu de `LONGTEXT`, et un `CREATE INDEX` séparé sur SQLite ou PostgreSQL).
+    `sessions:init` écrit le DDL embarqué dans `mvc/models/sql/forge_sessions.sql` (write-if-new, sans l'exécuter) ; `forge db:apply` l'applique.
+    Le DDL est écrit pour MariaDB : adaptez les types au backend actif si nécessaire (par exemple `TEXT` au lieu de `LONGTEXT`, et un `CREATE INDEX` séparé sur SQLite ou PostgreSQL).
+
+    La table porte une colonne `version` : le store l'utilise pour une concurrence optimiste (aucune écriture concurrente n'est perdue, le message flash est rendu une seule fois).
 
     ### Désinstallation
 
@@ -219,7 +212,13 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     print(f"{supprimees} sessions expirées supprimées")
     ```
 
-    À appeler depuis un cron applicatif : rien n'est planifié automatiquement.
+    En ligne de commande, `forge sessions:gc` fait la même purge :
+
+    ```bash
+    forge sessions:gc
+    ```
+
+    Rien n'est planifié automatiquement : branchez `forge sessions:gc` sur un cron ou un systemd timer.
 
     ### 8.3 Tester sans base réelle
 

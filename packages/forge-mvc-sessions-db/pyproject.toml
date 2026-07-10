@@ -24,6 +24,10 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 
+# ADR-059 : commandes CLI de l'opt-in decouvertes par le coeur (dispatch_optin).
+[project.entry-points."forge_mvc.commands"]
+forge_mvc_sessions_db = "forge_mvc_sessions_db.commands:COMMANDS"
+
 [project.urls]
 Homepage = "https://github.com/caucrogeGit/Forge"
 Repository = "https://github.com/caucrogeGit/Forge"
@@ -34,4 +38,4 @@ where = ["."]
 include = ["forge_mvc_sessions_db*"]
 
 [tool.setuptools.package-data]
-"forge_mvc_sessions_db" = ["py.typed"]
+"forge_mvc_sessions_db" = ["py.typed", "sql/*.sql"]
