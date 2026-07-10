@@ -441,7 +441,8 @@ if __name__ == "__main__":
         logger.warning(
             "AVERTISSEMENT — Forge utilise des sessions mémoire (backend mono-processus). "
             "Le multi-worker n'est pas supporté sans backend de session partagé. "
-            "Voir ADR-002 : docs/adr/002-session-strategy.md"
+            "Activez un store partagé, par exemple l'opt-in forge-mvc-sessions-db : "
+            "forge.configure(session_store=DbSessionStore())."
         )
 
     from core.app.prod_warnings import emit_memory_store_warning_if_needed
