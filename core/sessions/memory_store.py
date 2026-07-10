@@ -151,7 +151,7 @@ class MemorySessionStore:
 
         Aucun thread, aucun scheduler — l'appel reste explicite et borné
         (alignement avec `FileSessionStore.cleanup_expired()` et
-        `MariaDbSessionStore.cleanup_expired()`).
+        `DbSessionStore.cleanup_expired()`).
         """
         with self._lock:
             return self._cleanup()

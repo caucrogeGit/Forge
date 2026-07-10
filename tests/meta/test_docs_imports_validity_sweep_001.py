@@ -89,8 +89,8 @@ _FRAMEWORK_ROOTS = frozenset({
     # forge-mvc-iot / forge-mvc-video : paquets opt-in framework au même titre
     # que leurs frères ci-dessus.
     "forge_mvc_iot", "forge_mvc_video", "forge_mvc_audio", "forge_mvc_files",
-    # forge-mvc-pivot : pivot advanced extrait du core (ADR-021).
-    "forge_mvc_pivot",
+    # forge-mvc-entities : moteur d'entités extrait du core (ADR-070, absorbe pivot).
+    "forge_mvc_entities",
     # forge-mvc-mail : mail extrait du core (ADR-022).
     "forge_mvc_mail",
     # forge-mvc-i18n : i18n extrait du core (ADR-027).
@@ -100,6 +100,8 @@ _FRAMEWORK_ROOTS = frozenset({
     # Opt-ins ADR-052 et déploiement (ADR-053) : paquets framework officiels.
     "forge_mvc_settings", "forge_mvc_import_export", "forge_mvc_audit",
     "forge_mvc_jobs", "forge_mvc_notifications", "forge_mvc_deploy",
+    # forge-mvc-sessions-db : store de session BDD extrait du core (ADR-054).
+    "forge_mvc_sessions_db",
     # forge-mvc-testing : infrastructure de test partagée, dev-only (ADR-041).
     "forge_mvc_testing",
     # forge-mvc-mariadb / -sqlite / -postgres / -mssql : backends BDD (ADR-054).

@@ -611,7 +611,7 @@ Description:
 
   Opt-ins officiels : admin, audio, audit, deploy, entities, files, i18n,
   images, import-export, iot, jobs, mail, mfa, notifications, qrcode, rbac,
-  settings, stats, video, workflow.
+  sessions-db, settings, stats, video, workflow.
 
   Une fois le package présent, brancher l'opt-in avec :
   `forge opt-in:enable <name>`.

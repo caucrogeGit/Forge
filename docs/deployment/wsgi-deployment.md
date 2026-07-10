@@ -222,9 +222,9 @@ Ce guide est un **socle minimal**, pas une recette d'exploitation complète.
 Les limites suivantes restent à la charge de l'opérateur :
 
 - **Session store mémoire** (`MemorySessionStore`) : volatile au redémarrage, mono-processus.
-  Utiliser `FileSessionStore` ou `MariaDbSessionStore` (voir [ADR-002](../adr/002-session-strategy.md)) via `forge.configure(session_store=...)`.
+  Utiliser `FileSessionStore` ou `DbSessionStore` (voir [ADR-002](../adr/002-session-strategy.md)) via `forge.configure(session_store=...)`.
 - **`FileSessionStore`** : utilisable, mais reste fragile en multi-worker (pas de verrou partagé strict).
-  Pour un déploiement multi-worker fiable, privilégier `MariaDbSessionStore`.
+  Pour un déploiement multi-worker fiable, privilégier `DbSessionStore`.
 - **Rate-limits login/upload encore en mémoire** : compteurs non partagés entre workers Gunicorn.
   Chaque worker tient son propre compteur, donc la limite effective est multipliée par le nombre de workers : avec le défaut login de 5 tentatives par fenêtre de 60 s (`core/auth/rate_limit.py`, `LOGIN_MAX_ATTEMPTS`/`LOGIN_RATE_LIMIT_WINDOW`), un déploiement à `N` workers tolère jusqu'à `N × 5` tentatives par fenêtre, l'attaquant étant réparti sur les workers par le proxy.
   La protection reste utile mais n'est pas distribuée.

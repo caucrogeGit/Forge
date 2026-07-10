@@ -1,11 +1,17 @@
 # pyright: strict
-"""Backend MariaDB pour les sessions Forge.
+"""Store de session persistant adossé à la BDD (ex-MariaDbSessionStore, ADR-054).
 
-Stocke les sessions dans la table forge_sessions.
-Permet le partage de sessions entre processus Forge via une base commune.
-Le backend par défaut reste MemorySessionStore.
+Stocke les sessions dans la table `forge_sessions`, partagées entre processus
+Forge via une base commune (utile en multi-worker). Le backend par défaut du
+cœur reste `MemorySessionStore`.
 
-Table requise : voir mvc/models/sql/forge_sessions.sql.
+Agnostique du SGBD : tout le SQL passe par `core.database.db`, dispatché vers le
+backend BDD actif. Les horodatages (`created_at`, `updated_at`, comparaison
+d'expiration) sont calculés côté Python et passés en paramètres, pour éviter
+toute fonction SQL propriétaire (`NOW()` MariaDB, `GETDATE()` SQL Server,
+`datetime('now')` SQLite) et rester portable.
+
+Table requise : voir `mvc/models/sql/forge_sessions.sql`.
 """
 
 from __future__ import annotations
@@ -25,23 +31,25 @@ _SESSION_ID_RE = re.compile(r"^[0-9a-f]{64}$")
 _FetchOne = Callable[[str, "tuple[Any, ...]"], "dict[str, Any] | None"]
 _Execute = Callable[[str, "tuple[Any, ...]"], int]
 
-# ── Requêtes SQL ──────────────────────────────────────────────────────────────
+# ── Requêtes SQL (portables : horodatages passés en paramètres) ───────────────
 
 _SQL_INSERT = (
     "INSERT INTO forge_sessions (session_id, data, expire_at, created_at, updated_at)"
-    " VALUES (?, ?, ?, NOW(), NOW())"
+    " VALUES (?, ?, ?, ?, ?)"
 )
 _SQL_SELECT = (
-    "SELECT data FROM forge_sessions WHERE session_id = ? AND expire_at > NOW()"
+    "SELECT data FROM forge_sessions WHERE session_id = ? AND expire_at > ?"
 )
 _SQL_UPDATE = (
-    "UPDATE forge_sessions SET data = ?, updated_at = NOW() WHERE session_id = ?"
+    "UPDATE forge_sessions SET data = ?, updated_at = ? WHERE session_id = ?"
 )
 _SQL_UPDATE_EXPIRY = (
-    "UPDATE forge_sessions SET data = ?, expire_at = ?, updated_at = NOW() WHERE session_id = ?"
+    "UPDATE forge_sessions SET data = ?, expire_at = ?, updated_at = ? WHERE session_id = ?"
 )
 _SQL_DELETE = "DELETE FROM forge_sessions WHERE session_id = ?"
-_SQL_CLEANUP = "DELETE FROM forge_sessions WHERE expire_at < NOW()"
+_SQL_CLEANUP = "DELETE FROM forge_sessions WHERE expire_at < ?"
+
+_DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
 
 
 # ── Accesseurs DB par défaut (lazy — pas de connexion à l'import) ─────────────
@@ -57,14 +65,19 @@ def _default_execute(sql: str, params: "tuple[Any, ...]" = ()) -> int:
 
 
 def _dt(unix_ts: float) -> str:
-    """Convertit un timestamp Unix en DATETIME MariaDB (heure locale)."""
-    return datetime.fromtimestamp(unix_ts).strftime("%Y-%m-%d %H:%M:%S")
+    """Convertit un timestamp Unix en DATETIME (format canonique portable)."""
+    return datetime.fromtimestamp(unix_ts).strftime(_DATETIME_FMT)
+
+
+def _now_str() -> str:
+    """Horodatage courant au même format canonique que `_dt` (comparaisons cohérentes)."""
+    return datetime.now().strftime(_DATETIME_FMT)
 
 
 # ── Store ─────────────────────────────────────────────────────────────────────
 
-class MariaDbSessionStore:
-    """Backend de session utilisant la table MariaDB forge_sessions.
+class DbSessionStore:
+    """Backend de session utilisant la table BDD `forge_sessions`.
 
     Sessions partagées entre processus Forge. Persiste les sessions après
     redémarrage. Ne devient pas le backend par défaut.
@@ -90,7 +103,7 @@ class MariaDbSessionStore:
     def _load(self, session_id: str) -> dict[str, Any] | None:
         """Charge et désérialise une session non expirée. Retourne None si absente,
         expirée ou corrompue."""
-        row = self._fetch_one(_SQL_SELECT, (session_id,))
+        row = self._fetch_one(_SQL_SELECT, (session_id, _now_str()))
         if not row:
             return None
         try:
@@ -113,7 +126,8 @@ class MariaDbSessionStore:
             "csrf_token": secrets.token_hex(16),
             "expires_at": expires_at,
         }
-        self._execute(_SQL_INSERT, (session_id, json.dumps(session), _dt(expires_at)))
+        now = _now_str()
+        self._execute(_SQL_INSERT, (session_id, json.dumps(session), _dt(expires_at), now, now))
         return session_id
 
     def get(self, session_id: str) -> dict[str, Any] | None:
@@ -130,7 +144,7 @@ class MariaDbSessionStore:
         if existing is None:
             return
         existing.update(data)
-        self._execute(_SQL_UPDATE, (json.dumps(existing), session_id))
+        self._execute(_SQL_UPDATE, (json.dumps(existing), _now_str(), session_id))
 
     def replace(self, session_id: str, data: dict[str, Any]) -> None:
         """Remplace intégralement les données d'une session existante (sans merge).
@@ -141,7 +155,7 @@ class MariaDbSessionStore:
             return
         if self._load(session_id) is None:
             return
-        self._execute(_SQL_UPDATE, (json.dumps(data), session_id))
+        self._execute(_SQL_UPDATE, (json.dumps(data), _now_str(), session_id))
 
     def delete(self, session_id: str) -> None:
         """Supprime la session."""
@@ -158,7 +172,8 @@ class MariaDbSessionStore:
         nouveau_id = secrets.token_hex(32)
         expires_at = time.time() + self._ttl
         existing["expires_at"] = expires_at
-        self._execute(_SQL_INSERT, (nouveau_id, json.dumps(existing), _dt(expires_at)))
+        now = _now_str()
+        self._execute(_SQL_INSERT, (nouveau_id, json.dumps(existing), _dt(expires_at), now, now))
         return nouveau_id
 
     def authenticate(self, session_id: str, user_data: dict[str, Any], ttl_seconds: int) -> str | None:
@@ -178,7 +193,8 @@ class MariaDbSessionStore:
             "csrf_token": secrets.token_hex(16),
             "expires_at": expires_at,
         }
-        self._execute(_SQL_INSERT, (nouveau_id, json.dumps(new_session), _dt(expires_at)))
+        now = _now_str()
+        self._execute(_SQL_INSERT, (nouveau_id, json.dumps(new_session), _dt(expires_at), now, now))
         return nouveau_id
 
     def touch_expiry(self, session_id: str, ttl_seconds: int) -> bool:
@@ -190,7 +206,7 @@ class MariaDbSessionStore:
             return False
         expires_at = time.time() + ttl_seconds
         data["expires_at"] = expires_at
-        self._execute(_SQL_UPDATE_EXPIRY, (json.dumps(data), _dt(expires_at), session_id))
+        self._execute(_SQL_UPDATE_EXPIRY, (json.dumps(data), _dt(expires_at), _now_str(), session_id))
         return True
 
     def set_flash(self, session_id: str, message: str, level: str = "success") -> bool:
@@ -201,7 +217,7 @@ class MariaDbSessionStore:
         if data is None:
             return False
         data["flash"] = {"message": message, "level": level}
-        self._execute(_SQL_UPDATE, (json.dumps(data), session_id))
+        self._execute(_SQL_UPDATE, (json.dumps(data), _now_str(), session_id))
         return True
 
     def get_flash(self, session_id: str) -> dict[str, Any] | None:
@@ -213,9 +229,9 @@ class MariaDbSessionStore:
             return None
         flash = data.pop("flash", None)
         if flash is not None:
-            self._execute(_SQL_UPDATE, (json.dumps(data), session_id))
+            self._execute(_SQL_UPDATE, (json.dumps(data), _now_str(), session_id))
         return flash
 
     def cleanup_expired(self) -> int:
         """Supprime les sessions expirées. Retourne le nombre de lignes supprimées."""
-        return self._execute(_SQL_CLEANUP, ()) or 0
+        return self._execute(_SQL_CLEANUP, (_now_str(),)) or 0

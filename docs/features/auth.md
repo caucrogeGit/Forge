@@ -158,7 +158,7 @@ La session Auth/User stocke uniquement l'identifiant utilisateur local sous une 
 Elle ne stocke ni `email`, ni `password_hash`, ni objet `AuthUser` complet.
 
 **Limite importante** : le backend de session par défaut (`MemorySessionStore`) est en mémoire processus, les sessions sont perdues au redémarrage.
-`FileSessionStore` offre une persistance locale ; `MariaDbSessionStore` offre un stockage partagé entre processus.
+`FileSessionStore` offre une persistance locale ; `DbSessionStore` offre un stockage partagé entre processus.
 Les deux sont disponibles dans `core.sessions` et doivent être configurés explicitement.
 Voir [ADR-002, Stratégie de session](../adr/002-session-strategy.md).
 

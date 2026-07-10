@@ -9,5 +9,4 @@ nav:
       - Gestionnaire de backend (manager.py): manager.md
       - Backend mémoire (memory_store.py): memory_store.md
       - Backend fichier (file_store.py): file_store.md
-      - Backend MariaDB (mariadb_store.py): mariadb_store.md
       - Clés de session (keys.py): keys.md

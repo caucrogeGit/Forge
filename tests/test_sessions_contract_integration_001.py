@@ -1,7 +1,8 @@
 """Tests SESSIONS-CONTRACT-001 — intégration du contrat de session sur les trois backends.
 
 Chaque test du scénario complet s'exécute sur MemorySessionStore et FileSessionStore.
-MariaDbSessionStore utilise des callables injectés (pas de connexion réelle requise).
+DbSessionStore (opt-in forge-mvc-sessions-db) utilise des callables injectés
+(pas de connexion réelle requise).
 """
 
 from __future__ import annotations
@@ -10,18 +11,19 @@ import pytest
 
 from core.sessions.memory_store import MemorySessionStore
 from core.sessions.file_store import FileSessionStore
-from core.sessions.mariadb_store import MariaDbSessionStore
+
+DbSessionStore = pytest.importorskip("forge_mvc_sessions_db").DbSessionStore
 
 
 # ── Fixture commune — instancie le store selon le paramètre ──────────────────
 
-@pytest.fixture(params=["memory", "file", "mariadb"])
+@pytest.fixture(params=["memory", "file", "db"])
 def store(request, tmp_path):
     if request.param == "memory":
         return MemorySessionStore()
     if request.param == "file":
         return FileSessionStore(sessions_dir=str(tmp_path / "sessions"))
-    # mariadb — store en mémoire simulé via callables injectés
+    # db — store en mémoire simulé via callables injectés
     _db: dict[str, dict] = {}
 
     def _fetch_one(sql, params):
@@ -36,11 +38,13 @@ def store(request, tmp_path):
             sid, data_json = params[0], params[1]
             _db[sid] = _json.loads(data_json)
         elif sql_up.startswith("UPDATE") and "expire_at" in sql.lower():
-            data_json, _expire, sid = params[0], params[1], params[2]
+            # touch_expiry : data, expire, updated, sid
+            data_json, sid = params[0], params[3]
             if sid in _db:
                 _db[sid] = _json.loads(data_json)
         elif sql_up.startswith("UPDATE"):
-            data_json, sid = params[0], params[1]
+            # set/replace/flash : data, updated, sid
+            data_json, sid = params[0], params[2]
             if sid in _db:
                 _db[sid] = _json.loads(data_json)
         elif sql_up.startswith("DELETE"):
@@ -48,7 +52,7 @@ def store(request, tmp_path):
             _db.pop(sid, None)
         return 1
 
-    return MariaDbSessionStore(fetch_one=_fetch_one, execute=_execute)
+    return DbSessionStore(fetch_one=_fetch_one, execute=_execute)
 
 
 # ── Scénario complet ──────────────────────────────────────────────────────────

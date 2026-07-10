@@ -60,7 +60,7 @@ def login_user(request: Any, user: AuthUser) -> None:
     """Stocke l'identifiant utilisateur dans la session et le persiste.
 
     La mutation in-place ne suffit pas : les backends FileSessionStore et
-    MariaDbSessionStore renvoient une copie désérialisée à chaque `get()`.
+    DbSessionStore (forge-mvc-sessions-db) renvoient une copie désérialisée à chaque `get()`.
     Sans `store.set()`, la connexion serait perdue sur ces backends (seul
     MemorySessionStore renvoie une référence vivante). On persiste donc
     explicitement, comme le font les contrôleurs starters.

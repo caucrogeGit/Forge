@@ -13,7 +13,7 @@ Trois backends sont disponibles dans `core.sessions` :
 |---|---|---|---|
 | `MemorySessionStore` | Mémoire Python | Non | Développement, tests |
 | `FileSessionStore` | Fichiers JSON sur disque | Non (verrou interne) | Développement persistant |
-| `MariaDbSessionStore` | Table MariaDB `forge_sessions` | Oui | Production multi-worker |
+| `DbSessionStore` (opt-in `forge-mvc-sessions-db`) | Table `forge_sessions` (backend BDD actif) | Oui | Production multi-worker |
 
 ---
 
@@ -148,12 +148,15 @@ forge.configure(session_store=store)
 - Méthode supplémentaire : `cleanup_expired() -> int` (supprime les fichiers expirés, retourne le nombre supprimé)
 - Dossier créé automatiquement si absent
 
-### `MariaDbSessionStore`
+### `DbSessionStore` (opt-in `forge-mvc-sessions-db`)
+
+Le cœur agnostique du SGBD ne fournit pas de store BDD : il vit dans l'opt-in
+`forge-mvc-sessions-db` (`pip install --pre forge-mvc-sessions-db`).
 
 ```python
-from core.sessions import MariaDbSessionStore
+from forge_mvc_sessions_db import DbSessionStore
 
-store = MariaDbSessionStore(ttl=3600)
+store = DbSessionStore(ttl=3600)
 forge.configure(session_store=store)
 ```
 
@@ -172,12 +175,12 @@ CREATE TABLE IF NOT EXISTS forge_sessions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-- Sessions partagées entre processus via MariaDB
+- Sessions partagées entre processus via la base (backend BDD actif)
 - Persiste après redémarrage
-- L'expiration est gérée par la clause `expire_at > NOW()` dans les requêtes SQL
+- L'expiration est comparée à un horodatage calculé côté Python, passé en paramètre (SQL portable, sans `NOW()` propriétaire)
 - Méthode supplémentaire : `cleanup_expired() -> int` (supprime les lignes expirées)
-- Les callables `fetch_one` et `execute` sont injectables pour les tests sans MariaDB réelle
-- Utilise la connexion Forge configurée via `core.database.db`
+- Les callables `fetch_one` et `execute` sont injectables pour les tests sans base réelle
+- Utilise la connexion Forge configurée via `core.database.db`, quel que soit le backend
 
 ---
 
@@ -216,20 +219,20 @@ Il ne couvre pas :
 | Production mono-worker | **Déconseillé** | Sessions perdues au redémarrage |
 | Production multi-worker (Gunicorn, uWSGI) | **Ne pas utiliser** | Sessions non partagées entre workers |
 | Production multi-processus | **Ne pas utiliser** | Sessions non partagées entre processus |
-| Besoin de persistance entre redémarrages | **Ne pas utiliser** | Utiliser `FileSessionStore` ou `MariaDbSessionStore` |
+| Besoin de persistance entre redémarrages | **Ne pas utiliser** | Utiliser `FileSessionStore` ou `DbSessionStore` |
 
 ### Alternatives recommandées
 
 Pour un usage persistant ou multi-worker, deux backends sont disponibles sans dépendance externe supplémentaire :
 
 - **`FileSessionStore`**, persiste entre les redémarrages, adapté à un seul processus ou à un développement persistant local ;
-- **`MariaDbSessionStore`**, sessions partagées entre workers via MariaDB, adapté à la production multi-processus.
+- **`DbSessionStore`** (opt-in `forge-mvc-sessions-db`), sessions partagées entre workers via la base, adapté à la production multi-processus.
 
 ```python
-from core.sessions import MariaDbSessionStore
+from forge_mvc_sessions_db import DbSessionStore
 import core.forge as forge
 
-forge.configure(session_store=MariaDbSessionStore(ttl=3600))
+forge.configure(session_store=DbSessionStore(ttl=3600))
 ```
 
 Leur documentation complète est dans la section [Backends disponibles](#backends-disponibles) ci-dessus.
@@ -326,7 +329,7 @@ forge.configure(session_store=DictSessionStore())
 - **Thread-safety mémoire** : voir section [Thread-safety et limites de MemorySessionStore](#thread-safety-et-limites-de-memorysessionstore), livrée par SESSIONS-MEMORY-THREADSAFE-DOC-001.
 - **Double pile auth/session** : `core/security/session.py` (API legacy FR) et `core/auth/session.py` (API moderne EN) coexistent.
   La déduplication et la décision de l'API canonique sont traitées en Phase 4 (AUTH-SESSION-DEDUP-001).
-- **Production hardening** : `MariaDbSessionStore` est fonctionnel mais sa robustesse production (reconnexion, pool, timeout) dépend de la configuration de `core.database.db`, non documentée dans ce ticket.
+- **Production hardening** : `DbSessionStore` est fonctionnel mais sa robustesse production (reconnexion, pool, timeout) dépend de la configuration de `core.database.db`, non documentée dans ce ticket.
 - **MFA/RBAC** : non concernés par les stores de session directement.
 
 ---

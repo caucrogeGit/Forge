@@ -43,6 +43,7 @@ pyright>=1.1.400
 -e ./packages/forge-mvc-mail
 -e ./packages/forge-mvc-i18n
 -e ./packages/forge-mvc-qrcode
+-e ./packages/forge-mvc-sessions-db
 -e ./packages/forge-mvc-settings
 -e ./packages/forge-mvc-import-export
 -e ./packages/forge-mvc-audit

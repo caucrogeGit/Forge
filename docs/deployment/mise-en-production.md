@@ -159,10 +159,10 @@ Créez la table `forge_sessions` (voir `mvc/models/sql/forge_sessions.sql`), pui
 ```python
 # wsgi.py
 import core.forge as forge
-from core.sessions.mariadb_store import MariaDbSessionStore
+from forge_mvc_sessions_db import DbSessionStore
 from core.app.wsgi import create_configured_wsgi_app
 
-forge.configure(session_store=MariaDbSessionStore())
+forge.configure(session_store=DbSessionStore())
 application = create_configured_wsgi_app()
 ```
 

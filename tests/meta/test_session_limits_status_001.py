@@ -29,9 +29,17 @@ class TestSessionStoresDelivered:
             "core/sessions/file_store.py introuvable — FileSessionStore attendu."
         )
 
-    def test_mariadb_store_exists(self):
-        assert (PROJECT_ROOT / "core" / "sessions" / "mariadb_store.py").exists(), (
-            "core/sessions/mariadb_store.py introuvable — MariaDbSessionStore attendu."
+    def test_db_store_extracted_to_optin(self):
+        # ADR-054 : le store BDD a quitté le cœur pour l'opt-in forge-mvc-sessions-db.
+        assert not (PROJECT_ROOT / "core" / "sessions" / "mariadb_store.py").exists(), (
+            "core/sessions/mariadb_store.py doit avoir quitté le cœur (ADR-054)."
+        )
+        pkg_store = (
+            PROJECT_ROOT / "packages" / "forge-mvc-sessions-db"
+            / "forge_mvc_sessions_db" / "store.py"
+        )
+        assert pkg_store.exists(), (
+            "store.py attendu dans forge-mvc-sessions-db (DbSessionStore, ADR-054)."
         )
 
 
@@ -69,7 +77,7 @@ class TestSecurityMdNoPhantomSessionTickets:
         """SECURITY.md decrit les backends disponibles, pas des tickets futurs."""
         assert "MemorySessionStore" in self.text or "FileSessionStore" in self.text, (
             "SECURITY.md devrait decrire les backends de session disponibles "
-            "(MemorySessionStore, FileSessionStore, MariaDbSessionStore)."
+            "(MemorySessionStore, FileSessionStore, DbSessionStore)."
         )
 
 

@@ -256,7 +256,7 @@ Forge utilise par défaut `MemorySessionStore`, sessions en mémoire processus, 
 |---|---|---|---|
 | Mémoire (défaut) | `MemorySessionStore` | Non | Non |
 | Fichier JSON | `FileSessionStore` | Oui (local) | Non |
-| MariaDB | `MariaDbSessionStore` | Oui | Oui (même base) |
+| MariaDB | `DbSessionStore` | Oui | Oui (même base) |
 
 Pour activer le backend fichier :
 
@@ -267,18 +267,18 @@ from core.sessions.file_store import FileSessionStore
 forge.configure(session_store=FileSessionStore(sessions_dir="storage/sessions"))
 ```
 
-Pour activer le backend MariaDB (table `forge_sessions` requise, voir `mvc/models/sql/forge_sessions.sql`) :
+Pour activer le store BDD (opt-in `forge-mvc-sessions-db`) (table `forge_sessions` requise, voir `mvc/models/sql/forge_sessions.sql`) :
 
 ```python
 import core.forge as forge
-from core.sessions.mariadb_store import MariaDbSessionStore
+from forge_mvc_sessions_db import DbSessionStore
 
-forge.configure(session_store=MariaDbSessionStore())
+forge.configure(session_store=DbSessionStore())
 ```
 
 Cet appel se place au point d'entrée, avant la construction de l'application : `wsgi.py` en production, `app.py` en développement. Voir [Mise en production pas à pas](mise-en-production.md).
 
-Le backend MariaDB partage les sessions entre tous les workers Gunicorn (et entre plusieurs processus Forge sur la même base). C'est lui qui rend possible le chemin de production officiel (Gunicorn multi-worker). Il **ne rend pas Forge automatiquement scalable horizontalement** : la configuration du load balancer et de la base reste à charge du déploiement.
+Le store BDD (opt-in `forge-mvc-sessions-db`) partage les sessions entre tous les workers Gunicorn (et entre plusieurs processus Forge sur la même base). C'est lui qui rend possible le chemin de production officiel (Gunicorn multi-worker). Il **ne rend pas Forge automatiquement scalable horizontalement** : la configuration du load balancer et de la base reste à charge du déploiement.
 
 **Avec le store par défaut `MemorySessionStore` :**
 
@@ -286,7 +286,7 @@ Le backend MariaDB partage les sessions entre tous les workers Gunicorn (et entr
 - le multi-worker n'est donc pas utilisable (déconnexions aléatoires) ;
 - les sessions sont perdues à chaque redémarrage du service.
 
-**Avec `MariaDbSessionStore` (recommandé en production) :**
+**Avec `DbSessionStore` (recommandé en production) :**
 
 - les sessions sont partagées entre workers et survivent au redémarrage ;
 - Gunicorn multi-worker est pleinement supporté.
@@ -349,5 +349,5 @@ curl -s http://127.0.0.1:8000/health
 - **Pas de déploiement automatique**, Forge génère les fichiers de configuration, l'installation sur le serveur reste manuelle.
 - **Pas de HTTPS automatique**, configurer Nginx pour terminer TLS (Let's Encrypt + Certbot recommandé).
 - **Pas de Docker**, non prévu pour l'instant.
-- **Sessions à partager en multi-worker**, Gunicorn multi-worker exige le store partagé `MariaDbSessionStore`. Voir section 9.
+- **Sessions à partager en multi-worker**, Gunicorn multi-worker exige le store partagé `DbSessionStore`. Voir section 9.
 - **Nginx uniquement documenté**, Apache httpd est également un reverse proxy valide mais non documenté ici.

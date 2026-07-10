@@ -53,9 +53,10 @@ class TestSessionsDocMentionsBackends:
             "docs/reference/sessions.md doit mentionner FileSessionStore"
         )
 
-    def test_mariadb_store_mentioned(self):
-        assert "MariaDbSessionStore" in _text(), (
-            "docs/reference/sessions.md doit mentionner MariaDbSessionStore"
+    def test_db_store_mentioned(self):
+        assert "DbSessionStore" in _text(), (
+            "docs/reference/sessions.md doit mentionner DbSessionStore "
+            "(opt-in forge-mvc-sessions-db)"
         )
 
 

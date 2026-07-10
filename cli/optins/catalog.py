@@ -148,6 +148,10 @@ OFFICIAL_OPTINS: dict[str, OptIn] = {
         "deploy", "forge-mvc-deploy", "forge_mvc_deploy", KIND_CLI, CATEGORY_OPERATIONS,
         "Outillage de déploiement : deploy:init (wsgi.py, Nginx, systemd) et deploy:check, CLI-only.",
     ),
+    "sessions-db": OptIn(
+        "sessions-db", "forge-mvc-sessions-db", "forge_mvc_sessions_db", KIND_LIBRARY, CATEGORY_OPERATIONS,
+        "Store de session persistant adossé à la BDD (DbSessionStore, ADR-054) : sessions partagées multi-worker.",
+    ),
 }
 
 

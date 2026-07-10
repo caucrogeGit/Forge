@@ -7,7 +7,7 @@ Verrouille le nettoyage automatique des sessions expirées :
   * le cleanup opportuniste préexistant (lazy via `get()`, balayage
     global via `create()`) continue de fonctionner ;
   * aucun thread, scheduler ou timer global n'est introduit ;
-  * les autres stores Forge (`FileSessionStore`, `MariaDbSessionStore`)
+  * les autres stores Forge (`FileSessionStore`, `DbSessionStore`)
     exposent la même API pour qu'un opérateur cron applicatif puisse
     appeler `cleanup_expired()` uniformément.
 """
@@ -128,9 +128,10 @@ class TestApiAlignmentAcrossStores:
         from core.sessions.file_store import FileSessionStore
         assert callable(getattr(FileSessionStore, "cleanup_expired", None))
 
-    def test_mariadb_store_has_cleanup_expired(self):
-        from core.sessions.mariadb_store import MariaDbSessionStore
-        assert callable(getattr(MariaDbSessionStore, "cleanup_expired", None))
+    def test_db_store_has_cleanup_expired(self):
+        import pytest
+        DbSessionStore = pytest.importorskip("forge_mvc_sessions_db").DbSessionStore
+        assert callable(getattr(DbSessionStore, "cleanup_expired", None))
 
 
 # ── 5. Pas de mutation cookies / autres données ─────────────────────────────

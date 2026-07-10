@@ -77,7 +77,7 @@ Il ajoute une méthode propre au backend.
 |---|---|
 | Persister les sessions sans base de données | `FileSessionStore()` |
 | Déploiement mono-serveur | un seul nœud lit et écrit le dossier |
-| Déploiement multi-nœud | préférer [le backend MariaDB](mariadb_store.md) |
+| Déploiement multi-nœud | préférer le store BDD `DbSessionStore` (opt-in `forge-mvc-sessions-db`) |
 | Purger les sessions expirées du dossier | `cleanup_expired()` |
 
 ## 6. Exemples d'utilisation
@@ -103,11 +103,11 @@ print(f"{supprimees} sessions expirées supprimées")
 
 !!! warning "Un seul processus par dossier"
     Le verrou `RLock` ne protège que les threads d'un même processus.
-    Plusieurs processus écrivant le même dossier sans verrou externe peuvent se concurrencer : pour un déploiement multi-worker, préférer [le backend MariaDB](mariadb_store.md).
+    Plusieurs processus écrivant le même dossier sans verrou externe peuvent se concurrencer : pour un déploiement multi-worker, préférer le store BDD `DbSessionStore` (opt-in `forge-mvc-sessions-db`).
 
 ## Voir aussi
 
 - [Le contrat de backend](contract.md) : l'interface implémentée.
 - [Le gestionnaire de backend](manager.md) : brancher ce backend.
 - [Le backend mémoire](memory_store.md) : le backend par défaut.
-- [Le backend MariaDB](mariadb_store.md) : sessions partagées entre processus.
+- le store BDD `DbSessionStore` (opt-in `forge-mvc-sessions-db`) : sessions partagées entre processus.

@@ -133,3 +133,17 @@ Multiplierait les façons de faire (principe 11) et le SQL applicatif ne serait 
 ## Charte appliquée
 
 Principe 5 (garder SQL visible), principe 8 (noyau minimal, briques opt-in), principe 11 (une seule façon officielle de faire chaque chose), ADR-004 (périmètre du cœur), ADR-052 (stratégie des opt-ins).
+
+---
+
+## Addendum : extraction du store de session BDD (AUDIT-SESSION-STORE-EXTRACT-001)
+
+L'ADR notait que `core/sessions/mariadb_store.py` restait spécifique MariaDB dans un cœur voulu agnostique.
+Le volet backend (contrat `Dialect`) et le volet générateurs (ADR-070) ont été livrés, mais le store de session était resté en l'état.
+
+Ce volet est désormais réalisé de la façon suivante :
+
+- le store BDD quitte le cœur pour l'opt-in **`forge-mvc-sessions-db`**, sous le nom générique **`DbSessionStore`** ;
+- le cœur ne fournit plus que `MemorySessionStore`, `FileSessionStore` et le contrat `SessionStore` (un cœur agnostique n'embarque pas de store BDD) ;
+- le SQL du store devient portable : les horodatages (`created_at`, `updated_at`, comparaison d'expiration) sont calculés côté Python et passés en paramètres, supprimant toute fonction propriétaire (`NOW()` MariaDB, `GETDATE()` SQL Server, `datetime('now')` SQLite). Le store fonctionne donc sur tous les backends via `core.database.db` ;
+- un seul store générique est publié (pas de copie par backend) : configuration via `forge.configure(session_store=DbSessionStore())`.

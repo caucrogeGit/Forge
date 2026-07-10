@@ -16,7 +16,8 @@ pytestmark = pytest.mark.meta
 _STORE_FILES = [
     PROJECT_ROOT / "core" / "sessions" / "memory_store.py",
     PROJECT_ROOT / "core" / "sessions" / "file_store.py",
-    PROJECT_ROOT / "core" / "sessions" / "mariadb_store.py",
+    # Store BDD extrait vers l'opt-in forge-mvc-sessions-db (ADR-054).
+    PROJECT_ROOT / "packages" / "forge-mvc-sessions-db" / "forge_mvc_sessions_db" / "store.py",
 ]
 
 

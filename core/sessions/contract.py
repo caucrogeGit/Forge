@@ -13,7 +13,7 @@ class SessionStore(Protocol):
     Implémentations disponibles :
     - MemorySessionStore (défaut, mono-processus)
     - FileSessionStore (persistance JSON sur disque)
-    - MariaDbSessionStore (sessions partagées entre processus)
+    - DbSessionStore (sessions partagées entre processus)
     """
 
     def create(self, data: dict[str, Any] | None = None) -> str:

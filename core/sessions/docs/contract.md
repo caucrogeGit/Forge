@@ -11,7 +11,7 @@ Pour que ces backends soient interchangeables, ils partagent une même interface
 `SessionStore` est cette interface.
 C'est un `Protocol` Python décoré `@runtime_checkable` : tout objet qui expose les bonnes méthodes en est une implémentation valide, sans héritage explicite.
 
-Les trois backends fournis par Forge (`MemorySessionStore`, `FileSessionStore`, `MariaDbSessionStore`) respectent ce contrat.
+Les trois backends fournis par Forge (`MemorySessionStore`, `FileSessionStore`, `DbSessionStore`) respectent ce contrat.
 Une application peut écrire son propre backend en implémentant les mêmes méthodes.
 
 ## 2. Vue d'ensemble rapide
@@ -24,7 +24,7 @@ Une application peut écrire son propre backend en implémentant les mêmes mét
 | Rôle | définir l'interface commune des backends de session |
 | Nature | `typing.Protocol`, `@runtime_checkable` |
 | API publique | `create`, `get`, `set`, `replace`, `delete`, `regenerate`, `authenticate`, `touch_expiry`, `set_flash`, `get_flash` |
-| Implémentations fournies | `MemorySessionStore`, `FileSessionStore`, `MariaDbSessionStore` |
+| Implémentations fournies | `MemorySessionStore`, `FileSessionStore`, `DbSessionStore` |
 | Choisi par | `core.sessions.manager` |
 
 `SessionStore` est un contrat de frontière : il sépare le code qui consomme une session du backend qui la stocke.
@@ -56,11 +56,11 @@ classDiagram
 
     class MemorySessionStore
     class FileSessionStore
-    class MariaDbSessionStore
+    class DbSessionStore
 
     SessionStore <|.. MemorySessionStore : implémente
     SessionStore <|.. FileSessionStore : implémente
-    SessionStore <|.. MariaDbSessionStore : implémente
+    SessionStore <|.. DbSessionStore : implémente
 ```
 
 À retenir :
@@ -153,5 +153,5 @@ set_session_store(NullSessionStore())
 - [Le gestionnaire de backend](manager.md) : choisir le backend actif.
 - [Le backend mémoire](memory_store.md) : implémentation par défaut.
 - [Le backend fichier](file_store.md) : persistance JSON sur disque.
-- [Le backend MariaDB](mariadb_store.md) : sessions partagées entre processus.
+- le store BDD `DbSessionStore` (opt-in `forge-mvc-sessions-db`) : sessions partagées entre processus.
 - [Les clés de session](keys.md) : la structure de données rangée dans une session.

@@ -123,7 +123,7 @@ Le store doit implémenter le protocole `SessionStore` (`core.sessions.contract`
 Le store par défaut est `MemorySessionStore` (mono-processus, sessions perdues au redémarrage).
 Passer `None` réinitialise à ce comportement par défaut.
 
-Trois backends sont disponibles dans `core.sessions` : `MemorySessionStore`, `FileSessionStore`, `MariaDbSessionStore`.
+Trois backends sont disponibles dans `core.sessions` : `MemorySessionStore`, `FileSessionStore`, `DbSessionStore`.
 Leur documentation complète est traitée dans le ticket SESSIONS-STORE-CONTRACT-DOC-001.
 
 ---

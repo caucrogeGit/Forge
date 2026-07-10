@@ -85,10 +85,10 @@ class TestPersistentBackendRecommended:
             "comme alternative persistante"
         )
 
-    def test_mariadb_session_store_mentioned_as_alternative(self):
-        assert "MariaDbSessionStore" in _text(), (
-            "docs/reference/sessions.md doit mentionner MariaDbSessionStore "
-            "comme alternative multi-processus"
+    def test_db_session_store_mentioned_as_alternative(self):
+        assert "DbSessionStore" in _text(), (
+            "docs/reference/sessions.md doit mentionner DbSessionStore "
+            "(opt-in forge-mvc-sessions-db) comme alternative multi-processus"
         )
 
 

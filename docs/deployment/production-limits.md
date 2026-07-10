@@ -33,7 +33,7 @@ Elle complète les pages [Mise en production pas à pas](mise-en-production.md),
 | HTTPS | Hors Forge | Terminer TLS côté reverse proxy |
 | IP client | Support `X-Real-IP` sécurisé | Configurer `APP_TRUSTED_PROXIES` |
 | Sessions par défaut | `MemorySessionStore` non persistant | Éviter en production (warning émis au démarrage) |
-| Sessions persistantes | `FileSessionStore`, `MariaDbSessionStore` | À configurer explicitement |
+| Sessions persistantes | `FileSessionStore`, `DbSessionStore` | À configurer explicitement |
 | Rate-limits login / upload | Compteurs en mémoire mono-process | Non partagés entre workers |
 | Anti-rejeu MFA (TOTP) | État en mémoire mono-process | Code TOTP rejouable sur un autre worker |
 | Fichiers statiques (`/static/...`) | Servis par Forge | À déléguer au reverse proxy |
@@ -65,7 +65,7 @@ Il :
 - `FileSessionStore` : persistance basique sur disque.
   Utilisable en mono-worker.
   En multi-worker, le verrou n'est pas strict ; à éviter pour des charges concurrentes élevées.
-- `MariaDbSessionStore` : persistance et partage entre workers.
+- `DbSessionStore` : persistance et partage entre workers.
   C'est le choix le plus robuste actuellement disponible côté Forge.
 
 Sélection explicite via `forge.configure(session_store=...)` ou [ADR-002](../adr/002-session-strategy.md).
@@ -123,7 +123,7 @@ Augmenter le nombre de workers sans configurer un session store partagé donne u
 - les compteurs de rate-limit seront divisés par le nombre de workers en pratique (un attaquant a N tentatives avant d'être bloqué au lieu d'1) ;
 - l'anti-rejeu TOTP étant lui aussi par worker, un code MFA intercepté peut être rejoué sur un autre worker que celui qui l'a consommé.
 
-Pour un déploiement multi-worker fiable, **configurer `MariaDbSessionStore` explicitement** (cf §4).
+Pour un déploiement multi-worker fiable, **configurer `DbSessionStore` explicitement** (cf §4).
 
 ---
 

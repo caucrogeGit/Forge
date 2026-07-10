@@ -115,11 +115,11 @@ set_session_store(MemorySessionStore(ttl=1800))   # sessions de 30 minutes
 
 !!! warning "Pas de persistance ni de partage"
     Les sessions sont perdues au redémarrage du processus et ne sont pas visibles d'un autre worker.
-    Pour un déploiement multi-worker ou persistant, utiliser [le backend fichier](file_store.md) ou [le backend MariaDB](mariadb_store.md).
+    Pour un déploiement multi-worker ou persistant, utiliser [le backend fichier](file_store.md) ou le store BDD `DbSessionStore` (opt-in `forge-mvc-sessions-db`).
 
 ## Voir aussi
 
 - [Le contrat de backend](contract.md) : l'interface implémentée.
 - [Le gestionnaire de backend](manager.md) : brancher un autre backend.
 - [Le backend fichier](file_store.md) : persistance sur disque.
-- [Le backend MariaDB](mariadb_store.md) : sessions partagées entre processus.
+- le store BDD `DbSessionStore` (opt-in `forge-mvc-sessions-db`) : sessions partagées entre processus.

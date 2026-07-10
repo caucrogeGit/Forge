@@ -2,7 +2,7 @@
 
 Régression : `login_user` mutait le dict de session in-place sans appeler
 `store.set()`. Sur MemorySessionStore (`get()` renvoie une référence vivante)
-la mutation tenait, mais sur FileSessionStore et MariaDbSessionStore (`get()`
+la mutation tenait, mais sur FileSessionStore et DbSessionStore (`get()`
 renvoie une copie désérialisée) la connexion était silencieusement perdue —
 le bug était masqué car le store par défaut est Memory.
 
@@ -45,15 +45,15 @@ def _request_with_cookie(session_id: str):
 
 
 def _store_factories(tmp_path):
-    """Liste (id, store) des backends à tester ; MariaDB sous opt-in env."""
+    """Liste (id, store) des backends à tester ; store BDD sous opt-in env."""
     factories = [
         ("memory", MemorySessionStore()),
         ("file", FileSessionStore(sessions_dir=tmp_path / "sessions")),
     ]
     if os.environ.get("FORGE_E2E_MARIADB"):
-        from core.sessions.mariadb_store import MariaDbSessionStore
+        from forge_mvc_sessions_db import DbSessionStore
 
-        factories.append(("mariadb", MariaDbSessionStore()))
+        factories.append(("db", DbSessionStore()))
     return factories
 
 

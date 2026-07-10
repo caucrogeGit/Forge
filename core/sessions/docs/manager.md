@@ -100,4 +100,4 @@ set_session_store(None)   # revient au MemorySessionStore par défaut
 - [Le contrat de backend](contract.md) : l'interface attendue de `store`.
 - [Le backend mémoire](memory_store.md) : le backend par défaut.
 - [Le backend fichier](file_store.md) : persistance JSON sur disque.
-- [Le backend MariaDB](mariadb_store.md) : sessions partagées entre processus.
+- le store BDD `DbSessionStore` (opt-in `forge-mvc-sessions-db`) : sessions partagées entre processus.
