@@ -86,6 +86,7 @@ nav:
         - Guidance agent IA: features/agents.md
         - Génération PDF: features/pdf.md
         - ImageMagick (guide complet): features/imagemagick-logos.md
+        - Outils interactifs: features/outils-interactifs.md
 
     - Référence:
         - Commandes CLI: reference/cli-commands.md
@@ -174,6 +175,11 @@ nav:
             - La façade Flash: starters/welcome-helpers/flash.md
             - Imports et usage: starters/welcome-helpers/imports-usage.md
             - Bilan: starters/welcome-helpers/bilan.md
+        - Progression outils interactifs (welcome-outils):
+            - Présentation: starters/welcome-outils/index.md
+            - Calculateur de sous-réseau (SSR pur): starters/welcome-outils/subnet-calculator.md
+            - Oscilloscope (JavaScript local): starters/welcome-outils/oscilloscope.md
+            - Bilan: starters/welcome-outils/bilan.md
         - Progression Markdown (welcome-markdown):
             - Préambule: starters/welcome-markdown/installation.md
             - Débutant:

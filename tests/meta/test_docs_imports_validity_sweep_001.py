@@ -392,7 +392,7 @@ class TestNonFrameworkImportsAreAnnotatedOrUserProject:
             "logging", "typing", "subprocess", "io", "ast",
             "secrets", "hashlib", "hmac", "functools", "itertools",
             "collections", "dataclasses", "enum", "tempfile", "shutil",
-            "warnings", "unittest", "contextlib", "abc",
+            "warnings", "unittest", "contextlib", "abc", "ipaddress",
             "pytest", "cryptography", "pyotp", "PIL", "jinja2",
             "mariadb", "argon2", "jsonschema", "dotenv",
             "importlib", "fastapi", "flask",  # non-Forge fréquents
