@@ -127,7 +127,7 @@ block_user_zone() {
 # settings du hook, pyproject, fichiers .env) restent protégées.
 
 case "$REL_PATH" in
-  "charte_philosophique_forge_v2.md"|\
+  "CHARTE_DOC.md"|\
   "CLAUDE.md"|\
   ".claude/settings.json"|\
   ".claude/hooks/"*|\

@@ -416,11 +416,11 @@ charte avant chaque écriture.
 **Fichiers toujours bloqués (règle 3) :**
 
 ```
-charte_philosophique_forge_v2.md
+CHARTE_DOC.md
 CLAUDE.md
 .claude/settings.json
 .claude/hooks/**
-pyproject.toml
+pyproject.toml   (racine uniquement ; les pyproject.toml des paquets restent modifiables)
 .env  /  .env.*  /  **/.env  /  **/.env.*
 ```
 

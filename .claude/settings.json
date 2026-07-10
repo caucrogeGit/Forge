@@ -30,6 +30,16 @@
     ]
   },
   "hooks": {
-    "PreToolUse": []
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/forge-write-if-new.sh\""
+          }
+        ]
+      }
+    ]
   }
 }
