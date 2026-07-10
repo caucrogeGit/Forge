@@ -265,4 +265,4 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
 - [Statuts (status.py)](references/status.md) : `WorkflowStatus`, validation des noms.
 - [Transitions (transitions.py)](references/transitions.md) : `can_transition`, transitions disponibles.
 - [Helpers Jinja (jinja.py)](references/jinja.md) : badges et libellés.
-- [Progression Workflow](welcome/debutant/workflow-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Workflow](welcome/debutant/workflow-welcome.md) : apprendre l'opt-in pas à pas.

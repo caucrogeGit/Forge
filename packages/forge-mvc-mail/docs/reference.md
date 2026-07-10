@@ -337,4 +337,4 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
 - [Mailer (mailer.py)](references/mailer.md) : envoi et journalisation.
 - [Rendu de gabarits (templates.py)](references/templates.md) : `MailTemplateRenderer`.
 - [Journal des envois (log.py)](references/log.md) et [Erreurs (exceptions.py)](references/exceptions.md).
-- [Progression Mail](welcome/debutant/mail-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Mail](welcome/debutant/mail-welcome.md) : apprendre l'opt-in pas à pas.

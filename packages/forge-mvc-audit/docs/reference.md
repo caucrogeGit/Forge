@@ -270,4 +270,4 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
 - [Le journal d'audit (store.py)](references/store.md) : détail des fonctions et du SQL.
 - [Initialisation (audit:init)](references/cli.md) : création de la table.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `AuditError`.
-- [Progression Audit](welcome/debutant/audit-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Audit](welcome/debutant/audit-welcome.md) : apprendre l'opt-in pas à pas.

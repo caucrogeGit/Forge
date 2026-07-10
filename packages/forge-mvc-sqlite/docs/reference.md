@@ -249,5 +249,5 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
 ## Voir aussi
 
-- [Progression SQLite](welcome/debutant/sqlite-welcome.md) : apprendre le backend pas à pas.
+- [Welcome-SQLite](welcome/debutant/sqlite-welcome.md) : apprendre le backend pas à pas.
 - [ADR-054](https://forgemvc.com/docs/forge/adr/054-database-backend-optins/) : cœur agnostique BDD.

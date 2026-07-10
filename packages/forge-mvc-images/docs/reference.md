@@ -274,4 +274,4 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
 - [Dépôt de médias (media_repository.py)](references/media_repository.md) : associations média / entité.
 - [Galerie (media_gallery.py)](references/media_gallery.md) : galerie, couverture, URLs.
 - [Guide média](media.md) : vue d'ensemble applicative.
-- [Progression Images](welcome/debutant/images-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Images](welcome/debutant/images-welcome.md) : apprendre l'opt-in pas à pas.

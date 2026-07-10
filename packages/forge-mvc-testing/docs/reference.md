@@ -226,5 +226,5 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
 
 ## Voir aussi
 
-- [Progression Testing](welcome/debutant/testing-welcome.md) : apprendre l'outillage pas à pas.
+- [Welcome-Testing](welcome/debutant/testing-welcome.md) : apprendre l'outillage pas à pas.
 - [ADR-041](https://forgemvc.com/docs/forge/adr/041-shared-test-support/) : infrastructure de test partagée.

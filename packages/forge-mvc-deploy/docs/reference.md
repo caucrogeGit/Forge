@@ -220,4 +220,4 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
 ## Voir aussi
 
 - [Commandes deploy:* (cli/deploy.py)](references/cli.md) : détail de `deploy:init` / `deploy:check`.
-- [Progression Deploy](welcome/debutant/deploy-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Deploy](welcome/debutant/deploy-welcome.md) : apprendre l'opt-in pas à pas.

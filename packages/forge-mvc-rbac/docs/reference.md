@@ -312,4 +312,4 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
 - [Résolveur de permissions (resolver.py)](references/resolver.md) et [Liens utilisateur/rôle (user_rbac.py)](references/user_rbac.md).
 - [Helpers Jinja (jinja.py)](references/jinja.md) : `can()`.
 - [Contrat RBAC séparé](contract.md) et [RBAC, usage applicatif](usage.md).
-- [Progression RBAC](welcome/debutant/rbac-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-RBAC](welcome/debutant/rbac-welcome.md) : apprendre l'opt-in pas à pas.

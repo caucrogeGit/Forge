@@ -255,4 +255,4 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
 
 - [Traduction (translator.py)](references/translator.md) : détail de `trans` et des locales.
 - [Erreurs (exceptions.py)](references/exceptions.md) : `I18nError`, `TranslationCatalogError`.
-- [Progression i18n](welcome/debutant/i18n-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-i18n](welcome/debutant/i18n-welcome.md) : apprendre l'opt-in pas à pas.

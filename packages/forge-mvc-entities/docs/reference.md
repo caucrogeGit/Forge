@@ -94,7 +94,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     | 4. Générer le CRUD | `make:crud` | [make:crud](modules/make_crud.md) |
     | 5. Faire évoluer le schéma | `migration:make` / `migration:apply` | [migrations](modules/migrations.md) |
 
-    Apprentissage guidé, pas à pas : [Progression Entités](welcome/debutant/entity-welcome.md).
+    Apprentissage guidé, pas à pas : [Welcome-Entités](welcome/debutant/entity-welcome.md).
 
 ??? note "6. Le pivot enrichi"
 
@@ -243,4 +243,4 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
 - [Référence par module](modules/make_entity.md) : une page par commande et module du moteur.
 - [Service pivot (service.py)](references/service.md) : détail du CRUD de la jonction enrichie.
 - [Générateur de sous-CRUD (make_pivot_crud.py)](references/make_pivot_crud.md) : `make:pivot-crud`.
-- [Progression Entités](welcome/debutant/entity-welcome.md) : apprendre le moteur pas à pas.
+- [Welcome-Entités](welcome/debutant/entity-welcome.md) : apprendre le moteur pas à pas.

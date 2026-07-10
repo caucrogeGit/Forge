@@ -281,4 +281,4 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
 - [Upload générique (manager.py)](references/manager.md) : détail de `save_upload` / `serve_media_file`.
 - [Primitives de stockage (storage.py)](references/storage.md) : anti-traversal, écriture bas niveau (ADR-020).
 - [Rate-limit d'upload (rate_limit.py)](references/rate_limit.md) : limiter le débit.
-- [Progression Files](welcome/debutant/files-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Files](welcome/debutant/files-welcome.md) : apprendre l'opt-in pas à pas.

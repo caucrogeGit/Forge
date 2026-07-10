@@ -255,4 +255,4 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
 - [La génération (generator.py)](references/generator.md) : détail de `QrCode`.
 - [La réponse HTTP (response.py)](references/response.md) : détail de `QrCodeResponse`.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `QrCodeError`.
-- [Progression QR Code](welcome/debutant/qrcode-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-QR Code](welcome/debutant/qrcode-welcome.md) : apprendre l'opt-in pas à pas.

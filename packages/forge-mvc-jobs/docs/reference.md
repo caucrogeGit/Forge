@@ -284,4 +284,4 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
 - [La file (queue.py)](references/queue.md) : détail des fonctions et du SQL.
 - [Initialisation (jobs:init)](references/cli.md) : création de la table.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `JobError`.
-- [Progression Jobs](welcome/debutant/jobs-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Jobs](welcome/debutant/jobs-welcome.md) : apprendre l'opt-in pas à pas.
