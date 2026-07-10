@@ -204,7 +204,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | Besoin | Élément |
     |---|---|
     | Vérifier l'installation | `forge iot:doctor` |
-    | Préparer la table | `forge iot:init` puis `forge db:apply` |
+    | Préparer la table | `forge iot:init` puis `forge migration:apply` |
     | Tester sans capteur | `forge iot:simulate` |
     | Recevoir les mesures | `forge iot:listen` (process séparé) |
     | Exposer en JSON | `register_iot_routes(router)` |
@@ -228,7 +228,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     ### 8.2 Écouter le broker (process séparé)
 
     ```bash
-    forge iot:init && forge db:apply     # crée la table iot_events
+    forge iot:init && forge migration:apply     # crée la table iot_events
     forge iot:simulate                   # publie des mesures de test
     forge iot:listen                     # écoute et stocke
     ```
