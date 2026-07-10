@@ -54,6 +54,7 @@ Cette page liste les opt-ins officiels par usage ; chaque nom renvoie à sa docu
 | [Admin](../admin/reference.md) | back-office applicatif : CRUD générique, auth, CSRF, RBAC optionnel |
 | [IoT](../iot/reference.md) | réception et exposition de données IoT (MQTT, stockage, API HTTP) |
 | [Déploiement](../deploy/reference.md) | outillage de déploiement CLI : gabarits Nginx/systemd/WSGI |
+| [Sessions BDD](../sessions-db/reference.md) | store de session persistant adossé à la base, partagé multi-worker (`DbSessionStore`, ADR-054) |
 
 ## Bases de données (backends)
 

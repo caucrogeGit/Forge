@@ -1,0 +1,24 @@
+# Documentation embarquée du paquet forge-mvc-sessions-db (ADR-038).
+# Agrégée dans le site unique forgemvc.com par le plugin mkdocs-monorepo.
+# Le site_name sert de préfixe d'URL : les pages sont montées sous /sessions-db/.
+site_name: sessions-db
+docs_dir: docs
+nav:
+  - Présentation: index.md
+  - Référence: reference.md
+  - Référence (par module):
+      - Le store (store.py): references/store.md
+  - Progression Sessions BDD:
+      - Débutant:
+          - Première session persistante: welcome/debutant/sessions-db-welcome.md
+          - Survivre au redémarrage: welcome/debutant/sessions-db-persist.md
+          - Bilan débutant: welcome/debutant/bilan.md
+      - Intermédiaire:
+          - Sessions partagées entre workers: welcome/intermediaire/sessions-db-multiworker.md
+          - Nettoyer les sessions expirées: welcome/intermediaire/sessions-db-cleanup.md
+          - Bilan intermédiaire: welcome/intermediaire/bilan.md
+      - Avancé:
+          - Un SQL portable: welcome/avance/sessions-db-portable.md
+          - Injecter les exécuteurs: welcome/avance/sessions-db-inject.md
+          - Bilan avancé: welcome/avance/bilan.md
+      - Aide-mémoire: welcome/recapitulatif.md

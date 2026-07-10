@@ -404,6 +404,7 @@ nav:
       - Jobs: '!include packages/forge-mvc-jobs/mkdocs.yml'
       - Notifications: '!include packages/forge-mvc-notifications/mkdocs.yml'
       - Déploiement (opt-in): '!include packages/forge-mvc-deploy/mkdocs.yml'
+      - Sessions BDD: '!include packages/forge-mvc-sessions-db/mkdocs.yml'
       - Bases de données (backend, un seul par projet):
           - MariaDB: '!include packages/forge-mvc-mariadb/mkdocs.yml'
           - SQLite: '!include packages/forge-mvc-sqlite/mkdocs.yml'
