@@ -102,7 +102,7 @@
         },
         "pivot": {
           "type": "object",
-          "description": "Définition de la table pivot enrichie. La structure détaillée est validée par l'opt-in forge-mvc-pivot (ADR-057) ; le cœur ne valide que la présence d'un objet."
+          "description": "Définition de la table pivot enrichie. La structure détaillée est validée par l'opt-in forge-mvc-entities (ADR-070, qui a absorbé pivot) ; le cœur ne valide que la présence d'un objet."
         }
       }
     }

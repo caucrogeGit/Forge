@@ -15,7 +15,7 @@ license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "workflow", "statuts"]
 dependencies = [
     "forge-mvc>=1.0.0rc2,<2",
-    "markupsafe>=2.0",
+    "markupsafe>=2.0,<4",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

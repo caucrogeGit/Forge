@@ -24,7 +24,7 @@ dependencies = [
     # CORE-DROP-PILLOW-001 (ADR-018) : Pillow a quitté le core. Le traitement
     # d'image vit dans l'opt-in forge-mvc-images, qui déclare Pillow lui-même.
     "argon2-cffi>=25.1,<26",
-    "jsonschema>=4.18",
+    "jsonschema>=4.18,<5",
 ]
 
 classifiers = [
@@ -177,7 +177,7 @@ pythonVersion = "3.12"
 [tool.ruff]
 target-version = "py312"
 line-length = 120
-exclude = ["cmd/", ".venv/", "site/", "packages/core", "packages/cli", "packages/integrations"]
+exclude = ["cmd/", ".venv/", "site/"]
 
 [tool.ruff.lint]
 select = ["E", "F"]

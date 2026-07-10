@@ -10,8 +10,11 @@ gardées par ce test contre toute dérive :
 Schémas extraits du cœur vers leur opt-in (absents du cœur, embarqués par le
 paquet) : ``rbac`` (ADR-056), ``pivot`` (ADR-057, désormais dans
 ``forge-mvc-entities`` qui a absorbé pivot, ADR-070). ``forge-mvc-entities``
-dépend du cœur : il n'embarque pas de copie des schémas de base (il lit
-``cli/schemas`` au runtime), seul ``pivot.schema.json`` lui est propre.
+dépend du cœur : il lit ``cli/schemas`` au runtime pour valider entités et
+relations, mais embarque aussi une copie synchronisée de ``common`` et
+``field`` (aux côtés de son ``pivot.schema.json`` propre) pour que les ``$ref``
+de son schéma pivot résolvent de façon autonome. Ces copies embarquées sont
+gardées contre la dérive par ``OPTIN_EMBEDDED_BASE`` ci-dessous.
 """
 from __future__ import annotations
 
