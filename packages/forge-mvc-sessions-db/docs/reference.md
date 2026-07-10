@@ -54,10 +54,10 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
     ```bash
     forge sessions:init
-    forge db:apply
+    forge migration:apply
     ```
 
-    `sessions:init` écrit le DDL embarqué dans `mvc/models/sql/forge_sessions.sql` (write-if-new, sans l'exécuter) ; `forge db:apply` l'applique.
+    `sessions:init` copie la migration embarquée dans `mvc/migrations/` (write-if-new, sans l'exécuter) ; `forge migration:apply` l'applique et la trace dans `forge_migrations` (convention de provisioning des opt-ins, ADR-071).
     Le DDL est écrit pour MariaDB : adaptez les types au backend actif si nécessaire (par exemple `TEXT` au lieu de `LONGTEXT`, et un `CREATE INDEX` séparé sur SQLite ou PostgreSQL).
 
     La table porte une colonne `version` : le store l'utilise pour une concurrence optimiste (aucune écriture concurrente n'est perdue, le message flash est rendu une seule fois).
@@ -200,7 +200,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     forge.configure(session_store=DbSessionStore(ttl=3600))
     ```
 
-    La table `forge_sessions` doit exister au préalable (script `mvc/models/sql/forge_sessions.sql`).
+    La table `forge_sessions` doit exister au préalable (`forge sessions:init` puis `forge migration:apply`).
 
     ### 8.2 Nettoyer les sessions expirées
 
@@ -249,7 +249,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
     !!! warning "Création de la table"
         Le store suppose la table `forge_sessions` présente.
-        Elle n'est pas créée automatiquement : appliquez le script `mvc/models/sql/forge_sessions.sql`.
+        Elle n'est pas créée automatiquement : lancez `forge sessions:init` puis `forge migration:apply`.
 
 ## Voir aussi
 

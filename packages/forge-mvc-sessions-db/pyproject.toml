@@ -38,4 +38,4 @@ where = ["."]
 include = ["forge_mvc_sessions_db*"]
 
 [tool.setuptools.package-data]
-"forge_mvc_sessions_db" = ["py.typed", "sql/*.sql"]
+"forge_mvc_sessions_db" = ["py.typed", "migrations/*.sql"]

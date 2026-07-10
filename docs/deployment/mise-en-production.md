@@ -154,7 +154,7 @@ Installez Gunicorn dans l'environnement virtuel, puis testez le service à la ma
 Ajustez `--workers` selon le nombre de cœurs (règle simple : 2 × cœurs + 1).
 
 En multi-processus, les sessions doivent être **partagées** entre workers : utilisez le store MariaDB.
-Créez la table `forge_sessions` (voir `mvc/models/sql/forge_sessions.sql`), puis éditez `wsgi.py` :
+Créez la table `forge_sessions` (`forge sessions:init` puis `forge migration:apply`), puis éditez `wsgi.py` :
 
 ```python
 # wsgi.py

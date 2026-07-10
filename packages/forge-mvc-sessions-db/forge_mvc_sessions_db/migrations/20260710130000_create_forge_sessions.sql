@@ -1,8 +1,9 @@
--- DDL Forge Sessions : table du store de session persistant.
--- Source : forge-mvc-sessions-db (retour terrain 016, F34/F36/F37).
+-- Migration Forge Sessions : table du store de session persistant.
+-- Source : forge-mvc-sessions-db (retour terrain 016 F34/F36/F37 ; ADR-071).
 --
--- `forge sessions:init` écrit ce fichier dans mvc/models/sql/ ; `forge db:apply`
--- l'applique. `CREATE TABLE IF NOT EXISTS` rend l'opération idempotente.
+-- `forge sessions:init` copie cette migration dans mvc/migrations/ ;
+-- `forge migration:apply` l'applique. `CREATE TABLE IF NOT EXISTS` rend
+-- l'opération idempotente.
 --
 -- Horodatages : Python est l'unique autorité (UTC). Pas de DEFAULT
 -- CURRENT_TIMESTAMP ni ON UPDATE (pas de double horloge SGBD/Python, F37).

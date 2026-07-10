@@ -33,16 +33,17 @@ Premier palier du **niveau débutant** de la progression Sessions BDD.
 ## 1. Créer la table
 
 La table n'est pas créée automatiquement.
-Le paquet fournit son script SQL dans `mvc/models/sql/forge_sessions.sql`.
-Appliquez ce script sur votre base, une seule fois.
+`forge sessions:init` copie la migration embarquée du paquet dans `mvc/migrations/`.
+Appliquez-la sur votre base, une seule fois.
 
 ```bash
-forge db:apply
+forge sessions:init
+forge migration:apply
 ```
 
 ### Comprendre ce code
 
-- Le script `mvc/models/sql/forge_sessions.sql` définit la table `forge_sessions`.
+- `sessions:init` dépose la migration qui définit la table `forge_sessions`, `migration:apply` l'exécute.
 - Une écriture en base reste explicite : rien n'est créé en silence.
 - Sans cette table, `create()` et `get()` échouent faute de support de stockage.
 
@@ -85,7 +86,7 @@ print(session["panier"])   # []
 
 - Une session persistante se crée avec `create()` et se relit avec `get()`.
 - Le store se branche sur l'application avec `forge.configure(session_store=...)`.
-- La table `forge_sessions` doit exister au préalable (script `mvc/models/sql/forge_sessions.sql`).
+- La table `forge_sessions` doit exister au préalable (`forge sessions:init` puis `forge migration:apply`).
 
 ## Après ce starter
 

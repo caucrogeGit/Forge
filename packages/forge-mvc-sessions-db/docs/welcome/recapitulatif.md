@@ -6,11 +6,11 @@ Synthèse de l'API de `forge-mvc-sessions-db`, à garder sous la main.
 
 | Étape | Effet |
 |-------|-------|
-| Créer la table | Appliquer le script `mvc/models/sql/forge_sessions.sql` sur la base. |
+| Créer la table | `forge sessions:init` puis `forge migration:apply`. |
 | Brancher le store | `forge.configure(session_store=DbSessionStore(ttl=3600))`. |
 
 La table n'est jamais créée automatiquement.
-Cet opt-in n'a aucune commande CLI : c'est une bibliothèque que l'on importe.
+L'opt-in expose deux commandes CLI (`sessions:init`, `sessions:gc`) ; le store lui-même s'importe et se branche par `forge.configure`.
 
 ## Construire le store
 

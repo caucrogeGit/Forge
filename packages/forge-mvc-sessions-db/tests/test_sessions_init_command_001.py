@@ -1,8 +1,8 @@
-"""Garde-fous des commandes `forge sessions:init` / `sessions:gc` (retour 016 F34/F35).
+"""Garde-fous des commandes `forge sessions:init` / `sessions:gc` (retour 016 F34/F35 ; ADR-071).
 
-Vérifie que le paquet embarque le DDL `forge_sessions` (avec colonne `version`),
-que la commande le copie dans `mvc/models/sql/` sans écraser un fichier
-divergent, et que le DDL ne pose pas de double horloge SGBD/Python (F37).
+Vérifie que le paquet embarque la migration `forge_sessions` (avec colonne
+`version`), que la commande la copie dans `mvc/migrations/` sans écraser un
+fichier divergent, et que le DDL ne pose pas de double horloge SGBD/Python (F37).
 """
 from __future__ import annotations
 
@@ -13,16 +13,16 @@ import pytest
 forge_mvc_sessions_db = pytest.importorskip("forge_mvc_sessions_db")
 
 from forge_mvc_sessions_db.cli.init import (
-    init_sessions_schema,
-    iter_sessions_sql_resources,
+    init_sessions_migrations,
+    iter_sessions_migration_resources,
 )
 
 PKG_ROOT = Path(forge_mvc_sessions_db.__file__).resolve().parent
 
 
-def test_ships_forge_sessions_ddl() -> None:
-    sql_files = list((PKG_ROOT / "sql").glob("*.sql"))
-    assert sql_files, "forge-mvc-sessions-db doit embarquer le DDL forge_sessions"
+def test_ships_forge_sessions_migration() -> None:
+    sql_files = list((PKG_ROOT / "migrations").glob("*.sql"))
+    assert sql_files, "forge-mvc-sessions-db doit embarquer la migration forge_sessions"
     sql = sql_files[0].read_text(encoding="utf-8")
     assert "CREATE TABLE IF NOT EXISTS forge_sessions" in sql
     # F36 : colonne version pour la concurrence optimiste.
@@ -34,29 +34,29 @@ def test_ships_forge_sessions_ddl() -> None:
     assert "ON UPDATE" not in ddl
 
 
-def test_init_copies_ddl_into_models_sql(tmp_path: Path) -> None:
+def test_init_copies_migration_into_mvc_migrations(tmp_path: Path) -> None:
     (tmp_path / "mvc").mkdir()
-    assert init_sessions_schema(tmp_path) == 0
-    copied = list((tmp_path / "mvc" / "models" / "sql").glob("*.sql"))
-    assert copied, "le DDL doit être copié dans mvc/models/sql/"
+    assert init_sessions_migrations(tmp_path) == 0
+    copied = list((tmp_path / "mvc" / "migrations").glob("*.sql"))
+    assert copied, "la migration doit être copiée dans mvc/migrations/"
 
 
 def test_init_without_mvc_dir_fails(tmp_path: Path) -> None:
-    assert init_sessions_schema(tmp_path) == 1
+    assert init_sessions_migrations(tmp_path) == 1
 
 
 def test_init_is_idempotent(tmp_path: Path) -> None:
     (tmp_path / "mvc").mkdir()
-    assert init_sessions_schema(tmp_path) == 0
-    assert init_sessions_schema(tmp_path) == 0
+    assert init_sessions_migrations(tmp_path) == 0
+    assert init_sessions_migrations(tmp_path) == 0
 
 
 def test_init_never_overwrites_divergent_file(tmp_path: Path) -> None:
-    (tmp_path / "mvc" / "models" / "sql").mkdir(parents=True)
-    name = next(iter(iter_sessions_sql_resources()))[0]
-    target = tmp_path / "mvc" / "models" / "sql" / name
+    (tmp_path / "mvc" / "migrations").mkdir(parents=True)
+    name = next(iter(iter_sessions_migration_resources()))[0]
+    target = tmp_path / "mvc" / "migrations" / name
     target.write_text("-- contenu projet à préserver\n", encoding="utf-8")
-    assert init_sessions_schema(tmp_path) == 0
+    assert init_sessions_migrations(tmp_path) == 0
     assert target.read_text(encoding="utf-8") == "-- contenu projet à préserver\n"
 
 

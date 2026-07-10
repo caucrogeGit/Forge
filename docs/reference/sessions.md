@@ -161,15 +161,16 @@ forge.configure(session_store=store)
 ```
 
 **Prérequis** : la table `forge_sessions` doit exister dans la base de données.
-Script de création : `mvc/models/sql/forge_sessions.sql`
+`forge sessions:init` copie la migration embarquée dans `mvc/migrations/`, puis `forge migration:apply` l'applique (convention de provisioning des opt-ins, ADR-071).
 
 ```sql
 CREATE TABLE IF NOT EXISTS forge_sessions (
-    session_id CHAR(64)     NOT NULL,
-    data       LONGTEXT     NOT NULL,
-    expire_at  DATETIME     NOT NULL,
-    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    session_id CHAR(64)  NOT NULL,
+    data       LONGTEXT  NOT NULL,
+    expire_at  DATETIME  NOT NULL,
+    version    INT       NOT NULL DEFAULT 0,
+    created_at DATETIME  NOT NULL,
+    updated_at DATETIME  NOT NULL,
     PRIMARY KEY (session_id),
     INDEX idx_forge_sessions_expire_at (expire_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -177,7 +178,8 @@ CREATE TABLE IF NOT EXISTS forge_sessions (
 
 - Sessions partagées entre processus via la base (backend BDD actif)
 - Persiste après redémarrage
-- L'expiration est comparée à un horodatage calculé côté Python, passé en paramètre (SQL portable, sans `NOW()` propriétaire)
+- L'expiration et les horodatages `created_at`/`updated_at` sont calculés côté Python en UTC et passés en paramètre : Python est l'unique autorité, le DDL ne pose donc pas de `DEFAULT CURRENT_TIMESTAMP` ni `ON UPDATE` (SQL portable, sans `NOW()` propriétaire)
+- La colonne `version` porte une concurrence optimiste (garde `WHERE version = ?`) : aucune écriture concurrente perdue, message flash rendu une seule fois
 - Méthode supplémentaire : `cleanup_expired() -> int` (supprime les lignes expirées)
 - Les callables `fetch_one` et `execute` sont injectables pour les tests sans base réelle
 - Utilise la connexion Forge configurée via `core.database.db`, quel que soit le backend

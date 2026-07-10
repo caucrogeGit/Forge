@@ -20,4 +20,5 @@ from forge_mvc_sessions_db import DbSessionStore
 forge.configure(session_store=DbSessionStore())
 ```
 
-Table requise : `forge_sessions` (voir `mvc/models/sql/forge_sessions.sql`).
+Table requise : `forge_sessions`.
+`forge sessions:init` copie la migration dans `mvc/migrations/`, puis `forge migration:apply` l'applique.

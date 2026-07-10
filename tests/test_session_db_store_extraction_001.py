@@ -14,7 +14,15 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-_SQL = ROOT / "tests" / "fixtures" / "app" / "mvc" / "models" / "sql" / "forge_sessions.sql"
+_SQL = (
+    ROOT
+    / "tests"
+    / "fixtures"
+    / "app"
+    / "mvc"
+    / "migrations"
+    / "20260710130000_create_forge_sessions.sql"
+)
 
 
 # ── Extraction : le store BDD n'est plus dans le cœur ─────────────────────────

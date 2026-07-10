@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposée (2026-07-10).
+Acceptée (2026-07-10).
 
 ## Contexte
 
@@ -64,15 +64,15 @@ Critère de tri, pour un schéma livré par un paquet :
 
 ### Réalignement de `forge-mvc-sessions-db`
 
-`forge-mvc-sessions-db` est le seul opt-in du côté « migration » de la frontière à
-suivre encore la convention B. Il est réaligné sur la convention A dans un ticket
-dédié :
+`forge-mvc-sessions-db` était le seul opt-in du côté « migration » de la frontière
+à suivre encore la convention B. Il est réaligné sur la convention A :
 
 - le DDL `forge_sessions` est livré comme migration embarquée
-  (`forge_mvc_sessions_db/migrations/`) plutôt que comme `sql/*.sql` ;
+  (`forge_mvc_sessions_db/migrations/`) au lieu de `sql/*.sql` ;
 - `forge sessions:init` copie la migration vers `mvc/migrations/` et suggère
   `forge migration:apply` (au lieu de `mvc/models/sql/` + `db:apply`) ;
-- le docstring du store et la notice de l'opt-in citent la nouvelle cible.
+- le docstring du store, la notice de l'opt-in et la doc cœur de session citent la
+  nouvelle cible ; la fixture applicative de test suit la même convention.
 
 La rupture est interne et assumée en phase bêta (ADR-009), sans alias de
 compatibilité : le contrat fonctionnel du store (`SessionStore`, colonne `version`

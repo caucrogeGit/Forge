@@ -267,7 +267,7 @@ from core.sessions.file_store import FileSessionStore
 forge.configure(session_store=FileSessionStore(sessions_dir="storage/sessions"))
 ```
 
-Pour activer le store BDD (opt-in `forge-mvc-sessions-db`) (table `forge_sessions` requise, voir `mvc/models/sql/forge_sessions.sql`) :
+Pour activer le store BDD (opt-in `forge-mvc-sessions-db`) (table `forge_sessions` requise ; `forge sessions:init` puis `forge migration:apply`) :
 
 ```python
 import core.forge as forge

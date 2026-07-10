@@ -21,8 +21,8 @@ entre-temps : on recharge et on retente (pas de `SELECT ... FOR UPDATE`, non
 portable). Cela garantit l'absence de lost-update et l'unicité du message flash.
 
 Table requise : `forge_sessions`, à créer dans le projet avant usage (elle
-n'est pas créée automatiquement). `forge sessions:init` écrit le DDL dans
-`mvc/models/sql/forge_sessions.sql` ; `forge db:apply` l'applique.
+n'est pas créée automatiquement). `forge sessions:init` copie la migration
+embarquée dans `mvc/migrations/` ; `forge migration:apply` l'applique (ADR-071).
 """
 
 from __future__ import annotations
