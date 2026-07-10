@@ -55,25 +55,14 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     La couche traitement (`save_image_upload`, `verify_image_content`, variantes) fonctionne dès l'installation.
     La couche médias applicative (`attach_media_to_entity`, `get_media_gallery`, `get_cover_media`) exige en plus une table `media`, prérequis dur.
 
-    Le paquet ne livre ni commande ni migration pour cette table : créez la migration `mvc/migrations/20260605100000_create_media.sql`, puis appliquez-la avec `forge migration:apply` :
+    Créez-la avec la migration embarquée :
 
-    ```sql
-    CREATE TABLE IF NOT EXISTS media (
-        Id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        EntityName VARCHAR(100) NOT NULL,
-        EntityId INT NOT NULL,
-        Path VARCHAR(500) NOT NULL,
-        OriginalName VARCHAR(255) NOT NULL,
-        MimeType VARCHAR(120) NOT NULL,
-        Size INT NOT NULL,
-        Role VARCHAR(50) NOT NULL DEFAULT 'default',
-        Position INT NOT NULL DEFAULT 0,
-        AltText VARCHAR(255) NULL,
-        CreatedAt DATETIME NOT NULL,
-        PRIMARY KEY (Id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ```bash
+    forge images:init
+    forge migration:apply
     ```
 
+    `images:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
     Sans cette table, tout appel de la couche médias échoue au premier `INSERT INTO media`.
 
     ### Désinstallation
