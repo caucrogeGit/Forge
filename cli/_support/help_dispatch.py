@@ -609,8 +609,8 @@ Description:
   Forge tourne depuis pipx). La commande **n'exécute rien** : la présence
   du package reste un geste explicite de l'utilisateur (ADR-016).
 
-  Opt-ins officiels : admin, audio, audit, deploy, files, i18n, images,
-  import-export, iot, jobs, mail, mfa, notifications, pivot, qrcode, rbac,
+  Opt-ins officiels : admin, audio, audit, deploy, entities, files, i18n,
+  images, import-export, iot, jobs, mail, mfa, notifications, qrcode, rbac,
   settings, stats, video, workflow.
 
   Une fois le package présent, brancher l'opt-in avec :
@@ -1854,8 +1854,8 @@ Options:
 Limites:
   - ne génère pas le CRUD principal des deux entités liées (voir
     forge make:crud) ;
-  - le runtime vit dans l'opt-in forge-mvc-pivot (forge_mvc_pivot),
-    extrait du core (ADR-021) ; installer : pip install --pre forge-mvc-pivot ;
+  - le runtime vit dans l'opt-in forge-mvc-entities (forge_mvc_entities),
+    qui a absorbé le pivot (ADR-021/070) ; installer : pip install --pre forge-mvc-entities ;
   - ne modifie pas mvc/routes/__init__.py — le routage du sous-CRUD pivot est
     à brancher manuellement.""",
 

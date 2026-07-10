@@ -15,7 +15,7 @@ pyright>=1.1.400
 # Modules opt-in Forge, installés en mode éditable depuis le monorepo.
 # Sans ces lignes, les tests qui importent forge_mvc_mfa, forge_mvc_rbac,
 # forge_mvc_workflow, forge_mvc_stats, forge_mvc_files, forge_mvc_images,
-# forge_mvc_audio, forge_mvc_iot, forge_mvc_video, forge_mvc_pivot et
+# forge_mvc_audio, forge_mvc_iot, forge_mvc_video, forge_mvc_entities et
 # forge_mvc_mail sont silencieusement skippés (pytest.importorskip), donc
 # leur suite ne s'exécute pas en CI. L'extra forge-mvc[all] ne couvre que
 # rbac/workflow/stats (tous les autres opt-ins sont exclus, voir pyproject.toml) :
