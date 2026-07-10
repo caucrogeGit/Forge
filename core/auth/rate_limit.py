@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import threading
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from math import ceil
 from typing import Any, cast
 
@@ -101,6 +101,20 @@ def _normalize_optional_text(value: Any, field_name: str) -> str | None:
             f"{field_name} doit etre None ou une chaine non vide"
         )
     return value.strip()
+
+
+def _ensure_aware_utc(value: datetime) -> datetime:
+    """Ramene une datetime en UTC tz-aware (les naives sont supposees UTC).
+
+    Le rate limit compare et soustrait des datetimes venant de sources
+    heterogenes : l'horloge par defaut, des tentatives chargees d'une base, et
+    les chemins MFA qui passent un now aware. Sans normalisation, une comparaison
+    naif/aware leve TypeError et casse le controle anti-bruteforce (le verrou
+    devient un deni de service permanent). On aligne tout sur UTC aware.
+    """
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
 def validate_auth_rate_limit_attempt_contract(data: Any) -> AuthRateLimitAttempt:
@@ -262,7 +276,7 @@ def check_auth_rate_limit(
     else:
         attempts_iterable = tuple(attempts)
 
-    now = now or datetime.now()
+    now = datetime.now(tz=timezone.utc) if now is None else _ensure_aware_utc(now)
     window_start = now - timedelta(seconds=checked_rule.window_seconds)
     matching_failures: list[AuthRateLimitAttempt] = []
 
@@ -276,7 +290,8 @@ def check_auth_rate_limit(
             continue
         if attempt.created_at is None:
             continue
-        if not (window_start <= attempt.created_at <= now):
+        created_at = _ensure_aware_utc(attempt.created_at)
+        if not (window_start <= created_at <= now):
             continue
         matching_failures.append(attempt)
 
@@ -292,7 +307,11 @@ def check_auth_rate_limit(
             retry_after_seconds=None,
         )
 
-    oldest = min(attempt.created_at for attempt in matching_failures if attempt.created_at)
+    oldest = min(
+        _ensure_aware_utc(attempt.created_at)
+        for attempt in matching_failures
+        if attempt.created_at
+    )
     retry_after = max(
         0,
         ceil((oldest + timedelta(seconds=checked_rule.window_seconds) - now).total_seconds()),
@@ -328,7 +347,7 @@ def record_attempt(
     now: datetime | None = None,
 ) -> None:
     """Enregistre une tentative dans le store in-memory."""
-    ts = now if now is not None else datetime.now()
+    ts = _ensure_aware_utc(now) if now is not None else datetime.now(tz=timezone.utc)
     attempt = create_auth_rate_limit_attempt(
         action=action,
         key=key,
