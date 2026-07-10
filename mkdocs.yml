@@ -313,6 +313,7 @@ nav:
             - ADR-068 Routes applicatives par contrôleur dans mvc/routes/: adr/068-per-controller-routes-package.md
             - ADR-069 Clé étrangère de première classe (type foreign_key): adr/069-foreign-key-field-type.md
             - ADR-070 Extraction du moteur d'entités (forge-mvc-entities): adr/070-entities-engine-extraction.md
+            - ADR-071 Convention de provisioning des opt-ins BDD: adr/071-optin-db-provisioning-convention.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
