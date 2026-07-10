@@ -117,6 +117,18 @@
 
 ### Corrigé
 
+- **Commandes CLI des opt-ins : aide et config projet (retour terrain 016, F39 / F40 ; ADR-072).**
+  Deux frictions sur les commandes livrées par les opt-ins, corrigées dans le dispatch commun
+  (`dispatch_optin`). **F40** : `forge sessions:gc --help` (et `sessions:init --help`) exécutait
+  l'effet au lieu d'afficher l'aide ; `-h`/`--help` est désormais **intercepté avant tout effet**
+  pour toute commande d'opt-in (les commandes Forge documentées l'étaient déjà via
+  `format_command_help`, ce filet couvre aussi les opt-ins tiers). **F39** : `forge sessions:gc`
+  ouvrait une connexion BDD sans avoir chargé la config du projet (`env/dev`), le pool se rabattant
+  sur l'utilisateur système sans mot de passe (`Access denied`) et rendant la purge inutilisable en
+  cron/systemd. La table `COMMANDS` d'un opt-in peut maintenant marquer une commande adossée à la
+  base avec `config: True` : le dispatch **amorce alors `load_project_config()`** (comme le cœur le
+  fait pour `migration:apply`) avant le handler. `sessions:gc` le déclare ; `sessions:init` non
+  (copie de fichiers). Clé additive, rétro-compatible.
 - **Unicité des relations scopée à l'entité source (retour terrain, F24 / F25).** `make:relation`
   et le validateur partagé (`validate_relations_definition`, donc aussi `entity:validate`,
   `sync:relations`, `project:check`) traitaient le **nom de relation** et le **nom de colonne FK**

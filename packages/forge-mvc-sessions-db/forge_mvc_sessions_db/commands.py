@@ -6,7 +6,10 @@ cœur (dispatch_optin) importe le handler paresseusement à l'invocation.
 """
 from __future__ import annotations
 
+# `config: True` amorce la config projet (env/dev) avant le handler : sessions:gc
+# ouvre une connexion BDD et a besoin des identifiants applicatifs (ADR-072,
+# retour terrain 016 F39). sessions:init ne copie que des fichiers : pas de config.
 COMMANDS: dict[str, dict[str, str | bool]] = {
     "sessions:init": {"module": "forge_mvc_sessions_db.cli.init"},
-    "sessions:gc": {"module": "forge_mvc_sessions_db.cli.gc"},
+    "sessions:gc": {"module": "forge_mvc_sessions_db.cli.gc", "config": True},
 }

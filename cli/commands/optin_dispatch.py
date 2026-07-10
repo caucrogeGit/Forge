@@ -31,6 +31,7 @@ class OptinCommand:
     attr: str = "main"            # attribut appelable dans le module
     pass_full_args: bool = False  # le handler reçoit les args complets (commande incluse)
     exit_on_rc: bool = True       # sys.exit(rc) si le handler renvoie un code non nul
+    needs_config: bool = False    # amorcer la config projet (env/dev) avant le handler
 
 
 _discovered_cache: dict[str, OptinCommand] | None = None
@@ -59,6 +60,7 @@ def _discovered_commands() -> dict[str, OptinCommand]:
                 attr=str(spec.get("attr", "main")),
                 pass_full_args=bool(spec.get("full", False)),
                 exit_on_rc=bool(spec.get("exit_rc", True)),
+                needs_config=bool(spec.get("config", False)),
             )
     _discovered_cache = discovered
     return _discovered_cache
@@ -73,14 +75,40 @@ def all_optin_commands() -> dict[str, OptinCommand]:
 
 
 def dispatch_optin(command: str, args: list[str]) -> bool:
-    """Exécute une commande opt-in si elle est découverte (ADR-059).
+    """Exécute une commande opt-in si elle est découverte (ADR-059, ADR-072).
 
     Renvoie True si la commande a été prise en charge, False sinon. Échoue
     proprement (cli_fail) si le module de l'opt-in est introuvable.
+
+    Deux garanties transverses à toutes les commandes d'opt-in (ADR-072) :
+
+    - ``-h``/``--help`` est **intercepté avant tout effet** (retour terrain
+      016 F40) : une commande ne doit jamais s'exécuter quand on demande son
+      aide. Les commandes Forge documentées sont déjà interceptées en amont
+      par ``format_command_help`` ; ce filet protège aussi les opt-ins tiers.
+    - une commande déclarant ``config: True`` (adossée à la base) voit la
+      **config du projet amorcée** (``env/dev`` via ``load_project_config``)
+      avant le handler, comme le cœur le fait pour ``migration:apply`` (retour
+      terrain 016 F39). Sans quoi le pool BDD se rabattrait sur l'utilisateur
+      système sans mot de passe.
     """
     spec = _discovered_commands().get(command)
     if spec is None:
         return False
+
+    from cli._support.help_dispatch import format_command_help, wants_help
+
+    # F40 : afficher l'aide sans jamais déclencher l'effet de la commande.
+    if wants_help(args[1:]):
+        detailed = format_command_help(command)
+        if detailed is not None:
+            print(detailed)
+        else:
+            print(f"forge {command} — commande fournie par l'opt-in {spec.package}.")
+            print("Cette commande n'expose pas d'aide détaillée ; "
+                  "consultez la documentation de l'opt-in.")
+        return True
+
     try:
         module = importlib.import_module(spec.module)
     except ImportError:
@@ -88,6 +116,19 @@ def dispatch_optin(command: str, args: list[str]) -> bool:
             f"module {spec.package} non installé.",
             hint=f"installe le module opt-in : pip install {spec.package}",
         )
+
+    # F39 : amorcer la config projet pour les commandes adossées à la base.
+    if spec.needs_config:
+        from cli.project.project_config import ProjectConfigError, load_project_config
+        try:
+            load_project_config()
+        except ProjectConfigError as exc:
+            cli_fail(
+                str(exc),
+                hint="lancez la commande depuis la racine d'un projet Forge "
+                     "(config.py et env/dev requis, comme pour forge migration:apply).",
+            )
+
     handler: Callable[[list[str]], Any] = getattr(module, spec.attr)
     rc = handler(args if spec.pass_full_args else args[1:])
     if spec.exit_on_rc and rc:
