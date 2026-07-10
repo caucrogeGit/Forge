@@ -237,13 +237,42 @@ def _is_table_missing_error(exc: Exception) -> bool:
     return "doesn't exist" in str(exc).lower()
 
 
+def _load_project_config_if_present() -> None:
+    """Charge la config du projet (``env/dev``) si on est dans un projet Forge.
+
+    Un diagnostic doit tourner **aussi hors projet** (checks statiques). Mais en
+    projet, le check ``--db`` doit connecter avec les **identifiants applicatifs**
+    (``env/dev``), sinon le pool se rabat sur l'utilisateur système et le doctor
+    signale à tort la base injoignable (retour terrain 016, esprit ADR-072).
+
+    Nuance clé vs les commandes fonctionnelles adossées à la base (``iot:listen``,
+    marquées ``config: True`` : la config y est **exigée**) : un doctor **charge la
+    config si elle est présente**, mais ne la **réclame pas**. L'absence de projet
+    (ou un ``config.py`` invalide) n'est donc pas une erreur ici : on continue avec
+    l'environnement ambiant, le check ``--db`` reflètera l'état réel.
+    """
+    try:
+        from cli.project.project_config import (  # noqa: PLC0415
+            ProjectConfigError,
+            load_project_config,
+        )
+    except ImportError:
+        return  # cœur non importable (cas très dégradé) : le doctor continue
+    try:
+        load_project_config()
+    except ProjectConfigError:
+        pass  # hors projet ou config.py invalide : on continue avec l'env ambiant
+
+
 def check_database_table(fetch_one_func: _FetchOne | None = None) -> CheckResult:
     """Vérifie l'accès à la table ``iot_events``.
 
     Le paramètre ``fetch_one_func`` permet l'injection en test (mock).
     Par défaut, utilise ``core.database.db.fetch_one`` — import différé
     pour ne déclencher aucun import DB tant que ``--db`` n'est pas
-    explicitement passé.
+    explicitement passé. Dans ce cas par défaut, la config du projet est
+    d'abord chargée si elle est présente (``_load_project_config_if_present``)
+    pour connecter avec les identifiants applicatifs d'``env/dev``.
 
     Retourne :
 
@@ -255,6 +284,7 @@ def check_database_table(fetch_one_func: _FetchOne | None = None) -> CheckResult
       etc.) — message volontairement sobre, pas de stacktrace.
     """
     if fetch_one_func is None:
+        _load_project_config_if_present()
         try:
             from core.database.db import fetch_one as fetch_one_func  # noqa: PLC0415
         except ImportError as exc:

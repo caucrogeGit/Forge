@@ -132,6 +132,13 @@
   `video:upload` / `video:process` / `video:cleanup` (table vidéo). Les commandes qui ne connectent
   pas (copie de migration `*:init`, diagnostics statiques `*:doctor`, `iot:simulate`) ne le posent
   pas. Clé additive, rétro-compatible ; garde-fou verrouillant l'audit.
+- **`forge iot:doctor --db` charge la config projet si présente (IOT-DOCTOR-DB-CONFIG-BOOTSTRAP-001).**
+  Le check `--db` connectait avec l'environnement ambiant : en projet, sans `env/dev` chargé, il
+  signalait à tort la base injoignable. Il charge désormais `env/dev` **si un projet est présent**,
+  pour se connecter avec les identifiants applicatifs, tout en restant utilisable **hors projet**
+  (checks statiques) : contrairement aux commandes fonctionnelles adossées à la base (`config: True`,
+  qui exigent la config), un diagnostic charge la config sans la réclamer. Le chemin statique et les
+  tests (fetch injecté) ne sont pas affectés.
 - **Unicité des relations scopée à l'entité source (retour terrain, F24 / F25).** `make:relation`
   et le validateur partagé (`validate_relations_definition`, donc aussi `entity:validate`,
   `sync:relations`, `project:check`) traitaient le **nom de relation** et le **nom de colonne FK**
