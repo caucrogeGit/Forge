@@ -127,8 +127,11 @@
   sur l'utilisateur système sans mot de passe (`Access denied`) et rendant la purge inutilisable en
   cron/systemd. La table `COMMANDS` d'un opt-in peut maintenant marquer une commande adossée à la
   base avec `config: True` : le dispatch **amorce alors `load_project_config()`** (comme le cœur le
-  fait pour `migration:apply`) avant le handler. `sessions:gc` le déclare ; `sessions:init` non
-  (copie de fichiers). Clé additive, rétro-compatible.
+  fait pour `migration:apply`) avant le handler. Un audit transverse a posé le drapeau sur toutes
+  les commandes d'opt-in adossées à la base : `sessions:gc`, `iot:listen` (INSERT `iot_events`),
+  `video:upload` / `video:process` / `video:cleanup` (table vidéo). Les commandes qui ne connectent
+  pas (copie de migration `*:init`, diagnostics statiques `*:doctor`, `iot:simulate`) ne le posent
+  pas. Clé additive, rétro-compatible ; garde-fou verrouillant l'audit.
 - **Unicité des relations scopée à l'entité source (retour terrain, F24 / F25).** `make:relation`
   et le validateur partagé (`validate_relations_definition`, donc aussi `entity:validate`,
   `sync:relations`, `project:check`) traitaient le **nom de relation** et le **nom de colonne FK**

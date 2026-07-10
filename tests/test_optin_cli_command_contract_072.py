@@ -95,3 +95,41 @@ def test_sessions_commands_declare_config_correctly():
 
     assert COMMANDS["sessions:gc"].get("config") is True
     assert "config" not in COMMANDS["sessions:init"]
+
+
+# Audit transverse (retour terrain 016, suite F39) : toute commande d'opt-in qui
+# ouvre une connexion BDD inconditionnellement doit déclarer config:True.
+_DB_BACKED_COMMANDS = frozenset({
+    "sessions:gc",     # DELETE des sessions expirées
+    "iot:listen",      # INSERT dans iot_events
+    "video:upload",    # INSERT ligne vidéo
+    "video:process",   # UPDATE statut/poster/MP4
+    "video:cleanup",   # DELETE lignes failed
+})
+
+# Commandes qui ne connectent pas (copie de fichiers, diagnostic statique,
+# publication MQTT) : elles ne doivent pas forcer la config d'un projet.
+_NON_DB_COMMANDS = frozenset({
+    "sessions:init", "iot:init", "iot:doctor", "iot:simulate",
+    "video:init", "video:doctor", "audio:doctor",
+    "images:init", "audit:init", "settings:init", "jobs:init",
+    "notifications:init", "admin:init", "admin:doctor",
+})
+
+
+def test_db_backed_optin_commands_declare_config():
+    cmds = optin_dispatch.all_optin_commands()
+    for name in _DB_BACKED_COMMANDS:
+        if name in cmds:  # opt-in installé dans l'environnement de test
+            assert cmds[name].needs_config is True, (
+                f"{name} ouvre une connexion BDD : doit déclarer config:True (F39)."
+            )
+
+
+def test_non_db_optin_commands_do_not_declare_config():
+    cmds = optin_dispatch.all_optin_commands()
+    for name in _NON_DB_COMMANDS:
+        if name in cmds:
+            assert cmds[name].needs_config is False, (
+                f"{name} ne connecte pas la BDD : ne doit pas forcer la config projet."
+            )
