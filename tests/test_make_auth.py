@@ -49,6 +49,17 @@ def test_controleur_cable_sur_le_backend_auth():
     assert 'BaseController.redirect("/login")' in AUTH_CONTROLLER
 
 
+def test_controleur_genere_est_anti_bruteforce():
+    # Principe §7 « sécuriser par défaut » : le /login scaffoldé plafonne les
+    # tentatives par IP (vérification avant auth + enregistrement sur échec).
+    assert "is_login_rate_limited(request.ip)" in AUTH_CONTROLLER
+    assert "record_login_attempt(request.ip)" in AUTH_CONTROLLER
+    assert (
+        "from core.auth.rate_limit import is_login_rate_limited, record_login_attempt"
+        in AUTH_CONTROLLER
+    )
+
+
 def test_controleur_genere_est_du_python_valide():
     ast.parse(AUTH_CONTROLLER)  # ne lève pas
 

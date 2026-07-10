@@ -15,7 +15,8 @@ Sans ancrage, il n'écrit pas et affiche le bloc à coller. Le bouton s'appuie s
 
 Périmètre v1 : socle standard `users` (email / password_hash / is_active, produit
 par `forge auth:init`), avec défense anti-fixation de session (régénération +
-cookie). MFA, rate-limit et audit sont laissés en extension (voir le contrôleur de
+cookie) et limitation anti-bruteforce par IP (principe §7 « sécuriser par
+défaut »). MFA et audit sont laissés en extension (voir le contrôleur de
 référence `tests/fixtures/app/mvc/controllers/auth_controller.py`).
 
 `auth:init` reste centré sur les comptes/SQL ; `make:auth` scaffolde l'UI/le flux.
@@ -30,9 +31,10 @@ AUTH_CONTROLLER = '''\
 """Contrôleur d'authentification (généré par forge make:auth).
 
 Flux de connexion sur le socle `users` (forge auth:init) : formulaire, POST de
-login (avec défense anti-fixation de session), et logout. Le loader charge un
-utilisateur par email pour `authenticate_user` (cœur).
+login (défense anti-fixation de session + limitation anti-bruteforce par IP), et
+logout. Le loader charge un utilisateur par email pour `authenticate_user` (cœur).
 """
+from core.auth.rate_limit import is_login_rate_limited, record_login_attempt
 from core.auth.session import authenticate_user, login_user, logout_user
 from core.database.db import fetch_one
 from core.http.request import Request
@@ -74,6 +76,15 @@ class AuthController(BaseController):
         if session_id is None or session is None:
             return BaseController.redirect("/login")
 
+        # Anti-bruteforce : plafonne les tentatives échouées par IP (fenêtre glissante).
+        if is_login_rate_limited(request.ip):
+            response = BaseController.render("auth/login.html", context={
+                "csrf_token": session.get("csrf_token", ""),
+                "erreur": "Trop de tentatives. Réessayez dans un instant.",
+            })
+            set_session_cookie(response, session_id)
+            return response
+
         email = request.form("email", "")
         password = request.form("password", "")
         user = authenticate_user(email, password, load_user_by_email)
@@ -85,6 +96,8 @@ class AuthController(BaseController):
             set_session_cookie(response, new_id)
             return response
 
+        # Échec : enregistre la tentative pour la limitation par IP.
+        record_login_attempt(request.ip)
         response = BaseController.render("auth/login.html", context={
             "csrf_token": session.get("csrf_token", ""),
             "erreur": "Identifiant ou mot de passe incorrect.",
