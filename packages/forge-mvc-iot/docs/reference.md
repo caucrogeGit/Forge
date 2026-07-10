@@ -50,6 +50,16 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
     `forge opt-in:install iot` affiche la commande `pip` sans l'exécuter.
 
+    Puis créez la table `iot_events`, prérequis dur du module :
+
+    ```bash
+    forge iot:init
+    forge migration:apply
+    ```
+
+    `iot:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
+    Sans cette table, le premier message reçu échoue.
+
     ### Désinstallation
 
     ```bash

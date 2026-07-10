@@ -51,6 +51,16 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
     `forge opt-in:install audit` affiche la commande `pip` sans l'exécuter.
 
+    Puis créez la table `audit_log`, prérequis dur du module :
+
+    ```bash
+    forge audit:init
+    forge migration:apply
+    ```
+
+    `audit:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
+    Sans cette table, `record_audit` et `get_audit_log` échouent au premier appel.
+
     ### Désinstallation
 
     ```bash

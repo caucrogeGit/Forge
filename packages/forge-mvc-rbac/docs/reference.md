@@ -51,6 +51,18 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in se greffe ensuite dans vos flux : décorateurs, starter).
     `forge opt-in:install rbac` affiche la commande `pip` sans l'exécuter.
 
+    Selon le chemin retenu, une étape base peut être un prérequis dur.
+
+    Le chemin recommandé (`require_contract_permission`, contrat `mvc/security/rbac.json`) n'utilise pas la base : aucune table requise.
+
+    Le chemin basé base (`require_user_permission`, `auth_user_can`) suppose en revanche des tables présentes, qu'aucune commande ne crée automatiquement.
+    Appliquez le SQL embarqué avant le premier appel :
+
+    - `roles`, `permissions`, `role_permissions` : fichier `sql/rbac.sql` du paquet ;
+    - `user_roles` (liaison utilisateur/rôle) : fichier `sql/user_roles.sql` du paquet.
+
+    Sans ces tables, `require_user_permission` échoue dès la résolution des permissions.
+
     ### Désinstallation
 
     ```bash

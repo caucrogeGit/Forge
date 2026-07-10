@@ -51,6 +51,23 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
     `forge opt-in:install video` affiche la commande `pip` sans l'exécuter.
 
+    Puis installez les binaires externes `ffmpeg` et `ffprobe`, requis pour le sondage et le transcodage :
+
+    ```bash
+    forge video:doctor
+    ```
+
+    `video:doctor` vérifie leur présence ; sans eux, `video:process` échoue.
+
+    Créez enfin la table `videos`, prérequis dur du module :
+
+    ```bash
+    forge video:init
+    forge migration:apply
+    ```
+
+    `video:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
+
     ### Désinstallation
 
     ```bash

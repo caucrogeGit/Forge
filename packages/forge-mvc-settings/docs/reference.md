@@ -51,6 +51,16 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
     `forge opt-in:install settings` affiche la commande `pip` sans l'exécuter.
 
+    Puis créez la table `app_settings`, prérequis dur du module :
+
+    ```bash
+    forge settings:init
+    forge migration:apply
+    ```
+
+    `settings:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
+    Sans cette table, `get_setting` et `set_setting` échouent au premier appel.
+
     ### Désinstallation
 
     ```bash

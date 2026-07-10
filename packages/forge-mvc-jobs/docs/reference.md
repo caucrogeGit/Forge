@@ -52,6 +52,16 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
     `forge opt-in:install jobs` affiche la commande `pip` sans l'exécuter.
 
+    Puis créez la table `jobs`, prérequis dur du module :
+
+    ```bash
+    forge jobs:init
+    forge migration:apply
+    ```
+
+    `jobs:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
+    Sans cette table, `enqueue` et le worker échouent au premier appel.
+
     ### Désinstallation
 
     ```bash

@@ -50,6 +50,25 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
     `forge opt-in:install sessions-db` affiche la commande `pip` sans l'exécuter.
 
+    Puis créez la table `forge_sessions`, prérequis dur du module : sans elle, la première requête de session échoue par une erreur SQL.
+
+    Le paquet ne livre aucun script ; placez le DDL dans `mvc/models/sql/forge_sessions.sql` :
+
+    ```sql
+    CREATE TABLE IF NOT EXISTS forge_sessions (
+        session_id CHAR(64)  NOT NULL,
+        data       LONGTEXT  NOT NULL,
+        expire_at  DATETIME  NOT NULL,
+        created_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (session_id),
+        INDEX idx_forge_sessions_expire_at (expire_at)
+    );
+    ```
+
+    Appliquez ensuite le schéma avec `forge db:apply`.
+    Le DDL ci-dessus est écrit pour MariaDB : adaptez les types au backend actif si nécessaire (par exemple `TEXT` au lieu de `LONGTEXT`, et un `CREATE INDEX` séparé sur SQLite ou PostgreSQL).
+
     ### Désinstallation
 
     ```bash

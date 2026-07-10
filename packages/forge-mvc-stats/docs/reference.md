@@ -55,6 +55,19 @@ Aucun cookie visiteur, aucune IP.
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
     `forge opt-in:install stats` affiche la commande `pip` sans l'exécuter.
 
+    Puis créez la table `forge_stats_events`, prérequis dur du module.
+
+    Cet opt-in n'expose aucune commande CLI : appliquez une fois, comme migration applicative, le `CREATE TABLE` fourni par `get_stats_events_schema_sql()` :
+
+    ```python
+    import core.database.db as db
+    from forge_mvc_stats import get_stats_events_schema_sql
+
+    db.execute(get_stats_events_schema_sql())
+    ```
+
+    Sans cette table, `track_event` échoue au premier appel.
+
     ### Désinstallation
 
     ```bash

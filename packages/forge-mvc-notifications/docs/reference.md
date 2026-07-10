@@ -52,6 +52,16 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
     `forge opt-in:install notifications` affiche la commande `pip` sans l'exécuter.
 
+    Puis créez la table `notifications`, prérequis dur du module :
+
+    ```bash
+    forge notifications:init
+    forge migration:apply
+    ```
+
+    `notifications:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
+    Sans cette table, `notify` et `get_notifications` échouent au premier appel.
+
     ### Désinstallation
 
     ```bash

@@ -69,6 +69,23 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in se greffe ensuite dans vos flux : décorateurs, starter).
     `forge opt-in:install mfa` affiche la commande `pip` sans l'exécuter.
 
+    Puis posez la clé de chiffrement `FORGE_MFA_SECRET_KEY`, prérequis dur du module.
+
+    Le secret TOTP est chiffré au repos (Fernet) : sans cette clé, MFA lève `MfaSecretKeyMissing` dès le premier usage.
+    Générez une clé, puis reportez-la dans l'environnement du projet (jamais dans le dépôt) :
+
+    ```bash
+    python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    ```
+
+    Placez la valeur sous `FORGE_MFA_SECRET_KEY` dans `env/dev` et l'environnement de production.
+    Appelez `validate_mfa_secret_key_config()` au démarrage pour échouer tôt si la clé manque.
+
+    Créez enfin les tables de persistance `auth_mfa_factors` et `auth_mfa_recovery_codes`, lues et écrites par l'enrôlement, le challenge et les codes de récupération.
+
+    La persistance reste applicative (ADR-008) : les DDL de référence sont fournies dans `sql/auth_mfa_factors.sql` et `sql/auth_mfa_recovery_codes.sql`, à intégrer à vos migrations avant le premier usage.
+    Ces tables portent une clé étrangère vers `users(id)`.
+
     ### Désinstallation
 
     ```bash
