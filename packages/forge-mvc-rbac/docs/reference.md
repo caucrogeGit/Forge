@@ -55,11 +55,45 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
 
     Le chemin recommandé (`require_contract_permission`, contrat `mvc/security/rbac.json`) n'utilise pas la base : aucune table requise.
 
-    Le chemin basé base (`require_user_permission`, `auth_user_can`) suppose en revanche des tables présentes, qu'aucune commande ne crée automatiquement.
-    Appliquez le SQL embarqué avant le premier appel :
+    Le chemin basé base (`require_user_permission`, `auth_user_can`) suppose en revanche des tables présentes.
 
-    - `roles`, `permissions`, `role_permissions` : fichier `sql/rbac.sql` du paquet ;
-    - `user_roles` (liaison utilisateur/rôle) : fichier `sql/user_roles.sql` du paquet.
+    La liaison utilisateur/rôle `user_roles` fait partie du socle d'authentification : le cœur l'écrit via `forge auth:init` dès que `forge-mvc-rbac` est installé.
+
+    ```bash
+    forge auth:init
+    forge db:apply
+    ```
+
+    Les tables de base `roles`, `permissions`, `role_permissions` ne sont pas provisionnées par le socle auth ; créez-les avant le premier appel du chemin base :
+
+    ```sql
+    CREATE TABLE IF NOT EXISTS roles (
+        id          INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        name        VARCHAR(100) NOT NULL,
+        slug        VARCHAR(100) NOT NULL UNIQUE,
+        description TEXT         NULL,
+        created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+    CREATE TABLE IF NOT EXISTS permissions (
+        id          INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        code        VARCHAR(150) NOT NULL UNIQUE,
+        label       VARCHAR(255) NULL,
+        description TEXT         NULL,
+        created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+    CREATE TABLE IF NOT EXISTS role_permissions (
+        role_id       INT NOT NULL,
+        permission_id INT NOT NULL,
+        PRIMARY KEY (role_id, permission_id),
+        CONSTRAINT fk_rp_role
+            FOREIGN KEY (role_id)       REFERENCES roles(id)       ON DELETE CASCADE,
+        CONSTRAINT fk_rp_permission
+            FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE,
+        INDEX idx_rp_permission (permission_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ```
 
     Sans ces tables, `require_user_permission` échoue dès la résolution des permissions.
 

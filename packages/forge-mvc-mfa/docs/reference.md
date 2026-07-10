@@ -83,8 +83,14 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     Créez enfin les tables de persistance `auth_mfa_factors` et `auth_mfa_recovery_codes`, lues et écrites par l'enrôlement, le challenge et les codes de récupération.
 
-    La persistance reste applicative (ADR-008) : les DDL de référence sont fournies dans `sql/auth_mfa_factors.sql` et `sql/auth_mfa_recovery_codes.sql`, à intégrer à vos migrations avant le premier usage.
-    Ces tables portent une clé étrangère vers `users(id)`.
+    Ces tables font partie du socle d'authentification (clé étrangère vers `users(id)`) : le cœur les provisionne via `forge auth:init`, qui écrit leur DDL dès que `forge-mvc-mfa` est installé.
+
+    ```bash
+    forge auth:init
+    forge db:apply
+    ```
+
+    `auth:init` écrit `mvc/models/sql/auth_mfa_factors.sql` et `auth_mfa_recovery_codes.sql` (persistance applicative, ADR-008) ; `db:apply` les crée.
 
     ### Désinstallation
 
