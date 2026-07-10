@@ -259,4 +259,4 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
 - [Sondage (probe.py)](references/probe.md) et [Transcodage MP4 (transcode.py)](references/transcode.md) : le pipeline.
 - [Traitement (process.py)](references/process.md) : orchestration complète.
 - [Lecture HTTP (http.py)](references/http.md) : routes et streaming.
-- [Welcome-Vidéo](welcome/debutant/video-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Vidéo](welcome/debutant/video-welcome.md) : parcours d'apprentissage.

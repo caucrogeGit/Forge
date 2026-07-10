@@ -242,5 +242,5 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
 ## Voir aussi
 
 - [Contrat de ressource](resources.md) : détail de `AdminResource`.
-- [Welcome-Admin](welcome/debutant/admin-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Admin](welcome/debutant/admin-welcome.md) : parcours d'apprentissage.
 - `docs/roadmap/forge-admin-roadmap.md` : trajectoire du back-office.

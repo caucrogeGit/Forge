@@ -260,4 +260,4 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
 - [Moteur d'import (engine.py)](references/engine.md) : `import_rows`, `FieldSpec`, `ImportReport`.
 - [Export programmatique (csv_writer.py)](references/export.md) : `to_csv`.
 - [Erreurs (errors.py)](references/errors.md) : `CsvImportError`.
-- [Welcome-Import/Export](welcome/debutant/import-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Import/Export](welcome/debutant/import-welcome.md) : parcours d'apprentissage.

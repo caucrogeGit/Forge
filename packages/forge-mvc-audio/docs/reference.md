@@ -265,4 +265,4 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
 - [Ingestion (ingest.py)](references/ingest.md) : `ingest_audio`, stockage par uuid.
 - [Sondage (probe.py)](references/probe.md) et [Transcodage MP3 (transcode.py)](references/transcode.md).
 - [Lecture HTTP (http.py)](references/http.md) : routes et streaming.
-- [Welcome-Audio](welcome/debutant/audio-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Audio](welcome/debutant/audio-welcome.md) : parcours d'apprentissage.

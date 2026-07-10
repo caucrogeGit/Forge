@@ -273,4 +273,4 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
 - [Les notifications (store.py)](references/store.md) : détail des fonctions et du SQL.
 - [Initialisation (notifications:init)](references/cli.md) : création de la table.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `NotificationError`.
-- [Welcome-Notifications](welcome/debutant/notif-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Notifications](welcome/debutant/notif-welcome.md) : parcours d'apprentissage.

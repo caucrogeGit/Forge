@@ -400,4 +400,4 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 - [Codes de récupération (recovery.py)](references/recovery.md) : génération et consommation.
 - [Chiffrement des secrets (secret_crypto.py)](references/secret_crypto.md) : Fernet, `FORGE_MFA_SECRET_KEY`.
 - [Protection anti-rejeu (totp_replay.py)](references/totp_replay.md).
-- [Welcome-MFA](welcome/debutant/mfa-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-MFA](welcome/debutant/mfa-welcome.md) : parcours d'apprentissage.

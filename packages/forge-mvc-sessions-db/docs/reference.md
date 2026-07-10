@@ -237,4 +237,4 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
 - [Le store (store.py)](references/store.md) : `DbSessionStore` et ses méthodes.
 - [Les sessions dans le cœur](/docs/forge/reference/sessions/) : contrat `SessionStore`, stores mémoire et fichier.
-- [Welcome-Sessions BDD](welcome/debutant/sessions-db-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Sessions BDD](welcome/debutant/sessions-db-welcome.md) : parcours d'apprentissage.

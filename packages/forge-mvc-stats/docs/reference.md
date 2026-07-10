@@ -256,4 +256,4 @@ Aucun cookie visiteur, aucune IP.
 - [Tracking (tracking.py)](references/tracking.md) : `track_event`.
 - [Affichage admin (admin.py)](references/admin.md) : lister et filtrer.
 - [Agrégation (aggregate.py)](references/aggregate.md) : compter par dimension (ADR-037).
-- [Welcome-Stats](welcome/debutant/stats-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-Stats](welcome/debutant/stats-welcome.md) : parcours d'apprentissage.

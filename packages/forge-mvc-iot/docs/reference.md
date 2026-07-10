@@ -257,4 +257,4 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
 - [Repository d'événements (storage/repository.py)](references/storage_repository.md) et [Contrat SQL](references/storage_events.md).
 - [API HTTP (http.py)](references/http.md) : routes JSON.
 - [Architecture Forge IoT](architecture.md) : trajectoire d'ensemble.
-- [Welcome-IoT](welcome/debutant/iot-welcome.md) : apprendre l'opt-in pas à pas.
+- [Welcome-IoT](welcome/debutant/iot-welcome.md) : parcours d'apprentissage.
