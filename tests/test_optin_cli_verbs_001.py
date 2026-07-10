@@ -24,9 +24,10 @@ FORGE_PY = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
 class TestCatalog:
     def test_official_optins(self):
         assert optin_names() == [
-            "admin", "audio", "audit", "deploy", "files", "i18n", "images",
-            "import-export", "iot", "jobs", "mail", "mfa", "notifications",
-            "qrcode", "rbac", "settings", "stats", "video", "workflow",
+            "admin", "audio", "audit", "deploy", "entities", "files", "i18n",
+            "images", "import-export", "iot", "jobs", "mail", "mfa",
+            "notifications", "qrcode", "rbac", "settings", "stats", "video",
+            "workflow",
         ]
 
     @pytest.mark.parametrize("name", optin_names())

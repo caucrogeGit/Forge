@@ -92,6 +92,10 @@ OFFICIAL_OPTINS: dict[str, OptIn] = {
         "import-export", "forge-mvc-import-export", "forge_mvc_import_export", KIND_LIBRARY, CATEGORY_DATA,
         "Échange CSV : import (validation par champ, rapport d'erreurs) et export programmatique (to_csv).",
     ),
+    "entities": OptIn(
+        "entities", "forge-mvc-entities", "forge_mvc_entities", KIND_CLI, CATEGORY_DATA,
+        "Moteur d'entités (ADR-070) : make:entity/crud, migration:*, contrats de modèle et pivot enrichi.",
+    ),
     "images": OptIn(
         "images", "forge-mvc-images", "forge_mvc_images", KIND_LIBRARY, CATEGORY_MEDIA,
         "Traitement d'image (Pillow) + gestion applicative des médias (galerie, couverture).",

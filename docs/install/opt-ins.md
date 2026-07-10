@@ -236,6 +236,7 @@ Si l’opt-in ajoute des migrations, des routes ou une configuration spécifique
 | `audio`           | `forge-mvc-audio`          | Upload, sondage, transcodage MP3 et lecture audio  |
 | `audit`           | `forge-mvc-audit`          | Journal d’audit applicatif (table `audit_log`)     |
 | `deploy`          | `forge-mvc-deploy`         | Outillage de déploiement (`deploy:init`, `deploy:check`) |
+| `entities`        | `forge-mvc-entities`       | Moteur d’entités (`make:entity/crud`, `migration:*`, pivot) |
 | `files`           | `forge-mvc-files`          | Upload générique, stockage et service de fichiers  |
 | `i18n`            | `forge-mvc-i18n`           | Internationalisation, catalogues et traduction     |
 | `images`          | `forge-mvc-images`         | Traitement d’images et médias applicatifs          |
@@ -252,9 +253,8 @@ Si l’opt-in ajoute des migrations, des routes ou une configuration spécifique
 | `video`           | `forge-mvc-video`          | Upload, transcodage MP4 et lecture vidéo           |
 | `workflow`        | `forge-mvc-workflow`       | Statuts et transitions applicatives                |
 
-Le moteur d’entités `forge-mvc-entities` (commandes `make:entity`, `make:crud`, `migration:*`, pivot enrichi ; ADR-070) s’installe directement par son package :
-`python -m pip install --pre forge-mvc-entities`.
-Ses commandes sont ensuite découvertes automatiquement par la CLI.
+Le moteur d’entités `entities` fournit les commandes de modélisation (`make:entity`, `make:crud`, `migration:*`, pivot enrichi ; ADR-070).
+Une fois installé, ses commandes sont découvertes automatiquement par la CLI.
 
 ---
 
