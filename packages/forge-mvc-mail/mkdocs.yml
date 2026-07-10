@@ -4,8 +4,8 @@
 site_name: mail
 docs_dir: docs
 nav:
-  - Gestion des mails (référence):
-      - Vue d'ensemble: reference.md
+  - Référence: reference.md
+  - Référence (par module):
       - Configuration (config.py): references/config.md
       - Message (message.py): references/message.md
       - Transports (transports.py): references/transports.md

@@ -4,8 +4,8 @@
 site_name: rbac
 docs_dir: docs
 nav:
-  - RBAC (référence):
-      - Vue d'ensemble: reference.md
+  - Référence: reference.md
+  - Référence (par module):
       - Cœur RBAC (rbac.py): references/rbac.md
       - Contrat RBAC (contract.py): references/contract.md
       - Autorisation Auth/User (authorization.py): references/authorization.md
