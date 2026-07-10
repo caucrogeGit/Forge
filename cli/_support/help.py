@@ -122,6 +122,7 @@ Internationalisation
 Médias et JavaScript
   upload:init         Configure les uploads de fichiers.
   media:init          Configure les médias.
+  images:init         Copie la migration Images du package vers mvc/migrations/ (idempotent, sans appliquer).
   js:init             Installe htmx, alpine ou les deux.
 
 Déploiement
@@ -133,6 +134,8 @@ Opt-ins applicatifs
   audit:init          Prépare le journal d'audit applicatif (forge-mvc-audit).
   jobs:init           Prépare la file de tâches de fond (forge-mvc-jobs).
   notifications:init  Prépare les notifications in-app (forge-mvc-notifications).
+  sessions:init       Copie la migration Sessions du package vers mvc/migrations/ (idempotent, sans appliquer).
+  sessions:gc         Purge les sessions expirées (à brancher sur cron/systemd).
 
 Version et aide
   --version           Affiche la version de Forge.

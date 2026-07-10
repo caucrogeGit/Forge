@@ -86,11 +86,12 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Internationalisation
     "i18n:init", "i18n:check",
     # Médias et JavaScript
-    "upload:init", "media:init", "js:init",
+    "upload:init", "media:init", "images:init", "js:init",
     # Déploiement
     "deploy:init", "deploy:check",
     # Opt-ins applicatifs (ADR-052)
     "settings:init", "audit:init", "jobs:init", "notifications:init",
+    "sessions:init", "sessions:gc",
 })
 
 

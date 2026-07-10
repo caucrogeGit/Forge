@@ -141,6 +141,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # Médias et JavaScript
     "upload:init":      "Configure les uploads de fichiers (dossiers storage/uploads).",
     "media:init":       "Configure les médias (alias de upload:init).",
+    "images:init":      "Copie la migration Images vers mvc/migrations/ (idempotent, sans appliquer).",
     "js:init":          "Installe htmx, alpine ou les deux.",
     # Déploiement
     "deploy:init":      "Initialise la configuration de déploiement.",
@@ -150,6 +151,8 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "audit:init":         "Prépare le journal d'audit applicatif (forge-mvc-audit).",
     "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
     "notifications:init": "Prépare les notifications in-app (forge-mvc-notifications).",
+    "sessions:init":      "Copie la migration Sessions vers mvc/migrations/ (idempotent, sans appliquer).",
+    "sessions:gc":        "Purge les sessions expirées (à brancher sur cron/systemd).",
 }
 
 
@@ -239,6 +242,67 @@ Prérequis:
 Limites:
   - n'exécute aucun SQL et ne contacte pas MariaDB ;
   - lancer ensuite forge migration:apply pour appliquer la migration.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "images:init": """\
+Usage:
+  forge images:init
+
+Description:
+  Prépare la migration SQL de l'opt-in forge-mvc-images (table media)
+  dans mvc/migrations/, sans exécuter de SQL.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - copie la migration embarquée du paquet vers mvc/migrations/.
+
+Prérequis:
+  - forge-mvc-images installé (pip install --pre forge-mvc-images) ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - lancer ensuite forge migration:apply pour appliquer la migration.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "sessions:init": """\
+Usage:
+  forge sessions:init
+
+Description:
+  Prépare la migration SQL de l'opt-in forge-mvc-sessions-db (table
+  forge_sessions) dans mvc/migrations/, sans exécuter de SQL (ADR-071).
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - copie la migration embarquée du paquet vers mvc/migrations/.
+
+Prérequis:
+  - forge-mvc-sessions-db installé (pip install --pre forge-mvc-sessions-db) ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - lancer ensuite forge migration:apply pour appliquer la migration.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "sessions:gc": """\
+Usage:
+  forge sessions:gc
+
+Description:
+  Purge les sessions expirées de la table forge_sessions (opt-in
+  forge-mvc-sessions-db). À brancher sur une tâche planifiée (cron,
+  systemd timer).
+
+Effets:
+  - supprime les lignes dont la date d'expiration est dépassée ;
+  - affiche le nombre de sessions purgées.
+
+Prérequis:
+  - forge-mvc-sessions-db installé et table forge_sessions provisionnée ;
+  - être à la racine d'un projet Forge (dossier mvc/).
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.""",

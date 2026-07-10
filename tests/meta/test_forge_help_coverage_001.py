@@ -99,6 +99,8 @@ OPT_IN_CLI_NAMESPACES = (
     "rbac:", "workflow:", "stats:", "pivot:", "admin:",
     # Opt-ins ADR-052 : commandes :init documentées dans la doc embarquée du paquet.
     "settings:", "audit:", "jobs:", "notifications:",
+    # Opt-ins médias et sessions : doc embarquée du paquet (ADR-038).
+    "images:", "sessions:",
 )
 
 # Commandes dans forge --help intentionnellement non documentées (rare)
