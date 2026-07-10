@@ -230,20 +230,31 @@ Si l’opt-in ajoute des migrations, des routes ou une configuration spécifique
 
 ## Liste des opt-ins officiels
 
-| Identifiant | Package              | Rôle principal                                    |
-| ----------- | -------------------- | ------------------------------------------------- |
-| `audio`     | `forge-mvc-audio`    | Upload, sondage, transcodage MP3 et lecture audio |
-| `files`     | `forge-mvc-files`    | Upload générique, stockage et service de fichiers |
-| `i18n`      | `forge-mvc-i18n`     | Internationalisation, catalogues et traduction    |
-| `images`    | `forge-mvc-images`   | Traitement d’images et médias applicatifs         |
-| `iot`       | `forge-mvc-iot`      | Réception MQTT, stockage et API HTTP IoT          |
-| `mail`      | `forge-mvc-mail`     | Composition et envoi d’e-mails                    |
-| `mfa`       | `forge-mvc-mfa`      | Authentification multi-facteurs                   |
-| `pivot`     | `forge-mvc-pivot`    | Tables pivot enrichies et CRUD pivot              |
-| `rbac`      | `forge-mvc-rbac`     | Rôles, permissions et contrôle d’accès            |
-| `stats`     | `forge-mvc-stats`    | Agrégats et compteurs                             |
-| `video`     | `forge-mvc-video`    | Upload, transcodage MP4 et lecture vidéo          |
-| `workflow`  | `forge-mvc-workflow` | Statuts et transitions applicatives               |
+| Identifiant       | Package                    | Rôle principal                                     |
+| ----------------- | -------------------------- | -------------------------------------------------- |
+| `admin`           | `forge-mvc-admin`          | Back-office applicatif (CRUD générique, auth, RBAC) |
+| `audio`           | `forge-mvc-audio`          | Upload, sondage, transcodage MP3 et lecture audio  |
+| `audit`           | `forge-mvc-audit`          | Journal d’audit applicatif (table `audit_log`)     |
+| `deploy`          | `forge-mvc-deploy`         | Outillage de déploiement (`deploy:init`, `deploy:check`) |
+| `files`           | `forge-mvc-files`          | Upload générique, stockage et service de fichiers  |
+| `i18n`            | `forge-mvc-i18n`           | Internationalisation, catalogues et traduction     |
+| `images`          | `forge-mvc-images`         | Traitement d’images et médias applicatifs          |
+| `import-export`   | `forge-mvc-import-export`  | Échange CSV (import validé, export `to_csv`)       |
+| `iot`             | `forge-mvc-iot`            | Réception MQTT, stockage et API HTTP IoT           |
+| `jobs`            | `forge-mvc-jobs`           | File de tâches de fond adossée à la base           |
+| `mail`            | `forge-mvc-mail`           | Composition et envoi d’e-mails                     |
+| `mfa`             | `forge-mvc-mfa`            | Authentification multi-facteurs                    |
+| `notifications`   | `forge-mvc-notifications`  | Notifications in-app (table `notifications`)       |
+| `qrcode`          | `forge-mvc-qrcode`         | Génération de QR Codes (PNG/SVG)                   |
+| `rbac`            | `forge-mvc-rbac`           | Rôles, permissions et contrôle d’accès             |
+| `settings`        | `forge-mvc-settings`       | Paramètres applicatifs persistés (`app_settings`)  |
+| `stats`           | `forge-mvc-stats`          | Agrégats et compteurs                              |
+| `video`           | `forge-mvc-video`          | Upload, transcodage MP4 et lecture vidéo           |
+| `workflow`        | `forge-mvc-workflow`       | Statuts et transitions applicatives                |
+
+Le moteur d’entités `forge-mvc-entities` (commandes `make:entity`, `make:crud`, `migration:*`, pivot enrichi ; ADR-070) s’installe directement par son package :
+`python -m pip install --pre forge-mvc-entities`.
+Ses commandes sont ensuite découvertes automatiquement par la CLI.
 
 ---
 

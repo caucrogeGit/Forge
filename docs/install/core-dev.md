@@ -257,7 +257,7 @@ forge-mvc-images         Traitement d'image (Pillow) + couche médias
 forge-mvc-audio          Upload, sondage, transcodage MP3, lecture HTTP Range
 forge-mvc-video          Upload, transcodage MP4, lecture HTTP Range
 forge-mvc-iot            Réception/exposition de données IoT (MQTT)
-forge-mvc-pivot          Tables pivot enrichies (many_to_many avec attributs)
+forge-mvc-entities       Moteur d'entités (make:entity/crud, migrations, pivot enrichi)
 forge-mvc-mail           Envoi de courriels (composition, transports, templates)
 forge-mvc-i18n           Internationalisation (catalogues JSON, trans(), fallback)
 forge-mvc-qrcode         Génération de QR Codes (PNG/SVG)
