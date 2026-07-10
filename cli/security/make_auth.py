@@ -26,6 +26,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from cli.project.views_namespace import entity_view_dir, resolve_app_views_namespace
+
 
 AUTH_CONTROLLER = '''\
 """Contrôleur d'authentification (généré par forge make:auth).
@@ -243,11 +245,17 @@ def _integrate_auth_nav(nav_path: Path, result: MakeAuthResult) -> None:
     result.nav_needs_manual = True
 
 
-def make_auth(root: Path | None = None) -> MakeAuthResult:
+def make_auth(root: Path | None = None, views_namespace: str = "") -> MakeAuthResult:
     base = root or Path.cwd()
     result = MakeAuthResult(created=[], skipped=[], modified=[])
-    _write_if_new(base / "mvc" / "controllers" / "auth_controller.py", AUTH_CONTROLLER, result)
-    _write_if_new(base / "mvc" / "views" / "auth" / "login.html", AUTH_LOGIN_VIEW, result)
+    # Vues de l'application sous le namespace du projet (ADR-073) : "app/auth/" par
+    # défaut côté CLI (main résout depuis config.py), à côté des vues d'entités.
+    # La fonction reste plate par défaut (""), la CLI passe le namespace résolu.
+    # view_dir est figé dans le chemin écrit ET dans les render(...) du contrôleur.
+    view_dir = entity_view_dir("auth", views_namespace)
+    controller = AUTH_CONTROLLER.replace('"auth/login.html"', f'"{view_dir}/login.html"')
+    _write_if_new(base / "mvc" / "controllers" / "auth_controller.py", controller, result)
+    _write_if_new(base / "mvc" / "views" / view_dir / "login.html", AUTH_LOGIN_VIEW, result)
     # ADR-068 : les routes du contrôleur auth vivent dans leur propre fichier ;
     # mvc/routes/__init__.py ne fait que les brancher (affiché ci-dessous).
     _write_if_new(base / "mvc" / "routes" / "auth_routes.py", AUTH_ROUTES_FILE, result)
@@ -264,7 +272,7 @@ def main(argv: list[str] | None = None) -> None:
         print("Usage : forge make:auth")
         raise SystemExit(1)
 
-    result = make_auth()
+    result = make_auth(views_namespace=resolve_app_views_namespace())
     for path in result.created:
         print(f"[CREE] {path}")
     for path in result.modified:

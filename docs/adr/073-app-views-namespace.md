@@ -85,10 +85,11 @@ ce réglage : les chemins générés (et écrits à la main) sont littéraux.
 ### Portée
 
 - **`make:crud`** (vues d'entités) : namespacé sous `APP_VIEWS_NAMESPACE`.
+- **`make:auth`** (vue de connexion) : namespacé de même (`app/auth/login.html` par
+  défaut). Le générateur est dans le cœur (`cli/security`) ; le helper de namespace
+  vit donc dans le cœur (`cli.project.views_namespace`) et est ré-exporté par
+  l'opt-in entités, sans que le cœur dépende de l'opt-in (ADR-070).
 - **`make:public-*`** : inchangé (déjà sous `public/`).
-- **`make:auth`** (dossier `auth/`) : hors périmètre de cet ADR (un seul dossier,
-  générateur distinct du cœur) ; pourra rejoindre `app/auth/` dans un suivi si le
-  besoin se confirme.
 - Le cadre (`components`, `errors`, `home`, `layouts`, `pages`, `partials`) reste à
   la racine.
 

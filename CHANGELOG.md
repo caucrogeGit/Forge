@@ -67,8 +67,10 @@
   `render("app/<snake>/...")` / `{% include %}` cohérents ; `render()` et le loader Jinja sont
   inchangés (chemins littéraux). Le dossier est réglé par `APP_VIEWS_NAMESPACE` dans `config.py`
   (défaut `"app"` ; `""` rétablit la disposition plate historique). Projet existant : ajouter
-  `APP_VIEWS_NAMESPACE = ""` à `config.py` pour rester à plat. `make:public-*` (déjà sous
-  `public/`) est inchangé.
+  `APP_VIEWS_NAMESPACE = ""` à `config.py` pour rester à plat. `make:auth` range de même sa
+  vue de connexion sous `app/auth/login.html` (le helper de namespace vit dans le cœur,
+  `cli.project.views_namespace`, ré-exporté par l'opt-in entités sans dépendance inverse,
+  ADR-070). `make:public-*` (déjà sous `public/`) est inchangé.
 - **`make:auth` génère un bouton Connexion / Déconnexion pour la barre de navigation (retour terrain).**
   En plus du contrôleur, de la vue de login et des routes, `make:auth` génère désormais
   un bouton conditionnel « Connexion » (lien vers `/login` pour un visiteur) ou « Déconnexion »

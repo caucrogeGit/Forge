@@ -117,7 +117,7 @@ Le dossier `mvc/views/` sépare trois natures de vues (ADR-073) :
 
 - les dossiers du **cadre**, à la racine : `layouts`, `components`, `partials`, `errors`, `home`, `pages` ;
 - les vues **publiques** sous `public/` (générées par `make:public-*`) ;
-- les vues de **l'application** sous `app/` : les vues propres à vos entités, écrites à la main ou générées par `make:crud`.
+- les vues de **l'application** sous `app/` : les vues propres à vos entités et à l'authentification, écrites à la main ou générées par `make:crud` et `make:auth`.
 
 ```text
 mvc/views/
