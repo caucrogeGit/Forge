@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposée.
+Acceptée.
 Décision d'architecture ; relève du mainteneur.
 
 ## Date
