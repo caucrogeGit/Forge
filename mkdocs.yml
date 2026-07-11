@@ -323,6 +323,7 @@ nav:
             - ADR-072 Contrat des commandes CLI des opt-ins: adr/072-optin-cli-command-contract.md
             - ADR-073 Namespace app/ des vues applicatives: adr/073-app-views-namespace.md
             - ADR-074 Opt-in fixtures (données de démo et test): adr/074-fixtures-optin.md
+            - ADR-075 Rendu de littéraux SQL par le Dialect: adr/075-dialect-literal-rendering.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
