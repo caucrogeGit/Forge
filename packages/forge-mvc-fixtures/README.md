@@ -7,13 +7,9 @@ Données de démonstration et de test opt-in pour le framework Forge.
 `forge-mvc-fixtures` est marqué `Development Status :: 4 - Beta`.
 Le paquet est introduit par l'ADR-074.
 
-C'est un **opt-in à CLI seule** : il ajoutera les commandes `forge fixtures:load`
-et `forge fixtures:purge` une fois complet. Il n'expose **aucune API runtime** ;
+C'est un **opt-in à CLI seule** : il ajoute les commandes `forge fixtures:load`
+et `forge fixtures:purge` une fois installé. Il n'expose **aucune API runtime** ;
 une application ne l'importe jamais à l'exécution.
-
-Ce premier ticket met en place la structure du paquet.
-Les commandes sont livrées aux tickets suivants, avec un contrat complet
-(charte principe 10 : pas d'API publique à moitié faite).
 
 ## Pourquoi un opt-in
 
@@ -45,10 +41,10 @@ pip install -r requirements-dev.txt  # installe forge-mvc-fixtures depuis packag
 
 ## Commandes
 
-| Commande | Rôle | Statut |
-|---|---|---|
-| `forge fixtures:load` | Charge un jeu de fixtures dans la base de l'environnement actif, après affichage du SQL. | À venir |
-| `forge fixtures:purge` | Vide les tables ciblées pour repartir d'un état propre. | À venir |
+| Commande | Rôle |
+|---|---|
+| `forge fixtures:load` | Charge les fixtures `mvc/fixtures/*.sql` dans la base de l'environnement actif. Affiche le SQL par défaut ; `--run` exécute ; `--run --force` en production. |
+| `forge fixtures:purge` | Vide les tables ciblées par les fixtures (dérivées des `INSERT INTO`) pour repartir d'un état propre. Mêmes options `--run` / `--force`. |
 
 ## Compatibilité
 

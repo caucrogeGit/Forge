@@ -1051,6 +1051,33 @@ Options:
   --force       Autorise le chargement en production (avec --run).
   -h, --help    Affiche cette aide sans exécuter la commande.""",
 
+    "fixtures:purge": """\
+Usage:
+  forge fixtures:purge [--run] [--force]
+
+Description:
+  Vide les tables ciblées par les fixtures du projet pour repartir d'un état
+  propre. Les tables cibles sont dérivées des INSERT INTO de mvc/fixtures/*.sql,
+  puis vidées par des DELETE FROM en ordre inverse (respect des clés étrangères).
+
+Comportement (charte §7, comme forge fixtures:load) :
+  - par défaut, AFFICHE les DELETE sans rien exécuter ;
+  - --run exécute la purge dans la base ;
+  - en APP_ENV=prod, --run seul refuse : ajouter --force pour confirmer.
+
+Prérequis:
+  - opt-in installé (pip install --pre forge-mvc-fixtures) ;
+  - être à la racine d'un projet Forge (config.py + env/<APP_ENV>).
+
+Limites:
+  - ne touche pas au schéma : c'est une remise à zéro des données, pas un DROP ;
+  - ne supprime que les tables que les fixtures peuplent (INSERT INTO relus).
+
+Options:
+  --run         Exécute la purge (sinon affichage seul).
+  --force       Autorise la purge en production (avec --run).
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+
     # ── Schémas JSON & RBAC (CLI-HELP-FLAGS-SCHEMA-RBAC-001) ─────────────────
 
     "schema:list": """\
