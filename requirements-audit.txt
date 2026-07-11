@@ -1,0 +1,24 @@
+# Surface de dépendances tierces RÉELLEMENT EXPÉDIÉES, auditée par pip-audit en CI.
+#
+# Le cœur (requirements.txt) ne couvre que ses 4 dépendances runtime ; les opt-ins
+# apportent des dépendances à surface CVE (Pillow, cryptography, mariadb, ...) qui
+# n'étaient jamais scannées. Ce fichier agrège le cœur et les dépendances tierces
+# des opt-ins runtime, sans les outils de développement (pytest, mkdocs, ...).
+#
+# Un garde-fou (tests/meta/test_pip_audit_optin_coverage_001.py) vérifie que chaque
+# dépendance tierce déclarée par un paquet opt-in figure ici : à l'ajout d'une
+# nouvelle dépendance opt-in, compléter cette liste.
+
+-r requirements.txt
+
+# Opt-ins (dépendances tierces déclarées dans packages/*/pyproject.toml).
+# jinja2 et jsonschema sont déjà couverts par le cœur (requirements.txt).
+cryptography>=48.0.1,<49
+mariadb==1.1.14
+markupsafe>=2.0,<4
+paho-mqtt>=2.1,<3
+Pillow>=10.3,<13
+psycopg[binary]>=3.1,<4
+pyodbc>=5.0,<6
+pyotp>=2.9,<3
+segno>=1.6,<2
