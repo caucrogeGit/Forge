@@ -24,16 +24,20 @@ def test_version_is_non_empty_string() -> None:
 
 
 def test_all_is_defined() -> None:
-    # Scaffold : __all__ existe et est vide (aucune API publique livrée encore).
+    # Opt-in CLI-only : pas d'API runtime exposée par le package (les commandes
+    # sont découvertes via l'entry point, pas via __all__).
     names = getattr(mod, "__all__", None)
-    assert names == [], f"{MODULE}.__all__ doit être vide au scaffold, vu : {names!r}"
+    assert names == [], f"{MODULE}.__all__ doit rester vide (CLI-only), vu : {names!r}"
 
 
-def test_commands_table_is_empty_dict() -> None:
-    # ADR-074 : la plomberie de l'entry point est en place, commandes à venir.
+def test_commands_declares_load_with_config() -> None:
+    # ADR-074 / ADR-072 : fixtures:load ouvre une connexion BDD -> config: True.
     from forge_mvc_fixtures.commands import COMMANDS
 
-    assert COMMANDS == {}, f"COMMANDS doit être vide au scaffold, vu : {COMMANDS!r}"
+    assert "fixtures:load" in COMMANDS
+    spec = COMMANDS["fixtures:load"]
+    assert spec["module"] == "forge_mvc_fixtures.cli.load"
+    assert spec["config"] is True
 
 
 def test_ships_py_typed() -> None:

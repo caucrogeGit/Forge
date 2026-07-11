@@ -1022,6 +1022,35 @@ Limites:
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.""",
 
+    "fixtures:load": """\
+Usage:
+  forge fixtures:load [--run] [--force]
+
+Description:
+  Charge les fixtures SQL du projet (mvc/fixtures/*.sql) dans la base de
+  l'environnement actif (APP_ENV, défaut dev). Données de démo/test rejouables
+  et cadrées par environnement (ADR-074), à SQL visible.
+
+Comportement (charte §7, comme forge db:init) :
+  - par défaut, AFFICHE le SQL sans rien exécuter ;
+  - --run exécute le chargement dans la base ;
+  - en APP_ENV=prod, --run seul refuse : ajouter --force pour confirmer.
+
+Prérequis:
+  - opt-in installé (pip install --pre forge-mvc-fixtures) ;
+  - être à la racine d'un projet Forge (config.py + env/<APP_ENV>) ;
+  - un backend BDD installé et les tables ciblées déjà provisionnées.
+
+Limites:
+  - ne crée pas de schéma : le référentiel permanent reste une migration de
+    seed appliquée par forge migration:apply (frontière ADR-074) ;
+  - voir forge fixtures:purge pour vider les tables et repartir propre.
+
+Options:
+  --run         Exécute le chargement (sinon affichage seul).
+  --force       Autorise le chargement en production (avec --run).
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+
     # ── Schémas JSON & RBAC (CLI-HELP-FLAGS-SCHEMA-RBAC-001) ─────────────────
 
     "schema:list": """\
