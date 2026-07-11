@@ -799,9 +799,26 @@ def print_show_result(result: MakePublicShowResult) -> None:
         print(out.warn(warning))
 
 
+def _require_entities_module() -> None:
+    """Échoue proprement si le moteur d'entités (forge-mvc-entities) est absent.
+
+    make:public-list/show/form lisent le contrat JSON de l'entité via ce moteur
+    (ADR-070) ; sans l'opt-in, on rend un message d'installation plutôt qu'une
+    traceback brute d'import (principes 8 et 10).
+    """
+    import importlib.util
+    if importlib.util.find_spec("forge_mvc_entities") is None:
+        from cli._support.errors import cli_fail
+        cli_fail(
+            "module forge-mvc-entities non installé.",
+            hint="installe le moteur d'entités : pip install --pre forge-mvc-entities",
+        )
+
+
 def main(args: list[str], *, root: Path | None = None) -> MakePublicListResult:
     if len(args) != 1:
         raise SystemExit("Usage : forge make:public-list <Entite>")
+    _require_entities_module()
     project_root = root or Path.cwd()
     try:
         result = make_public_list(
@@ -819,6 +836,7 @@ def main(args: list[str], *, root: Path | None = None) -> MakePublicListResult:
 def show_main(args: list[str], *, root: Path | None = None) -> MakePublicShowResult:
     if len(args) != 1:
         raise SystemExit("Usage : forge make:public-show <Entite>")
+    _require_entities_module()
     project_root = root or Path.cwd()
     try:
         result = make_public_show(

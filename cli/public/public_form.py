@@ -30,6 +30,7 @@ from cli.public.public_list import (
     SIMPLE_PYTHON_TYPES,
     _ensure_import,
     _humanize,
+    _require_entities_module,
 )
 
 
@@ -507,6 +508,7 @@ def print_result(result: MakePublicFormResult) -> None:
 def main(args: list[str], *, root: Path | None = None) -> MakePublicFormResult:
     if len(args) != 1:
         raise SystemExit("Usage : forge make:public-form <Entite>")
+    _require_entities_module()
     project_root = root or Path.cwd()
     try:
         result = make_public_form(

@@ -129,6 +129,12 @@
 
 ### Corrigé
 
+- **`make:public-list/show/form` échouent proprement sans le moteur d'entités (audit, ADR-070).**
+  Ces commandes du cœur lisent le contrat JSON de l'entité via `forge-mvc-entities` ; sans l'opt-in,
+  elles produisaient une traceback brute d'import au lieu d'un message d'installation. Elles gatent
+  désormais sur `find_spec` et rendent le même message que `db:init` (principes 8 et 10). Au passage,
+  `forge-mvc-entities` et `forge-mvc-rbac` déclarent `jsonschema` comme dépendance directe (elles
+  l'utilisent, mais ne la tiraient que transitivement via le cœur).
 - **Upload multi-fichiers (galeries) : plus de perte de données silencieuse (audit).**
   `Request.files` était un `dict[str, UploadedFile]` qui écrasait à chaque part de même nom :
   un `<input type="file" ... multiple>` (galerie `make:crud`) n'enregistrait qu'**un seul** fichier
