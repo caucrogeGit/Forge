@@ -1,0 +1,19 @@
+# Bilan : niveau avancé (Fixtures)
+
+Récapitulatif du **niveau avancé** de la progression *Fixtures*.
+
+## Ce que vous avez validé
+
+| Palier | Compétence acquise |
+|--------|--------------------|
+| 1 : [Fixtures ou migration de seed](fixtures-vs-seed.md) | Choisir la bonne voie selon le besoin (permanent contre rejouable). |
+| 2 : [Un opt-in CLI-only](fixtures-optin.md) | Comprendre le profil opt-in, CLI seule, SQL visible, indépendant du cœur. |
+
+Vous savez situer les fixtures dans l'architecture de Forge et les employer à bon escient.
+
+## Et ensuite
+
+La progression *Fixtures* est terminée.
+Gardez sous la main l'aide-mémoire des commandes et des règles.
+
+[Consulter l'aide-mémoire](../recapitulatif.md)
