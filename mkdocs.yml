@@ -324,6 +324,7 @@ nav:
             - ADR-073 Namespace app/ des vues applicatives: adr/073-app-views-namespace.md
             - ADR-074 Opt-in fixtures (données de démo et test): adr/074-fixtures-optin.md
             - ADR-075 Rendu de littéraux SQL par le Dialect: adr/075-dialect-literal-rendering.md
+            - ADR-076 Génération de fixtures par classes factory: adr/076-fixtures-factory-generation.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
