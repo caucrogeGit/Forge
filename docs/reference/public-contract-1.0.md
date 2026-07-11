@@ -13,7 +13,7 @@ Un garde-fou, `tests/meta/test_public_contract_1_0_001.py`, verrouille mécaniqu
 
 ## 1. Famille de commandes `opt-in:*` (gelée)
 
-La famille canonique de gestion des opt-ins officiels, **exactement 5 verbes** :
+La famille canonique de gestion des opt-ins officiels, **exactement 6 verbes** :
 
 | Commande | Axe | Effet |
 |---|---|---|
@@ -21,7 +21,8 @@ La famille canonique de gestion des opt-ins officiels, **exactement 5 verbes** :
 | `forge opt-in:remove <name>` | présence (−) | affiche la désinstallation |
 | `forge opt-in:enable <name>` | activation (+) | câblage réel (kind `route`) / conseil (library, crosscutting) |
 | `forge opt-in:disable <name>` | activation (−) | inverse de `enable` |
-| `forge opt-in:list` | lecture | état des 12 opt-ins officiels |
+| `forge opt-in:list` | lecture (projet) | état de câblage des opt-ins dans le projet |
+| `forge opt-in:installed` | lecture (pip) | opt-ins réellement installés dans l'environnement (version) |
 
 **Décisions finales 1.0** :
 

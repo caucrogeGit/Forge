@@ -17,12 +17,12 @@ FORGE_PY = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
 CONTRACT = PROJECT_ROOT / "docs" / "reference" / "public-contract-1.0.md"
 
 
-# ── Famille opt-in:* (exactement 5 verbes) ───────────────────────────────────
+# ── Famille opt-in:* (exactement 6 verbes) ───────────────────────────────────
 
 class TestOptInFamilyFrozen:
-    EXPECTED = {"install", "remove", "enable", "disable", "list"}
+    EXPECTED = {"install", "remove", "enable", "disable", "list", "installed"}
 
-    def test_optin_family_is_exactly_five(self):
+    def test_optin_family_is_exactly_six(self):
         # ADR-059 : la famille opt-in:* est dispatchée via la table CORE_COMMANDS.
         from forge import CORE_COMMANDS
 
