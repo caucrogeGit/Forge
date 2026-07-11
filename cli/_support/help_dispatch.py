@@ -153,6 +153,10 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "notifications:init": "Prépare les notifications in-app (forge-mvc-notifications).",
     "sessions:init":      "Copie la migration Sessions vers mvc/migrations/ (idempotent, sans appliquer).",
     "sessions:gc":        "Purge les sessions expirées (à brancher sur cron/systemd).",
+    "fixtures:load":         "Charge les fixtures mvc/fixtures/*.sql (affiche ; --run exécute).",
+    "fixtures:purge":        "Vide les tables ciblées par les fixtures (affiche ; --run exécute).",
+    "fixtures:generate":     "Génère un .sql depuis une factory (forge-mvc-fixtures, Faker).",
+    "fixtures:make-factory": "Échafaude une factory depuis le contrat d'entité (scaffold riche).",
 }
 
 

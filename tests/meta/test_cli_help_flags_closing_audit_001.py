@@ -92,6 +92,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Opt-ins applicatifs (ADR-052)
     "settings:init", "audit:init", "jobs:init", "notifications:init",
     "sessions:init", "sessions:gc",
+    # Fixtures (ADR-074, ADR-076)
+    "fixtures:load", "fixtures:purge", "fixtures:generate", "fixtures:make-factory",
 })
 
 

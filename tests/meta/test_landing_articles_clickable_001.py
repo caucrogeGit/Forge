@@ -107,8 +107,8 @@ class TestLandingArticlesClickable:
 
     def test_all_articles_are_wrapped_in_links(self):
         # Nombre de cartes cliquables de la landing. À mettre à jour quand on
-        # ajoute ou retire une carte (ici : +1 carte parcours sessions-db, ADR-054).
-        expected = 67
+        # ajoute ou retire une carte (ici : +1 carte parcours fixtures, ADR-074/076).
+        expected = 68
         text = LANDING.read_text(encoding="utf-8")
         wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group"[^>]*>', text)
         assert len(wrapped) == expected, (

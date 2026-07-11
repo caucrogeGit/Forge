@@ -106,6 +106,11 @@ OPTIN_MODULES: dict[str, set[str]] = {
     # et sont marqués `db` (sautés sans base). Adossé au backend BDD core, pas
     # d'extra tiers à lister.
     "forge_mvc_sessions_db": set(),
+    # forge-mvc-fixtures : données de démo/test (ADR-074/076). Ses tests
+    # d'intégration db gardent l'import via importorskip. Faker (dépendance de
+    # l'opt-in) n'est jamais importé au top-level des tests du cœur (import
+    # paresseux dans Factory), donc pas d'extra à lister.
+    "forge_mvc_fixtures": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}

@@ -137,6 +137,12 @@ Opt-ins applicatifs
   sessions:init       Copie la migration Sessions du package vers mvc/migrations/ (idempotent, sans appliquer).
   sessions:gc         Purge les sessions expirées (à brancher sur cron/systemd).
 
+Fixtures (démo/test)
+  fixtures:load          Charge les fixtures mvc/fixtures/*.sql (affiche ; --run exécute).
+  fixtures:purge         Vide les tables ciblées par les fixtures (affiche ; --run exécute).
+  fixtures:generate      Génère un .sql depuis une factory (Faker, forge-mvc-fixtures).
+  fixtures:make-factory  Échafaude une factory depuis le contrat d'entité (scaffold riche).
+
 Version et aide
   --version           Affiche la version de Forge.
   help, --help, -h    Affiche cette aide.

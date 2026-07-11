@@ -14,6 +14,7 @@
 # Opt-ins (dépendances tierces déclarées dans packages/*/pyproject.toml).
 # jinja2 et jsonschema sont déjà couverts par le cœur (requirements.txt).
 cryptography>=48.0.1,<49
+faker>=30,<40
 mariadb==1.1.14
 markupsafe>=2.0,<4
 paho-mqtt>=2.1,<3

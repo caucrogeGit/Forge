@@ -44,6 +44,8 @@ EXPECTED_CLASSIFIERS = {
     "forge-mvc-notifications": "Development Status :: 4 - Beta",
     # forge-mvc-deploy : outillage de déploiement CLI-only (DEPLOY-EXTRACT-001, ADR-053).
     "forge-mvc-deploy":   "Development Status :: 4 - Beta",
+    # forge-mvc-fixtures : données de démo/test, génération par factory (ADR-074, ADR-076).
+    "forge-mvc-fixtures": "Development Status :: 4 - Beta",
     # forge-mvc-entities : moteur d'entités extrait du cœur (ADR-070), scaffold en cours.
     "forge-mvc-entities": "Development Status :: 4 - Beta",
     # forge-mvc-testing : infra de test partagée, publiée pour l'écosystème (ADR-041).

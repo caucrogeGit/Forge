@@ -175,6 +175,15 @@ Choix du moteur (SQLite, MariaDB, PostgreSQL, SQL Server) : [Bases de données](
 | `forge deploy:init` | génère les gabarits Nginx / systemd / WSGI | [Déploiement](../deploy/reference.md) |
 | `forge deploy:check` | vérifie la configuration de déploiement | [Déploiement](../deploy/reference.md) |
 
+## Fixtures (opt-in)
+
+| Commande | Rôle | Détail |
+|---|---|---|
+| `forge fixtures:load` | charge les fixtures `mvc/fixtures/*.sql` (affiche ; `--run` exécute) | opt-in `forge-mvc-fixtures` |
+| `forge fixtures:purge` | vide les tables ciblées par les fixtures (affiche ; `--run` exécute) | opt-in `forge-mvc-fixtures` |
+| `forge fixtures:generate` | génère un `.sql` depuis une factory (Faker) | opt-in `forge-mvc-fixtures` |
+| `forge fixtures:make-factory` | échafaude une factory depuis le contrat d'entité | opt-in `forge-mvc-fixtures` |
+
 ## Gestion des modules optionnels { #opt-ins-branchement-projet }
 
 <a id="commandes-forge-iot"></a>
