@@ -146,12 +146,12 @@ class TestMultiuploadGeneration:
     def test_create_normalise_fichier_unique_en_liste(self):
         code = build_controller(_article_with_gallery())
         create_lines = _lines_in_method(code, "create")
-        assert any("isinstance(_photos_files_raw, list)" in l for l in create_lines)
+        assert any('request.files_list("photos")' in l for l in create_lines)
 
     def test_create_utilise_request_files_pas_cleaned_data(self):
         code = build_controller(_article_with_gallery())
         create_lines = _lines_in_method(code, "create")
-        assert any('request.files.get("photos"' in l for l in create_lines)
+        assert any('request.files_list("photos")' in l for l in create_lines)
         assert not any('form.cleaned_data.get("photos")' in l for l in create_lines)
 
     def test_update_boucle_sur_fichiers_galerie(self):
@@ -162,7 +162,7 @@ class TestMultiuploadGeneration:
     def test_update_utilise_request_files_pas_cleaned_data(self):
         code = build_controller(_article_with_gallery())
         update_lines = _lines_in_method(code, "update")
-        assert any('request.files.get("photos"' in l for l in update_lines)
+        assert any('request.files_list("photos")' in l for l in update_lines)
         assert not any('form.cleaned_data.get("photos")' in l for l in update_lines)
 
     def test_update_ne_contient_pas_delete_media_pour_multiupload(self):
@@ -194,7 +194,7 @@ class TestMultiuploadGeneration:
         code = build_controller(_article_mixed())
         create_lines = _lines_in_method(code, "create")
         assert any('form.cleaned_data.get("cover")' in l for l in create_lines)
-        assert any('request.files.get("photos"' in l for l in create_lines)
+        assert any('request.files_list("photos")' in l for l in create_lines)
 
     # ── Tests de génération pour la validation ────────────────────────────────
 

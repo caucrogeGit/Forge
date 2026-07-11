@@ -129,6 +129,13 @@
 
 ### Corrigé
 
+- **Upload multi-fichiers (galeries) : plus de perte de données silencieuse (audit).**
+  `Request.files` était un `dict[str, UploadedFile]` qui écrasait à chaque part de même nom :
+  un `<input type="file" ... multiple>` (galerie `make:crud`) n'enregistrait qu'**un seul** fichier
+  sur N, sans erreur. Le parsing multipart accumule désormais tous les fichiers ; un nouvel accesseur
+  `request.files_list("champ")` renvoie la liste complète (le CRUD généré l'utilise pour les
+  galeries), tandis que `request.files` / `request.file(...)` restent focalisés sur le cas mono
+  (premier fichier, rétro-compatible). Garde-fou de parsing HTTP réel (3 fichiers de même nom → 3 conservés).
 - **Commandes CLI des opt-ins : aide et config projet (retour terrain 016, F39 / F40 ; ADR-072).**
   Deux frictions sur les commandes livrées par les opt-ins, corrigées dans le dispatch commun
   (`dispatch_optin`). **F40** : `forge sessions:gc --help` (et `sessions:init --help`) exécutait

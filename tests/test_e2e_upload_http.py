@@ -160,28 +160,28 @@ class TestMultipartParsingHTTP:
         body = _multipart_body(boundary, "photo.png", _PNG_BYTES)
         content_type = f"multipart/form-data; boundary={boundary}"
         _, files = Request._parse_multipart(content_type, body)
-        assert files["avatar"].filename == "photo.png"
+        assert files["avatar"][0].filename == "photo.png"
 
     def test_parse_multipart_content_preserve(self):
         boundary = "----TestBoundary003"
         body = _multipart_body(boundary, "photo.png", _PNG_BYTES)
         content_type = f"multipart/form-data; boundary={boundary}"
         _, files = Request._parse_multipart(content_type, body)
-        assert files["avatar"].read() == _PNG_BYTES
+        assert files["avatar"][0].read() == _PNG_BYTES
 
     def test_parse_multipart_content_type_preserve(self):
         boundary = "----TestBoundary004"
         body = _multipart_body(boundary, "photo.png", _PNG_BYTES, "image/png")
         content_type = f"multipart/form-data; boundary={boundary}"
         _, files = Request._parse_multipart(content_type, body)
-        assert files["avatar"].content_type == "image/png"
+        assert files["avatar"][0].content_type == "image/png"
 
     def test_parse_multipart_size_correct(self):
         boundary = "----TestBoundary005"
         body = _multipart_body(boundary, "photo.png", _PNG_BYTES)
         content_type = f"multipart/form-data; boundary={boundary}"
         _, files = Request._parse_multipart(content_type, body)
-        assert files["avatar"].size == len(_PNG_BYTES)
+        assert files["avatar"][0].size == len(_PNG_BYTES)
 
     def test_request_complet_parse_fichier(self):
         boundary = "----TestBoundary006"
@@ -477,3 +477,53 @@ class TestDispatchPathTraversal:
         apres = set(p for p in parent.rglob("*") if p != upload_dir and not str(p).startswith(str(upload_dir)))
         assert apres == avant, "Un fichier a été créé hors du dossier uploads/"
 
+
+
+# ---------------------------------------------------------------------------
+# Multi-upload (galerie) : plusieurs parts de même nom (audit correctness)
+# ---------------------------------------------------------------------------
+
+def _multipart_gallery_body(boundary: str, name: str,
+                            files: list[tuple[str, bytes]]) -> bytes:
+    """Body multipart avec plusieurs fichiers sous le MÊME nom de champ."""
+    chunks: list[bytes] = []
+    for filename, content in files:
+        chunks.append((
+            f"--{boundary}\r\n"
+            f'Content-Disposition: form-data; name="{name}"; filename="{filename}"\r\n'
+            f"Content-Type: image/png\r\n\r\n"
+        ).encode("utf-8") + content + b"\r\n")
+    chunks.append(f"--{boundary}--\r\n".encode("utf-8"))
+    return b"".join(chunks)
+
+
+class TestMultipartMultiUpload:
+    """Un champ `multiple` produit plusieurs parts de même nom : tous conservés."""
+
+    def test_parse_accumulates_same_name(self):
+        boundary = "----GalBoundary001"
+        body = _multipart_gallery_body(boundary, "photos", [
+            ("a.png", _PNG_BYTES), ("b.png", _PNG_BYTES), ("c.png", _PNG_BYTES),
+        ])
+        _, files = Request._parse_multipart(
+            f"multipart/form-data; boundary={boundary}", body)
+        assert [u.filename for u in files["photos"]] == ["a.png", "b.png", "c.png"]
+
+    def test_request_files_first_and_files_list_all(self):
+        boundary = "----GalBoundary002"
+        body = _multipart_gallery_body(boundary, "photos", [
+            ("a.png", _PNG_BYTES), ("b.png", _PNG_BYTES), ("c.png", _PNG_BYTES),
+        ])
+        req = Request(_http_handler(body=body, headers={
+            "Content-Length": str(len(body)),
+            "Content-Type": f"multipart/form-data; boundary={boundary}",
+        }))
+        # files / file() : premier fichier (rétro-compat cas mono)
+        assert req.files["photos"].filename == "a.png"
+        assert req.file("photos").filename == "a.png"
+        # files_list() : les trois (le bug écrasait tout sauf le dernier)
+        assert [u.filename for u in req.files_list("photos")] == ["a.png", "b.png", "c.png"]
+
+    def test_files_list_empty_for_absent_field(self):
+        req = Request(_http_handler(method="GET", body=b""))
+        assert req.files_list("photos") == []

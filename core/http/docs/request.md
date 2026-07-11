@@ -417,6 +417,8 @@ Ils sont repliables pour garder une vision générale de la page.
 
     `request.file(...)` renvoie un objet `UploadedFile` ou `None`.
 
+    Pour un champ multi-fichiers (`<input type="file" name="photos" multiple>`), utilisez `request.files_list("photos")` qui renvoie la liste de tous les fichiers reçus (liste vide si aucun). `request.file(...)` et `request.files` restent focalisés sur le cas mono et renvoient le premier fichier du champ.
+
     | Propriété ou méthode | Rôle |
     |---|---|
     | `field_name` | nom du champ de formulaire |

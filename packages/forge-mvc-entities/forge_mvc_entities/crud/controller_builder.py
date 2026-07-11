@@ -279,8 +279,7 @@ def _render_create(ctx: _ControllerContext) -> list[str]:
                 continue
             mname = entry["name"]
             create_lines += [
-                f'        _{mname}_files_raw = request.files.get("{mname}", [])',
-                f'        _{mname}_files = _{mname}_files_raw if isinstance(_{mname}_files_raw, list) else ([_{mname}_files_raw] if _{mname}_files_raw else [])',
+                f'        _{mname}_files = request.files_list("{mname}")',
                 f'        for _{mname}_f in _{mname}_files:',
                 f'            if getattr(_{mname}_f, "filename", ""):',
                 '                try:',
@@ -498,8 +497,7 @@ def _render_update(ctx: _ControllerContext) -> list[str]:
         mname = entry["name"]
         mrole = entry["role"]
         update_lines += [
-            f'        _{mname}_files_raw = request.files.get("{mname}", [])',
-            f'        _{mname}_files = _{mname}_files_raw if isinstance(_{mname}_files_raw, list) else ([_{mname}_files_raw] if _{mname}_files_raw else [])',
+            f'        _{mname}_files = request.files_list("{mname}")',
             f'        for _{mname}_f in _{mname}_files:',
             f'            if getattr(_{mname}_f, "filename", ""):',
             '                try:',

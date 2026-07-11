@@ -78,6 +78,14 @@ class FakeRequest:
     def file(self, key, default=None):
         return self.files.get(key, default)
 
+    def files_list(self, key):
+        """Liste des fichiers pour `key` (galeries multi-upload), à l'image de
+        `Request.files_list`. Accepte une valeur mono ou déjà-liste dans `files`."""
+        val = self.files.get(key, [])
+        if isinstance(val, (list, tuple)):
+            return list(val)
+        return [val] if val else []
+
     def route(self, key, default=None):
         return self.route_params.get(key, default)
 

@@ -172,6 +172,7 @@ class Request:
     body: dict[str, list[str]]
     json_body: Any
     files: dict[str, UploadedFile]
+    _files_multi: dict[str, list[UploadedFile]]
     route_params: dict[str, str]
     ip: str
 
@@ -183,6 +184,7 @@ class Request:
         self.headers  = handler.headers
         self.params   = parse_qs(parsed.query)
         self.files    = {}
+        self._files_multi = {}
         self.ip           = resolve_client_ip(
             handler.client_address[0],
             handler.headers,
@@ -208,7 +210,10 @@ class Request:
                     self.json_body = {}
                 self.body = {}
             elif "multipart/form-data" in content_type:
-                self.body, self.files = self._parse_multipart(content_type, raw)
+                self.body, self._files_multi = self._parse_multipart(content_type, raw)
+                # `files` expose le premier fichier par champ (cas mono, rétro-compat) ;
+                # `files_list(name)` donne la liste complète (galeries multi-upload).
+                self.files = {name: uploads[0] for name, uploads in self._files_multi.items()}
                 self.json_body = {}
             else:
                 try:
@@ -299,8 +304,21 @@ class Request:
         return default
 
     def file(self, key: str, default: "UploadedFile | None" = None) -> "UploadedFile | None":
-        """Fichier uploadé pour le champ `key` (`UploadedFile` ou `default`)."""
+        """Fichier uploadé pour le champ `key` (`UploadedFile` ou `default`).
+
+        En multi-upload (galerie), renvoie le **premier** fichier ; utiliser
+        `files_list(key)` pour obtenir la liste complète.
+        """
         return self.files.get(key, default)
+
+    def files_list(self, key: str) -> "list[UploadedFile]":
+        """Tous les fichiers uploadés pour le champ `key` (galeries multi-upload).
+
+        Un `<input type="file" name="{key}" multiple>` produit plusieurs parts
+        sous le même nom ; cet accesseur les renvoie toutes (liste vide si aucune).
+        `files` / `file()` restent focalisés sur le cas mono (premier fichier).
+        """
+        return list(self._files_multi.get(key, []))
 
     @overload
     def route(self, key: str, default: str) -> str: ...
@@ -361,9 +379,9 @@ class Request:
     @staticmethod
     def _parse_multipart(
         content_type: str, raw: bytes
-    ) -> tuple[dict[str, list[str]], dict[str, UploadedFile]]:
+    ) -> tuple[dict[str, list[str]], dict[str, list[UploadedFile]]]:
         body: dict[str, list[str]] = {}
-        files: dict[str, UploadedFile] = {}
+        files: dict[str, list[UploadedFile]] = {}
         header = (
             f"Content-Type: {content_type}\r\n"
             "MIME-Version: 1.0\r\n\r\n"
@@ -385,12 +403,14 @@ class Request:
             # imprécis (surcharges), on fixe le type pour le typage statique.
             payload = cast(bytes, part.get_payload(decode=True) or b"")
             if filename is not None:
-                files[name] = UploadedFile(
+                # Un champ `multiple` produit plusieurs parts de même nom : on les
+                # accumule au lieu d'écraser (sinon seul le dernier fichier survit).
+                files.setdefault(name, []).append(UploadedFile(
                     field_name=name,
                     filename=filename,
                     content=payload,
                     content_type=part.get_content_type(),
-                )
+                ))
             else:
                 try:
                     value = payload.decode(part.get_content_charset() or "utf-8")
