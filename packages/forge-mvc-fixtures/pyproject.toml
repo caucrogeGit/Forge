@@ -15,6 +15,9 @@ license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "fixtures", "seed", "demo", "test-data"]
 dependencies = [
     "forge-mvc>=1.0.0rc2,<2",
+    # Faker alimente les factories de fixtures (ADR-076). Utilisé uniquement à la
+    # génération (outillage de développement), jamais au runtime de l'application.
+    "faker>=30,<40",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

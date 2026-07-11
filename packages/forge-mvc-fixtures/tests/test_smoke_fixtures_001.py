@@ -23,11 +23,13 @@ def test_version_is_non_empty_string() -> None:
     assert isinstance(version, str) and version, f"{MODULE}.__version__ manquant"
 
 
-def test_all_is_defined() -> None:
-    # Opt-in CLI-only : pas d'API runtime exposée par le package (les commandes
-    # sont découvertes via l'entry point, pas via __all__).
+def test_public_api_resolves() -> None:
+    # ADR-076 : la classe de base Factory est l'API publique (importée par le
+    # code de factory de l'utilisateur, pas dans le chemin d'une requête).
     names = getattr(mod, "__all__", None)
-    assert names == [], f"{MODULE}.__all__ doit rester vide (CLI-only), vu : {names!r}"
+    assert names == ["Factory", "FactoryError"], f"__all__ inattendu : {names!r}"
+    missing = [n for n in names if not hasattr(mod, n)]
+    assert not missing, f"{MODULE} : noms de __all__ non résolus : {missing}"
 
 
 def test_commands_declares_load_with_config() -> None:
