@@ -30,17 +30,27 @@ ADR-018).
 - `forge-mvc-video` (upload, transcodage MP4 et lecture vidéo en streaming)
 - `forge-mvc-audio` (upload, sondage, transcodage MP3 et lecture audio en streaming, sans état)
 - `forge-mvc-mail` (envoi d'emails, transports interchangeables ; extrait du core, ADR-022)
-- `forge-mvc-pivot` (tables pivot enrichies `many_to_many` ; extrait du core, ADR-021)
 - `forge-mvc-i18n` (internationalisation par catalogues JSON, helper `trans()` ; extrait du core, ADR-027)
 - `forge-mvc-qrcode` (génération de QR Codes PNG/SVG, réponse HTTP servable depuis un contrôleur ; ADR-050)
 - `forge-mvc-admin` (back-office applicatif opt-in, scaffold ; voir `docs/roadmap/forge-admin-roadmap.md`)
 - `forge-mvc-testing` (infrastructure de test partagée, dev-only : `FakeRequest` et plugin pytest ; ADR-041)
+- `forge-mvc-entities` (moteur d'entités : `make:entity`/`make:relation`/`make:crud`, normaliseur, migrations, provisioning `db:*` ; absorbe l'ancien `forge-mvc-pivot` ; extrait du core, ADR-070)
+- `forge-mvc-sessions-db` (store de session persistant adossé au backend BDD, ADR-054 ; provisioning ADR-071)
+- `forge-mvc-audit` (journal d'audit applicatif)
+- `forge-mvc-settings` (paramètres applicatifs persistés)
+- `forge-mvc-jobs` (file de tâches de fond adossée à la base)
+- `forge-mvc-notifications` (notifications in-app)
+- `forge-mvc-import-export` (import/export CSV)
+- `forge-mvc-deploy` (outillage de déploiement, opt-in CLI-only, ADR-053)
+- Backends BDD (cœur agnostique, exclusifs, découverts par entry points ; ADR-054) : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres`, `forge-mvc-mssql`
+
+**Note** : `forge-mvc-pivot` a été supprimé, absorbé par `forge-mvc-entities` (ADR-070) ; un shim de compatibilité est réexporté.
 
 **Python** : 3.12+ minimum (ADR-006).
 
 **Statut** : version courante dans `pyproject.toml`. Trajectoire publique
-1.0, actuellement en **bêta publique** (`1.0.0-beta.x`) ; consolidation
-bêta en cours. Voir `CHANGELOG.md` et `docs/roadmap/` pour l'avancement
+1.0, actuellement en **release candidate** (`1.0.0rc.x`) ; consolidation
+bêta terminée, RC en cours. Voir `CHANGELOG.md` et `docs/roadmap/` pour l'avancement
 détaillé.
 
 ---
@@ -131,11 +141,15 @@ d'utilisateurs externes ni de code applicatif externe à protéger.
 - `forge-mvc-video` — upload, transcodage MP4 (H.264/AAC), lecture HTTP Range, CLI `video:*`
 - `forge-mvc-audio` — upload, sondage (`ffprobe`), transcodage MP3 (`ffmpeg`), lecture HTTP Range, CLI `audio:doctor` ; sans état
 - `forge-mvc-mail` : envoi d'emails, transports interchangeables (console, SMTP, log), templates Jinja, CLI `mail:*` ; extrait du core (ADR-022)
-- `forge-mvc-pivot` : tables pivot enrichies (`many_to_many` avec attributs), `make:pivot-crud` ; extrait du core (ADR-021)
 - `forge-mvc-i18n` : internationalisation par catalogues JSON, locale et fallback, helper `trans()`, repli no-op du noyau ; extrait du core (ADR-027)
 - `forge-mvc-qrcode` : génération de QR Codes PNG/SVG depuis du texte ou une URL, réponse HTTP servable depuis un contrôleur (ADR-050)
 - `forge-mvc-admin` : back-office applicatif opt-in (scaffold), voir `docs/roadmap/forge-admin-roadmap.md`
 - `forge-mvc-testing` : infrastructure de test partagée réservée au développement (`FakeRequest` et plugin pytest), ADR-041
+- `forge-mvc-entities` : moteur d'entités extrait du cœur (ADR-070) ; `make:entity`/`make:relation`/`make:crud`, normaliseur canonique, `build:model`, migrations, provisioning `db:*` ; absorbe le pivot enrichi (`make:pivot-crud`, ADR-021)
+- `forge-mvc-sessions-db` : store de session persistant (`DbSessionStore`), concurrence optimiste ; `sessions:init`/`sessions:gc` (ADR-054/071/072)
+- `forge-mvc-audit`, `forge-mvc-settings`, `forge-mvc-jobs`, `forge-mvc-notifications`, `forge-mvc-import-export` : opt-ins applicatifs adossés à la base (migration + `<opt-in>:init`, ADR-071)
+- `forge-mvc-deploy` : outillage de déploiement opt-in CLI-only (`deploy:init`/`deploy:check`, ADR-053)
+- Backends BDD (ADR-054) : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres` (Alpha), `forge-mvc-mssql` (Alpha) ; exclusifs, découverts par entry points `forge_mvc.db_backend`
 
 **Hors scope Forge** (à charge de l'application) :
 
@@ -206,6 +220,27 @@ structurante.
 | ADR-050 | `050-qrcode-optin.md` | Opt-in QR Code `forge-mvc-qrcode` |
 | ADR-051 | `051-public-page-controller-insertion.md` | Insertion d'une méthode dans le contrôleur des pages publiques (`make:public-page`) |
 | ADR-052 | `052-optin-strategy.md` | Stratégie et critères des opt-ins : deux filtres d'admission (runtime WSGI, charte), classification et ordre |
+| ADR-053 | `053-deploy-extraction.md` | Extraction du déploiement dans un opt-in CLI-only `forge-mvc-deploy` |
+| ADR-054 | `054-database-backend-optins.md` | Cœur agnostique BDD : backends en opt-ins exclusifs, découverts par entry points |
+| ADR-055 | `055-optin-categories.md` | Classification des opt-ins par destination (champ `category`) |
+| ADR-056 | `056-rbac-contract-tooling-extraction.md` | Extraction du contrat et de l'outillage RBAC vers `forge-mvc-rbac` |
+| ADR-057 | `057-pivot-schema-decoupling.md` | Découplage du schéma pivot, extrait vers l'opt-in pivot |
+| ADR-058 | `058-schemas-single-source.md` | Source unique des schémas JSON : `cli/schemas/` canonique |
+| ADR-059 | `059-cli-command-dispatch-registry.md` | Registre de dispatch des commandes CLI (entry points `forge_mvc.commands`) |
+| ADR-060 | `060-backend-free-skeleton.md` | Squelette livré sans backend BDD |
+| ADR-061 | `061-optin-project-registry.md` | Registre d'opt-ins visible du projet (`optins/registry.py`) |
+| ADR-062 | `062-forge-new-install-source.md` | `forge new` épingle la source d'install (Git ou PyPI, PEP 610) |
+| ADR-063 | `063-skeleton-quality-enforcement-config.md` | Le squelette livre l'apparat qualité complet ; `forge new --bare` |
+| ADR-064 | `064-db-config-env-scaffold.md` | `forge db:config` amorce l'env du backend BDD |
+| ADR-065 | `065-skeleton-top-level-package.md` | Squelette à la racine `skeleton/` (paquet Python) |
+| ADR-066 | `066-db-host-port-unification.md` | Contrat d'env BDD unifié : `DB_HOST`/`DB_PORT` partagés |
+| ADR-067 | `067-db-init-provisioning-sql.md` | `forge db:init` génère et affiche le SQL de provisioning ; `--run` exécute |
+| ADR-068 | `068-per-controller-routes-package.md` | Routes en package `mvc/routes/`, un fichier par contrôleur |
+| ADR-069 | `069-foreign-key-field-type.md` | Clé étrangère = champ d'entité de première classe (type `foreign_key`) |
+| ADR-070 | `070-entities-engine-extraction.md` | Extraction du moteur d'entités vers `forge-mvc-entities` (absorbe pivot) |
+| ADR-071 | `071-optin-db-provisioning-convention.md` | Convention unique de provisioning des opt-ins BDD (`migration:apply`) |
+| ADR-072 | `072-optin-cli-command-contract.md` | Contrat des commandes CLI d'opt-in : interception `--help`, amorçage config (`config: True`) |
+| ADR-073 | `073-app-views-namespace.md` | Namespace `app/` des vues applicatives (`APP_VIEWS_NAMESPACE`) |
 
 Pour créer un nouvel ADR : `docs/adr/<numéro>-<sujet>.md`, suivre le format existant.
 
@@ -339,15 +374,12 @@ Les conventions opérationnelles de Forge sont consolidées dans
 - **D. Documentation** : MkDocs strict + liens hors `docs/`,
   `docs/history/` comme mémoire brute, section « Historique » dans la nav
 
-Note sur `packages/` : 15 sous-dossiers maintenus (`forge-mvc-mfa`,
-`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-files`,
-`forge-mvc-images`, `forge-mvc-iot`, `forge-mvc-video`, `forge-mvc-audio`,
-`forge-mvc-mail` (ADR-022), `forge-mvc-pivot` (ADR-021), `forge-mvc-i18n` (ADR-027),
-`forge-mvc-qrcode` (ADR-050), `forge-mvc-admin`, `forge-mvc-testing` (ADR-041)),
-chacun avec son propre `pyproject.toml`. Le paquet `forge-mvc-media` a été
-supprimé ; son shim de compatibilité est réexporté par `forge-mvc-images`
-(ADR-018). Le `pyproject.toml` racine est la source de vérité pour `forge-mvc`
-(résolu en T2 + T2b, consolidation bêta 1.0).
+Note sur `packages/` : 26 sous-dossiers maintenus (liste exhaustive et à jour
+en section 1), chacun avec son propre `pyproject.toml`. Deux paquets ont été
+absorbés et supprimés : `forge-mvc-pivot` par `forge-mvc-entities` (ADR-070) et
+`forge-mvc-media` par `forge-mvc-images` (ADR-018) ; leurs shims de compatibilité
+sont réexportés. Le `pyproject.toml` racine est la source de vérité pour
+`forge-mvc`.
 
 ---
 
@@ -362,7 +394,7 @@ Les informations volatiles ne sont pas ici — voir section 8.
 
 **Prochaine refonte prévue** : tag majeur 2.0 (ou refonte intermédiaire si
 un changement architectural important le justifie).
-**Dernière refonte** : 2026-06 (resync opt-ins et ADR jusqu'à 051, `GOV-CLAUDE-MD-OPTINS-RESYNC-001`)
+**Dernière refonte** : 2026-07 (resync opt-ins jusqu'à 26 paquets et ADR jusqu'à 073, `GOV-CLAUDE-MD-RESYNC-AUDIT-001`)
 
 ---
 
