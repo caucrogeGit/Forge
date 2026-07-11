@@ -1104,6 +1104,29 @@ Options:
   --force       Remplace mvc/fixtures/<table>.sql s'il existe déjà.
   -h, --help    Affiche cette aide sans exécuter la commande.""",
 
+    "fixtures:make-factory": """\
+Usage:
+  forge fixtures:make-factory <entity> [--force]
+
+Description:
+  Génère une factory de fixtures depuis le contrat d'entité
+  mvc/entities/<entity>/<entity>.json. Chaque champ reçoit un provider Faker
+  plausible, deviné par type et par nom : on part d'une factory qui fonctionne,
+  puis on ajuste (providers, boucles, conditions).
+
+Effets (write-if-new, charte §9) :
+  - affiche le code généré ;
+  - écrit mvc/fixtures/factories/<entity>_factory.py s'il n'existe pas ;
+  - --force remplace un fichier existant.
+
+Prérequis:
+  - opt-in installé (pip install --pre forge-mvc-fixtures) ;
+  - l'entité existe (forge make:entity <entity>).
+
+Options:
+  --force       Remplace la factory existante.
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+
     # ── Schémas JSON & RBAC (CLI-HELP-FLAGS-SCHEMA-RBAC-001) ─────────────────
 
     "schema:list": """\

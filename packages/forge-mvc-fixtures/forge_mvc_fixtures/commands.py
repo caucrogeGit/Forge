@@ -14,4 +14,6 @@ COMMANDS: dict[str, dict[str, str | bool]] = {
     "fixtures:load": {"module": "forge_mvc_fixtures.cli.load", "config": True},
     "fixtures:purge": {"module": "forge_mvc_fixtures.cli.purge", "config": True},
     "fixtures:generate": {"module": "forge_mvc_fixtures.cli.generate", "config": True},
+    # make-factory ne lit qu'un contrat JSON et écrit un .py : pas de config BDD.
+    "fixtures:make-factory": {"module": "forge_mvc_fixtures.cli.make_factory"},
 }
