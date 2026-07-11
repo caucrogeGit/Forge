@@ -1976,7 +1976,7 @@ Description:
 Effets (un projet PEUT être modifié) :
   - écrit en mode write-if-new (aucun fichier existant n'est écrasé) :
       * mvc/controllers/auth_controller.py : login_form, login, logout ;
-      * mvc/views/auth/login.html          : formulaire de connexion ;
+      * mvc/views/app/auth/login.html      : formulaire (namespace app/, ADR-073) ;
   - génère mvc/routes/auth_routes.py (register_auth_routes) et affiche le
     branchement à ajouter dans mvc/routes/__init__.py (Forge n'y écrit pas ; ADR-068).
 

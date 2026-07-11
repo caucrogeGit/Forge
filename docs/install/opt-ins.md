@@ -357,7 +357,7 @@ Exemple pour IoT :
 forge opt-in:enable iot --apply
 forge iot:doctor
 forge iot:init
-forge db:apply
+forge migration:apply
 ```
 
 Les commandes exactes dépendent de l’opt-in utilisé.

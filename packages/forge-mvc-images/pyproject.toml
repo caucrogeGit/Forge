@@ -15,7 +15,7 @@ license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "images", "pillow", "uploads", "gallery"]
 dependencies = [
     "forge-mvc>=1.0.0rc2,<2",
-    "Pillow>=10.0,<13",
+    "Pillow>=10.3,<13",
     # FILES-IMAGES-REPOINT-001 (ADR-019) : le traitement d'image réutilise le
     # pipeline d'upload générique, désormais détenu par forge-mvc-files.
     "forge-mvc-files>=1.0.0rc2,<2",

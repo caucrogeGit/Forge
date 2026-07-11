@@ -18,7 +18,7 @@ Il se place après `auth:init` : `auth:init` crée les comptes et le SQL, `make:
 Écriture en mode write-if-new (aucun fichier existant n'est écrasé) :
 
 - `mvc/controllers/auth_controller.py` : `login_form` (GET), `login` (POST), `logout` (POST) ;
-- `mvc/views/auth/login.html` : le formulaire de connexion ;
+- `mvc/views/app/auth/login.html` : le formulaire de connexion (sous le namespace `APP_VIEWS_NAMESPACE`, `app` par défaut ; ADR-073) ;
 - `mvc/routes/auth_routes.py` : les routes du contrôleur.
 
 Le branchement des routes est **affiché**, à coller dans `mvc/routes/__init__.py` (charte principe 9, Forge n'écrit pas en silence un fichier utilisateur).

@@ -16,8 +16,11 @@ Contrat strict (audit ``OPTINS-CLI-ENABLE-AUDIT-001``) :
 - **jamais d'écrasement silencieux** ;
 - **pas de discovery magique** : le branchement reste explicite via
   ``optins/registry.py`` ;
-- **``mvc/routes/__init__.py`` n'est PAS modifié automatiquement** : la commande
-  affiche seulement l'instruction à ajouter ;
+- **``mvc/routes/__init__.py``** : en ``--apply`` et si la structure attendue
+  est reconnue (ancre ``router = Router()``), le branchement
+  ``register_optins(router)`` y est **inséré prudemment** (idempotent, jamais
+  d'écrasement) ; sinon, ou en dry-run, l'instruction est **seulement affichée**
+  à coller à la main ;
 - Forge Core reste indépendant des opt-ins : ce module ne fait
   qu'**écrire des fichiers texte** et vérifie la présence du paquet via
   ``importlib.util.find_spec`` (aucun import de ``forge_mvc_iot`` ici).
