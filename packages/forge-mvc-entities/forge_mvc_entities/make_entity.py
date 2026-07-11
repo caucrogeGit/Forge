@@ -343,17 +343,18 @@ def _write_entity_files(
 
 
 def sql_default_literal(field: dict[str, Any]) -> str | None:
+    """Littéral SQL de la valeur `DEFAULT` d'un champ, ou None si sans défaut.
+
+    Délègue au rendu de littéral du dialecte du backend actif (ADR-075) : les
+    booléens et les dates sont donc rendus correctement pour le SGBD cible
+    (`TRUE`/`FALSE` en PostgreSQL, `1`/`0` ailleurs), au lieu d'un rendu
+    dialecte-naïf. Une seule façon officielle de rendre un littéral (principe 11).
+    """
     if "default" not in field:
         return None
-    value = field["default"]
-    if value is None:
-        return "NULL"
-    if isinstance(value, bool):
-        return "1" if value else "0"
-    if isinstance(value, str):
-        escaped = value.replace("'", "''")
-        return f"'{escaped}'"
-    return str(value)
+    from core.database.backend import get_backend
+
+    return get_backend().dialect.render_literal(field["default"])
 
 
 def build_entity_sql(entity_definition: dict[str, Any]) -> str:
