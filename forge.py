@@ -543,6 +543,7 @@ CORE_COMMANDS: dict[str, _CoreRunner] = {
     "opt-in:install": _lazy("cli.optins.install", exit_rc=True),
     "opt-in:enable": _lazy("cli.optins.enable", exit_rc=True),
     "opt-in:list": _lazy("cli.optins.list", exit_rc=True),
+    "opt-in:installed": _lazy("cli.optins.installed", exit_rc=True),
     "opt-in:remove": _lazy("cli.optins.remove", exit_rc=True),
     "opt-in:disable": _lazy("cli.optins.disable", exit_rc=True),
     **_group(

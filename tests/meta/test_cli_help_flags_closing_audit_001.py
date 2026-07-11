@@ -81,6 +81,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "admin:doctor",
     # Opt-ins (branchement projet)
     "opt-in:install", "opt-in:remove", "opt-in:enable", "opt-in:disable", "opt-in:list",
+    "opt-in:installed",
     # Documentation
     "docs:pdf",
     # Internationalisation

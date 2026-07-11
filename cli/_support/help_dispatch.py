@@ -133,6 +133,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "opt-in:enable":    "Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.",
     "opt-in:disable":   "Débranche un opt-in du projet (retire optins/) ; dry-run par défaut, --apply pour écrire.",
     "opt-in:list":      "Affiche les opt-ins officiels et leur état (lecture seule).",
+    "opt-in:installed": "Affiche les opt-ins réellement installés (pip, lecture seule).",
     # Documentation
     "docs:pdf":         "Génère un PDF depuis la documentation.",
     # Internationalisation
@@ -717,6 +718,23 @@ Description:
   Nom canonique de la liste des opt-ins (ADR-016). Affiche les opt-ins
   officiels et leur état local dans un projet Forge. **Commande lecture
   seule** : ne crée, ne modifie et n'installe rien.
+
+Code de sortie:
+  0 toujours (lecture seule).
+""",
+    "opt-in:installed": """\
+Usage:
+  forge opt-in:installed
+
+Description:
+  Affiche les opt-ins et backends BDD **réellement installés** dans
+  l'environnement Python (via importlib.metadata), avec leur version.
+  **Commande lecture seule, sans contexte projet.**
+
+  Complémentaire d'`opt-in:list` : `opt-in:list` dit ce qui est câblé dans le
+  projet (couche optins/), `opt-in:installed` dit ce qui est installé. Pour les
+  opt-ins CLI-only (deploy, fixtures), utilisables dès l'installation sans
+  câblage, c'est cette commande qui fait foi.
 
 Code de sortie:
   0 toujours (lecture seule).

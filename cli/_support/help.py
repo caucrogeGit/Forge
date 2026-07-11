@@ -110,7 +110,8 @@ Opt-ins (branchement projet)
   opt-in:remove       Affiche la commande de désinstallation du package d'un opt-in officiel.
   opt-in:enable       Branche un opt-in dans le projet (optins/) ; dry-run par défaut, --apply pour écrire.
   opt-in:disable      Débranche un opt-in du projet (retire optins/) ; dry-run par défaut, --apply pour écrire.
-  opt-in:list         Affiche les opt-ins officiels et leur état (lecture seule).
+  opt-in:list         Affiche les opt-ins officiels et leur état projet (lecture seule).
+  opt-in:installed    Affiche les opt-ins réellement installés (pip, lecture seule).
 
 Documentation
   docs:pdf            Génère un PDF depuis la documentation.

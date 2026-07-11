@@ -202,7 +202,8 @@ Les commandes propres à un module (par exemple `forge iot:*`) sont documentées
 | `forge opt-in:remove` | affiche la commande de désinstallation | [remove](../cli-optins/remove.md) |
 | `forge opt-in:enable` | branche un opt-in dans le projet (`optins/`) | [enable](../cli-optins/enable.md) |
 | `forge opt-in:disable` | débranche un opt-in du projet | [disable](../cli-optins/disable.md) |
-| `forge opt-in:list` | état des opt-ins officiels (lecture seule) | [list](../cli-optins/list.md) |
+| `forge opt-in:list` | état projet des opt-ins officiels (lecture seule) | [list](../cli-optins/list.md) |
+| `forge opt-in:installed` | opt-ins réellement installés (pip, lecture seule) | [list](../cli-optins/list.md) |
 
 Catalogue complet des opt-ins : [Opt-ins officiels](../optins/index.md).
 
