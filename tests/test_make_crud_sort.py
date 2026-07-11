@@ -198,3 +198,60 @@ def test_aucun_javascript_ajoute():
     html = build_index_view(CONTACT)
 
     assert "<script" not in html
+
+
+# ── Preuve PAR EXÉCUTION de l'anti-injection du tri (audit tests) ──────────────
+# Les tests ci-dessus figent la STRUCTURE générée (substrings). Ceux-ci EXÉCUTENT
+# le modèle généré avec des entrées hostiles et vérifient le SQL réellement produit
+# (ORDER BY = colonne whitelistée, jamais l'entrée brute), à la bonne altitude.
+
+def _exec_model(definition):
+    code = build_model(definition)
+    ns: dict = {}
+    exec(compile(code, "<model_généré>", "exec"), ns)
+    return ns
+
+
+def _capture_sql(ns, func_name, **kwargs):
+    captured = {}
+
+    def fake_fetch_all(sql, params=()):
+        captured["sql"] = sql
+        captured["params"] = params
+        return []
+
+    ns["fetch_all"] = fake_fetch_all
+    ns[func_name](**kwargs)
+    return captured["sql"]
+
+
+_HOSTILE_SORT = "email; DROP TABLE contact; --"
+_HOSTILE_DIR = "asc'; DROP TABLE contact; --"
+
+
+class TestSortInjectionAtRuntime:
+
+    def test_hostile_sort_neutralise_en_execution_paginated(self):
+        ns = _exec_model(CONTACT)
+        sql = _capture_sql(ns, "find_contacts_paginated", sort=_HOSTILE_SORT, direction=_HOSTILE_DIR)
+        assert "ORDER BY Id ASC" in sql, "sort hostile -> colonne par défaut (pk)"
+        assert "DROP TABLE" not in sql
+        assert _HOSTILE_SORT not in sql
+
+    def test_hostile_sort_neutralise_en_execution_export(self):
+        ns = _exec_model(CONTACT)
+        sql = _capture_sql(ns, "find_contacts_for_export", sort=_HOSTILE_SORT, direction=_HOSTILE_DIR)
+        assert "ORDER BY Id ASC" in sql
+        assert "DROP TABLE" not in sql
+        assert _HOSTILE_SORT not in sql
+
+    def test_sort_valide_mappe_sur_la_colonne_en_execution(self):
+        ns = _exec_model(CONTACT)
+        assert "ORDER BY Nom DESC" in _capture_sql(ns, "find_contacts_paginated", sort="nom", direction="desc")
+        assert "ORDER BY Email ASC" in _capture_sql(ns, "find_contacts_paginated", sort="email", direction="asc")
+
+    def test_direction_hostile_retombe_sur_asc_en_execution(self):
+        ns = _exec_model(CONTACT)
+        sql = _capture_sql(ns, "find_contacts_paginated", sort="nom", direction=_HOSTILE_DIR)
+        assert "ORDER BY Nom ASC" in sql, "direction non 'desc' -> ASC"
+        assert _HOSTILE_DIR not in sql
