@@ -45,6 +45,8 @@ pip install -r requirements-dev.txt  # installe forge-mvc-fixtures depuis packag
 |---|---|
 | `forge fixtures:load` | Charge les fixtures `mvc/fixtures/*.sql` dans la base de l'environnement actif. Affiche le SQL par défaut ; `--run` exécute ; `--run --force` en production. |
 | `forge fixtures:purge` | Vide les tables ciblées par les fixtures (dérivées des `INSERT INTO`) pour repartir d'un état propre. Mêmes options `--run` / `--force`. |
+| `forge fixtures:make-factory <entity>` | Échafaude une factory depuis le contrat d'entité (providers Faker devinés), sous `mvc/fixtures/factories/`. |
+| `forge fixtures:generate <entity>` | Exécute la factory et écrit `mvc/fixtures/<table>.sql` (`--rows N`, `--seed S`, `--force`). |
 
 ## Compatibilité
 

@@ -49,6 +49,6 @@ En production, le référentiel permanent passe par une migration de seed, pas p
 
 ## La suite
 
-Faisons le bilan du niveau intermédiaire.
+Assez écrit de SQL à la main : apprenons à le générer.
 
-[Continuer : bilan du niveau intermédiaire](bilan.md)
+[Continuer : générer plutôt qu'écrire à la main](fixtures-generate.md)

@@ -6,8 +6,9 @@ Récapitulatif du **niveau avancé** de la progression *Fixtures*.
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 : [Fixtures ou migration de seed](fixtures-vs-seed.md) | Choisir la bonne voie selon le besoin (permanent contre rejouable). |
-| 2 : [Un opt-in CLI-only](fixtures-optin.md) | Comprendre le profil opt-in, CLI seule, SQL visible, indépendant du cœur. |
+| 1 : [La factory comme code](fixtures-factory.md) | Coder sa génération (boucles, conditions, tableaux), Faker optionnel, boucle code vers SQL. |
+| 2 : [Fixtures ou migration de seed](fixtures-vs-seed.md) | Choisir la bonne voie selon le besoin (permanent contre rejouable). |
+| 3 : [Un opt-in CLI-only](fixtures-optin.md) | Comprendre le profil opt-in, CLI seule, SQL visible, indépendant du cœur. |
 
 Vous savez situer les fixtures dans l'architecture de Forge et les employer à bon escient.
 

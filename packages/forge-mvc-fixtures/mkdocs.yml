@@ -16,8 +16,10 @@ nav:
       - Intermédiaire:
           - Repartir d'un état propre: welcome/intermediaire/fixtures-purge.md
           - Cadrer par environnement: welcome/intermediaire/fixtures-env.md
+          - Générer plutôt qu'écrire à la main: welcome/intermediaire/fixtures-generate.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
+          - La factory comme code: welcome/avance/fixtures-factory.md
           - Fixtures ou migration de seed: welcome/avance/fixtures-vs-seed.md
           - Un opt-in CLI-only: welcome/avance/fixtures-optin.md
           - Bilan avancé: welcome/avance/bilan.md

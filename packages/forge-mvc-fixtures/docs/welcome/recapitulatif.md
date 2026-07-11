@@ -13,19 +13,21 @@ Récapitulatif des paliers de la progression *Fixtures* et des commandes de l'op
 | 1 | [Bonjour les fixtures](debutant/fixtures-welcome.md) | Ce qu'est une fixture, où elle vit | `mvc/fixtures/*.sql` |
 | 2 | [Charger une première fixture](debutant/fixtures-load.md) | Afficher puis charger | `fixtures:load`, `--run` |
 
-## Niveau intermédiaire : rejouer et cadrer
+## Niveau intermédiaire : rejouer, cadrer, générer
 
 | # | Palier | Ce qu'on apprend | Commande-clé |
 |---|--------|------------------|---------|
 | 1 | [Repartir d'un état propre](intermediaire/fixtures-purge.md) | Vider les tables ciblées | `fixtures:purge`, `--run` |
 | 2 | [Cadrer par environnement](intermediaire/fixtures-env.md) | Viser `APP_ENV`, prod protégée | `--force` |
+| 3 | [Générer plutôt qu'écrire à la main](intermediaire/fixtures-generate.md) | Échafauder et générer | `fixtures:make-factory`, `fixtures:generate` |
 
-## Niveau avancé : situer
+## Niveau avancé : coder et situer
 
 | # | Palier | Ce qu'on apprend | Notion-clé |
 |---|--------|------------------|---------|
-| 1 | [Fixtures ou migration de seed](avance/fixtures-vs-seed.md) | Choisir la bonne voie | Frontière (principe 11) |
-| 2 | [Un opt-in CLI-only](avance/fixtures-optin.md) | Profil opt-in, indépendance du cœur | CLI-only |
+| 1 | [La factory comme code](avance/fixtures-factory.md) | Coder sa génération | `rows()`, `self.faker`, `--seed` |
+| 2 | [Fixtures ou migration de seed](avance/fixtures-vs-seed.md) | Choisir la bonne voie | Frontière (principe 11) |
+| 3 | [Un opt-in CLI-only](avance/fixtures-optin.md) | Profil opt-in, indépendance du cœur | CLI-only |
 
 ## Mémo des commandes
 
@@ -36,6 +38,8 @@ Récapitulatif des paliers de la progression *Fixtures* et des commandes de l'op
 | `forge fixtures:purge` | Affiche les `DELETE` dérivés des fixtures. |
 | `forge fixtures:purge --run` | Vide les tables ciblées. |
 | `... --run --force` | Autorise l'exécution en `APP_ENV=prod`. |
+| `forge fixtures:make-factory <entity>` | Échafaude une factory depuis le contrat d'entité. |
+| `forge fixtures:generate <entity> --rows N --seed S` | Exécute la factory, écrit `mvc/fixtures/<table>.sql`. |
 
 ## Règle d'or
 
