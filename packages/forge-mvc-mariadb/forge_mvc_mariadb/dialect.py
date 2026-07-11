@@ -9,6 +9,8 @@ ne rien changer au SQL généré tant que le backend est MariaDB.
 """
 from typing import Any
 
+from core.database.literals import escape_string, render_literal_value
+
 # Types Forge « simples » → type de colonne MariaDB.
 # boolean → BOOLEAN (et non TINYINT(1)) : voir la note du normaliseur.
 _SIMPLE_TYPES: dict[str, str] = {
@@ -100,6 +102,17 @@ class MariaDBDialect:
 
     def quote_identifier(self, name: str) -> str:
         return f"`{name}`"
+
+    def render_literal(self, value: object) -> str:
+        # Booléens 1/0, dates en chaîne ISO quotée (ADR-075).
+        return render_literal_value(
+            value,
+            bool_true="1",
+            bool_false="0",
+            render_string=escape_string,
+            render_date=lambda d: escape_string(d.isoformat()),
+            render_datetime=lambda dt: escape_string(dt.strftime("%Y-%m-%d %H:%M:%S")),
+        )
 
     def add_columns_sql(self, table: str, columns: "list[tuple[str, str]]") -> str:
         defs = [

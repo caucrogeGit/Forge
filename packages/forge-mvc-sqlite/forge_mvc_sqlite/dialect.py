@@ -9,6 +9,8 @@ type booléen ni date/heure natifs (stockés en TEXT ISO ou entier 0/1).
 import re
 from typing import Any
 
+from core.database.literals import escape_string, render_literal_value
+
 _SAFE_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 
 # Types Forge « simples » → affinité SQLite.
@@ -96,6 +98,17 @@ class SQLiteDialect:
 
     def quote_identifier(self, name: str) -> str:
         return f'"{name}"'
+
+    def render_literal(self, value: object) -> str:
+        # SQLite : pas de booléen ni de date natifs (0/1 et chaîne ISO), ADR-075.
+        return render_literal_value(
+            value,
+            bool_true="1",
+            bool_false="0",
+            render_string=escape_string,
+            render_date=lambda d: escape_string(d.isoformat()),
+            render_datetime=lambda dt: escape_string(dt.strftime("%Y-%m-%d %H:%M:%S")),
+        )
 
     def add_columns_sql(self, table: str, columns: "list[tuple[str, str]]") -> str:
         # SQLite : une seule colonne ajoutée par ALTER TABLE.

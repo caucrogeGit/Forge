@@ -123,6 +123,22 @@ class Dialect(Protocol):
         """Échappe un identifiant SQL (backticks MariaDB, guillemets SQLite)."""
         ...
 
+    # ── DML (rendu de littéraux, ADR-075) ────────────────────────────────────
+
+    def render_literal(self, value: object) -> str:
+        """Rend une valeur Python comme littéral SQL de ce dialecte (ADR-075).
+
+        Couvre None, bool, int, float, Decimal, str, date, datetime ; lève sur
+        un type non couvert. Booléens et dates sont propres au dialecte (`1`/`0`
+        contre `TRUE`/`FALSE`, formes de date), chaînes échappées (`''`, `N'...'`
+        en SQL Server).
+
+        Réservé à la **génération d'artefacts relus** (fixtures, `DEFAULT` de
+        DDL) : le littéral est du SQL visible. Ne JAMAIS l'utiliser pour une
+        requête à l'exécution (la DML reste paramétrée, principe 7).
+        """
+        ...
+
     def add_columns_sql(self, table: str, columns: "list[tuple[str, str]]") -> str:
         """Migration d'ajout de colonnes. `columns` : (nom, définition SQL).
 

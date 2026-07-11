@@ -8,6 +8,8 @@ INDEX séparées (PostgreSQL n'accepte pas d'index dans le CREATE TABLE).
 """
 from typing import Any
 
+from core.database.literals import escape_string, render_literal_value
+
 _SIMPLE_TYPES: dict[str, str] = {
     "text":        "TEXT",
     "integer":     "INTEGER",
@@ -103,6 +105,17 @@ class PostgreSQLDialect:
 
     def quote_identifier(self, name: str) -> str:
         return f'"{name}"'
+
+    def render_literal(self, value: object) -> str:
+        # PostgreSQL : booléens TRUE/FALSE, dates typées DATE '...' / TIMESTAMP '...' (ADR-075).
+        return render_literal_value(
+            value,
+            bool_true="TRUE",
+            bool_false="FALSE",
+            render_string=escape_string,
+            render_date=lambda d: f"DATE {escape_string(d.isoformat())}",
+            render_datetime=lambda dt: f"TIMESTAMP {escape_string(dt.strftime('%Y-%m-%d %H:%M:%S'))}",
+        )
 
     def add_columns_sql(self, table: str, columns: "list[tuple[str, str]]") -> str:
         defs = [

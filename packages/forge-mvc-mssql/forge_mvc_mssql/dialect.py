@@ -10,6 +10,8 @@ index en instructions séparées.
 """
 from typing import Any
 
+from core.database.literals import escape_string, render_literal_value
+
 _SIMPLE_TYPES: dict[str, str] = {
     "text":        "NVARCHAR(MAX)",
     "integer":     "INT",
@@ -105,6 +107,17 @@ class MSSQLDialect:
 
     def quote_identifier(self, name: str) -> str:
         return f"[{name}]"
+
+    def render_literal(self, value: object) -> str:
+        # SQL Server : chaînes Unicode N'...', booléens (BIT) 1/0, dates ISO (ADR-075).
+        return render_literal_value(
+            value,
+            bool_true="1",
+            bool_false="0",
+            render_string=lambda s: escape_string(s, national=True),
+            render_date=lambda d: escape_string(d.isoformat()),
+            render_datetime=lambda dt: escape_string(dt.strftime("%Y-%m-%d %H:%M:%S")),
+        )
 
     def add_columns_sql(self, table: str, columns: "list[tuple[str, str]]") -> str:
         # SQL Server : un seul ALTER TABLE ... ADD col def, col def (sans COLUMN).
