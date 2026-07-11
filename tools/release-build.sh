@@ -29,6 +29,15 @@ echo "-- nettoyage dist/ build/ *.egg-info --"
 rm -rf "$DIST" "$ROOT/build" "$ROOT"/*.egg-info
 find packages -maxdepth 2 -name "*.egg-info" -type d -exec rm -rf {} + 2>/dev/null || true
 
+# PKG-WHEEL-NO-CACHE-001 — purge des caches d'outillage avant build. Le squelette
+# porte sa propre config ruff (`skeleton/data/pyproject.toml`), donc `ruff check .`
+# crée `skeleton/data/.ruff_cache` ; avec `include-package-data = true`, les globs
+# package-data l'embarqueraient dans la wheel (ni exclude-package-data ni le prune
+# MANIFEST ne le filtrent pour la wheel). On le supprime du disque en amont.
+echo "-- purge caches d'outillage (.ruff_cache/.pytest_cache/.mypy_cache) --"
+find "$ROOT" -type d \( -name .ruff_cache -o -name .pytest_cache -o -name .mypy_cache \) \
+    -exec rm -rf {} + 2>/dev/null || true
+
 # 2. Build du cœur forge-mvc (racine) puis des 12 opt-ins, vers un dist/ partagé
 echo "-- build forge-mvc (racine) --"
 python -m build "$ROOT" --outdir "$DIST"

@@ -45,6 +45,20 @@ def _clean_build_dirs() -> None:
     for egg in PROJECT_ROOT.glob("*.egg-info"):
         shutil.rmtree(egg)
 
+    # PKG-WHEEL-NO-CACHE-001 : le squelette porte sa propre config ruff
+    # (`skeleton/data/pyproject.toml`), donc `ruff check .` crée
+    # `skeleton/data/.ruff_cache`. Avec `include-package-data = true`, les globs
+    # `package-data` lisent le disque et embarqueraient ce cache dans la wheel
+    # (ni `exclude-package-data` ni le `prune` MANIFEST ne le filtrent pour la
+    # wheel). On purge ces caches d'outillage avant le build, comme le fait
+    # `tools/release-build.sh`.
+    for cache in PROJECT_ROOT.rglob(".ruff_cache"):
+        shutil.rmtree(cache, ignore_errors=True)
+    for cache in PROJECT_ROOT.rglob(".pytest_cache"):
+        shutil.rmtree(cache, ignore_errors=True)
+    for cache in PROJECT_ROOT.rglob(".mypy_cache"):
+        shutil.rmtree(cache, ignore_errors=True)
+
 
 @pytest.fixture(scope="module")
 def fresh_wheel(tmp_path_factory):
@@ -198,6 +212,29 @@ class TestWheelIsClean:
             f"({len(bytecode)} fichiers) — build non propre. "
             f"Exemples : {bytecode[:5]}. "
             "Nettoyer build/ avant python -m build (cf. release_check.sh --full)."
+        )
+
+    def test_wheel_has_no_tooling_cache(self, fresh_wheel):
+        """PKG-WHEEL-NO-CACHE-001 : aucun cache d'outillage dans la wheel.
+
+        `skeleton/data/pyproject.toml` déclare `[tool.ruff]`, donc lancer
+        `ruff check .` depuis la racine crée `skeleton/data/.ruff_cache`.
+        Avec `include-package-data = true`, ce cache local (non reproductible,
+        gitignoré) fuirait dans les projets créés par `forge new`. Le build
+        release et ce test purgent ces caches en amont.
+        """
+        with zipfile.ZipFile(fresh_wheel) as zf:
+            names = zf.namelist()
+        cache = [
+            n for n in names
+            if ".ruff_cache/" in n or ".pytest_cache/" in n or ".mypy_cache/" in n
+        ]
+        assert not cache, (
+            "La wheel embarque un cache d'outillage "
+            f"({len(cache)} entrées) — build non propre. "
+            f"Exemples : {cache[:5]}. "
+            "Purger .ruff_cache/.pytest_cache/.mypy_cache avant python -m build "
+            "(cf. tools/release-build.sh)."
         )
 
 

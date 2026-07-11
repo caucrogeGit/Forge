@@ -7,6 +7,15 @@ global-exclude *.pyc
 global-exclude *.pyo
 recursive-exclude * __pycache__
 
+# PKG-WHEEL-NO-CACHE-001 — ne jamais embarquer les caches d'outillage. Le
+# squelette porte sa propre config ruff (`skeleton/data/pyproject.toml`), donc
+# `ruff check .` crée `skeleton/data/.ruff_cache` ; l'empaqueter fuirait un cache
+# local non reproductible dans les projets créés par `forge new`.
+prune skeleton/data/.ruff_cache
+prune skeleton/data/.pytest_cache
+prune skeleton/data/.mypy_cache
+recursive-exclude * .ruff_cache .pytest_cache .mypy_cache
+
 # PKG-SDIST-TESTS-DECISION-001 — la suite de tests Forge est un outil de
 # développement (elle s'exécute depuis le monorepo avec les opt-ins en
 # éditable, cf. requirements-dev.txt). Elle n'a pas sa place dans le sdist

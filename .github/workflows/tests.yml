@@ -57,6 +57,14 @@ jobs:
       - name: Run tests
         run: python -m pytest -m "not db"
 
+      - name: Purge tooling caches before build
+        # PKG-WHEEL-NO-CACHE-001 — `ruff check .` crée skeleton/data/.ruff_cache
+        # (le squelette a sa propre config ruff) ; avec include-package-data=true
+        # ce cache fuirait dans la wheel. On le purge avant tout build.
+        run: |
+          find . -type d \( -name .ruff_cache -o -name .pytest_cache -o -name .mypy_cache \) \
+            -exec rm -rf {} + 2>/dev/null || true
+
       - name: Build package
         run: python -m build --no-isolation
 
