@@ -4,7 +4,7 @@ Modules Python de `forge-mvc-fixtures`. Le paquet expose une classe publique
 (`Factory`) importée par le code de factory de l'utilisateur, et quatre commandes
 CLI découvertes par le cœur.
 
-## `factory.py` — la classe de base `Factory` (API publique)
+## `factory.py` : la classe de base `Factory` (API publique)
 
 | Élément | Rôle |
 |---|---|
@@ -17,14 +17,14 @@ CLI découvertes par le cœur.
 
 La factory ne touche jamais la base et ne rend pas de SQL : elle produit des dicts.
 
-## `commands.py` — table des commandes (ADR-059)
+## `commands.py` : table des commandes (ADR-059)
 
 Expose `COMMANDS`, la table déclarative découverte par l'entry point
 `forge_mvc.commands`. `fixtures:load`, `fixtures:purge` et `fixtures:generate`
 déclarent `config: True` (config projet amorcée avant le handler, ADR-072) ;
 `fixtures:make-factory` non (il ne lit qu'un contrat JSON).
 
-## `cli/load.py` — `fixtures:load`
+## `cli/load.py` : `fixtures:load`
 
 | Fonction | Rôle |
 |---|---|
@@ -34,7 +34,7 @@ déclarent `config: True` (config projet amorcée avant le handler, ADR-072) ;
 | `load_fixtures(root, *, run, force, env)` | Affiche puis (si `run`) exécute les fixtures. Codes : 0, 2 (refus prod), 1 (erreur SQL). |
 | `main(args)` | Point d'entrée ; lit `--run` et `--force`. |
 
-## `cli/purge.py` — `fixtures:purge`
+## `cli/purge.py` : `fixtures:purge`
 
 | Fonction | Rôle |
 |---|---|
@@ -42,7 +42,7 @@ déclarent `config: True` (config projet amorcée avant le handler, ADR-072) ;
 | `purge_fixtures(root, *, run, force, env)` | Affiche puis (si `run`) exécute les `DELETE FROM` en ordre inverse. |
 | `main(args)` | Point d'entrée ; lit `--run` et `--force`. |
 
-## `cli/generate.py` — `fixtures:generate`
+## `cli/generate.py` : `fixtures:generate`
 
 | Fonction | Rôle |
 |---|---|
@@ -51,7 +51,7 @@ déclarent `config: True` (config projet amorcée avant le handler, ADR-072) ;
 | `generate_fixtures(root, entity, *, rows, seed, force, dialect)` | Affiche puis écrit `mvc/fixtures/<table>.sql` (write-if-new). Codes : 0, 2 (erreur), 1 (fichier existant). |
 | `main(args)` | Point d'entrée ; lit `<entity>`, `--rows`, `--seed`, `--force`. |
 
-## `cli/make_factory.py` — `fixtures:make-factory`
+## `cli/make_factory.py` : `fixtures:make-factory`
 
 | Fonction | Rôle |
 |---|---|
