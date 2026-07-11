@@ -635,7 +635,7 @@ def main() -> None:
                 "module forge-mvc-entities non installé.",
                 hint="installe le moteur d'entités : pip install --pre forge-mvc-entities",
             )
-        db_init_main([command])
+        db_init_main(args)  # argv complet (commande incluse) : --run doit passer
         return
 
     if command == "db:apply":
@@ -652,7 +652,7 @@ def main() -> None:
                 "module forge-mvc-entities non installé.",
                 hint="installe le moteur d'entités : pip install --pre forge-mvc-entities",
             )
-        db_apply_main([command])
+        db_apply_main(args)  # argv complet : rejette les arguments inconnus
         return
 
     if command == "routes:list":
