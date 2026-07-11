@@ -238,6 +238,11 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-entities` : la dépendance va de l'opt-in vers le cœur.
 
+## Connexion sans serveur (`serverless_db.py`)
+
+`configure_serverless_db` fournit la connexion runtime d'un backend BDD **sans serveur** (SQLite, ADR-054), qui n'a pas de comptes d'administration `DB_ADMIN_*`.
+Elle est utilisée hors du flux `db:init` / `db:apply`, réservé aux SGBD serveur.
+
 ## Voir aussi
 
 - [Référence par module](modules/make_entity.md) : une page par commande et module du moteur.

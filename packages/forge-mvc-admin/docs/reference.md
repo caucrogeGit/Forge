@@ -239,6 +239,11 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-admin` : la dépendance va de l'opt-in vers le cœur.
 
+## Construction du SQL (`query.py`)
+
+Le module `query.py` construit le SQL des ressources du back-office à partir d'un `AdminResource`, en ne laissant entrer que des **identifiants déclarés et revalidés** (anti-injection).
+Il expose les constructeurs `build_list_sql`, `build_count_sql`, `build_get_sql`, `build_insert_sql`, `build_update_sql`, `build_delete_sql`, et leurs exécuteurs `list_rows`, `count_rows`, `get_row`, `insert_row`, `update_row`, `delete_row`.
+
 ## Voir aussi
 
 - [Contrat de ressource](resources.md) : détail de `AdminResource`.
