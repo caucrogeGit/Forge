@@ -331,8 +331,12 @@ def check_auth_rate_limit(
 # Store in-memory process-local — API impérative (helpers stateful)
 # ---------------------------------------------------------------------------
 # Limitation assumée : en multi-worker (gunicorn, uWSGI) chaque processus a son
-# propre _attempts_store. Comportement cohérent avec core.security.hashing.
-# Solution multi-worker : backend partagé (DB, Redis) hors scope de ce ticket.
+# propre _attempts_store, donc la limite effective devient 5 x N workers.
+# Mitigation recommandée : rate-limit sur /login au reverse proxy (Nginx
+# limit_req), qui compte pour tous les workers ; voir le guide de déploiement
+# (docs/deployment/production-security.md, section « Rate limiting »).
+# Alternative applicative : check_auth_rate_limit accepte une liste de tentatives
+# externe, ce qui permettrait un backend partagé (DB, Redis) si besoin.
 
 _attempts_store: dict[str, list[AuthRateLimitAttempt]] = {}
 _store_lock = threading.RLock()

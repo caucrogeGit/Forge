@@ -230,11 +230,42 @@ Les logs d'audit ne sont pas configurés automatiquement par Forge, la politique
 ### Rate limiting
 
 Une protection anti-bruteforce est active sur `/login` via `core.auth.rate_limit`.
-Les paramètres de seuil sont configurables dans l'application.
+Par défaut : 5 tentatives par IP par fenêtre glissante de 60 secondes (`LOGIN_MAX_ATTEMPTS`, `LOGIN_RATE_LIMIT_WINDOW`).
 
 Une protection anti-abus est active sur les routes d'upload via le rate-limit d'upload (module optionnel).
 Par défaut : 10 uploads par IP par fenêtre glissante de 60 secondes.
 Les compteurs sont **isolés** des compteurs de connexion.
+
+#### Limite connue : compteur par processus (multi-worker)
+
+Le compteur anti-bruteforce vit **en mémoire du processus** (`core.auth.rate_limit._attempts_store`).
+Il est donc **local à chaque worker** et remis à zéro à chaque redémarrage.
+
+Sur le chemin de production recommandé (Gunicorn multi-worker), la limite effective devient `5 × N` tentatives par fenêtre, où `N` est le nombre de workers, puisque chaque worker compte séparément.
+Contrairement aux sessions (l'opt-in `forge-mvc-sessions-db` fournit un store partagé), il n'existe pas de store de tentatives partagé livré.
+
+**Mitigation recommandée en multi-worker : poser un rate-limit sur `/login` au niveau du reverse proxy**, qui compte pour l'ensemble des workers.
+
+Exemple Nginx (`limit_req`) :
+
+```nginx
+# Dans le bloc http : une zone dédiée aux tentatives de connexion.
+limit_req_zone $binary_remote_addr zone=forge_login:10m rate=5r/m;
+
+server {
+    # ... TLS, proxy_pass vers Gunicorn ...
+
+    location = /login {
+        # 5 requêtes/minute par IP, petite rafale tolérée, puis 429.
+        limit_req zone=forge_login burst=5 nodelay;
+        limit_req_status 429;
+        proxy_pass http://127.0.0.1:8000;
+    }
+}
+```
+
+Le rate-limit applicatif reste utile (défense en profondeur, mono-worker, développement) ; le rate-limit du proxy est la ligne de défense fiable en multi-worker.
+Le moteur `check_auth_rate_limit` accepte déjà une liste de tentatives externe : un backend partagé (base, cache) reste une évolution possible si un rate-limit purement applicatif est requis.
 
 ---
 
@@ -536,6 +567,7 @@ Sécurité applicative
 [ ] RBAC : routes protégées par décorateurs serveur (@require_permission)
 [ ] Auth audit : handler de log configuré (forge.auth.audit)
 [ ] Rate limiting login actif
+[ ] Rate limiting login au reverse proxy si multi-worker (compteur applicatif par processus, voir section 5)
 [ ] Rate limiting upload actif (module d'upload optionnel)
 
 Fichiers et stockage
