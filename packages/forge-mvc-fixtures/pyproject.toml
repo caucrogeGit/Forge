@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forge-mvc-fixtures"
+version = "1.0.0rc2"
+description = "Forge Fixtures — opt-in de données de démo et de test rejouables et cadrées par environnement : forge fixtures:load et forge fixtures:purge, CLI-only, SQL visible (ADR-074)."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+authors = [
+    { name = "Roger Lequette" },
+]
+license = "LicenseRef-Forge-Proprietary"
+keywords = ["python", "mvc", "forge", "fixtures", "seed", "demo", "test-data"]
+dependencies = [
+    "forge-mvc>=1.0.0rc2,<2",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+# ADR-059 : commandes CLI de l'opt-in decouvertes par le coeur (dispatch_optin).
+# Table vide au scaffold (ADR-074) : fixtures:load et fixtures:purge arrivent
+# aux tickets suivants.
+[project.entry-points."forge_mvc.commands"]
+forge_mvc_fixtures = "forge_mvc_fixtures.commands:COMMANDS"
+
+[project.urls]
+Homepage = "https://github.com/caucrogeGit/Forge"
+Repository = "https://github.com/caucrogeGit/Forge"
+Documentation = "https://forgemvc.com/docs/forge/"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["forge_mvc_fixtures*"]
+
+[tool.setuptools.package-data]
+"forge_mvc_fixtures" = ["py.typed"]

@@ -24,8 +24,8 @@ FORGE_PY = (PROJECT_ROOT / "forge.py").read_text(encoding="utf-8")
 class TestCatalog:
     def test_official_optins(self):
         assert optin_names() == [
-            "admin", "audio", "audit", "deploy", "entities", "files", "i18n",
-            "images", "import-export", "iot", "jobs", "mail", "mfa",
+            "admin", "audio", "audit", "deploy", "entities", "files", "fixtures",
+            "i18n", "images", "import-export", "iot", "jobs", "mail", "mfa",
             "notifications", "qrcode", "rbac", "sessions-db", "settings",
             "stats", "video", "workflow",
         ]

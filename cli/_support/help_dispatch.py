@@ -673,9 +673,9 @@ Description:
   Forge tourne depuis pipx). La commande **n'exécute rien** : la présence
   du package reste un geste explicite de l'utilisateur (ADR-016).
 
-  Opt-ins officiels : admin, audio, audit, deploy, entities, files, i18n,
-  images, import-export, iot, jobs, mail, mfa, notifications, qrcode, rbac,
-  sessions-db, settings, stats, video, workflow.
+  Opt-ins officiels : admin, audio, audit, deploy, entities, files, fixtures,
+  i18n, images, import-export, iot, jobs, mail, mfa, notifications, qrcode,
+  rbac, sessions-db, settings, stats, video, workflow.
 
   Une fois le package présent, brancher l'opt-in avec :
   `forge opt-in:enable <name>`.
