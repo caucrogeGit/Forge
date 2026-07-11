@@ -1078,6 +1078,32 @@ Options:
   --force       Autorise la purge en production (avec --run).
   -h, --help    Affiche cette aide sans exécuter la commande.""",
 
+    "fixtures:generate": """\
+Usage:
+  forge fixtures:generate <entity> [--rows N] [--seed S] [--force]
+
+Description:
+  Génère un fichier de fixtures SQL depuis une classe factory. Exécute
+  mvc/fixtures/factories/<entity>_factory.py, rend les lignes en INSERT INTO
+  (littéraux corrects pour le backend installé, ADR-075), affiche le SQL puis
+  l'écrit dans mvc/fixtures/<table>.sql.
+
+Comportement (charte §7 et §9) :
+  - affiche le SQL généré (on voit ce qui va être écrit) ;
+  - écrit le fichier s'il n'existe pas (write-if-new) ;
+  - --force remplace un fichier existant.
+
+Prérequis:
+  - opt-in installé (pip install --pre forge-mvc-fixtures) ;
+  - une factory pour l'entité (forge fixtures:make-factory <entity>) ;
+  - un backend BDD installé (pour le rendu des littéraux).
+
+Options:
+  --rows N      Nombre de lignes à générer (défaut 10).
+  --seed S      Graine Faker pour une génération reproductible.
+  --force       Remplace mvc/fixtures/<table>.sql s'il existe déjà.
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+
     # ── Schémas JSON & RBAC (CLI-HELP-FLAGS-SCHEMA-RBAC-001) ─────────────────
 
     "schema:list": """\

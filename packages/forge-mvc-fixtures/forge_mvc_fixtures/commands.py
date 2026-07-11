@@ -13,4 +13,5 @@ from __future__ import annotations
 COMMANDS: dict[str, dict[str, str | bool]] = {
     "fixtures:load": {"module": "forge_mvc_fixtures.cli.load", "config": True},
     "fixtures:purge": {"module": "forge_mvc_fixtures.cli.purge", "config": True},
+    "fixtures:generate": {"module": "forge_mvc_fixtures.cli.generate", "config": True},
 }
