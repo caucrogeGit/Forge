@@ -101,6 +101,11 @@ OPTIN_MODULES: dict[str, set[str]] = {
     "forge_mvc_mail": set(),
     # forge-mvc-i18n : i18n extrait du core (ADR-027). aucune dep tierce.
     "forge_mvc_i18n": set(),
+    # forge-mvc-sessions-db : store de session persistant (ADR-054). Ses tests
+    # d'intégration gardent l'import via pytest.importorskip("forge_mvc_sessions_db")
+    # et sont marqués `db` (sautés sans base). Adossé au backend BDD core, pas
+    # d'extra tiers à lister.
+    "forge_mvc_sessions_db": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}
