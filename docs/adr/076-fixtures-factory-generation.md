@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposée.
+Acceptée.
 Décision d'architecture ; relève du mainteneur.
 
 ## Date
@@ -43,9 +43,9 @@ from forge_mvc_fixtures import Factory
 class VilleFactory(Factory):
     table = "ville"
 
-    def rows(self) -> list[dict]:
+    def rows(self, count: int) -> list[dict]:
         villes = []
-        for i in range(50):
+        for i in range(count):
             villes.append({
                 "nom": self.faker.city(),
                 "code_postal": self.faker.postcode(),
@@ -55,9 +55,10 @@ class VilleFactory(Factory):
 ```
 
 Boucles, conditions, tableaux : l'utilisateur code sa génération.
+`count` vient de `--rows` ; l'utilisateur reste libre de l'ignorer et de fixer sa propre volumétrie.
 `self.faker` est disponible (locale configurable) mais **optionnel** : les données peuvent aussi être écrites à la main ou calculées.
 
-Une méthode `definition()` renvoyant une seule ligne est offerte pour le cas simple ; la classe de base l'appelle alors `--rows` fois.
+Une méthode `definition()` renvoyant une seule ligne est offerte pour le cas simple ; la classe de base `rows(count)` l'appelle alors `count` fois.
 `rows()` prime si les deux sont définies.
 
 ### Pas de magie (principe 3)
@@ -93,7 +94,7 @@ Tickets distincts :
 
 1. Classe de base `Factory` (contrat `rows()`/`definition()`, `self.faker`, rendu via `render_literal`), dépendance `faker`.
 2. `fixtures:generate` (exécution des factories, affichage puis écriture du `.sql`, `--rows`/`--seed`).
-3. `fixtures:make-factory` (scaffold depuis le contrat d'entité, mapping type/nom vers provider Faker par défaut).
+3. `fixtures:make-factory` (scaffold **riche** depuis le contrat d'entité : chaque champ reçoit un provider Faker plausible deviné par type et par nom, `email` vers `faker.email()`, un champ nommé `nom`/`name` vers `faker.name()`, `date` vers `faker.date_object()`, etc. ; l'utilisateur part d'une factory qui fonctionne puis ajuste).
 4. Doc embarquée et palier welcome : écrire une factory, la génération, la boucle code vers SQL.
 
 ## Conséquences
