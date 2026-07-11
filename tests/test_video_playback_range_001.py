@@ -164,3 +164,23 @@ def test_stream_open_when_no_token(tmp_path):
 def test_config_api_token_optional():
     assert load_video_config({}).api_token is None
     assert load_video_config({"FORGE_VIDEO_API_TOKEN": "abc"}).api_token == "abc"
+
+
+# ── Confinement du chemin issu de la base (défense en profondeur, audit) ──────
+
+def test_stream_rejects_path_escaping_storage_root(tmp_path):
+    """Une ligne DB corrompue avec `../` ne doit pas servir un fichier hors storage."""
+    secret = tmp_path.parent / "secret_outside.mp4"
+    secret.write_bytes(b"SECRET")
+    row = {"uuid": "u1", "mp4_path": None, "original_path": f"../{secret.name}"}
+    resp = _ctrl(row, tmp_path).stream(FakeRequest(params={"uuid": "u1"}))
+    assert resp.status == 404, "chemin sortant de storage_root refusé"
+
+
+def test_stream_rejects_absolute_path(tmp_path):
+    """Un chemin absolu en base ne doit pas être servi tel quel."""
+    secret = tmp_path.parent / "abs_secret.mp4"
+    secret.write_bytes(b"SECRET")
+    row = {"uuid": "u1", "mp4_path": None, "original_path": str(secret)}
+    resp = _ctrl(row, tmp_path).stream(FakeRequest(params={"uuid": "u1"}))
+    assert resp.status == 404

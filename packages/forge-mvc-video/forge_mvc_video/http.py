@@ -7,8 +7,10 @@ Branche une route de **lecture en streaming** sur un ``Router`` Forge :
   HTTP **Range** (seek), via la primitive core ``Response.file``.
 
 Le chemin servi vient **de la base** (``mp4_path`` si la vidéo est transcodée,
-sinon ``original_path``), jamais de l'URL → aucun *path traversal* possible
-(l'``uuid`` n'est qu'une clé de lookup).
+sinon ``original_path``), jamais de l'URL (l'``uuid`` n'est qu'une clé de lookup).
+En défense en profondeur, le chemin résolu est en plus confiné **sous**
+``storage_root`` avant d'être servi (une ligne DB corrompue ne peut pas sortir du
+dossier de stockage).
 
 Sécurité (optionnelle, mirror IoT) : si ``FORGE_VIDEO_API_TOKEN`` est défini,
 la route exige ``Authorization: Bearer <token>`` ; sinon elle est ouverte
@@ -93,7 +95,16 @@ class VideoHttpController:
         if not rel:
             return _error("not_available", 409)
 
-        path = Path(self._config.storage_root) / rel
+        # Défense en profondeur : le chemin vient de la base (généré via UUID au
+        # transcodage, jamais de l'URL), mais on revalide qu'il reste **sous**
+        # storage_root. Une ligne DB corrompue ou écrite par un autre composant
+        # (`../`, chemin absolu) ne doit pas permettre de sortir du dossier de
+        # stockage. Mirror de la validation côté audio.
+        storage_root = Path(self._config.storage_root).resolve()
+        path = (storage_root / rel).resolve()
+        if not path.is_relative_to(storage_root):
+            logger.warning("Forge Video — chemin hors storage_root refusé pour %s : %s", uuid, rel)
+            return _error("not_found", 404)
         if not path.is_file():
             logger.warning("Forge Video — fichier absent pour %s : %s", uuid, path)
             return _error("file_missing", 404)
