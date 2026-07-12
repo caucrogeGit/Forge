@@ -1086,8 +1086,10 @@ Description:
   Vide les tables ciblées par les fixtures du projet pour repartir d'un état
   propre. Le démontage suit l'ordre inverse EXACT du chargement (le graphe
   topologique de fixtures:load renversé, .sql et fixtures callable) : les enfants
-  avant les parents. Ainsi fixtures:purge --run puis fixtures:load --run
-  reconstruit un état cohérent sans violer de clé étrangère (rejouable).
+  avant les parents, et il est encadré par la désactivation des contraintes FK du
+  dialecte (SET FOREIGN_KEY_CHECKS, PRAGMA foreign_keys...), robuste même pour un
+  callable peuplant plusieurs tables liées. Ainsi fixtures:purge --run puis
+  fixtures:load --run reconstruit un état cohérent sans erreur FK (rejouable).
 
 Comportement (charte §7, comme forge fixtures:load) :
   - par défaut, AFFICHE les DELETE sans rien exécuter ;

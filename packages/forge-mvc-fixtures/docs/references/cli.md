@@ -51,7 +51,7 @@ Découvertes par le cœur via l'entry point `forge_mvc.commands` (ADR-059). `loa
 | Fonction | Rôle |
 |---|---|
 | `collect_target_tables(files)` | Tables peuplées par les `.sql`, par ordre de première apparition. |
-| `purge_fixtures(root, *, run, force, env)` | Démonte dans l'ordre inverse **exact** du chargement (`order_load_units` renversé) : `.sql` (`DELETE FROM`) et callable (`purge()`), enfants avant parents (F52). |
+| `purge_fixtures(root, *, run, force, env)` | Démonte dans l'ordre inverse **exact** du chargement (`order_load_units` renversé) : `.sql` (`DELETE FROM`) et callable (`purge()`), enfants avant parents (F52), encadré par la désactivation FK du dialecte (`foreign_key_checks_ddl`). |
 | `main(args)` | Point d'entrée ; lit `--run` et `--force`. |
 
 ### 2.3 `fixtures:generate` (`cli/generate.py`)

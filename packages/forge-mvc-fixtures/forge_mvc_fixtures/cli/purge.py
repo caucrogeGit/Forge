@@ -104,8 +104,8 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
 
     print(
         f"Démontage des fixtures dans l'environnement '{env}' "
-        f"(ordre inverse du chargement ; {callable_total} fixture(s) Python, "
-        f"{sql_total} table(s) SQL) :\n"
+        f"(ordre inverse du chargement, contraintes FK désactivées le temps de "
+        f"l'opération ; {callable_total} fixture(s) Python, {sql_total} table(s) SQL) :\n"
     )
     for unit in teardown:
         if unit.kind == "callable" and unit.fixture is not None:
@@ -128,31 +128,53 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
 
     from core.database import db
 
+    # F52 (complément) : encadrer le démontage par la désactivation des contraintes
+    # FK du dialecte. Robuste et indépendant de l'ordre interne d'un callable
+    # multi-tables (dont les tables liées, ou un pivot, ne sont pas forcément
+    # ordonnées). Backend indisponible : on s'appuie sur le seul ordre inverse.
+    disable_ddl: list[str] = []
+    enable_ddl: list[str] = []
+    try:
+        from core.database.backend import get_backend
+
+        dialect = get_backend().dialect
+        disable_ddl = dialect.foreign_key_checks_ddl(enabled=False)
+        enable_ddl = dialect.foreign_key_checks_ddl(enabled=True)
+    except Exception:  # noqa: BLE001 — pas de backend résolu : repli sur l'ordre inverse
+        disable_ddl = []
+        enable_ddl = []
+
     deleted = 0
     purged_callables = 0
-    for unit in teardown:
-        if unit.kind == "callable" and unit.fixture is not None:
-            try:
-                unit.fixture().purge()
-            except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
-                print(
-                    f"Erreur en démontant la fixture {unit.path.name} : {exc}",
-                    file=sys.stderr,
-                )
-                return 1
-            purged_callables += 1
-        else:
-            for table in _sql_tables_reversed(unit.path):
-                statement = f"DELETE FROM {table}"
+    try:
+        for statement in disable_ddl:
+            db.execute(statement)
+        for unit in teardown:
+            if unit.kind == "callable" and unit.fixture is not None:
                 try:
-                    db.execute(statement)
+                    unit.fixture().purge()
                 except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
                     print(
-                        f"Erreur en purgeant : {exc}\nInstruction : {statement}",
+                        f"Erreur en démontant la fixture {unit.path.name} : {exc}",
                         file=sys.stderr,
                     )
                     return 1
-                deleted += 1
+                purged_callables += 1
+            else:
+                for table in _sql_tables_reversed(unit.path):
+                    statement = f"DELETE FROM {table}"
+                    try:
+                        db.execute(statement)
+                    except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
+                        print(
+                            f"Erreur en purgeant : {exc}\nInstruction : {statement}",
+                            file=sys.stderr,
+                        )
+                        return 1
+                    deleted += 1
+    finally:
+        for statement in enable_ddl:
+            db.execute(statement)
 
     suffix = (
         f" et {purged_callables} fixture(s) Python démontée(s)" if purged_callables else ""

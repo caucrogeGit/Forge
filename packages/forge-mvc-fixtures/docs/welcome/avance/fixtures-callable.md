@@ -85,6 +85,7 @@ La production reste protégée : `--run` seul y est refusé, `--force` est requi
 ## Démonter proprement
 
 `fixtures:purge` démonte dans l'ordre **inverse exact** du chargement (le même graphe renversé, `.sql` et callable) : les enfants avant les parents.
+Il désactive aussi les contraintes de clés étrangères le temps de l'opération, ce qui reste robuste même quand un callable peuple plusieurs tables liées entre elles.
 Ainsi `fixtures:purge --run` puis `fixtures:load --run` reconstruit un état propre sans casser de clé étrangère, autant de fois que vous voulez.
 Par défaut, une fixture vide les `tables` qu'elle a déclarées.
 Pour un démontage sur-mesure (l'inverse exact de votre `load()`), surchargez `purge()` :

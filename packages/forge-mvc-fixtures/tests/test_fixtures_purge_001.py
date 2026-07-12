@@ -93,7 +93,10 @@ class TestPurge:
         monkeypatch.setattr(db_mod, "execute", lambda sql, *a, **k: calls.append(sql) or 0)
         rc = purge_fixtures(tmp_path, run=True, force=False, env="dev")
         assert rc == 0
-        assert calls == ["DELETE FROM contact", "DELETE FROM ville"]
+        # F52 : la purge est encadrée par la (dés)activation FK du dialecte ; on
+        # vérifie l'ordre des DELETE indépendamment du backend actif.
+        deletes = [sql for sql in calls if sql.upper().startswith("DELETE")]
+        assert deletes == ["DELETE FROM contact", "DELETE FROM ville"]
         assert "2 table(s) vidée(s)" in capsys.readouterr().out
 
     def test_execution_error_returns_1(
@@ -102,7 +105,10 @@ class TestPurge:
         _write_fixture(tmp_path, "01.sql", "INSERT INTO ville (nom) VALUES ('Lyon');")
 
         def boom(sql: str, *a: object, **k: object) -> int:
-            raise RuntimeError("FK violation")
+            # Seul le DELETE échoue ; la (dés)activation FF encadrante passe.
+            if sql.upper().startswith("DELETE"):
+                raise RuntimeError("FK violation")
+            return 0
 
         import core.database.db as db_mod
         monkeypatch.setattr(db_mod, "execute", boom)

@@ -244,8 +244,9 @@ class TestF52PurgeReverseOrder:
         monkeypatch.setattr(db_mod, "execute", lambda sql, *a, **k: calls.append(sql) or 0)
         rc = purge_fixtures(tmp_path, run=True, force=False, env="dev")
         assert rc == 0
-        # enfant (affectation) supprimé avant le parent (annee_scolaire).
-        assert calls == [
+        # enfant (affectation) supprimé avant le parent (annee_scolaire) ; on filtre
+        # la (dés)activation FK encadrante pour rester indépendant du backend.
+        assert [s for s in calls if s.upper().startswith("DELETE")] == [
             "DELETE FROM affectation_professeur_classe",
             "DELETE FROM annee_scolaire",
         ]
@@ -258,3 +259,78 @@ class TestF52PurgeReverseOrder:
             )
         ]
         assert load_order == ["annee.sql", "affectation.sql"]
+
+
+class TestF52ForeignKeyWrap:
+    """F52 (complément) : la purge encadre le démontage par la désactivation FK,
+    robuste face à un callable multi-tables dont l'ordre interne viole ses FK."""
+
+    def test_purge_brackets_deletes_with_fk_toggle(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        # Dialecte factice : statements FK déterministes, quel que soit le backend.
+        class _Dialect:
+            def foreign_key_checks_ddl(self, *, enabled: bool) -> list[str]:
+                return [f"SET FOREIGN_KEY_CHECKS = {1 if enabled else 0}"]
+
+        class _Backend:
+            dialect = _Dialect()
+
+        import core.database.backend as backend_mod
+        monkeypatch.setattr(backend_mod, "get_backend", lambda: _Backend())
+
+        # Callable multi-tables : pivot déclaré AVANT la table qu'il référence,
+        # donc reversed(tables) donnerait le mauvais ordre. La désactivation FK
+        # rend le démontage robuste malgré cela.
+        src = (
+            "from forge_mvc_fixtures import Fixture\n"
+            "from core.database import db\n"
+            "class RefFixture(Fixture):\n"
+            "    tables = ('referentiel_niveau_classe', 'niveau_classe')\n"
+            "    def load(self): ...\n"
+        )
+        _write(tmp_path, "mvc/fixtures/referentiel.py", src)
+
+        calls: list[str] = []
+        import core.database.db as db_mod
+        monkeypatch.setattr(db_mod, "execute", lambda sql, *a, **k: calls.append(sql) or 0)
+        rc = purge_fixtures(tmp_path, run=True, force=False, env="dev")
+        assert rc == 0
+        # Encadrement : désactivation en tête, réactivation en fin.
+        assert calls[0] == "SET FOREIGN_KEY_CHECKS = 0"
+        assert calls[-1] == "SET FOREIGN_KEY_CHECKS = 1"
+        # Toutes les tables déclarées sont vidées.
+        deletes = [s for s in calls if s.startswith("DELETE")]
+        assert set(deletes) == {
+            "DELETE FROM referentiel_niveau_classe",
+            "DELETE FROM niveau_classe",
+        }
+
+    def test_fk_reenabled_even_on_error(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        class _Dialect:
+            def foreign_key_checks_ddl(self, *, enabled: bool) -> list[str]:
+                return ["SET FOREIGN_KEY_CHECKS = 1" if enabled else "SET FOREIGN_KEY_CHECKS = 0"]
+
+        class _Backend:
+            dialect = _Dialect()
+
+        import core.database.backend as backend_mod
+        monkeypatch.setattr(backend_mod, "get_backend", lambda: _Backend())
+
+        _write(tmp_path, "mvc/fixtures/ville.sql", "INSERT INTO ville (nom) VALUES ('Lyon');")
+        calls: list[str] = []
+
+        def execute(sql: str, *a: object, **k: object) -> int:
+            calls.append(sql)
+            if sql.startswith("DELETE"):
+                raise RuntimeError("boom")
+            return 0
+
+        import core.database.db as db_mod
+        monkeypatch.setattr(db_mod, "execute", execute)
+        rc = purge_fixtures(tmp_path, run=True, force=False, env="dev")
+        assert rc == 1
+        # Réactivation FK garantie même en cas d'erreur (finally).
+        assert calls[-1] == "SET FOREIGN_KEY_CHECKS = 1"

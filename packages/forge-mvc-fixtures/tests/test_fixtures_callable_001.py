@@ -227,7 +227,9 @@ class TestPurgeCallable:
         monkeypatch.setattr(db_mod, "execute", lambda sql, *a, **k: calls.append(sql) or 0)
         rc = purge_fixtures(tmp_path, run=True, force=False, env="dev")
         assert rc == 0
-        assert calls == ["DELETE FROM demo"]
+        # F52 : DELETE encadrés par la (dés)activation FK ; on filtre pour rester
+        # indépendant du backend actif.
+        assert [s for s in calls if s.upper().startswith("DELETE")] == ["DELETE FROM demo"]
 
     def test_purge_custom_method(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         src = (
@@ -244,7 +246,9 @@ class TestPurgeCallable:
         monkeypatch.setattr(db_mod, "execute", lambda sql, *a, **k: calls.append(sql) or 0)
         rc = purge_fixtures(tmp_path, run=True, force=False, env="dev")
         assert rc == 0
-        assert calls == ["DELETE FROM custom WHERE Seed = 1"]
+        assert [s for s in calls if s.upper().startswith("DELETE")] == [
+            "DELETE FROM custom WHERE Seed = 1"
+        ]
 
     def test_purge_callable_before_sql(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         _write_sql(tmp_path, "users.sql", "INSERT INTO users (Email) VALUES ('a@b.fr');")
@@ -255,7 +259,9 @@ class TestPurgeCallable:
         rc = purge_fixtures(tmp_path, run=True, force=False, env="dev")
         assert rc == 0
         # callable démontée avant la table SQL.
-        assert calls == ["DELETE FROM demo", "DELETE FROM users"]
+        assert [s for s in calls if s.upper().startswith("DELETE")] == [
+            "DELETE FROM demo", "DELETE FROM users"
+        ]
 
     def test_purge_dry_run_lists_callable(self, tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
         _write_callable(tmp_path, "demo.py", _DEMO_FIXTURE)
