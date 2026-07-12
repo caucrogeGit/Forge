@@ -107,9 +107,9 @@ class TestLandingArticlesClickable:
 
     def test_all_articles_are_wrapped_in_links(self):
         # Nombre de cartes cliquables de la landing. À mettre à jour quand on
-        # ajoute ou retire une carte (ici : +2 cartes starters welcome-outils et
-        # welcome-design).
-        expected = 70
+        # ajoute ou retire une carte (ici : +1 carte module forge-mvc-fixtures
+        # dans la grille des modules officiels, alignée sur les autres opt-ins).
+        expected = 71
         text = LANDING.read_text(encoding="utf-8")
         wrapped = re.findall(r'<a\s+href="[^"]+"\s+class="block group"[^>]*>', text)
         assert len(wrapped) == expected, (
