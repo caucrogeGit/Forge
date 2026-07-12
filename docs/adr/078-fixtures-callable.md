@@ -58,16 +58,18 @@ On écarte la **fonction `load()` nue** : la classe porte les métadonnées d'or
 Le sous-dossier `mvc/fixtures/factories/` (factories de génération, ADR-076) et les fichiers `__*.py` sont exclus.
 Chaque module expose une sous-classe de `Fixture`.
 
+Avant de charger un `mvc/fixtures/*.py`, la racine du projet (où vivent `config.py` et `mvc/`) est insérée dans `sys.path` : une fixture callable importe donc le code applicatif (`from mvc.services… import …`) comme n'importe quelle commande du projet (retour terrain F49).
+
 ### Ordre de chargement unifié
 
-Le pipeline ordonne un ensemble d'**unités** : les fichiers `.sql` et les fixtures callable, ensemble.
-Le rang de chaque unité vient du tri topologique F44 (graphe de clés étrangères de `relations.json`) :
+Le pipeline ordonne un ensemble d'**unités** (les fichiers `.sql` et les fixtures callable) par un **unique graphe fournit / dépend** (retour terrain F50) :
 
-- une unité `.sql` prend le rang de son entité (via `INSERT INTO <table>`), comme aujourd'hui ;
-- une unité callable prend le rang **maximal** de ses `depends_on` (résolus en entités/tables), sinon de ses `tables`, sinon un rang « tardif » ;
-- à rang égal, les `.sql` passent avant les callable (une callable dépend en général de tables déjà chargées), puis on départage par nom de fichier.
+- chaque unité **fournit** des tables : les `INSERT INTO` d'un `.sql`, les `tables` d'un callable ;
+- chaque unité **dépend** de tables : les clés étrangères de ses tables fournies (graphe de `relations.json`), plus les `depends_on` d'un callable (résolus en tables) ;
+- une unité qui dépend d'une table passe après **toute** unité qui la fournit, quel qu'en soit le type. Un callable fournissant `niveau_classe` est donc ordonné avant un `.sql` dont une clé étrangère en dépend.
 
-Repli (pas de `relations.json`, ou cycle) : les `.sql` d'abord (par nom), puis les callable (par nom, préfixe numérique compris).
+Le tri topologique de ce graphe est déterministe : à contrainte égale, les `.sql` passent avant les callable, puis on départage par nom de fichier (préfixe numérique `50_`, `90_` compris).
+Repli en cas de cycle : les unités restantes dans ce même ordre déterministe.
 
 ### Affichage puis exécution (charte §7)
 

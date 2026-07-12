@@ -217,6 +217,19 @@ def _load_fixture_class(path: Path) -> "type[Fixture] | None":
     return candidates[0]
 
 
+def _ensure_project_importable(root: Path) -> None:
+    """Met la racine du projet dans ``sys.path`` pour que ``import mvc.…`` marche (F49).
+
+    Une fixture callable importe du code applicatif (``from mvc.services… import …``).
+    ``fixtures:load`` charge le fichier par chemin (``spec_from_file_location``), ce qui
+    ne place pas la racine (où vivent ``config.py``/``mvc/``) dans le chemin d'import :
+    on l'y insère, comme le contexte des autres commandes du projet.
+    """
+    root_str = str(root)
+    if root_str not in sys.path:
+        sys.path.insert(0, root_str)
+
+
 def collect_callable_fixtures(root: Path) -> "list[tuple[Path, type[Fixture]]]":
     """Fixtures callable du projet : ``mvc/fixtures/*.py`` (hors ``factories/``).
 
@@ -226,14 +239,29 @@ def collect_callable_fixtures(root: Path) -> "list[tuple[Path, type[Fixture]]]":
     fixtures_dir = root / "mvc" / "fixtures"
     if not fixtures_dir.is_dir():
         return []
+    py_files = [
+        path
+        for path in sorted(fixtures_dir.glob("*.py"), key=lambda p: p.name)
+        if not path.name.startswith("__")
+    ]
+    if not py_files:
+        return []
+    _ensure_project_importable(root)  # F49 : la racine dans sys.path avant l'import.
     found: list[tuple[Path, type[Fixture]]] = []
-    for path in sorted(fixtures_dir.glob("*.py"), key=lambda p: p.name):
-        if path.name.startswith("__"):
-            continue
+    for path in py_files:
         fixture_cls = _load_fixture_class(path)
         if fixture_cls is not None:
             found.append((path, fixture_cls))
     return found
+
+
+def _tables_of_file(path: Path) -> set[str]:
+    """Toutes les tables peuplées par un ``.sql`` (chaque ``INSERT INTO``)."""
+    try:
+        text = _strip_line_comments(path.read_text(encoding="utf-8"))
+    except OSError:
+        return set()
+    return {match.group(1) for match in _INSERT_INTO.finditer(text)}
 
 
 def order_load_units(
@@ -241,53 +269,90 @@ def order_load_units(
     sql_files: list[Path],
     callables: "list[tuple[Path, type[Fixture]]]",
 ) -> list[LoadUnit]:
-    """Ordonne ``.sql`` et fixtures callable dans un pipeline unique (ADR-078).
+    """Ordonne ``.sql`` et fixtures callable dans un pipeline unique (ADR-078, F50).
 
-    Rang par tri topologique des dépendances FK (F44) : une unité ``.sql`` prend
-    le rang de son entité ; une callable prend le rang maximal de ses
-    ``depends_on`` (résolus en entités/tables), sinon de ses ``tables``, sinon un
-    rang tardif. À rang égal, les ``.sql`` passent avant les callable, puis on
-    départage par nom (préfixe numérique compris). Repli (pas de graphe) : ``.sql``
-    par nom, puis callable par nom.
+    Un seul graphe d'ordonnancement sur les **unités** : chaque unité *fournit*
+    des tables (``INSERT INTO`` d'un ``.sql``, ``Fixture.tables`` d'un callable) et
+    *dépend* de tables (clés étrangères de ``relations.json`` pour les tables
+    fournies, plus ``Fixture.depends_on``). Une unité qui dépend d'une table passe
+    après **toute** unité qui la fournit, quel qu'en soit le type : un callable
+    fournissant ``niveau_classe`` est ordonné avant un ``.sql`` dont une FK en
+    dépend. Tri topologique déterministe (``.sql`` avant callable à égalité, puis
+    par nom, préfixe numérique compris) ; en cas de cycle, repli déterministe.
     """
-    deps = _fk_dependencies(root)
-    topo = _topological_order(deps) if deps is not None else None
-    if topo is None:
-        rank: dict[str, int] = {}
-        table_to_entity: dict[str, str] = {}
-        unknown_rank = 0
-    else:
-        rank = {entity: index for index, entity in enumerate(topo)}
-        table_to_entity = {table: entity for entity, table in _entity_tables(root).items()}
-        unknown_rank = len(topo)
+    entity_tables = _entity_tables(root)  # entité (PascalCase) -> table
+    table_to_entity = {table: entity for entity, table in entity_tables.items()}
+    entity_deps = _fk_dependencies(root) or {}  # entité -> entités référencées (FK)
 
-    def rank_of_name(name: str) -> int | None:
-        if name in rank:
-            return rank[name]
-        entity = table_to_entity.get(name)
-        if entity is not None and entity in rank:
-            return rank[entity]
-        return None
+    def fk_tables_of(table: str) -> set[str]:
+        entity = table_to_entity.get(table)
+        if entity is None:
+            return set()
+        return {
+            entity_tables[dep]
+            for dep in entity_deps.get(entity, set())
+            if dep in entity_tables
+        }
 
-    def sql_rank(path: Path) -> int:
-        table = _table_of_file(path)
-        entity = table_to_entity.get(table) if table else None
-        return rank.get(entity, unknown_rank) if entity else unknown_rank
+    def as_table(name: str) -> str:
+        # depends_on peut nommer une entité (PascalCase) ou directement une table.
+        return entity_tables.get(name, name)
 
-    def callable_rank(fixture: "type[Fixture]") -> int:
-        hints = [rank_of_name(name) for name in (*fixture.depends_on, *fixture.tables)]
-        resolved = [value for value in hints if value is not None]
-        return max(resolved) if resolved else unknown_rank
-
-    keyed: list[tuple[int, int, str, LoadUnit]] = []
+    units: list[LoadUnit] = []
+    provides: list[set[str]] = []
+    depends: list[set[str]] = []
     for path in sql_files:
-        keyed.append((sql_rank(path), 0, path.name, LoadUnit("sql", path)))
+        tables = _tables_of_file(path)
+        dep: set[str] = set()
+        for table in tables:
+            dep |= fk_tables_of(table)
+        units.append(LoadUnit("sql", path))
+        provides.append(tables)
+        depends.append(dep - tables)
     for path, fixture_cls in callables:
-        keyed.append(
-            (callable_rank(fixture_cls), 1, path.name, LoadUnit("callable", path, fixture_cls))
-        )
-    keyed.sort(key=lambda item: (item[0], item[1], item[2]))
-    return [item[3] for item in keyed]
+        tables = set(fixture_cls.tables)
+        dep = {as_table(name) for name in fixture_cls.depends_on}
+        for table in tables:
+            dep |= fk_tables_of(table)
+        units.append(LoadUnit("callable", path, fixture_cls))
+        provides.append(tables)
+        depends.append(dep - tables)
+
+    providers: dict[str, list[int]] = {}
+    for index, produced in enumerate(provides):
+        for table in produced:
+            providers.setdefault(table, []).append(index)
+
+    count = len(units)
+    indegree = [0] * count
+    successors: list[set[int]] = [set() for _ in range(count)]
+    for index in range(count):
+        for needed in depends[index]:
+            for provider in providers.get(needed, ()):
+                if provider != index and index not in successors[provider]:
+                    successors[provider].add(index)
+                    indegree[index] += 1
+
+    def unit_key(index: int) -> tuple[int, str]:
+        unit = units[index]
+        return (0 if unit.kind == "sql" else 1, unit.path.name)
+
+    order: list[int] = []
+    done = [False] * count
+    ready = sorted((i for i in range(count) if indegree[i] == 0), key=unit_key)
+    while ready:
+        current = ready.pop(0)
+        done[current] = True
+        order.append(current)
+        for successor in successors[current]:
+            indegree[successor] -= 1
+            if indegree[successor] == 0:
+                ready.append(successor)
+        ready.sort(key=unit_key)
+    if len(order) < count:  # cycle : repli déterministe sur les unités restantes.
+        order.extend(sorted((i for i in range(count) if not done[i]), key=unit_key))
+
+    return [units[index] for index in order]
 
 
 def _strip_line_comments(sql: str) -> str:
