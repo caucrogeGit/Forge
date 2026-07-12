@@ -12,6 +12,7 @@ Mode « Forge génère » (charte §9) : write-if-new, jamais d'écrasement sans
 from __future__ import annotations
 
 import json
+import re
 import sys
 from collections.abc import Callable
 from pathlib import Path
@@ -28,7 +29,9 @@ except ImportError:  # pragma: no cover - depend de l'environnement d'installati
 
 __all__ = [
     "column_for_field",
+    "reference_expr",
     "provider_for_field",
+    "fk_targets",
     "render_factory",
     "make_factory",
     "main",
@@ -89,6 +92,20 @@ def column_for_field(field: dict[str, Any]) -> str:
     return str(field.get("name", ""))
 
 
+def reference_expr(target_table: str | None) -> tuple[str, str]:
+    """Scaffold ``self.reference(...)`` pour une clé étrangère (F43, ADR-077).
+
+    Relie la ligne à une autre table par une clé naturelle, plutôt qu'un
+    ``random_int`` sans cible. ``target_table`` vient de ``relations.json`` quand
+    il est connu ; la clé naturelle et sa valeur restent des TODO à renseigner.
+    """
+    table = target_table or "table_cible"
+    return (
+        f'self.reference("{table}", "cle_naturelle", "valeur")',
+        "  # TODO (F43): renseignez la clé naturelle (colonne unique) et sa valeur",
+    )
+
+
 def provider_for_field(field: dict[str, Any]) -> tuple[str, str]:
     """Expression de valeur + commentaire éventuel, pour un champ.
 
@@ -98,7 +115,7 @@ def provider_for_field(field: dict[str, Any]) -> tuple[str, str]:
     ftype = str(field.get("type", "string"))
 
     if ftype == "foreign_key":
-        return "1", "  # TODO: id d'une ligne existante (clé étrangère)"
+        return reference_expr(None)
 
     if ftype in _TEXTUAL_TYPES:
         for tokens, provider in _PROVIDER_BY_NAME:
@@ -106,6 +123,63 @@ def provider_for_field(field: dict[str, Any]) -> tuple[str, str]:
                 return provider, ""
 
     return _PROVIDER_BY_TYPE.get(ftype, "self.faker.word()"), ""
+
+
+def _snake(name: str) -> str:
+    """PascalCase vers snake_case (``AnneeScolaire`` vers ``annee_scolaire``)."""
+    return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
+
+
+def _target_table(root: Path, target_entity: str) -> str:
+    """Table de l'entité cible, lue dans son contrat ; repli sur le nom snake."""
+    snake = _snake(target_entity)
+    path = root / "mvc" / "entities" / snake / f"{snake}.json"
+    if path.is_file():
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            return snake
+        if isinstance(data, dict):
+            table = cast("dict[str, Any]", data).get("table")
+            if isinstance(table, str) and table:
+                return table
+    return snake
+
+
+def fk_targets(root: Path, entity: str) -> dict[str, str]:
+    """Colonnes clé étrangère de l'entité vers leur table cible (F43, ADR-077).
+
+    Lit ``mvc/entities/relations.json`` : pour chaque relation ``many_to_one``
+    dont l'entité est la source, associe la colonne FK (``foreign_key`` ou
+    ``<name>_id`` par défaut) à la table de l'entité cible. Absente ou illisible,
+    renvoie un mapping vide (repli sans référence).
+    """
+    path = root / "mvc" / "entities" / "relations.json"
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    relations = cast("dict[str, Any]", data).get("relations")
+    if not isinstance(relations, list):
+        return {}
+    targets: dict[str, str] = {}
+    for rel_obj in cast("list[Any]", relations):
+        if not isinstance(rel_obj, dict):
+            continue
+        rel = cast("dict[str, Any]", rel_obj)
+        if rel.get("type") != "many_to_one":
+            continue
+        if _snake(str(rel.get("from", ""))) != entity:
+            continue
+        name = str(rel.get("name", ""))
+        fk_column = str(rel.get("foreign_key") or f"{name}_id")
+        if fk_column:
+            targets[fk_column] = _target_table(root, str(rel.get("to", "")))
+    return targets
 
 
 def _read_contract(root: Path, entity: str) -> dict[str, Any]:
@@ -124,8 +198,16 @@ def _read_contract(root: Path, entity: str) -> dict[str, Any]:
     return cast("dict[str, Any]", data)
 
 
-def render_factory(contract: dict[str, Any]) -> str:
-    """Rend le code Python d'une factory riche depuis un contrat d'entité."""
+def render_factory(
+    contract: dict[str, Any], *, fk_map: dict[str, str] | None = None
+) -> str:
+    """Rend le code Python d'une factory riche depuis un contrat d'entité.
+
+    ``fk_map`` associe une colonne clé étrangère à sa table cible (``relations.json``,
+    F43) : un champ ``foreign_key``, ou dont le nom y figure, reçoit un
+    ``self.reference(...)`` au lieu d'un provider aléatoire.
+    """
+    targets = fk_map or {}
     class_name = str(contract.get("name") or "Entity").replace(" ", "")
     table = str(contract.get("table") or "table")
     fields: Any = contract.get("fields") or []
@@ -135,10 +217,14 @@ def render_factory(contract: dict[str, Any]) -> str:
         if not isinstance(field_obj, dict):
             continue
         field = cast("dict[str, Any]", field_obj)
-        if not str(field.get("name", "")):
+        name = str(field.get("name", ""))
+        if not name:
             continue
         column = column_for_field(field)
-        expr, comment = provider_for_field(field)
+        if str(field.get("type", "")) == "foreign_key" or name in targets:
+            expr, comment = reference_expr(targets.get(name))
+        else:
+            expr, comment = provider_for_field(field)
         field_lines.append(f'            "{column}": {expr},{comment}')
 
     body = "\n".join(field_lines) if field_lines else "            # Ajoutez vos colonnes ici."
@@ -171,7 +257,7 @@ def make_factory(root: Path, entity: str, *, force: bool) -> int:
         print(f"Erreur : {exc}", file=sys.stderr)
         return 2
 
-    source = render_factory(contract)
+    source = render_factory(contract, fk_map=fk_targets(root, entity))
     print(source)
 
     target = root / "mvc" / "fixtures" / "factories" / f"{entity}_factory.py"

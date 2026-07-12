@@ -17,10 +17,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from forge_mvc_fixtures.factory import Factory, FactoryError
+from forge_mvc_fixtures.factory import Factory, FactoryError, FixtureReference
 
 __all__ = [
     "load_factory",
+    "render_value",
     "render_inserts",
     "generate_fixtures",
     "main",
@@ -67,6 +68,22 @@ def load_factory(root: Path, entity: str) -> Factory:
     return candidates[0]()
 
 
+def render_value(value: Any, dialect: Any) -> str:
+    """Rend une valeur de colonne en SQL pour le dialecte donné.
+
+    Un ``FixtureReference`` (ADR-077) devient une sous-requête résolue à la charge
+    ``(SELECT Id FROM <table> WHERE <key_column> = <valeur> LIMIT 1)`` ; toute autre
+    valeur passe par ``dialect.render_literal`` (littéral correct par backend, ADR-075).
+    """
+    if isinstance(value, FixtureReference):
+        literal = dialect.render_literal(value.value)
+        return (
+            f"(SELECT Id FROM {value.table} "
+            f"WHERE {value.key_column} = {literal} LIMIT 1)"
+        )
+    return dialect.render_literal(value)
+
+
 def render_inserts(table: str, rows: list[dict[str, Any]], dialect: Any) -> str:
     """Rend les lignes en instructions ``INSERT INTO`` pour le dialecte donné."""
     if not rows:
@@ -78,7 +95,7 @@ def render_inserts(table: str, rows: list[dict[str, Any]], dialect: Any) -> str:
         "-- Relire avant de charger (forge fixtures:load).",
     ]
     for row in rows:
-        values = ", ".join(dialect.render_literal(row[column]) for column in columns)
+        values = ", ".join(render_value(row[column], dialect) for column in columns)
         lines.append(f"INSERT INTO {table} ({col_list}) VALUES ({values});")
     return "\n".join(lines) + "\n"
 

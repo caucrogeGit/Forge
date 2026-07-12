@@ -12,7 +12,7 @@ import pytest
 pytest.importorskip("faker")
 pytest.importorskip("forge_mvc_fixtures")
 
-from forge_mvc_fixtures import Factory, FactoryError
+from forge_mvc_fixtures import Factory, FactoryError, FixtureReference
 
 
 class VilleFactory(Factory):
@@ -28,6 +28,27 @@ class ManyVilleFactory(Factory):
     def rows(self, count: int) -> list[dict[str, Any]]:
         # L'utilisateur code sa génération : boucle + condition.
         return [{"nom": f"Ville {i}", "prefecture": i == 0} for i in range(count)]
+
+
+class TestReference:
+    """F43 (ADR-077) : Factory.reference produit un sentinelle FixtureReference."""
+
+    def test_reference_returns_fixture_reference(self) -> None:
+        ref = VilleFactory(seed=1).reference("users", "Email", "prof@ecole.fr")
+        assert isinstance(ref, FixtureReference)
+        assert ref.table == "users"
+        assert ref.key_column == "Email"
+        assert ref.value == "prof@ecole.fr"
+
+    def test_reference_usable_as_row_value(self) -> None:
+        class EleveFactory(Factory):
+            table = "eleve"
+
+            def definition(self) -> dict[str, Any]:
+                return {"Nom": "Durand", "UserId": self.reference("users", "Email", "x@y.fr")}
+
+        rows = EleveFactory(seed=1).build(2)
+        assert all(isinstance(r["UserId"], FixtureReference) for r in rows)
 
 
 class TestDefinitionPath:

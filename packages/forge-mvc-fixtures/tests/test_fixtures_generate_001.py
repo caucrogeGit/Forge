@@ -15,10 +15,12 @@ pytest.importorskip("forge_mvc_sqlite")
 
 from forge_mvc_sqlite.dialect import SQLiteDialect
 
+from forge_mvc_fixtures import FixtureReference
 from forge_mvc_fixtures.cli.generate import (
     generate_fixtures,
     load_factory,
     render_inserts,
+    render_value,
 )
 
 DIALECT = SQLiteDialect()
@@ -52,6 +54,33 @@ class TestRenderInserts:
 
     def test_empty_rows(self) -> None:
         assert "Aucune ligne" in render_inserts("ville", [], DIALECT)
+
+
+class TestFixtureReference:
+    """F43 (ADR-077) : une référence devient une sous-requête résolue à la charge."""
+
+    def test_render_value_plain_literal(self) -> None:
+        assert render_value("Lyon", DIALECT) == "'Lyon'"
+
+    def test_render_value_reference_subquery(self) -> None:
+        ref = FixtureReference(table="users", key_column="Email", value="prof@ecole.fr")
+        assert (
+            render_value(ref, DIALECT)
+            == "(SELECT Id FROM users WHERE Email = 'prof@ecole.fr' LIMIT 1)"
+        )
+
+    def test_render_value_reference_escapes_value(self) -> None:
+        ref = FixtureReference(table="users", key_column="Nom", value="l'Isle")
+        assert "WHERE Nom = 'l''Isle' LIMIT 1)" in render_value(ref, DIALECT)
+
+    def test_insert_embeds_reference_subquery(self) -> None:
+        ref = FixtureReference(table="users", key_column="Email", value="prof@ecole.fr")
+        rows = [{"Nom": "Durand", "UserId": ref}]
+        sql = render_inserts("eleve", rows, DIALECT)
+        assert (
+            "INSERT INTO eleve (Nom, UserId) VALUES "
+            "('Durand', (SELECT Id FROM users WHERE Email = 'prof@ecole.fr' LIMIT 1));"
+        ) in sql
 
 
 class TestLoadFactory:

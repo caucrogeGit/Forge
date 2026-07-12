@@ -14,6 +14,7 @@ magie ni d'auto-persistance, principe 3).
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 DEFAULT_LOCALE = "fr_FR"
@@ -21,6 +22,22 @@ DEFAULT_LOCALE = "fr_FR"
 
 class FactoryError(Exception):
     """Factory mal définie : table manquante ou lignes incohérentes."""
+
+
+@dataclass(frozen=True)
+class FixtureReference:
+    """Référence à l'``Id`` d'une ligne d'une autre table, résolue à la charge (ADR-077).
+
+    Produite par ``Factory.reference()`` et posée comme valeur de colonne (une clé
+    étrangère, typiquement). ``fixtures:generate`` la rend en **sous-requête SQL**
+    ``(SELECT Id FROM <table> WHERE <key_column> = <valeur> LIMIT 1)`` au lieu d'un
+    littéral : la résolution se fait donc contre les vrais ``Id`` auto-incrémentés
+    au moment de ``fixtures:load``, et le SQL reste visible et relu (principe 5).
+    """
+
+    table: str
+    key_column: str
+    value: Any
 
 
 class Factory:
@@ -38,6 +55,17 @@ class Factory:
         self.faker: Any = Faker(self.locale)
         if seed is not None:
             self.faker.seed_instance(seed)
+
+    def reference(self, table: str, key_column: str, value: Any) -> FixtureReference:
+        """Référence l'``Id`` d'une ligne d'une autre table par une clé naturelle.
+
+        Rend une valeur de colonne (typiquement une clé étrangère) qui pointe la
+        ligne de ``table`` dont ``key_column`` vaut ``value`` : elle relie une
+        fixture à une ligne produite par une autre, sans connaître son ``Id``.
+        ``fixtures:generate`` l'écrit ``(SELECT Id FROM table WHERE key_column =
+        value LIMIT 1)`` ; la résolution a lieu à la charge (ADR-077).
+        """
+        return FixtureReference(table=table, key_column=key_column, value=value)
 
     def definition(self) -> dict[str, Any]:
         """Une ligne (colonne vers valeur). À surcharger pour le cas simple."""
