@@ -22,6 +22,7 @@ from forge_mvc_fixtures.cli.load import (
     load_fixtures,
     order_load_units,
 )
+from forge_mvc_fixtures.cli.purge import purge_fixtures
 
 
 def _write(root: Path, rel: str, content: str) -> None:
@@ -212,3 +213,48 @@ class TestF51ReferenceOrder:
             "INSERT INTO eleve (Nom, UserId) VALUES "
             "('Dupont', (SELECT Id FROM users WHERE email = 'a@b.fr' LIMIT 1))",
         ]
+
+
+class TestF52PurgeReverseOrder:
+    """F52 : purge dans l'ordre inverse EXACT du chargement (enfants avant parents)."""
+
+    def _make(self, root: Path) -> None:
+        # annee_scolaire (parent) <- affectation_professeur_classe (enfant, FK).
+        _write_entity(root, "annee_scolaire", "AnneeScolaire", "annee_scolaire")
+        _write_entity(
+            root, "affectation_professeur_classe",
+            "AffectationProfesseurClasse", "affectation_professeur_classe",
+        )
+        _write_relations(root, [
+            {"type": "many_to_one", "from": "AffectationProfesseurClasse",
+             "to": "AnneeScolaire", "name": "annee_scolaire"},
+        ])
+        _write(root, "mvc/fixtures/annee.sql",
+               "INSERT INTO annee_scolaire (Libelle) VALUES ('2025-2026');")
+        _write(root, "mvc/fixtures/affectation.sql",
+               "INSERT INTO affectation_professeur_classe (AnneeScolaireId) VALUES "
+               "((SELECT Id FROM annee_scolaire WHERE Libelle = '2025-2026' LIMIT 1));")
+
+    def test_purge_deletes_child_before_parent(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        self._make(tmp_path)
+        calls: list[str] = []
+        import core.database.db as db_mod
+        monkeypatch.setattr(db_mod, "execute", lambda sql, *a, **k: calls.append(sql) or 0)
+        rc = purge_fixtures(tmp_path, run=True, force=False, env="dev")
+        assert rc == 0
+        # enfant (affectation) supprimé avant le parent (annee_scolaire).
+        assert calls == [
+            "DELETE FROM affectation_professeur_classe",
+            "DELETE FROM annee_scolaire",
+        ]
+
+    def test_purge_is_exact_reverse_of_load(self, tmp_path: Path) -> None:
+        self._make(tmp_path)
+        load_order = [
+            u.path.name for u in order_load_units(
+                tmp_path, collect_fixture_files(tmp_path), collect_callable_fixtures(tmp_path)
+            )
+        ]
+        assert load_order == ["annee.sql", "affectation.sql"]

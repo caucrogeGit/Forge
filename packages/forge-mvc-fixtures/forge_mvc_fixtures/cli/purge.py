@@ -54,12 +54,20 @@ def collect_target_tables(files: list[Path]) -> list[str]:
     return seen
 
 
+def _sql_tables_reversed(path: Path) -> list[str]:
+    """Tables d'un ``.sql``, ordre inverse d'insertion (référençantes d'abord)."""
+    return list(reversed(collect_target_tables([path])))
+
+
 def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
     """Affiche (et, si ``run``, exécute) le démontage des fixtures du projet.
 
-    Démonte en ordre **inverse** du chargement : d'abord les fixtures callable
-    (``Fixture.purge()``, défaut sur ``tables`` déclarées, ADR-078), puis les
-    tables des ``.sql`` (``DELETE FROM`` en ordre inverse d'insertion).
+    Démonte dans l'ordre **inverse exact** du chargement (F52) : le même graphe
+    topologique que ``fixtures:load`` (``.sql`` et callable, dépendances FK de
+    ``relations.json``, sous-requêtes ``reference()`` et ``depends_on``), renversé.
+    Les enfants sont supprimés avant leurs parents, donc le cycle purge puis load
+    est rejouable sans violer de clé étrangère. Une unité ``.sql`` émet
+    ``DELETE FROM`` sur ses tables ; une callable appelle ``Fixture.purge()``.
 
     Codes de sortie : 0 succès ou affichage seul, 2 refus (prod sans ``--force``
     ou fixture illisible), 1 erreur d'exécution.
@@ -75,13 +83,11 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
         print("Aucune fixture. Rien à purger (mvc/fixtures/ est vide ou absent).")
         return 0
 
-    tables = collect_target_tables(files)
-    # Ordre inverse d'insertion : supprimer les référençantes avant les référencées.
-    statements = [f"DELETE FROM {table}" for table in reversed(tables)]
-    # Callable démontées avant les .sql (elles en dépendent) : inverse du chargement.
-    teardown = list(reversed(order_load_units(root, [], callables)))
+    teardown = list(reversed(order_load_units(root, files, callables)))
+    sql_total = sum(len(_sql_tables_reversed(u.path)) for u in teardown if u.kind == "sql")
+    callable_total = sum(1 for u in teardown if u.kind == "callable")
 
-    if not statements and not teardown:
+    if sql_total == 0 and callable_total == 0:
         print(
             "Aucune table cible détectée dans les fixtures "
             "(aucun INSERT INTO relu, aucune fixture callable purgeable)."
@@ -98,21 +104,22 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
 
     print(
         f"Démontage des fixtures dans l'environnement '{env}' "
-        f"({len(teardown)} fixture(s) Python, {len(tables)} table(s) SQL) :\n"
+        f"(ordre inverse du chargement ; {callable_total} fixture(s) Python, "
+        f"{sql_total} table(s) SQL) :\n"
     )
     for unit in teardown:
-        fixture_cls = unit.fixture
-        if fixture_cls is None:
-            continue
-        if fixture_cls.purge is not Fixture.purge:
-            print(f"-- {unit.path.name} : purge() personnalisé (démontage sur-mesure)")
-        elif fixture_cls.tables:
-            for table in reversed(fixture_cls.tables):
-                print(f"DELETE FROM {table};  -- {unit.path.name}")
+        if unit.kind == "callable" and unit.fixture is not None:
+            fixture_cls = unit.fixture
+            if fixture_cls.purge is not Fixture.purge:
+                print(f"-- {unit.path.name} : purge() personnalisé (démontage sur-mesure)")
+            elif fixture_cls.tables:
+                for table in reversed(fixture_cls.tables):
+                    print(f"DELETE FROM {table};  -- {unit.path.name}")
+            else:
+                print(f"-- {unit.path.name} : aucune table déclarée, non purgé automatiquement")
         else:
-            print(f"-- {unit.path.name} : aucune table déclarée, non purgé automatiquement")
-    for statement in statements:
-        print(f"{statement};")
+            for table in _sql_tables_reversed(unit.path):
+                print(f"DELETE FROM {table};")
     print()
 
     if not run:
@@ -121,36 +128,37 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
 
     from core.database import db
 
+    deleted = 0
     purged_callables = 0
     for unit in teardown:
-        fixture_cls = unit.fixture
-        if fixture_cls is None:
-            continue
-        try:
-            fixture_cls().purge()
-        except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
-            print(
-                f"Erreur en démontant la fixture {unit.path.name} : {exc}",
-                file=sys.stderr,
-            )
-            return 1
-        purged_callables += 1
-
-    for statement in statements:
-        try:
-            db.execute(statement)
-        except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
-            print(
-                f"Erreur en purgeant : {exc}\nInstruction : {statement}",
-                file=sys.stderr,
-            )
-            return 1
+        if unit.kind == "callable" and unit.fixture is not None:
+            try:
+                unit.fixture().purge()
+            except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
+                print(
+                    f"Erreur en démontant la fixture {unit.path.name} : {exc}",
+                    file=sys.stderr,
+                )
+                return 1
+            purged_callables += 1
+        else:
+            for table in _sql_tables_reversed(unit.path):
+                statement = f"DELETE FROM {table}"
+                try:
+                    db.execute(statement)
+                except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
+                    print(
+                        f"Erreur en purgeant : {exc}\nInstruction : {statement}",
+                        file=sys.stderr,
+                    )
+                    return 1
+                deleted += 1
 
     suffix = (
         f" et {purged_callables} fixture(s) Python démontée(s)" if purged_callables else ""
     )
     print(
-        f"{STATUS_OK} {len(statements)} table(s) vidée(s){suffix} "
+        f"{STATUS_OK} {deleted} table(s) vidée(s){suffix} "
         f"dans l'environnement '{env}'."
     )
     return 0

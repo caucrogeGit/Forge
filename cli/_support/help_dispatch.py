@@ -1084,8 +1084,10 @@ Usage:
 
 Description:
   Vide les tables ciblées par les fixtures du projet pour repartir d'un état
-  propre. Les tables cibles sont dérivées des INSERT INTO de mvc/fixtures/*.sql,
-  puis vidées par des DELETE FROM en ordre inverse (respect des clés étrangères).
+  propre. Le démontage suit l'ordre inverse EXACT du chargement (le graphe
+  topologique de fixtures:load renversé, .sql et fixtures callable) : les enfants
+  avant les parents. Ainsi fixtures:purge --run puis fixtures:load --run
+  reconstruit un état cohérent sans violer de clé étrangère (rejouable).
 
 Comportement (charte §7, comme forge fixtures:load) :
   - par défaut, AFFICHE les DELETE sans rien exécuter ;
