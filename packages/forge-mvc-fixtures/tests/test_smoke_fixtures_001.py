@@ -27,7 +27,8 @@ def test_public_api_resolves() -> None:
     # ADR-076 : la classe de base Factory est l'API publique (importée par le
     # code de factory de l'utilisateur, pas dans le chemin d'une requête).
     names = getattr(mod, "__all__", None)
-    assert names == ["Factory", "FactoryError", "FixtureReference"], (
+    assert isinstance(names, list), f"__all__ manquant : {names!r}"
+    assert names == ["Factory", "FactoryError", "Fixture", "FixtureReference"], (
         f"__all__ inattendu : {names!r}"
     )
     missing = [n for n in names if not hasattr(mod, n)]

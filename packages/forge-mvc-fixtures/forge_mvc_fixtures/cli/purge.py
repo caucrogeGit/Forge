@@ -22,9 +22,13 @@ from pathlib import Path
 
 from forge_mvc_fixtures.cli.load import (
     STATUS_OK,
+    FixtureDiscoveryError,
     active_env,
+    collect_callable_fixtures,
     collect_fixture_files,
+    order_load_units,
 )
+from forge_mvc_fixtures.factory import Fixture
 
 __all__ = ["collect_target_tables", "purge_fixtures", "main"]
 
@@ -51,26 +55,38 @@ def collect_target_tables(files: list[Path]) -> list[str]:
 
 
 def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
-    """Affiche (et, si ``run``, exécute) les ``DELETE`` de purge des tables cibles.
+    """Affiche (et, si ``run``, exécute) le démontage des fixtures du projet.
 
-    Codes de sortie : 0 succès ou affichage seul, 2 refus (prod sans ``--force``),
-    1 erreur d'exécution SQL.
+    Démonte en ordre **inverse** du chargement : d'abord les fixtures callable
+    (``Fixture.purge()``, défaut sur ``tables`` déclarées, ADR-078), puis les
+    tables des ``.sql`` (``DELETE FROM`` en ordre inverse d'insertion).
+
+    Codes de sortie : 0 succès ou affichage seul, 2 refus (prod sans ``--force``
+    ou fixture illisible), 1 erreur d'exécution.
     """
     files = collect_fixture_files(root)
-    if not files:
+    try:
+        callables = collect_callable_fixtures(root)
+    except FixtureDiscoveryError as exc:
+        print(f"Erreur : {exc}", file=sys.stderr)
+        return 2
+
+    if not files and not callables:
         print("Aucune fixture. Rien à purger (mvc/fixtures/ est vide ou absent).")
         return 0
 
     tables = collect_target_tables(files)
-    if not tables:
-        print(
-            "Aucune table cible détectée dans les fixtures "
-            "(aucun INSERT INTO relu dans mvc/fixtures/*.sql)."
-        )
-        return 0
-
     # Ordre inverse d'insertion : supprimer les référençantes avant les référencées.
     statements = [f"DELETE FROM {table}" for table in reversed(tables)]
+    # Callable démontées avant les .sql (elles en dépendent) : inverse du chargement.
+    teardown = list(reversed(order_load_units(root, [], callables)))
+
+    if not statements and not teardown:
+        print(
+            "Aucune table cible détectée dans les fixtures "
+            "(aucun INSERT INTO relu, aucune fixture callable purgeable)."
+        )
+        return 0
 
     if run and env == "prod" and not force:
         print(
@@ -81,9 +97,20 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
         return 2
 
     print(
-        f"Purge des tables ciblées par les fixtures dans l'environnement "
-        f"'{env}' ({len(tables)} table(s)) :\n"
+        f"Démontage des fixtures dans l'environnement '{env}' "
+        f"({len(teardown)} fixture(s) Python, {len(tables)} table(s) SQL) :\n"
     )
+    for unit in teardown:
+        fixture_cls = unit.fixture
+        if fixture_cls is None:
+            continue
+        if fixture_cls.purge is not Fixture.purge:
+            print(f"-- {unit.path.name} : purge() personnalisé (démontage sur-mesure)")
+        elif fixture_cls.tables:
+            for table in reversed(fixture_cls.tables):
+                print(f"DELETE FROM {table};  -- {unit.path.name}")
+        else:
+            print(f"-- {unit.path.name} : aucune table déclarée, non purgé automatiquement")
     for statement in statements:
         print(f"{statement};")
     print()
@@ -93,6 +120,21 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
         return 0
 
     from core.database import db
+
+    purged_callables = 0
+    for unit in teardown:
+        fixture_cls = unit.fixture
+        if fixture_cls is None:
+            continue
+        try:
+            fixture_cls().purge()
+        except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
+            print(
+                f"Erreur en démontant la fixture {unit.path.name} : {exc}",
+                file=sys.stderr,
+            )
+            return 1
+        purged_callables += 1
 
     for statement in statements:
         try:
@@ -104,8 +146,12 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
             )
             return 1
 
+    suffix = (
+        f" et {purged_callables} fixture(s) Python démontée(s)" if purged_callables else ""
+    )
     print(
-        f"{STATUS_OK} {len(statements)} table(s) vidée(s) dans l'environnement '{env}'."
+        f"{STATUS_OK} {len(statements)} table(s) vidée(s){suffix} "
+        f"dans l'environnement '{env}'."
     )
     return 0
 

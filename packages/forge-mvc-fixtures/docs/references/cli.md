@@ -19,6 +19,14 @@ Base des factories de fixtures, à sous-classer par entité sous `mvc/fixtures/f
 | `FixtureReference` | Sentinelle de référence ; `fixtures:generate` la rend en sous-requête `(SELECT Id FROM ... LIMIT 1)`. |
 | `FactoryError` | Factory mal définie. |
 
+Pour ce que le SQL statique ne peut pas exprimer (import, agrégats), une **fixture callable** sous-classe `Fixture` (`factory.py`, ADR-078) dans `mvc/fixtures/<nom>.py` :
+
+| Symbole | Rôle |
+|---|---|
+| `Fixture` | Classe de base d'un hook Python. `tables` et `depends_on` pour l'ordre et la purge. |
+| `Fixture.load()` | Persiste les données (écrit via `core.database.db`). À surcharger. |
+| `Fixture.purge()` | Démonte (défaut : `DELETE FROM tables` en ordre inverse). Surchargeable. |
+
 La factory ne touche jamais la base et ne rend pas de SQL : elle produit des dicts. Elle est importée par le code de factory de l'utilisateur, exécuté par `fixtures:generate`.
 
 ## 2. Les commandes (`cli/`)
@@ -31,17 +39,19 @@ Découvertes par le cœur via l'entry point `forge_mvc.commands` (ADR-059). `loa
 |---|---|
 | `active_env()` | Nom de l'environnement actif (`APP_ENV`, défaut `dev`). |
 | `collect_fixture_files(root)` | Fichiers `mvc/fixtures/*.sql`, triés par nom. |
-| `order_fixture_files(root, files)` | Ordonne par dépendances FK (tri topologique depuis `relations.json`) ; repli sur le nom (ADR-077). |
+| `collect_callable_fixtures(root)` | Fixtures callable `mvc/fixtures/*.py` (hors `factories/`, ADR-078). Lève `FixtureDiscoveryError` sur import cassé ou ambigu. |
+| `order_fixture_files(root, files)` | Ordonne les `.sql` par dépendances FK (tri topologique depuis `relations.json`) ; repli sur le nom (ADR-077). |
+| `order_load_units(root, sql_files, callables)` | Ordre unifié des `.sql` et fixtures callable (`LoadUnit`) ; `.sql` avant callable à rang égal (ADR-078). |
 | `split_sql_statements(sql)` | Découpe un script en instructions, en respectant les chaînes `'...'`. |
-| `load_fixtures(root, *, run, force, env, no_fk_checks=False)` | Affiche puis (si `run`) exécute les fixtures. Codes : 0, 2 (refus prod), 1 (erreur SQL). |
+| `load_fixtures(root, *, run, force, env, no_fk_checks=False)` | Affiche puis (si `run`) exécute les unités (SQL et `load()` callable). Codes : 0, 2, 1. |
 | `main(args)` | Point d'entrée ; lit `--run`, `--force`, `--no-fk-checks`. |
 
 ### 2.2 `fixtures:purge` (`cli/purge.py`)
 
 | Fonction | Rôle |
 |---|---|
-| `collect_target_tables(files)` | Tables peuplées par les fixtures, par ordre de première apparition. |
-| `purge_fixtures(root, *, run, force, env)` | Affiche puis (si `run`) exécute les `DELETE FROM` en ordre inverse. |
+| `collect_target_tables(files)` | Tables peuplées par les `.sql`, par ordre de première apparition. |
+| `purge_fixtures(root, *, run, force, env)` | Démonte les fixtures callable (`purge()`) puis les tables `.sql` (`DELETE FROM` en ordre inverse), ADR-078. |
 | `main(args)` | Point d'entrée ; lit `--run` et `--force`. |
 
 ### 2.3 `fixtures:generate` (`cli/generate.py`)

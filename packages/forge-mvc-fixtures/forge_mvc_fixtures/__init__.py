@@ -17,8 +17,13 @@ runtime : l'application ne l'importe jamais dans le chemin d'une requête.
 """
 from __future__ import annotations
 
-from forge_mvc_fixtures.factory import Factory, FactoryError, FixtureReference
+from forge_mvc_fixtures.factory import (
+    Factory,
+    FactoryError,
+    Fixture,
+    FixtureReference,
+)
 
 __version__ = "1.0.0rc2"
 
-__all__ = ["Factory", "FactoryError", "FixtureReference"]
+__all__ = ["Factory", "FactoryError", "Fixture", "FixtureReference"]

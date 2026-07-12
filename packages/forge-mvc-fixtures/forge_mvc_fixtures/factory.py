@@ -105,3 +105,44 @@ class Factory:
                     f"même ordre. Attendu {columns}, vu {keys}."
                 )
         return produced
+
+
+class Fixture:
+    """Base d'une fixture *callable* (hook Python), à sous-classer (ADR-078).
+
+    Pour ce qu'un ``.sql`` statique ne peut exprimer : import d'un référentiel
+    depuis une source, valeurs calculées. La sous-classe vit dans
+    ``mvc/fixtures/<nom>.py`` et code sa persistance dans ``load()``, en écrivant
+    en base **comme le reste du projet** (``from core.database import db``).
+
+    ``fixtures:load`` la découvre, l'ordonne avec les ``.sql`` (via ``tables`` et
+    ``depends_on``), affiche son source puis, sur ``--run``, appelle ``load()``.
+    Le SQL reste paramétré et visible dans le code applicatif appelé (principe 7) ;
+    le fichier ``.py`` est versionné et relu.
+    """
+
+    #: Tables peuplées par la fixture ; sert à l'ordre de chargement et à la purge.
+    tables: tuple[str, ...] = ()
+    #: Entités ou tables à charger avant celle-ci (ordre topologique, ADR-077/078).
+    depends_on: tuple[str, ...] = ()
+
+    def load(self) -> None:
+        """Persiste les données de la fixture. À surcharger.
+
+        Écrit en base via ``core.database.db`` (connexion applicative), ou appelle
+        une fonction applicative qui le fait (importeur, calcul d'agrégats).
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} doit définir load() (écriture en base)."
+        )
+
+    def purge(self) -> None:
+        """Démonte ce que ``load()`` a écrit. Surchargeable.
+
+        Par défaut, vide les ``tables`` déclarées (``DELETE FROM`` en ordre
+        inverse). Surchargez pour un démontage sur-mesure, l'inverse de ``load()``.
+        """
+        from core.database import db
+
+        for table in reversed(self.tables):
+            db.execute(f"DELETE FROM {table}")

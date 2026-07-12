@@ -1049,15 +1049,16 @@ Usage:
   forge fixtures:load [--run] [--force] [--no-fk-checks]
 
 Description:
-  Charge les fixtures SQL du projet (mvc/fixtures/*.sql) dans la base de
-  l'environnement actif (APP_ENV, défaut dev). Données de démo/test rejouables
-  et cadrées par environnement (ADR-074), à SQL visible.
+  Charge les fixtures du projet dans la base de l'environnement actif (APP_ENV,
+  défaut dev) : les fichiers mvc/fixtures/*.sql (données statiques) et les
+  fixtures callable mvc/fixtures/*.py (hooks Python : import, agrégats, ADR-078).
+  Données de démo/test rejouables et cadrées par environnement (ADR-074).
 
 Comportement (charte §7, comme forge db:init) :
-  - les fichiers sont ordonnés par dépendances de clés étrangères (ADR-077) :
-    une table est chargée après celles qu'elle référence (relations.json) ;
-  - par défaut, AFFICHE le SQL sans rien exécuter ;
-  - --run exécute le chargement dans la base ;
+  - les unités (.sql et .py) sont ordonnées par dépendances de clés étrangères
+    (ADR-077/078) : une table est chargée après celles qu'elle référence ;
+  - par défaut, AFFICHE le SQL et le source des fixtures Python sans rien exécuter ;
+  - --run exécute le chargement (SQL et load() des fixtures callable) ;
   - en APP_ENV=prod, --run seul refuse : ajouter --force pour confirmer.
 
 Prérequis:

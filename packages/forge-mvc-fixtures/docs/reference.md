@@ -96,7 +96,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     | Couche | opt-in **CLI-only** (ADR-052), sans API de runtime |
     | Dépend de | `forge-mvc`, un backend BDD installé (ADR-054), et `faker` (génération) |
     | Commandes | `fixtures:load`, `fixtures:purge`, `fixtures:generate`, `fixtures:make-factory` |
-    | API publique | `Factory` (classe de base, `reference`), `FactoryError`, `FixtureReference` |
+    | API publique | `Factory` (classe de base, `reference`), `Fixture` (hooks Python), `FactoryError`, `FixtureReference` |
     | Table SQL | aucune (l'opt-in peuple des tables déjà provisionnées) |
     | Environnement | vise `APP_ENV` (défaut `dev`) ; production protégée (`--force`) |
     | Rendu SQL | via `dialect.render_literal` (ADR-075), correct pour le backend installé |
@@ -277,7 +277,36 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     `fixtures:generate` lit le contrat de l'entité et **ajoute automatiquement** `CreatedAt`/`UpdatedAt` aux `INSERT` quand la factory ne les fournit pas, avec un horodatage déterministe constant (fixtures reproductibles, pas de `NOW()`).
     Une colonne déjà posée par la factory est respectée, jamais écrasée ; une entité sans timestamps n'est pas touchée.
 
-??? note "10. Frontière avec la migration de seed"
+??? note "10. Fixtures callable (hooks Python, ADR-078)"
+
+    Deux étapes d'un seed réaliste ne sont pas des données statiques et ne peuvent pas s'écrire en `.sql` : l'**import** d'un référentiel depuis une source (un JSON canonique), et des **valeurs calculées** (un agrégat).
+    Pour ces cas, une **fixture callable** exécute du code Python dans le même pipeline que les `.sql`.
+
+    On sous-classe `Fixture` dans `mvc/fixtures/<nom>.py` :
+
+    ```python
+    from forge_mvc_fixtures import Fixture
+    from mvc.services.referentiel_importer import import_referentiel
+
+
+    class ReferentielFixture(Fixture):
+        tables = ("matiere", "niveau")      # pour l'ordre et la purge
+        depends_on = ("annee_scolaire",)    # exécutée après ces tables
+
+        def load(self) -> None:
+            import_referentiel("data/referentiel.json")   # écrit via core.database.db
+    ```
+
+    - `load(self)` écrit en base **comme le reste du projet** (`from core.database import db`, ou une fonction applicative qui le fait) : le SQL reste paramétré et visible dans le code appelé (principe 7).
+    - `tables` et `depends_on` placent la fixture dans l'ordre de chargement (tri topologique unifié avec les `.sql`) ; un préfixe numérique (`50_referentiel.py`) ordonne les callable entre elles.
+    - `purge(self)` (surchargeable) démonte la fixture ; par défaut, vide les `tables` déclarées.
+
+    `fixtures:load` découvre les `mvc/fixtures/*.py` (hors `factories/`), **affiche** leur source par défaut, puis les exécute avec `--run` ; `fixtures:purge` les démonte avant les `.sql` (ordre inverse).
+    Une fixture qui écrit dans des tables non déclarées et ne surcharge pas `purge()` n'est pas purgée automatiquement (limite : déclarer `tables`, ou écrire `purge()`).
+
+    Frontière (principe 11) : la fixture callable n'est **pas** une deuxième façon d'insérer du statique (cela reste des `.sql`), mais le recours pour ce que le SQL statique ne peut pas exprimer.
+
+??? note "11. Frontière avec la migration de seed"
 
     Une seule façon officielle par besoin (principe 11) :
 

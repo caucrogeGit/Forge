@@ -16,26 +16,47 @@ reste une migration appliquée par ``forge migration:apply``.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
+
+from forge_mvc_fixtures.factory import Fixture
 
 STATUS_OK = "[OK]"
 
 __all__ = [
     "STATUS_OK",
+    "LoadUnit",
+    "FixtureDiscoveryError",
     "active_env",
     "collect_fixture_files",
+    "collect_callable_fixtures",
     "order_fixture_files",
+    "order_load_units",
     "split_sql_statements",
     "load_fixtures",
     "main",
 ]
 
 _INSERT_INTO = re.compile(r"INSERT\s+INTO\s+[`\"\[]?(\w+)", re.IGNORECASE)
+
+
+class FixtureDiscoveryError(Exception):
+    """Un fichier ``mvc/fixtures/*.py`` n'a pas pu être importé ou est ambigu."""
+
+
+@dataclass(frozen=True)
+class LoadUnit:
+    """Une unité du pipeline de chargement : un ``.sql`` ou une fixture callable."""
+
+    kind: str  # "sql" | "callable"
+    path: Path
+    fixture: "type[Fixture] | None" = None
 
 
 def active_env() -> str:
@@ -164,6 +185,111 @@ def order_fixture_files(root: Path, files: list[Path]) -> list[Path]:
     return sorted(by_name, key=sort_key)
 
 
+def _load_fixture_class(path: Path) -> "type[Fixture] | None":
+    """Importe le module ``.py`` et renvoie sa sous-classe de ``Fixture`` (ADR-078).
+
+    ``None`` si le fichier ne définit aucune fixture (fichier utilitaire).
+    Lève ``FixtureDiscoveryError`` si l'import échoue ou si le module en définit
+    plusieurs (ambigu).
+    """
+    module_name = f"_forge_fixture_{path.stem}"
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    if spec is None or spec.loader is None:
+        raise FixtureDiscoveryError(f"Chargement impossible : {path.as_posix()}.")
+    module = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(module)
+    except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
+        raise FixtureDiscoveryError(f"Import de {path.name} : {exc}") from exc
+
+    candidates = [
+        value
+        for value in vars(module).values()
+        if isinstance(value, type) and issubclass(value, Fixture) and value is not Fixture
+    ]
+    if not candidates:
+        return None
+    if len(candidates) > 1:
+        names = ", ".join(sorted(c.__name__ for c in candidates))
+        raise FixtureDiscoveryError(
+            f"Plusieurs fixtures dans {path.name} ({names}) ; une seule par fichier."
+        )
+    return candidates[0]
+
+
+def collect_callable_fixtures(root: Path) -> "list[tuple[Path, type[Fixture]]]":
+    """Fixtures callable du projet : ``mvc/fixtures/*.py`` (hors ``factories/``).
+
+    Les fichiers ``__*.py`` (dunder) et les modules sans sous-classe de ``Fixture``
+    sont ignorés. Triés par nom (l'ordre définitif vient de ``order_load_units``).
+    """
+    fixtures_dir = root / "mvc" / "fixtures"
+    if not fixtures_dir.is_dir():
+        return []
+    found: list[tuple[Path, type[Fixture]]] = []
+    for path in sorted(fixtures_dir.glob("*.py"), key=lambda p: p.name):
+        if path.name.startswith("__"):
+            continue
+        fixture_cls = _load_fixture_class(path)
+        if fixture_cls is not None:
+            found.append((path, fixture_cls))
+    return found
+
+
+def order_load_units(
+    root: Path,
+    sql_files: list[Path],
+    callables: "list[tuple[Path, type[Fixture]]]",
+) -> list[LoadUnit]:
+    """Ordonne ``.sql`` et fixtures callable dans un pipeline unique (ADR-078).
+
+    Rang par tri topologique des dépendances FK (F44) : une unité ``.sql`` prend
+    le rang de son entité ; une callable prend le rang maximal de ses
+    ``depends_on`` (résolus en entités/tables), sinon de ses ``tables``, sinon un
+    rang tardif. À rang égal, les ``.sql`` passent avant les callable, puis on
+    départage par nom (préfixe numérique compris). Repli (pas de graphe) : ``.sql``
+    par nom, puis callable par nom.
+    """
+    deps = _fk_dependencies(root)
+    topo = _topological_order(deps) if deps is not None else None
+    if topo is None:
+        rank: dict[str, int] = {}
+        table_to_entity: dict[str, str] = {}
+        unknown_rank = 0
+    else:
+        rank = {entity: index for index, entity in enumerate(topo)}
+        table_to_entity = {table: entity for entity, table in _entity_tables(root).items()}
+        unknown_rank = len(topo)
+
+    def rank_of_name(name: str) -> int | None:
+        if name in rank:
+            return rank[name]
+        entity = table_to_entity.get(name)
+        if entity is not None and entity in rank:
+            return rank[entity]
+        return None
+
+    def sql_rank(path: Path) -> int:
+        table = _table_of_file(path)
+        entity = table_to_entity.get(table) if table else None
+        return rank.get(entity, unknown_rank) if entity else unknown_rank
+
+    def callable_rank(fixture: "type[Fixture]") -> int:
+        hints = [rank_of_name(name) for name in (*fixture.depends_on, *fixture.tables)]
+        resolved = [value for value in hints if value is not None]
+        return max(resolved) if resolved else unknown_rank
+
+    keyed: list[tuple[int, int, str, LoadUnit]] = []
+    for path in sql_files:
+        keyed.append((sql_rank(path), 0, path.name, LoadUnit("sql", path)))
+    for path, fixture_cls in callables:
+        keyed.append(
+            (callable_rank(fixture_cls), 1, path.name, LoadUnit("callable", path, fixture_cls))
+        )
+    keyed.sort(key=lambda item: (item[0], item[1], item[2]))
+    return [item[3] for item in keyed]
+
+
 def _strip_line_comments(sql: str) -> str:
     """Retire les lignes de commentaire ``--`` (le SQL affiché les garde)."""
     return "\n".join(
@@ -217,18 +343,24 @@ def load_fixtures(
 ) -> int:
     """Affiche (et, si ``run``, exécute) les fixtures du projet.
 
-    Les fichiers sont ordonnés par dépendances de clés étrangères (F44). Avec
-    ``no_fk_checks``, le chargement est encadré par la désactivation des
-    contraintes du dialecte (jeux non triables, cycles).
+    Les unités (fichiers ``.sql`` et fixtures callable ``*.py``, ADR-078) sont
+    ordonnées par dépendances de clés étrangères (F44). Avec ``no_fk_checks``, le
+    chargement est encadré par la désactivation des contraintes du dialecte.
 
     Retourne le code de sortie : 0 succès ou affichage seul, 2 refus (prod sans
-    ``--force``), 1 erreur d'exécution SQL.
+    ``--force`` ou fixture illisible), 1 erreur d'exécution.
     """
-    files = order_fixture_files(root, collect_fixture_files(root))
-    if not files:
+    try:
+        callables = collect_callable_fixtures(root)
+    except FixtureDiscoveryError as exc:
+        print(f"Erreur : {exc}", file=sys.stderr)
+        return 2
+
+    units = order_load_units(root, collect_fixture_files(root), callables)
+    if not units:
         print(
             "Aucune fixture à charger. "
-            "Créez des fichiers .sql dans mvc/fixtures/ (SQL visible, relu)."
+            "Créez des fichiers .sql ou une fixture Python dans mvc/fixtures/."
         )
         return 0
 
@@ -240,10 +372,11 @@ def load_fixtures(
         )
         return 2
 
-    print(f"Fixtures pour l'environnement '{env}' ({len(files)} fichier(s)) :\n")
-    for path in files:
-        print(f"-- {path.name}")
-        print(path.read_text(encoding="utf-8").strip())
+    print(f"Fixtures pour l'environnement '{env}' ({len(units)} unité(s)) :\n")
+    for unit in units:
+        label = "fixture Python" if unit.kind == "callable" else "SQL"
+        print(f"-- {unit.path.name} ({label})")
+        print(unit.path.read_text(encoding="utf-8").strip())
         print()
 
     if not run:
@@ -266,32 +399,46 @@ def load_fixtures(
                 "le chargement s'appuie sur l'ordre topologique seul."
             )
 
-    executed = 0
+    sql_count = 0
+    callable_count = 0
+    statement_count = 0
     try:
         for statement in disable_ddl:
             db.execute(statement)
-        for path in files:
+        for unit in units:
+            if unit.kind == "callable" and unit.fixture is not None:
+                try:
+                    unit.fixture().load()
+                except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
+                    print(
+                        f"Erreur en exécutant la fixture {unit.path.name} : {exc}",
+                        file=sys.stderr,
+                    )
+                    return 1
+                callable_count += 1
+                continue
             statements = split_sql_statements(_strip_line_comments(
-                path.read_text(encoding="utf-8")
+                unit.path.read_text(encoding="utf-8")
             ))
             for statement in statements:
                 try:
                     db.execute(statement)
                 except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
                     print(
-                        f"Erreur en chargeant {path.name} : {exc}\n"
+                        f"Erreur en chargeant {unit.path.name} : {exc}\n"
                         f"Instruction : {statement}",
                         file=sys.stderr,
                     )
                     return 1
-                executed += 1
+                statement_count += 1
+            sql_count += 1
     finally:
         for statement in enable_ddl:
             db.execute(statement)
 
     print(
-        f"{STATUS_OK} {len(files)} fichier(s), {executed} instruction(s) "
-        f"chargée(s) dans l'environnement '{env}'."
+        f"{STATUS_OK} {sql_count} fichier(s) SQL ({statement_count} instruction(s)) "
+        f"et {callable_count} fixture(s) Python chargé(s) dans l'environnement '{env}'."
     )
     return 0
 
