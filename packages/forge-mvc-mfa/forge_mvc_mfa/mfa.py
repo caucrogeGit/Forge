@@ -388,6 +388,12 @@ def _session_user_matches(request: Any, expected_user_id: int) -> bool:
     session = _resolve_mfa_session(request)
     if session is None:
         return False
+    # Auth moderne (ADR-010) : la session ne porte que l'identifiant
+    # `_auth_user_id`. On le prend en priorité ; à défaut, on retombe sur la
+    # session legacy (dépréciée) `authenticated` + `user.id`.
+    modern_id = _session_get(session, "_auth_user_id")
+    if isinstance(modern_id, int) and not isinstance(modern_id, bool):
+        return modern_id == expected_user_id
     if not _session_get(session, "authenticated"):
         return False
     user: object = _session_get(session, "user") or {}
