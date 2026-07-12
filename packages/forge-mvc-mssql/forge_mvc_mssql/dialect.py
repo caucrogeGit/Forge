@@ -147,6 +147,12 @@ class MSSQLDialect:
             f"    CREATE INDEX {name} ON {table} ({column});"
         )
 
+    def foreign_key_checks_ddl(self, *, enabled: bool) -> "list[str]":
+        # SQL Server ne désactive les contraintes que table par table
+        # (ALTER TABLE ... NOCHECK CONSTRAINT), sans levier de session : pas de
+        # forme générale ici. Le chargement s'appuie sur l'ordre topologique.
+        return []
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

@@ -70,3 +70,8 @@ class TestRenderLiteralValue:
 
 def test_dialect_protocol_declares_render_literal() -> None:
     assert hasattr(Dialect, "render_literal")
+
+
+def test_dialect_protocol_declares_foreign_key_checks_ddl() -> None:
+    # ADR-077 : levier FK exposé par le dialecte (fixtures:load --no-fk-checks).
+    assert hasattr(Dialect, "foreign_key_checks_ddl")

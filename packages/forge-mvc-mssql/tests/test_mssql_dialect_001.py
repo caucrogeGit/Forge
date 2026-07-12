@@ -73,3 +73,9 @@ def test_forge_migrations_ddl_identity_et_garde() -> None:
     assert "IF OBJECT_ID(N'forge_migrations', N'U') IS NULL" in ddl
     assert "id BIGINT IDENTITY(1,1) PRIMARY KEY" in ddl
     assert "UNIQUE (version)" in ddl
+
+
+def test_foreign_key_checks_ddl_is_empty() -> None:
+    # ADR-077 : SQL Server n'a pas de levier FK de session ; liste vide.
+    assert D.foreign_key_checks_ddl(enabled=False) == []
+    assert D.foreign_key_checks_ddl(enabled=True) == []

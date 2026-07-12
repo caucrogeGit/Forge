@@ -15,6 +15,8 @@ Base des factories de fixtures, à sous-classer par entité sous `mvc/fixtures/f
 | `Factory.definition()` | Renvoie **une** ligne (dict colonne vers valeur). Cas simple. |
 | `Factory.rows(count)` | Renvoie **la liste** des lignes ; par défaut répète `definition()`. Surface de code libre (boucles, conditions, tableaux). |
 | `Factory.build(count)` | Produit et valide les lignes (table définie, colonnes cohérentes). Lève `FactoryError`. |
+| `Factory.reference(table, key_column, value)` | Relie une colonne à l'`Id` d'une autre table par une clé naturelle (ADR-077). Renvoie un `FixtureReference`. |
+| `FixtureReference` | Sentinelle de référence ; `fixtures:generate` la rend en sous-requête `(SELECT Id FROM ... LIMIT 1)`. |
 | `FactoryError` | Factory mal définie. |
 
 La factory ne touche jamais la base et ne rend pas de SQL : elle produit des dicts. Elle est importée par le code de factory de l'utilisateur, exécuté par `fixtures:generate`.
@@ -29,9 +31,10 @@ Découvertes par le cœur via l'entry point `forge_mvc.commands` (ADR-059). `loa
 |---|---|
 | `active_env()` | Nom de l'environnement actif (`APP_ENV`, défaut `dev`). |
 | `collect_fixture_files(root)` | Fichiers `mvc/fixtures/*.sql`, triés par nom. |
+| `order_fixture_files(root, files)` | Ordonne par dépendances FK (tri topologique depuis `relations.json`) ; repli sur le nom (ADR-077). |
 | `split_sql_statements(sql)` | Découpe un script en instructions, en respectant les chaînes `'...'`. |
-| `load_fixtures(root, *, run, force, env)` | Affiche puis (si `run`) exécute les fixtures. Codes : 0, 2 (refus prod), 1 (erreur SQL). |
-| `main(args)` | Point d'entrée ; lit `--run` et `--force`. |
+| `load_fixtures(root, *, run, force, env, no_fk_checks=False)` | Affiche puis (si `run`) exécute les fixtures. Codes : 0, 2 (refus prod), 1 (erreur SQL). |
+| `main(args)` | Point d'entrée ; lit `--run`, `--force`, `--no-fk-checks`. |
 
 ### 2.2 `fixtures:purge` (`cli/purge.py`)
 
@@ -46,7 +49,8 @@ Découvertes par le cœur via l'entry point `forge_mvc.commands` (ADR-059). `loa
 | Fonction | Rôle |
 |---|---|
 | `load_factory(root, entity)` | Importe et instancie la factory de l'entité. |
-| `render_inserts(table, rows, dialect)` | Rend les lignes en `INSERT INTO` via `dialect.render_literal` (ADR-075). |
+| `render_value(value, dialect)` | Rend une valeur : sous-requête pour un `FixtureReference` (ADR-077), sinon `dialect.render_literal`. |
+| `render_inserts(table, rows, dialect)` | Rend les lignes en `INSERT INTO` (via `render_value`). |
 | `generate_fixtures(root, entity, *, rows, seed, force, dialect)` | Affiche puis écrit `mvc/fixtures/<table>.sql` (write-if-new). Codes : 0, 2, 1. |
 | `main(args)` | Point d'entrée ; lit `<entity>`, `--rows`, `--seed`, `--force`. |
 
@@ -54,8 +58,11 @@ Découvertes par le cœur via l'entry point `forge_mvc.commands` (ADR-059). `loa
 
 | Fonction | Rôle |
 |---|---|
+| `column_for_field(field)` | Colonne SQL réelle d'un champ (délègue à `forge-mvc-entities`, repli sur le nom ; ADR-077). |
 | `provider_for_field(field)` | Provider Faker deviné pour un champ (par type, puis par nom pour les champs textuels). |
-| `render_factory(contract)` | Rend le code Python d'une factory riche depuis un contrat d'entité. |
+| `reference_expr(target_table)` | Scaffold `self.reference(...)` pour une clé étrangère (ADR-077). |
+| `fk_targets(root, entity)` | Colonnes FK de l'entité vers leur table cible, depuis `relations.json`. |
+| `render_factory(contract, *, fk_map=None)` | Rend le code Python d'une factory riche (colonnes réelles, références FK). |
 | `make_factory(root, entity, *, force)` | Affiche puis écrit `mvc/fixtures/factories/<entity>_factory.py` (write-if-new). |
 | `main(args)` | Point d'entrée ; lit `<entity>` et `--force`. |
 

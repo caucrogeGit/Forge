@@ -137,6 +137,12 @@ class PostgreSQLDialect:
     def create_index_sql(self, table: str, name: str, column: str) -> str:
         return f"CREATE INDEX IF NOT EXISTS {name} ON {table} ({column});"
 
+    def foreign_key_checks_ddl(self, *, enabled: bool) -> "list[str]":
+        # PostgreSQL n'a pas d'interrupteur FK ; session_replication_role =
+        # replica court-circuite les triggers (dont les contraintes FK). Exige un
+        # rôle superuser (ADR-077).
+        return [f"SET session_replication_role = {'origin' if enabled else 'replica'}"]
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

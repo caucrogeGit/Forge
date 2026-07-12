@@ -180,6 +180,19 @@ class Dialect(Protocol):
         """
         ...
 
+    def foreign_key_checks_ddl(self, *, enabled: bool) -> "list[str]":
+        """Instructions SQL pour (dés)activer la vérification des clés étrangères.
+
+        Utilisé par `fixtures:load --no-fk-checks` (ADR-077) pour charger un jeu
+        non triable (cycle de dépendances FK) sans violer les contraintes :
+        désactivation avant le chargement, réactivation après. Propre au SGBD
+        (`SET FOREIGN_KEY_CHECKS` en MariaDB, `PRAGMA foreign_keys` en SQLite,
+        `session_replication_role` en PostgreSQL). Renvoie une liste vide si le
+        dialecte n'expose pas de levier de session (SQL Server) : le chargement
+        s'appuie alors sur le seul ordre topologique.
+        """
+        ...
+
 
 @runtime_checkable
 class DatabaseBackend(Protocol):

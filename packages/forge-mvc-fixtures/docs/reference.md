@@ -84,6 +84,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
 
     `load` et `purge` **affichent** leur SQL par défaut ; `--run` exécute ; `--run --force` autorise `APP_ENV=prod`.
     `generate` et `make-factory` écrivent un fichier en mode write-if-new (`--force` pour remplacer).
+    `load` ordonne les fichiers par dépendances de clés étrangères (ADR-077) ; `--no-fk-checks` désactive les contraintes le temps du chargement pour les jeux non triables.
 
 ??? note "4. Vue d'ensemble rapide"
 
@@ -95,7 +96,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     | Couche | opt-in **CLI-only** (ADR-052), sans API de runtime |
     | Dépend de | `forge-mvc`, un backend BDD installé (ADR-054), et `faker` (génération) |
     | Commandes | `fixtures:load`, `fixtures:purge`, `fixtures:generate`, `fixtures:make-factory` |
-    | API publique | `Factory` (classe de base des factories), `FactoryError` |
+    | API publique | `Factory` (classe de base, `reference`), `FactoryError`, `FixtureReference` |
     | Table SQL | aucune (l'opt-in peuple des tables déjà provisionnées) |
     | Environnement | vise `APP_ENV` (défaut `dev`) ; production protégée (`--force`) |
     | Rendu SQL | via `dialect.render_literal` (ADR-075), correct pour le backend installé |
@@ -173,6 +174,8 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     | `Factory.definition` | `definition() -> dict` | une ligne (colonne vers valeur), cas simple |
     | `Factory.rows` | `rows(count) -> list[dict]` | les lignes ; surface de code libre (boucles, conditions) |
     | `Factory.build` | `build(count) -> list[dict]` | produit et valide les lignes (table définie, colonnes cohérentes) |
+    | `Factory.reference` | `reference(table, key_column, value) -> FixtureReference` | relie une colonne à l'`Id` d'une autre table par une clé naturelle (ADR-077) |
+    | `FixtureReference` | valeur | sentinelle rendue en sous-requête par `fixtures:generate` |
     | `FactoryError` | exception | factory mal définie |
 
     La classe de base est importée par le code de factory de l'utilisateur (`from forge_mvc_fixtures import Factory`), exécuté par `fixtures:generate` ; ce n'est pas une API de runtime.
@@ -228,7 +231,45 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
         - à la main : un fichier dans `mvc/fixtures/`, puis `fixtures:load` ;
         - généré : `make-factory` puis `generate`, puis `fixtures:load`.
 
-??? note "9. Frontière avec la migration de seed"
+??? note "9. Fixtures reliées : références et ordre de chargement (ADR-077)"
+
+    Un jeu de démo réaliste relie des tables : un `eleve` pointe un compte `users`, une `classe` pointe une `annee_scolaire`.
+    Trois mécanismes rendent ce cas natif, sans bricolage dans l'application.
+
+    ### 9.1 Colonnes réelles
+
+    `fixtures:make-factory` échafaude le dict de la factory avec les **colonnes réelles** de l'entité, pas les noms de champs du contrat : `Nom`, `UserId` (PascalCase), une clé étrangère gardant son nom snake (`user_id`).
+    Le mapping vient de `forge-mvc-entities` (source unique, `column_for_field`), donc le SQL généré tourne tel quel sur le backend installé (cohérent ADR-075).
+
+    ### 9.2 Références inter-fixtures
+
+    Une factory relie une ligne à une autre table par une **clé naturelle**, sans connaître l'`Id` auto-incrémenté :
+
+    ```python
+    def rows(self, count: int) -> list[dict]:
+        return [{
+            "Nom": self.faker.last_name(),
+            "UserId": self.reference("users", "Email", "prof.durand@ecole.fr"),
+        } for _ in range(count)]
+    ```
+
+    `fixtures:generate` rend `self.reference(...)` en **sous-requête SQL**, résolue à la charge contre les vrais `Id` :
+
+    ```sql
+    INSERT INTO eleve (Nom, UserId)
+    VALUES ('Durand', (SELECT Id FROM users WHERE Email = 'prof.durand@ecole.fr' LIMIT 1));
+    ```
+
+    `make-factory` reconnaît les clés étrangères (type `foreign_key`, ou colonne déclarée dans `relations.json`) et échafaude un `self.reference(...)` commenté, à compléter, au lieu d'un entier aléatoire.
+
+    ### 9.3 Ordre de chargement par dépendances
+
+    `fixtures:load` ordonne les fichiers par **tri topologique** du graphe de clés étrangères déduit de `relations.json` : une table est chargée après celles qu'elle référence (`users` avant `eleve`).
+    Repli sur l'ordre du nom de fichier si `relations.json` est absent ou en cas de cycle (le préfixe `01_`, `02_` reste un ordre déclaratif de secours).
+
+    Pour un jeu non triable (cycle de dépendances), `--no-fk-checks` encadre le chargement par la désactivation des contraintes du dialecte (`SET FOREIGN_KEY_CHECKS` en MariaDB, `PRAGMA foreign_keys` en SQLite, `session_replication_role` en PostgreSQL ; sans effet en SQL Server).
+
+??? note "10. Frontière avec la migration de seed"
 
     Une seule façon officielle par besoin (principe 11) :
 

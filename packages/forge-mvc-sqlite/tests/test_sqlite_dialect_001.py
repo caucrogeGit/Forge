@@ -19,6 +19,12 @@ def test_identity_et_string_et_decimal() -> None:
     assert D.decimal_type(10, 2) == "NUMERIC"
 
 
+def test_foreign_key_checks_ddl() -> None:
+    # ADR-077 : PRAGMA SQLite (sans effet dans une transaction ouverte).
+    assert D.foreign_key_checks_ddl(enabled=False) == ["PRAGMA foreign_keys = OFF"]
+    assert D.foreign_key_checks_ddl(enabled=True) == ["PRAGMA foreign_keys = ON"]
+
+
 @pytest.mark.parametrize(
     "forge_type, expected",
     [

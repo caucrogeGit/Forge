@@ -133,6 +133,10 @@ class MariaDBDialect:
     def create_index_sql(self, table: str, name: str, column: str) -> str:
         return f"CREATE INDEX {name} ON {table} ({column});"
 
+    def foreign_key_checks_ddl(self, *, enabled: bool) -> "list[str]":
+        # Levier de session MariaDB (ADR-077).
+        return [f"SET FOREIGN_KEY_CHECKS = {1 if enabled else 0}"]
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

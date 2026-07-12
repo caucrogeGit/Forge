@@ -133,6 +133,10 @@ class SQLiteDialect:
     def create_index_sql(self, table: str, name: str, column: str) -> str:
         return f"CREATE INDEX IF NOT EXISTS {name} ON {table} ({column});"
 
+    def foreign_key_checks_ddl(self, *, enabled: bool) -> "list[str]":
+        # PRAGMA SQLite (ADR-077) ; sans effet dans une transaction ouverte.
+        return [f"PRAGMA foreign_keys = {'ON' if enabled else 'OFF'}"]
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

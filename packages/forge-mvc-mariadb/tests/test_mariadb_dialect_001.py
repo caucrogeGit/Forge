@@ -52,3 +52,9 @@ def test_add_columns_sql_un_seul_alter() -> None:
 
 def test_quote_identifier_backticks() -> None:
     assert D.quote_identifier("contact") == "`contact`"
+
+
+def test_foreign_key_checks_ddl() -> None:
+    # ADR-077 : levier de session MariaDB.
+    assert D.foreign_key_checks_ddl(enabled=False) == ["SET FOREIGN_KEY_CHECKS = 0"]
+    assert D.foreign_key_checks_ddl(enabled=True) == ["SET FOREIGN_KEY_CHECKS = 1"]

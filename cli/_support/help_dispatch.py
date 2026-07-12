@@ -1046,7 +1046,7 @@ Options:
 
     "fixtures:load": """\
 Usage:
-  forge fixtures:load [--run] [--force]
+  forge fixtures:load [--run] [--force] [--no-fk-checks]
 
 Description:
   Charge les fixtures SQL du projet (mvc/fixtures/*.sql) dans la base de
@@ -1054,6 +1054,8 @@ Description:
   et cadrées par environnement (ADR-074), à SQL visible.
 
 Comportement (charte §7, comme forge db:init) :
+  - les fichiers sont ordonnés par dépendances de clés étrangères (ADR-077) :
+    une table est chargée après celles qu'elle référence (relations.json) ;
   - par défaut, AFFICHE le SQL sans rien exécuter ;
   - --run exécute le chargement dans la base ;
   - en APP_ENV=prod, --run seul refuse : ajouter --force pour confirmer.
@@ -1069,9 +1071,11 @@ Limites:
   - voir forge fixtures:purge pour vider les tables et repartir propre.
 
 Options:
-  --run         Exécute le chargement (sinon affichage seul).
-  --force       Autorise le chargement en production (avec --run).
-  -h, --help    Affiche cette aide sans exécuter la commande.""",
+  --run          Exécute le chargement (sinon affichage seul).
+  --force        Autorise le chargement en production (avec --run).
+  --no-fk-checks Désactive les contraintes FK pendant le chargement (jeux non
+                 triables, cycles) ; propre au backend (ADR-077).
+  -h, --help     Affiche cette aide sans exécuter la commande.""",
 
     "fixtures:purge": """\
 Usage:

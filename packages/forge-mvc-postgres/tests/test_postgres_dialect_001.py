@@ -65,3 +65,13 @@ def test_forge_migrations_ddl_bigserial() -> None:
     ddl = D.forge_migrations_ddl()
     assert "id BIGSERIAL PRIMARY KEY" in ddl
     assert "UNIQUE (version)" in ddl
+
+
+def test_foreign_key_checks_ddl() -> None:
+    # ADR-077 : PostgreSQL passe par session_replication_role.
+    assert D.foreign_key_checks_ddl(enabled=False) == [
+        "SET session_replication_role = replica"
+    ]
+    assert D.foreign_key_checks_ddl(enabled=True) == [
+        "SET session_replication_role = origin"
+    ]
