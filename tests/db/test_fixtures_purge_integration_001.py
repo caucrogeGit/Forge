@@ -60,3 +60,57 @@ def test_display_only_purges_nothing(ville_table, tmp_path: Path) -> None:
     load_fixtures(tmp_path, run=True, force=False, env="dev")
     assert purge_fixtures(tmp_path, run=False, force=False, env="dev") == 0
     assert len(db.fetch_all("SELECT id FROM ville", ())) == 1
+
+
+@pytest.fixture()
+def related_tables(real_db):
+    """Deux tables liées par une FK (parent référencé par enfant)."""
+    from core.database import db
+
+    db.execute("DROP TABLE IF EXISTS child", ())
+    db.execute("DROP TABLE IF EXISTS parent", ())
+    db.execute(
+        "CREATE TABLE parent (Id INT AUTO_INCREMENT PRIMARY KEY, nom VARCHAR(50) NOT NULL)",
+        (),
+    )
+    db.execute(
+        "CREATE TABLE child (Id INT AUTO_INCREMENT PRIMARY KEY, parent_id INT NOT NULL, "
+        "CONSTRAINT fk_child_parent FOREIGN KEY (parent_id) REFERENCES parent (Id))",
+        (),
+    )
+    yield db
+    db.execute("DROP TABLE IF EXISTS child", ())
+    db.execute("DROP TABLE IF EXISTS parent", ())
+
+
+def test_purge_load_idempotent_multi_table_callable(related_tables, tmp_path: Path) -> None:
+    """F52-bis : un callable multi-tables liées est rejouable sur pool (DB_POOL_SIZE=2).
+
+    ``tables`` est déclaré dans l'ordre « défavorable » (enfant avant parent) :
+    ``reversed()`` supprimerait le parent d'abord, ce qui violerait la FK. Seule
+    la désactivation FK dans une transaction unique (F52-bis) rend le cycle
+    rejouable ; l'encadrement émis sur le pool (avant 1373b228) échouait ici.
+    """
+    db = related_tables
+    fixtures = tmp_path / "mvc" / "fixtures"
+    fixtures.mkdir(parents=True, exist_ok=True)
+    (fixtures / "referentiel.py").write_text(
+        "from forge_mvc_fixtures import Fixture\n"
+        "from core.database import db\n"
+        "class ReferentielFixture(Fixture):\n"
+        "    tables = ('child', 'parent')\n"  # ordre défavorable exprès
+        "    def load(self):\n"
+        "        db.execute(\"INSERT INTO parent (nom) VALUES ('P')\")\n"
+        "        pid = db.fetch_all('SELECT Id FROM parent')[0]['Id']\n"
+        "        db.execute('INSERT INTO child (parent_id) VALUES (?)', (pid,))\n",
+        encoding="utf-8",
+    )
+
+    # Deux cycles complets : aucune erreur FK, aucun doublon, état vidé à chaque purge.
+    for _ in range(2):
+        assert load_fixtures(tmp_path, run=True, force=False, env="dev") == 0
+        assert len(db.fetch_all("SELECT Id FROM child", ())) == 1
+        assert len(db.fetch_all("SELECT Id FROM parent", ())) == 1
+        assert purge_fixtures(tmp_path, run=True, force=False, env="dev") == 0
+        assert db.fetch_all("SELECT Id FROM child", ()) == []
+        assert db.fetch_all("SELECT Id FROM parent", ()) == []

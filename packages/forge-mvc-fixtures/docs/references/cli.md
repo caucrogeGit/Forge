@@ -25,7 +25,7 @@ Pour ce que le SQL statique ne peut pas exprimer (import, agrégats), une **fixt
 |---|---|
 | `Fixture` | Classe de base d'un hook Python. `tables` et `depends_on` pour l'ordre et la purge. |
 | `Fixture.load()` | Persiste les données (écrit via `core.database.db`). À surcharger. |
-| `Fixture.purge()` | Démonte (défaut : `DELETE FROM tables` en ordre inverse). Surchargeable. |
+| `Fixture.purge(*, tx=None)` | Démonte (défaut : `DELETE FROM tables` en ordre inverse). Reçoit et propage la transaction de `fixtures:purge` (F52-bis). Surchargeable. |
 
 La factory ne touche jamais la base et ne rend pas de SQL : elle produit des dicts. Elle est importée par le code de factory de l'utilisateur, exécuté par `fixtures:generate`.
 
@@ -51,7 +51,7 @@ Découvertes par le cœur via l'entry point `forge_mvc.commands` (ADR-059). `loa
 | Fonction | Rôle |
 |---|---|
 | `collect_target_tables(files)` | Tables peuplées par les `.sql`, par ordre de première apparition. |
-| `purge_fixtures(root, *, run, force, env)` | Démonte dans l'ordre inverse **exact** du chargement (`order_load_units` renversé) : `.sql` (`DELETE FROM`) et callable (`purge()`), enfants avant parents (F52), encadré par la désactivation FK du dialecte (`foreign_key_checks_ddl`). |
+| `purge_fixtures(root, *, run, force, env)` | Démonte dans l'ordre inverse **exact** du chargement (`order_load_units` renversé) : `.sql` (`DELETE FROM`) et callable (`purge(tx=...)`), enfants avant parents (F52), dans **une transaction unique** encadrée par la désactivation FK du dialecte (F52-bis, `foreign_key_checks_ddl`). |
 | `main(args)` | Point d'entrée ; lit `--run` et `--force`. |
 
 ### 2.3 `fixtures:generate` (`cli/generate.py`)

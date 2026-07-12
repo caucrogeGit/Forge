@@ -87,8 +87,9 @@ La production reste protégée : `--run` seul y est refusé, `--force` est requi
 `fixtures:purge` démonte dans l'ordre **inverse exact** du chargement (le même graphe renversé, `.sql` et callable) : les enfants avant les parents.
 Il désactive aussi les contraintes de clés étrangères le temps de l'opération, ce qui reste robuste même quand un callable peuple plusieurs tables liées entre elles.
 Ainsi `fixtures:purge --run` puis `fixtures:load --run` reconstruit un état propre sans casser de clé étrangère, autant de fois que vous voulez.
+Tout le démontage se déroule dans **une seule transaction** : c'est indispensable, car la désactivation des clés étrangères (`SET FOREIGN_KEY_CHECKS`) est une variable de connexion.
 Par défaut, une fixture vide les `tables` qu'elle a déclarées.
-Pour un démontage sur-mesure (l'inverse exact de votre `load()`), surchargez `purge()` :
+Pour un démontage sur-mesure (l'inverse exact de votre `load()`), surchargez `purge()` en gardant la signature `purge(self, *, tx=None)` et en **propageant `tx`** à vos `db.execute` (sinon ils repartent sur une autre connexion, hors de la transaction) :
 
 ```python
 class ReferentielFixture(Fixture):
@@ -97,10 +98,10 @@ class ReferentielFixture(Fixture):
     def load(self) -> None:
         import_referentiel("data/referentiel.json")
 
-    def purge(self) -> None:               # optionnel : sur-mesure
+    def purge(self, *, tx=None) -> None:        # optionnel : sur-mesure
         from core.database import db
-        db.execute("DELETE FROM niveau")
-        db.execute("DELETE FROM matiere")
+        db.execute("DELETE FROM niveau", tx=tx)
+        db.execute("DELETE FROM matiere", tx=tx)
 ```
 
 Une fixture qui écrit dans des tables non déclarées et ne surcharge pas `purge()` n'est pas purgée automatiquement : déclarez `tables`, ou écrivez `purge()`.

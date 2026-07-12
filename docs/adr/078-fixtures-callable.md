@@ -46,7 +46,7 @@ class ReferentielFixture(Fixture):
 - `load(self)` (requis) écrit en base **comme le reste du projet** : la fixture importe `core.database.db` (ou appelle une fonction applicative qui le fait). Le SQL vit dans le code applicatif, paramétré et visible (principe 7).
 - `tables: tuple[str, ...]` (optionnel) : les tables peuplées, pour l'ordre de chargement et la purge.
 - `depends_on: tuple[str, ...]` (optionnel) : noms d'entités ou de tables à charger avant.
-- `purge(self)` (optionnel) : démontage ; par défaut vide les `tables` déclarées, surchargeable pour un teardown sur-mesure.
+- `purge(self, *, tx=None)` (optionnel) : démontage ; par défaut vide les `tables` déclarées, surchargeable pour un teardown sur-mesure. Reçoit la transaction de `fixtures:purge` et la propage à ses `db.execute` (F52-bis).
 
 Le **préfixe numérique** du nom de fichier (`50_referentiel.py`, `90_bilan.py`) ordonne les fixtures callable entre elles, comme secours déclaratif.
 
@@ -85,10 +85,13 @@ La protection production reste identique (`--run` seul refusé en `APP_ENV=prod`
 
 `fixtures:purge` intègre les fixtures callable au démontage, en ordre inverse du chargement (les callable, qui dépendent des tables de base, sont purgées avant les `.sql`).
 
-Chaque `Fixture` porte une méthode `purge(self)` :
+Le démontage est encadré par la désactivation des contraintes de clés étrangères du dialecte (`foreign_key_checks_ddl`, ADR-054), robuste même pour un callable peuplant plusieurs tables liées.
+`SET FOREIGN_KEY_CHECKS` étant une variable de **session** (par connexion), tout le démontage se déroule dans **une seule transaction** (`core.database.transaction`) : la désactivation, tous les `DELETE` et la réactivation partagent la même connexion (F52-bis). Un `db.execute` sans `tx` repioche une connexion du pool où les FK restent actives.
 
-- par défaut, elle vide les `tables` déclarées (`DELETE FROM <table>` en ordre inverse) ;
-- une sous-classe peut la **surcharger** pour un démontage sur-mesure (l'inverse exact de son `load()`).
+Chaque `Fixture` porte une méthode `purge(self, *, tx=None)` :
+
+- par défaut, elle vide les `tables` déclarées (`DELETE FROM <table>` en ordre inverse), en propageant `tx` à ses `db.execute` ;
+- une sous-classe peut la **surcharger** pour un démontage sur-mesure (l'inverse exact de son `load()`), en gardant la signature `purge(self, *, tx=None)` et en propageant `tx`.
 
 Une fixture callable qui écrit dans des tables **non déclarées** et ne surcharge pas `purge()` n'est pas purgée automatiquement : limite documentée (déclarer `tables`, ou écrire `purge()`).
 
@@ -107,7 +110,7 @@ Le callable est réservé à ce que le SQL statique ne peut pas exprimer : impor
 - Surface d'API élargie (additive, rétro-compatible) :
     - `forge-mvc-fixtures` : classe `Fixture` (nouvelle, publique ; `load()`, `tables`, `depends_on`, `purge()`) ;
     - `fixtures:load` découvre, ordonne, affiche et exécute les `mvc/fixtures/*.py` ;
-    - `fixtures:purge` démonte les fixtures callable (`purge()`, défaut sur `tables`) en ordre inverse.
+    - `fixtures:purge` démonte les fixtures callable (`purge(*, tx=None)`, défaut sur `tables`) en ordre inverse, dans une transaction unique encadrée par la désactivation FK (F52-bis).
 - Un seed 100 % opt-in devient possible : `.sql` pour le statique et le relationnel, callable pour l'import et les agrégats, dans un ordre unique.
 - Le pipeline exécute du code applicatif : posture de sécurité alignée sur « lancer le projet », documentée.
 - Le SQL reste paramétré et visible (dans le code applicatif appelé) ; les fixtures `.py` sont versionnées et affichées avant exécution.

@@ -237,8 +237,8 @@ class TestPurgeCallable:
             "from core.database import db\n"
             "class CustomFixture(Fixture):\n"
             "    def load(self): ...\n"
-            "    def purge(self):\n"
-            "        db.execute('DELETE FROM custom WHERE Seed = 1')\n"
+            "    def purge(self, *, tx=None):\n"
+            "        db.execute('DELETE FROM custom WHERE Seed = 1', tx=tx)\n"
         )
         _write_callable(tmp_path, "custom.py", src)
         calls: list[str] = []

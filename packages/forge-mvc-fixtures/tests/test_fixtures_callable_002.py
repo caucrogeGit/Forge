@@ -306,6 +306,49 @@ class TestF52ForeignKeyWrap:
             "DELETE FROM niveau_classe",
         }
 
+    def test_all_statements_share_one_transaction(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        # F52-bis : SET FOREIGN_KEY_CHECKS est une variable de session (par
+        # connexion). Tout le démontage (SET, DELETE des .sql ET des callable)
+        # doit passer par le MÊME tx, sinon chaque db.execute repioche une
+        # connexion du pool où les FK restent actives.
+        class _Dialect:
+            def foreign_key_checks_ddl(self, *, enabled: bool) -> list[str]:
+                return [f"SET FOREIGN_KEY_CHECKS = {1 if enabled else 0}"]
+
+        class _Backend:
+            dialect = _Dialect()
+
+        import core.database.backend as backend_mod
+        monkeypatch.setattr(backend_mod, "get_backend", lambda: _Backend())
+
+        # un callable multi-tables + un .sql : les deux doivent partager le tx.
+        _write(
+            tmp_path, "mvc/fixtures/referentiel.py",
+            "from forge_mvc_fixtures import Fixture\n"
+            "class RefFixture(Fixture):\n"
+            "    tables = ('a', 'b')\n"
+            "    def load(self): ...\n",
+        )
+        _write(tmp_path, "mvc/fixtures/ville.sql", "INSERT INTO ville (nom) VALUES ('Lyon');")
+
+        seen_tx: list[object] = []
+
+        def execute(sql: str, params: object = (), *, tx: object = None) -> int:
+            seen_tx.append(tx)
+            return 0
+
+        import core.database.db as db_mod
+        monkeypatch.setattr(db_mod, "execute", execute)
+        rc = purge_fixtures(tmp_path, run=True, force=False, env="dev")
+        assert rc == 0
+        # Au moins : SET=0, DELETE b, DELETE a (callable), DELETE ville (.sql), SET=1.
+        assert len(seen_tx) >= 5
+        assert all(tx is not None for tx in seen_tx)
+        # Toutes les instructions partagent le même objet transaction (une connexion).
+        assert len({id(tx) for tx in seen_tx}) == 1
+
     def test_fk_reenabled_even_on_error(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:

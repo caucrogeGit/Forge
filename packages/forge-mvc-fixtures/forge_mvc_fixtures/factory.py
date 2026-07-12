@@ -15,7 +15,10 @@ magie ni d'auto-persistance, principe 3).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from core.database.transaction import Transaction
 
 DEFAULT_LOCALE = "fr_FR"
 
@@ -136,13 +139,21 @@ class Fixture:
             f"{type(self).__name__} doit définir load() (écriture en base)."
         )
 
-    def purge(self) -> None:
+    def purge(self, *, tx: "Transaction | None" = None) -> None:
         """Démonte ce que ``load()`` a écrit. Surchargeable.
 
         Par défaut, vide les ``tables`` déclarées (``DELETE FROM`` en ordre
-        inverse). Surchargez pour un démontage sur-mesure, l'inverse de ``load()``.
+        inverse). ``fixtures:purge`` déroule tout le démontage dans **une seule
+        transaction** et fournit ``tx`` : propagez-le à vos ``db.execute`` pour
+        que la désactivation des contraintes FK de la commande couvre bien vos
+        suppressions (variable de session, par connexion). Sans ``tx``, les
+        ``DELETE`` repartiraient sur d'autres connexions du pool, hors de la
+        transaction, et le levier FK ne les verrait pas (F52-bis).
+
+        Surchargez pour un démontage sur-mesure (l'inverse de ``load()``), en
+        gardant la signature ``purge(self, *, tx=None)`` et en propageant ``tx``.
         """
         from core.database import db
 
         for table in reversed(self.tables):
-            db.execute(f"DELETE FROM {table}")
+            db.execute(f"DELETE FROM {table}", tx=tx)

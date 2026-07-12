@@ -127,11 +127,15 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
         return 0
 
     from core.database import db
+    from core.database.transaction import transaction
 
-    # F52 (complément) : encadrer le démontage par la désactivation des contraintes
-    # FK du dialecte. Robuste et indépendant de l'ordre interne d'un callable
-    # multi-tables (dont les tables liées, ou un pivot, ne sont pas forcément
-    # ordonnées). Backend indisponible : on s'appuie sur le seul ordre inverse.
+    # F52 (complément) + F52-bis : encadrer le démontage par la désactivation des
+    # contraintes FK du dialecte, robuste et indépendant de l'ordre interne d'un
+    # callable multi-tables (tables liées, pivot hors relations.json). SET
+    # FOREIGN_KEY_CHECKS est une variable de SESSION (par connexion) : tout le
+    # démontage doit tenir dans UNE seule transaction (une connexion), sinon
+    # chaque db.execute repioche une connexion du pool où les FK sont actives.
+    # Backend non résolu : repli sur le seul ordre inverse (transaction sans FK-off).
     disable_ddl: list[str] = []
     enable_ddl: list[str] = []
     try:
@@ -147,34 +151,29 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
     deleted = 0
     purged_callables = 0
     try:
-        for statement in disable_ddl:
-            db.execute(statement)
-        for unit in teardown:
-            if unit.kind == "callable" and unit.fixture is not None:
-                try:
-                    unit.fixture().purge()
-                except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
-                    print(
-                        f"Erreur en démontant la fixture {unit.path.name} : {exc}",
-                        file=sys.stderr,
-                    )
-                    return 1
-                purged_callables += 1
-            else:
-                for table in _sql_tables_reversed(unit.path):
-                    statement = f"DELETE FROM {table}"
-                    try:
-                        db.execute(statement)
-                    except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
-                        print(
-                            f"Erreur en purgeant : {exc}\nInstruction : {statement}",
-                            file=sys.stderr,
-                        )
-                        return 1
-                    deleted += 1
-    finally:
-        for statement in enable_ddl:
-            db.execute(statement)
+        with transaction() as tx:
+            for statement in disable_ddl:
+                db.execute(statement, tx=tx)
+            try:
+                for unit in teardown:
+                    if unit.kind == "callable" and unit.fixture is not None:
+                        unit.fixture().purge(tx=tx)
+                        purged_callables += 1
+                    else:
+                        for table in _sql_tables_reversed(unit.path):
+                            db.execute(f"DELETE FROM {table}", tx=tx)
+                            deleted += 1
+            finally:
+                # Réactiver les FK sur la MÊME connexion avant de la rendre au pool
+                # (variable de session non transactionnelle : pas remise par le rollback).
+                for statement in enable_ddl:
+                    db.execute(statement, tx=tx)
+    except Exception as exc:  # noqa: BLE001 — la transaction a été annulée (rollback)
+        print(
+            f"Erreur en purgeant (démontage annulé) : {exc}",
+            file=sys.stderr,
+        )
+        return 1
 
     suffix = (
         f" et {purged_callables} fixture(s) Python démontée(s)" if purged_callables else ""
