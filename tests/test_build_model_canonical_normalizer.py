@@ -23,6 +23,7 @@ import pytest
 
 from forge_mvc_entities.canonical_model_normalizer import (
     CanonicalNormalizationError,
+    column_for_field,
     normalize_canonical_entity_for_model_build,
 )
 
@@ -365,6 +366,35 @@ class TestSystemFields:
     def test_soft_delete_false_no_deleted_at(self):
         result = _normalize(_entity(options={"soft_delete": False}))
         assert _find_field(result, "deleted_at") is None
+
+
+# ── Mapping champ vers colonne (ADR-069 / ADR-077) ────────────────────────────
+
+class TestColumnForField:
+    """`column_for_field` : source unique du mapping champ vers colonne SQL."""
+
+    def test_ordinary_field_is_pascal_case(self):
+        assert column_for_field(_field("date_naissance", "date")) == "DateNaissance"
+
+    def test_single_word_field_is_capitalised(self):
+        assert column_for_field(_field("nom", "string")) == "Nom"
+
+    def test_foreign_key_keeps_snake_case(self):
+        assert column_for_field(_field("annee_scolaire_id", "foreign_key")) == "annee_scolaire_id"
+
+    def test_matches_normalizer_column(self):
+        # La colonne exposée par la fonction publique coïncide avec celle que le
+        # normaliseur écrit dans le modèle (une seule source de vérité).
+        result = _normalize(_entity(fields=[
+            _field("user_id", "foreign_key"),
+            _field("date_naissance", "date"),
+        ]))
+        assert _find_field(result, "user_id")["column"] == column_for_field(
+            _field("user_id", "foreign_key")
+        )
+        assert _find_field(result, "date_naissance")["column"] == column_for_field(
+            _field("date_naissance", "date")
+        )
 
 
 # ── Indexes ignorés ───────────────────────────────────────────────────────────

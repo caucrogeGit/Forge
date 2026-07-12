@@ -13,10 +13,26 @@ from __future__ import annotations
 
 import json
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, cast
 
-__all__ = ["provider_for_field", "render_factory", "make_factory", "main"]
+# Dependance douce a forge-mvc-entities (ADR-077) : producteur des contrats, il
+# expose la source unique du mapping champ vers colonne. Absent, on retombe sur
+# le nom de champ brut (mode degrade documente).
+_entities_column_for_field: Callable[[dict[str, Any]], str] | None
+try:
+    from forge_mvc_entities import column_for_field as _entities_column_for_field
+except ImportError:  # pragma: no cover - depend de l'environnement d'installation
+    _entities_column_for_field = None
+
+__all__ = [
+    "column_for_field",
+    "provider_for_field",
+    "render_factory",
+    "make_factory",
+    "main",
+]
 
 
 class MakeFactoryError(Exception):
@@ -58,6 +74,19 @@ _PROVIDER_BY_NAME: list[tuple[tuple[str, ...], str]] = [
 ]
 
 _TEXTUAL_TYPES = {"string", "text", "slug"}
+
+
+def column_for_field(field: dict[str, Any]) -> str:
+    """Colonne SQL reelle d'un champ de contrat (ADR-077).
+
+    Delegue a ``forge_mvc_entities.column_for_field`` (source unique du mapping
+    champ vers colonne : ``Id`` pour la PK, snake conserve pour un
+    ``foreign_key``, PascalCase sinon). En son absence (dependance douce), repli
+    sur le nom de champ brut, mode degrade documente.
+    """
+    if _entities_column_for_field is not None:
+        return _entities_column_for_field(field)
+    return str(field.get("name", ""))
 
 
 def provider_for_field(field: dict[str, Any]) -> tuple[str, str]:
@@ -106,9 +135,9 @@ def render_factory(contract: dict[str, Any]) -> str:
         if not isinstance(field_obj, dict):
             continue
         field = cast("dict[str, Any]", field_obj)
-        column = str(field.get("name", ""))
-        if not column:
+        if not str(field.get("name", "")):
             continue
+        column = column_for_field(field)
         expr, comment = provider_for_field(field)
         field_lines.append(f'            "{column}": {expr},{comment}')
 

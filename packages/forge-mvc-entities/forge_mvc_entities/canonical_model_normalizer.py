@@ -61,6 +61,26 @@ def _column_from_name(name: str) -> str:
     return "".join(part.capitalize() for part in name.split("_") if part)
 
 
+def column_for_field(field: dict[str, Any]) -> str:
+    """Nom de colonne SQL d'un champ de contrat d'entite (ADR-069, ADR-077).
+
+    Convention canonique, source unique du mapping champ vers colonne :
+
+    - un champ `foreign_key` garde son nom snake_case (`annee_scolaire_id`), en
+      coherence avec la colonne emise par `build:model` ;
+    - tout autre champ passe en PascalCase (`user_id` vers `UserId`,
+      `nom` vers `Nom`).
+
+    La cle primaire (`Id`) n'est pas un champ de contrat : elle n'est pas
+    concernee. Fonction publique consommee par `forge-mvc-fixtures`
+    (`make-factory`) pour echafauder les colonnes reelles (ADR-077).
+    """
+    name = str(field.get("name", ""))
+    if str(field.get("type", "")) == "foreign_key":
+        return name
+    return _column_from_name(name)
+
+
 def _build_sql_and_python_type(forge_type: str, field: dict[str, Any]) -> tuple[str, str]:
     field_name = field.get("name", "?")
     dialect = _dialect()
@@ -141,9 +161,8 @@ def _normalize_field(field: dict[str, Any]) -> dict[str, Any]:
     if "max" in field and python_type in ("int", "float"):
         constraints["max_value"] = field["max"]
 
-    # ADR-069 : une clé étrangère garde le nom de colonne snake_case fidèle au
-    # dictionnaire (annee_scolaire_id), là où un champ ordinaire est en PascalCase.
-    column = name if forge_type == "foreign_key" else _column_from_name(name)
+    # ADR-069 / ADR-077 : mapping champ vers colonne, source unique.
+    column = column_for_field(field)
 
     normalized: dict[str, Any] = {
         "name": name,

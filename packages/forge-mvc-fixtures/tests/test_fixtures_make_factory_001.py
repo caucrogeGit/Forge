@@ -13,6 +13,7 @@ import pytest
 pytest.importorskip("forge_mvc_fixtures")
 
 from forge_mvc_fixtures.cli.make_factory import (
+    column_for_field,
     make_factory,
     provider_for_field,
     render_factory,
@@ -72,13 +73,33 @@ class TestProviderMapping:
         assert "boolean" in expr
 
 
+class TestColumnMapping:
+    """F45 (ADR-077) : le scaffold porte les colonnes réelles de l'entité."""
+
+    @pytest.mark.parametrize("name, ftype, expected", [
+        ("title", "string", "Title"),
+        ("content", "text", "Content"),
+        ("published_at", "datetime", "PublishedAt"),
+        ("author_email", "email", "AuthorEmail"),
+        ("category_id", "foreign_key", "category_id"),
+    ])
+    def test_column_for_field(self, name: str, ftype: str, expected: str) -> None:
+        assert column_for_field({"name": name, "type": ftype}) == expected
+
+
 class TestRenderFactory:
 
     def test_valid_python_with_class_and_table(self) -> None:
         src = render_factory(ARTICLE)
         assert "class ArticleFactory(Factory):" in src
         assert 'table = "articles"' in src
-        assert '"title":' in src and '"category_id": 1,' in src
+        # F45 : colonnes réelles (PascalCase) ; une clé étrangère garde son snake.
+        assert '"Title":' in src
+        assert '"PublishedAt":' in src
+        assert '"AuthorEmail":' in src
+        assert '"category_id": 1,' in src
+        # pas de fuite du nom de champ snake pour les champs ordinaires
+        assert '"title":' not in src
         # le code généré doit être du Python valide
         compile(src, "<factory>", "exec")
 

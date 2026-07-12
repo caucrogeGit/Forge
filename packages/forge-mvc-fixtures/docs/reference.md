@@ -204,12 +204,15 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
             villes = []
             for i in range(count):
                 villes.append({
-                    "nom": self.faker.city(),
-                    "code_postal": self.faker.postcode(),
-                    "prefecture": i == 0,       # condition
+                    "Nom": self.faker.city(),
+                    "CodePostal": self.faker.postcode(),
+                    "Prefecture": i == 0,       # condition
                 })
             return villes
     ```
+
+    Les clés du dict sont les **colonnes réelles** de la table, pas les noms de champs du contrat : `Nom`, `CodePostal` (PascalCase), une clé étrangère gardant son nom snake (`user_id`).
+    C'est ce que `fixtures:make-factory` échafaude désormais (ADR-077), via le mapping canonique de `forge-mvc-entities`.
 
     ### 8.2 Générer puis charger
 

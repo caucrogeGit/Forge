@@ -24,6 +24,7 @@ pour l'usage applicatif (`from forge_mvc_entities import PivotAdvancedService`).
 """
 from __future__ import annotations
 
+from forge_mvc_entities.canonical_model_normalizer import column_for_field
 from forge_mvc_entities.service import (
     PivotAdvancedService,
     PivotConstraintError,
@@ -39,6 +40,7 @@ __all__ = [
     "PivotFieldConstraint",
     "PivotFormError",
     "PivotRow",
+    "column_for_field",
     "pivot_error_to_form_error",
 ]
 

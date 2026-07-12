@@ -33,7 +33,7 @@ Rappel du mapping (normaliseur `forge-mvc-entities`, ADR-069) : la PK est `Id` ;
 
 ## Décision
 
-### F45 — Colonnes réelles
+### F45 : colonnes réelles
 
 `fixtures:make-factory` échafaude le dict de la factory avec les **colonnes réelles** de l'entité, plus les noms de champs.
 
@@ -42,7 +42,7 @@ Le mapping champ vers colonne est la convention canonique du normaliseur : `Id` 
 
 `fixtures:generate` est **inchangé** : il rend les clés du dict telles quelles. Les factories portant désormais les colonnes réelles, le SQL généré utilise `Nom`, `UserId`, etc., correct pour le backend installé (cohérent ADR-075).
 
-### F43 — Références inter-fixtures
+### F43 : références inter-fixtures
 
 Nouvelle API de `Factory` : `self.reference(table, key_column, value)` renvoie un sentinelle `FixtureReference` au lieu d'une valeur littérale.
 
@@ -56,7 +56,7 @@ La résolution se fait donc à la **charge** (`fixtures:load`), contre les vrais
 
 `fixtures:make-factory` : pour un champ **clé étrangère** (type `foreign_key`, ou FK de l'entité déclarée dans `relations.json`), échafaude un `self.reference("<table cible>", "<clé naturelle>", ...)` commenté (avec un TODO sur la clé naturelle) au lieu de `random_int`.
 
-### F44 — Ordre de chargement par dépendances FK
+### F44 : ordre de chargement par dépendances FK
 
 `fixtures:load` ordonne les fichiers par **tri topologique** du graphe de dépendances déduit de `relations.json` : une entité est chargée après celles qu'elle référence (les `users` avant `eleve`, `annee_scolaire`/`niveau_classe` avant `classe`).
 Chaque fichier `.sql` est rattaché à sa table (via `INSERT INTO <table>`), puis à son entité.
@@ -66,7 +66,7 @@ Replis :
 - `relations.json` absent, table inconnue, ou **cycle** de dépendances : retour à l'ordre par nom de fichier (le préfixe numérique `01_`, `02_` reste un ordre déclaratif de secours) ;
 - option `--no-fk-checks` : encadre le chargement par la désactivation des contraintes du dialecte (`SET FOREIGN_KEY_CHECKS=0/1` en MariaDB ; équivalent PostgreSQL exposé par le backend), pour les jeux non triables.
 
-### Piste « fixtures callable » — différée
+### Piste « fixtures callable » (différée)
 
 Deux étapes d'un seed complet restent de la logique métier hors SQL : import d'un référentiel depuis un JSON canonique, et données calculées (agrégations).
 Un hook Python exécuté par `fixtures:load` sort du modèle « SQL visible, relu » et mérite un examen séparé (dépendance, ordre, sécurité).
