@@ -65,8 +65,8 @@ Avant de charger un `mvc/fixtures/*.py`, la racine du projet (où vivent `config
 Le pipeline ordonne un ensemble d'**unités** (les fichiers `.sql` et les fixtures callable) par un **unique graphe fournit / dépend** (retour terrain F50) :
 
 - chaque unité **fournit** des tables : les `INSERT INTO` d'un `.sql`, les `tables` d'un callable ;
-- chaque unité **dépend** de tables : les clés étrangères de ses tables fournies (graphe de `relations.json`), plus les `depends_on` d'un callable (résolus en tables) ;
-- une unité qui dépend d'une table passe après **toute** unité qui la fournit, quel qu'en soit le type. Un callable fournissant `niveau_classe` est donc ordonné avant un `.sql` dont une clé étrangère en dépend.
+- chaque unité **dépend** de tables : les clés étrangères de ses tables fournies (graphe de `relations.json`), les tables citées par une sous-requête `reference()` d'un `.sql` (`SELECT Id FROM <table>`, F43, même hors `relations.json` comme la table de socle `users`), plus les `depends_on` d'un callable (résolus en tables) ;
+- une unité qui dépend d'une table passe après **toute** unité qui la fournit, quel qu'en soit le type. Un callable fournissant `niveau_classe` (ou `users`) est donc ordonné avant un `.sql` dont une clé étrangère ou une `reference()` en dépend.
 
 Le tri topologique de ce graphe est déterministe : à contrainte égale, les `.sql` passent avant les callable, puis on départage par nom de fichier (préfixe numérique `50_`, `90_` compris).
 Repli en cas de cycle : les unités restantes dans ce même ordre déterministe.

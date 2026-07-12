@@ -44,6 +44,8 @@ __all__ = [
 ]
 
 _INSERT_INTO = re.compile(r"INSERT\s+INTO\s+[`\"\[]?(\w+)", re.IGNORECASE)
+# Table citée par une sous-requête de reference() (F43) : (SELECT Id FROM <table> …).
+_FROM_TABLE = re.compile(r"\bFROM\s+[`\"\[]?(\w+)", re.IGNORECASE)
 
 
 class FixtureDiscoveryError(Exception):
@@ -264,6 +266,20 @@ def _tables_of_file(path: Path) -> set[str]:
     return {match.group(1) for match in _INSERT_INTO.finditer(text)}
 
 
+def _referenced_tables_of_file(path: Path) -> set[str]:
+    """Tables citées par un ``.sql`` via une sous-requête ``FROM`` (F51).
+
+    Une factory `reference("users", …)` (F43) rend `(SELECT Id FROM users …)` :
+    la table lue est une **dépendance** d'ordonnancement, même si elle n'est pas
+    déclarée dans ``relations.json`` (table du socle, comme ``users``).
+    """
+    try:
+        text = _strip_line_comments(path.read_text(encoding="utf-8"))
+    except OSError:
+        return set()
+    return {match.group(1) for match in _FROM_TABLE.finditer(text)}
+
+
 def order_load_units(
     root: Path,
     sql_files: list[Path],
@@ -303,7 +319,7 @@ def order_load_units(
     depends: list[set[str]] = []
     for path in sql_files:
         tables = _tables_of_file(path)
-        dep: set[str] = set()
+        dep: set[str] = _referenced_tables_of_file(path)  # F51 : sous-requêtes reference()
         for table in tables:
             dep |= fk_tables_of(table)
         units.append(LoadUnit("sql", path))

@@ -165,3 +165,50 @@ class TestF50ProviderOrder:
             "INSERT INTO classe (Nom, NiveauClasseId) VALUES "
             "('CP', (SELECT Id FROM niveau_classe WHERE Code = 'CP' LIMIT 1))",
         ]
+
+
+class TestF51ReferenceOrder:
+    """F51 : une reference() vers une table hors relations.json est une dépendance."""
+
+    def _make(self, root: Path) -> None:
+        # comptes.py (callable) fournit users ; eleve.sql y référence users par
+        # sous-requête (reference("users", …)). users n'est pas une entité mvc/.
+        _write(
+            root, "mvc/fixtures/comptes.py",
+            "from forge_mvc_fixtures import Fixture\n"
+            "from core.database import db\n"
+            "class ComptesFixture(Fixture):\n"
+            "    tables = ('users', 'user_roles')\n"
+            "    def load(self):\n"
+            "        db.execute(\"INSERT INTO users (email) VALUES ('a@b.fr')\")\n",
+        )
+        _write(
+            root, "mvc/fixtures/eleve.sql",
+            "INSERT INTO eleve (Nom, UserId) VALUES "
+            "('Dupont', (SELECT Id FROM users WHERE email = 'a@b.fr' LIMIT 1));",
+        )
+
+    def test_reference_orders_after_provider(self, tmp_path: Path) -> None:
+        self._make(tmp_path)
+        units = order_load_units(
+            tmp_path, collect_fixture_files(tmp_path), collect_callable_fixtures(tmp_path)
+        )
+        order = [u.path.name for u in units]
+        # eleve.sql référence users (fourni par comptes.py) : chargé après.
+        assert order.index("comptes.py") < order.index("eleve.sql")
+
+    def test_load_runs_provider_before_reference(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        self._make(tmp_path)
+        calls: list[str] = []
+        import core.database.db as db_mod
+        monkeypatch.setattr(db_mod, "execute", lambda sql, *a, **k: calls.append(sql) or 0)
+        rc = load_fixtures(tmp_path, run=True, force=False, env="dev")
+        assert rc == 0
+        # comptes.load() crée users AVANT l'INSERT eleve qui le référence.
+        assert calls == [
+            "INSERT INTO users (email) VALUES ('a@b.fr')",
+            "INSERT INTO eleve (Nom, UserId) VALUES "
+            "('Dupont', (SELECT Id FROM users WHERE email = 'a@b.fr' LIMIT 1))",
+        ]
