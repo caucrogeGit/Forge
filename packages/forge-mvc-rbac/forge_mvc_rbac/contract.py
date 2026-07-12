@@ -278,15 +278,33 @@ def _legacy_session_user(request: Any) -> "dict[str, Any] | None":
     return cast("dict[str, Any]", user) if isinstance(user, dict) else None
 
 
+def _roles_from_modern_auth(request: Any) -> list[str]:
+    """Rôles résolus en base sous l'auth moderne (ADR-010), sans injection préalable.
+
+    `get_authenticated_user_id` (identité seule en session) -> `get_user_role_slugs`
+    (user_roles -> roles.slug). Fonctionne partout, y compris routes publiques.
+    Tuple vide si non authentifié ou tables de rôles absentes (mode dégradé).
+    """
+    from core.auth.session import get_authenticated_user_id
+
+    from forge_mvc_rbac.resolver import get_user_role_slugs
+
+    user_id = get_authenticated_user_id(request)
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+        return []
+    return list(get_user_role_slugs(user_id))
+
+
 def get_request_roles(request: Any) -> list[str]:
     """Extrait les rôles de la requête/session courante.
 
     Ordre de résolution :
-    1. `request.roles` — **point d'injection canonique sous l'auth moderne**
-       (ADR-010) : l'application charge l'utilisateur (`current_user`) puis pose
-       ses rôles sur la requête (middleware) ; le RBAC contractuel les lit ici.
-    2. session utilisateur **legacy** (dépréciée, ADR-012) → champ "roles".
-    3. liste vide si rien trouvé.
+    1. `request.roles` — injection directe (middleware, cache par requête).
+    2. **auth moderne, résolution en base** (ADR-010) : identité en session
+       (`get_authenticated_user_id`) puis `user_roles -> roles.slug`. Auto-suffisant :
+       marche sur les routes publiques sans injection préalable.
+    3. session utilisateur **legacy** (dépréciée, ADR-012) → champ "roles".
+    4. liste vide si rien trouvé.
 
     Ne lève jamais d'erreur si la requête ou la session est absente. N'appelle
     plus `core.security.session.get_user` (déprécié) : F30.
@@ -296,6 +314,13 @@ def get_request_roles(request: Any) -> list[str]:
         if isinstance(injected, list):
             return [r for r in cast("list[Any]", injected) if isinstance(r, str)]
         return []
+
+    try:
+        modern = _roles_from_modern_auth(request)
+    except Exception:
+        modern = []
+    if modern:
+        return modern
 
     try:
         utilisateur = _legacy_session_user(request)

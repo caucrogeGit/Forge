@@ -30,6 +30,15 @@ ORDER BY role_id
 """
 
 
+SELECT_USER_ROLE_SLUGS_SQL = """\
+SELECT r.slug AS slug
+FROM user_roles ur
+JOIN roles r ON r.id = ur.role_id
+WHERE ur.user_id = ?
+ORDER BY r.slug
+"""
+
+
 SELECT_USER_PERMISSIONS_SQL = """\
 SELECT DISTINCT p.code AS code
 FROM user_roles ur
@@ -103,6 +112,34 @@ def get_user_role_ids(
         role_ids.add(role_id)
 
     return tuple(sorted(role_ids))
+
+
+def get_user_role_slugs(
+    user_id: int,
+    *,
+    fetch_all: FetchAll | None = None,
+) -> tuple[str, ...]:
+    """Retourne les slugs de rôles associés à user_id (pont vers le contrat RBAC).
+
+    Fait le lien user_id -> user_roles -> roles.slug. Les slugs sont l'identité
+    des rôles côté contrat (rbac.json), d'où ce résolveur dédié en plus des
+    role_id. Retourne un tuple sans doublon, dans l'ordre des slugs ; tuple vide
+    si aucune table (mode dégradé) ou aucun rôle.
+    """
+    validate_user_role_user_id(user_id)
+
+    slugs: list[str] = []
+    seen: set[str] = set()
+    for row in _fetch_rows(fetch_all, SELECT_USER_ROLE_SLUGS_SQL, (user_id,)):
+        if not isinstance(row, dict) or "slug" not in row:  # pyright: ignore[reportUnnecessaryIsInstance]
+            raise AuthUserRbacResolverError("ligne roles invalide")
+        slug = row["slug"]
+        if not isinstance(slug, str) or not slug:
+            raise AuthUserRbacResolverError("slug de rôle invalide")
+        if slug not in seen:
+            seen.add(slug)
+            slugs.append(slug)
+    return tuple(slugs)
 
 
 def get_user_permissions(
