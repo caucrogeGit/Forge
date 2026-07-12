@@ -37,6 +37,8 @@ Points clés :
 - `tables` déclare les tables peuplées : elles servent à l'ordre de chargement et à la purge.
 - `depends_on` liste les entités ou tables à charger avant.
 
+`fixtures:load` place la racine du projet dans le chemin d'import : votre `from mvc.services… import …` fonctionne exactement comme dans le reste de l'application.
+
 ## Un exemple qui calcule
 
 Rien n'oblige à appeler un importeur : `load()` est du code Python ordinaire.
@@ -67,7 +69,8 @@ Un préfixe numérique dans le nom du fichier ordonne les fixtures callable entr
 ## Un seul pipeline, un seul ordre
 
 `fixtures:load` découvre vos `mvc/fixtures/*.py` et les mêle aux `.sql` dans **un seul ordre** :
-le tri topologique des dépendances de clés étrangères (vu au palier précédent) place chaque unité, `.sql` comme callable, après ce dont elle dépend.
+le tri topologique des dépendances (clés étrangères de `relations.json`, liens `reference()`, `depends_on`) place chaque unité, `.sql` comme callable, après **toute** unité qui fournit une table dont elle dépend.
+Un callable déclarant `tables = ("niveau_classe",)` est donc chargé avant un `.sql` dont une clé étrangère pointe `niveau_classe`.
 
 Comme partout dans Forge, la commande **affiche** d'abord et n'exécute rien :
 

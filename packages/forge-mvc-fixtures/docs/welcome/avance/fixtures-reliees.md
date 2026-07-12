@@ -59,8 +59,9 @@ Rien de caché : vous voyez la sous-requête, vous la relisez, vous la comprenez
 ## L'ordre de chargement suit les clés étrangères
 
 Un compte `users` doit exister avant l'`eleve` qui le référence.
-`fixtures:load` s'en charge : il ordonne les fichiers par **tri topologique** du graphe de clés étrangères déclaré dans `mvc/entities/relations.json`.
-La table `users` est chargée avant `eleve`, même si le nom de fichier `eleve.sql` vient avant `users.sql` dans l'alphabet.
+`fixtures:load` s'en charge : il ordonne les fichiers par **tri topologique** de leurs dépendances : les clés étrangères déclarées dans `mvc/entities/relations.json`, mais aussi les liens `reference()` eux-mêmes.
+Ainsi une factory qui pose `reference("users", …)` est chargée après ce qui fournit `users`, même si `users` n'est pas une entité `mvc/entities/`.
+La table `users` est donc chargée avant `eleve`, même si le nom de fichier `eleve.sql` vient avant `users.sql` dans l'alphabet.
 
 ```bash
 forge fixtures:load --run

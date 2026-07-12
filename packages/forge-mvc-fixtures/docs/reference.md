@@ -264,8 +264,9 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
 
     ### 9.3 Ordre de chargement par dépendances
 
-    `fixtures:load` ordonne les fichiers par **tri topologique** du graphe de clés étrangères déduit de `relations.json` : une table est chargée après celles qu'elle référence (`users` avant `eleve`).
-    Repli sur l'ordre du nom de fichier si `relations.json` est absent ou en cas de cycle (le préfixe `01_`, `02_` reste un ordre déclaratif de secours).
+    `fixtures:load` ordonne les unités par **tri topologique** d'un graphe de dépendances : chaque `.sql` est chargé après les tables dont il dépend, qu'elles viennent d'une clé étrangère de `relations.json` (`users` avant `eleve`) ou d'une sous-requête `reference()` (`SELECT Id FROM users …`, même pour une table de socle comme `users`, hors `relations.json`).
+    Les fixtures callable (chapitre 10) entrent dans le même graphe : une unité passe après **toute** unité qui fournit une table dont elle dépend, `.sql` comme `.py`.
+    Repli sur l'ordre du nom de fichier si le graphe est absent ou en cas de cycle (le préfixe `01_`, `02_` reste un ordre déclaratif de secours).
 
     Pour un jeu non triable (cycle de dépendances), `--no-fk-checks` encadre le chargement par la désactivation des contraintes du dialecte (`SET FOREIGN_KEY_CHECKS` en MariaDB, `PRAGMA foreign_keys` en SQLite, `session_replication_role` en PostgreSQL ; sans effet en SQL Server).
 
