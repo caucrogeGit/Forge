@@ -21,7 +21,11 @@ from pathlib import Path
 from typing import Any, cast
 
 from core.http.response import Response          # noqa: E402
-from core.security.session import get_user       # noqa: E402
+from core.sessions.keys import (                 # noqa: E402
+    SESSION_KEY_AUTHENTICATED,
+    SESSION_KEY_USER,
+    session_get,
+)
 
 
 _RBAC_CONTRACT_RELATIVE = Path("mvc") / "security" / "rbac.json"
@@ -255,15 +259,37 @@ def require_contract_permission(
 # ---------------------------------------------------------------------------
 
 
+def _legacy_session_user(request: Any) -> "dict[str, Any] | None":
+    """Utilisateur de la session **legacy** (dépréciée), sans passer par le
+    `core.security.session.get_user` déprécié : on résout la session via les
+    primitives non dépréciées et on lit directement les clés legacy.
+
+    Retourne None si la session est absente ou non authentifiée.
+    """
+    from core.security.session import get_session, get_session_id
+
+    session_id = get_session_id(request)
+    if not session_id:
+        return None
+    session = get_session(session_id)
+    if not session or not session_get(session, SESSION_KEY_AUTHENTICATED):
+        return None
+    user = session_get(session, SESSION_KEY_USER)
+    return cast("dict[str, Any]", user) if isinstance(user, dict) else None
+
+
 def get_request_roles(request: Any) -> list[str]:
     """Extrait les rôles de la requête/session courante.
 
     Ordre de résolution :
-    1. request.roles (injection directe, tests)
-    2. session utilisateur → champ "roles"
-    3. liste vide si rien trouvé
+    1. `request.roles` — **point d'injection canonique sous l'auth moderne**
+       (ADR-010) : l'application charge l'utilisateur (`current_user`) puis pose
+       ses rôles sur la requête (middleware) ; le RBAC contractuel les lit ici.
+    2. session utilisateur **legacy** (dépréciée, ADR-012) → champ "roles".
+    3. liste vide si rien trouvé.
 
-    Ne lève jamais d'erreur si la requête ou la session est absente.
+    Ne lève jamais d'erreur si la requête ou la session est absente. N'appelle
+    plus `core.security.session.get_user` (déprécié) : F30.
     """
     injected = getattr(request, "roles", None)
     if injected is not None:
@@ -272,7 +298,7 @@ def get_request_roles(request: Any) -> list[str]:
         return []
 
     try:
-        utilisateur = get_user(request)
+        utilisateur = _legacy_session_user(request)
     except Exception:
         return []
 
