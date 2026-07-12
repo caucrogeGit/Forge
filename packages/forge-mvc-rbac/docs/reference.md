@@ -350,6 +350,21 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     La dépendance va dans un seul sens : `forge-mvc-rbac` → `core`.
     `core/auth/audit.py` peut nommer des événements d'audit RBAC génériques : ce vocabulaire est assumé dans le core (ADR-011), il ne représente pas une dépendance fonctionnelle vers le module opt-in.
 
+## Garde par préfixe d'URL (`prefix_guard.py`)
+
+Le module `prefix_guard.py` fournit `PrefixPermissionMiddleware`, une garde RBAC **par préfixe d'URL** (et non route par route).
+On lui passe une table `préfixe -> permission` ; à chaque requête, le préfixe le plus spécifique qui matche impose sa permission contractuelle (403 sinon).
+Il couvre ainsi des domaines entiers, y compris leurs routes futures, sans décoration ni passe sur le routeur.
+Il s'installe comme middleware d'`Application` et s'adosse au contrat (`get_request_roles` + `has_contract_permission`).
+
+## Provider Jinja du modèle contrat
+
+Pour un `can()` de template adossé au contrat (rbac.json), `jinja.py` expose `make_contract_jinja_can`, `make_contract_jinja_context` et `register_contract_rbac_provider`, en complément du provider table par défaut.
+
+## Résolution des rôles en base (`resolver.py`)
+
+`get_user_role_slugs(user_id)` fait le pont `user_roles -> roles.slug` : il fournit les slugs de rôles d'un utilisateur au modèle contrat, ce qui permet à `get_request_roles` de résoudre les rôles sous l'auth moderne sans injection préalable.
+
 ## Voir aussi
 
 - [Cœur RBAC (rbac.py)](references/rbac.md) : modèle, primitives, `make_can`.

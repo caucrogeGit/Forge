@@ -136,8 +136,8 @@ def make_contract_jinja_can(
 
     Réutilise ``get_request_roles`` (request.roles puis résolution en base sous
     l'auth moderne, puis session legacy) et ``has_contract_permission``. Ne requiert
-    **aucune** table ``permissions``/``role_permissions`` (à la différence du provider
-    table par défaut). Ne lève jamais vers le template.
+    **aucune** table du modèle table (à la différence du provider par défaut). Ne
+    lève jamais vers le template.
     """
     from forge_mvc_rbac.contract import (
         get_request_roles,
@@ -178,7 +178,7 @@ def register_contract_rbac_provider() -> None:
 
     À appeler par une application en modèle contrat (rbac.json), au lieu du provider
     table auto-enregistré : le ``can()`` des templates s'adosse alors au contrat,
-    sans tables ``permissions``/``role_permissions``. Remplace un provider maison.
+    sans les tables du modèle table. Remplace un provider maison.
     """
     from core.mvc.controller.registry import register_jinja_context_provider
 

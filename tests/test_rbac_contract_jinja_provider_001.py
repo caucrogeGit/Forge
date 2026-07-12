@@ -81,6 +81,14 @@ class TestContractContext:
         assert ctx["can"]("article.delete") is True
 
 
-def test_register_contract_provider_does_not_raise() -> None:
-    # L'enregistrement dans le registre core est disponible et sans effet de bord fatal.
-    register_contract_rbac_provider()
+def test_register_contract_provider_registers_and_restores() -> None:
+    # Enregistre le provider contrat, puis restaure le registre pour ne pas
+    # polluer les autres tests (le registre core est un état global partagé).
+    from core.mvc.controller import registry
+
+    before = registry.iter_jinja_context_providers()
+    try:
+        register_contract_rbac_provider()
+        assert make_contract_jinja_context_with_can in registry.iter_jinja_context_providers()
+    finally:
+        registry._providers[:] = before  # pyright: ignore[reportPrivateUsage]
