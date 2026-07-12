@@ -2,12 +2,14 @@
 
 `forge-mvc-fixtures` est l'opt-in de **données de démonstration et de test** de Forge (ADR-074).
 
-Il ajoute deux commandes une fois installé :
+Il ajoute quatre commandes une fois installé :
 
 - `forge fixtures:load` charge des jeux de données dans la base de l'environnement actif ;
-- `forge fixtures:purge` vide les tables ciblées pour repartir d'un état propre.
+- `forge fixtures:purge` vide les tables ciblées pour repartir d'un état propre ;
+- `forge fixtures:make-factory` échafaude une factory depuis le contrat d'entité ;
+- `forge fixtures:generate` exécute la factory et écrit un `.sql` (données Faker).
 
-C'est un opt-in **à ligne de commande seule** : aucune API runtime, une application ne l'importe jamais à l'exécution.
+C'est un opt-in **à ligne de commande seule** : aucune API de runtime, une application ne l'importe jamais dans le chemin d'une requête.
 
 ## Pour qui, pourquoi
 
