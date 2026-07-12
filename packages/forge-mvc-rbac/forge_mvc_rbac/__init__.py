@@ -32,6 +32,7 @@ from forge_mvc_rbac.contract import (
     require_contract_permission_for_request,
 )
 from forge_mvc_rbac.authorization import auth_user_can, require_user_permission
+from forge_mvc_rbac.prefix_guard import PrefixPermissionMiddleware
 from forge_mvc_rbac.jinja import (
     AuthJinjaUser,
     get_jinja_current_user,
@@ -109,6 +110,7 @@ __all__ = [
     "make_contract_jinja_context",
     "make_contract_jinja_context_with_can",
     "register_contract_rbac_provider",
+    "PrefixPermissionMiddleware",
     "sanitize_jinja_user",
     "Permission",
     "PermissionDenied",
