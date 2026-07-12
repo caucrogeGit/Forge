@@ -69,11 +69,19 @@ forge fixtures:load --run
 Si un jeu n'est pas triable (une dépendance circulaire), l'option `--no-fk-checks` désactive les contraintes le temps du chargement, puis les réactive.
 À réserver aux cas où l'ordre ne suffit pas : par défaut, l'ordre topologique respecte l'intégrité, ce qui est préférable.
 
+## Les timestamps sont posés pour vous
+
+Beaucoup d'entités déclarent `options.timestamps: true` : les colonnes `CreatedAt` et `UpdatedAt` sont `NOT NULL`, sans valeur par défaut en base.
+Vous n'avez pas à les écrire dans chaque factory : `fixtures:generate` lit le contrat de l'entité et les ajoute automatiquement aux `INSERT`, avec un horodatage constant (fixtures reproductibles).
+
+Si vous fournissez vous-même `CreatedAt` dans la factory, c'est votre valeur qui est gardée ; une entité sans timestamps n'est pas concernée.
+
 ## Ce qu'il faut retenir
 
 - les clés du dict sont les colonnes réelles de la table ;
 - `self.reference(table, colonne, valeur)` relie une ligne à une autre par une clé naturelle, sans `Id` en dur ;
-- `fixtures:load` charge dans l'ordre des dépendances ; `--no-fk-checks` reste une échappatoire pour les cycles.
+- `fixtures:load` charge dans l'ordre des dépendances ; `--no-fk-checks` reste une échappatoire pour les cycles ;
+- les timestamps `NOT NULL` (`CreatedAt`, `UpdatedAt`) sont ajoutés automatiquement à la génération.
 
 ## La suite
 

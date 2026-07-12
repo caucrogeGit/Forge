@@ -51,6 +51,8 @@ Découvertes par le cœur via l'entry point `forge_mvc.commands` (ADR-059). `loa
 | `load_factory(root, entity)` | Importe et instancie la factory de l'entité. |
 | `render_value(value, dialect)` | Rend une valeur : sous-requête pour un `FixtureReference` (ADR-077), sinon `dialect.render_literal`. |
 | `render_inserts(table, rows, dialect)` | Rend les lignes en `INSERT INTO` (via `render_value`). |
+| `timestamp_columns(root, entity)` | Colonnes timestamps `NOT NULL` de l'entité si `options.timestamps` (F46). |
+| `apply_timestamps(rows, columns)` | Complète les lignes avec les timestamps manquants (horodatage déterministe ; ne surcharge pas la factory). |
 | `generate_fixtures(root, entity, *, rows, seed, force, dialect)` | Affiche puis écrit `mvc/fixtures/<table>.sql` (write-if-new). Codes : 0, 2, 1. |
 | `main(args)` | Point d'entrée ; lit `<entity>`, `--rows`, `--seed`, `--force`. |
 

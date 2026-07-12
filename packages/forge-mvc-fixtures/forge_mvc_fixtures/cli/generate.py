@@ -13,21 +13,44 @@ elle n'insère pas en base (principe 11).
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
+from collections.abc import Callable
+from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from forge_mvc_fixtures.factory import Factory, FactoryError, FixtureReference
+
+# Dépendance douce à forge-mvc-entities (source unique du mapping champ vers
+# colonne, ADR-077) ; absent, repli sur un PascalCase local (F46).
+_entities_column_for_field: Callable[[dict[str, Any]], str] | None
+try:
+    from forge_mvc_entities import column_for_field as _entities_column_for_field
+except ImportError:  # pragma: no cover - dépend de l'environnement d'installation
+    _entities_column_for_field = None
 
 __all__ = [
     "load_factory",
     "render_value",
     "render_inserts",
+    "timestamp_columns",
+    "apply_timestamps",
     "generate_fixtures",
     "main",
 ]
 
 DEFAULT_ROWS = 10
+
+# Horodatage déterministe des fixtures (constant pour tout le lot, fixtures
+# reproductibles ; pas de NOW(), F46).
+FIXTURE_TIMESTAMP = datetime(2024, 1, 1, 0, 0, 0)
+
+
+def _column(name: str) -> str:
+    if _entities_column_for_field is not None:
+        return _entities_column_for_field({"name": name})
+    return "".join(part.capitalize() for part in name.split("_") if part)
 
 
 class GenerateError(Exception):
@@ -100,6 +123,50 @@ def render_inserts(table: str, rows: list[dict[str, Any]], dialect: Any) -> str:
     return "\n".join(lines) + "\n"
 
 
+def timestamp_columns(root: Path, entity: str) -> list[str]:
+    """Colonnes timestamps NOT NULL de l'entité, si ``options.timestamps`` (F46).
+
+    Lit le contrat ``mvc/entities/<entity>/<entity>.json`` (comme F45 lit les
+    colonnes). Renvoie ``[CreatedAt, UpdatedAt]`` si les timestamps sont activés,
+    sinon ``[]``. Contrat absent ou illisible : ``[]`` (aucun ajout).
+    """
+    path = root / "mvc" / "entities" / entity / f"{entity}.json"
+    if not path.is_file():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return []
+    if not isinstance(data, dict):
+        return []
+    options = cast("dict[str, Any]", data).get("options")
+    if not isinstance(options, dict) or not cast("dict[str, Any]", options).get("timestamps"):
+        return []
+    return [_column("created_at"), _column("updated_at")]
+
+
+def apply_timestamps(
+    rows: list[dict[str, Any]], columns: list[str]
+) -> list[dict[str, Any]]:
+    """Complète chaque ligne avec les colonnes timestamps manquantes (F46).
+
+    Valeur : ``FIXTURE_TIMESTAMP`` (horodatage déterministe, constant pour tout
+    le lot). Une colonne déjà fournie par la factory est **respectée**, jamais
+    écrasée. Les lignes portant les mêmes colonnes (garanti par ``build``), on
+    décide d'après la première.
+    """
+    if not rows or not columns:
+        return rows
+    present = set(rows[0].keys())
+    missing = [column for column in columns if column not in present]
+    if not missing:
+        return rows
+    for row in rows:
+        for column in missing:
+            row[column] = FIXTURE_TIMESTAMP
+    return rows
+
+
 def generate_fixtures(
     root: Path,
     entity: str,
@@ -117,6 +184,10 @@ def generate_fixtures(
     except (GenerateError, FactoryError) as exc:
         print(f"Erreur : {exc}", file=sys.stderr)
         return 2
+
+    # F46 : colonnes timestamps NOT NULL posées automatiquement si l'entité les
+    # déclare et que la factory ne les fournit pas (sinon le load viole NOT NULL).
+    built = apply_timestamps(built, timestamp_columns(root, entity))
 
     table = factory_instance.table
     sql = render_inserts(table, built, dialect)

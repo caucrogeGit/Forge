@@ -17,10 +17,13 @@ from forge_mvc_sqlite.dialect import SQLiteDialect
 
 from forge_mvc_fixtures import FixtureReference
 from forge_mvc_fixtures.cli.generate import (
+    FIXTURE_TIMESTAMP,
+    apply_timestamps,
     generate_fixtures,
     load_factory,
     render_inserts,
     render_value,
+    timestamp_columns,
 )
 
 DIALECT = SQLiteDialect()
@@ -41,6 +44,20 @@ def _write_factory(root: Path, entity: str, src: str = _FACTORY_SRC) -> None:
     d = root / "mvc" / "fixtures" / "factories"
     d.mkdir(parents=True, exist_ok=True)
     (d / f"{entity}_factory.py").write_text(src, encoding="utf-8")
+
+
+def _write_contract(root: Path, entity: str, *, timestamps: bool) -> None:
+    import json
+
+    d = root / "mvc" / "entities" / entity
+    d.mkdir(parents=True, exist_ok=True)
+    contract = {
+        "name": entity.capitalize(),
+        "table": entity,
+        "fields": [],
+        "options": {"timestamps": timestamps},
+    }
+    (d / f"{entity}.json").write_text(json.dumps(contract), encoding="utf-8")
 
 
 class TestRenderInserts:
@@ -149,3 +166,59 @@ class TestGenerate:
         rc = generate_fixtures(tmp_path, "ville", rows=3, seed=None, force=False, dialect=DIALECT)
         assert rc == 2
         assert "introuvable" in capsys.readouterr().err
+
+
+class TestTimestamps:
+    """F46 : timestamps NOT NULL posés automatiquement si l'entité les déclare."""
+
+    def test_timestamp_columns_when_enabled(self, tmp_path: Path) -> None:
+        _write_contract(tmp_path, "ville", timestamps=True)
+        assert timestamp_columns(tmp_path, "ville") == ["CreatedAt", "UpdatedAt"]
+
+    def test_timestamp_columns_when_disabled(self, tmp_path: Path) -> None:
+        _write_contract(tmp_path, "ville", timestamps=False)
+        assert timestamp_columns(tmp_path, "ville") == []
+
+    def test_timestamp_columns_no_contract(self, tmp_path: Path) -> None:
+        assert timestamp_columns(tmp_path, "ville") == []
+
+    def test_apply_adds_missing_columns(self) -> None:
+        rows = [{"Nom": "Lyon"}, {"Nom": "Nice"}]
+        out = apply_timestamps(rows, ["CreatedAt", "UpdatedAt"])
+        assert all(r["CreatedAt"] == FIXTURE_TIMESTAMP for r in out)
+        assert all(r["UpdatedAt"] == FIXTURE_TIMESTAMP for r in out)
+
+    def test_apply_respects_existing_column(self) -> None:
+        # La factory a déjà fourni CreatedAt : non écrasé ; seul UpdatedAt ajouté.
+        rows = [{"Nom": "Lyon", "CreatedAt": "2020-01-01 00:00:00"}]
+        out = apply_timestamps(rows, ["CreatedAt", "UpdatedAt"])
+        assert out[0]["CreatedAt"] == "2020-01-01 00:00:00"
+        assert out[0]["UpdatedAt"] == FIXTURE_TIMESTAMP
+
+    def test_apply_noop_without_columns(self) -> None:
+        rows = [{"Nom": "Lyon"}]
+        assert apply_timestamps(rows, []) == [{"Nom": "Lyon"}]
+
+    def test_generate_emits_timestamps(self, tmp_path: Path) -> None:
+        _write_factory(tmp_path, "ville")
+        _write_contract(tmp_path, "ville", timestamps=True)
+        rc = generate_fixtures(tmp_path, "ville", rows=2, seed=1, force=False, dialect=DIALECT)
+        assert rc == 0
+        content = (tmp_path / "mvc" / "fixtures" / "ville.sql").read_text(encoding="utf-8")
+        assert "INSERT INTO ville (nom, prefecture, CreatedAt, UpdatedAt)" in content
+        assert "'2024-01-01 00:00:00'" in content
+
+    def test_generate_without_timestamps_unaffected(self, tmp_path: Path) -> None:
+        _write_factory(tmp_path, "ville")
+        _write_contract(tmp_path, "ville", timestamps=False)
+        rc = generate_fixtures(tmp_path, "ville", rows=2, seed=1, force=False, dialect=DIALECT)
+        assert rc == 0
+        content = (tmp_path / "mvc" / "fixtures" / "ville.sql").read_text(encoding="utf-8")
+        assert "CreatedAt" not in content
+
+    def test_generate_no_contract_unaffected(self, tmp_path: Path) -> None:
+        _write_factory(tmp_path, "ville")
+        rc = generate_fixtures(tmp_path, "ville", rows=2, seed=1, force=False, dialect=DIALECT)
+        assert rc == 0
+        content = (tmp_path / "mvc" / "fixtures" / "ville.sql").read_text(encoding="utf-8")
+        assert "CreatedAt" not in content

@@ -269,6 +269,14 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
 
     Pour un jeu non triable (cycle de dépendances), `--no-fk-checks` encadre le chargement par la désactivation des contraintes du dialecte (`SET FOREIGN_KEY_CHECKS` en MariaDB, `PRAGMA foreign_keys` en SQLite, `session_replication_role` en PostgreSQL ; sans effet en SQL Server).
 
+    ### 9.4 Colonnes timestamps automatiques
+
+    Une entité `options.timestamps: true` déclare `CreatedAt` et `UpdatedAt` en `NOT NULL` (posées par la couche applicative, pas par un `DEFAULT`).
+    Une fixture qui les omettrait serait refusée au chargement (`Field 'CreatedAt' doesn't have a default value`).
+
+    `fixtures:generate` lit le contrat de l'entité et **ajoute automatiquement** `CreatedAt`/`UpdatedAt` aux `INSERT` quand la factory ne les fournit pas, avec un horodatage déterministe constant (fixtures reproductibles, pas de `NOW()`).
+    Une colonne déjà posée par la factory est respectée, jamais écrasée ; une entité sans timestamps n'est pas touchée.
+
 ??? note "10. Frontière avec la migration de seed"
 
     Une seule façon officielle par besoin (principe 11) :
