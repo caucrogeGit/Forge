@@ -27,8 +27,9 @@ Récapitulatif des paliers de la progression *Fixtures* et des commandes de l'op
 |---|--------|------------------|---------|
 | 1 | [La factory comme code](avance/fixtures-factory.md) | Coder sa génération | `rows()`, `self.faker`, `--seed` |
 | 2 | [Relier les fixtures entre elles](avance/fixtures-reliees.md) | Colonnes réelles, références, ordre FK | `self.reference`, `--no-fk-checks` |
-| 3 | [Fixtures ou migration de seed](avance/fixtures-vs-seed.md) | Choisir la bonne voie | Frontière (principe 11) |
-| 4 | [Un opt-in CLI-only](avance/fixtures-optin.md) | Profil opt-in, indépendance du cœur | CLI-only |
+| 3 | [Fixtures callable](avance/fixtures-callable.md) | Import, valeurs calculées en Python | `Fixture.load()`, `purge()` |
+| 4 | [Fixtures ou migration de seed](avance/fixtures-vs-seed.md) | Choisir la bonne voie | Frontière (principe 11) |
+| 5 | [Un opt-in CLI-only](avance/fixtures-optin.md) | Profil opt-in, indépendance du cœur | CLI-only |
 
 ## Mémo des commandes
 

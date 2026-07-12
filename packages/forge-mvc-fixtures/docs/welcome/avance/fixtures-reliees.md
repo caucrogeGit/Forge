@@ -76,39 +76,17 @@ Vous n'avez pas à les écrire dans chaque factory : `fixtures:generate` lit le 
 
 Si vous fournissez vous-même `CreatedAt` dans la factory, c'est votre valeur qui est gardée ; une entité sans timestamps n'est pas concernée.
 
-## Quand le SQL ne suffit pas : une fixture callable
-
-Certaines étapes ne sont pas des données statiques : importer un référentiel depuis un JSON, calculer un agrégat.
-Les figer en `.sql` dupliquerait la source ou serait impossible.
-Pour cela, on écrit une **fixture callable**, une classe `Fixture` dans `mvc/fixtures/<nom>.py` :
-
-```python
-from forge_mvc_fixtures import Fixture
-from mvc.services.referentiel_importer import import_referentiel
-
-
-class ReferentielFixture(Fixture):
-    tables = ("matiere", "niveau")      # pour l'ordre et la purge
-    depends_on = ("annee_scolaire",)    # exécutée après ces tables
-
-    def load(self) -> None:
-        import_referentiel("data/referentiel.json")
-```
-
-`load()` écrit en base comme le reste de votre code (`from core.database import db`, ou une fonction applicative qui le fait).
-`fixtures:load` la découvre, l'ordonne avec les `.sql` (grâce à `tables` et `depends_on`), affiche son source, puis l'exécute avec `--run`.
-Elle n'est pas une deuxième façon d'insérer du statique : c'est le recours pour ce que le SQL ne peut pas exprimer.
-
 ## Ce qu'il faut retenir
 
 - les clés du dict sont les colonnes réelles de la table ;
 - `self.reference(table, colonne, valeur)` relie une ligne à une autre par une clé naturelle, sans `Id` en dur ;
 - `fixtures:load` charge dans l'ordre des dépendances ; `--no-fk-checks` reste une échappatoire pour les cycles ;
-- les timestamps `NOT NULL` (`CreatedAt`, `UpdatedAt`) sont ajoutés automatiquement à la génération ;
-- une fixture callable (`Fixture.load()`) couvre l'import et les valeurs calculées, dans le même pipeline.
+- les timestamps `NOT NULL` (`CreatedAt`, `UpdatedAt`) sont ajoutés automatiquement à la génération.
+
+Tout cela reste des données **statiques** (des `.sql`). Le palier suivant montre comment exécuter du code Python pour ce que le SQL ne peut pas exprimer.
 
 ## La suite
 
-Voyons quand générer des fixtures et quand écrire une migration de seed.
+Voyons comment importer un référentiel ou calculer des valeurs, avec une fixture callable.
 
-[Continuer : fixtures ou migration de seed](fixtures-vs-seed.md)
+[Continuer : fixtures callable](fixtures-callable.md)

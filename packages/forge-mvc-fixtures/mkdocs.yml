@@ -21,6 +21,7 @@ nav:
       - Avancé:
           - La factory comme code: welcome/avance/fixtures-factory.md
           - Relier les fixtures entre elles: welcome/avance/fixtures-reliees.md
+          - Fixtures callable (hooks Python): welcome/avance/fixtures-callable.md
           - Fixtures ou migration de seed: welcome/avance/fixtures-vs-seed.md
           - Un opt-in CLI-only: welcome/avance/fixtures-optin.md
           - Bilan avancé: welcome/avance/bilan.md

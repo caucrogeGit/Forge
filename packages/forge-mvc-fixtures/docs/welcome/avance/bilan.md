@@ -8,8 +8,9 @@ Récapitulatif du **niveau avancé** de la progression *Fixtures*.
 |--------|--------------------|
 | 1 : [La factory comme code](fixtures-factory.md) | Coder sa génération (boucles, conditions, tableaux), Faker optionnel, boucle code vers SQL. |
 | 2 : [Relier les fixtures entre elles](fixtures-reliees.md) | Colonnes réelles, `self.reference` par clé naturelle, ordre de chargement par dépendances FK. |
-| 3 : [Fixtures ou migration de seed](fixtures-vs-seed.md) | Choisir la bonne voie selon le besoin (permanent contre rejouable). |
-| 4 : [Un opt-in CLI-only](fixtures-optin.md) | Comprendre le profil opt-in, CLI seule, SQL visible, indépendant du cœur. |
+| 3 : [Fixtures callable](fixtures-callable.md) | Exécuter du Python (import, agrégats) dans le pipeline ; `Fixture.load()`/`purge()`, ordre unifié. |
+| 4 : [Fixtures ou migration de seed](fixtures-vs-seed.md) | Choisir la bonne voie selon le besoin (permanent contre rejouable). |
+| 5 : [Un opt-in CLI-only](fixtures-optin.md) | Comprendre le profil opt-in, CLI seule, SQL visible, indépendant du cœur. |
 
 Vous savez situer les fixtures dans l'architecture de Forge et les employer à bon escient.
 
