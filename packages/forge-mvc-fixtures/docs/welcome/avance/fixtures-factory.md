@@ -71,6 +71,6 @@ Aucune magie, aucune écriture cachée.
 
 ## La suite
 
-Voyons quand générer des fixtures et quand écrire une migration de seed.
+Voyons comment relier plusieurs tables entre elles, sans coder d'`Id` en dur.
 
-[Continuer : fixtures ou migration de seed](fixtures-vs-seed.md)
+[Continuer : relier les fixtures entre elles](fixtures-reliees.md)
