@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposée.
+Acceptée.
 Décision d'architecture ; relève du mainteneur.
 
 ## Date
@@ -46,6 +46,7 @@ class ReferentielFixture(Fixture):
 - `load(self)` (requis) écrit en base **comme le reste du projet** : la fixture importe `core.database.db` (ou appelle une fonction applicative qui le fait). Le SQL vit dans le code applicatif, paramétré et visible (principe 7).
 - `tables: tuple[str, ...]` (optionnel) : les tables peuplées, pour l'ordre de chargement et la purge.
 - `depends_on: tuple[str, ...]` (optionnel) : noms d'entités ou de tables à charger avant.
+- `purge(self)` (optionnel) : démontage ; par défaut vide les `tables` déclarées, surchargeable pour un teardown sur-mesure.
 
 Le **préfixe numérique** du nom de fichier (`50_referentiel.py`, `90_bilan.py`) ordonne les fixtures callable entre elles, comme secours déclaratif.
 
@@ -80,8 +81,14 @@ La protection production reste identique (`--run` seul refusé en `APP_ENV=prod`
 
 ### Purge
 
-`fixtures:purge` cible aussi les tables déclarées par `Fixture.tables` (unies aux tables des `.sql`), vidées par `DELETE FROM` en ordre inverse.
-Une fixture callable qui écrit dans des tables **non déclarées** n'est pas purgée automatiquement : limite documentée (déclarer `tables` pour être purgeable).
+`fixtures:purge` intègre les fixtures callable au démontage, en ordre inverse du chargement (les callable, qui dépendent des tables de base, sont purgées avant les `.sql`).
+
+Chaque `Fixture` porte une méthode `purge(self)` :
+
+- par défaut, elle vide les `tables` déclarées (`DELETE FROM <table>` en ordre inverse) ;
+- une sous-classe peut la **surcharger** pour un démontage sur-mesure (l'inverse exact de son `load()`).
+
+Une fixture callable qui écrit dans des tables **non déclarées** et ne surcharge pas `purge()` n'est pas purgée automatiquement : limite documentée (déclarer `tables`, ou écrire `purge()`).
 
 ### Sécurité
 
@@ -96,9 +103,9 @@ Le callable est réservé à ce que le SQL statique ne peut pas exprimer : impor
 ## Conséquences
 
 - Surface d'API élargie (additive, rétro-compatible) :
-    - `forge-mvc-fixtures` : classe `Fixture` (nouvelle, publique ; `load()`, `tables`, `depends_on`) ;
+    - `forge-mvc-fixtures` : classe `Fixture` (nouvelle, publique ; `load()`, `tables`, `depends_on`, `purge()`) ;
     - `fixtures:load` découvre, ordonne, affiche et exécute les `mvc/fixtures/*.py` ;
-    - `fixtures:purge` unit les tables déclarées par les fixtures callable.
+    - `fixtures:purge` démonte les fixtures callable (`purge()`, défaut sur `tables`) en ordre inverse.
 - Un seed 100 % opt-in devient possible : `.sql` pour le statique et le relationnel, callable pour l'import et les agrégats, dans un ordre unique.
 - Le pipeline exécute du code applicatif : posture de sécurité alignée sur « lancer le projet », documentée.
 - Le SQL reste paramétré et visible (dans le code applicatif appelé) ; les fixtures `.py` sont versionnées et affichées avant exécution.
