@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, cast
 
 from core.auth.session import (
@@ -124,3 +125,61 @@ def make_auth_jinja_context(
 def make_auth_jinja_context_with_can(request: Any) -> dict[str, Any]:
     """Wrapper sans argument pour le registre core — délègue à make_auth_jinja_context."""
     return make_auth_jinja_context(request, fallback_can=make_can(request))
+
+
+# ── Modèle CONTRAT (rbac.json) : provider Jinja natif (manque terrain C) ────────
+
+def make_contract_jinja_can(
+    request: Any, *, project_root: "str | Path" = ".",
+) -> Callable[[str], bool]:
+    """``can(permission)`` adossé au **contrat** (rbac.json), pour le modèle contrat.
+
+    Réutilise ``get_request_roles`` (request.roles puis résolution en base sous
+    l'auth moderne, puis session legacy) et ``has_contract_permission``. Ne requiert
+    **aucune** table ``permissions``/``role_permissions`` (à la différence du provider
+    table par défaut). Ne lève jamais vers le template.
+    """
+    from forge_mvc_rbac.contract import (
+        get_request_roles,
+        has_contract_permission,
+        load_rbac_contract,
+    )
+
+    def can(permission: str) -> bool:
+        try:
+            result = load_rbac_contract(project_root)
+            roles = get_request_roles(request)
+            return has_contract_permission(result, roles, permission)
+        except Exception:
+            return False
+
+    return can
+
+
+def make_contract_jinja_context(
+    request: Any, *, project_root: "str | Path" = ".",
+) -> dict[str, Any]:
+    """Contexte Jinja du modèle contrat : ``current_user`` + ``is_authenticated`` + ``can()`` contractuel."""
+    current = get_jinja_current_user(request)
+    return {
+        "current_user": current,
+        "is_authenticated": current is not None,
+        "can": make_contract_jinja_can(request, project_root=project_root),
+    }
+
+
+def make_contract_jinja_context_with_can(request: Any) -> dict[str, Any]:
+    """Wrapper sans argument pour le registre core (projet = répertoire courant)."""
+    return make_contract_jinja_context(request)
+
+
+def register_contract_rbac_provider() -> None:
+    """Enregistre le provider Jinja du **modèle contrat** dans le registre core.
+
+    À appeler par une application en modèle contrat (rbac.json), au lieu du provider
+    table auto-enregistré : le ``can()`` des templates s'adosse alors au contrat,
+    sans tables ``permissions``/``role_permissions``. Remplace un provider maison.
+    """
+    from core.mvc.controller.registry import register_jinja_context_provider
+
+    register_jinja_context_provider(make_contract_jinja_context_with_can)

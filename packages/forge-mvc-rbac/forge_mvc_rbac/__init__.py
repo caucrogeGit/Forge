@@ -38,6 +38,10 @@ from forge_mvc_rbac.jinja import (
     make_auth_jinja_can,
     make_auth_jinja_context,
     make_auth_jinja_context_with_can,
+    make_contract_jinja_can,
+    make_contract_jinja_context,
+    make_contract_jinja_context_with_can,
+    register_contract_rbac_provider,
     sanitize_jinja_user,
 )
 from forge_mvc_rbac.rbac import (
@@ -101,6 +105,10 @@ __all__ = [
     "make_auth_jinja_can",
     "make_auth_jinja_context",
     "make_auth_jinja_context_with_can",
+    "make_contract_jinja_can",
+    "make_contract_jinja_context",
+    "make_contract_jinja_context_with_can",
+    "register_contract_rbac_provider",
     "sanitize_jinja_user",
     "Permission",
     "PermissionDenied",
