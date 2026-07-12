@@ -58,6 +58,7 @@ nav:
 
     - Concepts:
         - Vue d'ensemble: guide/concepts.md
+        - Anatomie d'une app Forge: guide/anatomie-app.md
         - Bases de données (backends): guide/bases-de-donnees.md
         - Positionnement: guide/positioning.md
         - FAQ: guide/faq.md

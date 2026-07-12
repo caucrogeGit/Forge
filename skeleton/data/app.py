@@ -115,6 +115,22 @@ template_manager.register(Jinja2Renderer(VIEWS_DIR))
 
 _routes = importlib.import_module(APP_ROUTES_MODULE)
 forge.configure(router=_routes.router)
+# Les middlewares (auth, RBAC, ...) se câblent ICI, dans app.py, pas dans mvc/.
+# Chacun expose check(request) -> Response | None ; le premier qui renvoie une
+# Response court-circuite la requête. Par défaut aucun (projet nu). Exemple pour
+# exiger l'authentification et protéger des domaines par préfixe d'URL :
+#
+#     from core.security.middleware import AuthMiddleware
+#     from forge_mvc_rbac import PrefixPermissionMiddleware   # opt-in forge-mvc-rbac
+#     _app = Application(_routes.router, middlewares=[
+#         AuthMiddleware("/login"),
+#         PrefixPermissionMiddleware({"/admin": "admin.access"}),
+#     ])
+#
+# Ce câblage vit dans app.py (à vous) : copier seulement mvc/ vers un nouveau
+# projet le perdrait (et retirerait vos protections). Préférez « forge
+# skeleton:upgrade » (montée en place) à une copie. Voir la doc « Anatomie
+# d'une app Forge ».
 _app    = Application(_routes.router)
 
 logger = logging.getLogger(__name__)
