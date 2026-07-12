@@ -191,6 +191,17 @@ class TestForeignKeyCollision:
         errors = _errors([ARTICLE, CATEGORY], rel)
         assert not errors
 
+    def test_foreign_key_typed_field_is_not_a_collision(self):
+        # ADR-069 / F26 : la clé étrangère de première classe (type foreign_key,
+        # injectée par make:relation) porte le nom de la FK. Ce n'est PAS une
+        # collision avec un champ métier ; seul un champ d'un AUTRE type l'est.
+        entity = ("article.json", _entity("Article", "articles", fields=[
+            {"name": "category_id", "type": "foreign_key", "references": "categories"},
+        ]))
+        rel = _relations([_m2o("Article", "Category", "category")])
+        errors = _errors([entity, CATEGORY], rel)
+        assert not any("collision" in e.message.lower() for e in errors)
+
 
 class TestSetNullNullableFalse:
     def test_set_null_with_not_nullable_is_error(self):

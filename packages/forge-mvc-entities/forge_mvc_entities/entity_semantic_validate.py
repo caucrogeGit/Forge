@@ -211,11 +211,17 @@ def _check_many_to_one(
     # 7. Collision clé étrangère / champ métier
     if rel_from in entity_by_name:
         from_entity = entity_by_name[rel_from]
-        existing_fields = {
-            cast("dict[str, Any]", f).get("name", "") for f in from_entity.get("fields", []) if isinstance(f, dict)
+        # ADR-069 : un champ de type `foreign_key` est une clé étrangère DÉCLARÉE
+        # (make:relation l'injecte comme champ de première classe), pas une
+        # collision avec un champ métier. On ne signale une collision que si le
+        # champ existant du même nom est d'un AUTRE type.
+        field_types = {
+            cast("dict[str, Any]", f).get("name", ""): cast("dict[str, Any]", f).get("type", "")
+            for f in from_entity.get("fields", [])
+            if isinstance(f, dict)
         }
         fk = relation.get("foreign_key") or f"{rel_name}_id"
-        if fk in existing_fields:
+        if fk in field_types and field_types[fk] != "foreign_key":
             errors.append(SemanticError(
                 code=FORGE_RELATION_FK_COLLISION,
                 file=source,
