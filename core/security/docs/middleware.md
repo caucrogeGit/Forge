@@ -32,7 +32,7 @@ Chaque middleware expose une méthode `check(request)` qui renvoie une `Response
 ```mermaid
 classDiagram
     class AuthMiddleware {
-        +__init__(login_url="/login")
+        +__init__(login_url="/login", user_loader=None)
         +check(request) Response|None
     }
     class CsrfMiddleware {
@@ -47,6 +47,7 @@ classDiagram
 À retenir :
 
 - `AuthMiddleware.check` renvoie une redirection `302` si la session n'est pas authentifiée ;
+- avec un `user_loader` (ADR-080), `AuthMiddleware` valide l'**existence** du sujet : une session dont l'`user_id` ne pointe plus aucun compte (supprimé, réattribué, inactif) est fermée (logout + purge du cookie) avant la redirection ; sans loader, le contrôle reste id-based (rétrocompatible) ;
 - `CsrfMiddleware.check` renvoie un `403` (gabarit `errors/403.html`) si le jeton manque ou diffère ;
 - `CsrfMiddleware` lit le jeton dans le champ de formulaire puis, à défaut, dans l'en-tête ;
 - la comparaison du jeton passe par `hmac.compare_digest`, donc en temps constant.
