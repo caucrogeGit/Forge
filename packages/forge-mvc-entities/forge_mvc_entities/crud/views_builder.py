@@ -13,6 +13,7 @@ from forge_mvc_entities.crud.utils import (
     _filter_fields,
     _humanize,
     _is_bool_sql,
+    _is_managed,
     _is_textarea,
     _html_input_type,
     _media_form_fields,
@@ -687,7 +688,10 @@ def build_form_view(
 ) -> str:
     entity = definition["entity"]
     snake = _to_snake(entity)
-    non_pk = _non_pk_fields(definition)
+    # Le formulaire n'expose pas les horodatages gérés (ADR-081) : posés par le
+    # modèle, ils ne sont pas saisis. Ils restent visibles en lecture ailleurs
+    # (fiche détail, liste).
+    non_pk = [f for f in _non_pk_fields(definition) if not _is_managed(f)]
     relations_by_field = _relation_by_field(relations)
     media_entries = _media_form_fields(definition)
 

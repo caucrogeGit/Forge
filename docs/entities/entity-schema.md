@@ -155,6 +155,12 @@ Les clés inconnues dans `options` sont **interdites**.
 
 Quand `timestamps: true`, Forge ajoute `created_at DATETIME` et `updated_at DATETIME` dans la projection SQL. Ces colonnes ne sont pas déclarées dans `fields[]`.
 
+Ces horodatages sont **gérés par le framework** (ADR-081), jamais saisis.
+Le CRUD généré les exclut du formulaire.
+Le modèle les pose lui-même avec `datetime.now(timezone.utc)` : `created_at` et `updated_at` à l'insertion, `updated_at` seul à la mise à jour (`created_at` reste stable).
+Le DDL ne porte pas de `DEFAULT` : Python est la seule autorité sur la valeur.
+La fiche détail et la liste les affichent en lecture seule.
+
 Quand `soft_delete: true`, Forge ajoute `deleted_at DATETIME NULL`. Les enregistrements supprimés sont conservés en base avec une date de suppression.
 
 ---

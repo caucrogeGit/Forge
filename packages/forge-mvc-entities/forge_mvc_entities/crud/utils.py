@@ -41,6 +41,25 @@ def _is_generated(field: dict[str, Any]) -> bool:
     return bool(field.get("source"))
 
 
+def _is_managed(field: dict[str, Any]) -> bool:
+    """Champ géré par le framework (horodatage ``created_at``/``updated_at``, ADR-081).
+
+    Marqué ``managed`` par le normaliseur depuis ``options.timestamps``. Absent
+    du formulaire et de la vue de saisie ; la valeur est posée par le modèle
+    (``datetime.now(timezone.utc)`` à l'``INSERT``/``UPDATE``), jamais saisie.
+    """
+    return bool(field.get("managed"))
+
+
+def _managed_touches_update(field: dict[str, Any]) -> bool:
+    """Vrai si l'horodatage géré est réécrit à chaque ``UPDATE`` (``updated_at``).
+
+    Faux pour un horodatage de création stable (``created_at``), exclu de
+    l'``UPDATE`` comme un champ auto-généré.
+    """
+    return field.get("managed") == "timestamp_updated"
+
+
 _FORM_FIELD_CLASS_MAP: dict[str, str] = {
     "string":   "StringField",
     "email":    "EmailField",

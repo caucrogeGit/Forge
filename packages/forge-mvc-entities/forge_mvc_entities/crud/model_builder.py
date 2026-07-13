@@ -12,6 +12,8 @@ from forge_mvc_entities.crud.context import (
 from forge_mvc_entities.crud.utils import (
     _filter_fields,
     _is_generated,
+    _is_managed,
+    _managed_touches_update,
     _non_pk_fields,
     _pk_field,
     _text_search_fields,
@@ -22,6 +24,17 @@ from forge_mvc_entities.crud.relations_loader import (
     _unique_choice_relations,
     _unique_many_to_many_choice_relations,
 )
+
+
+def _column_value_expr(field: dict[str, Any]) -> str:
+    """Expression Python de la valeur d'une colonne dans l'INSERT/UPDATE généré.
+
+    Un horodatage géré (ADR-081) est posé par le modèle via
+    ``datetime.now(timezone.utc)`` ; les autres colonnes lisent ``data``.
+    """
+    if _is_managed(field):
+        return "datetime.now(timezone.utc)"
+    return f'data["{field["name"]}"]'
 
 
 def _render_model_query(
@@ -227,7 +240,7 @@ def build_model(
     insert_fields = non_pk if auto_inc else definition["fields"]
     insert_cols = ", ".join(f["column"] for f in insert_fields)
     insert_placeholders = ", ".join("?" for _ in insert_fields)
-    insert_values = ", ".join(f'data["{f["name"]}"]' for f in insert_fields)
+    insert_values = ", ".join(_column_value_expr(f) for f in insert_fields)
 
     if insert_fields and auto_inc:
         new_insert_exec = f"return insert(INSERT, ({insert_values},))"
@@ -236,19 +249,32 @@ def build_model(
     else:
         new_insert_exec = "execute(INSERT)"
 
-    # Un champ auto-généré (slug avec source) est stable à l'édition :
-    # exclu de l'UPDATE (ADR-017 D4), mais conservé dans l'INSERT.
-    update_fields = [f for f in non_pk if not _is_generated(f)]
+    # Champs exclus de l'UPDATE car stables à l'édition : un champ auto-généré
+    # (slug avec source, ADR-017 D4) et un horodatage de création (created_at,
+    # ADR-081). L'horodatage de mise à jour (updated_at) reste dans l'UPDATE,
+    # réécrit à chaque fois par le modèle.
+    update_fields = [
+        f for f in non_pk
+        if not _is_generated(f)
+        and not (_is_managed(f) and not _managed_touches_update(f))
+    ]
     if update_fields:
         update_set = ", ".join(f'{f["column"]} = ?' for f in update_fields)
-        update_values = ", ".join(f'data["{f["name"]}"]' for f in update_fields)
+        update_values = ", ".join(_column_value_expr(f) for f in update_fields)
         update_constant = f'"UPDATE {table} SET {update_set} WHERE {pk_col} = ?"'
         update_exec = f"execute(UPDATE, ({update_values}, {pk_name}))"
     else:
         update_constant = "None  # aucun champ métier — UPDATE non applicable"
         update_exec = "return  # aucun champ à mettre à jour"
 
+    # Import datetime seulement si un horodatage géré est posé par le modèle
+    # (ADR-081) — sinon l'import serait inutilisé (ruff F401).
+    needs_datetime = any(_is_managed(f) for f in insert_fields) or any(
+        _is_managed(f) for f in update_fields
+    )
+
     lines: list[str] = [
+        *(["from datetime import datetime, timezone", ""] if needs_datetime else []),
         "from typing import Any",
         "",
         "from core.database.db import fetch_one, fetch_all, execute, insert",

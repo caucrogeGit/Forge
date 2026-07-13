@@ -11,6 +11,7 @@ from forge_mvc_entities.crud.utils import (
     _FORM_FIELD_STR_CONSTRAINTS,
     _humanize,
     _is_generated,
+    _is_managed,
     _media_form_fields,
     _non_pk_fields,
     _relation_by_field,
@@ -146,8 +147,12 @@ def build_form(
 ) -> tuple[str, list[str]]:
     """Retourne (code_python, liste_avertissements)."""
     entity = definition["entity"]
-    # Les champs auto-générés (slug avec source) sont absents du formulaire.
-    form_fields = [f for f in _non_pk_fields(definition) if not _is_generated(f)]
+    # Sont absents du formulaire : les champs auto-générés (slug avec source)
+    # et les champs gérés par le framework (horodatages managed, ADR-081).
+    form_fields = [
+        f for f in _non_pk_fields(definition)
+        if not _is_generated(f) and not _is_managed(f)
+    ]
     relations_by_field = _relation_by_field(relations)
     warnings: list[str] = []
     field_lines: list[str] = []

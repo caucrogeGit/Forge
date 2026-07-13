@@ -27,7 +27,13 @@ ALLOWED_FIELD_KEYS = {
     "list",
     "source",
     "references",
+    "managed",
 }
+# Champs gérés par le framework (ADR-081) : le normaliseur pose ce marqueur sur
+# les horodatages issus de `options.timestamps`. La valeur nomme le rôle et
+# détermine le comportement du générateur CRUD (INSERT/UPDATE, exclusion du
+# formulaire). Marqueur interne : les auteurs d'entités ne le posent pas.
+ALLOWED_MANAGED_VALUES = {"timestamp_created", "timestamp_updated"}
 ALLOWED_FORM_KEYS = {"field"}
 SUPPORTED_FORM_FIELD_VALUES = {
     "string", "email", "phone", "url", "textarea", "slug", "date", "datetime"
@@ -357,6 +363,10 @@ def _validate_field_structure(field: Any, index: int, issues: list[EntityDefinit
     if "unique" in field and not isinstance(field["unique"], bool):
         _add_issue(issues, f"{path}.unique", "doit etre un booleen")
 
+    if "managed" in field and field["managed"] not in ALLOWED_MANAGED_VALUES:
+        known = ", ".join(sorted(ALLOWED_MANAGED_VALUES))
+        _add_issue(issues, f"{path}.managed", f"valeur managed non supportee — valeurs acceptees : {known}")
+
     constraints = field.get("constraints")
     if "constraints" in field and not isinstance(constraints, dict):
         _add_issue(issues, f"{path}.constraints", "doit etre un objet")
@@ -504,6 +514,8 @@ def _normalize_field_data(
         normalized_field["list"] = dict(field["list"])
     if "source" in field and isinstance(field.get("source"), str):
         normalized_field["source"] = field["source"]
+    if "managed" in field and isinstance(field.get("managed"), str):
+        normalized_field["managed"] = field["managed"]
     return normalized_field
 
 

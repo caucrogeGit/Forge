@@ -130,8 +130,10 @@ def _id_field() -> dict[str, Any]:
     }
 
 
-def _system_datetime_field(name: str, *, nullable: bool) -> dict[str, Any]:
-    return {
+def _system_datetime_field(
+    name: str, *, nullable: bool, managed: str | None = None
+) -> dict[str, Any]:
+    field: dict[str, Any] = {
         "name": name,
         "column": _column_from_name(name),
         "sql_type": _dialect().simple_type("datetime"),
@@ -142,6 +144,12 @@ def _system_datetime_field(name: str, *, nullable: bool) -> dict[str, Any]:
         "constraints": {},
         "unique": False,
     }
+    # ADR-081 : horodatage géré par le framework (posé par le modèle, exclu du
+    # formulaire). La valeur distingue la stabilité à l'édition (created stable,
+    # updated réécrit à chaque UPDATE).
+    if managed is not None:
+        field["managed"] = managed
+    return field
 
 
 def _normalize_field(field: dict[str, Any]) -> dict[str, Any]:
@@ -217,8 +225,8 @@ def normalize_canonical_entity_for_model_build(entity: dict[str, Any]) -> dict[s
         fields.append(_normalize_field(field))
 
     if options.get("timestamps"):
-        fields.append(_system_datetime_field("created_at", nullable=False))
-        fields.append(_system_datetime_field("updated_at", nullable=False))
+        fields.append(_system_datetime_field("created_at", nullable=False, managed="timestamp_created"))
+        fields.append(_system_datetime_field("updated_at", nullable=False, managed="timestamp_updated"))
 
     if options.get("soft_delete"):
         fields.append(_system_datetime_field("deleted_at", nullable=True))
