@@ -45,6 +45,30 @@ def test_context_authentifie_expose_un_utilisateur_minimal():
     assert context["current_user"] == AuthJinjaUser(id=7)
 
 
+def test_loader_aware_orpheline_vue_non_authentifiee():
+    # ADR-080 (F55) : avec un user_loader, une session orpheline (id sans compte)
+    # est vue NON authentifiée par le provider Jinja, cohérent avec AuthMiddleware.
+    context = make_auth_jinja_context(
+        _authenticated_request(7),
+        user_loader=lambda _uid: None,  # le compte n'existe plus
+    )
+
+    assert context["current_user"] is None
+    assert context["is_authenticated"] is False
+
+
+def test_loader_aware_sujet_existant_authentifie():
+    from core.auth.user import AuthUser
+
+    context = make_auth_jinja_context(
+        _authenticated_request(7),
+        user_loader=lambda uid: AuthUser(id=uid, email="u@x.fr", password_hash="x"),
+    )
+
+    assert context["is_authenticated"] is True
+    assert context["current_user"] is not None
+
+
 def test_can_true_si_permission_presente():
     context = make_auth_jinja_context(
         _authenticated_request(7),

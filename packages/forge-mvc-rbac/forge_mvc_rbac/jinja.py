@@ -157,10 +157,19 @@ def make_contract_jinja_can(
 
 
 def make_contract_jinja_context(
-    request: Any, *, project_root: "str | Path" = ".",
+    request: Any,
+    *,
+    project_root: "str | Path" = ".",
+    user_loader: Callable[[int], Any] | None = None,
 ) -> dict[str, Any]:
-    """Contexte Jinja du modèle contrat : ``current_user`` + ``is_authenticated`` + ``can()`` contractuel."""
-    current = get_jinja_current_user(request)
+    """Contexte Jinja du modèle contrat : ``current_user`` + ``is_authenticated`` + ``can()`` contractuel.
+
+    Avec un ``user_loader`` (ADR-080), ``current_user`` et ``is_authenticated``
+    reflètent l'**existence** du sujet : une session orpheline (id sans compte)
+    est vue non authentifiée, cohérent avec `AuthMiddleware`. Sans loader, valeur
+    id-based (rétrocompatible).
+    """
+    current = get_jinja_current_user(request, user_loader=user_loader)
     return {
         "current_user": current,
         "is_authenticated": current is not None,

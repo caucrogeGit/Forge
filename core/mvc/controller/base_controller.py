@@ -40,6 +40,9 @@ class BaseController:
             if "csrf_token" not in ctx:
                 ctx["csrf_token"] = BaseController.csrf_token(request)
             # État d'authentification exposé à tout template (barre de nav, etc.).
+            # Valeur par DÉFAUT (id-based) ; un provider Jinja auth/RBAC câblé avec
+            # un user_loader la REMPLACE par la valeur adossée au sujet (ADR-080) :
+            # le provider est la source autoritaire, la fusion ci-dessous gagne.
             if "is_authenticated" not in ctx:
                 from core.auth.session import is_authenticated as _is_authenticated
                 ctx["is_authenticated"] = _is_authenticated(request)

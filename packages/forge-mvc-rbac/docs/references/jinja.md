@@ -28,8 +28,11 @@ C'est une représentation **minimale** : jamais de mot de passe ni de secret cô
 | `get_jinja_current_user(request, *, user_loader=None)` | l'utilisateur public courant, ou `None` |
 | `sanitize_jinja_user(user)` | réduit un utilisateur à sa représentation publique |
 | `make_auth_jinja_can(request, ...)` | construit le helper `can(permission)` exposé aux gabarits |
-| `make_auth_jinja_context(request, ...)` | le contexte Auth/User standard pour Jinja |
+| `make_auth_jinja_context(request, *, user_loader=None, ...)` | le contexte Auth/User standard pour Jinja |
 | `make_auth_jinja_context_with_can(request)` | variante sans argument pour le registre du noyau |
+| `make_contract_jinja_context(request, *, project_root=".", user_loader=None)` | contexte du modèle contrat (rbac.json) |
+
+Avec un `user_loader` (ADR-080), `current_user` et `is_authenticated` reflètent l'**existence** du sujet : une session orpheline (un `user_id` sans compte, après réassignation d'identifiants par exemple) est vue non authentifiée, cohérent avec `AuthMiddleware`. Sans loader, valeur id-based (rétrocompatible). Le provider Jinja est la **source autoritaire** de `is_authenticated` dans le rendu : `BaseController.render` pose une valeur par défaut que le provider remplace.
 
 ## 4. Usage dans un gabarit
 

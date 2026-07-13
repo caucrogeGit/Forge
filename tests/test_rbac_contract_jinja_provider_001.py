@@ -74,6 +74,19 @@ class TestContractContext:
         assert callable(ctx["can"])
         assert ctx["can"]("article.list") is True
 
+    def test_context_loader_aware_orpheline_non_authentifiee(self, tmp_path: Path) -> None:
+        # ADR-080 (F55) : le provider contrat est loader-aware ; une session
+        # orpheline (id sans compte) est vue non authentifiée.
+        from types import SimpleNamespace
+
+        _contract(tmp_path)
+        req = SimpleNamespace(roles=[], session={"_auth_user_id": 1})
+        ctx = make_contract_jinja_context(
+            req, project_root=tmp_path, user_loader=lambda _uid: None
+        )
+        assert ctx["is_authenticated"] is False
+        assert ctx["current_user"] is None
+
     def test_with_can_wrapper_is_no_arg(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         _contract(tmp_path)
         monkeypatch.chdir(tmp_path)
