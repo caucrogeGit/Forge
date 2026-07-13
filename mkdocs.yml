@@ -330,6 +330,7 @@ nav:
             - ADR-078 Fixtures callable (hooks Python): adr/078-fixtures-callable.md
             - ADR-079 Découpeur SQL canonique: adr/079-canonical-sql-statement-splitter.md
             - ADR-080 Validation du sujet authentifié: adr/080-auth-subject-validation.md
+            - ADR-081 Horodatages gérés par le framework: adr/081-managed-timestamps.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
