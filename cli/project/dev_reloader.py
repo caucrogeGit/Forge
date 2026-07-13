@@ -19,6 +19,12 @@ Architecture :
                   `forge run` ne s'arrête que sur Ctrl+C — une erreur ne tue
                   jamais le serveur de dév.
 
+Arrêt propre (DEV-SERVER-CLEAN-SHUTDOWN-001, retour terrain 021) :
+    Ctrl+C (SIGINT) ET SIGTERM déclenchent le même arrêt propre. SIGTERM est
+    installé le temps de la boucle : un `kill`, un arrêt par l'éditeur ou une
+    fin de groupe de processus exécute alors le `finally` (arrêt du subprocess
+    `python app.py`), sans laisser d'orphelin qui garderait le port.
+
 Volontairement simple :
     - polling stat() (pas d'inotify, pas de watchfiles, pas de watchdog) ;
     - redémarrage de processus (jamais importlib.reload) ;
@@ -31,14 +37,27 @@ ni core/http, ni le chemin WSGI.
 from __future__ import annotations
 
 import os
+import signal
 import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Callable, Iterable
+from typing import TYPE_CHECKING, Callable, Iterable
+
+if TYPE_CHECKING:
+    from types import FrameType
 
 
 LOG_PREFIX = "[DEV-RELOAD]"
+
+
+def _raise_keyboard_interrupt(_signum: int, _frame: FrameType | None) -> None:
+    """Handler SIGTERM : convertit le signal en KeyboardInterrupt.
+
+    La boucle du superviseur traite ainsi SIGTERM exactement comme Ctrl+C :
+    le `finally` s'exécute (arrêt du subprocess applicatif), pas d'orphelin.
+    """
+    raise KeyboardInterrupt
 
 
 # Fichiers individuels surveillés à la racine du projet (chemins relatifs).
@@ -251,6 +270,7 @@ class DevReloader:
         fast_crashes = 0
         awaiting_change = False
 
+        sigterm_installed = self._install_sigterm_handler()
         try:
             while True:
                 self._sleep(self.poll_interval)
@@ -293,10 +313,39 @@ class DevReloader:
                     self.start()
                     self.log("Serveur relancé.")
         except KeyboardInterrupt:
-            self.log("Interruption (Ctrl+C). Arrêt du serveur...")
+            self.log("Arrêt demandé (Ctrl+C ou SIGTERM). Arrêt du serveur...")
         finally:
+            if sigterm_installed:
+                self._restore_default_sigterm()
             self.stop()
         return 0
+
+    # ── Arrêt propre (SIGTERM) ──────────────────────────────────────────────
+
+    def _install_sigterm_handler(self) -> bool:
+        """Route SIGTERM vers l'arrêt propre le temps de la boucle.
+
+        Sans handler, un SIGTERM sur `forge run` tuerait le superviseur sans
+        exécuter le `finally`, laissant `python app.py` orphelin et le port
+        occupé (retour terrain 021). Retourne True si le handler a pu être posé
+        (échoue hors du thread principal, contexte de test : sans gravité).
+        """
+        try:
+            signal.signal(signal.SIGTERM, _raise_keyboard_interrupt)
+            return True
+        except ValueError:
+            return False
+
+    def _restore_default_sigterm(self) -> None:
+        """Restaure le handler SIGTERM par défaut après la boucle.
+
+        `forge run` est le processus de tête : SIGTERM valait le défaut avant
+        la boucle, on y revient sans clobberer un handler applicatif.
+        """
+        try:
+            signal.signal(signal.SIGTERM, signal.SIG_DFL)
+        except ValueError:
+            pass
 
     # ── Aides ───────────────────────────────────────────────────────────────
 

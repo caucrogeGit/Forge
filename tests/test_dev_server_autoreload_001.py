@@ -524,6 +524,58 @@ class TestRunLoop:
         )
 
 
+# ── 5b. Arrêt propre sur SIGTERM (DEV-SERVER-CLEAN-SHUTDOWN-001) ──────────────
+
+
+def test_handler_sigterm_leve_keyboardinterrupt():
+    import signal
+    with pytest.raises(KeyboardInterrupt):
+        dev_reloader._raise_keyboard_interrupt(signal.SIGTERM, None)
+
+
+class TestCleanShutdownSigterm:
+    """Un SIGTERM sur `forge run` déclenche le même arrêt propre que Ctrl+C :
+    pas d'orphelin `python app.py` qui garderait le port (retour terrain 021).
+    """
+
+    def test_run_installe_handler_sigterm_pendant_la_boucle(self, tmp_path):
+        import signal
+        root = _make_project(tmp_path)
+        spawned: list[FakeProcess] = []
+
+        def spawn() -> FakeProcess:
+            proc = FakeProcess()
+            proc.alive = True
+            spawned.append(proc)
+            return proc
+
+        observed: dict[str, object] = {}
+
+        def sleep_fn(_delay: float) -> None:
+            # Pendant la boucle, SIGTERM doit être routé vers le handler d'arrêt.
+            observed["handler"] = signal.getsignal(signal.SIGTERM)
+            raise KeyboardInterrupt
+
+        previous = signal.getsignal(signal.SIGTERM)
+        reloader = DevReloader(
+            root,
+            poll_interval=0.0,
+            spawn_fn=spawn,
+            log_fn=lambda _msg: None,
+            sleep_fn=sleep_fn,
+        )
+        code = reloader.run()
+
+        assert code == 0
+        assert observed["handler"] is dev_reloader._raise_keyboard_interrupt, (
+            "SIGTERM doit être routé vers l'arrêt propre pendant la boucle."
+        )
+        # Enfant arrêté par le finally (pas d'orphelin).
+        assert spawned[0].terminate_calls == 1
+        # Handler restauré au défaut après la boucle (pas de fuite).
+        assert signal.getsignal(signal.SIGTERM) in (signal.SIG_DFL, previous)
+
+
 # ── 6. Intégration `forge run` ───────────────────────────────────────────────
 
 
