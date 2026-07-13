@@ -304,192 +304,135 @@ Génère `mvc/views/public/{plural}/form.html` et la classe controller `Public{P
 
 ## Composants Jinja
 
-Forge fournit un dossier de composants HTML/Jinja réutilisables dans `mvc/views/components/`.
-Chaque composant est un fragment HTML simple, lisible et sans logique métier.
+Forge fournit des composants réutilisables sous forme de macros Jinja, regroupées par thème dans `mvc/views/components/`.
+Une macro est une fonction de template : on l'importe, puis on l'appelle avec ses arguments.
+Chaque composant reste un fragment HTML lisible, sans logique métier.
 
-### Composants disponibles
+### Fichiers de composants
 
-| Composant | Rôle | Variables attendues |
+Quatre fichiers regroupent les macros par thème.
+
+| Fichier | Macros principales | Rôle |
 |---|---|---|
-| `button.html` | Bouton ou lien avec variantes de style | `label`, `type`, `variant`, `href` |
-| `alert.html` | Message d'alerte coloré | `message`, `type` |
-| `form_field.html` | Champ de formulaire avec label et erreur | `label`, `name`, `value`, `type`, `error` |
-| `table.html` | Tableau HTML structuré | `headers`, `rows` |
-| `badge.html` | Badge/étiquette coloré | `label`, `variant` |
-| `pagination.html` | Navigation de pagination | `pagination` |
+| `components/ui.html` | `button`, `alert`, `badge`, `flash_messages`, `card`, `page_header`, `empty_state`, `stat`, `breadcrumb`, `navbar` | éléments d'interface |
+| `components/forms.html` | `field`, `textarea_field`, `select_field`, `checkbox`, `radio_group`, `file_field`, `search_field`, `form_errors`, `submit` | champs de formulaire |
+| `components/data.html` | `table`, `pagination` | affichage de données |
+| `components/interactive.html` | `accordion`, `dropdown`, `menu_item`, `modal_trigger`, `modal` | éléments interactifs, sans JavaScript ajouté |
 
-Les variantes de `button.html` sont `primary` (défaut), `secondary` et `danger`.
-Les variantes de `alert.html` sont `info` (défaut), `success`, `warning` et `error`.
-Les variantes de `badge.html` sont `success`, `warning`, `danger`/`error`, et gris par défaut.
+Les variantes de `button` sont `primary` (défaut), `secondary`, `ghost` et `danger`.
+Les niveaux de `alert` sont `info` (défaut), `success`, `warning` et `error`.
+Les tons de `badge` sont `forge` (défaut), `success`, `warning`, `danger` et `neutral`.
 
-Le composant `button.html` rend un `<button>` par défaut.
-Si la variable `href` est définie, il rend un `<a href>` avec le même style.
-Usage recommandé :
+`button` rend un `<button>` par défaut.
+Si l'argument `href` est fourni, il rend un `<a href>` avec le même style.
+Usage recommandé des variantes :
 
 - `primary`, action principale : créer, enregistrer
 - `secondary`, action neutre : annuler, retour sous forme de bouton
 - `danger`, action destructrice : supprimer
 
-Les liens de navigation (`← Retour`) et les actions inline de tableau (Voir, Modifier, Supprimer) restent des text-links légers, non soumis au composant.
+### Importer et appeler une macro
 
-Notes sur les composants moins utilisés :
-
-- `components/form_field.html`, n'est pas branché automatiquement dans les templates `make:crud` ; les champs y sont générés en HTML inline.
-- `table.html`, non utilisé dans les vues liste générées ; celles-ci contiennent leur tableau en HTML inline.
-- `badge.html`, générique, sans logique métier ; aucun variant n'est lié à une valeur applicative.
-- `pagination.html`, composant serveur classique ; la pagination HTMX optionnelle des CRUD générés passe par leur partial `_pagination.html`.
-
-### Inclure un composant
-
-Les composants s'incluent avec `{% include %}`.
-Pour leur passer des variables spécifiques, utiliser `{% with %}` :
+On importe la ou les macros voulues, puis on les appelle comme des fonctions.
 
 ```jinja
-{# Bouton submit primary #}
-{% with type="submit", variant="primary", label=trans('common.save') %}
-    {% include "components/button.html" %}
-{% endwith %}
+{% from "components/ui.html" import button, flash_messages %}
+{% from "components/forms.html" import field, select_field %}
 
-{# Lien secondary (href déclenche le rendu <a>) #}
-{% with href="/contacts", variant="secondary", label=trans('common.cancel') %}
-    {% include "components/button.html" %}
-{% endwith %}
+{{ flash_messages(flash) }}
 
-{# Bouton danger dans un formulaire de suppression #}
-{% with type="submit", variant="danger", label=trans('crud.delete') %}
-    {% include "components/button.html" %}
-{% endwith %}
+{{ button(label="Enregistrer", variant="primary", type="submit") }}
+{{ button(label="Annuler", variant="secondary", href="/contacts") }}
+{{ button(label="Supprimer", variant="danger", type="submit") }}
 ```
 
 ```jinja
-{% with message=flash_message, type="success" %}
-    {% include "components/alert.html" %}
-{% endwith %}
+{{ field(name="prenom", label="Prénom", value=form.value("prenom"), error=form.error("prenom")) }}
+{{ select_field(name="role", label="Rôle", options=roles, selected=form.value("role")) }}
 ```
 
 ```jinja
-{% with label="Statut", variant="success" %}
-    {% include "components/badge.html" %}
-{% endwith %}
+{% from "components/data.html" import table, pagination %}
+{{ table(headers=["Nom", "Email"], rows=data) }}
+{{ pagination(page=page, total_pages=total_pages, base_url="/contacts") }}
 ```
 
-```jinja
-{% with headers=["Nom", "Email"], rows=data %}
-    {% include "components/table.html" %}
-{% endwith %}
-```
-
-```jinja
-{% with label="Prénom", name="first_name", value=contact.first_name %}
-    {% include "components/form_field.html" %}
-{% endwith %}
-```
-
-Le composant `pagination.html` utilise l'objet `pagination` directement depuis le contexte de la vue :
-
-```jinja
-{% include "components/pagination.html" %}
-```
+Placer l'import dans le bloc `content`, pas au sommet du fichier : un template enfant n'hérite pas des imports de son layout.
 
 ### Règles Forge pour les composants
 
-- Les composants restent lisibles dans leur source HTML.
-- Aucun composant ne contient de logique métier.
-- Aucun composant ne charge HTMX ou Alpine.js automatiquement.
-- Les variables attendues sont explicites dans le template, aucun composant n'est opaque.
+- Les macros restent lisibles dans leur source HTML.
+- Aucune macro ne contient de logique métier.
+- Aucune macro ne charge HTMX ou Alpine.js automatiquement.
+- Les arguments attendus sont explicites dans la signature de la macro, aucune n'est opaque.
 - Les composants ne forment pas un mini-framework front.
-- Les templates générés (`make:crud`, starters) restent compréhensibles sans connaître les composants.
+- Les templates générés (`make:crud`, parcours d'accueil) restent compréhensibles sans connaître les composants.
 - Les noms métier restent dans l'application, jamais dans les composants.
 
-### Boutons dans les templates CRUD
+### Composants dans les templates CRUD
 
-Les templates générés par `make:crud` utilisent `components/button.html` pour les boutons standalone :
+Les vues générées par `make:crud` s'appuient sur ces macros.
 
-| Action | Vue | Variant |
+| Élément | Vue | Macro |
 |---|---|---|
-| Nouveau (lien) | Index | `primary` |
-| Modifier (lien) | Show | `primary` |
-| Supprimer (submit) | Show | `danger` |
-| Enregistrer (submit) | Form | `primary` |
-| Annuler (lien) | Form | `secondary` |
+| Bouton Nouveau (lien) | liste | `button` variante `primary` |
+| Champs de saisie | formulaire | `field`, `textarea_field`, `select_field`, `checkbox` |
+| Bouton Enregistrer / Annuler | formulaire | `button` |
+| Bouton Modifier / Supprimer | fiche détail | `button` |
+| Message flash | toutes | `flash_messages` |
 
-Les actions inline dans les lignes du tableau (Voir, Modifier, Supprimer) restent des text-links légers (`text-sm text-blue-600 hover:underline` ou `text-sm font-medium text-red-600 hover:text-red-800`).
+Les libellés du CRUD généré sont en français littéral : Voir, Modifier, Supprimer, Rechercher, Enregistrer, Annuler, Retour.
+Le générateur n'appelle pas `trans()` : l'internationalisation est un opt-in (`forge-mvc-i18n`) que l'application câble elle-même si elle vise le multilingue.
+Les actions inline dans les lignes du tableau (Voir, Modifier, Supprimer) et les liens de navigation (`← Retour`) restent des text-links légers, hors macro.
 
-Les liens de navigation `← Retour` restent des text-links (`text-gray-600 hover:underline`).
+### Messages flash
 
-### Limites actuelles
-
-- Tous les composants ne sont pas encore utilisés dans tous les templates générés.
-- `make:crud` utilise uniquement `button.html` pour les boutons standalone.
-- `alert.html` est utilisé par `render_flash_html()` pour les messages flash.
-- Les états vides sont rendus directement dans le template, pas via un composant dédié.
-- Aucune modale Alpine n'est générée par `make:crud`.
-- Aucun comportement HTMX n'est ajouté aux composants ni aux templates générés.
-- Les enrichissements dynamiques (HTMX, Alpine) viendront dans les futurs tickets CRUD-HTMX/templates.
-- Ces composants ne remplacent pas les partials existants dans `mvc/views/partials/`.
-
-### Messages flash dans les layouts
-
-Les layouts `admin.html`, `public.html` et `base.html` affichent automatiquement les messages flash quand la variable `flash_html` est présente dans le contexte de la vue.
-
-La zone flash est placée dans `<main>`, avant `{% block content %}` :
+Le contrôleur pose un message flash après une action via `BaseController.redirect_with_flash(request, url, message)`.
+Au rendu suivant, la vue reçoit le dictionnaire `flash` dans son contexte (via `get_flash(get_session_id(request))`) et l'affiche avec la macro `flash_messages` :
 
 ```jinja
-{% if flash_html %}
-    {{ flash_html | safe }}
-{% endif %}
+{% from "components/ui.html" import flash_messages %}
+{{ flash_messages(flash) }}
 ```
 
-La variable `flash_html` est une chaîne HTML pré-rendue par `mvc/helpers/flash.py`.
-Le helper `render_flash_html(request)` lit le message flash de la session (lecture destructive), puis le rend via le composant `components/alert.html`.
-
-Usage standard dans un contrôleur :
-
-```python
-from mvc.helpers.flash import render_flash_html
-
-context = {
-    "flash_html": render_flash_html(request),
-    # autres variables...
-}
-```
-
-Les niveaux supportés sont `success`, `info`, `warning` et `error`, ils correspondent directement aux variants de `components/alert.html`.
-Le niveau `danger` est traité comme `error`.
-
-TPL-004 standardise uniquement l'affichage.
-La logique applicative (stocker un flash après une action, rediriger) reste dans les contrôleurs via `BaseController.redirect_with_flash()`.
-Aucun nouveau système de session ou de stockage n'est créé.
+`flash_messages` ne rend rien si `flash` est absent.
+Les niveaux correspondent à ceux de `alert` : `success`, `info`, `warning`, `error`.
+Aucun nouveau système de session n'est créé : le flash passe par la session existante.
 
 ### États vides dans les listes CRUD
 
-Les vues liste générées par `make:crud` affichent un état vide standard quand la collection est vide :
+Les vues liste générées affichent un état vide quand la collection est vide, rendu directement dans le template :
 
 ```jinja
 {% if contacts %}
     {# tableau #}
 {% else %}
 <div class="rounded-xl border border-dashed border-gray-300 bg-white p-6 text-center text-gray-600">
-    {{ trans("crud.empty") }}
+    Aucun élément à afficher.
 </div>
 {% endif %}
 ```
 
-L'état vide utilise la clé i18n `crud.empty` ("Aucun élément à afficher.").
-Il est générique, il n'affiche pas le nom de l'entité ni ne dépend de logique métier.
-Les messages flash sont distincts des états vides : un flash passe par la session et `render_flash_html()`, un état vide est rendu directement dans le template selon l'état de la liste.
+Le message est en français littéral, générique : il n'affiche ni le nom de l'entité ni de logique métier.
 
 ### Confirmations de suppression
 
-Les formulaires de suppression générés par `make:crud` (vue liste et vue détail) affichent une confirmation native avant soumission :
+Les formulaires de suppression générés (liste et fiche détail) demandent une confirmation native avant soumission :
 
 ```html
-<form method="post" action="/contacts/{{ contact.id }}/delete"
-      onsubmit="return confirm('{{ trans("crud.confirm_delete") }}')">
+<form method="post" action="/contacts/destroy/{{ contact.id }}"
+      onsubmit="return confirm('Confirmer la suppression ?')">
 ```
 
-La clé i18n `crud.confirm_delete` ("Confirmer la suppression ?") est injectée par Jinja2 au rendu.
-Aucune dépendance JavaScript supplémentaire n'est requise, `window.confirm()` est natif au navigateur.
+Le texte est littéral.
+Aucune dépendance JavaScript supplémentaire n'est requise : `window.confirm()` est natif au navigateur.
+
+### Limites actuelles
+
+- Toutes les macros ne sont pas encore utilisées dans tous les templates générés.
+- Les états vides sont rendus directement dans le template, pas via la macro `empty_state`.
+- `make:crud` ne génère ni modale ni comportement HTMX ou Alpine.
+- Les composants ne remplacent pas les partials existants dans `mvc/views/partials/`.
 
 ## Recompiler le CSS
 

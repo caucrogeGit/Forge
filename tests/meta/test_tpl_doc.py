@@ -21,34 +21,42 @@ def test_front_md_existe():
     assert FRONT_MD.is_file()
 
 
-# --- Composants référencés dans la doc ---
+# --- Fichiers de macros référencés dans la doc (macros groupées) ---
 
 
-def test_doc_mentionne_button_html():
-    assert "components/button.html" in _doc()
+def test_doc_mentionne_ui_html():
+    # ui.html porte button, alert, badge, flash_messages.
+    doc = _doc()
+    assert "components/ui.html" in doc
+    assert "button" in doc
+    assert "alert" in doc
+    assert "badge" in doc
+    assert "flash_messages" in doc
 
 
-def test_doc_mentionne_alert_html():
-    assert "components/alert.html" in _doc()
+def test_doc_mentionne_forms_html():
+    # forms.html porte field, select_field, checkbox, textarea_field.
+    doc = _doc()
+    assert "components/forms.html" in doc
+    assert "field" in doc
 
 
-def test_doc_mentionne_form_field_html():
-    assert "components/form_field.html" in _doc()
+def test_doc_mentionne_data_html():
+    # data.html porte table et pagination.
+    doc = _doc()
+    assert "components/data.html" in doc
+    assert "table" in doc
+    assert "pagination" in doc.lower()
 
 
-def test_doc_mentionne_table_html():
-    assert "components/table.html" in _doc()
+def test_doc_macros_importees_pas_incluses():
+    # Les macros s'importent ({% from %}) et s'appellent, on n'inclut plus de
+    # fichier par composant.
+    doc = _doc()
+    assert '{% from "components/ui.html" import' in doc
 
 
-def test_doc_mentionne_badge_html():
-    assert "components/badge.html" in _doc()
-
-
-def test_doc_mentionne_pagination_html():
-    assert "components/pagination.html" in _doc()
-
-
-# --- Variants button.html ---
+# --- Variants du bouton ---
 
 
 def test_doc_mentionne_variant_primary():
@@ -135,15 +143,16 @@ def test_doc_section_limites_actuelles():
     assert "Limites actuelles" in _doc()
 
 
-# --- Limites par composant documentées ---
+# --- Usage des macros dans les templates CRUD ---
 
 
-def test_doc_form_field_limite_inline():
+def test_doc_crud_utilise_macro_field():
+    # make:crud branche désormais les champs sur la macro field (plus d'inline).
     doc = _doc()
-    assert "form_field" in doc
-    assert "inline" in doc
+    assert "field" in doc
+    assert "make:crud" in doc
 
 
-def test_doc_pagination_limite_htmx():
+def test_doc_mentionne_pagination():
     doc = _doc()
     assert "pagination" in doc.lower()
