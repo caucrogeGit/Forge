@@ -10,7 +10,9 @@ Une entité avec `options.timestamps: true` produit des horodatages
   l'UPDATE (`updated_at` seul, `created_at` stable), via
   `datetime.now(timezone.utc)`, jamais lus depuis `data` ;
 - sans `DEFAULT` SQL (Python reste la seule autorité, cohérent sessions-db) ;
-- conservés en lecture seule dans la fiche détail (`show.html`).
+- absents de toutes les vues générées (formulaire, liste, fiche détail) : ce
+  sont des métadonnées système, consultables en base (ADR-081 révisé, retour
+  terrain sur l'UX du CRUD généré).
 
 Ce garde-fou matérialise l'invariant que pyright/ruff ne voient pas : le
 contenu réellement généré pour une entité horodatée.
@@ -74,6 +76,19 @@ def test_form_view_excludes_timestamps(definition):
     assert "created_at" not in html
 
 
+def test_list_view_excludes_timestamps(definition):
+    from forge_mvc_entities.crud.views_builder import build_table_partial
+    html = build_table_partial(definition)
+    assert "CreatedAt" not in html
+    assert "UpdatedAt" not in html
+
+
+def test_show_view_excludes_timestamps(definition):
+    html = build_show_view(definition)
+    assert "CreatedAt" not in html
+    assert "UpdatedAt" not in html
+
+
 # ── Posés par le modèle ──────────────────────────────────────────────────────
 
 def test_model_inserts_both_timestamps_from_now(definition):
@@ -110,14 +125,6 @@ def test_ddl_timestamps_have_no_default(definition):
             assert "NOT NULL" in line
             assert "DEFAULT" not in line
             assert "CURRENT_TIMESTAMP" not in line
-
-
-# ── Conservés en lecture dans la fiche détail ────────────────────────────────
-
-def test_show_view_keeps_timestamps_readonly(definition):
-    html = build_show_view(definition)
-    assert "CreatedAt" in html
-    assert "UpdatedAt" in html
 
 
 # ── Le marqueur managed est un contrat interne validé ───────────────────────

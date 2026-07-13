@@ -1274,64 +1274,78 @@ def test_many_to_one_relation_field_formulaire_inchange(tmp_path):
 # ── I18N — appels trans() dans les vues générées ──────────────────────────────
 
 
-def test_index_contient_trans_crud_show():
+# Les vues générées portent des libellés français LITTÉRAUX (pas de trans() :
+# i18n reste un opt-in que l'application câble elle-même). Retour terrain sur
+# l'UX du CRUD généré (clés brutes affichées).
+
+def test_index_libelle_voir():
     html = build_table_partial(_CONTACT_JSON)
-    assert "trans('crud.show')" in html
+    assert ">Voir</a>" in html
+    assert "trans(" not in html
 
 
-def test_index_contient_trans_crud_edit():
+def test_index_libelle_modifier():
     html = build_table_partial(_CONTACT_JSON)
-    assert "trans('crud.edit')" in html
+    assert ">Modifier</a>" in html
 
 
-def test_index_contient_trans_crud_delete():
+def test_index_libelle_supprimer():
     html = build_table_partial(_CONTACT_JSON)
-    assert "trans('crud.delete')" in html
+    assert ">Supprimer</button>" in html
 
 
-def test_index_contient_trans_crud_empty():
+def test_index_libelle_vide():
     html = build_table_partial(_CONTACT_JSON)
-    assert "trans('crud.empty')" in html
+    assert "Aucun élément à afficher." in html
 
 
-def test_index_contient_trans_common_search():
+def test_index_libelle_rechercher():
     html = build_index_view(_CONTACT_JSON)
-    assert "trans('common.search')" in html
+    assert "Rechercher" in html
+    assert "trans(" not in html
 
 
-def test_index_contient_trans_crud_actions():
+def test_index_libelle_actions():
     html = build_table_partial(_CONTACT_JSON)
-    assert "trans('crud.actions')" in html
+    assert ">Actions</th>" in html
 
 
-def test_show_contient_trans_crud_edit():
+def test_show_libelle_modifier():
     html = build_show_view(_CONTACT_JSON)
-    assert "trans('crud.edit')" in html
+    assert "label='Modifier'" in html
 
 
-def test_show_contient_trans_crud_delete():
+def test_show_libelle_supprimer():
     html = build_show_view(_CONTACT_JSON)
-    assert "trans('crud.delete')" in html
+    assert "label='Supprimer'" in html
 
 
-def test_show_contient_trans_common_back():
+def test_show_libelle_retour():
     html = build_show_view(_CONTACT_JSON)
-    assert "trans('common.back')" in html
+    assert "← Retour" in html
 
 
-def test_form_contient_trans_common_save():
+def test_form_libelle_enregistrer():
     html = build_form_view(_CONTACT_JSON)
-    assert "trans('common.save')" in html
+    assert "label='Enregistrer'" in html
 
 
-def test_form_contient_trans_common_cancel():
+def test_form_libelle_annuler():
     html = build_form_view(_CONTACT_JSON)
-    assert "trans('common.cancel')" in html
+    assert "label='Annuler'" in html
 
 
-def test_form_contient_trans_common_back():
+def test_form_libelle_retour():
     html = build_form_view(_CONTACT_JSON)
-    assert "trans('common.back')" in html
+    assert "← Retour" in html
+
+
+def test_vues_generees_sans_trans():
+    # Aucune vue générée ne dépend de trans() / i18n : libellés littéraux.
+    assert "trans(" not in build_index_view(_CONTACT_JSON)
+    assert "trans(" not in build_table_partial(_CONTACT_JSON)
+    assert "trans(" not in build_show_view(_CONTACT_JSON)
+    assert "trans(" not in build_form_view(_CONTACT_JSON)
 
 
 def test_noms_champs_non_remplaces_par_cles_i18n():
@@ -1412,13 +1426,13 @@ def test_boutons_sans_alpine():
 def test_index_retour_reste_text_link():
     # La page index n'a pas de lien retour — le lien retour est dans show et form
     html = build_show_view(_CONTACT_JSON)
-    assert "← {{ trans('common.back') }}" in html
+    assert "← Retour" in html
     assert "text-gray-600 hover:underline" in html
 
 
 def test_form_retour_reste_text_link():
     html = build_form_view(_CONTACT_JSON)
-    assert "← {{ trans('common.back') }}" in html
+    assert "← Retour" in html
     assert "text-gray-600 hover:underline" in html
 
 
@@ -1433,16 +1447,16 @@ def test_index_etat_vide_utilise_div_style():
     assert "text-center" in html
 
 
-def test_index_etat_vide_contient_trans_crud_empty():
+def test_index_etat_vide_libelle_litteral():
     html = build_table_partial(_CONTACT_JSON)
-    assert "trans('crud.empty')" in html
+    assert "Aucun élément à afficher." in html
 
 
 def test_index_etat_vide_est_dans_else():
     html = build_table_partial(_CONTACT_JSON)
     empty_div_idx = html.index("border-dashed")
     else_idx = html.rfind("{% else %}", 0, empty_div_idx)
-    empty_idx = html.index("trans('crud.empty')")
+    empty_idx = html.index("Aucun élément à afficher.")
     endif_idx = html.rfind("{% endif %}")
     assert else_idx < empty_idx < endif_idx
 
@@ -1459,13 +1473,13 @@ def test_index_etat_vide_sans_p_tag():
 def test_show_sans_etat_vide():
     html = build_show_view(_CONTACT_JSON)
     assert "border-dashed" not in html
-    assert "trans('crud.empty')" not in html
+    assert "Aucun élément à afficher." not in html
 
 
 def test_form_sans_etat_vide():
     html = build_form_view(_CONTACT_JSON)
     assert "border-dashed" not in html
-    assert "trans('crud.empty')" not in html
+    assert "Aucun élément à afficher." not in html
 
 
 def test_index_etat_vide_sans_htmx():
@@ -1507,9 +1521,9 @@ def test_index_delete_form_confirm_natif():
     assert "return confirm(" in html
 
 
-def test_index_delete_form_confirm_utilise_trans():
+def test_index_delete_form_confirm_libelle():
     html = build_table_partial(_CONTACT_JSON)
-    assert "trans(\"crud.confirm_delete\")" in html
+    assert "Confirmer la suppression ?" in html
 
 
 def test_show_delete_form_contient_onsubmit():
@@ -1522,9 +1536,9 @@ def test_show_delete_form_confirm_natif():
     assert "return confirm(" in html
 
 
-def test_show_delete_form_confirm_utilise_trans():
+def test_show_delete_form_confirm_libelle():
     html = build_show_view(_CONTACT_JSON)
-    assert "trans(\"crud.confirm_delete\")" in html
+    assert "Confirmer la suppression ?" in html
 
 
 def test_form_view_sans_onsubmit_confirm():

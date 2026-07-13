@@ -99,8 +99,8 @@ class TestTablePartialGuard:
 
     def test_avec_rbac_lien_show_toujours_present_sans_guard(self):
         html = build_table_partial(_DEFN_SIMPLE, rbac=_RBAC_FULL)
-        assert "crud.show" in html
-        idx_show = html.index("crud.show")
+        assert ">Voir</a>" in html
+        idx_show = html.index(">Voir</a>")
         before = html[:idx_show]
         # Tout bloc {% if can( %} avant le lien show doit être fermé par {% endif %} avant lui.
         # Le lien show lui-même n'est pas dans un bloc RBAC.

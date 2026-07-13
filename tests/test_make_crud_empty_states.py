@@ -120,7 +120,7 @@ def test_etat_vide_general_existant_est_conserve():
     html = build_table_partial(CONTACT)
 
     assert "border-dashed" in html
-    assert "trans('crud.empty')" in html
+    assert "Aucun élément à afficher." in html
 
 
 def test_controller_calcule_empty_context_default_sans_q_ni_filtres():
@@ -186,12 +186,12 @@ def test_template_index_affiche_messages_contextuels():
     html = build_table_partial(CONTACT_WITH_FILTER)
 
     assert 'empty_context == "search"' in html
-    assert "trans('crud.empty_search')" in html
+    assert "Aucun résultat ne correspond à votre recherche." in html
     assert 'empty_context == "filters"' in html
-    assert "trans('crud.empty_filters')" in html
+    assert "Aucun résultat ne correspond aux filtres sélectionnés." in html
     assert 'empty_context == "search_filters"' in html
-    assert "trans('crud.empty_search_filters')" in html
-    assert "trans('crud.empty')" in html
+    assert "Aucun résultat ne correspond à votre recherche et aux filtres sélectionnés." in html
+    assert "Aucun élément à afficher." in html
 
 
 def test_cles_i18n_contextuelles_existent():

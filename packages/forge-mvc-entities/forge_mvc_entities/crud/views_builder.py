@@ -82,7 +82,7 @@ def build_index_view(
         f'      hx-get="/{snake}" hx-target="#crud-results" hx-swap="innerHTML" hx-push-url="true"',
         '      class="mb-4 flex gap-2 items-center flex-wrap">',
         '    <input type="search" name="q" value="{{ pagination.q }}"',
-        "           placeholder=\"{{ trans('common.search') }}…\"",
+        "           placeholder=\"Rechercher…\"",
         '           class="border border-gray-300 rounded px-3 py-1.5 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-400">',
     ]
     for ff in filter_flds:
@@ -104,8 +104,8 @@ def build_index_view(
                 f'    <select name="{fname}"',
                 '            class="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">',
                 '        <option value="">Tous</option>',
-                f"        <option value=\"1\" {{{{ 'selected' if pagination.filters.{fname} == '1' }}}}>{{{{ trans('common.yes') }}}}</option>",
-                f"        <option value=\"0\" {{{{ 'selected' if pagination.filters.{fname} == '0' }}}}>{{{{ trans('common.no') }}}}</option>",
+                f"        <option value=\"1\" {{{{ 'selected' if pagination.filters.{fname} == '1' }}}}>Oui</option>",
+                f"        <option value=\"0\" {{{{ 'selected' if pagination.filters.{fname} == '0' }}}}>Non</option>",
                 "    </select>",
             ]
         else:
@@ -117,7 +117,7 @@ def build_index_view(
     lines += [
         '    <button type="submit"',
         '            class="bg-gray-100 text-gray-800 text-sm px-3 py-1.5 rounded font-medium hover:bg-gray-200">',
-        "        {{ trans('common.search') }}</button>",
+        "        Rechercher</button>",
         "    {% if pagination.q or pagination.filters %}",
         f'    <a href="/{snake}"',
         f'       hx-get="/{snake}" hx-target="#crud-results" hx-swap="innerHTML" hx-push-url="true"',
@@ -191,7 +191,7 @@ def _render_table_headers(
             f'                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">{_humanize(relation.target_entity)}</th>'
         )
     lines.append(
-        "                <th class=\"px-4 py-3 text-right text-sm font-semibold text-gray-600\">{{ trans('crud.actions') }}</th>"
+        "                <th class=\"px-4 py-3 text-right text-sm font-semibold text-gray-600\">Actions</th>"
     )
     return lines
 
@@ -237,17 +237,17 @@ def _render_table_row(
         ]
     _edit_link = [
         f'                    <a href="/{snake}/edit/{{{{ {snake}.{pk_col} }}}}"',
-        "                       class=\"text-sm text-blue-600 hover:underline\">{{ trans('crud.edit') }}</a>",
+        "                       class=\"text-sm text-blue-600 hover:underline\">Modifier</a>",
     ]
     if edit_perm:
         _edit_link = [f"                    {{% if can('{edit_perm}') %}}"] + _edit_link + ["                    {% endif %}"]
     _delete_form = [
         f'                    <form method="post" action="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}{list_query}"',
-        f'                          hx-post="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}{list_query}" hx-target="#crud-results" hx-swap="innerHTML" hx-confirm="{{{{ trans(\'crud.confirm_delete\') }}}}"',
-        '                          style="display:inline" onsubmit="return confirm(\'{{ trans("crud.confirm_delete") }}\')">',
+        f'                          hx-post="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}{list_query}" hx-target="#crud-results" hx-swap="innerHTML" hx-confirm="Confirmer la suppression ?"',
+        '                          style="display:inline" onsubmit="return confirm(\'Confirmer la suppression ?\')">',
         '                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
         '                        <button type="submit"',
-        "                            class=\"text-sm font-medium text-red-600 hover:text-red-800\">{{ trans('crud.delete') }}</button>",
+        "                            class=\"text-sm font-medium text-red-600 hover:text-red-800\">Supprimer</button>",
         "                    </form>",
     ]
     if delete_perm:
@@ -255,7 +255,7 @@ def _render_table_row(
     lines += [
         '                <td class="px-4 py-3 text-right space-x-2">',
         f'                    <a href="/{snake}/show/{{{{ {snake}.{pk_col} }}}}"',
-        "                       class=\"text-sm text-blue-600 hover:underline\">{{ trans('crud.show') }}</a>",
+        "                       class=\"text-sm text-blue-600 hover:underline\">Voir</a>",
         *_edit_link,
         *_delete_form,
         "                </td>",
@@ -274,7 +274,9 @@ def build_table_partial(
     plural = snake + "s"
     pk = _pk_field(definition)
     pk_col = pk["column"]
-    non_pk = _non_pk_fields(definition)
+    # Les horodatages gérés (ADR-081) ne sont pas affichés dans la liste :
+    # métadonnées système posées par le modèle, consultables en base.
+    non_pk = [f for f in _non_pk_fields(definition) if not _is_managed(f)]
     rel_by_field = _relation_by_field(relations)
     perms = (rbac or {}).get("permissions", {})
     edit_perm = perms.get("edit")
@@ -339,13 +341,13 @@ def build_table_partial(
         "{% else %}",
         '<div class="rounded-xl border border-dashed border-gray-300 bg-white p-6 text-center text-gray-600">',
         '    {% if empty_context == "search" %}',
-        "    {{ trans('crud.empty_search') }}",
+        "    Aucun résultat ne correspond à votre recherche.",
         '    {% elif empty_context == "filters" %}',
-        "    {{ trans('crud.empty_filters') }}",
+        "    Aucun résultat ne correspond aux filtres sélectionnés.",
         '    {% elif empty_context == "search_filters" %}',
-        "    {{ trans('crud.empty_search_filters') }}",
+        "    Aucun résultat ne correspond à votre recherche et aux filtres sélectionnés.",
         "    {% else %}",
-        "    {{ trans('crud.empty') }}",
+        "    Aucun élément à afficher.",
         "    {% endif %}",
         "</div>",
         "{% endif %}",
@@ -403,14 +405,16 @@ def build_show_view(
     snake = _to_snake(entity)
     pk = _pk_field(definition)
     pk_col = pk["column"]
-    non_pk = _non_pk_fields(definition)
+    # Les horodatages gérés (ADR-081) ne sont pas affichés dans la fiche détail :
+    # métadonnées système posées par le modèle, consultables en base.
+    non_pk = [f for f in _non_pk_fields(definition) if not _is_managed(f)]
     relations_by_field = {r.field_name: r for r in (relations or [])}
     perms = (rbac or {}).get("permissions", {})
     edit_perm = perms.get("edit")
     delete_perm = perms.get("delete")
 
     _edit_btn = [
-        f"        {{{{ button(label=trans('crud.edit'), variant='primary', href='/{snake}/edit/' ~ {snake}.{pk_col}) }}}}",
+        f"        {{{{ button(label='Modifier', variant='primary', href='/{snake}/edit/' ~ {snake}.{pk_col}) }}}}",
     ]
     if edit_perm:
         _edit_btn = [f"        {{% if can('{edit_perm}') %}}"] + _edit_btn + ["        {% endif %}"]
@@ -424,7 +428,7 @@ def build_show_view(
         f'    <h1 class="text-2xl font-bold text-gray-800">Détail {snake}</h1>',
         '    <div class="space-x-2">',
         *_edit_btn,
-        f"        <a href=\"/{snake}\" class=\"text-gray-600 hover:underline\">← {{{{ trans('common.back') }}}}</a>",
+        f"        <a href=\"/{snake}\" class=\"text-gray-600 hover:underline\">← Retour</a>",
         "    </div>",
         "</div>",
         "",
@@ -513,9 +517,9 @@ def build_show_view(
             ]
         lines.append("    </div>")
     _delete_form = [
-        f'<form method="post" action="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}" class="mt-4" onsubmit="return confirm(\'{{{{ trans("crud.confirm_delete") }}}}\')">',
+        f'<form method="post" action="/{snake}/destroy/{{{{ {snake}.{pk_col} }}}}" class="mt-4" onsubmit="return confirm(\'Confirmer la suppression ?\')">',
         '    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">',
-        "    {{ button(label=trans('crud.delete'), variant='danger', type='submit') }}",
+        "    {{ button(label='Supprimer', variant='danger', type='submit') }}",
         "</form>",
     ]
     if delete_perm:
@@ -621,7 +625,7 @@ def _render_form_media(media_entries: list[dict[str, Any]]) -> list[str]:
                     '                     class="h-20 rounded">',
                     '                <label class="flex items-center gap-1 text-xs text-gray-600 mt-1">',
                     f'                    <input type="checkbox" name="_delete_media_{mname}" value="{{{{ _m.id }}}}">',
-                    "                    {{ trans('crud.delete') }}",
+                    "                    Supprimer",
                     "                </label>",
                     f'                <input type="number" name="_media_position_{mname}_{{{{ _m.id }}}}" value="{{{{ _m.position }}}}" min="0" class="mt-1 w-16 border border-gray-300 rounded px-1 py-0.5 text-xs">',
                     f'                <input type="text" name="_media_alt_{mname}_{{{{ _m.id }}}}" value="{{{{ _m.alt_text or \'\' }}}}" placeholder="Texte alternatif" class="mt-1 w-full border border-gray-300 rounded px-1 py-0.5 text-xs">',
@@ -709,7 +713,7 @@ def build_form_view(
         "{{ flash_messages(flash) }}",
         '<div class="flex justify-between items-center mb-6">',
         '    <h1 class="text-2xl font-bold text-gray-800">{{ titre }}</h1>',
-        f"    <a href=\"/{snake}\" class=\"text-gray-600 hover:underline\">← {{{{ trans('common.back') }}}}</a>",
+        f"    <a href=\"/{snake}\" class=\"text-gray-600 hover:underline\">← Retour</a>",
         "</div>",
         "",
         '{% include "partials/form_errors.html" %}',
@@ -725,8 +729,8 @@ def build_form_view(
 
     lines += [
         '        <div class="flex gap-4 pt-2">',
-        "            {{ button(label=trans('common.save'), variant='primary', type='submit') }}",
-        f"            {{{{ button(label=trans('common.cancel'), variant='secondary', href='/{snake}') }}}}",
+        "            {{ button(label='Enregistrer', variant='primary', type='submit') }}",
+        f"            {{{{ button(label='Annuler', variant='secondary', href='/{snake}') }}}}",
         "        </div>",
         "    </form>",
         "</div>",

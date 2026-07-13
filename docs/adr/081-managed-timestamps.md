@@ -38,7 +38,7 @@ Le normaliseur pose une clé `managed` sur ces champs :
 
 - **Formulaire** (classe `Form` et `form.html`) : les champs gérés sont exclus, comme un champ auto-généré (slug avec `source`). L'utilisateur ne saisit pas d'horodatage.
 - **Modèle** : l'`INSERT` pose `created_at` **et** `updated_at` à `datetime.now(timezone.utc)` ; l'`UPDATE` pose `updated_at` à `datetime.now(timezone.utc)` et **exclut** `created_at` (stable à l'édition, comme le slug). Aucune de ces colonnes n'est lue depuis `data`.
-- **Fiche détail et liste** : les horodatages restent affichés en **lecture seule** ; ce sont des métadonnées utiles, seule leur **saisie** est retirée.
+- **Toutes les vues générées** (formulaire, liste, fiche détail) et l'export CSV et le tri : les horodatages gérés sont **exclus**. Ce sont des métadonnées système, consultables en base ; les afficher alourdissait la liste d'en-têtes techniques (`Created at` / `Updated at`) et donnait un rendu de développeur plutôt qu'une UX utilisateur (retour terrain).
 
 ### Pas de valeur par défaut SQL
 
@@ -55,8 +55,8 @@ Le DDL reste `DATETIME NOT NULL`, **sans** `DEFAULT CURRENT_TIMESTAMP` ni `ON UP
 
 - **Défauts SQL (`DEFAULT CURRENT_TIMESTAMP` + `ON UPDATE CURRENT_TIMESTAMP`).**
   Proposée par le retour terrain. Écartée : introduit une double horloge (base et code) et contredit la convention établie pour sessions-db. La portabilité entre backends (ADR-054) est aussi plus simple si Python fournit la valeur.
-- **Exclure aussi les horodatages des vues de lecture.**
-  Écartée : leur affichage en lecture seule est une métadonnée utile ; seule leur saisie pose problème.
+- **Conserver les horodatages en lecture seule dans la liste et la fiche détail.**
+  Retenue au départ, puis écartée sur retour terrain : les colonnes `Created at` / `Updated at` alourdissaient la liste et donnaient un rendu technique. Les horodatages gérés sont désormais absents de toutes les vues générées ; ils restent en base.
 - **Étendre `_is_generated` (slug) au lieu d'un marqueur dédié.**
   Écartée : mélange deux notions (valeur calculée depuis une source vs horodatage système) ; un marqueur `managed` distinct est plus lisible et extensible.
 

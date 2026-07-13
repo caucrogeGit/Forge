@@ -61,7 +61,7 @@ def test_formulaire_suppression_ajoute_htmx_sur_meme_url_que_action():
     assert f'hx-post="{action}' in html
     assert 'hx-target="#crud-results"' in html
     assert 'hx-swap="innerHTML"' in html
-    assert 'hx-confirm="{{ trans(\'crud.confirm_delete\') }}"' in html
+    assert 'hx-confirm="Confirmer la suppression ?"' in html
 
 
 def test_suppression_preserve_parametres_liste_dans_url():

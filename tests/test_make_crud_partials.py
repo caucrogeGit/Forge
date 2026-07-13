@@ -149,19 +149,19 @@ def test_table_partial_contient_table_actions_tri_etats_vides_et_relations(tmp_p
     assert "<table" in table
     assert "?sort=title" in table
     assert "?sort=category_id" in table
-    assert "trans('crud.actions')" in table
-    assert "trans('crud.show')" in table
-    assert "trans('crud.edit')" in table
-    assert "trans('crud.delete')" in table
+    assert ">Actions</th>" in table
+    assert ">Voir</a>" in table
+    assert ">Modifier</a>" in table
+    assert ">Supprimer</button>" in table
     assert "onsubmit" in table
     assert "return confirm(" in table
     assert 'empty_context == "search"' in table
-    assert "trans('crud.empty_search')" in table
+    assert "Aucun résultat ne correspond à votre recherche." in table
     assert 'empty_context == "filters"' in table
-    assert "trans('crud.empty_filters')" in table
+    assert "Aucun résultat ne correspond aux filtres sélectionnés." in table
     assert 'empty_context == "search_filters"' in table
-    assert "trans('crud.empty_search_filters')" in table
-    assert "trans('crud.empty')" in table
+    assert "Aucun résultat ne correspond à votre recherche et aux filtres sélectionnés." in table
+    assert "Aucun élément à afficher." in table
     assert "article.category_id_label" in table
     assert "tags_by_article_id.get(article.Id, [])" in table
     assert '| join(", ") if _tag_ids_labels else "—"' in table

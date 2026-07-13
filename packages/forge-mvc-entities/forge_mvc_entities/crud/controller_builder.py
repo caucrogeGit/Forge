@@ -15,6 +15,7 @@ from forge_mvc_entities.crud.utils import (
     _humanize,
     _is_bool_sql,
     _is_generated,
+    _is_managed,
     _media_form_fields,
     _non_pk_fields,
     _pk_field,
@@ -861,7 +862,10 @@ def build_controller(
     pk = _pk_field(definition)
     pk_name = pk["name"]
     pk_col = pk["column"]
-    non_pk = _non_pk_fields(definition)
+    # Les horodatages gérés (ADR-081) ne sont surfacés dans aucun artefact
+    # utilisateur : ni tri, ni export CSV, ni préremplissage de formulaire.
+    # Leur valeur est posée par le modèle et reste consultable en base.
+    non_pk = [f for f in _non_pk_fields(definition) if not _is_managed(f)]
     # Champs slug auto-générés : (nom, champ source) — calculés à la création.
     generated_fields = [(f["name"], f["source"]) for f in non_pk if _is_generated(f)]
     allowed_sort_keys = [f["name"] for f in non_pk] + [pk_name]

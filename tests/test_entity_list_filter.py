@@ -603,8 +603,8 @@ class TestBuildIndexViewFilters:
         html = build_index_view(self._entity_with_bool_filter())
         assert 'name="actif"' in html
         assert "<select" in html
-        assert "trans('common.yes')" in html
-        assert "trans('common.no')" in html
+        assert ">Oui</option>" in html
+        assert ">Non</option>" in html
 
     def test_filters_loop_dans_sort_links(self):
         html = build_table_partial(self._entity_with_varchar_filter())
