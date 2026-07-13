@@ -152,6 +152,7 @@ def render_seed_adr_doc_style(date: str | None = None) -> str:
     """Retourne l'ADR-002 d'amorçage (style de documentation), daté si fourni.
 
     Posé par `forge new` et `forge agents:init` en write-if-new, à côté de
-    l'ADR-001. Donne à chaque nouveau projet une règle de rédaction explicite.
+    l'ADR-001. Donne à chaque nouveau projet une règle de rédaction explicite
+    (ADR-082, extension d'ADR-047).
     """
     return SEED_ADR_DOC_STYLE.format(date=date or _DATE_PLACEHOLDER)

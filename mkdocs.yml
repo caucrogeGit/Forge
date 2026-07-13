@@ -331,6 +331,7 @@ nav:
             - ADR-079 Découpeur SQL canonique: adr/079-canonical-sql-statement-splitter.md
             - ADR-080 Validation du sujet authentifié: adr/080-auth-subject-validation.md
             - ADR-081 Horodatages gérés par le framework: adr/081-managed-timestamps.md
+            - ADR-082 ADR de style de doc dans le squelette: adr/082-skeleton-doc-style-adr.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
