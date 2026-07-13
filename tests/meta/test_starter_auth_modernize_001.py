@@ -8,6 +8,7 @@ Vérifie que :
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -52,11 +53,20 @@ def _read(path: Path) -> str:
 # ---------------------------------------------------------------------------
 
 
+# Import canonique de is_authenticated depuis core.auth.session, forme simple
+# `from core.auth.session import is_authenticated` ou groupée/aliasée
+# `from core.auth.session import (\n    ... is_authenticated as _is_authenticated, ...)`.
+_CANONICAL_IMPORT = re.compile(
+    r"from core\.auth\.session import \([^)]*\bis_authenticated\b", re.DOTALL
+)
+
+
 def test_middleware_imports_canonical_is_authenticated():
     src = _read(_MIDDLEWARE)
-    assert "from core.auth.session import is_authenticated" in src, (
-        "middleware.py doit importer is_authenticated depuis core.auth.session"
-    )
+    assert (
+        "from core.auth.session import is_authenticated" in src
+        or _CANONICAL_IMPORT.search(src) is not None
+    ), "middleware.py doit importer is_authenticated depuis core.auth.session"
 
 
 def test_middleware_does_not_import_legacy_is_authenticated():
