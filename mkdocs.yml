@@ -329,6 +329,7 @@ nav:
             - ADR-077 Fixtures reliées (colonnes, références, ordre FK): adr/077-fixtures-reliees.md
             - ADR-078 Fixtures callable (hooks Python): adr/078-fixtures-callable.md
             - ADR-079 Découpeur SQL canonique: adr/079-canonical-sql-statement-splitter.md
+            - ADR-080 Validation du sujet authentifié: adr/080-auth-subject-validation.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
