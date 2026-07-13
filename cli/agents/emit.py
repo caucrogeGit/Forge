@@ -1,8 +1,9 @@
 # pyright: strict
 """Émission des fichiers de guidance agent dans une application Forge (ADR-047).
 
-Écrit `CLAUDE.md`, `AGENTS.md` (même briefing) et `docs/adr/001-adopter-forge.md`
-en write-if-new : un fichier déjà présent n'est jamais écrasé (charte principe 9).
+Écrit `CLAUDE.md`, `AGENTS.md` (même briefing) et les ADR d'amorçage
+`docs/adr/001-adopter-forge.md` et `docs/adr/002-style-documentation.md` en
+write-if-new : un fichier déjà présent n'est jamais écrasé (charte principe 9).
 Utilisé par `forge new` et par `forge agents:init`.
 """
 from __future__ import annotations
@@ -11,7 +12,7 @@ from datetime import date as _date
 from pathlib import Path
 
 from cli.agents.briefing import render_app_briefing
-from cli.agents.seed_adr import render_seed_adr
+from cli.agents.seed_adr import render_seed_adr, render_seed_adr_doc_style
 from cli.agents.settings import render_app_settings
 
 __all__ = ["emit_app_agent_files"]
@@ -33,9 +34,10 @@ def emit_app_agent_files(
 ) -> list[str]:
     """Écrit la couche guidance agent dans `project_root` (write-if-new).
 
-    Fichiers : `CLAUDE.md`, `AGENTS.md`, `docs/adr/001-adopter-forge.md`, et,
-    si `with_settings`, `.claude/settings.json` (commandes pré-autorisées).
-    `date` (ISO) tamponne l'ADR-001 ; par défaut, la date du jour.
+    Fichiers : `CLAUDE.md`, `AGENTS.md`, `docs/adr/001-adopter-forge.md`,
+    `docs/adr/002-style-documentation.md`, et, si `with_settings`,
+    `.claude/settings.json` (commandes pré-autorisées).
+    `date` (ISO) tamponne les ADR d'amorçage ; par défaut, la date du jour.
     Retourne la liste des chemins créés (relatifs au projet) ; un fichier déjà
     présent n'est pas listé (ni écrasé).
     """
@@ -47,6 +49,12 @@ def emit_app_agent_files(
     _write_if_new(
         project_root / "docs" / "adr" / "001-adopter-forge.md",
         render_seed_adr(date=stamp),
+        created,
+        project_root,
+    )
+    _write_if_new(
+        project_root / "docs" / "adr" / "002-style-documentation.md",
+        render_seed_adr_doc_style(date=stamp),
         created,
         project_root,
     )

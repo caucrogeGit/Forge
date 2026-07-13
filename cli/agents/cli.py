@@ -1,10 +1,11 @@
 # pyright: strict
 """Commande `forge agents:init` — guidance agent IA d'une application (ADR-047).
 
-- sans option : génère la couche guidance (`CLAUDE.md`, `AGENTS.md`, ADR-001) en
-  write-if-new (ne réécrit rien d'existant) ;
+- sans option : génère la couche guidance (`CLAUDE.md`, `AGENTS.md`, ADR-001 et
+  ADR-002) en write-if-new (ne réécrit rien d'existant) ;
 - `--force` : rafraîchit `CLAUDE.md` et `AGENTS.md` depuis la référence de la
-  version de Forge installée, sans toucher l'ADR-001 (propriété du projet) ;
+  version de Forge installée, sans toucher les ADR d'amorçage (propriété du
+  projet) ;
 - `--check` : diagnostic en lecture seule (fichiers absents ou briefing divergé).
 """
 from __future__ import annotations
@@ -18,6 +19,7 @@ __all__ = ["main"]
 
 _BRIEFING_FILES = ("CLAUDE.md", "AGENTS.md")
 _SEED_ADR = "docs/adr/001-adopter-forge.md"
+_SEED_ADR_DOC_STYLE = "docs/adr/002-style-documentation.md"
 
 
 def _check(root: Path) -> int:
@@ -31,6 +33,8 @@ def _check(root: Path) -> int:
             problems.append(f"{name} a divergé de la référence Forge installée")
     if not (root / _SEED_ADR).exists():
         problems.append(f"{_SEED_ADR} absent")
+    if not (root / _SEED_ADR_DOC_STYLE).exists():
+        problems.append(f"{_SEED_ADR_DOC_STYLE} absent")
     if problems:
         for problem in problems:
             print(f"[WARN] {problem}")
@@ -50,7 +54,7 @@ def _force(root: Path, *, with_settings: bool) -> int:
         if name not in _BRIEFING_FILES:
             print(f"[OK] créé : {name}")
     print()
-    print(f"Note : {_SEED_ADR} n'est jamais écrasé (il appartient au projet).")
+    print(f"Note : {_SEED_ADR} et {_SEED_ADR_DOC_STYLE} ne sont jamais écrasés (ils appartiennent au projet).")
     return 0
 
 

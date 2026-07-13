@@ -14,6 +14,8 @@ Contexte, Décision, Conséquences, Alternatives écartées.
 
 - `001-adopter-forge.md` : adoption de Forge et de ses conventions (posé par
   `forge agents:init`).
+- `002-style-documentation.md` : règles de rédaction de la documentation
+  (posé par `forge agents:init`).
 
-Numérotez les décisions suivantes `002`, `003`, etc., et ajoutez-les à ce
+Numérotez les décisions suivantes `003`, `004`, etc., et ajoutez-les à ce
 journal.

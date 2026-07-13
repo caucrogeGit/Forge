@@ -481,13 +481,14 @@ def test_aide_new_ne_mentionne_plus_starter():
 # ── Guidance agent (ADR-047) ────────────────────────────────────────────────────
 
 def test_emet_la_guidance_agent(monkeypatch, tmp_path):
-    """cmd_new produit CLAUDE.md, AGENTS.md et docs/adr/001-adopter-forge.md."""
+    """cmd_new produit CLAUDE.md, AGENTS.md et les ADR d'amorçage 001 et 002."""
     _patch_cmd_new(monkeypatch, tmp_path)
     forge.cmd_new("MonProjet")
     proj = tmp_path / "MonProjet"
     assert (proj / "CLAUDE.md").is_file()
     assert (proj / "AGENTS.md").is_file()
     assert (proj / "docs" / "adr" / "001-adopter-forge.md").is_file()
+    assert (proj / "docs" / "adr" / "002-style-documentation.md").is_file()
 
 
 # ── Mode dev : FORGE_DEV_SRC installe forge-mvc en éditable ───────────────────
