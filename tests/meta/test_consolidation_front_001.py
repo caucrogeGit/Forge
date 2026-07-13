@@ -223,11 +223,15 @@ def test_jinja_env_expose_trans():
     assert "trans" in content
 
 
-def test_generateurs_publics_utilisent_trans():
-    """Les générateurs de pages publiques utilisent trans() dans les templates générés."""
+def test_generateurs_publics_libelles_litteraux():
+    """Les générateurs de pages publiques émettent du français littéral, pas trans().
+
+    Comme le CRUD : un projet neuf n'a pas forge-mvc-i18n, un trans() non résolu
+    afficherait la clé brute. L'i18n reste un opt-in câblé par l'application.
+    """
     for fname in ("public_page.py", "public_form.py", "public_list.py", "public_contact.py"):
         content = (ROOT / "cli" / "public" / fname).read_text(encoding="utf-8")
-        assert "trans(" in content, f"trans() absent dans {fname}"
+        assert "trans(" not in content, f"trans() encore présent dans {fname}"
 
 
 # ── Absence de dépendances SPA ────────────────────────────────────────────────

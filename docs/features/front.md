@@ -201,33 +201,27 @@ Le template contient un titre, un texte d'introduction, un bloc coordonnées (em
 Ce n'est pas un formulaire de contact : aucun traitement serveur, aucun envoi de mail, aucun INSERT.
 Non destructif et idempotent.
 
-## Compatibilité i18n des pages publiques
+## Pages publiques et internationalisation
 
-Les templates générés par les commandes publiques utilisent `{{ trans('key') }}` pour les chaînes génériques.
-Si la clé existe dans `translations/fr.json`, la valeur traduite est affichée.
-Si la clé est absente, `trans()` retourne la clé elle-même, la page reste fonctionnelle.
+Les templates générés par les commandes publiques (`make:public-page`, `make:public-list`, `make:public-contact`, `make:public-form`) portent des libellés français littéraux, comme le CRUD.
+Ils n'appellent pas `trans()` : un projet neuf n'installe pas l'opt-in `forge-mvc-i18n`, et une clé non résolue afficherait la clé brute.
+Le texte est donc écrit en clair dans le gabarit, prêt à être adapté.
 
-**Clés publiques ajoutées dans `translations/fr.json` :**
+Libellés par défaut des gabarits publics :
 
-| Clé | Valeur par défaut |
+| Emplacement | Libellé |
 |---|---|
-| `public.page.generated` | Page publique générée par Forge. |
-| `public.list.empty` | Aucun élément public à afficher. |
-| `public.show.back` | Retour |
-| `public.show.not_found` | Élément public introuvable. |
-| `public.form.submit` | Envoyer |
-| `public.form.success` | Votre demande a été envoyée. |
-| `public.contact.title` | Contact |
-| `public.contact.intro` | Vous pouvez nous contacter… |
-| `public.contact.coordinates` | Coordonnées |
-| `public.contact.address` | Adresse |
-| `public.contact.email_label` | Email |
-| `public.contact.phone` | Téléphone |
-| `public.contact.address_placeholder` | Adresse à compléter |
+| Page générée | Page publique générée par Forge. |
+| Liste vide | Aucun élément public à afficher. |
+| Lien retour | Retour |
+| Élément introuvable | Élément public introuvable. |
+| Bouton de formulaire | Envoyer |
+| Titre du contact | Contact |
+| Intro du contact | Vous pouvez nous contacter avec les informations ci-dessous. |
+| Sections du contact | Coordonnées, Adresse, Téléphone |
 
-**Ce qui n'est PAS traduit automatiquement :** noms d'entités, routes, noms de fichiers.
+Pour un site multilingue, l'i18n reste un opt-in : installer `forge-mvc-i18n`, remplacer les libellés par des appels `trans('...')` et fournir les catalogues relève de l'application.
 Les textes propres à l'entité (titre de liste, champs) restent en clair dans les templates.
-L'i18n reste optionnelle : les pages publiques fonctionnent sans catalogue si les clés sont absentes (la clé s'affiche à la place).
 HTMX, Alpine.js et l'i18n avancée (détection de langue, middleware) ne sont pas imposés.
 
 ## Médias dans les pages publiques

@@ -30,7 +30,7 @@ def test_make_public_show_genere_template_public(tmp_path):
     assert "{% block content %}" in template
     assert "{% block scripts %}{% endblock %}" in template
     assert "{{ hebergement[field.name] }}" in template
-    assert "trans('public.show.not_found')" in template
+    assert "Élément public introuvable." in template
     assert '<a href="{{ back_url }}"' in template
 
 

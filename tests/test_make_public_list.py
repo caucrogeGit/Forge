@@ -99,7 +99,7 @@ def test_make_public_list_genere_template_public_de_liste(tmp_path):
     assert "{% block content %}" in template
     assert "{% block scripts %}{% endblock %}" in template
     assert "{% for row in hebergements %}" in template
-    assert "trans('public.list.empty')" in template
+    assert "Aucun élément public à afficher." in template
 
 
 def test_make_public_list_genere_controleur_public_dedie(tmp_path):

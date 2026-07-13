@@ -27,26 +27,26 @@ def build_contact_template() -> str:
     return (
         f'{{% extends "{PUBLIC_LAYOUT}" %}}\n'
         "\n"
-        f"{{% block {PUBLIC_TITLE_BLOCK} %}}{{{{ trans('public.contact.title') }}}}{{% endblock %}}\n"
+        f"{{% block {PUBLIC_TITLE_BLOCK} %}}Contact{{% endblock %}}\n"
         "\n"
         f"{{% block {PUBLIC_CONTENT_BLOCK} %}}\n"
         '<section class="mx-auto max-w-4xl px-6 py-12">\n'
-        '    <h1 class="text-3xl font-bold text-gray-900">{{ trans(\'public.contact.title\') }}</h1>\n'
+        '    <h1 class="text-3xl font-bold text-gray-900">Contact</h1>\n'
         '    <p class="mt-4 text-gray-600">\n'
-        "        {{ trans('public.contact.intro') }}\n"
+        "        Vous pouvez nous contacter avec les informations ci-dessous.\n"
         "    </p>\n"
         '    <div class="mt-8 grid gap-6 md:grid-cols-2">\n'
         '        <div class="rounded-lg border border-gray-200 bg-white p-6">\n'
-        "            <h2 class=\"text-xl font-semibold text-gray-800\">{{ trans('public.contact.coordinates') }}</h2>\n"
-        '            <p class="mt-4 text-gray-700">{{ trans(\'public.contact.email_label\') }} :\n'
+        "            <h2 class=\"text-xl font-semibold text-gray-800\">Coordonnées</h2>\n"
+        '            <p class="mt-4 text-gray-700">Email :\n'
         '                <a href="mailto:contact@example.com"'
         ' class="text-indigo-600 hover:underline">contact@example.com</a>\n'
         "            </p>\n"
-        "            <p class=\"mt-2 text-gray-700\">{{ trans('public.contact.phone') }} : 00 00 00 00 00</p>\n"
+        "            <p class=\"mt-2 text-gray-700\">Téléphone : 00 00 00 00 00</p>\n"
         "        </div>\n"
         '        <div class="rounded-lg border border-gray-200 bg-white p-6">\n'
-        "            <h2 class=\"text-xl font-semibold text-gray-800\">{{ trans('public.contact.address') }}</h2>\n"
-        "            <p class=\"mt-4 text-gray-700\">{{ trans('public.contact.address_placeholder') }}</p>\n"
+        "            <h2 class=\"text-xl font-semibold text-gray-800\">Adresse</h2>\n"
+        "            <p class=\"mt-4 text-gray-700\">Adresse à compléter</p>\n"
         "        </div>\n"
         "    </div>\n"
         "</section>\n"

@@ -45,7 +45,7 @@ def test_make_public_page_genere_template_public(tmp_path):
     assert '{% extends "layouts/base.html" %}' in template
     assert "{% block title %}Accueil{% endblock %}" in template
     assert "{% block content %}" in template
-    assert "trans('public.page.generated')" in template
+    assert "Page publique générée par Forge." in template
 
 
 def test_make_public_page_ajoute_route_publique(tmp_path):

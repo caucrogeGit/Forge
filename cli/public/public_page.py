@@ -76,7 +76,7 @@ def build_public_template(spec: PublicPageSpec) -> str:
         '<section class="mx-auto max-w-5xl px-6 py-12">\n'
         f'    <h1 class="text-3xl font-bold">{spec.title}</h1>\n'
         '    <p class="mt-4 text-gray-600">\n'
-        "        {{ trans('public.page.generated') }}\n"
+        "        Page publique générée par Forge.\n"
         "    </p>\n"
         "</section>\n"
         "{% endblock %}\n"

@@ -19,7 +19,7 @@ def test_contact_template_utilise_bloc_title():
     template = build_contact_template()
 
     assert "{% block title %}" in template
-    assert "trans('public.contact.title')" in template
+    assert "Contact" in template
     assert "{% endblock %}" in template
 
 
@@ -39,21 +39,21 @@ def test_contact_template_contient_titre_contact():
     template = build_contact_template()
 
     assert "<h1" in template
-    assert "trans('public.contact.title')" in template
+    assert "Contact" in template
 
 
 def test_contact_template_contient_coordonnees():
     template = build_contact_template()
 
-    assert "trans('public.contact.coordinates')" in template
+    assert "Coordonnées" in template
     assert "contact@example.com" in template
-    assert "trans('public.contact.phone')" in template
+    assert "Téléphone" in template
 
 
 def test_contact_template_contient_adresse():
     template = build_contact_template()
 
-    assert "trans('public.contact.address')" in template
+    assert "Adresse" in template
 
 
 def test_contact_template_contient_lien_mailto():
@@ -114,7 +114,7 @@ def test_make_public_contact_cree_template(tmp_path):
 
     template = _read(tmp_path, "mvc/views/public/contact.html")
     assert '{% extends "layouts/base.html" %}' in template
-    assert "trans('public.contact.title')" in template
+    assert "Contact" in template
 
 
 def test_make_public_contact_cree_controleur(tmp_path):

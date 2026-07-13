@@ -302,7 +302,7 @@ def build_public_form_template(spec: PublicFormSpec) -> str:
         "        </div>",
         "        {% endfor %}",
         '        <button type="submit" class="rounded bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">',
-        "            {{ trans('public.form.submit') }}",
+        "            Envoyer",
         "        </button>",
         "    </form>",
         "</section>",

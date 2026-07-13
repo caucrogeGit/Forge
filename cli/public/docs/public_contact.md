@@ -15,7 +15,7 @@ Elle réutilise entièrement la mécanique de `make:public-page` :
 - elle ajoute une méthode `contact` au contrôleur `mvc/controllers/public_pages_controller.py` ;
 - elle déclare une route publique `GET /contact` dans `mvc/routes/__init__.py`.
 
-Le gabarit affiche des coordonnées (email, téléphone, adresse) à travers le helper `trans()`, prêtes à être renseignées.
+Le gabarit affiche des coordonnées (email, téléphone, adresse) en français littéral, prêtes à être renseignées.
 Contrairement à `make:public-form`, cette page n'insère pas de données : elle présente des informations de contact.
 
 Forge ne réécrit jamais un fichier utilisateur en silence (principe 9).
@@ -131,7 +131,7 @@ print(result.spec.slug)  # "contact"
 
 !!! tip "Coordonnées à compléter"
     Le gabarit généré contient des valeurs de démonstration (email, téléphone, adresse).
-    Ce sont des libellés traduits via `trans()` : ajustez le catalogue de traductions et les coordonnées affichées.
+    Ce sont des libellés en français littéral : ajustez directement le texte et les coordonnées dans le gabarit.
 
 ## Voir aussi
 
