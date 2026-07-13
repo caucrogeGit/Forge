@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+# ADR-079 : découpeur SQL canonique du cœur (réexporté ici, consommé par migrations.py).
+from core.database.sql_script import split_sql_statements
 from forge_mvc_entities.model import ModelValidationError, check_model
 from cli.project.project_config import ProjectConfigError, load_project_config
 
@@ -170,23 +172,3 @@ def _rollback_quietly(connection: Any) -> None:
         pass
 
 
-def split_sql_statements(sql: str) -> list[str]:
-    statements: list[str] = []
-    current: list[str] = []
-    in_single_quote = False
-
-    for char in sql:
-        if char == "'":
-            in_single_quote = not in_single_quote
-        if char == ";" and not in_single_quote:
-            statement = "".join(current).strip()
-            if statement:
-                statements.append(statement)
-            current = []
-            continue
-        current.append(char)
-
-    tail = "".join(current).strip()
-    if tail:
-        statements.append(tail)
-    return statements

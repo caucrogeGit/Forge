@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
+from core.database.sql_script import split_sql_statements as _split_sql_statements
 from forge_mvc_fixtures.factory import Fixture
 
 STATUS_OK = "[OK]"
@@ -378,45 +379,9 @@ def _strip_line_comments(sql: str) -> str:
     )
 
 
-def split_sql_statements(sql: str) -> list[str]:
-    """Découpe un script SQL en instructions, en respectant les chaînes ``'...'``.
-
-    Un ``;`` à l'intérieur d'un littéral chaîne (par exemple une donnée de
-    fixture contenant un point-virgule) n'est pas un séparateur. Les guillemets
-    simples doublés (``''``) sont l'échappement SQL standard.
-    """
-    statements: list[str] = []
-    current: list[str] = []
-    in_string = False
-    i = 0
-    n = len(sql)
-    while i < n:
-        char = sql[i]
-        if in_string:
-            current.append(char)
-            if char == "'":
-                if i + 1 < n and sql[i + 1] == "'":
-                    current.append(sql[i + 1])
-                    i += 2
-                    continue
-                in_string = False
-            i += 1
-            continue
-        if char == "'":
-            in_string = True
-            current.append(char)
-        elif char == ";":
-            statement = "".join(current).strip()
-            if statement:
-                statements.append(statement)
-            current = []
-        else:
-            current.append(char)
-        i += 1
-    tail = "".join(current).strip()
-    if tail:
-        statements.append(tail)
-    return statements
+# ADR-079 : découpeur SQL canonique du cœur (chaînes '' + commentaires -- et /* */),
+# réexporté ici pour l'API de module de l'opt-in.
+split_sql_statements = _split_sql_statements
 
 
 def load_fixtures(
@@ -498,9 +463,8 @@ def load_fixtures(
                     return 1
                 callable_count += 1
                 continue
-            statements = split_sql_statements(_strip_line_comments(
-                unit.path.read_text(encoding="utf-8")
-            ))
+            # ADR-079 : le découpeur canonique gère lui-même les commentaires.
+            statements = split_sql_statements(unit.path.read_text(encoding="utf-8"))
             for statement in statements:
                 try:
                     db.execute(statement)

@@ -42,7 +42,7 @@ Découvertes par le cœur via l'entry point `forge_mvc.commands` (ADR-059). `loa
 | `collect_callable_fixtures(root)` | Fixtures callable `mvc/fixtures/*.py` (hors `factories/`, ADR-078). Lève `FixtureDiscoveryError` sur import cassé ou ambigu. |
 | `order_fixture_files(root, files)` | Ordonne les `.sql` par dépendances FK (tri topologique depuis `relations.json`) ; repli sur le nom (ADR-077). |
 | `order_load_units(root, sql_files, callables)` | Ordre unifié des `.sql` et fixtures callable (`LoadUnit`) par graphe fournit/dépend : FK de `relations.json`, sous-requêtes `reference()` et `depends_on` (ADR-078, F50/F51). |
-| `split_sql_statements(sql)` | Découpe un script en instructions, en respectant les chaînes `'...'`. |
+| `split_sql_statements(sql)` | Réexporte le découpeur SQL canonique du cœur (chaînes `'...'` + commentaires `--` / `/* */`, ADR-079). |
 | `load_fixtures(root, *, run, force, env, no_fk_checks=False)` | Affiche puis (si `run`) exécute les unités (SQL et `load()` callable). Codes : 0, 2, 1. |
 | `main(args)` | Point d'entrée ; lit `--run`, `--force`, `--no-fk-checks`. |
 
