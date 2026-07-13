@@ -229,7 +229,7 @@ def normalize_canonical_entity_for_model_build(entity: dict[str, Any]) -> dict[s
         fields.append(_system_datetime_field("updated_at", nullable=False, managed="timestamp_updated"))
 
     if options.get("soft_delete"):
-        fields.append(_system_datetime_field("deleted_at", nullable=True))
+        fields.append(_system_datetime_field("deleted_at", nullable=True, managed="soft_delete"))
 
     result: dict[str, Any] = {
         "entity": name,

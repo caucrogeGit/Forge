@@ -159,9 +159,13 @@ Ces horodatages sont **gérés par le framework** (ADR-081), jamais saisis.
 Le CRUD généré les exclut du formulaire.
 Le modèle les pose lui-même avec `datetime.now(timezone.utc)` : `created_at` et `updated_at` à l'insertion, `updated_at` seul à la mise à jour (`created_at` reste stable).
 Le DDL ne porte pas de `DEFAULT` : Python est la seule autorité sur la valeur.
-La fiche détail et la liste les affichent en lecture seule.
+Ils sont absents de toutes les vues générées (formulaire, liste, fiche détail) : ce sont des métadonnées système, consultables en base.
 
-Quand `soft_delete: true`, Forge ajoute `deleted_at DATETIME NULL`. Les enregistrements supprimés sont conservés en base avec une date de suppression.
+Quand `soft_delete: true`, Forge ajoute `deleted_at DATETIME NULL` et génère une **suppression logique réelle** (ADR-083).
+`deleted_at` est géré par le framework : absent des vues et de l'`INSERT`/`UPDATE`.
+La suppression (simple et groupée) pose `deleted_at = datetime.now(timezone.utc)` au lieu d'un `DELETE` physique.
+Toutes les lectures filtrent `deleted_at IS NULL` : un enregistrement supprimé est conservé en base mais invisible.
+La version actuelle ne génère pas de restauration ni de vue « corbeille ».
 
 ---
 

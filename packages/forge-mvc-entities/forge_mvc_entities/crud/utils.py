@@ -60,6 +60,25 @@ def _managed_touches_update(field: dict[str, Any]) -> bool:
     return field.get("managed") == "timestamp_updated"
 
 
+def _is_soft_delete(field: dict[str, Any]) -> bool:
+    """Vrai si le champ est la marque de suppression logique (``deleted_at``, ADR-083).
+
+    Marqué ``managed = "soft_delete"`` par le normaliseur depuis
+    ``options.soft_delete``. Absent des vues, jamais posé à l'INSERT/UPDATE ; le
+    modèle le pose à la suppression (``deleted_at = now``) et filtre les lectures
+    sur ``deleted_at IS NULL``.
+    """
+    return field.get("managed") == "soft_delete"
+
+
+def _soft_delete_column(definition: dict[str, Any]) -> str | None:
+    """Colonne de suppression logique de l'entité, ou ``None`` si absente."""
+    for field in definition["fields"]:
+        if _is_soft_delete(field):
+            return field["column"]
+    return None
+
+
 _FORM_FIELD_CLASS_MAP: dict[str, str] = {
     "string":   "StringField",
     "email":    "EmailField",

@@ -13,9 +13,11 @@ from forge_mvc_entities.crud.utils import (
     _filter_fields,
     _is_generated,
     _is_managed,
+    _is_soft_delete,
     _managed_touches_update,
     _non_pk_fields,
     _pk_field,
+    _soft_delete_column,
     _text_search_fields,
     _to_snake,
 )
@@ -52,8 +54,13 @@ def _render_model_query(
     """
     search_fields = _text_search_fields(definition, relations)
     qualifier = f"{table}." if relations else ""
+    # Suppression logique (ADR-083) : toute lecture filtre deleted_at IS NULL.
+    soft_col = _soft_delete_column(definition)
+    initial_clauses = f'["{qualifier}{soft_col} IS NULL"]' if soft_col else "[]"
     search_cols_repr = repr([qualifier + f["column"] for f in search_fields])
-    sort_items = [(f["name"], qualifier + f["column"]) for f in non_pk]
+    # Les champs gérés (horodatages, deleted_at) ne sont pas triables : absents
+    # des vues, ils n'ont pas d'en-tête de tri (ADR-081/083).
+    sort_items = [(f["name"], qualifier + f["column"]) for f in non_pk if not _is_managed(f)]
     sort_items.append((pk_name, qualifier + pk_col))
     allowed_sort_repr = "{" + ", ".join(f'"{k}": "{v}"' for k, v in sort_items) + "}"
     filter_flds_model = _filter_fields(definition, relations)
@@ -69,7 +76,7 @@ def _render_model_query(
         "",
         "",
         f"def count_{plural}(q: str | None = None, filters: dict[str, Any] | None = None) -> int:",
-        "    clauses: list[str] = []",
+        f"    clauses: list[str] = {initial_clauses}",
         "    params: list[Any] = []",
         "    if q and _SEARCH_COLS:",
         '        clauses.append("(" + " OR ".join(c + " LIKE ?" for c in _SEARCH_COLS) + ")")',
@@ -93,7 +100,7 @@ def _render_model_query(
         "    sort_col = _ALLOWED_SORT.get(sort or \"\", _DEFAULT_SORT)",
         '    sort_dir = "DESC" if direction == "desc" else "ASC"',
         f'    base = "{_build_select_base(table, relations)}"',
-        "    clauses: list[str] = []",
+        f"    clauses: list[str] = {initial_clauses}",
         "    params: list[Any] = []",
         "    if q and _SEARCH_COLS:",
         '        clauses.append("(" + " OR ".join(c + " LIKE ?" for c in _SEARCH_COLS) + ")")',
@@ -237,7 +244,15 @@ def build_model(
     # Champs slug → lookup get_<snake>_by_<slug>() pour le routing public (ADR-017).
     slug_fields = [f for f in definition["fields"] if cast("dict[str, Any]", f.get("form") or {}).get("field") == "slug"]
 
-    insert_fields = non_pk if auto_inc else definition["fields"]
+    # Suppression logique (ADR-083) : deleted_at n'est jamais posé à la création
+    # ni à l'édition (exclu de l'INSERT), le modèle le pose à la suppression, et
+    # toute lecture filtre deleted_at IS NULL.
+    soft_col = _soft_delete_column(definition)
+    main_q = (table + ".") if relations else ""
+    soft_where_all = f" WHERE {main_q}{soft_col} IS NULL" if soft_col else ""
+    soft_where_by_id = f" AND {main_q}{soft_col} IS NULL" if soft_col else ""
+
+    insert_fields = [f for f in (non_pk if auto_inc else definition["fields"]) if not _is_soft_delete(f)]
     insert_cols = ", ".join(f["column"] for f in insert_fields)
     insert_placeholders = ", ".join("?" for _ in insert_fields)
     insert_values = ", ".join(_column_value_expr(f) for f in insert_fields)
@@ -267,11 +282,27 @@ def build_model(
         update_constant = "None  # aucun champ métier — UPDATE non applicable"
         update_exec = "return  # aucun champ à mettre à jour"
 
-    # Import datetime seulement si un horodatage géré est posé par le modèle
-    # (ADR-081) — sinon l'import serait inutilisé (ruff F401).
-    needs_datetime = any(_is_managed(f) for f in insert_fields) or any(
-        _is_managed(f) for f in update_fields
+    # Import datetime si le modèle pose une valeur temporelle : horodatage géré
+    # (ADR-081) ou marque de suppression logique (ADR-083). Sinon l'import serait
+    # inutilisé (ruff F401).
+    needs_datetime = (
+        any(_is_managed(f) for f in insert_fields)
+        or any(_is_managed(f) for f in update_fields)
+        or bool(soft_col)
     )
+
+    # Suppression : logique (UPDATE deleted_at = now) si soft_delete, sinon
+    # physique (DELETE). Idem pour la suppression groupée.
+    if soft_col:
+        delete_constant = f'"UPDATE {table} SET {soft_col} = ? WHERE {pk_col} = ?"'
+        delete_exec = f"execute(DELETE, (datetime.now(timezone.utc), {pk_name}))"
+        bulk_delete_sql = f'"UPDATE {table} SET {soft_col} = ? WHERE {pk_col} IN (" + placeholders + ")"'
+        bulk_delete_params = "[datetime.now(timezone.utc), *ids]"
+    else:
+        delete_constant = f'"DELETE FROM {table} WHERE {pk_col} = ?"'
+        delete_exec = f"execute(DELETE, ({pk_name},))"
+        bulk_delete_sql = f'"DELETE FROM {table} WHERE {pk_col} IN (" + placeholders + ")"'
+        bulk_delete_params = "list(ids)"
 
     lines: list[str] = [
         *(["from datetime import datetime, timezone", ""] if needs_datetime else []),
@@ -279,11 +310,11 @@ def build_model(
         "",
         "from core.database.db import fetch_one, fetch_all, execute, insert",
         "",
-        f'SELECT_ALL   = "{_build_select_base(table, relations)} ORDER BY {"" if not relations else table + "."}{pk_col}"',
-        f'SELECT_BY_ID = "{_build_select_base(table, relations)} WHERE {"" if not relations else table + "."}{pk_col} = ?"',
+        f'SELECT_ALL   = "{_build_select_base(table, relations)}{soft_where_all} ORDER BY {main_q}{pk_col}"',
+        f'SELECT_BY_ID = "{_build_select_base(table, relations)} WHERE {main_q}{pk_col} = ?{soft_where_by_id}"',
         f'INSERT       = "INSERT INTO {table} ({insert_cols}) VALUES ({insert_placeholders})"',
         f'UPDATE       = {update_constant}',
-        f'DELETE       = "DELETE FROM {table} WHERE {pk_col} = ?"',
+        f'DELETE       = {delete_constant}',
         "",
         "",
         f"def get_{plural}():",
@@ -303,7 +334,7 @@ def build_model(
         "",
         "",
         f"def delete_{snake}({pk_name}):",
-        f"    execute(DELETE, ({pk_name},))",
+        f"    {delete_exec}",
         "",
         "",
         f"def bulk_delete_{plural}(ids):",
@@ -311,7 +342,7 @@ def build_model(
         "    if not ids:",
         "        return",
         '    placeholders = ", ".join("?" for _ in ids)',
-        f'    execute("DELETE FROM {table} WHERE {pk_col} IN (" + placeholders + ")", list(ids))',
+        f"    execute({bulk_delete_sql}, {bulk_delete_params})",
         "",
     ]
 
@@ -330,7 +361,7 @@ def build_model(
                 "",
                 "",
                 f"def get_{snake}_by_{sname}({sname}):",
-                f'    return fetch_one("SELECT * FROM {table} WHERE {scol} = ?", ({sname},))',
+                f'    return fetch_one("SELECT * FROM {table} WHERE {scol} = ?{" AND " + soft_col + " IS NULL" if soft_col else ""}", ({sname},))',
             ]
         lines[pos:pos] = block
 

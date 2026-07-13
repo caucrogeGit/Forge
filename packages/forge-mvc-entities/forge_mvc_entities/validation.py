@@ -33,7 +33,7 @@ ALLOWED_FIELD_KEYS = {
 # les horodatages issus de `options.timestamps`. La valeur nomme le rôle et
 # détermine le comportement du générateur CRUD (INSERT/UPDATE, exclusion du
 # formulaire). Marqueur interne : les auteurs d'entités ne le posent pas.
-ALLOWED_MANAGED_VALUES = {"timestamp_created", "timestamp_updated"}
+ALLOWED_MANAGED_VALUES = {"timestamp_created", "timestamp_updated", "soft_delete"}
 ALLOWED_FORM_KEYS = {"field"}
 SUPPORTED_FORM_FIELD_VALUES = {
     "string", "email", "phone", "url", "textarea", "slug", "date", "datetime"
