@@ -8,10 +8,12 @@ from pathlib import Path
 
 import cli._support.output as out
 from cli.public._shared import (
+    build_public_routes_file,
     ensure_routes_file as _ensure_routes_file,
     ensure_trailing_newline as _ensure_trailing_newline,
     has_router_factory as _has_router_factory,
     insert_import as _insert_import,
+    public_routes_branchement,
 )
 from core.http.slug import slugify
 
@@ -208,12 +210,19 @@ def ensure_route(routes_path: Path, spec: PublicPageSpec) -> tuple[bool, str | N
     return True, None
 
 
+def _page_register_name(spec: PublicPageSpec) -> str:
+    """Nom de la fonction/fichier de routes d'une page (slug kebab → snake)."""
+    return spec.slug.replace("-", "_")
+
+
 def make_public_page(name: str, *, root: Path | None = None) -> MakePublicPageResult:
     project_root = (root or Path.cwd()).resolve()
     spec = build_public_page_spec(name)
+    register_name = _page_register_name(spec)
+    routes_rel = Path("mvc/routes") / f"{register_name}_routes.py"
     template_path = project_root / TEMPLATE_DIR / f"{spec.slug}.html"
     controller_path = project_root / CONTROLLER_PATH
-    routes_path = project_root / ROUTES_PATH
+    routes_path = project_root / routes_rel
     result = MakePublicPageResult(
         spec=spec,
         template_path=template_path,
@@ -236,13 +245,24 @@ def make_public_page(name: str, *, root: Path | None = None) -> MakePublicPageRe
     if controller_warning:
         result.warnings.append(controller_warning)
 
-    route_changed, route_warning = ensure_route(routes_path, spec)
-    if route_changed:
-        result.created.append(ROUTES_PATH.as_posix())
+    # ADR-085 : fichier de routes dédié + affichage du branchement, jamais
+    # d'injection dans mvc/routes/__init__.py.
+    routes_path.parent.mkdir(parents=True, exist_ok=True)
+    if routes_path.exists():
+        result.preserved.append(routes_rel.as_posix())
     else:
-        result.preserved.append(ROUTES_PATH.as_posix())
-    if route_warning:
-        result.warnings.append(route_warning)
+        routes_path.write_text(
+            build_public_routes_file(
+                register_name,
+                "from mvc.controllers.public_pages_controller import PublicPagesController",
+                [
+                    f'public.add("GET", "/{spec.slug}", '
+                    f'PublicPagesController.{spec.method_name}, name="{spec.route_name}")'
+                ],
+            ),
+            encoding="utf-8",
+        )
+        result.created.append(routes_rel.as_posix())
 
     return result
 
@@ -263,6 +283,8 @@ def print_result(result: MakePublicPageResult) -> None:
         print("Aucun écrasement effectué.")
     for warning in result.warnings:
         print(out.warn(warning))
+    print()
+    print(public_routes_branchement(_page_register_name(spec)))
 
 
 def main(args: list[str], *, root: Path | None = None) -> MakePublicPageResult:

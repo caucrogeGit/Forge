@@ -93,6 +93,38 @@ def has_router_factory(content: str) -> bool:
     return False
 
 
+def build_public_routes_file(register_name: str, controller_import: str, add_lines: list[str]) -> str:
+    """Contenu d'un fichier `mvc/routes/<register_name>_routes.py` (ADR-068/085).
+
+    Un générateur `make:public-*` produit ses routes dans un fichier dédié plutôt
+    que de les injecter dans `mvc/routes/__init__.py` (ADR-085) : Forge ne réécrit
+    jamais un fichier utilisateur. `add_lines` sont les instructions
+    `public.add(...)` (sans indentation), branchées dans un groupe public.
+    """
+    body = "\n".join(f"        {line}" for line in add_lines)
+    return "\n".join([
+        f'"""Routes publiques {register_name} (ADR-068)."""',
+        "from core.http.router import Router",
+        controller_import,
+        "",
+        "",
+        f"def register_{register_name}_routes(router: Router) -> None:",
+        '    with router.group("", public=True) as public:',
+        body,
+        "",
+    ])
+
+
+def public_routes_branchement(register_name: str) -> str:
+    """Les deux lignes de branchement à afficher (ADR-085 : jamais injectées)."""
+    return "\n".join([
+        "Branchement à ajouter dans mvc/routes/__init__.py :",
+        "─" * 70,
+        f"  from mvc.routes.{register_name}_routes import register_{register_name}_routes",
+        f"  register_{register_name}_routes(router)",
+    ])
+
+
 def require_entities_module() -> None:
     """Échoue proprement si le moteur d'entités (forge-mvc-entities) est absent.
 

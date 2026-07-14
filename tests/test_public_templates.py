@@ -99,13 +99,15 @@ def test_generation_public_page_respecte_le_contrat_et_reste_idempotente(tmp_pat
     first_template = (tmp_path / "mvc" / "views" / "public" / "accueil.html").read_text(
         encoding="utf-8"
     )
-    first_routes = (tmp_path / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
+    # ADR-085 : la route vit dans un fichier dédié, pas dans __init__.py.
+    routes_file = tmp_path / "mvc" / "routes" / "accueil_routes.py"
+    first_routes = routes_file.read_text(encoding="utf-8")
     make_public_page("accueil", root=tmp_path)
 
     assert (tmp_path / "mvc" / "views" / "public" / "accueil.html").read_text(
         encoding="utf-8"
     ) == first_template
-    routes = (tmp_path / "mvc" / "routes" / "__init__.py").read_text(encoding="utf-8")
+    routes = routes_file.read_text(encoding="utf-8")
     assert routes.count('"/accueil"') == 1
     assert routes.count('name="public_pages-accueil"') == 1
     assert first_routes.count('"/accueil"') == 1

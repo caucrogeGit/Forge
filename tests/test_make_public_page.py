@@ -48,15 +48,32 @@ def test_make_public_page_genere_template_public(tmp_path):
     assert "Page publique générée par Forge." in template
 
 
-def test_make_public_page_ajoute_route_publique(tmp_path):
+def test_make_public_page_genere_fichier_de_routes(tmp_path):
+    # ADR-085 : un fichier de routes dédié, jamais d'injection dans __init__.py.
     _prepare_project(tmp_path)
+    init_before = _read(tmp_path, "mvc/routes/__init__.py")
 
-    make_public_page("accueil", root=tmp_path)
+    result = make_public_page("accueil", root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes/__init__.py")
+    routes = _read(tmp_path, "mvc/routes/accueil_routes.py")
     assert "from mvc.controllers.public_pages_controller import PublicPagesController" in routes
+    assert "def register_accueil_routes(router: Router) -> None:" in routes
     assert 'public.add("GET", "/accueil", PublicPagesController.accueil, name="public_pages-accueil")' in routes
     assert 'router.group("", public=True)' in routes
+    assert "mvc/routes/accueil_routes.py" in result.created
+    # routes/__init__.py n'est jamais touché.
+    assert _read(tmp_path, "mvc/routes/__init__.py") == init_before
+
+
+def test_make_public_page_affiche_le_branchement(tmp_path, capsys):
+    from cli.public.public_page import main
+
+    _prepare_project(tmp_path)
+    main(["accueil"], root=tmp_path)
+    out = capsys.readouterr().out
+    assert "Branchement à ajouter dans mvc/routes/__init__.py" in out
+    assert "from mvc.routes.accueil_routes import register_accueil_routes" in out
+    assert "register_accueil_routes(router)" in out
 
 
 def test_make_public_page_ajoute_controleur_public(tmp_path):
@@ -70,15 +87,17 @@ def test_make_public_page_ajoute_controleur_public(tmp_path):
     assert 'BaseController.render("public/accueil.html", request=request)' in controller
 
 
-def test_make_public_page_ne_duplique_pas_route_existante(tmp_path):
+def test_make_public_page_preserve_fichier_de_routes_existant(tmp_path):
     _prepare_project(tmp_path)
 
     make_public_page("accueil", root=tmp_path)
-    make_public_page("accueil", root=tmp_path)
+    result = make_public_page("accueil", root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes/__init__.py")
+    # Deuxième passage : fichier de routes préservé (write-if-new), pas de doublon.
+    routes = _read(tmp_path, "mvc/routes/accueil_routes.py")
     assert routes.count('"/accueil"') == 1
     assert routes.count('name="public_pages-accueil"') == 1
+    assert "mvc/routes/accueil_routes.py" in result.preserved
 
 
 def test_make_public_page_necrase_pas_template_existant(tmp_path):
@@ -149,39 +168,29 @@ def test_has_router_factory_faux_si_syntaxe_invalide():
     assert not _has_router_factory("def (:\n")
 
 
-def test_make_public_page_ninjecte_pas_si_router_seulement_en_commentaire(tmp_path):
-    """Si `routes.py` ne contient le marqueur que dans un commentaire, la route
-    n'est pas injectée (avertissement) et le fichier reste un module valide."""
+def test_make_public_page_ne_touche_jamais_routes_init(tmp_path):
+    """ADR-085 : routes/__init__.py n'est jamais modifié, même absent."""
     (tmp_path / "mvc" / "views" / "layouts").mkdir(parents=True, exist_ok=True)
     (tmp_path / "mvc" / "views" / "layouts" / "public.html").write_text(
         "{% block title %}{% endblock %}{% block content %}{% endblock %}\n",
         encoding="utf-8",
     )
-    routes_path = tmp_path / "mvc" / "routes" / "__init__.py"
-    routes_path.parent.mkdir(parents=True, exist_ok=True)
-    routes_path.write_text(
-        "from core.http.router import Router\n"
-        "# pensez a creer : router = Router()\n",
-        encoding="utf-8",
-    )
+    # Pas de mvc/routes/__init__.py du tout.
+    make_public_page("accueil", root=tmp_path)
 
-    result = make_public_page("accueil", root=tmp_path)
-
-    routes = routes_path.read_text(encoding="utf-8")
-    assert "PublicPagesController.accueil" not in routes  # pas de bloc injecté
-    assert any("à ajouter manuellement" in w for w in result.warnings)
-    compile(routes, "routes.py", "exec")  # toujours un module valide
+    assert not (tmp_path / "mvc" / "routes" / "__init__.py").exists()
+    routes = (tmp_path / "mvc" / "routes" / "accueil_routes.py").read_text(encoding="utf-8")
+    compile(routes, "accueil_routes.py", "exec")  # module valide
 
 
 def test_make_public_page_routes_resultantes_compilent(tmp_path):
-    """Après injection sur un `routes.py` valide, le fichier produit compile
-    (aucune référence `router` orpheline)."""
+    """Le fichier de routes généré compile (module valide)."""
     _prepare_project(tmp_path)
 
     make_public_page("accueil", root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes/__init__.py")
-    compile(routes, "routes.py", "exec")
+    routes = _read(tmp_path, "mvc/routes/accueil_routes.py")
+    compile(routes, "accueil_routes.py", "exec")
 
 
 def test_make_public_page_reste_independante_du_crud_admin(tmp_path):
@@ -193,7 +202,7 @@ def test_make_public_page_reste_independante_du_crud_admin(tmp_path):
         [
             _read(tmp_path, "mvc/views/public/accueil.html"),
             _read(tmp_path, "mvc/controllers/public_pages_controller.py"),
-            _read(tmp_path, "mvc/routes/__init__.py"),
+            _read(tmp_path, "mvc/routes/accueil_routes.py"),
         ]
     )
     assert "make:crud" not in generated
