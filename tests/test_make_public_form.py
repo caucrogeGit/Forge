@@ -8,7 +8,6 @@ from core.http.request import Request
 
 
 from cli.public.public_form import (
-    build_form_route_block,
     build_public_form_controller,
     build_public_form_create_method,
     build_public_form_spec,
@@ -398,20 +397,6 @@ def test_form_template_pas_liens_admin():
     assert "layouts/admin.html" not in template
 
 
-# --- build_form_route_block ---
-
-def test_build_form_route_block_contient_get_new_et_post():
-    spec = build_public_form_spec(DEMANDE_JSON)
-    block = build_form_route_block(spec)
-
-    assert '"GET"' in block
-    assert '"/demandes/new"' in block
-    assert '"POST"' in block
-    assert '"/demandes"' in block
-    assert 'name="public_demandes-new"' in block
-    assert 'name="public_demandes-create"' in block
-
-
 # --- Intégration make_public_form ---
 
 def test_make_public_form_cree_template(tmp_path):
@@ -436,15 +421,19 @@ def test_make_public_form_cree_controleur(tmp_path):
     assert "def create(request: Request) -> Response:" in controller
 
 
-def test_make_public_form_cree_routes(tmp_path):
+def test_make_public_form_genere_fichier_de_routes(tmp_path):
+    # ADR-085 : fichier de routes dédié, jamais d'injection dans __init__.py.
     _prepare_form_project(tmp_path, DEMANDE_JSON)
+    init_before = _read(tmp_path, "mvc/routes/__init__.py")
 
     make_public_form("Demande", output_root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes/__init__.py")
+    routes = _read(tmp_path, "mvc/routes/public_demandes_form_routes.py")
     assert "PublicDemandesController" in routes
-    assert '"/demandes/new"' in routes
-    assert '"/demandes"' in routes
+    assert "def register_public_demandes_form_routes(router: Router) -> None:" in routes
+    assert '"GET"' in routes and '"/demandes/new"' in routes
+    assert '"POST"' in routes and '"/demandes"' in routes
+    assert _read(tmp_path, "mvc/routes/__init__.py") == init_before  # jamais touché
 
 
 def test_make_public_form_preserve_template_existant(tmp_path):

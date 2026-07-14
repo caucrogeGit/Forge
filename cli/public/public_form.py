@@ -12,12 +12,11 @@ import cli._support.output as out
 # Moteur d'entités (forge-mvc-entities) importé paresseusement dans les fonctions
 # qui en dépendent (ADR-070) : le cœur n'en dépend pas au chargement.
 from cli.public._shared import (
+    build_public_routes_file,
     ensure_import as _ensure_import,
-    ensure_routes_file as _ensure_routes_file,
     ensure_trailing_newline as _ensure_trailing_newline,
-    has_router_factory as _has_router_factory,
     humanize as _humanize,
-    insert_import as _insert_import,
+    public_routes_branchement,
     require_entities_module as _require_entities_module,
 )
 from cli.public.public_page import (
@@ -25,7 +24,6 @@ from cli.public.public_page import (
     PUBLIC_LAYOUT,
     PUBLIC_SCRIPTS_BLOCK,
     PUBLIC_TITLE_BLOCK,
-    ROUTES_PATH,
 )
 from cli.public.public_list import (
     CONTROLLERS_ROOT,
@@ -315,48 +313,29 @@ def build_public_form_template(spec: PublicFormSpec) -> str:
     return "\n".join(lines)
 
 
-def _form_route_exists(content: str, spec: PublicFormSpec) -> bool:
-    new_name = f'name="{spec.route_new_name}"'
-    create_name = f'name="{spec.route_create_name}"'
-    new_path_pattern = rf'["\']{ re.escape(f"{spec.route_path}/new") }["\']'
-    return (
-        new_name in content
-        or create_name in content
-        or bool(re.search(new_path_pattern, content))
-    )
-
-
-def build_form_route_block(spec: PublicFormSpec) -> str:
-    return (
-        "\n"
-        "with router.group(\"\", public=True) as public:\n"
-        f'    public.add("GET", "{spec.route_path}/new", {spec.class_name}.new, name="{spec.route_new_name}")\n'
-        f'    public.add("POST", "{spec.route_path}", {spec.class_name}.create, name="{spec.route_create_name}")\n'
-    )
-
-
-def _ensure_form_route(routes_path: Path, spec: PublicFormSpec) -> tuple[bool, str | None]:
-    _ensure_routes_file(routes_path)
-    content = routes_path.read_text(encoding="utf-8")
-    import_line = f"from mvc.controllers.public_{spec.plural}_controller import {spec.class_name}"
-    changed = import_line not in content
-    content = _insert_import(content, import_line)
-
-    if _form_route_exists(content, spec):
-        routes_path.write_text(_ensure_trailing_newline(content), encoding="utf-8")
-        return changed, None
-
-    if not _has_router_factory(content):
-        return False, (
-            f"Routes à ajouter manuellement dans {routes_path.as_posix()} : "
-            f"GET {spec.route_path}/new et POST {spec.route_path}"
-        )
-
+def _write_form_routes(project_root: Path, result: "MakePublicFormResult", spec: PublicFormSpec) -> None:
+    """Écrit mvc/routes/public_<plural>_form_routes.py en write-if-new (ADR-085)."""
+    register_name = f"public_{spec.plural}_form"
+    routes_rel = Path("mvc/routes") / f"{register_name}_routes.py"
+    routes_path = project_root / routes_rel
+    routes_path.parent.mkdir(parents=True, exist_ok=True)
+    if routes_path.exists():
+        result.preserved.append(routes_rel.as_posix())
+        return
     routes_path.write_text(
-        _ensure_trailing_newline(content) + build_form_route_block(spec),
+        build_public_routes_file(
+            register_name,
+            f"from mvc.controllers.public_{spec.plural}_controller import {spec.class_name}",
+            [
+                f'public.add("GET", "{spec.route_path}/new", {spec.class_name}.new, '
+                f'name="{spec.route_new_name}")',
+                f'public.add("POST", "{spec.route_path}", {spec.class_name}.create, '
+                f'name="{spec.route_create_name}")',
+            ],
+        ),
         encoding="utf-8",
     )
-    return True, None
+    result.created.append(routes_rel.as_posix())
 
 
 def _ensure_insert_constant(content: str, spec: PublicFormSpec) -> tuple[str, bool]:
@@ -478,13 +457,8 @@ def make_public_form(
     if controller_warning:
         result.warnings.append(controller_warning)
 
-    route_changed, route_warning = _ensure_form_route(project_root / ROUTES_PATH, spec)
-    if route_changed:
-        result.created.append(ROUTES_PATH.as_posix())
-    else:
-        result.preserved.append(ROUTES_PATH.as_posix())
-    if route_warning:
-        result.warnings.append(route_warning)
+    # ADR-085 : fichier de routes dédié + affichage, jamais d'injection.
+    _write_form_routes(project_root, result, spec)
 
     if not spec.fields:
         result.warnings.append(f"Aucun champ public affichable détecté pour {spec.entity}.")
@@ -504,6 +478,8 @@ def print_result(result: MakePublicFormResult) -> None:
         print(out.preserved(path))
     for warning in result.warnings:
         print(out.warn(warning))
+    print()
+    print(public_routes_branchement(f"public_{spec.plural}_form"))
 
 
 def main(args: list[str], *, root: Path | None = None) -> MakePublicFormResult:
