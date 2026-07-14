@@ -12,9 +12,12 @@
 -r requirements.txt
 
 # Opt-ins (dépendances tierces déclarées dans packages/*/pyproject.toml).
-# jinja2 et jsonschema sont déjà couverts par le cœur (requirements.txt).
+# jinja2 est déjà couvert par le cœur (requirements.txt). jsonschema a quitté le
+# cœur avec le moteur d'entités (CORE-DROP-JSONSCHEMA-001) : il est désormais listé
+# ici, apporté par forge-mvc-entities et forge-mvc-rbac.
 cryptography>=48.0.1,<49
 faker>=30,<40
+jsonschema>=4.18,<5
 mariadb==1.1.14
 markupsafe>=2.0,<4
 paho-mqtt>=2.1,<3

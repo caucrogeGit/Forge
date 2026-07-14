@@ -23,9 +23,13 @@ dependencies = [
     "jinja2==3.1.6",
     # CORE-DROP-PILLOW-001 (ADR-018) : Pillow a quitté le core. Le traitement
     # d'image vit dans l'opt-in forge-mvc-images, qui déclare Pillow lui-même.
-    "argon2-cffi>=25.1,<26",
-    "jsonschema>=4.18,<5",
+        "argon2-cffi>=25.1,<26",
+    # CORE-DROP-JSONSCHEMA-001 (ADR-070) : jsonschema a quitté le core avec le
+    # moteur d'entités. forge-mvc-entities et forge-mvc-rbac le déclarent eux-mêmes.
+    # Les commandes du core (schema:list, schema:doctor) n'inspectent que présence,
+    # validité JSON et $ref, sans jsonschema.
 ]
+
 
 classifiers = [
     "Development Status :: 4 - Beta",
