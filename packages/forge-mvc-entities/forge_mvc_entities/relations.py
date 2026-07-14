@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportUnusedFunction=false
 """Validation et generation des relations globales Forge."""
 
 from __future__ import annotations
@@ -24,18 +23,6 @@ _CANONICAL_ON_DELETE_TO_SQL = {
     "set_null": "SET NULL",
     "no_action": "NO ACTION",
 }
-
-@dataclass(frozen=True)
-class ResolvedEntityField:
-    entity_name: str
-    table_name: str
-    field_name: str
-    column_name: str
-    python_type: str
-    sql_type: str
-    nullable: bool
-    primary_key: bool
-
 
 @dataclass(frozen=True)
 class ValidatedRelation:
@@ -114,15 +101,6 @@ def _is_sql_identifier(value: str) -> bool:
 
 def _is_pascal_case(value: str) -> bool:
     return bool(re.fullmatch(r"[A-Z][A-Za-z0-9]*", value))
-
-
-def _normalize_sql_type_for_fk(sql_type: str) -> str:
-    normalized = sql_type.strip().upper()
-    normalized = re.sub(r"\s+", " ", normalized)
-    normalized = re.sub(r"\s*\(\s*", "(", normalized)
-    normalized = re.sub(r"\s*,\s*", ",", normalized)
-    normalized = re.sub(r"\s*\)", ")", normalized)
-    return normalized
 
 
 def load_entity_definitions(entities_root: Path) -> dict[str, dict[str, Any]]:
@@ -716,38 +694,3 @@ def _validate_relation_item_canonical(
         fk_index=fk_index,
         fk_owned=fk_owned,
     )
-
-
-
-
-def _resolve_entity_field(
-    entity_map: dict[str, dict[str, Any]],
-    entity_name: str,
-    field_name: str,
-    issue_path: str,
-    issues: list[RelationIssue],
-) -> ResolvedEntityField | None:
-    entity = entity_map.get(entity_name)
-    if entity is None:
-        _add_issue(issues, issue_path.rsplit(".", 1)[0], f"l'entite {entity_name!r} est introuvable")
-        return None
-
-    for field in entity["fields"]:
-        if field["name"] == field_name:
-            return ResolvedEntityField(
-                entity_name=entity_name,
-                table_name=entity["table"],
-                field_name=field_name,
-                column_name=field["column"],
-                python_type=field["python_type"],
-                sql_type=field["sql_type"],
-                nullable=field["nullable"],
-                primary_key=field["primary_key"],
-            )
-
-    _add_issue(issues, issue_path, f"le champ {field_name!r} est introuvable dans l'entite {entity_name!r}")
-    return None
-
-
-def _is_safe_sql_type(value: str) -> bool:
-    return bool(re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*(?:\([0-9]+(?:,[0-9]+)?\))?(?:\s+[A-Za-z]+)*", value.strip()))
