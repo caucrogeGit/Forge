@@ -9,5 +9,5 @@ class DoublonError(Exception):
 
     Usage dans un controller :
         except DoublonError as e:
-            validator.add_error(f"L'ID « {e} » existe déjà.")
+            form.add_error("client_id", f"L'ID « {e} » existe déjà.")
     """

@@ -22,7 +22,6 @@ Construire la réponse et rendre les gabarits.
 - [BaseController](../core-mvc/base_controller.md) : la classe mère de tous les contrôleurs.
 - [Templating](../core-templating/manager.md) : le rendu Jinja2 ([contrats](../core-templating/contracts.md)).
 - [Pagination](../core-mvc/pagination.md) : listes paginées prêtes pour le gabarit.
-- [Validator](../core-mvc/validator.md) : validation simple côté contrôleur.
 
 ## Formulaires et validation
 

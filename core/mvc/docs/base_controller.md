@@ -253,4 +253,3 @@ class ApiController(BaseController):
 
 - [Le registre de contexte Jinja](registry.md) : enrichir le contexte de rendu.
 - [La pagination](pagination.md) : son `context` se passe au gabarit via `render`.
-- [Le validateur de modèle](validator.md) : produit les messages d'erreur affichés par `render_form`.

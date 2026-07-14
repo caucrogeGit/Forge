@@ -32,16 +32,21 @@ def test_validator_non_importable():
 
 
 def test_aucune_reference_au_module_validator():
-    # Aucune source ne doit réimporter le module retiré.
+    # Aucune source NI DOC ne doit référencer le module retiré. On balaie les
+    # .py mais aussi les .md/.yml : une doc embarquée qui importe le module
+    # supprimé casse test_embedded_docs_imports_001 et mkdocs --strict (leçon de
+    # ce ticket — un retrait n'est complet que quand ses docs le sont).
     offenders: list[str] = []
-    for root in ("core", "cli", "integrations", "packages", "skeleton"):
+    needles = ("core.mvc.model.validator", "from core.mvc.model import validator", "model/validator.py")
+    for root in ("core", "cli", "integrations", "packages", "skeleton", "docs"):
         base = PROJECT_ROOT / root
         if not base.exists():
             continue
-        for path in base.rglob("*.py"):
-            if "__pycache__" in path.parts or "/build/" in path.as_posix():
-                continue
-            text = path.read_text(encoding="utf-8")
-            if "core.mvc.model.validator" in text or "from core.mvc.model import validator" in text:
-                offenders.append(str(path.relative_to(PROJECT_ROOT)))
+        for pattern in ("*.py", "*.md", "*.yml"):
+            for path in base.rglob(pattern):
+                if "__pycache__" in path.parts or "/build/" in path.as_posix():
+                    continue
+                text = path.read_text(encoding="utf-8", errors="replace")
+                if any(needle in text for needle in needles):
+                    offenders.append(str(path.relative_to(PROJECT_ROOT)))
     assert not offenders, f"Références résiduelles au module validator retiré : {offenders}"

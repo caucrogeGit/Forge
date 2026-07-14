@@ -21,7 +21,7 @@ Quand un modèle tente d'insérer un enregistrement déjà existant, la base de 
 | Rôle | signaler une violation de contrainte d'unicité |
 | Levée par | un modèle, depuis l'erreur d'intégrité de la base |
 | Attrapée par | un contrôleur, pour produire un message d'unicité |
-| Objet lié | `Validator` (le message est ajouté via `add_error`) |
+| Objet lié | le formulaire (`Form.add_error`, `core.forms`) |
 
 `DoublonError` ne porte pas d'API propre : c'est une sous-classe d'`Exception`, dont l'argument transporte l'identifiant en cause.
 
@@ -60,7 +60,7 @@ classDiagram
 |---|---|
 | Signaler une insertion en doublon (modèle) | `raise DoublonError(identifiant)` |
 | Traiter un doublon (contrôleur) | `except DoublonError as e:` |
-| Transformer en message de formulaire | `validator.add_error(...)` |
+| Transformer en message de formulaire | `form.add_error("champ", "...")` (`core.forms`) |
 
 ## 6. Exemples d'utilisation
 
@@ -89,10 +89,10 @@ def store(request):
     try:
         create_client(data)
     except DoublonError as e:
-        validator.add_error(f"L'identifiant « {e} » existe déjà.")
+        form.add_error("client_id", f"L'identifiant « {e} » existe déjà.")
+        return BaseController.validation_error("clients/form.html", form=form, request=request)
 ```
 
 ## Voir aussi
 
-- [Le validateur de modèle](validator.md) : reçoit le message de doublon via `add_error`.
 - [Le contrôleur de base](base_controller.md) : affiche les erreurs de validation dans un formulaire.

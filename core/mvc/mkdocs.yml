@@ -6,5 +6,4 @@ nav:
       - Contrôleur de base (controller/base_controller.py): base_controller.md
       - Registre de contexte Jinja (controller/registry.py): registry.md
       - Pagination (view/pagination.py): pagination.md
-      - Validateur de modèle (model/validator.py): validator.md
       - Erreur de doublon (model/exceptions.py): exceptions.md
