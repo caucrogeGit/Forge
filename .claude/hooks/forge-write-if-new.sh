@@ -123,12 +123,17 @@ block_user_zone() {
 # de cette liste. C'est un fichier projet normal qui fait partie du
 # flux normal de release et d'audit Forge, et il doit pouvoir être mis
 # à jour par les agents (Claude Code, Codex, etc.) lorsqu'un ticket
-# le demande explicitement. Les autres entrées (charte, CLAUDE.md,
-# settings du hook, pyproject, fichiers .env) restent protégées.
+# le demande explicitement.
+#
+# Note (HOOK-CLAUDE-MD-UNBLOCK-001) : CLAUDE.md a été retiré de cette
+# liste. Le briefing agent fait partie du flux normal de resync et de
+# gouvernance Forge, et les agents doivent pouvoir le mettre à jour
+# lorsqu'un ticket le demande explicitement. Les autres entrées
+# (charte, settings du hook, pyproject racine, fichiers .env) restent
+# protégées.
 
 case "$REL_PATH" in
   "CHARTE_DOC.md"|\
-  "CLAUDE.md"|\
   ".claude/settings.json"|\
   ".claude/hooks/"*|\
   "pyproject.toml"|\

@@ -318,12 +318,18 @@ impératif, sans majuscule ni point final.
 **Validations attendues avant chaque commit** :
 
 ```bash
-python -m pytest -x -q          # complet, 0 régression
+python -m pytest -x -q -m "not docs"   # boucle code : comportement + garde-fous de structure
+python -m pytest -x -q -m docs         # en plus, si la doc a été modifiée
 python -m compileall -q .
 ruff check .
 mkdocs build --strict
 git diff --check
 ```
+
+La suite complète (`python -m pytest -x -q`) reste exigée aux jalons et avant
+release ; la CI l'exécute toujours et rattrape les dérives croisées code/doc.
+La carte des couches et des marqueurs (`meta`, `smoke`, `db`, `docs`) est dans
+`docs/contributing/conventions.md`, section B.7 (ticket `TESTS-DOCS-MARKER-001`).
 
 ---
 
@@ -449,12 +455,18 @@ charte avant chaque écriture.
 
 ```
 CHARTE_DOC.md
-CLAUDE.md
 .claude/settings.json
 .claude/hooks/**
 pyproject.toml   (racine uniquement ; les pyproject.toml des paquets restent modifiables)
 .env  /  .env.*  /  **/.env  /  **/.env.*
 ```
+
+**Note (déblocage `CLAUDE.md`, ticket `HOOK-CLAUDE-MD-UNBLOCK-001`)** : `CLAUDE.md`
+n'est **plus** bloqué par le hook. Le briefing agent fait partie du flux normal
+de resync et de gouvernance Forge ; les agents peuvent le mettre à jour
+lorsqu'un ticket le demande explicitement, sur le modèle du déblocage du
+`CHANGELOG.md`. Les modifications doivent rester limitées à la section
+concernée par le ticket en cours.
 
 **Note (déblocage `env/*`, ticket `HOOK-ENV-UNBLOCK-001`)** : les fichiers
 d'environnement Forge `env/dev`, `env/test`, `env/prod` et `env/*.local` ne sont
