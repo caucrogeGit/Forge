@@ -222,11 +222,18 @@ class TestTokenNeverLeaks:
 
 
 class TestImplementationGuards:
-    def test_uses_secrets_compare_digest(self):
+    def test_delegue_a_la_primitive_bearer_du_coeur(self):
+        # CORE-HTTP-BEARER-PRIMITIVE-001 : la logique Bearer (comparaison temps
+        # constant incluse) a quitté ce module pour core/http/bearer.py, testé
+        # une fois pour tous. iot doit déléguer à la primitive.
         src = HTTP_FILE.read_text(encoding="utf-8")
-        assert "secrets.compare_digest" in src, (
-            "la comparaison du token doit utiliser secrets.compare_digest "
-            "(temps constant), pas == "
+        assert "is_bearer_authorized" in src, (
+            "iot doit autoriser via core.http.bearer.is_bearer_authorized "
+            "(primitive partagée), pas sa propre copie."
+        )
+        bearer = (PROJECT_ROOT / "core" / "http" / "bearer.py").read_text(encoding="utf-8")
+        assert "secrets.compare_digest" in bearer, (
+            "la primitive Bearer du cœur doit comparer le token en temps constant."
         )
 
     def test_no_core_module_imports_forge_mvc_iot(self):
