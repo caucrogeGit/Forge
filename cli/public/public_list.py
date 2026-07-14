@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 from __future__ import annotations
 
 import json
@@ -12,16 +11,21 @@ from typing import Any, cast
 import cli._support.output as out
 # Moteur d'entités (forge-mvc-entities) importé paresseusement dans les fonctions
 # qui en dépendent (ADR-070) : le cœur n'en dépend pas au chargement.
+from cli.public._shared import (
+    ensure_import as _ensure_import,
+    ensure_routes_file as _ensure_routes_file,
+    ensure_trailing_newline as _ensure_trailing_newline,
+    has_router_factory as _has_router_factory,
+    humanize as _humanize,
+    insert_import as _insert_import,
+    require_entities_module as _require_entities_module,
+)
 from cli.public.public_page import (
     PUBLIC_CONTENT_BLOCK,
     PUBLIC_LAYOUT,
     PUBLIC_SCRIPTS_BLOCK,
     PUBLIC_TITLE_BLOCK,
     ROUTES_PATH,
-    _ensure_routes_file,
-    _ensure_trailing_newline,
-    _has_router_factory,
-    _insert_import,
 )
 
 
@@ -92,10 +96,6 @@ class MakePublicShowResult:
     created: list[str] = field(default_factory=list[str])
     preserved: list[str] = field(default_factory=list[str])
     warnings: list[str] = field(default_factory=list[str])
-
-
-def _humanize(name: str) -> str:
-    return name.replace("_", " ").capitalize()
 
 
 def _is_sensitive_field(field: dict[str, Any]) -> bool:
@@ -596,12 +596,6 @@ def _ensure_show_route(routes_path: Path, spec: PublicListSpec) -> tuple[bool, s
     return True, None
 
 
-def _ensure_import(content: str, import_line: str) -> tuple[str, bool]:
-    if import_line in content:
-        return content, False
-    return _insert_import(content, import_line), True
-
-
 def _ensure_detail_constant(content: str, spec: PublicListSpec) -> tuple[str, bool]:
     if "SELECT_PUBLIC_DETAIL" in content:
         return content, False
@@ -797,22 +791,6 @@ def print_show_result(result: MakePublicShowResult) -> None:
         print(out.preserved(path))
     for warning in result.warnings:
         print(out.warn(warning))
-
-
-def _require_entities_module() -> None:
-    """Échoue proprement si le moteur d'entités (forge-mvc-entities) est absent.
-
-    make:public-list/show/form lisent le contrat JSON de l'entité via ce moteur
-    (ADR-070) ; sans l'opt-in, on rend un message d'installation plutôt qu'une
-    traceback brute d'import (principes 8 et 10).
-    """
-    import importlib.util
-    if importlib.util.find_spec("forge_mvc_entities") is None:
-        from cli._support.errors import cli_fail
-        cli_fail(
-            "module forge-mvc-entities non installé.",
-            hint="installe le moteur d'entités : pip install --pre forge-mvc-entities",
-        )
 
 
 def main(args: list[str], *, root: Path | None = None) -> MakePublicListResult:

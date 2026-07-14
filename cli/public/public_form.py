@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 from __future__ import annotations
 
 import ast
@@ -12,25 +11,27 @@ from typing import Any
 import cli._support.output as out
 # Moteur d'entités (forge-mvc-entities) importé paresseusement dans les fonctions
 # qui en dépendent (ADR-070) : le cœur n'en dépend pas au chargement.
+from cli.public._shared import (
+    ensure_import as _ensure_import,
+    ensure_routes_file as _ensure_routes_file,
+    ensure_trailing_newline as _ensure_trailing_newline,
+    has_router_factory as _has_router_factory,
+    humanize as _humanize,
+    insert_import as _insert_import,
+    require_entities_module as _require_entities_module,
+)
 from cli.public.public_page import (
     PUBLIC_CONTENT_BLOCK,
     PUBLIC_LAYOUT,
     PUBLIC_SCRIPTS_BLOCK,
     PUBLIC_TITLE_BLOCK,
     ROUTES_PATH,
-    _ensure_routes_file,
-    _ensure_trailing_newline,
-    _has_router_factory,
-    _insert_import,
 )
 from cli.public.public_list import (
     CONTROLLERS_ROOT,
     ENTITIES_ROOT,
     PUBLIC_TEMPLATE_ROOT,
     SIMPLE_PYTHON_TYPES,
-    _ensure_import,
-    _humanize,
-    _require_entities_module,
 )
 
 

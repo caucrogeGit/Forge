@@ -1,5 +1,4 @@
 # pyright: strict
-# pyright: reportPrivateUsage=false
 from __future__ import annotations
 
 from pathlib import Path
@@ -15,8 +14,8 @@ from cli.public.public_page import (
     TEMPLATE_DIR,
     MakePublicPageResult,
     build_public_page_spec,
-    _ensure_controller_method,
-    _ensure_route,
+    ensure_controller_method as _ensure_controller_method,
+    ensure_route as _ensure_route,
 )
 
 _CONTACT_SLUG = "contact"

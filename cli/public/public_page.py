@@ -7,6 +7,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import cli._support.output as out
+from cli.public._shared import (
+    ensure_routes_file as _ensure_routes_file,
+    ensure_trailing_newline as _ensure_trailing_newline,
+    has_router_factory as _has_router_factory,
+    insert_import as _insert_import,
+)
 from core.http.slug import slugify
 
 
@@ -104,10 +110,6 @@ def build_controller(spec: PublicPageSpec) -> str:
     )
 
 
-def _ensure_trailing_newline(content: str) -> str:
-    return content if content.endswith("\n") else content + "\n"
-
-
 _REQUEST_IMPORT_LINE = "from core.http.request import Request\n"
 _RESPONSE_IMPORT_LINE = "from core.http.response import Response\n"
 
@@ -138,7 +140,7 @@ def _ensure_typed_imports(content: str) -> str:
     return "".join(lines)
 
 
-def _ensure_controller_method(controller_path: Path, spec: PublicPageSpec) -> tuple[bool, str | None]:
+def ensure_controller_method(controller_path: Path, spec: PublicPageSpec) -> tuple[bool, str | None]:
     if not controller_path.exists():
         controller_path.parent.mkdir(parents=True, exist_ok=True)
         controller_path.write_text(build_controller(spec), encoding="utf-8")
@@ -172,64 +174,6 @@ def _ensure_controller_method(controller_path: Path, spec: PublicPageSpec) -> tu
     return True, None
 
 
-def _ensure_routes_file(routes_path: Path) -> bool:
-    if routes_path.exists():
-        return False
-    routes_path.parent.mkdir(parents=True, exist_ok=True)
-    routes_path.write_text(
-        "from core.http.router import Router\n"
-        "\n"
-        "router = Router()\n",
-        encoding="utf-8",
-    )
-    return True
-
-
-def _insert_import(content: str, import_line: str) -> str:
-    if import_line in content:
-        return content
-
-    lines = _ensure_trailing_newline(content).splitlines(keepends=True)
-    insert_at = 0
-    for index, line in enumerate(lines):
-        if line.startswith("from ") or line.startswith("import "):
-            insert_at = index + 1
-            continue
-        if line.strip() == "":
-            continue
-        break
-    lines.insert(insert_at, import_line + "\n")
-    return "".join(lines)
-
-
-def _has_router_factory(content: str) -> bool:
-    """Vrai si `content` contient une affectation module-level `router = Router(...)`.
-
-    Détection par AST plutôt que par sous-chaîne : un commentaire ou une chaîne
-    contenant « router = Router() » ne doit pas être pris pour la vraie fabrique
-    (sinon on injecte un bloc référençant un `router` inexistant, ce qui casse
-    `routes.py` à l'import), et une affectation réelle écrite différemment
-    (espaces, arguments) doit bien être reconnue.
-    """
-    try:
-        tree = ast.parse(content)
-    except SyntaxError:
-        return False
-    for node in tree.body:
-        if not isinstance(node, ast.Assign):
-            continue
-        if not any(isinstance(t, ast.Name) and t.id == "router" for t in node.targets):
-            continue
-        call = node.value
-        if isinstance(call, ast.Call):
-            func = call.func
-            if isinstance(func, ast.Name) and func.id == "Router":
-                return True
-            if isinstance(func, ast.Attribute) and func.attr == "Router":
-                return True
-    return False
-
-
 def _route_exists(content: str, spec: PublicPageSpec) -> bool:
     route_path = f'"/{spec.slug}"'
     route_name = f'name="{spec.route_name}"'
@@ -245,7 +189,7 @@ def build_route_block(spec: PublicPageSpec) -> str:
     )
 
 
-def _ensure_route(routes_path: Path, spec: PublicPageSpec) -> tuple[bool, str | None]:
+def ensure_route(routes_path: Path, spec: PublicPageSpec) -> tuple[bool, str | None]:
     _ensure_routes_file(routes_path)
     content = routes_path.read_text(encoding="utf-8")
     import_line = "from mvc.controllers.public_pages_controller import PublicPagesController"
@@ -284,7 +228,7 @@ def make_public_page(name: str, *, root: Path | None = None) -> MakePublicPageRe
         template_path.write_text(build_public_template(spec), encoding="utf-8")
         result.created.append(TEMPLATE_DIR.joinpath(f"{spec.slug}.html").as_posix())
 
-    controller_changed, controller_warning = _ensure_controller_method(controller_path, spec)
+    controller_changed, controller_warning = ensure_controller_method(controller_path, spec)
     if controller_changed:
         result.created.append(CONTROLLER_PATH.as_posix())
     else:
@@ -292,7 +236,7 @@ def make_public_page(name: str, *, root: Path | None = None) -> MakePublicPageRe
     if controller_warning:
         result.warnings.append(controller_warning)
 
-    route_changed, route_warning = _ensure_route(routes_path, spec)
+    route_changed, route_warning = ensure_route(routes_path, spec)
     if route_changed:
         result.created.append(ROUTES_PATH.as_posix())
     else:
