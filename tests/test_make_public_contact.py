@@ -128,15 +128,19 @@ def test_make_public_contact_cree_controleur(tmp_path):
     assert 'BaseController.render("public/contact.html"' in controller
 
 
-def test_make_public_contact_cree_route(tmp_path):
+def test_make_public_contact_genere_fichier_de_routes(tmp_path):
+    # ADR-085 : fichier de routes dédié, jamais d'injection dans __init__.py.
     _prepare_project(tmp_path)
+    init_before = _read(tmp_path, "mvc/routes/__init__.py")
 
     make_public_contact(root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes/__init__.py")
+    routes = _read(tmp_path, "mvc/routes/contact_routes.py")
     assert "PublicPagesController" in routes
+    assert "def register_contact_routes(router: Router) -> None:" in routes
     assert '"/contact"' in routes
     assert 'name="public_pages-contact"' in routes
+    assert _read(tmp_path, "mvc/routes/__init__.py") == init_before  # jamais touché
 
 
 def test_make_public_contact_route_idempotente(tmp_path):
@@ -145,7 +149,7 @@ def test_make_public_contact_route_idempotente(tmp_path):
 
     make_public_contact(root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes/__init__.py")
+    routes = _read(tmp_path, "mvc/routes/contact_routes.py")
     assert routes.count('"/contact"') == 1
     assert routes.count('name="public_pages-contact"') == 1
 

@@ -4,18 +4,17 @@ from __future__ import annotations
 from pathlib import Path
 
 import cli._support.output as out
+from cli.public._shared import build_public_routes_file, public_routes_branchement
 from cli.public.public_page import (
     CONTROLLER_PATH,
     PUBLIC_CONTENT_BLOCK,
     PUBLIC_LAYOUT,
     PUBLIC_SCRIPTS_BLOCK,
     PUBLIC_TITLE_BLOCK,
-    ROUTES_PATH,
     TEMPLATE_DIR,
     MakePublicPageResult,
     build_public_page_spec,
     ensure_controller_method as _ensure_controller_method,
-    ensure_route as _ensure_route,
 )
 
 _CONTACT_SLUG = "contact"
@@ -58,9 +57,10 @@ def build_contact_template() -> str:
 def make_public_contact(*, root: Path | None = None) -> MakePublicPageResult:
     spec = build_public_page_spec(_CONTACT_SLUG)
     project_root = (root or Path.cwd()).resolve()
+    routes_rel = Path("mvc/routes") / f"{_CONTACT_SLUG}_routes.py"
     template_path = project_root / _CONTACT_TEMPLATE_REL
     controller_path = project_root / CONTROLLER_PATH
-    routes_path = project_root / ROUTES_PATH
+    routes_path = project_root / routes_rel
 
     result = MakePublicPageResult(
         spec=spec,
@@ -84,13 +84,23 @@ def make_public_contact(*, root: Path | None = None) -> MakePublicPageResult:
     if controller_warning:
         result.warnings.append(controller_warning)
 
-    route_changed, route_warning = _ensure_route(routes_path, spec)
-    if route_changed:
-        result.created.append(ROUTES_PATH.as_posix())
+    # ADR-085 : fichier de routes dédié + affichage, jamais d'injection.
+    routes_path.parent.mkdir(parents=True, exist_ok=True)
+    if routes_path.exists():
+        result.preserved.append(routes_rel.as_posix())
     else:
-        result.preserved.append(ROUTES_PATH.as_posix())
-    if route_warning:
-        result.warnings.append(route_warning)
+        routes_path.write_text(
+            build_public_routes_file(
+                _CONTACT_SLUG,
+                "from mvc.controllers.public_pages_controller import PublicPagesController",
+                [
+                    f'public.add("GET", "/{spec.slug}", '
+                    f'PublicPagesController.{spec.method_name}, name="{spec.route_name}")'
+                ],
+            ),
+            encoding="utf-8",
+        )
+        result.created.append(routes_rel.as_posix())
 
     return result
 
@@ -110,6 +120,8 @@ def print_result(result: MakePublicPageResult) -> None:
         print("Aucun écrasement effectué.")
     for warning in result.warnings:
         print(out.warn(warning))
+    print()
+    print(public_routes_branchement(_CONTACT_SLUG))
 
 
 def main(args: list[str] | None = None, *, root: Path | None = None) -> MakePublicPageResult:
