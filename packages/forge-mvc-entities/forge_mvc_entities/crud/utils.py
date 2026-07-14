@@ -20,11 +20,20 @@ def _humanize(name: str) -> str:
     return name.replace("_", " ").capitalize()
 
 
-def _pk_field(definition: dict[str, Any]) -> dict[str, Any]:
+def pk_field(definition: dict[str, Any]) -> dict[str, Any]:
+    """Retourne le champ clé primaire d'une entité, ou lève si absent.
+
+    API publique du moteur d'entités (ENTITIES-PUBLIC-NAMING-API-001), exposée à
+    la racine du paquet pour les générateurs de pages publiques du cœur.
+    """
     for f in definition["fields"]:
         if f.get("primary_key"):
             return f
     raise ValueError(f"Aucune clé primaire dans l'entité {definition['entity']!r}")
+
+
+# Alias interne rétro-compatible : les modules CRUD importent encore ``_pk_field``.
+_pk_field = pk_field
 
 
 def _non_pk_fields(definition: dict[str, Any]) -> list[dict[str, Any]]:

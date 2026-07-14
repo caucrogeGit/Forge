@@ -135,11 +135,11 @@ def public_form_fields(definition: dict[str, Any]) -> list[PublicFormField]:
 
 
 def build_public_form_spec(definition: dict[str, Any]) -> PublicFormSpec:
-    from forge_mvc_entities.make_crud import _pk_field, _to_snake
+    from forge_mvc_entities import pk_field, to_snake
     entity = definition["entity"]
-    snake = _to_snake(entity)
+    snake = to_snake(entity)
     plural = snake + "s"
-    pk = _pk_field(definition)
+    pk = pk_field(definition)
     class_name = "Public" + "".join(part.capitalize() for part in plural.split("_")) + "Controller"
     template_path = PUBLIC_TEMPLATE_ROOT / plural / "form.html"
     controller_path = CONTROLLERS_ROOT / f"public_{plural}_controller.py"
@@ -434,9 +434,9 @@ def _ensure_form_controller(controller_path: Path, spec: PublicFormSpec) -> tupl
 
 
 def load_public_form_definition(entity_name: str, *, entities_root: Path) -> dict[str, Any]:
-    from forge_mvc_entities.make_crud import _to_snake
+    from forge_mvc_entities import to_snake
     from forge_mvc_entities.validation import validate_entity_definition
-    snake = _to_snake(entity_name)
+    snake = to_snake(entity_name)
     json_path = entities_root / snake / f"{snake}.json"
     if not json_path.exists():
         raise FileNotFoundError(f"Entité introuvable : {json_path.as_posix()}")

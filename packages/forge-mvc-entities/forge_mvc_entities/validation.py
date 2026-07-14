@@ -141,10 +141,21 @@ def _normalize_sql_type(sql_type: str) -> str:
     return sql_type.strip().upper()
 
 
-def _to_snake(name: str) -> str:
+def to_snake(name: str) -> str:
+    """Convertit un nom d'entité (PascalCase, kebab...) en snake_case.
+
+    API publique du moteur d'entités (ENTITIES-PUBLIC-NAMING-API-001) : les
+    générateurs de pages publiques du cœur l'importent depuis
+    ``forge_mvc_entities`` plutôt que d'atteindre un symbole privé.
+    """
     value = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
     value = re.sub(r"([a-z\d])([A-Z])", r"\1_\2", value)
     return value.replace("-", "_").lower()
+
+
+# Alias interne rétro-compatible : les modules du paquet importent encore
+# ``_to_snake`` ; le nom public canonique est désormais ``to_snake``.
+_to_snake = to_snake
 
 
 def _column_from_field_name(name: str) -> str:
