@@ -58,24 +58,29 @@ pip install -e .
 pip install -r requirements-dev.txt
 
 # Vérifier : les modules opt-in sont importables
-python -c "import forge_mvc_mfa, forge_mvc_rbac, forge_mvc_workflow, forge_mvc_stats, forge_mvc_files, forge_mvc_images, forge_mvc_audio, forge_mvc_iot, forge_mvc_video, forge_mvc_pivot, forge_mvc_mail; print('OK')"
+python -c "import forge_mvc_mfa, forge_mvc_rbac, forge_mvc_workflow, forge_mvc_stats, forge_mvc_files, forge_mvc_images, forge_mvc_audio, forge_mvc_iot, forge_mvc_video, forge_mvc_entities, forge_mvc_mail; print('OK')"
 
 # Lancer la suite complète
 pytest
 ```
 
-Résultat attendu : **~9 349 passed, 2 skipped**.
+Résultat attendu : suite complète verte (0 failed ; les seuls skips sont les tests `db` sans base locale).
 
 ### Cycle de développement
 
-Une fois l'environnement initial créé :
+Une fois l'environnement initial créé, deux boucles rapides selon ce qu'on modifie (TESTS-LOOPS-OFFICIAL-001) :
 
 ```bash
 source .venv/bin/activate
-pytest                       # toute la suite (~2 minutes)
-pytest -m "not meta"         # tests fonctionnels uniquement (plus rapide)
-pytest -m meta               # tests de cohérence projet uniquement
+pytest -m "not docs"         # on touche au code : comportement + garde-fous de structure
+pytest -m docs               # on touche à la doc : tests de prose (compléter par mkdocs build --strict)
+pytest                       # jalons et release : suite complète
 ```
+
+La carte des couches de test et des marqueurs (`meta`, `smoke`, `db`, `docs`) est dans
+[docs/contributing/conventions.md](docs/contributing/conventions.md), section B.7.
+La CI exécute toujours la suite complète : elle rattrape les dérives croisées code/doc
+que les boucles rapides ne voient pas.
 
 ### Dépannage : `ModuleNotFoundError: forge_mvc_mfa` (ou autre)
 
@@ -103,21 +108,23 @@ python -m pip install -e . --no-deps             # rafraîchit l'entry point for
 python -m pip install -r requirements-dev.txt   # garantit que les modules opt-in sont à jour
 ```
 
-Pour lancer uniquement les tests fonctionnels du framework (plus rapide) :
+Pour la boucle code (comportement + garde-fous de structure, sans les tests de prose) :
 
 ```bash
-python -m pytest -m "not meta" -q
+python -m pytest -m "not docs" -q
 ```
 
-Pour lancer uniquement les tests de cohérence projet (doc, versions, charte) :
+Pour la boucle doc (tests de prose pure, à compléter par `mkdocs build --strict`) :
 
 ```bash
-python -m pytest -m meta -q
+python -m pytest -m docs -q
 ```
 
 Les tests dans `tests/meta/` vérifient la cohérence de la documentation, des ADR
 et de la structure du projet. Ils ne testent pas le comportement du framework
-lui-même (cf. charte 3.E).
+lui-même (cf. charte 3.E). Ceux qui ne peuvent casser que par édition de la
+documentation portent en plus le marqueur `docs` (garde-fou :
+`tests/meta/test_tests_docs_marker_001.py`).
 
 Pour le modèle d'entités, vérifier aussi que :
 
