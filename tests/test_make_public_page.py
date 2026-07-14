@@ -5,7 +5,6 @@ from pathlib import Path
 import pytest
 
 from cli.public.public_page import (
-    _has_router_factory,
     build_public_page_spec,
     main,
     make_public_page,
@@ -141,31 +140,6 @@ def test_make_public_page_refuse_les_chemins_dangereux(name):
 
 
 # --- Garde-fou B2 : détection de la fabrique `router` par AST (anti-corruption) ---
-
-
-def test_has_router_factory_detecte_affectation_reelle():
-    assert _has_router_factory("from core.http.router import Router\nrouter = Router()\n")
-
-
-def test_has_router_factory_tolere_espaces_et_arguments():
-    assert _has_router_factory("router  =  Router()\n")
-    assert _has_router_factory("router = Router(prefix='/x')\n")
-
-
-def test_has_router_factory_ignore_le_marqueur_en_commentaire():
-    # Cause racine B2 : un commentaire contenant le marqueur ne doit pas leurrer
-    # le générateur, sinon il injecte un bloc référençant un `router` inexistant.
-    content = "from core.http.router import Router\n# exemple : router = Router()\n"
-    assert not _has_router_factory(content)
-
-
-def test_has_router_factory_ignore_le_marqueur_en_chaine():
-    content = 'HELP = "router = Router()"\n'
-    assert not _has_router_factory(content)
-
-
-def test_has_router_factory_faux_si_syntaxe_invalide():
-    assert not _has_router_factory("def (:\n")
 
 
 def test_make_public_page_ne_touche_jamais_routes_init(tmp_path):

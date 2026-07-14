@@ -9,10 +9,7 @@ from pathlib import Path
 import cli._support.output as out
 from cli.public._shared import (
     build_public_routes_file,
-    ensure_routes_file as _ensure_routes_file,
     ensure_trailing_newline as _ensure_trailing_newline,
-    has_router_factory as _has_router_factory,
-    insert_import as _insert_import,
     public_routes_branchement,
 )
 from core.http.slug import slugify
@@ -20,8 +17,6 @@ from core.http.slug import slugify
 
 TEMPLATE_DIR = Path("mvc/views/public")
 CONTROLLER_PATH = Path("mvc/controllers/public_pages_controller.py")
-# ADR-068 : le routage est un package ; l'injection cible la racine de composition.
-ROUTES_PATH = Path("mvc/routes") / "__init__.py"
 PUBLIC_LAYOUT = "layouts/base.html"
 PUBLIC_TITLE_BLOCK = "title"
 PUBLIC_CONTENT_BLOCK = "content"
@@ -173,40 +168,6 @@ def ensure_controller_method(controller_path: Path, spec: PublicPageSpec) -> tup
     lines.insert(insert_at, build_controller_method(spec))
     new_content = _ensure_typed_imports("".join(lines))
     controller_path.write_text(new_content, encoding="utf-8")
-    return True, None
-
-
-def _route_exists(content: str, spec: PublicPageSpec) -> bool:
-    route_path = f'"/{spec.slug}"'
-    route_name = f'name="{spec.route_name}"'
-    return route_path in content or route_name in content
-
-
-def build_route_block(spec: PublicPageSpec) -> str:
-    return (
-        "\n"
-        "with router.group(\"\", public=True) as public:\n"
-        f'    public.add("GET", "/{spec.slug}", PublicPagesController.{spec.method_name}, '
-        f'name="{spec.route_name}")\n'
-    )
-
-
-def ensure_route(routes_path: Path, spec: PublicPageSpec) -> tuple[bool, str | None]:
-    _ensure_routes_file(routes_path)
-    content = routes_path.read_text(encoding="utf-8")
-    import_line = "from mvc.controllers.public_pages_controller import PublicPagesController"
-    changed = import_line not in content
-    content = _insert_import(content, import_line)
-
-    if _route_exists(content, spec):
-        routes_path.write_text(_ensure_trailing_newline(content), encoding="utf-8")
-        return changed, None
-
-    if not _has_router_factory(content):
-        return False, f"Route à ajouter manuellement dans {routes_path.as_posix()} : GET /{spec.slug}"
-
-    content = _ensure_trailing_newline(content) + build_route_block(spec)
-    routes_path.write_text(content, encoding="utf-8")
     return True, None
 
 

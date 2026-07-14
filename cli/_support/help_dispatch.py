@@ -1300,8 +1300,9 @@ Effets (write-if-new — aucun fichier existant n'est écrasé) :
     layouts/base.html) ;
   - crée ou complète mvc/controllers/public_pages_controller.py avec une
     méthode <slug>() ;
-  - insère la route GET /<slug> dans mvc/routes/__init__.py (public, sans CSRF) ;
-  - n'écrase ni le template, ni la méthode, ni la route si déjà présents.
+  - génère mvc/routes/<slug>_routes.py (register_<slug>_routes) et affiche le
+    branchement à coller dans mvc/routes/__init__.py (ADR-085, jamais injecté) ;
+  - n'écrase ni le template, ni la méthode, ni le fichier de routes s'ils existent.
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.
@@ -1325,7 +1326,7 @@ Effets (write-if-new — aucun fichier existant n'est écrasé) :
     publics ;
   - crée mvc/views/public/<plural>/list.html (template Jinja2 paginé) ;
   - ajoute la méthode liste publique au contrôleur correspondant ;
-  - insère la route GET /<plural> dans mvc/routes/__init__.py.
+  - génère mvc/routes/public_<plural>_routes.py et affiche le branchement (ADR-085).
 
 Prérequis:
   - l'entité <Entite> doit exister (forge make:entity <Entite>).
@@ -1351,7 +1352,7 @@ Effets (write-if-new — aucun fichier existant n'est écrasé) :
     publics ;
   - crée mvc/views/public/<plural>/show.html (template fiche) ;
   - ajoute la méthode fiche publique au contrôleur correspondant ;
-  - insère la route GET /<plural>/<id> dans mvc/routes/__init__.py.
+  - génère mvc/routes/public_<plural>_show_routes.py et affiche le branchement (ADR-085).
 
 Prérequis:
   - l'entité <Entite> doit exister.
@@ -1378,7 +1379,7 @@ Effets (write-if-new — aucun fichier existant n'est écrasé) :
     {{ csrf_token }}) ;
   - ajoute la méthode formulaire (GET) et la méthode soumission (POST) au
     contrôleur ;
-  - insère les routes GET et POST /<plural>/form dans mvc/routes/__init__.py.
+  - génère mvc/routes/public_<plural>_form_routes.py et affiche le branchement (ADR-085).
 
 Prérequis:
   - l'entité <Entite> doit exister ;
@@ -1406,8 +1407,7 @@ Effets (write-if-new — aucun fichier existant n'est écrasé) :
   - crée mvc/views/public/contact.html (formulaire de contact Jinja2) ;
   - crée ou complète mvc/controllers/public_pages_controller.py avec la
     méthode contact() ;
-  - insère la route GET /contact (et POST si applicable) dans
-    mvc/routes/__init__.py.
+  - génère mvc/routes/contact_routes.py et affiche le branchement (ADR-085).
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.

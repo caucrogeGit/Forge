@@ -29,7 +29,7 @@ def test_shared_module_expose_les_helpers_purs():
 
     for name in (
         "humanize", "ensure_trailing_newline", "insert_import", "ensure_import",
-        "ensure_routes_file", "has_router_factory", "require_entities_module",
+        "require_entities_module", "build_public_routes_file", "public_routes_branchement",
     ):
         assert callable(getattr(shared, name, None)), f"_shared doit exposer {name}"
 
