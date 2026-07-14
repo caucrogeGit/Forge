@@ -42,10 +42,11 @@ Architecture en deux dictionnaires :
                            `tests/meta/test_cli_help_flags_closing_audit_001.py`
                            lève une erreur de classification (garde-fou).
 
-Aujourd'hui les 45 commandes riches sont aussi présentes dans
-HELP_DESCRIPTIONS — la version riche prend le pas. La duplication est
-**délibérée** : elle garantit qu'aucune future entrée riche introuvable
-ne tombe pas dans le fallback.
+Toute commande à aide riche est aussi présente dans HELP_DESCRIPTIONS —
+la version riche prend le pas. La duplication est **délibérée** : elle
+garantit qu'aucune future entrée riche introuvable ne tombe pas dans le
+fallback. (Les décomptes exacts vivent dans les audits datés, pas ici —
+ils dérivent ; CLI-HELP-DRIFT-FIX-001.)
 """
 from __future__ import annotations
 
@@ -1296,7 +1297,7 @@ Description:
 
 Effets (write-if-new — aucun fichier existant n'est écrasé) :
   - crée mvc/views/public/<slug>.html (template Jinja2 héritant de
-    layouts/public.html) ;
+    layouts/base.html) ;
   - crée ou complète mvc/controllers/public_pages_controller.py avec une
     méthode <slug>() ;
   - insère la route GET /<slug> dans mvc/routes/__init__.py (public, sans CSRF) ;
@@ -2263,7 +2264,7 @@ Limites:
 
     "new": """\
 Usage:
-  forge new <NomProjet> [--profile <profil>]
+  forge new <NomProjet> [--profile <profil>] [--bare]
 
 Description:
   Crée un nouveau projet Forge nu dans ./<NomProjet>/ à partir du
@@ -2277,6 +2278,8 @@ Arguments:
 
 Options:
   --profile <id>     Profil de projet (voir SUPPORTED_PROJECT_PROFILES).
+  --bare             Omet l'apparat qualité du squelette (config qualité,
+                     tests, doc, CI — ADR-063).
   -h, --help         Affiche cette aide sans exécuter la commande.
 
 Effets (CRÉE un dossier complet) :

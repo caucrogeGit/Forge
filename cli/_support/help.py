@@ -40,7 +40,7 @@ Pages publiques
 
 Base de données
   db:config           Amorce les variables d'environnement du backend.
-  db:init             Crée la base de données depuis les entités.
+  db:init             Affiche le SQL de provisioning de la base (--run pour exécuter).
   db:apply            Applique le schéma SQL.
   migration:status    Statut des migrations.
   migration:apply     Applique les migrations en attente.
