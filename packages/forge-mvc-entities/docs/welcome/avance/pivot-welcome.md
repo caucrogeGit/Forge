@@ -86,10 +86,10 @@ class PivotWelcomeController(BaseController):
 
 ## La route
 
-Dans `mvc/routes.py`, ajoutez l'import en tête de fichier et les routes dans le groupe public.
+Dans `mvc/routes/__init__.py`, ajoutez l'import en tête de fichier et les routes dans le groupe public.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.pivot_welcome_controller import PivotWelcomeController
 
 with router.group("", public=True) as public:

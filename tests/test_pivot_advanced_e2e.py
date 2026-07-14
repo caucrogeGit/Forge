@@ -127,13 +127,13 @@ def test_e2e_relations_json_canonique_accepte(project):
 # ── E2E : make:pivot-crud génère les fichiers ─────────────────────────────────
 
 
-def test_e2e_make_pivot_crud_cree_les_trois_fichiers(project):
+def test_e2e_make_pivot_crud_cree_les_quatre_fichiers(project):
     result = make_pivot_crud(
         "Article", "tags",
         entities_root=project / "mvc" / "entities",
         output_root=project,
     )
-    assert len(result.created) == 3
+    assert len(result.created) == 4
     paths = [p.name for p in result.created]
     assert "article_tags_pivot_controller.py" in paths
     assert "index.html" in paths
@@ -158,7 +158,7 @@ def test_e2e_template_index_mentionne_champs_pivot(project):
         entities_root=project / "mvc" / "entities",
         output_root=project,
     )
-    index = project / "mvc" / "templates" / "pivot" / "article_tags" / "index.html"
+    index = project / "mvc" / "views" / "pivot" / "article_tags" / "index.html"
     text = index.read_text(encoding="utf-8")
     assert "position" in text
     assert "note" in text
@@ -170,7 +170,7 @@ def test_e2e_template_form_mentionne_champs_pivot(project):
         entities_root=project / "mvc" / "entities",
         output_root=project,
     )
-    form = project / "mvc" / "templates" / "pivot" / "article_tags" / "form.html"
+    form = project / "mvc" / "views" / "pivot" / "article_tags" / "form.html"
     text = form.read_text(encoding="utf-8")
     assert "position" in text
     assert "note" in text
@@ -190,7 +190,7 @@ def test_e2e_dry_run_ne_cree_aucun_fichier(project):
     ctrl = project / "mvc" / "controllers" / "pivot" / "article_tags_pivot_controller.py"
     assert not ctrl.exists()
     # Les fichiers sont listés dans created mais non écrits
-    assert len(result.created) == 3
+    assert len(result.created) == 4
 
 
 # ── E2E : non-écrasement ──────────────────────────────────────────────────────

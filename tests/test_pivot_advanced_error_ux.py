@@ -116,7 +116,7 @@ def generated(tmp_path):
         output_root=tmp_path,
     )
     ctrl = tmp_path / "mvc" / "controllers" / "pivot" / "article_tags_pivot_controller.py"
-    form = tmp_path / "mvc" / "templates" / "pivot" / "article_tags" / "form.html"
+    form = tmp_path / "mvc" / "views" / "pivot" / "article_tags" / "form.html"
     return {"ctrl": ctrl.read_text(encoding="utf-8"), "form": form.read_text(encoding="utf-8")}
 
 

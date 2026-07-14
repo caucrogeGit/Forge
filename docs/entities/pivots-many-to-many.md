@@ -228,9 +228,10 @@ La commande :
 - charge `mvc/entities/relations.json` ;
 - vérifie que la relation `Article.tags` est `many_to_many` avec `pivot.fields[]` non vide ;
 - génère `mvc/controllers/pivot/article_tags_pivot_controller.py` ;
-- génère `mvc/templates/pivot/article_tags/index.html` et `form.html` ;
+- génère `mvc/views/app/pivot/article_tags/index.html` et `form.html` (namespace `APP_VIEWS_NAMESPACE`, ADR-073) ;
+- génère `mvc/routes/article_tags_pivot_routes.py` (ADR-068) ;
 - n'écrase pas les fichiers existants ;
-- affiche les routes à ajouter manuellement dans `mvc/routes/__init__.py`.
+- affiche le branchement (deux lignes) à ajouter manuellement dans `mvc/routes/__init__.py`.
 
 Elle ne modifie pas `make:crud` et ne branche pas automatiquement les routes.
 

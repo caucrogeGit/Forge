@@ -170,7 +170,9 @@ def test_make_pivot_crud_cree_template_index(tmp_path):
         entities_root=tmp_path / "mvc" / "entities",
         output_root=tmp_path,
     )
-    index = tmp_path / "mvc" / "templates" / "pivot" / "article_tags" / "index.html"
+    # ADR-073 : les vues vivent sous mvc/views/ (namespace "" = disposition plate
+    # quand on appelle la fonction directement sans résolution de config projet).
+    index = tmp_path / "mvc" / "views" / "pivot" / "article_tags" / "index.html"
     assert index.exists()
 
 
@@ -181,7 +183,7 @@ def test_make_pivot_crud_cree_template_form(tmp_path):
         entities_root=tmp_path / "mvc" / "entities",
         output_root=tmp_path,
     )
-    form = tmp_path / "mvc" / "templates" / "pivot" / "article_tags" / "form.html"
+    form = tmp_path / "mvc" / "views" / "pivot" / "article_tags" / "form.html"
     assert form.exists()
 
 
@@ -235,14 +237,29 @@ def test_controleur_genere_lit_les_ids_de_route(tmp_path):
     assert "def index(request: Request) -> Response:" in src
 
 
-def test_controleur_genere_nomme_les_routes_adr029(tmp_path):
-    """L'exemple de routes suit la convention ADR-029 (<contrôleur>-<méthode>)
-    et l'API canonique router.group().add(...)."""
-    src = _generate_controller_source(tmp_path)
+def test_routes_generees_adr068_et_adr029(tmp_path):
+    """Les routes vivent dans mvc/routes/<...>_pivot_routes.py (ADR-068), avec
+    la convention ADR-029 (<contrôleur>-<méthode>) et l'API canonique
+    router.group().add(...)."""
+    _generate_controller_source(tmp_path)
+    routes = tmp_path / "mvc" / "routes" / "article_tags_pivot_routes.py"
+    assert routes.exists()
+    src = routes.read_text(encoding="utf-8")
+    ast.parse(src)
+    assert "def register_article_tags_pivot_routes(router: Router) -> None:" in src
     assert 'name="article_tags_pivot-index"' in src
     assert 'name="article_tags_pivot-remove"' in src
     assert "router.group(" in src
     assert "g.add(" in src
+
+
+def test_controleur_docstring_pointe_le_paquet_de_routes(tmp_path):
+    """Plus aucune mention du chemin pré-ADR-068 (mvc/routes.py) : le contrôleur
+    documente le fichier de routes dédié et son branchement."""
+    src = _generate_controller_source(tmp_path)
+    assert "mvc/routes.py" not in src
+    assert "article_tags_pivot_routes" in src
+    assert "register_article_tags_pivot_routes" in src
 
 
 # ── dry-run ───────────────────────────────────────────────────────────────────

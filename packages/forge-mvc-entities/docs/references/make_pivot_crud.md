@@ -60,16 +60,20 @@ python forge.py make:pivot-crud Article tags --dry-run
 | `--dry-run` | liste les fichiers qui seraient générés, sans rien écrire |
 | génération | crée les fichiers absents (write-if-new) |
 | fichiers existants | préservés, jamais écrasés |
-| routes | documentées dans la sortie, **non branchées automatiquement** |
+| routes | fichier dédié `mvc/routes/<src>_<relation>_pivot_routes.py` (ADR-068) ; branchement affiché, **jamais injecté** |
 | `make:crud` | non modifié, reste **neutre** |
 
 ## 4. Les fichiers générés
 
 ```
 mvc/controllers/pivot/article_tags_pivot_controller.py
-mvc/templates/pivot/article_tags/index.html
-mvc/templates/pivot/article_tags/form.html
+mvc/views/app/pivot/article_tags/index.html
+mvc/views/app/pivot/article_tags/form.html
+mvc/routes/article_tags_pivot_routes.py
 ```
+
+Les vues vivent sous le namespace applicatif `APP_VIEWS_NAMESPACE` (`app` par défaut, ADR-073) et étendent `layouts/base.html`.
+Le branchement des routes (deux lignes dans `mvc/routes/__init__.py`) est affiché en fin de commande.
 
 Le contrôleur expose six actions (`index`, `add_form`, `add`, `edit_form`, `edit`, `remove`) et importe `PivotAdvancedService`, `PivotConstraintError` et `pivot_error_to_form_error`.
 Les actions `add` et `edit` convertissent les erreurs de contrainte en `PivotFormError` transmis au gabarit.

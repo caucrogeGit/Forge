@@ -65,7 +65,7 @@ class PivotUpdateController(BaseController):
 ## Les routes
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.pivot_update_controller import PivotUpdateController
 
 with router.group("", public=True) as public:

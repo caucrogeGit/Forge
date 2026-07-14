@@ -62,7 +62,7 @@ class PivotListController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.pivot_list_controller import PivotListController
 
 with router.group("", public=True) as public:

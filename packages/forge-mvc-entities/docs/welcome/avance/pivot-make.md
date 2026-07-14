@@ -36,7 +36,7 @@ La sortie montre le contrôleur, les templates et les **routes** à câbler pour
 forge make:pivot-crud Article tags
 ```
 
-Les **fichiers nouveaux** sont créés ; les routes à ajouter dans `mvc/routes.py` sont **affichées** (Forge ne réécrit jamais vos routes en silence).
+Les **fichiers nouveaux** sont créés, dont un fichier de routes dédié sous `mvc/routes/` (ADR-068) ; le branchement à ajouter dans `mvc/routes/__init__.py` est **affiché** (Forge ne réécrit jamais vos routes en silence).
 
 ### Comprendre ce code
 

@@ -2031,8 +2031,11 @@ Effets (un projet PEUT être modifié) :
   - vérifie que la relation comporte un pivot.fields[] non vide ;
   - écrit en mode write-if-new (aucun fichier existant n'est écrasé) :
       * mvc/controllers/pivot/<src>_<relation>_pivot_controller.py ;
-      * mvc/templates/pivot/<src>_<relation>/index.html ;
-      * mvc/templates/pivot/<src>_<relation>/form.html ;
+      * mvc/views/<ns>/pivot/<src>_<relation>/index.html ;
+      * mvc/views/<ns>/pivot/<src>_<relation>/form.html ;
+      * mvc/routes/<src>_<relation>_pivot_routes.py (ADR-068) ;
+    (<ns> = APP_VIEWS_NAMESPACE du projet, « app » par défaut, ADR-073 ;
+    les vues étendent layouts/base.html) ;
   - --dry-run : affiche la liste des fichiers qui seraient générés
     sans rien écrire.
 
@@ -2058,8 +2061,8 @@ Limites:
     forge make:crud) ;
   - le runtime vit dans l'opt-in forge-mvc-entities (forge_mvc_entities),
     qui a absorbé le pivot (ADR-021/070) ; installer : pip install --pre forge-mvc-entities ;
-  - ne modifie pas mvc/routes/__init__.py — le routage du sous-CRUD pivot est
-    à brancher manuellement.""",
+  - ne modifie pas mvc/routes/__init__.py — le branchement (2 lignes,
+    affichées en fin de commande) reste un geste manuel (ADR-030/068).""",
 
     # ── Auth — commandes restantes (CLI-HELP-FLAGS-AUTH-COMPLETION-001) ──────
     # 5 commandes qui n'ont pas l'aide argparse native des auth:user:*

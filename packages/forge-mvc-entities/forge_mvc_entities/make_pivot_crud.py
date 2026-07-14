@@ -20,6 +20,11 @@ from typing import Any, cast
 
 import cli._support.output as out
 
+from forge_mvc_entities.crud.views_namespace import (
+    entity_view_dir,
+    resolve_app_views_namespace,
+)
+
 _SNAKE_RE = re.compile(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])")
 
 
@@ -176,7 +181,7 @@ def resolve_pivot_relation(
 
 # ── Contenu généré ────────────────────────────────────────────────────────────
 
-def _build_controller(rel: ResolvedPivotRelation) -> str:
+def _build_controller(rel: ResolvedPivotRelation, view_dir: str) -> str:
     src_snake = _to_snake(rel.from_entity)
     tgt_snake = _to_snake(rel.to_entity)
     fields_repr = repr(list(rel.pivot_fields))
@@ -187,19 +192,15 @@ def _build_controller(rel: ResolvedPivotRelation) -> str:
 Sous-CRUD Pivot advanced pour {rel.from_entity}.{rel.relation_name}.
 Généré par forge make:pivot-crud {rel.from_entity} {rel.relation_name}.
 
-Ce contrôleur est opt-in — les routes (imbriquées sous la source) sont à
-déclarer manuellement dans mvc/routes.py. Noms de routes au format ADR-029
-(<contrôleur>-<méthode>) ; les identifiants sont lus depuis les paramètres
-de route « source_id » et « target_id ».
+Les routes vivent dans mvc/routes/{src_snake}_{rel.relation_name}_pivot_routes.py
+(ADR-068, noms au format ADR-029 <contrôleur>-<méthode>), à brancher dans
+mvc/routes/__init__.py :
 
-Exemple de routes à ajouter :
-    with router.group("") as g:
-        g.add("GET",  "/{src_snake}s/{{source_id}}/{rel.relation_name}", controller.index, name="{src_snake}_{rel.relation_name}_pivot-index")
-        g.add("GET",  "/{src_snake}s/{{source_id}}/{rel.relation_name}/add", controller.add_form, name="{src_snake}_{rel.relation_name}_pivot-add_form")
-        g.add("POST", "/{src_snake}s/{{source_id}}/{rel.relation_name}/add", controller.add, name="{src_snake}_{rel.relation_name}_pivot-add")
-        g.add("GET",  "/{src_snake}s/{{source_id}}/{rel.relation_name}/{{target_id}}/edit", controller.edit_form, name="{src_snake}_{rel.relation_name}_pivot-edit_form")
-        g.add("POST", "/{src_snake}s/{{source_id}}/{rel.relation_name}/{{target_id}}/edit", controller.edit, name="{src_snake}_{rel.relation_name}_pivot-edit")
-        g.add("POST", "/{src_snake}s/{{source_id}}/{rel.relation_name}/{{target_id}}/remove", controller.remove, name="{src_snake}_{rel.relation_name}_pivot-remove")
+    from mvc.routes.{src_snake}_{rel.relation_name}_pivot_routes import register_{src_snake}_{rel.relation_name}_pivot_routes
+    register_{src_snake}_{rel.relation_name}_pivot_routes(router)
+
+Les identifiants sont lus depuis les paramètres de route « source_id » et
+« target_id ».
 """
 from __future__ import annotations
 
@@ -215,8 +216,8 @@ _SERVICE = PivotAdvancedService(
     pivot_fields={fields_repr},
 )
 
-_TEMPLATE_INDEX = "pivot/{src_snake}_{rel.relation_name}/index.html"
-_TEMPLATE_FORM  = "pivot/{src_snake}_{rel.relation_name}/form.html"
+_TEMPLATE_INDEX = "{view_dir}/index.html"
+_TEMPLATE_FORM  = "{view_dir}/form.html"
 
 
 class {rel.from_entity}{rel.relation_name.capitalize()}PivotController:
@@ -325,11 +326,11 @@ def _build_index_template(rel: ResolvedPivotRelation) -> str:
     )
 
     return f"""\
-{{% extends "layouts/app.html" %}}
+{{% extends "layouts/base.html" %}}
 {{% block content %}}
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold text-gray-800">
-        {rel.from_entity} #{{{ src_snake}_id}} — {rel.relation_name}
+        {rel.from_entity} #{{{{ {src_snake}_id }}}} — {rel.relation_name}
     </h1>
     <a href="/{src_snake}s/{{{{ {src_snake}_id }}}}/{rel.relation_name}/add"
        class="text-blue-600 hover:underline">Ajouter</a>
@@ -378,7 +379,7 @@ def _build_form_template(rel: ResolvedPivotRelation) -> str:
     )
 
     return f"""\
-{{% extends "layouts/app.html" %}}
+{{% extends "layouts/base.html" %}}
 {{% block content %}}
 <h1 class="text-2xl font-bold text-gray-800 mb-6">
     {{{{ "Modifier" if row else "Ajouter" }}}} — {rel.from_entity}.{rel.relation_name}
@@ -408,6 +409,31 @@ def _build_form_template(rel: ResolvedPivotRelation) -> str:
 """
 
 
+def _build_routes_file(rel: ResolvedPivotRelation) -> str:
+    """Contenu de mvc/routes/<src>_<relation>_pivot_routes.py (ADR-068)."""
+    src_snake = _to_snake(rel.from_entity)
+    ctrl_mod = f"{src_snake}_{rel.relation_name}_pivot_controller"
+    name_prefix = f"{src_snake}_{rel.relation_name}_pivot"
+    base = f"/{src_snake}s/{{source_id}}/{rel.relation_name}"
+
+    return "\n".join([
+        f'"""Routes du sous-CRUD pivot {rel.from_entity}.{rel.relation_name} (ADR-068)."""',
+        "from core.http.router import Router",
+        f"from mvc.controllers.pivot.{ctrl_mod} import controller",
+        "",
+        "",
+        f"def register_{name_prefix}_routes(router: Router) -> None:",
+        '    with router.group("") as g:',
+        f'        g.add("GET", "{base}", controller.index, name="{name_prefix}-index")',
+        f'        g.add("GET", "{base}/add", controller.add_form, name="{name_prefix}-add_form")',
+        f'        g.add("POST", "{base}/add", controller.add, name="{name_prefix}-add")',
+        f'        g.add("GET", "{base}/{{target_id}}/edit", controller.edit_form, name="{name_prefix}-edit_form")',
+        f'        g.add("POST", "{base}/{{target_id}}/edit", controller.edit, name="{name_prefix}-edit")',
+        f'        g.add("POST", "{base}/{{target_id}}/remove", controller.remove, name="{name_prefix}-remove")',
+        "",
+    ])
+
+
 # ── Écriture fichier ──────────────────────────────────────────────────────────
 
 def _write_if_new(
@@ -434,8 +460,14 @@ def make_pivot_crud(
     entities_root: Path,
     output_root: Path,
     dry_run: bool = False,
+    views_namespace: str = "",
 ) -> MakePivotCrudResult:
-    """Génère un sous-CRUD Pivot advanced pour une relation many_to_many."""
+    """Génère un sous-CRUD Pivot advanced pour une relation many_to_many.
+
+    Les vues sont écrites sous `mvc/views/<namespace>/pivot/...` (ADR-073,
+    `""` = disposition plate) et les routes dans un fichier dédié de
+    `mvc/routes/` (ADR-068), comme make:crud.
+    """
     relations_path = entities_root / "relations.json"
     rel = resolve_pivot_relation(
         source_entity,
@@ -444,18 +476,22 @@ def make_pivot_crud(
     )
 
     src_snake = _to_snake(rel.from_entity)
+    view_dir = entity_view_dir(f"pivot/{src_snake}_{rel.relation_name}", views_namespace)
     controllers_dir = output_root / "mvc" / "controllers" / "pivot"
-    templates_dir = output_root / "mvc" / "templates" / "pivot" / f"{src_snake}_{rel.relation_name}"
+    views_dir = output_root / "mvc" / "views" / Path(view_dir)
+    routes_dir = output_root / "mvc" / "routes"
 
     controller_path = controllers_dir / f"{src_snake}_{rel.relation_name}_pivot_controller.py"
-    index_path = templates_dir / "index.html"
-    form_path = templates_dir / "form.html"
+    index_path = views_dir / "index.html"
+    form_path = views_dir / "form.html"
+    routes_path = routes_dir / f"{src_snake}_{rel.relation_name}_pivot_routes.py"
 
     result = MakePivotCrudResult(dry_run=dry_run)
 
-    _write_if_new(controller_path, _build_controller(rel), result, dry_run)
+    _write_if_new(controller_path, _build_controller(rel, view_dir), result, dry_run)
     _write_if_new(index_path, _build_index_template(rel), result, dry_run)
     _write_if_new(form_path, _build_form_template(rel), result, dry_run)
+    _write_if_new(routes_path, _build_routes_file(rel), result, dry_run)
 
     return result
 
@@ -479,6 +515,7 @@ def cmd_make_pivot_crud_main(args: list[str]) -> None:
         entities_root=Path("mvc") / "entities",
         output_root=Path("."),
         dry_run=dry_run,
+        views_namespace=resolve_app_views_namespace(),
     )
 
     if dry_run:
@@ -495,19 +532,11 @@ def cmd_make_pivot_crud_main(args: list[str]) -> None:
 
         if result.created:
             src_snake = _to_snake(source_entity)
+            name_prefix = f"{src_snake}_{relation_name}_pivot"
             print()
             print(out.ok(f"Pivot advanced généré pour {source_entity}.{relation_name}"))
             print()
-            ctrl_ref = f"{src_snake}_{relation_name}_ctrl"
-            name_prefix = f"{src_snake}_{relation_name}_pivot"
-            base = f"/{src_snake}s/{{source_id}}/{relation_name}"
-            print("Routes à ajouter dans mvc/routes.py :")
-            print(f'    # Pivot {source_entity}.{relation_name}')
-            print(f'    from mvc.controllers.pivot.{src_snake}_{relation_name}_pivot_controller import controller as {ctrl_ref}')
-            print('    with router.group("") as g:')
-            print(f'        g.add("GET",  "{base}", {ctrl_ref}.index, name="{name_prefix}-index")')
-            print(f'        g.add("GET",  "{base}/add", {ctrl_ref}.add_form, name="{name_prefix}-add_form")')
-            print(f'        g.add("POST", "{base}/add", {ctrl_ref}.add, name="{name_prefix}-add")')
-            print(f'        g.add("GET",  "{base}/{{target_id}}/edit", {ctrl_ref}.edit_form, name="{name_prefix}-edit_form")')
-            print(f'        g.add("POST", "{base}/{{target_id}}/edit", {ctrl_ref}.edit, name="{name_prefix}-edit")')
-            print(f'        g.add("POST", "{base}/{{target_id}}/remove", {ctrl_ref}.remove, name="{name_prefix}-remove")')
+            print("Branchement à ajouter dans mvc/routes/__init__.py :")
+            print("─" * 70)
+            print(f"  from mvc.routes.{name_prefix}_routes import register_{name_prefix}_routes")
+            print(f"  register_{name_prefix}_routes(router)")

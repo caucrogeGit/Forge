@@ -65,7 +65,7 @@ class PivotAttachController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.pivot_attach_controller import PivotAttachController
 
 with router.group("", public=True) as public:
