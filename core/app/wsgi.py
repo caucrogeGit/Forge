@@ -72,8 +72,11 @@ _REASONS = {
 class _WsgiHeaders:
     """Vue insensible à la casse des headers HTTP extraits de `environ`.
 
-    Forge accède aux headers via `request.headers.get(name, default)` — cette
-    interface suffit, pas besoin de mimer `http.client.HTTPMessage` au complet.
+    Contrat minimal partagé avec `http.client.HTTPMessage` (le type de
+    `request.headers` sur le serveur de dev) : `get`, `keys`, `items`.
+    `keys()`/`items()` sont requis par la convention d'inspection
+    (`request.data`, `Response.debug`) — leur absence faisait lever
+    `AttributeError` sur tout le chemin WSGI (CORE-WSGI-HEADERS-CONTRACT-001).
     """
 
     def __init__(self, environ: dict[str, Any]) -> None:
@@ -89,6 +92,12 @@ class _WsgiHeaders:
 
     def get(self, name: str, default: str = "") -> str:
         return self._headers.get(name.lower(), default)
+
+    def keys(self) -> list[str]:
+        return list(self._headers.keys())
+
+    def items(self) -> list[tuple[str, str]]:
+        return list(self._headers.items())
 
 
 class _WsgiHandlerStub:
