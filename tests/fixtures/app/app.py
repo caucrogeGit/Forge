@@ -271,6 +271,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         )
         for key, value in headers_out.items():
             self.send_header(key, value)
+        # Cookies additionnels : une ligne Set-Cookie par cookie accumulé via
+        # response.add_cookie (CORE-RESPONSE-MULTI-COOKIE-001).
+        for cookie in getattr(response, "set_cookies", []):
+            self.send_header("Set-Cookie", str(cookie))
         self.end_headers()
         self.wfile.write(response.body)
 

@@ -191,6 +191,10 @@ def _response_to_wsgi(
         if key.lower() in _reserved:
             continue
         headers.append((key, value))
+    # Cookies additionnels : une ligne Set-Cookie par cookie accumulé via
+    # response.add_cookie (CORE-RESPONSE-MULTI-COOKIE-001).
+    for cookie in getattr(response, "set_cookies", []):
+        headers.append(("Set-Cookie", str(cookie)))
     start_response(_format_status(response.status), headers)
     return body_iter
 

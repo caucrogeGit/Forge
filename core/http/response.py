@@ -95,12 +95,30 @@ class Response:
         else:
             self.body = body
         self.headers = headers if headers is not None else {}
+        # Cookies additionnels (au-delà de l'éventuel Set-Cookie de session posé
+        # dans `headers`). `headers` est un dict[str, str] : il ne peut porter
+        # qu'un seul Set-Cookie. `add_cookie` accumule ici les cookies
+        # supplémentaires, chacun émis sur sa propre ligne Set-Cookie par la
+        # couche serveur (CORE-RESPONSE-MULTI-COOKIE-001).
+        self.set_cookies: list[str] = []
         # Corps en streaming (cf. CORE-HTTP-FILE-RANGE-001). Quand `stream`
         # n'est pas None, la couche WSGI émet cet itérable de `bytes` au lieu
         # de `body`, et `content_length` (octets) sert au `Content-Length`.
         # Les réponses ordinaires (text/html/json) gardent stream = None.
         self.stream: "Any | None" = None
         self.content_length: int | None = None
+
+    def add_cookie(self, cookie_header: str) -> None:
+        """Ajoute un cookie à la réponse, sans écraser les cookies déjà posés.
+
+        `cookie_header` est la valeur complète d'un en-tête `Set-Cookie`
+        (`"nom=valeur; Path=/; HttpOnly"`...). Permet d'émettre plusieurs
+        cookies dans une même réponse (session + préférence...), là où
+        `headers["Set-Cookie"]` seul en écraserait un
+        (CORE-RESPONSE-MULTI-COOKIE-001). Émis par la couche serveur, une
+        ligne `Set-Cookie` par cookie.
+        """
+        self.set_cookies.append(cookie_header)
 
     # ── Constructeurs nommés ────────────────────────────────────────────────
 
@@ -253,13 +271,11 @@ class Response:
         Ne renvoie jamais les valeurs : ce sont typiquement des tokens de
         session. La liste est vide si aucun cookie n'est posé.
         """
+        cookie_headers: list[str] = []
         raw = self.headers.get("Set-Cookie") if isinstance(self.headers, dict) else None  # pyright: ignore[reportUnnecessaryIsInstance]
-        if not raw:
-            return []
-        if isinstance(raw, list):
-            cookie_headers = raw
-        else:
-            cookie_headers = [raw]
+        if raw:
+            cookie_headers.extend(raw if isinstance(raw, list) else [raw])
+        cookie_headers.extend(self.set_cookies)
         names: list[str] = []
         for header_value in cookie_headers:
             name = str(header_value).split(";", 1)[0].split("=", 1)[0].strip()
