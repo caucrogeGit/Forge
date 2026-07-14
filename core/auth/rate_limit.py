@@ -337,9 +337,46 @@ def check_auth_rate_limit(
 # (docs/deployment/production-security.md, section « Rate limiting »).
 # Alternative applicative : check_auth_rate_limit accepte une liste de tentatives
 # externe, ce qui permettrait un backend partagé (DB, Redis) si besoin.
+#
+# Éviction (CORE-RATELIMIT-EVICTION-001) : l'empreinte mémoire du store est
+# bornée. Chaque écriture élague sa clé (tentatives plus vieilles que
+# ATTEMPTS_RETENTION_SECONDS, plafond MAX_ATTEMPTS_PER_KEY), et un balayage
+# global amorti (_SWEEP_EVERY écritures) évince les clés abandonnées — sans
+# lui, chaque IP attaquante laisserait une entrée pour toute la vie du
+# processus. Conséquence de contrat : is_locked_out() refuse une fenêtre plus
+# longue que la rétention (l'historique n'existerait plus, le comptage serait
+# silencieusement faux) ; pour ces fenêtres longues, passer par
+# check_auth_rate_limit() avec des tentatives chargées d'un backend externe.
+
+ATTEMPTS_RETENTION_SECONDS = 3600
+MAX_ATTEMPTS_PER_KEY = 100
+_SWEEP_EVERY = 256
 
 _attempts_store: dict[str, list[AuthRateLimitAttempt]] = {}
 _store_lock = threading.RLock()
+_writes_since_sweep = 0
+
+
+def _prune_bucket(bucket: list[AuthRateLimitAttempt], now: datetime) -> None:
+    """Élague en place les tentatives sorties de la rétention (lock déjà pris)."""
+    cutoff = now - timedelta(seconds=ATTEMPTS_RETENTION_SECONDS)
+    kept = [
+        attempt
+        for attempt in bucket
+        if attempt.created_at is not None and _ensure_aware_utc(attempt.created_at) >= cutoff
+    ]
+    if len(kept) > MAX_ATTEMPTS_PER_KEY:
+        kept = kept[-MAX_ATTEMPTS_PER_KEY:]
+    bucket[:] = kept
+
+
+def _sweep_store(now: datetime) -> None:
+    """Balaye tout le store : élague chaque clé, supprime les clés vides (lock pris)."""
+    for store_key in list(_attempts_store):
+        bucket = _attempts_store[store_key]
+        _prune_bucket(bucket, now)
+        if not bucket:
+            del _attempts_store[store_key]
 
 
 def record_attempt(
@@ -350,7 +387,8 @@ def record_attempt(
     success: bool = False,
     now: datetime | None = None,
 ) -> None:
-    """Enregistre une tentative dans le store in-memory."""
+    """Enregistre une tentative dans le store in-memory (avec éviction amortie)."""
+    global _writes_since_sweep
     ts = _ensure_aware_utc(now) if now is not None else datetime.now(tz=timezone.utc)
     attempt = create_auth_rate_limit_attempt(
         action=action,
@@ -362,7 +400,15 @@ def record_attempt(
     )
     store_key = f"{attempt.action}:{attempt.key}"
     with _store_lock:
-        _attempts_store.setdefault(store_key, []).append(attempt)
+        bucket = _attempts_store.setdefault(store_key, [])
+        bucket.append(attempt)
+        _prune_bucket(bucket, ts)
+        if not bucket:
+            del _attempts_store[store_key]
+        _writes_since_sweep += 1
+        if _writes_since_sweep >= _SWEEP_EVERY:
+            _writes_since_sweep = 0
+            _sweep_store(ts)
 
 
 def is_locked_out(
@@ -372,7 +418,19 @@ def is_locked_out(
     window_seconds: int,
     now: datetime | None = None,
 ) -> bool:
-    """Retourne True si la clé a dépassé max_attempts échecs dans la fenêtre."""
+    """Retourne True si la clé a dépassé max_attempts échecs dans la fenêtre.
+
+    La fenêtre ne peut pas dépasser ATTEMPTS_RETENTION_SECONDS : le store
+    in-memory n'a plus l'historique au-delà et le comptage serait
+    silencieusement faux. Pour une fenêtre plus longue, utiliser
+    check_auth_rate_limit() avec des tentatives chargées d'un backend externe.
+    """
+    if window_seconds > ATTEMPTS_RETENTION_SECONDS:
+        raise InvalidAuthRateLimitRuleError(
+            "window_seconds dépasse la rétention du store in-memory "
+            f"({ATTEMPTS_RETENTION_SECONDS} s) — utiliser check_auth_rate_limit() "
+            "avec un historique externe pour les fenêtres longues"
+        )
     checked_action = _normalize_action(action, InvalidAuthRateLimitAttemptError)
     checked_key = normalize_rate_limit_key(key)
     store_key = f"{checked_action}:{checked_key}"
