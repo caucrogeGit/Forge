@@ -1,7 +1,6 @@
 # pyright: strict
 from __future__ import annotations
 
-import json as _json
 from typing import TYPE_CHECKING, Any
 
 from core.forge import get as _cfg
@@ -119,9 +118,12 @@ class BaseController:
 
     @staticmethod
     def json(data: Any, status: int = 200) -> Response:
-        """Génère une réponse JSON."""
-        return Response(status, _json.dumps(data, ensure_ascii=False),
-                        "application/json; charset=utf-8")
+        """Génère une réponse JSON.
+
+        CORE-JSON-RESPONSE-UNIFY-001 : délègue à `Response.json`, seule
+        implémentation (garde `TypeError` → `ValueError`, content-type unique).
+        """
+        return Response.json(data, status)
 
     @staticmethod
     def body(request: Request) -> dict[str, str]:

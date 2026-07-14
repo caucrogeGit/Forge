@@ -1,5 +1,4 @@
 # pyright: strict
-import json as _json
 import logging
 import os
 from typing import Any
@@ -12,7 +11,6 @@ from core.templating.errors import (
 )
 from core.templating.manager import template_manager
 
-_JSON_CONTENT_TYPE = "application/json; charset=utf-8"
 _TEXT_CONTENT_TYPE = "text/plain; charset=utf-8"
 
 _logger = logging.getLogger(__name__)
@@ -101,11 +99,9 @@ def html(template: str, status: int = 200, context: "dict[str, Any] | None" = No
 
 
 def json_response(data: Any, status: int = 200) -> Response:
-    try:
-        body = _json.dumps(data, ensure_ascii=False)
-    except TypeError as exc:
-        raise ValueError(f"Données JSON non sérialisables : {exc}") from exc
-    return Response(status, body, _JSON_CONTENT_TYPE)
+    # CORE-JSON-RESPONSE-UNIFY-001 : Response.json est la seule implémentation
+    # de la sérialisation JSON (garde TypeError → ValueError, content-type).
+    return Response.json(data, status)
 
 
 def api_success(data: Any = None, status: int = 200, meta: "dict[str, Any] | None" = None) -> Response:
