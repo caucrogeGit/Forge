@@ -6,6 +6,14 @@ En mode APP_ENV=dev, chaque erreur non gérée interceptée par le dispatcher
 produit une ligne JSONL dans storage/logs/errors.dev.jsonl, puis régénère
 storage/logs/errors.dev.md depuis le JSONL.
 
+Le répertoire storage/logs est celui du PROJET : il est résolu contre le
+répertoire de lancement de l'application (cwd), comme les autres chemins
+d'un projet Forge — jamais contre le paquet installé
+(CORE-ERRORLOG-PROJECT-PATH-001 : l'ancien repli écrivait dans
+site-packages/core/storage/logs, invisible pour le développeur).
+`set_jsonl_dir()` reste le point d'injection explicite (tests, chemins
+non standard).
+
 Ce module est silencieux : si l'écriture échoue, il logge un warning
 et laisse l'application continuer normalement.
 
@@ -47,7 +55,7 @@ def set_jsonl_dir(path: pathlib.Path | None) -> None:
 def _resolve_jsonl_dir() -> pathlib.Path:
     if _jsonl_dir_override is not None:
         return _jsonl_dir_override
-    return pathlib.Path(__file__).parent.parent / "storage" / "logs"
+    return pathlib.Path.cwd() / "storage" / "logs"
 
 
 # ── Détection de la catégorie ─────────────────────────────────────────────────
