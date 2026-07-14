@@ -10,7 +10,7 @@ from typing import Any
 from datetime import datetime
 
 from core.validation import (
-    ValidationError,
+    PropertyValidationError,
     min_value,
     nullable,
     typed,
@@ -60,7 +60,7 @@ class MediaBase:
     @typed(str)
     def entity_name(self, value):
         if value is None:
-            raise ValidationError("entity_name", 'La propriété "entity_name" ne peut pas être nulle.')
+            raise PropertyValidationError("entity_name", 'La propriété "entity_name" ne peut pas être nulle.')
         self._entity_name = value
 
     @property
@@ -72,7 +72,7 @@ class MediaBase:
     @min_value(1)
     def entity_id(self, value):
         if value is None:
-            raise ValidationError("entity_id", 'La propriété "entity_id" ne peut pas être nulle.')
+            raise PropertyValidationError("entity_id", 'La propriété "entity_id" ne peut pas être nulle.')
         self._entity_id = value
 
     @property
@@ -83,7 +83,7 @@ class MediaBase:
     @typed(str)
     def path(self, value):
         if value is None:
-            raise ValidationError("path", 'La propriété "path" ne peut pas être nulle.')
+            raise PropertyValidationError("path", 'La propriété "path" ne peut pas être nulle.')
         self._path = value
 
     @property
@@ -94,7 +94,7 @@ class MediaBase:
     @typed(str)
     def original_name(self, value):
         if value is None:
-            raise ValidationError("original_name", 'La propriété "original_name" ne peut pas être nulle.')
+            raise PropertyValidationError("original_name", 'La propriété "original_name" ne peut pas être nulle.')
         self._original_name = value
 
     @property
@@ -105,7 +105,7 @@ class MediaBase:
     @typed(str)
     def mime_type(self, value):
         if value is None:
-            raise ValidationError("mime_type", 'La propriété "mime_type" ne peut pas être nulle.')
+            raise PropertyValidationError("mime_type", 'La propriété "mime_type" ne peut pas être nulle.')
         self._mime_type = value
 
     @property
@@ -117,7 +117,7 @@ class MediaBase:
     @min_value(0)
     def size(self, value):
         if value is None:
-            raise ValidationError("size", 'La propriété "size" ne peut pas être nulle.')
+            raise PropertyValidationError("size", 'La propriété "size" ne peut pas être nulle.')
         self._size = value
 
     @property
@@ -128,7 +128,7 @@ class MediaBase:
     @typed(str)
     def role(self, value):
         if value is None:
-            raise ValidationError("role", 'La propriété "role" ne peut pas être nulle.')
+            raise PropertyValidationError("role", 'La propriété "role" ne peut pas être nulle.')
         self._role = value
 
     @property
@@ -140,7 +140,7 @@ class MediaBase:
     @min_value(0)
     def position(self, value):
         if value is None:
-            raise ValidationError("position", 'La propriété "position" ne peut pas être nulle.')
+            raise PropertyValidationError("position", 'La propriété "position" ne peut pas être nulle.')
         self._position = value
 
     @property
@@ -164,7 +164,7 @@ class MediaBase:
     @typed(datetime)
     def created_at(self, value):
         if value is None:
-            raise ValidationError("created_at", 'La propriété "created_at" ne peut pas être nulle.')
+            raise PropertyValidationError("created_at", 'La propriété "created_at" ne peut pas être nulle.')
         self._created_at = value
 
     def to_dict(self) -> dict:

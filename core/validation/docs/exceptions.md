@@ -6,20 +6,20 @@ Le fichier de code correspondant est `core/validation/exceptions.py`.
 
 ## 1. Rôle
 
-`ValidationError` est l'exception unique levée quand une contrainte de propriété n'est pas respectée.
+`PropertyValidationError` est l'exception unique levée quand une contrainte de propriété n'est pas respectée.
 
 Elle porte deux informations : le nom de la propriété fautive et un message décrivant la raison du refus.
 Ainsi, le code qui attrape l'erreur sait exactement quelle propriété a posé problème et peut afficher le bon message au bon endroit.
 
-`ValidationError` hérite de `ValueError`.
+`PropertyValidationError` hérite de `ValueError`.
 Un code qui attrape déjà `ValueError` capture donc aussi les erreurs de validation Forge.
 
 ```python
-from core.validation import ValidationError
+from core.validation import PropertyValidationError
 
 try:
     article.title = ""
-except ValidationError as error:
+except PropertyValidationError as error:
     print(error.property_name)  # "title"
     print(error.message)        # la raison du refus
 ```
@@ -28,7 +28,7 @@ except ValidationError as error:
 
 | Élément | Valeur |
 |---|---|
-| Classe | `ValidationError` |
+| Classe | `PropertyValidationError` |
 | Module | `core.validation.exceptions` |
 | Couche | Validation du cœur |
 | Hérite de | `ValueError` |
@@ -41,9 +41,9 @@ except ValidationError as error:
 
 ### 3.1 Diagramme de classe
 
-Le diagramme montre la place de `ValidationError` dans la hiérarchie des exceptions et son lien avec les décorateurs qui la lèvent.
+Le diagramme montre la place de `PropertyValidationError` dans la hiérarchie des exceptions et son lien avec les décorateurs qui la lèvent.
 
-Il permet de voir que `ValidationError` est une `ValueError` enrichie de deux attributs nommés, levée par les décorateurs de validation.
+Il permet de voir que `PropertyValidationError` est une `ValueError` enrichie de deux attributs nommés, levée par les décorateurs de validation.
 
 ```mermaid
 classDiagram
@@ -53,7 +53,7 @@ classDiagram
         <<exception>>
     }
 
-    class ValidationError {
+    class PropertyValidationError {
         <<exception>>
         +str property_name
         +str message
@@ -65,22 +65,22 @@ classDiagram
         +pattern(...)
     }
 
-    ValueError <|-- ValidationError
-    Decorateur ..> ValidationError : leve
+    ValueError <|-- PropertyValidationError
+    Decorateur ..> PropertyValidationError : leve
 ```
 
 À retenir :
 
-- `ValidationError` hérite de `ValueError` ;
+- `PropertyValidationError` hérite de `ValueError` ;
 - elle porte `property_name` et `message` ;
 - elle est levée par les décorateurs de validation ;
-- un code qui attrape `ValueError` attrape aussi `ValidationError`.
+- un code qui attrape `ValueError` attrape aussi `PropertyValidationError`.
 
 ## 4. API publique
 
 | Élément | Signature | Rôle |
 |---|---|---|
-| `ValidationError` | `ValidationError(property_name: str, message: str)` | construit l'exception avec la propriété fautive et le message de refus |
+| `PropertyValidationError` | `PropertyValidationError(property_name: str, message: str)` | construit l'exception avec la propriété fautive et le message de refus |
 | `property_name` | attribut `str` | nom de la propriété en cause |
 | `message` | attribut `str` | raison lisible du refus |
 
@@ -92,7 +92,7 @@ Le `message` est aussi l'argument transmis à `ValueError`, donc `str(error)` re
 |---|---|
 | Identifier la propriété fautive | `error.property_name` |
 | Afficher la raison du refus | `error.message` |
-| Capturer une erreur de validation | `except ValidationError` |
+| Capturer une erreur de validation | `except PropertyValidationError` |
 | Capturer largement les erreurs de valeur | `except ValueError` |
 
 En pratique, les décorateurs de validation lèvent cette erreur lors d'une affectation de propriété.
@@ -103,7 +103,7 @@ Le code applicatif l'attrape, typiquement dans un contrôleur ou un service de f
 ??? example "Attraper l'erreur et lire ses attributs"
 
     ```python
-    from core.validation import ValidationError, typed, not_empty
+    from core.validation import PropertyValidationError, typed, not_empty
 
 
     class Article:
@@ -122,7 +122,7 @@ Le code applicatif l'attrape, typiquement dans un contrôleur ou un service de f
 
     try:
         article.title = "   "
-    except ValidationError as error:
+    except PropertyValidationError as error:
         print(error.property_name)  # "title"
         print(error.message)        # la propriété 'title' ne doit pas être vide.
     ```
@@ -130,14 +130,14 @@ Le code applicatif l'attrape, typiquement dans un contrôleur ou un service de f
 ??? example "Relier l'erreur à un champ de formulaire"
 
     ```python
-    from core.validation import ValidationError
+    from core.validation import PropertyValidationError
 
 
     def soumettre(article, data) -> dict[str, str]:
         erreurs: dict[str, str] = {}
         try:
             article.title = data.get("title")
-        except ValidationError as error:
+        except PropertyValidationError as error:
             erreurs[error.property_name] = error.message
         return erreurs
     ```
@@ -146,4 +146,4 @@ Le code applicatif l'attrape, typiquement dans un contrôleur ou un service de f
 
 ## Voir aussi
 
-- [Les décorateurs de validation dans Forge](decorators.md) : les décorateurs qui lèvent `ValidationError`.
+- [Les décorateurs de validation dans Forge](decorators.md) : les décorateurs qui lèvent `PropertyValidationError`.

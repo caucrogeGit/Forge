@@ -11,7 +11,7 @@ Les propriétés d'une entité doivent souvent respecter des contraintes : un ty
 Ce module fournit des décorateurs à poser sur les setters de propriété.
 Chaque décorateur vérifie la valeur reçue avant de la transmettre au setter d'origine.
 
-La validation est explicite : elle refuse une valeur invalide en levant `ValidationError`, et ne convertit jamais la valeur en douce.
+La validation est explicite : elle refuse une valeur invalide en levant `PropertyValidationError`, et ne convertit jamais la valeur en douce.
 Une valeur acceptée est transmise telle quelle au setter, sans transformation implicite.
 
 ```python
@@ -43,7 +43,7 @@ Tous les autres décorateurs laissent déjà passer la valeur `None` sans la val
 | Rôle | poser des contraintes sur les setters de propriété d'entité |
 | API publique | `typed`, `nullable`, `not_empty`, `min_length`, `max_length`, `min_value`, `max_value`, `pattern` |
 | Exposé par | `core.validation` |
-| Exception liée | `ValidationError` |
+| Exception liée | `PropertyValidationError` |
 | Principe | valider sans transformer ; lever plutôt que corriger |
 
 Ce module est un ensemble de fonctions décoratrices.
@@ -53,7 +53,7 @@ Il n'expose pas de classe : chaque entrée publique est un décorateur appliqué
 
 ### 3.1 Diagramme de classe
 
-Le diagramme montre comment un décorateur enveloppe le setter d'une propriété d'entité, et son lien avec `ValidationError`.
+Le diagramme montre comment un décorateur enveloppe le setter d'une propriété d'entité, et son lien avec `PropertyValidationError`.
 
 Il permet de voir que le décorateur ne remplace pas le setter : il l'enveloppe, contrôle la valeur, puis appelle le setter d'origine si la valeur est acceptée.
 
@@ -80,7 +80,7 @@ classDiagram
         +property title
     }
 
-    class ValidationError {
+    class PropertyValidationError {
         <<exception>>
         +str property_name
         +str message
@@ -88,14 +88,14 @@ classDiagram
 
     Decorateur --> Setter : enveloppe
     Setter --> Entite : appartient a
-    Decorateur ..> ValidationError : peut lever
+    Decorateur ..> PropertyValidationError : peut lever
 ```
 
 À retenir :
 
 - un décorateur enveloppe le setter d'une propriété ;
 - le setter appartient à une entité ;
-- une valeur invalide fait lever `ValidationError` ;
+- une valeur invalide fait lever `PropertyValidationError` ;
 - une valeur valide est transmise au setter d'origine sans transformation.
 
 ### 3.2 Diagramme de séquence
@@ -109,14 +109,14 @@ sequenceDiagram
     actor Code as Code applicatif
     participant Wrapper as Decorateur
     participant Setter as Setter d'origine
-    participant Erreur as ValidationError
+    participant Erreur as PropertyValidationError
 
     Code->>Wrapper: article.title = valeur
     Wrapper->>Wrapper: lit la valeur affectee
     alt valeur None
         Wrapper->>Setter: appelle le setter d'origine
     else valeur invalide
-        Wrapper->>Erreur: leve ValidationError(property_name, message)
+        Wrapper->>Erreur: leve PropertyValidationError(property_name, message)
     else valeur valide
         Wrapper->>Setter: appelle le setter d'origine
     end
@@ -165,7 +165,7 @@ Tous ces décorateurs sont exposés par `core.validation` et par `core.validatio
 | Imposer une longueur de chaîne | `min_length(size)` / `max_length(size)` |
 | Imposer une plage numérique | `min_value(limit)` / `max_value(limit)` |
 | Imposer un format de chaîne | `pattern(regex)` |
-| Identifier l'erreur levée | `ValidationError` |
+| Identifier l'erreur levée | `PropertyValidationError` |
 
 Ces décorateurs se posent sur les setters de propriété d'une entité, généralement empilés du plus général (`typed`) au plus spécifique (longueur, format).
 
@@ -174,7 +174,7 @@ Ces décorateurs se posent sur les setters de propriété d'une entité, génér
 ??? example "Valider le type sans conversion"
 
     ```python
-    from core.validation import typed, ValidationError
+    from core.validation import typed, PropertyValidationError
 
 
     class Compteur:
@@ -193,7 +193,7 @@ Ces décorateurs se posent sur les setters de propriété d'une entité, génér
 
     try:
         compteur.total = "3"  # refuse : ce n'est pas un int
-    except ValidationError as error:
+    except PropertyValidationError as error:
         print(error.property_name)  # "total"
         print(error.message)
     ```
@@ -251,7 +251,7 @@ Ces décorateurs se posent sur les setters de propriété d'une entité, génér
 ??? example "Imposer un format avec pattern"
 
     ```python
-    from core.validation import pattern, ValidationError
+    from core.validation import pattern, PropertyValidationError
 
 
     class Contact:
@@ -270,7 +270,7 @@ Ces décorateurs se posent sur les setters de propriété d'une entité, génér
 
     try:
         contact.code_postal = "ABC"  # refuse : ne correspond pas au motif
-    except ValidationError as error:
+    except PropertyValidationError as error:
         print(error.message)
     ```
 
@@ -289,12 +289,12 @@ Ces décorateurs se posent sur les setters de propriété d'une entité, génér
     C'est `nullable` qui exprime, de façon explicite, qu'une propriété accepte réellement l'absence de valeur.
 
 !!! warning "Cohérence type et contrainte"
-    Les contraintes de chaîne (`not_empty`, `min_length`, `max_length`, `pattern`) lèvent `ValidationError` si la valeur n'est pas une chaîne.
+    Les contraintes de chaîne (`not_empty`, `min_length`, `max_length`, `pattern`) lèvent `PropertyValidationError` si la valeur n'est pas une chaîne.
 
-    Les contraintes numériques (`min_value`, `max_value`) lèvent `ValidationError` si la valeur n'est pas un nombre, et refusent un `bool`.
+    Les contraintes numériques (`min_value`, `max_value`) lèvent `PropertyValidationError` si la valeur n'est pas un nombre, et refusent un `bool`.
 
     Posez `typed` en amont pour obtenir un message d'erreur plus clair sur le type attendu.
 
 ## Voir aussi
 
-- [L'erreur de validation dans Forge](exceptions.md) : l'exception `ValidationError` levée par ces décorateurs.
+- [L'erreur de validation dans Forge](exceptions.md) : l'exception `PropertyValidationError` levée par ces décorateurs.

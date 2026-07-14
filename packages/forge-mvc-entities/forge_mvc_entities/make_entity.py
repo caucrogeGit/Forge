@@ -473,10 +473,10 @@ def _validation_imports(fields: list[dict[str, Any]]) -> list[str]:
         if "pattern" in constraints:
             imports.add("pattern")
         if not field["nullable"] and not field["auto_increment"]:
-            imports.add("ValidationError")
+            imports.add("PropertyValidationError")
 
     order = [
-        "ValidationError",
+        "PropertyValidationError",
         "max_length",
         "max_value",
         "min_length",
@@ -534,7 +534,7 @@ def _render_property(field: dict[str, Any]) -> str:
             ]
         )
     else:
-        none_guard.append(f'            raise ValidationError("{name}", \'La propriété "{name}" ne peut pas être nulle.\')')
+        none_guard.append(f'            raise PropertyValidationError("{name}", \'La propriété "{name}" ne peut pas être nulle.\')')
 
     return (
         f"    @property\n"

@@ -11,10 +11,10 @@ from .decorators import (
     pattern,
     typed,
 )
-from .exceptions import ValidationError
+from .exceptions import PropertyValidationError
 
 __all__ = [
-    "ValidationError",
+    "PropertyValidationError",
     "typed",
     "nullable",
     "not_empty",

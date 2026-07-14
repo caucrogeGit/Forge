@@ -2,7 +2,7 @@ import pytest
 from datetime import date, datetime
 
 from core.validation import (
-    ValidationError,
+    PropertyValidationError,
     max_length,
     max_value,
     min_length,
@@ -64,13 +64,13 @@ def test_typed_string_ok():
 
 def test_typed_int_rejects_bool():
     entity = DummyEntity()
-    with pytest.raises(ValidationError, match="age"):
+    with pytest.raises(PropertyValidationError, match="age"):
         entity.age(True)
 
 
 def test_typed_rejects_wrong_type():
     entity = DummyEntity()
-    with pytest.raises(ValidationError, match="nom"):
+    with pytest.raises(PropertyValidationError, match="nom"):
         entity.nom(123)
 
 
@@ -92,37 +92,37 @@ def test_non_nullable_decorators_ignore_none():
 
 def test_not_empty_rejects_blank_string():
     entity = DummyEntity()
-    with pytest.raises(ValidationError, match="code"):
+    with pytest.raises(PropertyValidationError, match="code"):
         entity.code("   ")
 
 
 def test_min_length_rejects_short_string():
     entity = DummyEntity()
-    with pytest.raises(ValidationError, match="prenom"):
+    with pytest.raises(PropertyValidationError, match="prenom"):
         entity.prenom("Al")
 
 
 def test_max_length_rejects_long_string():
     entity = DummyEntity()
-    with pytest.raises(ValidationError, match="sigle"):
+    with pytest.raises(PropertyValidationError, match="sigle"):
         entity.sigle("ABCDEZ")
 
 
 def test_min_value_rejects_too_small_number():
     entity = DummyEntity()
-    with pytest.raises(ValidationError, match="minimum"):
+    with pytest.raises(PropertyValidationError, match="minimum"):
         entity.minimum(9)
 
 
 def test_max_value_rejects_too_large_number():
     entity = DummyEntity()
-    with pytest.raises(ValidationError, match="maximum"):
+    with pytest.raises(PropertyValidationError, match="maximum"):
         entity.maximum(21)
 
 
 def test_pattern_rejects_invalid_value():
     entity = DummyEntity()
-    with pytest.raises(ValidationError, match="reference"):
+    with pytest.raises(PropertyValidationError, match="reference"):
         entity.reference("ab12")
 
 

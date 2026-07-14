@@ -137,7 +137,7 @@ Règles de formatage :
 Contient le constructeur, les propriétés avec décorateurs de validation, `to_dict()`, `from_dict()` et `__repr__`.
 
 ```python
-from core.validation import ValidationError, max_length, not_empty, nullable, typed
+from core.validation import PropertyValidationError, max_length, not_empty, nullable, typed
 
 
 class ContactBase:
@@ -159,7 +159,7 @@ class ContactBase:
     @max_length(80)
     def nom(self, value):
         if value is None:
-            raise ValidationError("nom", 'La propriété "nom" ne peut pas être nulle.')
+            raise PropertyValidationError("nom", 'La propriété "nom" ne peut pas être nulle.')
         self._nom = value
 
     def to_dict(self) -> dict:

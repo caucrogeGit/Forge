@@ -7,7 +7,7 @@ import re
 from functools import wraps
 from typing import Any, Callable
 
-from .exceptions import ValidationError
+from .exceptions import PropertyValidationError
 
 Setter = Callable[..., Any]
 
@@ -17,7 +17,7 @@ def _property_name(func: Setter) -> str:
 
 
 def _raise(property_name: str, detail: str) -> None:
-    raise ValidationError(property_name, f"La propriete '{property_name}' {detail}.")
+    raise PropertyValidationError(property_name, f"La propriete '{property_name}' {detail}.")
 
 
 def _mark_nullable(func: Setter) -> None:
