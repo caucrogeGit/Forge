@@ -193,6 +193,93 @@ class Dialect(Protocol):
         """
         ...
 
+    # ── DDL du socle Auth/User (ADR-084) ─────────────────────────────────────
+
+    def auto_increment_primary_key_ddl(self, column: str, sql_type: str) -> str:
+        """Définition d'une colonne PK auto-incrémentée avec PRIMARY KEY inline.
+
+        Contrairement à `auto_increment_column_ddl` (entités, PK en clause
+        séparée possible), cette forme porte toujours PRIMARY KEY sur la
+        colonne : c'est le style canonique du socle Auth/User (ADR-084).
+        MariaDB : « col INT AUTO_INCREMENT PRIMARY KEY » ; SQLite :
+        « col INTEGER PRIMARY KEY AUTOINCREMENT » (type imposé INTEGER) ;
+        PostgreSQL : « col SERIAL PRIMARY KEY » ; SQL Server :
+        « col INT IDENTITY(1,1) PRIMARY KEY ».
+        """
+        ...
+
+    def char_type(self, length: int) -> str:
+        """Type colonne pour une chaîne de longueur fixe (hash hexadécimal...).
+
+        MariaDB/PostgreSQL/SQL Server : `CHAR(n)` ; SQLite : `TEXT` (affinité,
+        pas de longueur).
+        """
+        ...
+
+    def boolean_default_literal(self, value: bool) -> str:
+        """Littéral booléen d'une clause DEFAULT de DDL.
+
+        Distinct de `render_literal` (ADR-075, artefacts DML) : ici le littéral
+        qualifie une colonne booléenne dans un CREATE TABLE. MariaDB et
+        PostgreSQL écrivent `TRUE`/`FALSE` ; SQLite (INTEGER) et SQL Server
+        (BIT) écrivent `1`/`0`.
+        """
+        ...
+
+    def timestamp_default_clause(self, *, on_update: bool) -> str:
+        """Clause DEFAULT d'une colonne d'horodatage, avec ou sans on-update.
+
+        MariaDB : `DEFAULT CURRENT_TIMESTAMP` et, si `on_update`, ajoute
+        `ON UPDATE CURRENT_TIMESTAMP`. SQLite et PostgreSQL n'ont pas
+        d'équivalent déclaratif de l'on-update : la clause reste
+        `DEFAULT CURRENT_TIMESTAMP` et la mise à jour de la colonne est à la
+        charge de l'application (ou d'un trigger). SQL Server utilise
+        `DEFAULT SYSUTCDATETIME()` (cohérent avec `forge_migrations_ddl`).
+        """
+        ...
+
+    def collated_table_suffix(self) -> str:
+        """Suffixe de table avec collation explicite, ou chaîne vide.
+
+        MariaDB : « ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        COLLATE=utf8mb4_unicode_ci » (forme historique du socle Auth/User et de
+        `forge_migrations_ddl`, plus complète que `table_suffix`). Les autres
+        dialectes n'ont pas d'options de table : chaîne vide.
+        """
+        ...
+
+    # ── DDL des relations many_to_one (ADR-084) ──────────────────────────────
+
+    def add_foreign_key_sql(
+        self,
+        *,
+        table: str,
+        column: str,
+        sql_type: str,
+        nullable: bool,
+        ref_table: str,
+        ref_column: str,
+        constraint_name: str,
+        on_delete: str,
+        on_update: str,
+        index_name: "str | None",
+        add_column: bool,
+    ) -> "list[str]":
+        """Énoncés SQL posant une clé étrangère `many_to_one` sur une table existante.
+
+        `add_column` est vrai quand la colonne FK n'est pas déclarée comme champ
+        d'entité : la colonne est alors créée (type `sql_type`, nullabilité
+        `nullable`) avant la contrainte. `index_name` demande un index sur la
+        colonne (None : pas d'index). MariaDB, PostgreSQL et SQL Server émettent
+        ALTER TABLE ADD COLUMN (ADD seul en T-SQL), ALTER TABLE ADD CONSTRAINT
+        puis CREATE INDEX. SQLite ne supporte pas ALTER TABLE ADD CONSTRAINT :
+        quand la colonne est créée, la contrainte est portée inline par
+        ADD COLUMN (clause REFERENCES) ; quand la colonne existe déjà, le
+        dialecte émet un commentaire SQL explicite plutôt qu'un énoncé
+        inapplicable (règle B, ADR-084).
+        """
+        ...
+
 
 @runtime_checkable
 class DatabaseBackend(Protocol):

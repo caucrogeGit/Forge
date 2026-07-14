@@ -33,9 +33,10 @@ Les commandes d'administration des comptes parlent à la base avec les identifia
 | Fichiers touchés | `mvc/models/sql/*.sql` en write-if-new pour `auth:init`, aucun fichier pour les autres commandes |
 | Mode Forge | génère (`auth:init`), lit (`auth:status`, `auth:doctor`, `auth:list-sql`), administre la base (`auth:user:*`) |
 | Erreur lisible | `AuthAdminCliError` (message plus conseil) pour les commandes d'administration |
-| ADR liés | ADR-043 (regroupement CLI sécurité), ADR-033 / identifiants de connexion |
+| ADR liés | ADR-043 (regroupement CLI sécurité), ADR-033 / identifiants de connexion, ADR-084 (rendu dialectal du DDL) |
 
 Tables couvertes par `auth:init` : `users`, `auth_tokens`, `auth_mfa_factors`, `auth_mfa_recovery_codes`, `user_roles`, `auth_audit_log` et `auth_rate_limit_attempts`.
+Le SQL de ces tables est rendu dans le dialecte du backend BDD actif (ADR-084) ; sans backend résolu, `auth:init` refuse explicitement.
 
 ## 3. Schémas UML
 

@@ -153,6 +153,66 @@ class MSSQLDialect:
         # forme générale ici. Le chargement s'appuie sur l'ordre topologique.
         return []
 
+    # ── DDL du socle Auth/User (ADR-084) ─────────────────────────────────────
+
+    def auto_increment_primary_key_ddl(self, column: str, sql_type: str) -> str:
+        return f"{column} {sql_type} IDENTITY(1,1) PRIMARY KEY"
+
+    def char_type(self, length: int) -> str:
+        return f"CHAR({length})"
+
+    def boolean_default_literal(self, value: bool) -> str:
+        # BIT : littéraux 1/0.
+        return "1" if value else "0"
+
+    def timestamp_default_clause(self, *, on_update: bool) -> str:
+        # Pas d'ON UPDATE déclaratif en T-SQL (trigger sinon) ; SYSUTCDATETIME()
+        # par cohérence avec forge_migrations_ddl.
+        return "DEFAULT SYSUTCDATETIME()"
+
+    def collated_table_suffix(self) -> str:
+        return ""
+
+    # ── DDL des relations many_to_one (ADR-084) ──────────────────────────────
+
+    def add_foreign_key_sql(
+        self,
+        *,
+        table: str,
+        column: str,
+        sql_type: str,
+        nullable: bool,
+        ref_table: str,
+        ref_column: str,
+        constraint_name: str,
+        on_delete: str,
+        on_update: str,
+        index_name: "str | None",
+        add_column: bool,
+    ) -> "list[str]":
+        # T-SQL ne connaît pas RESTRICT : NO ACTION en est l'équivalent.
+        on_delete = "NO ACTION" if on_delete == "RESTRICT" else on_delete
+        on_update = "NO ACTION" if on_update == "RESTRICT" else on_update
+        statements: list[str] = []
+        if add_column:
+            # T-SQL : ALTER TABLE ... ADD (sans mot-clé COLUMN).
+            null_sql = "NULL" if nullable else "NOT NULL"
+            statements.append(
+                f"ALTER TABLE {table}\n"
+                f"    ADD {column} {sql_type} {null_sql};"
+            )
+        statements.append(
+            f"ALTER TABLE {table}\n"
+            f"    ADD CONSTRAINT {constraint_name}\n"
+            f"    FOREIGN KEY ({column})\n"
+            f"    REFERENCES {ref_table} ({ref_column})\n"
+            f"    ON DELETE {on_delete}\n"
+            f"    ON UPDATE {on_update};"
+        )
+        if index_name is not None:
+            statements.append(self.create_index_sql(table, index_name, column))
+        return statements
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

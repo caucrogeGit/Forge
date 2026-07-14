@@ -26,9 +26,12 @@ import importlib.util
 import sys
 from pathlib import Path
 from collections.abc import Callable
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import cli._support.output as out
+
+if TYPE_CHECKING:
+    from core.database.backend import Dialect
 
 
 _SQL_DIR = Path("mvc") / "models" / "sql"
@@ -270,19 +273,49 @@ CREATE TABLE IF NOT EXISTS auth_rate_limit_attempts (
 """
 
 
+def _auth_init_dialect() -> "Dialect":
+    """Dialecte du backend BDD actif, ou refus explicite (ADR-084).
+
+    Le DDL du socle Auth/User est rendu par le dialecte du backend installé :
+    sans backend résolu, la commande refuse plutôt que d'émettre du SQL d'un
+    autre dialecte.
+    """
+    from core.database.backend import get_backend
+
+    try:
+        return get_backend().dialect
+    except RuntimeError as error:
+        raise SystemExit(
+            "forge auth:init : aucun backend BDD résolu.\n"
+            f"Cause : {error}\n"
+            "ADR-084 : le SQL du socle Auth/User est rendu dans le dialecte du "
+            "backend actif ; installez un backend de niveau plein "
+            "(forge-mvc-mariadb ou forge-mvc-sqlite), ou fixez DB_BACKEND."
+        ) from error
+
+
 def cmd_auth_init(args: list[str], root: Path | None = None) -> None:
     if args:
         raise SystemExit("Usage : forge auth:init")
+
+    from cli.security.auth_sql import render_auth_sql
+
+    # ADR-084 : le DDL est rendu par le dialecte du backend BDD actif (MariaDB
+    # reproduit les constantes canoniques ci-dessus à l'identique, parité testée).
+    dialect = _auth_init_dialect()
 
     root = root or Path.cwd()
     sql_dir = root / _SQL_DIR
     sql_dir.mkdir(parents=True, exist_ok=True)
 
     # Socle de base : ne dépend que du cœur (core.auth), toujours applicable seul.
-    _write_if_new(sql_dir / "users.sql", USERS_SQL)
-    _write_if_new(sql_dir / "auth_tokens.sql", AUTH_TOKENS_SQL)
-    _write_if_new(sql_dir / "auth_audit_log.sql", AUTH_AUDIT_LOG_SQL)
-    _write_if_new(sql_dir / "auth_rate_limit_attempts.sql", AUTH_RATE_LIMIT_ATTEMPTS_SQL)
+    _write_if_new(sql_dir / "users.sql", render_auth_sql("users", dialect))
+    _write_if_new(sql_dir / "auth_tokens.sql", render_auth_sql("auth_tokens", dialect))
+    _write_if_new(sql_dir / "auth_audit_log.sql", render_auth_sql("auth_audit_log", dialect))
+    _write_if_new(
+        sql_dir / "auth_rate_limit_attempts.sql",
+        render_auth_sql("auth_rate_limit_attempts", dialect),
+    )
 
     # FORGE-4 : les ponts vers un opt-in ne sont écrits que si l'opt-in est
     # installé. Leur SQL référence des tables de l'opt-in (user_roles -> roles du
@@ -290,12 +323,15 @@ def cmd_auth_init(args: list[str], root: Path | None = None) -> None:
     # inapplicable d'un bloc (FK vers une table absente).
     skipped: list[str] = []
     if _optin_installed("forge_mvc_mfa"):
-        _write_if_new(sql_dir / "auth_mfa_factors.sql", AUTH_MFA_FACTORS_SQL)
-        _write_if_new(sql_dir / "auth_mfa_recovery_codes.sql", AUTH_MFA_RECOVERY_CODES_SQL)
+        _write_if_new(sql_dir / "auth_mfa_factors.sql", render_auth_sql("auth_mfa_factors", dialect))
+        _write_if_new(
+            sql_dir / "auth_mfa_recovery_codes.sql",
+            render_auth_sql("auth_mfa_recovery_codes", dialect),
+        )
     else:
         skipped.append("MFA (forge-mvc-mfa) : auth_mfa_factors.sql, auth_mfa_recovery_codes.sql")
     if _optin_installed("forge_mvc_rbac"):
-        _write_if_new(sql_dir / "user_roles.sql", USER_ROLES_SQL)
+        _write_if_new(sql_dir / "user_roles.sql", render_auth_sql("user_roles", dialect))
     else:
         skipped.append("RBAC (forge-mvc-rbac) : user_roles.sql")
 

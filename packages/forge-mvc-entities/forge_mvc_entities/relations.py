@@ -208,42 +208,41 @@ def generate_relations_sql(relations: list[ValidatedRelation | ValidatedCanonica
     blocks: list[str] = []
     for relation in relations:
         if isinstance(relation, ValidatedRelation):
-            statements: list[str] = []
-            if relation.fk_owned:
-                # FORGE-12/14 : créer la colonne FK au type exact de la PK visée,
-                # avant la contrainte (même ALTER TABLE impossible car ordre requis).
-                null_sql = "NULL" if relation.fk_nullable else "NOT NULL"
-                statements.append(
-                    "\n".join(
-                        [
-                            f"ALTER TABLE {relation.from_table}",
-                            f"    ADD COLUMN {relation.from_column} {relation.from_column_sql_type} {null_sql};",
-                        ]
-                    )
-                )
-            statements.append(
-                "\n".join(
-                    [
-                        f"ALTER TABLE {relation.from_table}",
-                        f"    ADD CONSTRAINT {relation.foreign_key_name}",
-                        f"    FOREIGN KEY ({relation.from_column})",
-                        f"    REFERENCES {relation.to_table} ({relation.to_column})",
-                        f"    ON DELETE {relation.on_delete}",
-                        f"    ON UPDATE {relation.on_update};",
-                    ]
-                )
-            )
-            if relation.fk_owned and relation.fk_index:
-                idx_name = f"idx_{relation.from_table}_{relation.from_column}"
-                statements.append(
-                    f"CREATE INDEX {idx_name} ON {relation.from_table} ({relation.from_column});"
-                )
-            blocks.append("\n".join(statements))
+            blocks.append(_generate_many_to_one_sql(relation))
         else:
             blocks.append(_generate_canonical_m2m_sql(relation))
     if not blocks:
         return ""
     return "\n\n".join(blocks) + "\n"
+
+
+def _generate_many_to_one_sql(relation: ValidatedRelation) -> str:
+    # ENTITIES-RELATIONS-DIALECT-001 (ADR-084) : la pose de la FK passe par le
+    # dialecte du backend actif, comme le chemin many_to_many voisin.
+    # FORGE-12/14 : quand relations.sql possède la colonne (fk_owned), elle est
+    # créée au type exact de la PK visée, avant la contrainte.
+    from core.database.backend import get_backend
+
+    dialect = get_backend().dialect
+    index_name = (
+        f"idx_{relation.from_table}_{relation.from_column}"
+        if relation.fk_owned and relation.fk_index
+        else None
+    )
+    statements = dialect.add_foreign_key_sql(
+        table=relation.from_table,
+        column=relation.from_column,
+        sql_type=relation.from_column_sql_type,
+        nullable=relation.fk_nullable,
+        ref_table=relation.to_table,
+        ref_column=relation.to_column,
+        constraint_name=relation.foreign_key_name,
+        on_delete=relation.on_delete,
+        on_update=relation.on_update,
+        index_name=index_name,
+        add_column=relation.fk_owned,
+    )
+    return "\n".join(statements)
 
 
 def _generate_canonical_m2m_sql(relation: ValidatedCanonicalManyToManyRelation) -> str:

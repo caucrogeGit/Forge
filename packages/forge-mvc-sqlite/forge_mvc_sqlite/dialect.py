@@ -137,6 +137,85 @@ class SQLiteDialect:
         # PRAGMA SQLite (ADR-077) ; sans effet dans une transaction ouverte.
         return [f"PRAGMA foreign_keys = {'ON' if enabled else 'OFF'}"]
 
+    # ── DDL du socle Auth/User (ADR-084) ─────────────────────────────────────
+
+    def auto_increment_primary_key_ddl(self, column: str, sql_type: str) -> str:
+        # SQLite impose INTEGER pour la PK auto-incrémentée ; le type passé est ignoré.
+        return f"{column} INTEGER PRIMARY KEY AUTOINCREMENT"
+
+    def char_type(self, length: int) -> str:
+        # SQLite ignore la longueur (affinité TEXT).
+        return "TEXT"
+
+    def boolean_default_literal(self, value: bool) -> str:
+        # Pas de type booléen natif : colonne INTEGER, littéraux 1/0.
+        return "1" if value else "0"
+
+    def timestamp_default_clause(self, *, on_update: bool) -> str:
+        # SQLite n'a pas d'ON UPDATE CURRENT_TIMESTAMP déclaratif : la mise à
+        # jour de la colonne est à la charge de l'application (ou d'un trigger).
+        return "DEFAULT CURRENT_TIMESTAMP"
+
+    def collated_table_suffix(self) -> str:
+        return ""
+
+    # ── DDL des relations many_to_one (ADR-084) ──────────────────────────────
+
+    def add_foreign_key_sql(
+        self,
+        *,
+        table: str,
+        column: str,
+        sql_type: str,
+        nullable: bool,
+        ref_table: str,
+        ref_column: str,
+        constraint_name: str,
+        on_delete: str,
+        on_update: str,
+        index_name: "str | None",
+        add_column: bool,
+    ) -> "list[str]":
+        """Pose de FK many_to_one, dans les limites d'ALTER TABLE SQLite.
+
+        SQLite ne supporte pas ALTER TABLE ... ADD CONSTRAINT. Quand la colonne
+        est créée par relations.sql (`add_column`), la contrainte est portée
+        inline par ADD COLUMN (clause CONSTRAINT ... REFERENCES), réellement
+        applicable. Deux limites sont révélées par un commentaire SQL plutôt que
+        masquées (règle B, ADR-084) : une colonne ajoutée avec REFERENCES doit
+        avoir NULL pour défaut (la colonne est donc créée nullable même si la
+        relation est NOT NULL, contrainte à faire respecter par l'application) ;
+        et une colonne déjà déclarée par l'entité ne peut plus recevoir de
+        contrainte après coup (aucun énoncé n'est émis, seulement le commentaire).
+        """
+        if not add_column:
+            return [
+                "-- SQLite ne supporte pas ALTER TABLE ... ADD CONSTRAINT : la contrainte\n"
+                f"-- {constraint_name} (FOREIGN KEY ({column}) REFERENCES {ref_table} ({ref_column}))\n"
+                f"-- ne peut pas être ajoutée après coup sur la colonne existante {table}.{column}.\n"
+                f"-- Portez la clause REFERENCES dans le CREATE TABLE de {table}, ou recréez la\n"
+                "-- table. Voir ADR-084."
+            ]
+        statements: list[str] = []
+        if not nullable:
+            statements.append(
+                "-- SQLite : une colonne NOT NULL ajoutée par ALTER TABLE exige un défaut non\n"
+                "-- nul, incompatible avec une clause REFERENCES (défaut NULL exigé). La colonne\n"
+                f"-- {column} est créée nullable ; NOT NULL est à faire respecter par\n"
+                "-- l'application. Voir ADR-084."
+            )
+        statements.append(
+            f"ALTER TABLE {table}\n"
+            f"    ADD COLUMN {column} {sql_type} NULL\n"
+            f"    CONSTRAINT {constraint_name}\n"
+            f"    REFERENCES {ref_table} ({ref_column})\n"
+            f"    ON DELETE {on_delete}\n"
+            f"    ON UPDATE {on_update};"
+        )
+        if index_name is not None:
+            statements.append(self.create_index_sql(table, index_name, column))
+        return statements
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

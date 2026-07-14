@@ -91,3 +91,67 @@ def test_add_columns_sql_executable() -> None:
         assert {"Id", "Email", "Age"} <= cols
     finally:
         conn.close()
+
+
+def test_ddl_auth_adr_084() -> None:
+    # ADR-084 : traits DDL du socle Auth/User (affinités SQLite).
+    assert D.auto_increment_primary_key_ddl("id", "INTEGER") == "id INTEGER PRIMARY KEY AUTOINCREMENT"
+    assert D.char_type(64) == "TEXT"
+    assert D.boolean_default_literal(True) == "1"
+    assert D.boolean_default_literal(False) == "0"
+    # Pas d'ON UPDATE déclaratif en SQLite : clause identique dans les deux cas.
+    assert D.timestamp_default_clause(on_update=False) == "DEFAULT CURRENT_TIMESTAMP"
+    assert D.timestamp_default_clause(on_update=True) == "DEFAULT CURRENT_TIMESTAMP"
+    assert D.collated_table_suffix() == ""
+
+
+def test_add_foreign_key_sql_inline_references_executable() -> None:
+    # ADR-084 : pas d'ADD CONSTRAINT en SQLite ; REFERENCES inline sur ADD COLUMN.
+    import sqlite3
+
+    statements = D.add_foreign_key_sql(
+        table="classe",
+        column="annee_scolaire_id",
+        sql_type="INTEGER",
+        nullable=True,
+        ref_table="annee_scolaire",
+        ref_column="id",
+        constraint_name="fk_classe_annee_scolaire_id",
+        on_delete="RESTRICT",
+        on_update="RESTRICT",
+        index_name="idx_classe_annee_scolaire_id",
+        add_column=True,
+    )
+    sql = "\n".join(statements)
+    assert "ADD CONSTRAINT" not in sql
+    assert "REFERENCES annee_scolaire (id)" in sql
+    conn = sqlite3.connect(":memory:")
+    try:
+        conn.execute("PRAGMA foreign_keys = ON")
+        conn.execute("CREATE TABLE annee_scolaire (id INTEGER PRIMARY KEY AUTOINCREMENT)")
+        conn.execute("CREATE TABLE classe (id INTEGER PRIMARY KEY AUTOINCREMENT)")
+        conn.executescript(sql)
+        fks = list(conn.execute("PRAGMA foreign_key_list(classe)"))
+        assert any(row[2] == "annee_scolaire" for row in fks)
+    finally:
+        conn.close()
+
+
+def test_add_foreign_key_sql_colonne_existante_commentaire_seul() -> None:
+    # ADR-084, règle B : colonne déjà déclarée, aucun énoncé inapplicable.
+    statements = D.add_foreign_key_sql(
+        table="classe",
+        column="annee_scolaire_id",
+        sql_type="INTEGER",
+        nullable=True,
+        ref_table="annee_scolaire",
+        ref_column="id",
+        constraint_name="fk_classe_annee_scolaire_id",
+        on_delete="RESTRICT",
+        on_update="RESTRICT",
+        index_name=None,
+        add_column=False,
+    )
+    assert len(statements) == 1
+    assert all(line.startswith("--") for line in statements[0].splitlines())
+    assert "ADR-084" in statements[0]

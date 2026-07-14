@@ -109,6 +109,9 @@ Forge ne demande pas de nom, avatar, telephone, adresse, profil proprietaire ou 
 
 ### `users.sql`
 
+Le SQL de `forge auth:init` est rendu dans le dialecte du backend BDD actif (ADR-084).
+Les extraits de cette page montrent le rendu MariaDB ; sous SQLite, la même commande écrit l'équivalent SQLite (`INTEGER PRIMARY KEY AUTOINCREMENT`, index en `CREATE INDEX` séparés, sans `ENGINE=` ni `ON UPDATE CURRENT_TIMESTAMP`).
+
 `forge auth:init` cree ou preserve :
 
 ```sql
@@ -442,6 +445,8 @@ forge auth:user:roles --email user@example.com
 - `auth_audit_log.sql`
 - `auth_rate_limit_attempts.sql`
 
+Le SQL est rendu dans le dialecte du backend BDD actif (ADR-084).
+Sans backend BDD résolu, la commande refuse explicitement et conseille d'installer un backend de niveau plein (MariaDB ou SQLite).
 La commande ne cree aucun utilisateur, aucun token, aucun facteur MFA, aucun role utilisateur, aucun audit et aucune tentative rate limit.
 Elle n'applique pas non plus le SQL.
 

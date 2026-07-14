@@ -75,3 +75,38 @@ def test_foreign_key_checks_ddl() -> None:
     assert D.foreign_key_checks_ddl(enabled=True) == [
         "SET session_replication_role = origin"
     ]
+
+
+def test_ddl_auth_adr_084() -> None:
+    # ADR-084 : traits DDL du socle Auth/User.
+    assert D.auto_increment_primary_key_ddl("id", "INTEGER") == "id SERIAL PRIMARY KEY"
+    assert D.auto_increment_primary_key_ddl("id", "BIGINT") == "id BIGSERIAL PRIMARY KEY"
+    assert D.char_type(64) == "CHAR(64)"
+    assert D.boolean_default_literal(True) == "TRUE"
+    assert D.boolean_default_literal(False) == "FALSE"
+    # Pas d'ON UPDATE déclaratif en PostgreSQL : clause identique dans les deux cas.
+    assert D.timestamp_default_clause(on_update=False) == "DEFAULT CURRENT_TIMESTAMP"
+    assert D.timestamp_default_clause(on_update=True) == "DEFAULT CURRENT_TIMESTAMP"
+    assert D.collated_table_suffix() == ""
+
+
+def test_add_foreign_key_sql_adr_084() -> None:
+    # ADR-084 : pose de FK many_to_one (ADD COLUMN, ADD CONSTRAINT, index gardé).
+    statements = D.add_foreign_key_sql(
+        table="classe",
+        column="annee_scolaire_id",
+        sql_type="BIGINT",
+        nullable=False,
+        ref_table="annee_scolaire",
+        ref_column="id",
+        constraint_name="fk_classe_annee_scolaire_id",
+        on_delete="RESTRICT",
+        on_update="RESTRICT",
+        index_name="idx_classe_annee_scolaire_id",
+        add_column=True,
+    )
+    assert statements[0] == "ALTER TABLE classe\n    ADD COLUMN annee_scolaire_id BIGINT NOT NULL;"
+    assert "ADD CONSTRAINT fk_classe_annee_scolaire_id" in statements[1]
+    assert statements[2] == (
+        "CREATE INDEX IF NOT EXISTS idx_classe_annee_scolaire_id ON classe (annee_scolaire_id);"
+    )

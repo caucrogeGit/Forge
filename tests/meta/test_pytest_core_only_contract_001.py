@@ -111,6 +111,14 @@ OPTIN_MODULES: dict[str, set[str]] = {
     # l'opt-in) n'est jamais importé au top-level des tests du cœur (import
     # paresseux dans Factory), donc pas d'extra à lister.
     "forge_mvc_fixtures": set(),
+    # Backends BDD (ADR-054/084) : opt-ins exclusifs. Les tests dialectaux du
+    # cœur (ex. parité DDL auth:init) gardent chaque import via importorskip.
+    # Les connecteurs (mariadb, sqlite3, psycopg, pyodbc) ne sont jamais
+    # importés au top-level des tests du cœur, donc pas d'extra à lister.
+    "forge_mvc_mariadb": set(),
+    "forge_mvc_sqlite": set(),
+    "forge_mvc_postgres": set(),
+    "forge_mvc_mssql": set(),
 }
 
 EXCLUDED_DIRS = {"history", "audits"}

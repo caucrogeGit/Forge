@@ -2075,7 +2075,9 @@ Usage:
 
 Description:
   Initialise les fichiers SQL optionnels du socle Auth/User Forge dans
-  le projet. Ne touche pas la base de données.
+  le projet. Ne touche pas la base de données. Le SQL est rendu dans le
+  dialecte du backend BDD actif (ADR-084) : MariaDB, SQLite, ou un
+  backend Alpha (PostgreSQL, SQL Server).
 
 Effets (un projet PEUT être modifié) :
   - crée mvc/models/sql/ si absent ;
@@ -2097,6 +2099,8 @@ ATTENTION:
 Limites:
   - ne crée AUCUNE table : utiliser forge db:apply pour exécuter le
     SQL produit ;
+  - sans backend BDD résolu, la commande refuse explicitement
+    (ADR-084) : installer forge-mvc-mariadb ou forge-mvc-sqlite ;
   - ne configure ni la session ni le hachage de mot de passe (déjà
     fournis par core.auth) ;
   - ne crée aucun utilisateur (voir forge auth:user:create) ;

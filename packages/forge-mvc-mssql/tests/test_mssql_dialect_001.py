@@ -79,3 +79,38 @@ def test_foreign_key_checks_ddl_is_empty() -> None:
     # ADR-077 : SQL Server n'a pas de levier FK de session ; liste vide.
     assert D.foreign_key_checks_ddl(enabled=False) == []
     assert D.foreign_key_checks_ddl(enabled=True) == []
+
+
+def test_ddl_auth_adr_084() -> None:
+    # ADR-084 : traits DDL du socle Auth/User.
+    assert D.auto_increment_primary_key_ddl("id", "INT") == "id INT IDENTITY(1,1) PRIMARY KEY"
+    assert D.char_type(64) == "CHAR(64)"
+    assert D.boolean_default_literal(True) == "1"
+    assert D.boolean_default_literal(False) == "0"
+    # Pas d'ON UPDATE déclaratif en T-SQL ; SYSUTCDATETIME() comme forge_migrations.
+    assert D.timestamp_default_clause(on_update=False) == "DEFAULT SYSUTCDATETIME()"
+    assert D.timestamp_default_clause(on_update=True) == "DEFAULT SYSUTCDATETIME()"
+    assert D.collated_table_suffix() == ""
+
+
+def test_add_foreign_key_sql_adr_084() -> None:
+    # ADR-084 : ADD sans mot-clé COLUMN (T-SQL), RESTRICT traduit en NO ACTION.
+    statements = D.add_foreign_key_sql(
+        table="classe",
+        column="annee_scolaire_id",
+        sql_type="BIGINT",
+        nullable=True,
+        ref_table="annee_scolaire",
+        ref_column="id",
+        constraint_name="fk_classe_annee_scolaire_id",
+        on_delete="RESTRICT",
+        on_update="RESTRICT",
+        index_name="idx_classe_annee_scolaire_id",
+        add_column=True,
+    )
+    assert statements[0] == "ALTER TABLE classe\n    ADD annee_scolaire_id BIGINT NULL;"
+    assert "ADD COLUMN" not in statements[0]
+    assert "ON DELETE NO ACTION" in statements[1]
+    assert "ON UPDATE NO ACTION" in statements[1]
+    assert "RESTRICT" not in statements[1]
+    assert "CREATE INDEX idx_classe_annee_scolaire_id ON classe (annee_scolaire_id);" in statements[2]

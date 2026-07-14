@@ -137,6 +137,61 @@ class MariaDBDialect:
         # Levier de session MariaDB (ADR-077).
         return [f"SET FOREIGN_KEY_CHECKS = {1 if enabled else 0}"]
 
+    # ── DDL du socle Auth/User (ADR-084) ─────────────────────────────────────
+
+    def auto_increment_primary_key_ddl(self, column: str, sql_type: str) -> str:
+        return f"{column} {sql_type} AUTO_INCREMENT PRIMARY KEY"
+
+    def char_type(self, length: int) -> str:
+        return f"CHAR({length})"
+
+    def boolean_default_literal(self, value: bool) -> str:
+        return "TRUE" if value else "FALSE"
+
+    def timestamp_default_clause(self, *, on_update: bool) -> str:
+        if on_update:
+            return "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        return "DEFAULT CURRENT_TIMESTAMP"
+
+    def collated_table_suffix(self) -> str:
+        return " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+
+    # ── DDL des relations many_to_one (ADR-084) ──────────────────────────────
+
+    def add_foreign_key_sql(
+        self,
+        *,
+        table: str,
+        column: str,
+        sql_type: str,
+        nullable: bool,
+        ref_table: str,
+        ref_column: str,
+        constraint_name: str,
+        on_delete: str,
+        on_update: str,
+        index_name: "str | None",
+        add_column: bool,
+    ) -> "list[str]":
+        statements: list[str] = []
+        if add_column:
+            null_sql = "NULL" if nullable else "NOT NULL"
+            statements.append(
+                f"ALTER TABLE {table}\n"
+                f"    ADD COLUMN {column} {sql_type} {null_sql};"
+            )
+        statements.append(
+            f"ALTER TABLE {table}\n"
+            f"    ADD CONSTRAINT {constraint_name}\n"
+            f"    FOREIGN KEY ({column})\n"
+            f"    REFERENCES {ref_table} ({ref_column})\n"
+            f"    ON DELETE {on_delete}\n"
+            f"    ON UPDATE {on_update};"
+        )
+        if index_name is not None:
+            statements.append(self.create_index_sql(table, index_name, column))
+        return statements
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":
