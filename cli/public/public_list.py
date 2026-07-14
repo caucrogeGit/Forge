@@ -12,12 +12,11 @@ import cli._support.output as out
 # Moteur d'entités (forge-mvc-entities) importé paresseusement dans les fonctions
 # qui en dépendent (ADR-070) : le cœur n'en dépend pas au chargement.
 from cli.public._shared import (
+    build_public_routes_file,
     ensure_import as _ensure_import,
-    ensure_routes_file as _ensure_routes_file,
     ensure_trailing_newline as _ensure_trailing_newline,
-    has_router_factory as _has_router_factory,
     humanize as _humanize,
-    insert_import as _insert_import,
+    public_routes_branchement,
     require_entities_module as _require_entities_module,
 )
 from cli.public.public_page import (
@@ -25,7 +24,6 @@ from cli.public.public_page import (
     PUBLIC_LAYOUT,
     PUBLIC_SCRIPTS_BLOCK,
     PUBLIC_TITLE_BLOCK,
-    ROUTES_PATH,
 )
 
 
@@ -519,83 +517,6 @@ def build_public_show_template(spec: PublicListSpec) -> str:
     return "\n".join(lines)
 
 
-def _route_exists(content: str, spec: PublicListSpec) -> bool:
-    path_pattern = rf'["\']{re.escape(spec.route_path)}["\']'
-    route_name = f'name="{spec.route_name}"'
-    return re.search(path_pattern, content) is not None or route_name in content
-
-
-def build_route_block(spec: PublicListSpec) -> str:
-    return (
-        "\n"
-        "with router.group(\"\", public=True) as public:\n"
-        f'    public.add("GET", "{spec.route_path}", {spec.class_name}.index, '
-        f'name="{spec.route_name}")\n'
-    )
-
-
-def build_show_route_block(spec: PublicListSpec) -> str:
-    return (
-        "\n"
-        "with router.group(\"\", public=True) as public:\n"
-        f'    public.add("GET", "{spec.show_route_path}", {spec.class_name}.show, '
-        f'name="{spec.show_route_name}")\n'
-    )
-
-
-def _ensure_route(routes_path: Path, spec: PublicListSpec) -> tuple[bool, str | None]:
-    _ensure_routes_file(routes_path)
-    content = routes_path.read_text(encoding="utf-8")
-    import_line = (
-        f"from mvc.controllers.public_{spec.plural}_controller import {spec.class_name}"
-    )
-    changed = import_line not in content
-    content = _insert_import(content, import_line)
-
-    if _route_exists(content, spec):
-        routes_path.write_text(_ensure_trailing_newline(content), encoding="utf-8")
-        return changed, None
-
-    if not _has_router_factory(content):
-        return False, f"Route à ajouter manuellement dans {routes_path.as_posix()} : GET {spec.route_path}"
-
-    routes_path.write_text(
-        _ensure_trailing_newline(content) + build_route_block(spec),
-        encoding="utf-8",
-    )
-    return True, None
-
-
-def _show_route_exists(content: str, spec: PublicListSpec) -> bool:
-    route_name = f'name="{spec.show_route_name}"'
-    route_path = re.escape(spec.show_route_path)
-    path_pattern = rf'["\']{route_path}["\']'
-    return re.search(path_pattern, content) is not None or route_name in content
-
-
-def _ensure_show_route(routes_path: Path, spec: PublicListSpec) -> tuple[bool, str | None]:
-    _ensure_routes_file(routes_path)
-    content = routes_path.read_text(encoding="utf-8")
-    import_line = (
-        f"from mvc.controllers.public_{spec.plural}_controller import {spec.class_name}"
-    )
-    changed = import_line not in content
-    content = _insert_import(content, import_line)
-
-    if _show_route_exists(content, spec):
-        routes_path.write_text(_ensure_trailing_newline(content), encoding="utf-8")
-        return changed, None
-
-    if not _has_router_factory(content):
-        return False, f"Route à ajouter manuellement dans {routes_path.as_posix()} : GET {spec.show_route_path}"
-
-    routes_path.write_text(
-        _ensure_trailing_newline(content) + build_show_route_block(spec),
-        encoding="utf-8",
-    )
-    return True, None
-
-
 def _ensure_detail_constant(content: str, spec: PublicListSpec) -> tuple[str, bool]:
     if "SELECT_PUBLIC_DETAIL" in content:
         return content, False
@@ -696,13 +617,17 @@ def make_public_list(
         controller_path.write_text(build_public_list_controller(spec), encoding="utf-8")
         result.created.append(spec.controller_path.as_posix())
 
-    route_changed, route_warning = _ensure_route(project_root / ROUTES_PATH, spec)
-    if route_changed:
-        result.created.append(ROUTES_PATH.as_posix())
-    else:
-        result.preserved.append(ROUTES_PATH.as_posix())
-    if route_warning:
-        result.warnings.append(route_warning)
+    # ADR-085 : fichier de routes dédié + affichage, jamais d'injection.
+    _write_public_routes(
+        project_root, result,
+        register_name=f"public_{spec.plural}",
+        class_name=spec.class_name,
+        plural=spec.plural,
+        add_lines=[
+            f'public.add("GET", "{spec.route_path}", {spec.class_name}.index, '
+            f'name="{spec.route_name}")'
+        ],
+    )
 
     if not spec.fields:
         result.warnings.append(
@@ -710,6 +635,33 @@ def make_public_list(
         )
 
     return result
+
+
+def _write_public_routes(
+    project_root: Path,
+    result: "MakePublicListResult | MakePublicShowResult",
+    *,
+    register_name: str,
+    class_name: str,
+    plural: str,
+    add_lines: list[str],
+) -> None:
+    """Écrit `mvc/routes/<register_name>_routes.py` en write-if-new (ADR-085)."""
+    routes_rel = Path("mvc/routes") / f"{register_name}_routes.py"
+    routes_path = project_root / routes_rel
+    routes_path.parent.mkdir(parents=True, exist_ok=True)
+    if routes_path.exists():
+        result.preserved.append(routes_rel.as_posix())
+        return
+    routes_path.write_text(
+        build_public_routes_file(
+            register_name,
+            f"from mvc.controllers.public_{plural}_controller import {class_name}",
+            add_lines,
+        ),
+        encoding="utf-8",
+    )
+    result.created.append(routes_rel.as_posix())
 
 
 def make_public_show(
@@ -745,17 +697,20 @@ def make_public_show(
     if controller_warning:
         result.warnings.append(controller_warning)
         result.warnings.append(
-            f"Route non ajoutée automatiquement tant que le contrôleur est à compléter : {ROUTES_PATH.as_posix()}"
+            "Fichier de routes non généré tant que le contrôleur est à compléter."
         )
-        result.preserved.append(ROUTES_PATH.as_posix())
     else:
-        route_changed, route_warning = _ensure_show_route(project_root / ROUTES_PATH, spec)
-        if route_changed:
-            result.created.append(ROUTES_PATH.as_posix())
-        else:
-            result.preserved.append(ROUTES_PATH.as_posix())
-        if route_warning:
-            result.warnings.append(route_warning)
+        # ADR-085 : fichier de routes dédié + affichage, jamais d'injection.
+        _write_public_routes(
+            project_root, result,
+            register_name=f"public_{spec.plural}_show",
+            class_name=spec.class_name,
+            plural=spec.plural,
+            add_lines=[
+                f'public.add("GET", "{spec.show_route_path}", {spec.class_name}.show, '
+                f'name="{spec.show_route_name}")'
+            ],
+        )
 
     if not spec.fields:
         result.warnings.append(
@@ -777,6 +732,8 @@ def print_result(result: MakePublicListResult) -> None:
         print(out.preserved(path))
     for warning in result.warnings:
         print(out.warn(warning))
+    print()
+    print(public_routes_branchement(f"public_{spec.plural}"))
 
 
 def print_show_result(result: MakePublicShowResult) -> None:
@@ -791,6 +748,9 @@ def print_show_result(result: MakePublicShowResult) -> None:
         print(out.preserved(path))
     for warning in result.warnings:
         print(out.warn(warning))
+    if not any("à compléter" in w for w in result.warnings):
+        print()
+        print(public_routes_branchement(f"public_{spec.plural}_show"))
 
 
 def main(args: list[str], *, root: Path | None = None) -> MakePublicListResult:

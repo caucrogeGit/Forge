@@ -114,17 +114,21 @@ def test_make_public_list_genere_controleur_public_dedie(tmp_path):
     assert '"hebergements": rows' in controller
 
 
-def test_make_public_list_ajoute_route_publique_idempotente(tmp_path):
+def test_make_public_list_genere_fichier_de_routes_idempotent(tmp_path):
+    # ADR-085 : fichier de routes dédié, jamais d'injection dans __init__.py.
     _prepare_project(tmp_path)
+    init_before = _read(tmp_path, "mvc/routes/__init__.py")
 
     make_public_list("Hebergement", output_root=tmp_path)
     make_public_list("Hebergement", output_root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes/__init__.py")
+    routes = _read(tmp_path, "mvc/routes/public_hebergements_routes.py")
     assert "from mvc.controllers.public_hebergements_controller import PublicHebergementsController" in routes
+    assert "def register_public_hebergements_routes(router: Router) -> None:" in routes
     assert 'public.add("GET", "/hebergements", PublicHebergementsController.index, name="public_hebergements-index")' in routes
     assert routes.count('"/hebergements"') == 1
     assert routes.count('name="public_hebergements-index"') == 1
+    assert _read(tmp_path, "mvc/routes/__init__.py") == init_before  # jamais touché
 
 
 def test_make_public_list_necrase_pas_template_existant(tmp_path):

@@ -60,17 +60,21 @@ def test_make_public_show_complete_controleur_public_existant(tmp_path):
     assert "SELECT_PUBLIC_DETAIL" in controller
 
 
-def test_make_public_show_ajoute_route_publique_idempotente(tmp_path):
+def test_make_public_show_genere_fichier_de_routes_idempotent(tmp_path):
+    # ADR-085 : fichier de routes show dédié, jamais d'injection.
     _prepare_project(tmp_path)
+    init_before = _read(tmp_path, "mvc/routes/__init__.py")
 
     make_public_show("Hebergement", output_root=tmp_path)
     make_public_show("Hebergement", output_root=tmp_path)
 
-    routes = _read(tmp_path, "mvc/routes/__init__.py")
+    routes = _read(tmp_path, "mvc/routes/public_hebergements_show_routes.py")
     assert "from mvc.controllers.public_hebergements_controller import PublicHebergementsController" in routes
+    assert "def register_public_hebergements_show_routes(router: Router) -> None:" in routes
     assert 'public.add("GET", "/hebergements/{id}", PublicHebergementsController.show, name="public_hebergements-show")' in routes
     assert routes.count('"/hebergements/{id}"') == 1
     assert routes.count('name="public_hebergements-show"') == 1
+    assert _read(tmp_path, "mvc/routes/__init__.py") == init_before  # jamais touché
 
 
 def test_make_public_show_necrase_pas_template_existant(tmp_path):
