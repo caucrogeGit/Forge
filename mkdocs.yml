@@ -334,6 +334,7 @@ nav:
             - ADR-082 ADR de style de doc dans le squelette: adr/082-skeleton-doc-style-adr.md
             - ADR-083 Suppression logique (soft_delete): adr/083-soft-delete.md
             - ADR-084 Niveaux de support des backends BDD: adr/084-database-backend-support-tiers.md
+            - ADR-085 Câblage de routes canonique: adr/085-canonical-route-wiring.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
