@@ -16,11 +16,9 @@ Contrat strict (audit ``OPTINS-CLI-ENABLE-AUDIT-001``) :
 - **jamais d'écrasement silencieux** ;
 - **pas de discovery magique** : le branchement reste explicite via
   ``optins/registry.py`` ;
-- **``mvc/routes/__init__.py``** : en ``--apply`` et si la structure attendue
-  est reconnue (ancre ``router = Router()``), le branchement
-  ``register_optins(router)`` y est **inséré prudemment** (idempotent, jamais
-  d'écrasement) ; sinon, ou en dry-run, l'instruction est **seulement affichée**
-  à coller à la main ;
+- **``mvc/routes/__init__.py``** : le branchement ``register_optins(router)``
+  n'est **jamais injecté** (ADR-085) ; l'import et l'appel sont **affichés** à
+  coller à la main. Si l'appel est déjà présent, ``[OK] déjà branché`` ;
 - Forge Core reste indépendant des opt-ins : ce module ne fait
   qu'**écrire des fichiers texte** et vérifie la présence du paquet via
   ``importlib.util.find_spec`` (aucun import de ``forge_mvc_iot`` ici).
@@ -340,84 +338,28 @@ SUPPORTED_OPTINS: dict[str, dict[str, Any]] = {
 _ROUTES_REL = "mvc/routes/__init__.py"
 _ROUTES_IMPORT = "from optins.registry import register_optins"
 _ROUTES_CALL = "register_optins(router)"
-_ROUTES_ANCHOR = "router = Router()"
 
 
 def _is_package_available(import_name: str) -> bool:
     return importlib.util.find_spec(import_name) is not None
 
 
-def _ensure_trailing_newline(text: str) -> str:
-    return text if text.endswith("\n") else text + "\n"
-
-
-def _insert_import(content: str, import_line: str) -> str:
-    """Insère ``import_line`` après le dernier import en tête de fichier.
-
-    No-op si l'import est déjà présent (pas de doublon). Logique alignée
-    sur ``cli.public.public_page._insert_import``.
-    """
-    if import_line in content:
-        return content
-    lines = _ensure_trailing_newline(content).splitlines(keepends=True)
-    insert_at = 0
-    for index, line in enumerate(lines):
-        if line.startswith("from ") or line.startswith("import "):
-            insert_at = index + 1
-            continue
-        if line.strip() == "":
-            continue
-        break
-    lines.insert(insert_at, import_line + "\n")
-    return "".join(lines)
-
-
-def _print_manual_routes_instruction() -> None:
-    print("       Ajoute manuellement :")
-    print("")
-    print(f"       {_ROUTES_IMPORT}")
-    print(f"       {_ROUTES_CALL}")
-
-
 def _branch_routes(routes_path: Path, *, apply: bool) -> None:
-    """Branche (ou propose de brancher) les opt-ins dans ``mvc/routes/__init__.py``.
+    """Affiche le branchement des opt-ins à ajouter dans ``mvc/routes/__init__.py``.
 
-    Prudent : ne modifie que si la structure est reconnue
-    (``router = Router()``). Idempotent : ne touche rien si l'appel
-    ``register_optins(router)`` est déjà présent. N'affecte pas le code
-    de sortie (avertissement informatif).
+    ADR-085 : Forge n'écrit jamais dans ``routes/__init__.py``. Le branchement
+    (l'import et l'appel ``register_optins(router)``) est **affiché**, jamais
+    injecté ; l'utilisateur le colle. Si l'appel est déjà présent, on le signale
+    (rien à faire). `apply` n'a plus d'effet sur le routage — il ne gouverne que
+    l'écriture des fichiers ``optins/``. N'affecte pas le code de sortie.
     """
-    if not routes_path.exists():
-        print(f"{STATUS_WARN} {_ROUTES_REL} introuvable — aucune modification.")
-        _print_manual_routes_instruction()
-        return
-
-    content = routes_path.read_text(encoding="utf-8")
-
-    if _ROUTES_CALL in content:
+    del apply  # le routage n'est plus jamais écrit (ADR-085)
+    if routes_path.exists() and _ROUTES_CALL in routes_path.read_text(encoding="utf-8"):
         print(f"{STATUS_OK} {_ROUTES_REL} déjà branché")
         return
-
-    if _ROUTES_ANCHOR not in content:
-        print(
-            f"{STATUS_WARN} {_ROUTES_REL} n'a pas une structure reconnue."
-        )
-        print("       Aucune modification automatique.")
-        _print_manual_routes_instruction()
-        return
-
-    # Structure reconnue.
-    if not apply:
-        print(
-            f"{STATUS_DRYRUN} {_ROUTES_REL} serait branché "
-            f"(import + {_ROUTES_CALL})"
-        )
-        return
-
-    new_content = _insert_import(content, _ROUTES_IMPORT)
-    new_content = _ensure_trailing_newline(new_content) + f"\n{_ROUTES_CALL}\n"
-    routes_path.write_text(new_content, encoding="utf-8")
-    print(f"{STATUS_OK} {_ROUTES_REL} branché (import + {_ROUTES_CALL})")
+    print(f"{STATUS_INFO} Branchement à ajouter dans {_ROUTES_REL} :")
+    print(f"       {_ROUTES_IMPORT}")
+    print(f"       {_ROUTES_CALL}")
 
 
 # ── Registre projet : insertion idempotente d'un opt-in (multi-opt-in) ───────

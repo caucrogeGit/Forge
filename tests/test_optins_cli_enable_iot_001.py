@@ -180,27 +180,26 @@ class TestErrors:
         assert "manquant" in out
 
 
-# ── mvc/routes.py : structure ambiguë non modifiée ───────────────────────────
+# ── mvc/routes/__init__.py : jamais modifié (ADR-085) ────────────────────────
 #
-# Le branchement automatique (structure reconnue) est couvert en détail
-# par tests/test_optins_cli_enable_routes_apply_001.py. Ici on garde le
-# garde-fou « structure ambiguë → pas de modification ».
+# Le câblage en affichage seul est couvert en détail par
+# tests/test_optins_cli_enable_routes_apply_001.py. Ici on garde le garde-fou
+# « routes/__init__.py n'est jamais réécrit ».
 
 
 class TestAmbiguousRoutesNotModified:
-    def test_ambiguous_routes_py_not_modified(self, tmp_path, capsys):
+    def test_routes_py_jamais_modifie(self, tmp_path, capsys):
+        # ADR-085 : routes/__init__.py n'est jamais modifié, quelle que soit
+        # sa structure ; le branchement est seulement affiché.
         mvc = tmp_path / "mvc"
         (mvc / "routes").mkdir(parents=True)
         routes = mvc / "routes" / "__init__.py"
-        # Pas de `router = Router()` → structure non reconnue.
-        routes.write_text("def register(router):\n    pass\n", encoding="utf-8")
+        original = "def register(router):\n    pass\n"
+        routes.write_text(original, encoding="utf-8")
         enable_optin("iot", apply=True, project_root=tmp_path, package_check=_PKG_OK)
         out = capsys.readouterr().out
-        # routes.py inchangé.
-        assert routes.read_text(encoding="utf-8") == "def register(router):\n    pass\n"
-        # WARN + instruction manuelle affichée.
-        assert "register_optins(router)" in out
-        assert "structure reconnue" in out
+        assert routes.read_text(encoding="utf-8") == original  # inchangé
+        assert "register_optins(router)" in out  # branchement affiché
 
 
 # ── Garde-fous périmètre ─────────────────────────────────────────────────────
