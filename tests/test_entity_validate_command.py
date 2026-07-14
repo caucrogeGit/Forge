@@ -268,13 +268,21 @@ class TestOutputFormat:
 
 class TestDependencyDeclaration:
     def test_pyproject_declares_jsonschema_dependency(self):
-        """jsonschema doit être déclaré dans pyproject.toml (ENTITY-CONTRACT-007-FIX-DEPENDENCY)."""
+        """jsonschema doit être déclaré par forge-mvc-entities, qui porte
+        entity:validate (ADR-070). CORE-DROP-JSONSCHEMA-001 l'a retiré du cœur :
+        le paquet qui l'utilise le déclare lui-même."""
         import tomllib
-        pyproject = PROJECT_ROOT / "pyproject.toml"
+        pyproject = PROJECT_ROOT / "packages" / "forge-mvc-entities" / "pyproject.toml"
         data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
         deps = data.get("project", {}).get("dependencies", [])
         declared = any("jsonschema" in dep for dep in deps)
         assert declared, (
-            "jsonschema doit être dans [project].dependencies de pyproject.toml "
-            "(requis par forge entity:validate)."
+            "jsonschema doit être dans [project].dependencies de "
+            "packages/forge-mvc-entities/pyproject.toml (requis par entity:validate)."
+        )
+        # Et il ne doit PAS être revenu dans le cœur (CORE-DROP-JSONSCHEMA-001).
+        core_data = tomllib.loads((PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        core_deps = core_data.get("project", {}).get("dependencies", [])
+        assert not any("jsonschema" in dep for dep in core_deps), (
+            "jsonschema ne doit plus être une dépendance runtime du cœur."
         )
