@@ -9,7 +9,11 @@ Tickets :
   retourne le callable WSGI prêt à l'emploi ;
 - WSGI-PROD-WARNINGS-001 : `create_configured_wsgi_app()` émet aussi
   les warnings production (`MemorySessionStore` en `APP_ENV=prod`) — une
-  seule fois à la construction de l'application, jamais par requête.
+  seule fois à la construction de l'application, jamais par requête ;
+- CORE-WSGI-BODY-LIMIT-001 : le corps de requête est contrôlé contre
+  `request_size_limit(...)` AVANT d'être lu (aucune allocation pour un
+  `Content-Length` au-delà de la limite), il n'est lu que pour les méthodes
+  à corps, et son dépassement répond 413 (plus jamais 400).
 
 Usage typique — dans le `wsgi.py` de l'application :
 
@@ -36,7 +40,12 @@ from collections.abc import Callable
 from io import BytesIO
 from typing import Any, Iterable
 
-from core.http.request import Request
+from core.http.request import (
+    BODY_METHODS,
+    Request,
+    RequestEntityTooLarge,
+    request_size_limit,
+)
 from core.http.response import Response
 from core.security import csp as _csp
 from core.security.headers import apply_security_headers
@@ -102,7 +111,16 @@ class _WsgiHandlerStub:
         except (TypeError, ValueError):
             length = 0
         stream = environ.get("wsgi.input")
-        raw = stream.read(length) if (length > 0 and stream is not None) else b""
+        # CORE-WSGI-BODY-LIMIT-001 : le corps n'est lu que pour les méthodes à
+        # corps (aligné sur `Request`, qui ignore le corps des autres), et le
+        # Content-Length annoncé est contrôlé AVANT toute lecture — un corps
+        # trop grand est refusé sans jamais être chargé en mémoire.
+        raw = b""
+        if length > 0 and stream is not None and self.command in BODY_METHODS:
+            content_type = self.headers.get("content-type", "")
+            if length > request_size_limit(content_type):
+                raise RequestEntityTooLarge(length)
+            raw = stream.read(length)
         self.rfile = BytesIO(raw)
 
 
@@ -176,9 +194,18 @@ def create_wsgi_app(application: Any) -> Callable[[dict[str, Any], Callable[...,
 
     def app(environ: dict[str, Any], start_response: Callable[..., Any]) -> Iterable[bytes]:
         is_https = environ.get("wsgi.url_scheme") == "https"
-        handler = _WsgiHandlerStub(environ)
         try:
+            handler = _WsgiHandlerStub(environ)
             request = Request(handler)
+        except RequestEntityTooLarge:
+            # CORE-WSGI-BODY-LIMIT-001 : un corps au-delà de la limite est un
+            # 413 explicite (comme le serveur de dev), pas un 400 générique.
+            too_large = Response(
+                status=413,
+                body=b"Payload Too Large",
+                content_type="text/plain; charset=utf-8",
+            )
+            return _response_to_wsgi(too_large, start_response, is_https=is_https)
         except Exception:
             # Même le 400 d'entrée ne doit pas être moins protégé que la
             # réponse nominale : on passe par _response_to_wsgi pour profiter

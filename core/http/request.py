@@ -137,7 +137,14 @@ class UploadedFile:
         return self.content
 
 
-def _request_size_limit(content_type: str) -> int:
+def request_size_limit(content_type: str) -> int:
+    """Taille maximale de corps acceptée (octets) pour un `Content-Type` donné.
+
+    Contrat partagé entre `Request` et les adaptateurs serveur (stub WSGI) :
+    tout corps dont le `Content-Length` annoncé dépasse cette limite doit être
+    refusé via `RequestEntityTooLarge` avant d'être chargé en mémoire
+    (CORE-WSGI-BODY-LIMIT-001).
+    """
     if "multipart/form-data" not in content_type:
         return MAX_BODY_SIZE
     try:
@@ -198,7 +205,7 @@ class Request:
                 content_length = int(handler.headers.get("Content-Length", 0))
             except (ValueError, TypeError):
                 content_length = 0
-            if content_length > _request_size_limit(content_type):
+            if content_length > request_size_limit(content_type):
                 raise RequestEntityTooLarge(content_length)
             content_length = max(0, content_length)
             raw: bytes = handler.rfile.read(content_length) if content_length else b""
