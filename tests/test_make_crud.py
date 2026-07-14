@@ -243,7 +243,7 @@ def test_non_ecrasement_controller(tmp_path):
 
     result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
 
-    assert ctrl_path in result.preserved
+    assert any(ctrl_path.as_posix() in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
     assert ctrl_path.read_text(encoding="utf-8") == "# existant"
 
 
@@ -255,7 +255,7 @@ def test_non_ecrasement_form(tmp_path):
 
     result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
 
-    assert form_path in result.preserved
+    assert any(form_path.as_posix() in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
     assert form_path.read_text(encoding="utf-8") == "# existant"
 
 
@@ -267,7 +267,7 @@ def test_non_ecrasement_vue_index(tmp_path):
 
     result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
 
-    assert index_path in result.preserved
+    assert any(index_path.as_posix() in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
     assert index_path.read_text(encoding="utf-8") == "<!-- existant -->"
 
 

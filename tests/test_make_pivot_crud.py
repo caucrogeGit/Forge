@@ -299,7 +299,7 @@ def test_non_ecrasement_par_defaut(tmp_path):
         entities_root=tmp_path / "mvc" / "entities",
         output_root=tmp_path,
     )
-    assert ctrl in result.preserved
+    assert any(ctrl.as_posix() in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
     assert ctrl.read_text(encoding="utf-8") == "# contenu modifié"
 
 

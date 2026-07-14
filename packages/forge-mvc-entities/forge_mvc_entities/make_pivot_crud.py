@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import cli._support.output as out
+from cli._support.scaffold import CREATED, PRESERVED, write_if_new
 
 from forge_mvc_entities.crud.views_namespace import (
     entity_view_dir,
@@ -65,6 +66,7 @@ class ResolvedPivotRelation:
 class MakePivotCrudResult:
     created: list[Path] = dc_field(default_factory=list[Path])
     preserved: list[Path] = dc_field(default_factory=list[Path])
+    warnings: list[str] = dc_field(default_factory=list[str])
     dry_run: bool = False
 
 
@@ -442,13 +444,13 @@ def _write_if_new(
     result: MakePivotCrudResult,
     dry_run: bool,
 ) -> None:
-    if path.exists():
-        result.preserved.append(path)
-    else:
-        if not dry_run:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(content, encoding="utf-8")
+    status = write_if_new(path, content, dry_run=dry_run)
+    if status == CREATED:
         result.created.append(path)
+    elif status == PRESERVED:
+        result.preserved.append(path)
+    else:  # WARNED : existant au contenu différent, jamais écrasé
+        result.warnings.append(f"{path.as_posix()} existe et diffère du modèle, non touché.")
 
 
 # ── Entrée principale ─────────────────────────────────────────────────────────
@@ -529,6 +531,8 @@ def cmd_make_pivot_crud_main(args: list[str]) -> None:
             print(out.created(p.as_posix()))
         for p in result.preserved:
             print(out.preserved(p.as_posix(), "← fichier existant, non touché"))
+        for warn in result.warnings:
+            print(out.warn(warn))
 
         if result.created:
             src_snake = _to_snake(source_entity)

@@ -210,7 +210,7 @@ def test_e2e_non_ecrasement(project):
         entities_root=project / "mvc" / "entities",
         output_root=project,
     )
-    assert ctrl in result.preserved
+    assert any(ctrl.as_posix() in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
     assert ctrl.read_text(encoding="utf-8") == "# marqueur"
 
 

@@ -49,6 +49,7 @@ from forge_mvc_entities.validation import (
     validate_entity_definition,
 )
 import cli._support.output as out
+from cli._support.scaffold import CREATED, PRESERVED, write_if_new
 
 # ── Re-exports from submodules (backward compatibility) ───────────────────────
 
@@ -153,13 +154,13 @@ def _route_block(definition: dict[str, Any]) -> str:
 # ── Écriture fichier ───────────────────────────────────────────────────────────
 
 def _write_if_new(path: Path, content: str, result: MakeCrudResult, dry_run: bool) -> None:
-    if path.exists():
-        result.preserved.append(path)
-    else:
-        if not dry_run:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(content, encoding="utf-8")
+    status = write_if_new(path, content, dry_run=dry_run)
+    if status == CREATED:
         result.created.append(path)
+    elif status == PRESERVED:
+        result.preserved.append(path)
+    else:  # WARNED : existant au contenu différent, jamais écrasé
+        result.warnings.append(f"{path.as_posix()} existe et diffère du modèle, non touché.")
 
 
 def _inject_relation_fk_fields(
