@@ -54,6 +54,14 @@ class Application:
         try:
             result = self._router.match(request.method, request.path)
             if result is None:
+                # CORE-HTTP-405-ALLOW-001 : distinguer un chemin inconnu (404)
+                # d'un chemin connu appelé avec une mauvaise méthode (405 +
+                # en-tête Allow, sémantique HTTP correcte).
+                allowed = self._router.allowed_methods(request.path)
+                if allowed:
+                    response = _html("errors/405.html", 405)
+                    response.headers["Allow"] = ", ".join(allowed)
+                    return response
                 return _html("errors/404.html", 404)
 
             route, params = result

@@ -181,6 +181,23 @@ class Router:
                 return entry, params
         return None
 
+    def allowed_methods(self, path: str) -> list[str]:
+        """Méthodes HTTP déclarées pour `path`, toutes routes confondues.
+
+        Sert à distinguer « chemin inconnu » (liste vide → 404) de « chemin
+        connu, méthode refusée » (liste non vide → 405 + en-tête `Allow`,
+        CORE-HTTP-405-ALLOW-001). Retourne la liste triée, sans doublon.
+        """
+        methods: set[str] = set()
+        for entry in self._entries:
+            if entry.match(path) is None:
+                continue
+            if isinstance(entry.method, list):
+                methods.update(entry.method)
+            else:
+                methods.add(entry.method)
+        return sorted(methods)
+
     def resolve(self, method: str, path: str) -> tuple[Handler, dict[str, Any]] | None:
         """
         Trouve la route correspondante.
