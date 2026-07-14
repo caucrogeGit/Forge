@@ -186,7 +186,7 @@ def _resolve_request_session(request: Any) -> dict[str, Any] | None:
         return cast("dict[str, Any]", session)
 
     try:
-        from core.security.session import get_session, get_session_id
+        from core.sessions.access import get_session, get_session_id
 
         session_id = get_session_id(request)
         return get_session(session_id) if session_id else None
@@ -210,7 +210,7 @@ def _persist_request_session(request: Any, data: dict[str, Any]) -> None:
     la mutation in-place reste valable pour un éventuel `request.session` vivant.
     """
     try:
-        from core.security.session import get_session_id
+        from core.sessions.access import get_session_id
         from core.sessions.manager import get_session_store
 
         session_id = get_session_id(request)

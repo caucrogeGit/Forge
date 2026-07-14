@@ -1,19 +1,23 @@
 # pyright: strict
 from __future__ import annotations
 
-import re
 import warnings
 from typing import TYPE_CHECKING, Any
 
+# CORE-AUTH-SECURITY-LAYERING-001 : la lecture de session vit désormais dans
+# core.sessions.access (couche basse, sans cycle). On la ré-exporte ici pour que
+# le chemin d'import public `core.security.session` (utilisé par du code généré)
+# reste inchangé.
+from core.sessions.access import (
+    SESSION_COOKIE_NAME as SESSION_COOKIE_NAME,
+    get_session as get_session,
+    get_session_id as get_session_id,
+)
 from core.sessions.keys import SESSION_KEY_AUTHENTICATED, SESSION_KEY_USER, session_get
 from core.sessions.manager import get_session_store as _get_store
 
 if TYPE_CHECKING:
     from core.http.request import Request
-
-_SESSION_ID_RE = re.compile(r"^[0-9a-f]{64}$")
-
-SESSION_COOKIE_NAME = "__Host-session_id"
 
 # Le store est résolu à chaque appel via _get_store() pour que forge.configure(session_store=...)
 # soit pris en compte même si ce module est importé avant la configuration.
@@ -30,13 +34,6 @@ def create_session() -> str:
         stacklevel=2,
     )
     return _get_store().create()
-
-
-def get_session(session_id: str | None) -> dict[str, Any] | None:
-    """Retourne les données de la session ou None si inexistante ou expirée."""
-    if session_id is None:
-        return None
-    return _get_store().get(session_id)
 
 
 def delete_session(session_id: str) -> None:
@@ -95,24 +92,6 @@ def authenticate_session(session_id: str, user: dict[str, Any]) -> str | None:
     )
     user_data = _normalize_legacy_user(user)
     return _get_store().authenticate(session_id, user_data, SESSION_DURATION)
-
-
-def get_session_id(request: Request) -> str | None:
-    """Extrait et valide l'identifiant de session depuis le cookie de la requête.
-
-    Retourne None si le cookie est absent ou si le format est invalide
-    (attendu : 64 caractères hexadécimaux).
-    """
-    prefix = SESSION_COOKIE_NAME + "="
-    cookie = request.headers.get("Cookie", "")
-    for part in cookie.split(";"):
-        part = part.strip()
-        if part.startswith(prefix):
-            sid = part[len(prefix):]
-            if _SESSION_ID_RE.match(sid):
-                return sid
-            return None
-    return None
 
 
 def is_authenticated(request: Request) -> bool:
