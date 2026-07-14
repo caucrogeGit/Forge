@@ -37,11 +37,11 @@ Hors périmètre :
 from __future__ import annotations
 
 import logging
-import secrets
 from datetime import UTC, datetime
 from typing import Any
 
 from core.forge import get as _forge_get
+from core.http.bearer import is_bearer_authorized
 from core.http.response import Response
 
 from forge_mvc_iot.config import IotConfig, load_iot_config
@@ -71,10 +71,6 @@ ROUTE_DEVICE_COUNT = "/api/iot/devices/{site}/{device_id}/count"
 ERROR_INVALID_LIMIT = "invalid_limit"
 ERROR_INTERNAL = "internal_server_error"
 ERROR_UNAUTHORIZED = "unauthorized"
-
-# Schéma d'autorisation attendu (exactement « Bearer <token> »).
-_BEARER_PREFIX = "Bearer "
-
 
 # ── Erreurs internes (capturées dans le contrôleur, jamais propagées) ──────
 
@@ -186,36 +182,6 @@ def _unauthorized_response() -> Response:
     )
 
 
-# ── Authentification optionnelle par Bearer token ──────────────────────────
-
-
-def _extract_bearer_token(request: Any) -> str | None:
-    """Extrait le token d'un en-tête ``Authorization: Bearer <token>``.
-
-    Retourne ``None`` si l'en-tête est absent ou si le schéma n'est pas
-    exactement ``Bearer `` (comparaison de schéma non secrète).
-    """
-    header = request.header("Authorization", None)
-    if not header or not header.startswith(_BEARER_PREFIX):
-        return None
-    return header[len(_BEARER_PREFIX):]
-
-
-def _is_authorized(request: Any, api_token: str | None) -> bool:
-    """Autorise la requête.
-
-    - ``api_token is None`` → API ouverte (mode local/pédagogique) ;
-    - sinon, exige un Bearer token égal au token configuré, comparé avec
-      ``secrets.compare_digest`` (temps constant).
-    """
-    if api_token is None:
-        return True
-    provided = _extract_bearer_token(request)
-    if provided is None:
-        return False
-    return secrets.compare_digest(provided, api_token)
-
-
 # ── Contrôleur ──────────────────────────────────────────────────────────────
 
 
@@ -236,7 +202,7 @@ class IotHttpController:
         self._api_token = api_token
 
     def list_events(self, request: Any) -> Response:
-        if not _is_authorized(request, self._api_token):
+        if not is_bearer_authorized(request, self._api_token):
             return _unauthorized_response()
         try:
             limit = _parse_limit(request)
@@ -252,7 +218,7 @@ class IotHttpController:
         )
 
     def find_by_device(self, request: Any) -> Response:
-        if not _is_authorized(request, self._api_token):
+        if not is_bearer_authorized(request, self._api_token):
             return _unauthorized_response()
         site = request.route("site")
         device_id = request.route("device_id")
@@ -273,7 +239,7 @@ class IotHttpController:
         )
 
     def count_by_device(self, request: Any) -> Response:
-        if not _is_authorized(request, self._api_token):
+        if not is_bearer_authorized(request, self._api_token):
             return _unauthorized_response()
         site = request.route("site")
         device_id = request.route("device_id")

@@ -21,10 +21,10 @@ explicitement. Aucune écriture dans ``mvc/routes.py`` (charte §9).
 from __future__ import annotations
 
 import logging
-import secrets
 from pathlib import Path
 from typing import Any
 
+from core.http.bearer import is_bearer_authorized
 from core.http.response import Response
 
 from forge_mvc_audio.config import AudioConfig, load_audio_config
@@ -35,26 +35,6 @@ __all__ = ["AudioHttpController", "register_audio_routes", "ROUTE_PLAYBACK"]
 logger = logging.getLogger(__name__)
 
 ROUTE_PLAYBACK = "/audio/{uuid}"
-
-_BEARER_PREFIX = "Bearer "
-
-
-def _extract_bearer_token(request: Any) -> str | None:
-    header = request.header("Authorization", None)
-    if not header or not header.startswith(_BEARER_PREFIX):
-        return None
-    return header[len(_BEARER_PREFIX):]
-
-
-def _is_authorized(request: Any, api_token: str | None) -> bool:
-    """Ouvert si ``api_token is None`` ; sinon Bearer == token (temps constant)."""
-    if api_token is None:
-        return True
-    provided = _extract_bearer_token(request)
-    if provided is None:
-        return False
-    return secrets.compare_digest(provided, api_token)
-
 
 def _error(code: str, status: int) -> Response:
     return Response.json({"error": code}, status=status)
@@ -68,7 +48,7 @@ class AudioHttpController:
         self._api_token = api_token
 
     def stream(self, request: Any) -> Response:
-        if not _is_authorized(request, self._api_token):
+        if not is_bearer_authorized(request, self._api_token):
             return _error("unauthorized", 401)
 
         uuid = request.route("uuid")
