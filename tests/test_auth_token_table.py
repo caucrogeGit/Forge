@@ -100,7 +100,7 @@ def test_auth_init_preserves_existing_users_sql(tmp_path, capsys):
     cmd_auth_init([], root=tmp_path)
 
     out, _ = capsys.readouterr()
-    assert "PRÉSERVÉ" in out
+    assert "diffère" in out  # WARNED : contenu divergent (CLI-SCAFFOLD-PRIMITIVE-001)
     assert sql_file.read_text(encoding="utf-8") == "-- custom users"
 
 
@@ -113,7 +113,7 @@ def test_auth_init_preserves_existing_auth_tokens_sql(tmp_path, capsys):
     cmd_auth_init([], root=tmp_path)
 
     out, _ = capsys.readouterr()
-    assert "PRÉSERVÉ" in out
+    assert "diffère" in out  # WARNED : contenu divergent (CLI-SCAFFOLD-PRIMITIVE-001)
     assert tokens_file.read_text(encoding="utf-8") == "-- custom tokens"
 
 

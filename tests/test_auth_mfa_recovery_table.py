@@ -104,7 +104,7 @@ def test_auth_init_preserves_existing_auth_mfa_recovery_codes_sql(tmp_path, caps
     cmd_auth_init([], root=tmp_path)
 
     out, _ = capsys.readouterr()
-    assert "PRÉSERVÉ" in out
+    assert "diffère" in out  # WARNED : contenu divergent (CLI-SCAFFOLD-PRIMITIVE-001)
     assert recovery_file.read_text(encoding="utf-8") == "-- custom recovery codes"
 
 

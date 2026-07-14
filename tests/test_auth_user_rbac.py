@@ -165,7 +165,7 @@ class TestAuthInitUserRoles:
         cmd_auth_init([], root=tmp_path)
 
         out, _ = capsys.readouterr()
-        assert "PRÉSERVÉ" in out
+        assert "diffère" in out  # WARNED : contenu divergent (CLI-SCAFFOLD-PRIMITIVE-001)
         assert sql_file.read_text(encoding="utf-8") == "-- custom user roles"
 
     def test_auth_init_does_not_seed_roles_or_permissions(self, tmp_path):

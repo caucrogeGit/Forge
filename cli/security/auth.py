@@ -29,6 +29,7 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal
 
 import cli._support.output as out
+from cli._support.scaffold import CREATED, WARNED, write_if_new
 
 if TYPE_CHECKING:
     from core.database.backend import Dialect
@@ -139,13 +140,13 @@ CREATE TABLE IF NOT EXISTS users (
 
 
 def _write_if_new(path: Path, content: str) -> None:
-    if path.exists():
+    status = write_if_new(path, content)
+    if status == CREATED:
+        print(out.created(path.as_posix()))
+    elif status == WARNED:
+        print(out.warn(f"{path.as_posix()} existe et diffère du modèle, non touché."))
+    else:
         print(out.preserved(path.as_posix(), "← fichier existant, non touché"))
-        return
-
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-    print(out.created(path.as_posix()))
 
 
 AUTH_TOKENS_SQL = """\

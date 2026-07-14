@@ -83,7 +83,7 @@ def test_auth_init_preserve_auth_audit_log_sql_existant(tmp_path, capsys):
     cmd_auth_init([], root=tmp_path)
 
     stdout = capsys.readouterr().out
-    assert "PRÉSERVÉ" in stdout
+    assert "diffère" in stdout  # WARNED : contenu divergent (CLI-SCAFFOLD-PRIMITIVE-001)
     assert sql_file.read_text(encoding="utf-8") == "-- custom audit"
 
 

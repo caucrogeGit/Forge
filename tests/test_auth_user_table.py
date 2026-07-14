@@ -78,7 +78,9 @@ def test_auth_init_creates_users_sql(tmp_path):
     assert sql_file.read_text(encoding="utf-8") == USERS_SQL
 
 
-def test_auth_init_preserves_existing_users_sql(tmp_path, capsys):
+def test_auth_init_avertit_sur_users_sql_divergent(tmp_path, capsys):
+    # CLI-SCAFFOLD-PRIMITIVE-001 : un fichier existant au contenu DIFFÉRENT est
+    # signalé (averti), jamais écrasé.
     sql_file = tmp_path / "mvc" / "models" / "sql" / "users.sql"
     sql_file.parent.mkdir(parents=True)
     sql_file.write_text("-- custom", encoding="utf-8")
@@ -86,8 +88,8 @@ def test_auth_init_preserves_existing_users_sql(tmp_path, capsys):
     cmd_auth_init([], root=tmp_path)
 
     out, _ = capsys.readouterr()
-    assert "PRÉSERVÉ" in out
-    assert sql_file.read_text(encoding="utf-8") == "-- custom"
+    assert "diffère" in out  # averti (le contenu diverge)
+    assert sql_file.read_text(encoding="utf-8") == "-- custom"  # jamais écrasé
 
 
 def test_forge_auth_init_is_dispatched(monkeypatch):
