@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 FRONT_MD = Path("docs/features/front.md")
 

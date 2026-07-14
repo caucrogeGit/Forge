@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 
 CHARTER_PATH = Path("CHARTE_DOC.md")

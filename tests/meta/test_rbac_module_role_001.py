@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 RAPPORT = Path("docs/history/audits/rbac-module-role-decision-001.md")
 

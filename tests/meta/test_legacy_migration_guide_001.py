@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 GUIDE = Path("docs/entities/migration-legacy-vers-canonique.md")
 MKDOCS = Path("mkdocs.yml")

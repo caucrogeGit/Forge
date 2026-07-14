@@ -4,7 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 CHARTER_ROOT = PROJECT_ROOT / "CHARTE_DOC.md"

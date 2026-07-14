@@ -16,7 +16,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 AUDIT = (ROOT / "docs" / "history" / "audits" / "quality-coverage-001.md").read_text(encoding="utf-8")

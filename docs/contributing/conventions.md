@@ -156,6 +156,7 @@ Le mécanisme existe déjà (marqueurs `pytest` en mode `--strict-markers`, doss
 |---|---|---|
 | Unitaire | cœur, CLI, générateurs (le gros de `tests/`) | `pytest tests -m "not db" --ignore=tests/meta --ignore=tests/release` |
 | Contrats (meta) | cohérence doc, version, charte, contrats d'API | `pytest tests/meta` |
+| Prose (docs) | tests de prose pure : ne cassent que par édition de la documentation (marqueur `docs`) | `pytest -m docs` |
 | Intégration BDD | tests nécessitant une vraie base (marqueur `db`) | `FORGE_REQUIRE_DB=1 pytest -m db` |
 | Release | garde-fous de publication | `pytest tests/release` |
 | Opt-ins | smoke et tests unitaires des paquets `packages/` | `pytest packages` |
@@ -165,10 +166,19 @@ Marqueurs canoniques (déclarés dans `pytest.ini`, `--strict-markers` actif, do
 
 - `meta` : test de cohérence projet (doc, version, charte), pas un test fonctionnel ;
 - `smoke` : test de fumée d'un paquet opt-in (import, API publique, `py.typed`) ;
-- `db` : test d'intégration nécessitant MariaDB (sauté en local sans base, requis en CI via `FORGE_REQUIRE_DB=1`).
+- `db` : test d'intégration nécessitant MariaDB (sauté en local sans base, requis en CI via `FORGE_REQUIRE_DB=1`) ;
+- `docs` : test de prose pure, ne casse que par édition de la documentation du dépôt (`TESTS-DOCS-MARKER-001`).
 
 Règle : tout test appartient à exactement une couche.
 Un nouveau test de contrat doc va sous `tests/meta/` (avec `pytestmark = pytest.mark.meta`) ; un test d'intégration base porte `@pytest.mark.db` ; le reste est unitaire dans `tests/` à plat.
+Le marqueur `docs` se combine à `meta` (forme liste : `pytestmark = [pytest.mark.meta, pytest.mark.docs]`) ; il est réservé à la prose pure, jamais à un test qui peut casser par édition de code.
+Le garde-fou `tests/meta/test_tests_docs_marker_001.py` applique cette classification automatiquement.
+
+Boucles de travail officielles :
+
+- on touche au code : `pytest -m "not docs"` (comportement + garde-fous de structure) ;
+- on touche à la doc : `pytest -m docs` puis `mkdocs build --strict` ;
+- jalon, release et CI : suite complète, qui rattrape les dérives croisées code/doc.
 
 Origine : point 5 de l'audit d'industrialisation (« savoir rapidement quelle couche est cassée, pas juste pytest rouge »).
 

@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 SESSIONS_DOC = PROJECT_ROOT / "docs" / "reference" / "sessions.md"

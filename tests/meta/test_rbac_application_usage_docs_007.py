@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 
 _USAGE_DOC = Path(__file__).parents[2] / "packages" / "forge-mvc-rbac" / "docs" / "usage.md"

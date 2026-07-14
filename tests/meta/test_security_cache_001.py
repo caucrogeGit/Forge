@@ -11,7 +11,7 @@ from __future__ import annotations
 import pathlib
 
 import pytest
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
 PROD_SECURITY = pathlib.Path("docs/deployment/production-security.md")

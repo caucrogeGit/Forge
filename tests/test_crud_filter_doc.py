@@ -20,6 +20,9 @@ Et que la roadmap est cohérente avec la Phase 13.
 from __future__ import annotations
 
 import pathlib
+import pytest
+
+pytestmark = pytest.mark.docs
 
 REFERENCE = pathlib.Path("docs/reference/crud.md")
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")

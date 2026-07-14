@@ -6,7 +6,7 @@ Vérifie la présence et le contenu du rapport de terrain.
 import pytest
 from pathlib import Path
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPORT = PROJECT_ROOT / "docs/history/field-tests/field-test-app-001.md"

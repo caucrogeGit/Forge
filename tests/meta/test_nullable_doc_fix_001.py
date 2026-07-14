@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 ENTITY_SCHEMA = Path("docs/entities/entity-schema.md")
 TYPES = Path("docs/entities/types-forge-mariadb.md")

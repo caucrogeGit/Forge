@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 SETTINGS = Path(".vscode/settings.json")
 DOC = Path("docs/entities/vscode-json-schema.md")

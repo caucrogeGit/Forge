@@ -3,7 +3,7 @@
 import pathlib
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 DOC_PATH = pathlib.Path("docs/reference/api-json.md")
 MKDOCS_PATH = pathlib.Path("mkdocs.yml")

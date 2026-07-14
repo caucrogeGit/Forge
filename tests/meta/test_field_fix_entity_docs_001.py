@@ -6,7 +6,7 @@ Vérifie que la documentation canonique des entités est cohérente avec le sch�
 import pytest
 from pathlib import Path
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CANONICAL_DOC = PROJECT_ROOT / "docs/entities/json-canonique.md"

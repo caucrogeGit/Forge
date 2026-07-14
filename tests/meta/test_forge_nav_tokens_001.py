@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 TOKENS = PROJECT_ROOT / "docs" / "static" / "forge-tokens.css"

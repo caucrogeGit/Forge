@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 REPORT = Path(__file__).resolve().parent.parent.parent / "docs" / "history" / "audits" / "legacy-remove-plan-001.md"
 

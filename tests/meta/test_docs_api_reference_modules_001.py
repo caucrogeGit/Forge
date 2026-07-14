@@ -16,7 +16,7 @@ import re
 from pathlib import Path
 
 import pytest
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 API_REF = PROJECT_ROOT / "docs" / "reference" / "api.md"

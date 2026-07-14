@@ -20,7 +20,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]

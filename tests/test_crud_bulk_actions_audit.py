@@ -16,6 +16,9 @@ Et que la roadmap est cohérente (ticket livré, prochaine priorité).
 from __future__ import annotations
 
 import pathlib
+import pytest
+
+pytestmark = pytest.mark.docs
 
 AUDIT = pathlib.Path("docs/history/audits/crud-bulk-actions-audit-001.md")
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")

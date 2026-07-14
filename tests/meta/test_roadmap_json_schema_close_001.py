@@ -10,7 +10,7 @@ import pathlib
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 ROADMAP = pathlib.Path("docs/roadmap/roadmap-forge-contrats-json-schema.md")
 

@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 # Doc embarquée par paquet depuis l'ADR-038 (montée sous /pivot/reference/).
 # Référence éclatée en pages par-module (DOCS-PIVOT-REFERENCE-SPLIT-001) :

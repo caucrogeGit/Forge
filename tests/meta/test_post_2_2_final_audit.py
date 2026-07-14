@@ -3,7 +3,7 @@
 import pathlib
 
 import pytest
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 AUDIT = pathlib.Path("docs/history/audits/post-2-2-final-audit-001.md")
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")

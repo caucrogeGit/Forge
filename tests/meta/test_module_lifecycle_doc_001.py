@@ -11,7 +11,7 @@ Valide que docs/reference/reference.md documente correctement :
 import pathlib
 
 import pytest
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 REF = (ROOT / "docs" / "reference" / "modules.md").read_text(encoding="utf-8")

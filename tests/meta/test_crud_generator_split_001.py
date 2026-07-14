@@ -6,7 +6,7 @@ import importlib
 from pathlib import Path
 
 import pytest
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 ROOT = Path(__file__).resolve().parents[2]
 CRUD_PKG = ROOT / "packages" / "forge-mvc-entities" / "forge_mvc_entities" / "crud"

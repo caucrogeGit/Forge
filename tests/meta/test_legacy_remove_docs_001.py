@@ -9,7 +9,7 @@ import pytest
 
 from pathlib import Path
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 DOCS_ROOT = Path(__file__).parent.parent.parent / "docs"
 ADR_012 = DOCS_ROOT / "adr" / "012-legacy-format-deprecation-policy.md"

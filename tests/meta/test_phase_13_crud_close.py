@@ -13,7 +13,7 @@ from __future__ import annotations
 import pathlib
 
 import pytest
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
 # Contrat déplacé : le récapitulatif des fonctionnalités CRUD vit dans la page

@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 DOC = Path("docs/install/mariadb-comptes.md")
 MKDOCS = Path("mkdocs.yml")

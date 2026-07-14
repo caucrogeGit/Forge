@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 _DOCS = Path("docs")
 _HUB = _DOCS / "release" / "release-and-compatibility.md"

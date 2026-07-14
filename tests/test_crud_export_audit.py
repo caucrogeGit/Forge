@@ -19,6 +19,9 @@ Vérifie que docs/history/audits/crud-export-audit-001.md :
 from __future__ import annotations
 
 import pathlib
+import pytest
+
+pytestmark = pytest.mark.docs
 
 AUDIT = pathlib.Path("docs/history/audits/crud-export-audit-001.md")
 ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")

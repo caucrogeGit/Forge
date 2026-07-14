@@ -6,7 +6,7 @@ Vérifie la présence et le contenu du rapport d'audit post-corrections terrain.
 import pytest
 from pathlib import Path
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 AUDIT = PROJECT_ROOT / "docs/history/audits/release-audit-post-field-fixes-002.md"

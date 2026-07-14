@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 ADR = Path("docs/adr/013-nullable-required-contract-policy.md")
 AUDIT = Path("docs/history/audits/nullable-contract-audit-001.md")

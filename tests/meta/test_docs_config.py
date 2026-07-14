@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 
 ROOT = Path(__file__).resolve().parents[2]

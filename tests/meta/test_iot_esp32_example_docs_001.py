@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-pytestmark = pytest.mark.meta
+pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 PAGE = PROJECT_ROOT / "packages" / "forge-mvc-iot" / "docs" / "esp32-example.md"
