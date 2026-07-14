@@ -23,9 +23,10 @@ référence `tests/fixtures/app/mvc/controllers/auth_controller.py`).
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
+from cli._support.scaffold import CREATED, PRESERVED, write_if_new
 from cli.project.views_namespace import entity_view_dir, resolve_app_views_namespace
 
 
@@ -209,16 +210,18 @@ class MakeAuthResult:
     route_block: str = ROUTE_BLOCK
     nav_block: str = NAV_BLOCK
     nav_needs_manual: bool = False
+    warned: list[str] = field(default_factory=list[str])
 
 
 def _write_if_new(path: Path, content: str, result: MakeAuthResult) -> None:
     rel = path.as_posix()
-    if path.exists():
+    status = write_if_new(path, content)
+    if status == CREATED:
+        result.created.append(rel)
+    elif status == PRESERVED:
         result.skipped.append(rel)
-        return
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-    result.created.append(rel)
+    else:  # WARNED : existant au contenu différent, jamais écrasé
+        result.warned.append(rel)
 
 
 def _integrate_auth_nav(nav_path: Path, result: MakeAuthResult) -> None:
@@ -279,6 +282,8 @@ def main(argv: list[str] | None = None) -> None:
         print(f"[MODIFIE] {path}")
     for path in result.skipped:
         print(f"[PRESERVE] {path}")
+    for path in result.warned:
+        print(f"[AVERTI] {path} existe et diffère, non touché")
     print()
     print(result.route_block)
     if result.nav_needs_manual:

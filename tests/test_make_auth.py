@@ -30,13 +30,14 @@ def test_genere_controleur_et_vue(tmp_path: Path):
     assert routes.as_posix() in result.created
 
 
-def test_write_if_new_preserve_l_existant(tmp_path: Path):
+def test_write_if_new_avertit_sur_existant_divergent(tmp_path: Path):
+    # CLI-SCAFFOLD-PRIMITIVE-001 : existant au contenu différent → averti, jamais écrasé.
     ctrl = tmp_path / "mvc" / "controllers" / "auth_controller.py"
     ctrl.parent.mkdir(parents=True)
     ctrl.write_text("# mon contrôleur\n", encoding="utf-8")
     result = make_auth(root=tmp_path)
-    assert ctrl.read_text(encoding="utf-8") == "# mon contrôleur\n"  # préservé
-    assert ctrl.as_posix() in result.skipped
+    assert ctrl.read_text(encoding="utf-8") == "# mon contrôleur\n"  # jamais écrasé
+    assert ctrl.as_posix() in result.warned
 
 
 def test_controleur_cable_sur_le_backend_auth():

@@ -19,11 +19,16 @@ __all__ = ["emit_app_agent_files"]
 
 
 def _write_if_new(path: Path, content: str, created: list[str], root: Path) -> None:
-    if path.exists():
-        return
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-    created.append(path.relative_to(root).as_posix())
+    from cli._support.scaffold import CREATED, WARNED, write_if_new
+
+    status = write_if_new(path, content)
+    rel = path.relative_to(root).as_posix()
+    if status == CREATED:
+        created.append(rel)
+    elif status == WARNED:
+        # Existant au contenu différent : jamais écrasé, mais signalé
+        # (CLI-SCAFFOLD-PRIMITIVE-001).
+        print(f"[AVERTI] {rel} existe et diffère, non touché")
 
 
 def emit_app_agent_files(
