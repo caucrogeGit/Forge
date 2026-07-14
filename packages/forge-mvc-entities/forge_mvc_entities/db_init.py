@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -59,6 +60,23 @@ class DbInitConfig:
     app_privileges: tuple[str, ...]
 
 
+# ENTITIES-DBINIT-CHARSET-ALLOWLIST-001 : DB_CHARSET et DB_COLLATION sont
+# interpolés dans le SQL de provisioning (généré et exécuté). Comme DB_NAME et
+# DB_APP_PRIVILEGES, ils doivent être validés avant interpolation — les noms de
+# charsets et de collations MariaDB sont toujours alphanumériques + tiret bas.
+_CHARSET_TOKEN_RE = re.compile(r"^[A-Za-z0-9_]{1,64}$")
+
+
+def _validate_charset_token(value: str, var_name: str) -> None:
+    """Refuse toute valeur de charset/collation non alphanumérique (défense)."""
+    if not _CHARSET_TOKEN_RE.fullmatch(value):
+        raise DbInitError(
+            f"{var_name} invalide : {value!r}. Un nom de charset ou de collation "
+            "MariaDB ne contient que lettres, chiffres et tiret bas "
+            "(1 à 64 caractères). Corrigez la valeur dans env/dev."
+        )
+
+
 def _parse_app_privileges(raw: object) -> tuple[str, ...]:
     if not isinstance(raw, str):
         raise DbInitError(
@@ -87,10 +105,15 @@ def load_db_init_config() -> DbInitConfig:
     raw_privileges = os.environ.get("DB_APP_PRIVILEGES")
     app_privileges = _parse_app_privileges(raw_privileges) if raw_privileges is not None else DEFAULT_APP_PRIVILEGES
 
+    db_charset = os.environ.get("DB_CHARSET", "utf8mb4")
+    db_collation = os.environ.get("DB_COLLATION", "utf8mb4_unicode_ci")
+    _validate_charset_token(db_charset, "DB_CHARSET")
+    _validate_charset_token(db_collation, "DB_COLLATION")
+
     return DbInitConfig(
         db_name=os.environ.get("DB_NAME", ""),
-        db_charset=os.environ.get("DB_CHARSET", "utf8mb4"),
-        db_collation=os.environ.get("DB_COLLATION", "utf8mb4_unicode_ci"),
+        db_charset=db_charset,
+        db_collation=db_collation,
         # ADR-066 : l'origine du grant applicatif suit DB_HOST (serveur partagé),
         # ce qui garantit que l'hôte du grant coïncide avec l'hôte de connexion.
         app_host=os.environ.get("DB_HOST", "localhost"),
@@ -125,10 +148,14 @@ def load_provisioning_env() -> ProvisioningEnv:
     load_project_config()
     raw_privileges = os.environ.get("DB_APP_PRIVILEGES")
     app_privileges = _parse_app_privileges(raw_privileges) if raw_privileges is not None else DEFAULT_APP_PRIVILEGES
+    db_charset = os.environ.get("DB_CHARSET", "utf8mb4")
+    db_collation = os.environ.get("DB_COLLATION", "utf8mb4_unicode_ci")
+    _validate_charset_token(db_charset, "DB_CHARSET")
+    _validate_charset_token(db_collation, "DB_COLLATION")
     return ProvisioningEnv(
         db_name=os.environ.get("DB_NAME", ""),
-        db_charset=os.environ.get("DB_CHARSET", "utf8mb4"),
-        db_collation=os.environ.get("DB_COLLATION", "utf8mb4_unicode_ci"),
+        db_charset=db_charset,
+        db_collation=db_collation,
         # ADR-066 : l'hôte du grant suit DB_HOST (serveur partagé).
         host=os.environ.get("DB_HOST", "localhost"),
         admin_login=os.environ.get("DB_ADMIN_LOGIN", ""),
