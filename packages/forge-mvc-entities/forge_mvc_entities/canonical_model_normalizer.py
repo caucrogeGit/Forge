@@ -5,9 +5,12 @@ Traduit une entité au format canonique (schema_version: "1.0") en un dict
 compatible avec le format legacy attendu par validate_entity_definition()
 et les générateurs build_entity_sql() / build_entity_base().
 
-Ce module est une couche de transition interne.
+Ce module est une couche de transition interne, vouée à disparaître (ADR-086).
 La structure produite n'est pas un format public — elle suit le format legacy
-attendu par normalize_entity_definition() dans validation.py.
+attendu par normalize_entity_definition() dans validation.py. Le mapping type
+canonique vers sql_type/python_type/column est délégué au service partagé
+`field_resolver` (source unique, ADR-086) ; ce module n'assure plus que
+l'assemblage du dict et la synthèse des champs système (id, horodatages).
 
 Limites documentées :
 - Les index (indexes[]) sont ignorés : build:model ne les gère pas encore.
@@ -22,105 +25,30 @@ from __future__ import annotations
 
 from typing import Any
 
-from core.database.backend import Dialect, get_backend
-
-
-_DEFAULT_STRING_LENGTH = 255
-
-# Type Python (runtime) d'un type Forge simple. Non dialectal : il ne dépend
-# pas du SGBD. Le type SQL correspondant, lui, vient du dialecte du backend
-# actif (ADR-054), via dialect.simple_type().
-_SIMPLE_PYTHON_TYPE: dict[str, str] = {
-    "text":        "str",
-    "integer":     "int",
-    "big_integer": "int",
-    "float":       "float",
-    "boolean":     "bool",
-    "date":        "date",
-    "datetime":    "datetime",
-    "email":       "str",
-    "password":    "str",
-    "slug":        "str",
-    "json":        "str",
-}
-
-
-def _dialect() -> Dialect:
-    """Dialecte SQL du backend BDD actif (ADR-054)."""
-    return get_backend().dialect
-
-# Longueur de colonne d'un slug URL (ADR-017 D3) — alignée avec SlugField.
-_SLUG_MAX_LENGTH = 180
-
-
-class CanonicalNormalizationError(ValueError):
-    """Erreur lors de la normalisation d'une entité canonique."""
-
-
-def _column_from_name(name: str) -> str:
-    return "".join(part.capitalize() for part in name.split("_") if part)
+from forge_mvc_entities.field_resolver import (
+    SLUG_MAX_LENGTH,
+    CanonicalNormalizationError as CanonicalNormalizationError,
+    column_of,
+    dialect,
+    resolve_sql_and_python_type,
+)
 
 
 def column_for_field(field: dict[str, Any]) -> str:
-    """Nom de colonne SQL d'un champ de contrat d'entite (ADR-069, ADR-077).
+    """Nom de colonne SQL d'un champ de contrat d'entité (ADR-069, ADR-077).
 
-    Convention canonique, source unique du mapping champ vers colonne :
-
-    - un champ `foreign_key` garde son nom snake_case (`annee_scolaire_id`), en
-      coherence avec la colonne emise par `build:model` ;
-    - tout autre champ passe en PascalCase (`user_id` vers `UserId`,
-      `nom` vers `Nom`).
-
-    La cle primaire (`Id`) n'est pas un champ de contrat : elle n'est pas
-    concernee. Fonction publique consommee par `forge-mvc-fixtures`
-    (`make-factory`) pour echafauder les colonnes reelles (ADR-077).
+    Fonction publique consommée par `forge-mvc-fixtures` (`make-factory`) pour
+    échafauder les colonnes réelles. Délègue au service `field_resolver`, source
+    unique du mapping champ vers colonne (ADR-086).
     """
-    name = str(field.get("name", ""))
-    if str(field.get("type", "")) == "foreign_key":
-        return name
-    return _column_from_name(name)
-
-
-def _build_sql_and_python_type(forge_type: str, field: dict[str, Any]) -> tuple[str, str]:
-    field_name = field.get("name", "?")
-    dialect = _dialect()
-
-    if forge_type == "string":
-        max_length = field.get("max_length", _DEFAULT_STRING_LENGTH)
-        if not isinstance(max_length, int) or isinstance(max_length, bool) or max_length <= 0:
-            raise CanonicalNormalizationError(
-                f"Champ '{field_name}' : max_length doit être un entier positif pour type 'string'."
-            )
-        return dialect.string_type(max_length), "str"
-
-    if forge_type == "decimal":
-        precision = field.get("precision")
-        scale = field.get("scale")
-        if precision is None or scale is None:
-            raise CanonicalNormalizationError(
-                f"Champ '{field_name}' : precision et scale sont requis pour type 'decimal'."
-            )
-        return dialect.decimal_type(precision, scale), "float"
-
-    if forge_type == "foreign_key":
-        # Clé étrangère de première classe (ADR-069) : même type que la PK visée.
-        # Toutes les PK Forge sont `identity_type()` (BIGINT UNSIGNED sur MariaDB),
-        # donc une FK vers n'importe quelle entité adopte ce type, backend-agnostique.
-        return dialect.identity_type(), "int"
-
-    if forge_type in _SIMPLE_PYTHON_TYPE:
-        return dialect.simple_type(forge_type), _SIMPLE_PYTHON_TYPE[forge_type]
-
-    raise CanonicalNormalizationError(
-        f"Champ '{field_name}' : type Forge inconnu : {forge_type!r}."
-    )
+    return column_of(field)
 
 
 def _id_field() -> dict[str, Any]:
     return {
         "name": "id",
         "column": "Id",
-        "sql_type": _dialect().identity_type(),
+        "sql_type": dialect().identity_type(),
         "python_type": "int",
         "nullable": False,
         "primary_key": True,
@@ -135,8 +63,8 @@ def _system_datetime_field(
 ) -> dict[str, Any]:
     field: dict[str, Any] = {
         "name": name,
-        "column": _column_from_name(name),
-        "sql_type": _dialect().simple_type("datetime"),
+        "column": column_of({"name": name}),
+        "sql_type": dialect().simple_type("datetime"),
         "python_type": "datetime",
         "nullable": nullable,
         "primary_key": False,
@@ -156,7 +84,7 @@ def _normalize_field(field: dict[str, Any]) -> dict[str, Any]:
     name = field["name"]
     forge_type = field.get("type", "")
 
-    sql_type, python_type = _build_sql_and_python_type(forge_type, field)
+    sql_type, python_type = resolve_sql_and_python_type(field)
 
     # ADR-013 : nullable par défaut (True), required prioritaire.
     nullable = bool(field.get("nullable", True))
@@ -191,7 +119,7 @@ def _normalize_field(field: dict[str, Any]) -> dict[str, Any]:
     # Type slug : widget SlugField + longueur de colonne (ADR-017).
     if forge_type == "slug":
         normalized["form"] = {"field": "slug"}
-        normalized["constraints"]["max_length"] = _SLUG_MAX_LENGTH
+        normalized["constraints"]["max_length"] = SLUG_MAX_LENGTH
         # Slug auto-généré depuis un champ source (étape B) : propagé tel quel,
         # consommé par le générateur CRUD (form exclu, slugify à la création).
         if "source" in field:
