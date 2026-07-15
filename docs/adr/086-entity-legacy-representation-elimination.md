@@ -2,13 +2,45 @@
 
 ## Statut
 
-Acceptée.
+Acceptée, **partiellement mise en œuvre puis clôturée** (voir « Avancement »).
 Décision d'architecture ; relève du mainteneur.
 Prolonge l'ADR-012 (dépréciation du format legacy) et l'ADR-070 (extraction du moteur d'entités).
 
 ## Date
 
 2026-07-15
+
+## Avancement (clôture au 2026-07-15)
+
+Les tickets de fondation (additifs, sans changement de comportement) sont livrés :
+
+- **ENTITY-RESOLVER-001** : service `field_resolver`, source unique du mapping
+  type canonique vers `(sql_type, python_type, column)`.
+- **ENTITY-CANONICAL-ACCESSORS-002** : accesseurs canoniques par champ
+  (nullabilité ADR-013, unique, bornes, clé primaire).
+- **ENTITY-FIELD-ENUMERATOR-003** : `resolve_entity_fields`, énumération des
+  champs résolus (id synthétique, champs métier, champs système) ; le pont
+  `canonical_model_normalizer` délègue toute sa résolution au service.
+- **ENTITY-CANONICAL-SEMANTIC-GAP-004** : `validate_semantic` récupère les trois
+  seules vérifications que `validation.py` assurait encore et qui n'étaient
+  couvertes ni par le JSON Schema ni garanties par le resolver (mot réservé SQL
+  sur table/entité, source de slug, cohérence de la valeur par défaut).
+
+À l'issue de ces tickets, `field_resolver` est la source unique de résolution et
+la validation canonique (`entity.schema.json` + `validate_semantic`) couvre tout
+ce que `validation.py` faisait d'utile : **`validation.py` est désormais
+redondant sur le chemin canonique**.
+
+La **suppression effective** de `validation.py` (tickets de bascule des loaders
+puis retrait du module) est **abandonnée**. La mesure du blast radius a établi
+qu'elle imposait de convertir au format canonique environ **167 tests** répartis
+sur de nombreux fichiers, dont les fixtures d'entités en forme interne minimale
+alimentent les loaders (le double de l'estimation initiale). Le rapport
+coût/bénéfice n'a pas été jugé favorable pour un nettoyage interne sans effet
+externe. `validation.py` reste en place, redondant mais inerte sur le chemin
+canonique. Une reprise éventuelle passerait plutôt par le relocalisation de la
+seule normalisation interne (une petite fraction du module) que par la
+conversion massive des fixtures.
 
 ## Contexte
 
