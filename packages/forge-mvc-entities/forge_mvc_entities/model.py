@@ -21,6 +21,7 @@ from forge_mvc_entities.make_entity import (
     validate_entity_name,
 )
 import cli._support.output as out
+from cli._support.scaffold import CREATED, write_if_new
 from forge_mvc_entities.relations import (
     EntityRelationsError,
     ValidatedCanonicalManyToManyRelation,
@@ -125,27 +126,23 @@ def build_model(entities_root: Path, *, dry_run: bool = False) -> BuildModelResu
             base_path.write_text(build_entity_base(source.definition), encoding="utf-8")
         written.extend([sql_path, base_path])
 
+        # Le fichier manuel de l'entite appartient au developpeur : sa divergence
+        # est attendue et reste silencieuse (WARNED assimile a preserved).
         manual_path = source.entity_dir / f"{snake}.py"
-        if manual_path.exists():
-            preserved.append(manual_path)
-        else:
-            if not dry_run:
-                manual_path.write_text(
-                    build_entity_manual(source.definition["entity"], snake),
-                    encoding="utf-8",
-                )
-            created.append(manual_path)
+        manual_status = write_if_new(
+            manual_path,
+            build_entity_manual(source.definition["entity"], snake),
+            dry_run=dry_run,
+        )
+        (created if manual_status == CREATED else preserved).append(manual_path)
 
         init_path = source.entity_dir / "__init__.py"
-        if init_path.exists():
-            preserved.append(init_path)
-        else:
-            if not dry_run:
-                init_path.write_text(
-                    build_entity_init(source.definition["entity"]),
-                    encoding="utf-8",
-                )
-            created.append(init_path)
+        init_status = write_if_new(
+            init_path,
+            build_entity_init(source.definition["entity"]),
+            dry_run=dry_run,
+        )
+        (created if init_status == CREATED else preserved).append(init_path)
 
     relations_path = entities_root / "relations.sql"
     if not dry_run:
