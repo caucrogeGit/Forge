@@ -140,7 +140,7 @@ def test_make_public_list_necrase_pas_template_existant(tmp_path):
     result = make_public_list("Hebergement", output_root=tmp_path)
 
     assert template.read_text(encoding="utf-8") == "template manuel\n"
-    assert "mvc/views/public/hebergements/index.html" in result.preserved
+    assert any("mvc/views/public/hebergements/index.html" in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
 
 
 def test_make_public_list_necrase_pas_controleur_existant(tmp_path):
@@ -152,7 +152,7 @@ def test_make_public_list_necrase_pas_controleur_existant(tmp_path):
     result = make_public_list("Hebergement", output_root=tmp_path)
 
     assert controller.read_text(encoding="utf-8") == "# controleur manuel\n"
-    assert "mvc/controllers/public_hebergements_controller.py" in result.preserved
+    assert any("mvc/controllers/public_hebergements_controller.py" in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
 
 
 def test_make_public_list_nexpose_aucun_lien_crud_admin():

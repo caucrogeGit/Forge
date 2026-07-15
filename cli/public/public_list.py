@@ -18,6 +18,7 @@ from cli.public._shared import (
     humanize as _humanize,
     public_routes_branchement,
     require_entities_module as _require_entities_module,
+    scaffold_into,
 )
 from cli.public.public_page import (
     PUBLIC_CONTENT_BLOCK,
@@ -601,21 +602,14 @@ def make_public_list(
     spec = build_public_list_spec(definition)
     result = MakePublicListResult(spec=spec)
 
-    template_path = project_root / spec.template_path
-    template_path.parent.mkdir(parents=True, exist_ok=True)
-    if template_path.exists():
-        result.preserved.append(spec.template_path.as_posix())
-    else:
-        template_path.write_text(build_public_list_template(spec), encoding="utf-8")
-        result.created.append(spec.template_path.as_posix())
-
-    controller_path = project_root / spec.controller_path
-    controller_path.parent.mkdir(parents=True, exist_ok=True)
-    if controller_path.exists():
-        result.preserved.append(spec.controller_path.as_posix())
-    else:
-        controller_path.write_text(build_public_list_controller(spec), encoding="utf-8")
-        result.created.append(spec.controller_path.as_posix())
+    scaffold_into(
+        project_root / spec.template_path, build_public_list_template(spec),
+        spec.template_path.as_posix(), result,
+    )
+    scaffold_into(
+        project_root / spec.controller_path, build_public_list_controller(spec),
+        spec.controller_path.as_posix(), result,
+    )
 
     # ADR-085 : fichier de routes dédié + affichage, jamais d'injection.
     _write_public_routes(
@@ -648,20 +642,15 @@ def _write_public_routes(
 ) -> None:
     """Écrit `mvc/routes/<register_name>_routes.py` en write-if-new (ADR-085)."""
     routes_rel = Path("mvc/routes") / f"{register_name}_routes.py"
-    routes_path = project_root / routes_rel
-    routes_path.parent.mkdir(parents=True, exist_ok=True)
-    if routes_path.exists():
-        result.preserved.append(routes_rel.as_posix())
-        return
-    routes_path.write_text(
+    scaffold_into(
+        project_root / routes_rel,
         build_public_routes_file(
             register_name,
             f"from mvc.controllers.public_{plural}_controller import {class_name}",
             add_lines,
         ),
-        encoding="utf-8",
+        routes_rel.as_posix(), result,
     )
-    result.created.append(routes_rel.as_posix())
 
 
 def make_public_show(
@@ -678,13 +667,10 @@ def make_public_show(
     spec = build_public_list_spec(definition)
     result = MakePublicShowResult(spec=spec)
 
-    template_path = project_root / spec.show_template_path
-    template_path.parent.mkdir(parents=True, exist_ok=True)
-    if template_path.exists():
-        result.preserved.append(spec.show_template_path.as_posix())
-    else:
-        template_path.write_text(build_public_show_template(spec), encoding="utf-8")
-        result.created.append(spec.show_template_path.as_posix())
+    scaffold_into(
+        project_root / spec.show_template_path, build_public_show_template(spec),
+        spec.show_template_path.as_posix(), result,
+    )
 
     controller_changed, controller_warning = _ensure_show_controller(
         project_root / spec.controller_path,

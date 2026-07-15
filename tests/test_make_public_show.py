@@ -86,7 +86,7 @@ def test_make_public_show_necrase_pas_template_existant(tmp_path):
     result = make_public_show("Hebergement", output_root=tmp_path)
 
     assert template.read_text(encoding="utf-8") == "template show manuel\n"
-    assert "mvc/views/public/hebergements/show.html" in result.preserved
+    assert any("mvc/views/public/hebergements/show.html" in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
 
 
 def test_make_public_show_necrase_pas_controleur_existant_non_reconnu(tmp_path):

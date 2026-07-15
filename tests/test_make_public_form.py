@@ -445,7 +445,7 @@ def test_make_public_form_preserve_template_existant(tmp_path):
     result = make_public_form("Demande", output_root=tmp_path)
 
     assert template_path.read_text(encoding="utf-8") == "EXISTING"
-    assert "mvc/views/public/demandes/form.html" in result.preserved
+    assert any("mvc/views/public/demandes/form.html" in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
 
 
 def test_make_public_form_apres_make_list_ajoute_methodes(tmp_path):

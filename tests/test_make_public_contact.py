@@ -163,7 +163,7 @@ def test_make_public_contact_preserve_template_existant(tmp_path):
     result = make_public_contact(root=tmp_path)
 
     assert template_path.read_text(encoding="utf-8") == "CONTENU EXISTANT"
-    assert "mvc/views/public/contact.html" in result.preserved
+    assert any("mvc/views/public/contact.html" in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
 
 
 def test_make_public_contact_preserve_controleur_existant(tmp_path):

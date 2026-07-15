@@ -4,7 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import cli._support.output as out
-from cli.public._shared import build_public_routes_file, public_routes_branchement
+from cli.public._shared import build_public_routes_file, public_routes_branchement, scaffold_into
 from cli.public.public_page import (
     CONTROLLER_PATH,
     PUBLIC_CONTENT_BLOCK,
@@ -69,12 +69,7 @@ def make_public_contact(*, root: Path | None = None) -> MakePublicPageResult:
         routes_path=routes_path,
     )
 
-    template_path.parent.mkdir(parents=True, exist_ok=True)
-    if template_path.exists():
-        result.preserved.append(_CONTACT_TEMPLATE_REL.as_posix())
-    else:
-        template_path.write_text(build_contact_template(), encoding="utf-8")
-        result.created.append(_CONTACT_TEMPLATE_REL.as_posix())
+    scaffold_into(template_path, build_contact_template(), _CONTACT_TEMPLATE_REL.as_posix(), result)
 
     controller_changed, controller_warning = _ensure_controller_method(controller_path, spec)
     if controller_changed:
@@ -85,22 +80,18 @@ def make_public_contact(*, root: Path | None = None) -> MakePublicPageResult:
         result.warnings.append(controller_warning)
 
     # ADR-085 : fichier de routes dédié + affichage, jamais d'injection.
-    routes_path.parent.mkdir(parents=True, exist_ok=True)
-    if routes_path.exists():
-        result.preserved.append(routes_rel.as_posix())
-    else:
-        routes_path.write_text(
-            build_public_routes_file(
-                _CONTACT_SLUG,
-                "from mvc.controllers.public_pages_controller import PublicPagesController",
-                [
-                    f'public.add("GET", "/{spec.slug}", '
-                    f'PublicPagesController.{spec.method_name}, name="{spec.route_name}")'
-                ],
-            ),
-            encoding="utf-8",
-        )
-        result.created.append(routes_rel.as_posix())
+    scaffold_into(
+        routes_path,
+        build_public_routes_file(
+            _CONTACT_SLUG,
+            "from mvc.controllers.public_pages_controller import PublicPagesController",
+            [
+                f'public.add("GET", "/{spec.slug}", '
+                f'PublicPagesController.{spec.method_name}, name="{spec.route_name}")'
+            ],
+        ),
+        routes_rel.as_posix(), result,
+    )
 
     return result
 
