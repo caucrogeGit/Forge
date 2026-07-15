@@ -211,7 +211,7 @@ def test_make_crud_preserve_controller_existant(tmp_path):
 
     result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
 
-    assert ctrl in result.preserved
+    assert any(ctrl.as_posix() in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
     assert ctrl.read_text(encoding="utf-8") == "# code utilisateur contrôleur\n"
 
 
@@ -226,7 +226,7 @@ def test_make_crud_preserve_form_existant(tmp_path):
 
     result = make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
 
-    assert form in result.preserved
+    assert any(form.as_posix() in w for w in result.warnings)  # WARNED (CLI-SCAFFOLD-PRIMITIVE-001)
     assert form.read_text(encoding="utf-8") == "# code utilisateur form\n"
 
 
