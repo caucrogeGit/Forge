@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol, cast
 
 from cli._support.scaffold import CREATED, PRESERVED, write_if_new
 
@@ -105,6 +105,34 @@ def public_routes_branchement(register_name: str) -> str:
         f"  from mvc.routes.{register_name}_routes import register_{register_name}_routes",
         f"  register_{register_name}_routes(router)",
     ])
+
+
+def load_public_entity_definition(entity_name: str, *, entities_root: Path) -> dict[str, Any]:
+    """Charge, ponte et valide l'entité pour les générateurs de pages publiques
+    (PUBLIC-CANONICAL-ENTITY-001).
+
+    make:entity écrit les fichiers d'entités au format canonique
+    (`schema_version: "1.0"`, types Forge abstraits). On applique le même pont
+    canonique -> forme interne que make:crud et les migrations avant de valider,
+    sans quoi make:public-list/show/form échouent sur toute entité réelle.
+    L'ancienne forme interne déjà normalisée reste acceptée telle quelle.
+    """
+    import json
+
+    from forge_mvc_entities import to_snake
+    from forge_mvc_entities.canonical_model_normalizer import (
+        normalize_canonical_entity_for_model_build,
+    )
+    from forge_mvc_entities.validation import validate_entity_definition
+
+    snake = to_snake(entity_name)
+    json_path = entities_root / snake / f"{snake}.json"
+    if not json_path.exists():
+        raise FileNotFoundError(f"Entité introuvable : {json_path.as_posix()}")
+    raw: Any = json.loads(json_path.read_text(encoding="utf-8"))
+    if isinstance(raw, dict) and cast("dict[str, Any]", raw).get("schema_version") == "1.0":
+        raw = normalize_canonical_entity_for_model_build(cast("dict[str, Any]", raw))
+    return validate_entity_definition(raw, source=str(json_path))
 
 
 def require_entities_module() -> None:

@@ -179,14 +179,9 @@ def _list_select_columns(spec: PublicListSpec) -> str:
 
 
 def load_public_list_definition(entity_name: str, *, entities_root: Path) -> dict[str, Any]:
-    from forge_mvc_entities import to_snake
-    from forge_mvc_entities.validation import validate_entity_definition
-    snake = to_snake(entity_name)
-    json_path = entities_root / snake / f"{snake}.json"
-    if not json_path.exists():
-        raise FileNotFoundError(f"Entité introuvable : {json_path.as_posix()}")
-    raw = json.loads(json_path.read_text(encoding="utf-8"))
-    return validate_entity_definition(raw, source=str(json_path))
+    # Pont canonique -> forme interne partagé (PUBLIC-CANONICAL-ENTITY-001).
+    from cli.public._shared import load_public_entity_definition
+    return load_public_entity_definition(entity_name, entities_root=entities_root)
 
 
 def build_public_list_spec(definition: dict[str, Any]) -> PublicListSpec:
