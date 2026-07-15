@@ -46,6 +46,9 @@ Les codes sont regroupés par famille.
 | `FORGE_ENTITY_RESERVED_PYTHON_NAME` | nom de champ réservé en Python |
 | `FORGE_ENTITY_DUPLICATE_TABLE` | table partagée par deux entités |
 | `FORGE_ENTITY_INVALID_INDEX` | index pointant vers un champ inexistant |
+| `FORGE_ENTITY_RESERVED_SQL_NAME` | table ou entité portant un mot réservé SQL |
+| `FORGE_ENTITY_INVALID_SLUG_SOURCE` | source de slug inexistante ou auto-référence |
+| `FORGE_ENTITY_INVALID_DEFAULT` | valeur par défaut incompatible avec le type du champ |
 
 ### 3.2 Erreurs de relation
 

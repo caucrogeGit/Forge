@@ -28,12 +28,16 @@ from typing import Any, cast
 
 import keyword
 from dataclasses import dataclass
+from datetime import date, datetime
 
 from forge_mvc_entities.entity_validation_errors import (
     FORGE_ENTITY_DUPLICATE_FIELD,
     FORGE_ENTITY_DUPLICATE_TABLE,
+    FORGE_ENTITY_INVALID_DEFAULT,
     FORGE_ENTITY_INVALID_INDEX,
+    FORGE_ENTITY_INVALID_SLUG_SOURCE,
     FORGE_ENTITY_RESERVED_PYTHON_NAME,
+    FORGE_ENTITY_RESERVED_SQL_NAME,
     FORGE_PIVOT_KEY_COLLISION,
     FORGE_PIVOT_RESERVED_FIELD,
     FORGE_PIVOT_TABLE_COLLISION,
@@ -42,6 +46,64 @@ from forge_mvc_entities.entity_validation_errors import (
     FORGE_RELATION_INVALID_ON_DELETE,
     FORGE_RELATION_UNKNOWN_ENTITY,
 )
+from forge_mvc_entities.field_resolver import SIMPLE_PYTHON_TYPE, nullable_of
+
+# Mots réservés SQL refusés comme nom de table ou d'entité (relocalisé de
+# validation.py, ADR-086). La colonne d'un champ métier est dérivée en
+# PascalCase donc jamais réservée ; seul le nom snake_case d'une clé étrangère
+# pourrait l'être, cas couvert par le contrôle sur les champs.
+SQL_RESERVED_WORDS = {
+    "add", "alter", "and", "by", "create", "delete", "drop", "from", "group",
+    "index", "insert", "into", "join", "key", "order", "primary", "references",
+    "select", "table", "update", "user", "where",
+}
+
+
+def _canonical_python_type(forge_type: str) -> str | None:
+    """Type Python d'un type Forge canonique, sans dépendance au dialecte."""
+    if forge_type == "string":
+        return "str"
+    if forge_type == "decimal":
+        return "float"
+    if forge_type == "foreign_key":
+        return "int"
+    return SIMPLE_PYTHON_TYPE.get(forge_type)
+
+
+def _is_iso_date_string(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
+
+
+def _is_iso_datetime_string(value: Any) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        datetime.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
+
+
+def _default_matches_type(python_type: str, value: Any) -> bool:
+    if python_type == "str":
+        return isinstance(value, str)
+    if python_type == "int":
+        return isinstance(value, int) and not isinstance(value, bool)
+    if python_type == "float":
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if python_type == "bool":
+        return isinstance(value, bool)
+    if python_type == "date":
+        return _is_iso_date_string(value)
+    if python_type == "datetime":
+        return _is_iso_datetime_string(value)
+    return True
 
 
 @dataclass(frozen=True)
@@ -51,6 +113,38 @@ class SemanticError:
     path: str
     message: str
     hint: str = ""
+
+
+def _check_field_default(
+    errors: list[SemanticError], source: str, index: int, field: dict[str, Any]
+) -> None:
+    """Vérifie qu'une valeur `default` est compatible avec le type du champ."""
+    value = field["default"]
+    fname = field.get("name", "?")
+    path = f"$.fields[{index}].default"
+
+    if value is None:
+        if not nullable_of(field):
+            errors.append(SemanticError(
+                code=FORGE_ENTITY_INVALID_DEFAULT,
+                file=source,
+                path=path,
+                message=f"la valeur par défaut null du champ \"{fname}\" n'est autorisée que si le champ est nullable.",
+                hint="Rendez le champ nullable ou remplacez la valeur par défaut.",
+            ))
+        return
+
+    python_type = _canonical_python_type(str(field.get("type", "")))
+    if python_type is None:
+        return  # type Forge inconnu : déjà signalé par le JSON Schema en amont.
+    if not _default_matches_type(python_type, value):
+        errors.append(SemanticError(
+            code=FORGE_ENTITY_INVALID_DEFAULT,
+            file=source,
+            path=path,
+            message=f"la valeur par défaut du champ \"{fname}\" est incompatible avec le type \"{field.get('type')}\".",
+            hint="Alignez la valeur par défaut sur le type du champ.",
+        ))
 
 
 def validate_semantic(
@@ -138,6 +232,58 @@ def validate_semantic(
                         ),
                         hint="Ajoutez le champ ou retirez-le de l'index.",
                     ))
+
+        # 5. Nom de table ou d'entité = mot réservé SQL (relocalisé, ADR-086)
+        if table and table.lower() in SQL_RESERVED_WORDS:
+            errors.append(SemanticError(
+                code=FORGE_ENTITY_RESERVED_SQL_NAME,
+                file=source,
+                path="$.table",
+                message=f"la table \"{table}\" est un mot réservé SQL.",
+                hint="Choisissez un nom de table qui n'est pas un mot réservé SQL.",
+            ))
+        if name and name.lower() in SQL_RESERVED_WORDS:
+            errors.append(SemanticError(
+                code=FORGE_ENTITY_RESERVED_SQL_NAME,
+                file=source,
+                path="$.name",
+                message=f"le nom d'entité \"{name}\" est un mot réservé SQL.",
+                hint="Choisissez un nom d'entité qui n'est pas un mot réservé SQL.",
+            ))
+
+        # 6. Slug auto-généré : `source` référence un champ existant, jamais soi-même
+        for i, f in enumerate(fields):
+            if not isinstance(f, dict):
+                continue
+            fdict = cast("dict[str, Any]", f)
+            if fdict.get("type") != "slug" or "source" not in fdict:
+                continue
+            src = fdict.get("source")
+            own = fdict.get("name", "")
+            if src == own:
+                errors.append(SemanticError(
+                    code=FORGE_ENTITY_INVALID_SLUG_SOURCE,
+                    file=source,
+                    path=f"$.fields[{i}].source",
+                    message=f"le slug \"{own}\" ne peut pas se référencer lui-même comme source.",
+                    hint="Indiquez un autre champ comme source du slug.",
+                ))
+            elif src not in field_name_set:
+                errors.append(SemanticError(
+                    code=FORGE_ENTITY_INVALID_SLUG_SOURCE,
+                    file=source,
+                    path=f"$.fields[{i}].source",
+                    message=f"la source \"{src}\" du slug \"{own}\" ne correspond à aucun champ de l'entité {name}.",
+                    hint="Vérifiez le nom du champ source.",
+                ))
+
+        # 7. Valeur par défaut cohérente avec le type du champ
+        for i, f in enumerate(fields):
+            if not isinstance(f, dict):
+                continue
+            fdict = cast("dict[str, Any]", f)
+            if "default" in fdict:
+                _check_field_default(errors, source, i, fdict)
 
         entity_by_name[name] = entity
 
