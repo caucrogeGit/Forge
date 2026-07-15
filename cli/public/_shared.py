@@ -12,6 +12,32 @@ cross-module. Ce module ne dépend d'aucun générateur : pas de cycle.
 from __future__ import annotations
 
 import importlib.util
+from pathlib import Path
+from typing import Protocol
+
+from cli._support.scaffold import CREATED, PRESERVED, write_if_new
+
+
+class _ScaffoldTarget(Protocol):
+    created: list[str]
+    preserved: list[str]
+    warnings: list[str]
+
+
+def scaffold_into(path: Path, content: str, rel: str, result: _ScaffoldTarget, *, dry_run: bool = False) -> None:
+    """Écrit `path` en write-if-new et enregistre l'issue dans `result` (ADR/CLI-SCAFFOLD).
+
+    `rel` est le chemin relatif affiché. `result` doit exposer `created`,
+    `preserved` et `warnings` (le contrat commun des résultats make:public-*).
+    Un fichier existant au contenu différent va dans `warnings`, jamais écrasé.
+    """
+    status = write_if_new(path, content, dry_run=dry_run)
+    if status == CREATED:
+        result.created.append(rel)
+    elif status == PRESERVED:
+        result.preserved.append(rel)
+    else:  # WARNED
+        result.warnings.append(f"{rel} existe et diffère du modèle, non touché.")
 
 
 def humanize(name: str) -> str:

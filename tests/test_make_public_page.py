@@ -107,8 +107,9 @@ def test_make_public_page_necrase_pas_template_existant(tmp_path):
 
     result = make_public_page("accueil", root=tmp_path)
 
+    # CLI-SCAFFOLD-PRIMITIVE-001 : contenu divergent → averti, jamais écrasé.
     assert template.read_text(encoding="utf-8") == "contenu utilisateur\n"
-    assert "mvc/views/public/accueil.html" in result.preserved
+    assert any("mvc/views/public/accueil.html" in w for w in result.warnings)
 
 
 def test_make_public_page_affiche_resume_et_preservation(tmp_path, capsys):
