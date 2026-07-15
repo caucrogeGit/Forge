@@ -25,6 +25,7 @@ from forge_mvc_entities.field_resolver import (
     nullable_of,
     numeric_constraints_of,
     python_type_of,
+    resolve_entity_fields,
     resolve_sql_and_python_type,
     sql_type_of,
     unique_of,
@@ -145,6 +146,61 @@ def test_numeric_constraints_ignorees_sur_type_non_numerique():
 def test_identity_column_est_Id():
     assert identity_column() == "Id"
     assert IDENTITY_COLUMN == "Id"
+
+
+# --- Énumérateur de champs canoniques (ENTITY-FIELD-ENUMERATOR-003) ---
+
+def _article_entity(**options):
+    return {
+        "name": "Article",
+        "table": "articles",
+        "fields": [
+            {"name": "title", "type": "string", "max_length": 255, "required": True},
+            {"name": "content", "type": "text", "nullable": True},
+        ],
+        "options": options,
+    }
+
+
+def test_resolve_entity_fields_injecte_pk_synthetique_en_tete():
+    fields = resolve_entity_fields(_article_entity())
+    assert fields[0]["name"] == "id"
+    assert fields[0]["column"] == IDENTITY_COLUMN
+    assert fields[0]["primary_key"] is True
+    assert fields[0]["auto_increment"] is True
+
+
+def test_resolve_entity_fields_ordre_id_puis_metier():
+    fields = resolve_entity_fields(_article_entity())
+    assert [f["name"] for f in fields] == ["id", "title", "content"]
+
+
+def test_resolve_entity_fields_timestamps_optionnels():
+    sans = resolve_entity_fields(_article_entity())
+    assert "created_at" not in [f["name"] for f in sans]
+
+    avec = resolve_entity_fields(_article_entity(timestamps=True))
+    noms = [f["name"] for f in avec]
+    assert "created_at" in noms and "updated_at" in noms
+    created = next(f for f in avec if f["name"] == "created_at")
+    assert created["managed"] == "timestamp_created"
+
+
+def test_resolve_entity_fields_soft_delete_optionnel():
+    avec = resolve_entity_fields(_article_entity(soft_delete=True))
+    deleted = next(f for f in avec if f["name"] == "deleted_at")
+    assert deleted["managed"] == "soft_delete"
+    assert deleted["nullable"] is True
+
+
+def test_resolve_entity_fields_ignore_champ_id_du_contrat():
+    # Un champ nommé 'id' dans le contrat est ignoré : la PK reste synthétique.
+    entity = _article_entity()
+    entity["fields"].insert(0, {"name": "id", "type": "integer"})
+    fields = resolve_entity_fields(entity)
+    ids = [f for f in fields if f["name"] == "id"]
+    assert len(ids) == 1
+    assert ids[0]["primary_key"] is True
 
 
 # --- Non-régression : le pont produit toujours le même dict via le service ---
