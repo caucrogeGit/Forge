@@ -27,6 +27,11 @@ DEFAULT_STRING_LENGTH = 255
 # Longueur de colonne d'un slug URL (ADR-017 D3), alignée avec SlugField.
 SLUG_MAX_LENGTH = 180
 
+# Nom de colonne de la clé primaire synthétique des entités canoniques. Toute
+# entité Forge a un `id` implicite (le contrat canonique n'exprime pas de PK
+# explicite) ; sa colonne est toujours `Id`.
+IDENTITY_COLUMN = "Id"
+
 # Type Python (runtime) d'un type Forge simple. Non dialectal : il ne dépend
 # pas du SGBD. Le type SQL correspondant, lui, vient du dialecte du backend
 # actif (ADR-054), via dialect.simple_type().
@@ -126,3 +131,40 @@ def sql_type_of(field: dict[str, Any]) -> str:
 def python_type_of(field: dict[str, Any]) -> str:
     """Type Python runtime d'un champ canonique."""
     return resolve_sql_and_python_type(field)[1]
+
+
+def nullable_of(field: dict[str, Any]) -> bool:
+    """Nullabilité d'un champ canonique (ADR-013).
+
+    Nullable par défaut (True) ; `required: true` a priorité et rend le champ
+    non nullable.
+    """
+    if field.get("required") is True:
+        return False
+    return bool(field.get("nullable", True))
+
+
+def unique_of(field: dict[str, Any]) -> bool:
+    """Contrainte UNIQUE d'un champ canonique."""
+    return bool(field.get("unique", False))
+
+
+def numeric_constraints_of(field: dict[str, Any]) -> dict[str, Any]:
+    """Bornes `min`/`max` canoniques traduites en contraintes de validation.
+
+    N'émet `min_value`/`max_value` que pour un champ de type Python numérique
+    (`int`/`float`) ; ignoré sinon.
+    """
+    python_type = python_type_of(field)
+    constraints: dict[str, Any] = {}
+    if python_type in ("int", "float"):
+        if "min" in field:
+            constraints["min_value"] = field["min"]
+        if "max" in field:
+            constraints["max_value"] = field["max"]
+    return constraints
+
+
+def identity_column() -> str:
+    """Colonne de la clé primaire synthétique d'une entité canonique (`Id`)."""
+    return IDENTITY_COLUMN

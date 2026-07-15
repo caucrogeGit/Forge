@@ -18,11 +18,16 @@ from forge_mvc_entities.canonical_model_normalizer import (
     normalize_canonical_entity_for_model_build,
 )
 from forge_mvc_entities.field_resolver import (
+    IDENTITY_COLUMN,
     CanonicalNormalizationError,
     column_of,
+    identity_column,
+    nullable_of,
+    numeric_constraints_of,
     python_type_of,
     resolve_sql_and_python_type,
     sql_type_of,
+    unique_of,
 )
 
 
@@ -103,6 +108,43 @@ def test_type_inconnu_leve():
 def test_sql_type_of_est_le_premier_element():
     field = {"name": "titre", "type": "string", "max_length": 50}
     assert sql_type_of(field) == resolve_sql_and_python_type(field)[0]
+
+
+# --- Accesseurs canoniques par champ (ENTITY-CANONICAL-ACCESSORS-002) ---
+
+def test_nullable_par_defaut_true():
+    assert nullable_of({"name": "x", "type": "text"}) is True
+
+
+def test_nullable_required_prioritaire():
+    assert nullable_of({"name": "x", "type": "text", "required": True}) is False
+
+
+def test_nullable_explicite_false():
+    assert nullable_of({"name": "x", "type": "text", "nullable": False}) is False
+
+
+def test_unique_par_defaut_false():
+    assert unique_of({"name": "x", "type": "text"}) is False
+
+
+def test_unique_explicite_true():
+    assert unique_of({"name": "x", "type": "email", "unique": True}) is True
+
+
+def test_numeric_constraints_bornes_sur_type_numerique():
+    c = numeric_constraints_of({"name": "age", "type": "integer", "min": 0, "max": 120})
+    assert c == {"min_value": 0, "max_value": 120}
+
+
+def test_numeric_constraints_ignorees_sur_type_non_numerique():
+    # min/max sur un champ texte ne produisent aucune contrainte numérique.
+    assert numeric_constraints_of({"name": "nom", "type": "string", "min": 1, "max": 9}) == {}
+
+
+def test_identity_column_est_Id():
+    assert identity_column() == "Id"
+    assert IDENTITY_COLUMN == "Id"
 
 
 # --- Non-régression : le pont produit toujours le même dict via le service ---

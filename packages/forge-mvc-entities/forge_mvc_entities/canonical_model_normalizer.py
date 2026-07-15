@@ -26,11 +26,15 @@ from __future__ import annotations
 from typing import Any
 
 from forge_mvc_entities.field_resolver import (
+    IDENTITY_COLUMN,
     SLUG_MAX_LENGTH,
     CanonicalNormalizationError as CanonicalNormalizationError,
     column_of,
     dialect,
+    nullable_of,
+    numeric_constraints_of,
     resolve_sql_and_python_type,
+    unique_of,
 )
 
 
@@ -47,7 +51,7 @@ def column_for_field(field: dict[str, Any]) -> str:
 def _id_field() -> dict[str, Any]:
     return {
         "name": "id",
-        "column": "Id",
+        "column": IDENTITY_COLUMN,
         "sql_type": dialect().identity_type(),
         "python_type": "int",
         "nullable": False,
@@ -86,30 +90,19 @@ def _normalize_field(field: dict[str, Any]) -> dict[str, Any]:
 
     sql_type, python_type = resolve_sql_and_python_type(field)
 
-    # ADR-013 : nullable par défaut (True), required prioritaire.
-    nullable = bool(field.get("nullable", True))
-    if field.get("required") is True:
-        nullable = False
-
-    constraints: dict[str, Any] = {}
-    if "min" in field and python_type in ("int", "float"):
-        constraints["min_value"] = field["min"]
-    if "max" in field and python_type in ("int", "float"):
-        constraints["max_value"] = field["max"]
-
-    # ADR-069 / ADR-077 : mapping champ vers colonne, source unique.
-    column = column_for_field(field)
-
+    # Dérivations par champ déléguées au service field_resolver (ADR-086,
+    # source unique) : nullabilité (ADR-013), bornes min/max, contrainte unique,
+    # colonne (ADR-069/077).
     normalized: dict[str, Any] = {
         "name": name,
-        "column": column,
+        "column": column_for_field(field),
         "sql_type": sql_type,
         "python_type": python_type,
-        "nullable": nullable,
+        "nullable": nullable_of(field),
         "primary_key": False,
         "auto_increment": False,
-        "constraints": constraints,
-        "unique": bool(field.get("unique", False)),
+        "constraints": numeric_constraints_of(field),
+        "unique": unique_of(field),
     }
 
     # Métadonnée de relation : l'entité cible référencée (contrat complet).
