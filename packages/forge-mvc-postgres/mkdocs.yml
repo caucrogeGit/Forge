@@ -13,10 +13,10 @@ nav:
           - Bilan débutant: welcome/debutant/bilan.md
       - Intermédiaire:
           - Faire évoluer le schéma: welcome/intermediaire/postgres-migrate.md
-          - État du support Alpha: welcome/intermediaire/postgres-status.md
+          - État du support: welcome/intermediaire/postgres-status.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Le dialecte PostgreSQL: welcome/avance/postgres-dialect.md
-          - Valider l'intégration: welcome/avance/postgres-validate.md
+          - Vérifier votre environnement: welcome/avance/postgres-validate.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

@@ -16,7 +16,7 @@ Forge 1.x garantit la stabilité de son interface publique : commandes CLI docum
 
 Le contrat couvre également :
 
-- Les modules opt-in officiels selon leur niveau de maturité (Bêta pour la plupart, Alpha pour les backends `forge-mvc-postgres` et `forge-mvc-mssql`). La grille de maturité à jour fait foi dans [release-policy.md](release-policy.md) (source unique) ; ce contrat ne la duplique pas pour éviter toute dérive.
+- Les modules opt-in officiels selon leur niveau de maturité (Bêta pour la plupart, les quatre backends BDD au niveau plein depuis la révision d'ADR-084). La grille de maturité à jour fait foi dans [release-policy.md](release-policy.md) (source unique) ; ce contrat ne la duplique pas pour éviter toute dérive.
 - Le mécanisme de plugins pour étendre le contexte Jinja (`core.mvc.controller.register_jinja_context_provider`).
 - L'absence de dépendance nominale du core sur les modules opt-in.
 

@@ -13,10 +13,10 @@ nav:
           - Bilan débutant: welcome/debutant/bilan.md
       - Intermédiaire:
           - Faire évoluer le schéma: welcome/intermediaire/mssql-migrate.md
-          - État du support Alpha: welcome/intermediaire/mssql-status.md
+          - État du support: welcome/intermediaire/mssql-status.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Le dialecte SQL Server: welcome/avance/mssql-dialect.md
-          - Valider l'intégration: welcome/avance/mssql-validate.md
+          - Vérifier votre environnement: welcome/avance/mssql-validate.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

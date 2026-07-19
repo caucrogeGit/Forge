@@ -1,34 +1,39 @@
-# État du support Alpha
+# État du support
 
-Objectif : savoir ce qui fonctionne et ce qui reste à faire pour SQL Server.
+Objectif : savoir ce qui est garanti pour SQL Server et ce qui reste à votre charge.
 
-**Ce que vous allez apprendre :** le périmètre exact du statut Alpha.
+**Ce que vous allez apprendre :** le périmètre exact du niveau de support.
 
 Deuxième palier du **niveau intermédiaire**.
 
-## Ce qui fonctionne
+## Niveau plein
+
+`forge-mvc-mssql` est au **niveau plein** (ADR-084, révision du 2026-07-19), comme les autres backends livrés.
+
+## Ce qui est garanti
 
 | Domaine | État |
 |---|---|
-| Dialecte Transact-SQL (types, DDL) | testé unitairement |
+| Provisioning par `db:init` (`--run`) | fonctionnel (compte `DB_ADMIN_*` existant) |
+| Dialecte Transact-SQL (types, DDL) | testé |
 | Paramètres `?` (pyodbc natif) | sans traduction |
-| `db:apply` sur une base existante | fonctionnel |
-| `migration:*` | fonctionnel |
-| Runtime (`core.database.db`) | fonctionnel (connexion pyodbc) |
+| Identité d'insertion (`lastrowid`) | fiable (`SCOPE_IDENTITY()` dans le lot de l'INSERT) |
+| `db:apply` | fonctionnel |
+| `migration:*` | validé en CI (application, idempotence, dry-run, refus `CHANGED`, rollback, introspection) |
+| Runtime (`core.database.db`) | validé en CI contre un vrai SQL Server 2022 |
 
-## Ce qui reste
+## Ce qui reste à votre charge
 
 | Domaine | État |
 |---|---|
-| Provisioning par `db:init` | **non câblé** (base + login à la main) |
-| Validation d'intégration sur serveur | à confirmer côté projet |
-| Diff incrémental de schéma | imparfait (noms de types SQL Server) |
+| Pilote ODBC système | requis (« ODBC Driver 18 for SQL Server » par défaut, `DB_ODBC_DRIVER`) |
+| Compte `DB_ADMIN_*` | doit exister sur le serveur avant `db:init --run` |
 
-!!! warning "Pilote ODBC + base à préparer"
-    Vérifiez la présence d'un pilote ODBC, et créez la base et le login avec les outils SQL Server.
+À noter : l'escape hatch `DB_APP_PRIVILEGES` au-delà du DML est propre à MariaDB, `db:init` le refuse explicitement sur SQL Server.
+Le diff incrémental de schéma compare des noms de types SQL Server et peut rester imparfait.
 
-!!! note "Contribuer"
-    Valider l'intégration sur un vrai serveur (par exemple `mcr.microsoft.com/mssql/server` en conteneur) et remonter les écarts aide à faire passer le backend en bêta.
+!!! note "Référence"
+    Le niveau de support des backends est défini par l'ADR-084 (révision du 2026-07-19 : promotion au niveau plein).
 
 ## Après cette étape
 

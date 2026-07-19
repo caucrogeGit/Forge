@@ -151,8 +151,8 @@ reste identique quel que soit le moteur.
 |---------|-----------------|----------|
 | `forge-mvc-mariadb` | MariaDB / MySQL | RC |
 | `forge-mvc-sqlite` | SQLite (sans serveur, idéal pour démarrer et tester) | RC |
-| `forge-mvc-postgres` | PostgreSQL | Alpha |
-| `forge-mvc-mssql` | SQL Server | Alpha |
+| `forge-mvc-postgres` | PostgreSQL | RC |
+| `forge-mvc-mssql` | SQL Server | RC |
 
 Chaque opt-in reste optionnel : le core Forge ne dépend d'aucun d'eux.
 Seuls `forge-mvc-rbac`, `forge-mvc-workflow` et `forge-mvc-stats` sont inclus

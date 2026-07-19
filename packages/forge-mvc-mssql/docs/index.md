@@ -4,21 +4,21 @@
 
 Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend installé et n'en utilise qu'un seul par projet.
 
-!!! warning "Statut Alpha"
-    Dialecte Transact-SQL testé unitairement ; intégration serveur (pilote ODBC) et provisioning CLI à valider/câbler.
+!!! note "Niveau plein"
+    Backend au **niveau plein** (ADR-084, révision du 2026-07-19) : provisioning par `db:init`, identité d'insertion fiable, intégration validée en CI contre un vrai SQL Server 2022.
 
-    Créez la base et le login à la main, puis utilisez `db:apply` / `migration:*`.
+    Un pilote ODBC système reste requis (« ODBC Driver 18 for SQL Server » par défaut, surchargeable via `DB_ODBC_DRIVER`).
 
 ## En bref
 
 - backend SQL Server via `pyodbc` (pilote ODBC requis) ;
 - paramètres `?` natifs (aucune traduction) ;
 - identité `BIGINT IDENTITY(1,1)`, identifiants entre crochets ;
-- provisioning CLI pas encore câblé (base + login manuels).
+- `db:init` provisionne base, comptes et registre des migrations (`--run` pour exécuter).
 
 ## Par où commencer
 
-- [Référence](reference.md) : rôle, contrat, dialecte, statut Alpha.
+- [Référence](reference.md) : rôle, contrat, dialecte, statut.
 - [Progression SQL Server](welcome/debutant/mssql-welcome.md) : apprendre le backend pas à pas.
 
 ## Installation

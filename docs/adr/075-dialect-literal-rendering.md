@@ -77,7 +77,7 @@ Tickets distincts, dans l'ordre :
 ## Conséquences
 
 - Le contrat `Dialect` gagne un concern **DML/littéral** à côté de son concern DDL.
-- Ajouter une méthode au `Protocol` impose son implémentation dans les **quatre** backends (PostgreSQL et SQL Server, en Alpha, compris).
+- Ajouter une méthode au `Protocol` impose son implémentation dans les **quatre** backends (PostgreSQL et SQL Server compris).
 - Un rendu de littéral dialecte-naïf et dupliqué disparaît (moteur d'entités) ; un bug de portabilité des `DEFAULT` (booléens, dates en PostgreSQL) est corrigé au passage.
 - La génération de fixtures native au backend (ADR-074) est débloquée, sans que l'opt-in fixtures ne connaisse les dialectes : il passe par le contrat.
 - La posture anti-injection est préservée : le rendu de littéral est cantonné à la génération d'artefacts relus, la DML d'exécution reste paramétrée.

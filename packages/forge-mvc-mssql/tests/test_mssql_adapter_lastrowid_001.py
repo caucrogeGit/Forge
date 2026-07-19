@@ -6,8 +6,8 @@ renvoie toujours NULL : l'adaptateur doit exécuter l'INSERT et la lecture
 d'identité dans le même lot, servir l'identité via ``lastrowid`` et le
 rowcount de l'INSERT (pas celui du SELECT) via ``rowcount``.
 
-Curseur pyodbc factice : aucun pilote ODBC ni serveur requis (statut Alpha,
-logique testée unitairement).
+Curseur pyodbc factice : aucun pilote ODBC ni serveur requis (la logique est
+aussi prouvée face à un vrai serveur par la suite `db_mssql`).
 """
 from __future__ import annotations
 

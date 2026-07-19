@@ -1,18 +1,18 @@
 # Bilan du niveau débutant
 
-Vous savez démarrer une base PostgreSQL avec Forge (en mode Alpha).
+Vous savez démarrer une base PostgreSQL avec Forge.
 
 ## Ce que vous avez appris
 
 - le cœur découvre `forge-mvc-postgres` par entry point ;
-- en Alpha, base et rôle se créent à la main (provisioning CLI non câblé) ;
-- `forge db:apply` applique le schéma sur la base existante ;
+- `forge db:init` affiche le SQL de provisioning et `--run` l'exécute ;
+- `forge db:apply` applique le schéma sur la base provisionnée ;
 - les paramètres `?` sont traduits en `%s` pour psycopg.
 
 ## Points clés
 
 - PostgreSQL est un serveur : il faut une connexion ;
-- statut Alpha : provisioning manuel, intégration à valider ;
+- niveau plein (ADR-084) : provisioning par la CLI, intégration validée en CI ;
 - un seul backend BDD par projet.
 
 ## Après ce niveau

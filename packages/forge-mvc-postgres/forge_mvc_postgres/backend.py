@@ -16,8 +16,9 @@ Le cœur attend des connexions compatibles « à la MariaDB » : curseur avec
 ``lastrowid``/``rowcount``. psycopg utilise le format de paramètres « %s » :
 l'adaptateur traduit les « ? » de Forge à l'exécution (voir translate).
 
-Statut Alpha : la logique (dialecte, traduction) est testée unitairement ;
-l'intégration serveur et le provisioning CLI restent à valider/câbler.
+Niveau plein (promotion ADR-084) : dialecte, provisioning `db:init` et
+intégration (couche DB, migrations, introspection) validés en CI contre un
+vrai serveur PostgreSQL.
 psycopg est importé paresseusement (l'usage du dialecte ne le requiert pas).
 """
 import logging

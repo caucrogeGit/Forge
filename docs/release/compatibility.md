@@ -131,7 +131,7 @@ Elles sont tirées via les extras du package `forge-mvc`.
 !!! info "Les opt-ins officiels sont distribués séparément sur PyPI"
     Les modules opt-in (`forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`, `forge-mvc-mfa`, `forge-mvc-iot`, `forge-mvc-files`, `forge-mvc-images`, `forge-mvc-audio`, `forge-mvc-video`, `forge-mvc-pivot`, `forge-mvc-mail`, `forge-mvc-i18n`, et les briques plus récentes) sont distribués séparément sur PyPI en préversion, synchronisés avec le core.
 
-    La maturité par paquet fait foi dans le classifier `Development Status` de chaque `pyproject.toml` et dans [release-policy.md](release-policy.md) : la plupart des opt-ins sont en Bêta ; les backends `forge-mvc-postgres` et `forge-mvc-mssql` restent en Alpha (dialecte et adaptateur livrés, intégration bout-en-bout à valider).
+    La maturité par paquet fait foi dans le classifier `Development Status` de chaque `pyproject.toml` et dans [release-policy.md](release-policy.md) : la plupart des opt-ins sont en Bêta ; les quatre backends BDD, dont `forge-mvc-postgres` et `forge-mvc-mssql`, sont au niveau plein (promotion ADR-084 du 2026-07-19, intégration validée en CI sur serveurs réels).
 
     Les opt-ins restent optionnels : le core Forge ne dépend d'aucun d'eux.
 

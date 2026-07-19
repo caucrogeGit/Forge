@@ -35,4 +35,4 @@ Le diff de schéma s'appuie sur `INFORMATION_SCHEMA` et `COLUMNPROPERTY` (identi
 
 ## Après cette étape
 
-[Palier suivant : Valider l'intégration](mssql-validate.md)
+[Palier suivant : Vérifier votre environnement](mssql-validate.md)

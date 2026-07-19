@@ -7,8 +7,8 @@ transaction et l'INSERT serait perdu au commit. L'adaptateur doit lire
 lastval() sous savepoint, restaurer le savepoint en cas d'échec (transaction
 préservée) et renvoyer None plutôt que de lever.
 
-Curseur psycopg factice : ni psycopg ni serveur requis (statut Alpha, logique
-testée unitairement).
+Curseur psycopg factice : ni psycopg ni serveur requis (la logique est aussi
+prouvée face à un vrai serveur par la suite `db_pg`).
 """
 from __future__ import annotations
 

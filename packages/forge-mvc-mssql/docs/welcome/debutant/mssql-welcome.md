@@ -3,33 +3,35 @@
 !!! note "Prérequis : installer l'opt-in"
     Installez `forge-mvc-mssql` avant de commencer : voir sa [référence](../../reference.md).
 
-Objectif : premier contact avec le backend **opt-in** `forge-mvc-mssql` (Alpha).
+Objectif : premier contact avec le backend **opt-in** `forge-mvc-mssql`.
 
-**Ce que vous allez apprendre :** comme le provisioning CLI n'est pas encore câblé, on crée la base et le login à la main, puis Forge prend le relais.
+**Ce que vous allez apprendre :** `forge db:init` provisionne la base SQL Server, puis Forge suit son flux habituel.
 
 Premier palier du **niveau débutant** de la progression SQL Server.
 
-!!! warning "Alpha : provisioning manuel"
-    `forge db:init` ne provisionne pas encore SQL Server.
+!!! note "Compte d'administration requis"
+    `forge db:init --run` se connecte avec le compte `DB_ADMIN_*`, qui doit exister sur le serveur.
 
-    On crée donc la base et le login avec les outils SQL Server, puis on utilise `db:apply`.
+    Il crée la base, la connexion et l'utilisateur applicatifs, et le registre des migrations.
 
 ## Ce que ce palier montre
 
-- créer la base et le login SQL Server ;
+- provisionner la base et le compte applicatif avec `db:init` ;
 - vérifier que le cœur résout le backend.
 
-## 1. Créer base et login
+## 1. Provisionner la base
 
-```sql
-CREATE DATABASE mon_projet;
-CREATE LOGIN mon_projet WITH PASSWORD = 'motdepasse';
-USE mon_projet;
-CREATE USER mon_projet FOR LOGIN mon_projet;
-ALTER ROLE db_owner ADD MEMBER mon_projet;
+```bash
+forge db:init
 ```
 
-(En conteneur, exécutez ces commandes via `sqlcmd` dans le conteneur SQL Server.)
+Forge **affiche** le SQL de provisioning (logins, base, utilisateurs, `GRANT` sur `SCHEMA::dbo`, table `forge_migrations`), en lots séparés par `GO` pour `sqlcmd`.
+
+```bash
+forge db:init --run
+```
+
+`--run` exécute ce provisioning avec le compte `DB_ADMIN_*`.
 
 ## 2. Vérifier le backend
 

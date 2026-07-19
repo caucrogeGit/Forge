@@ -32,4 +32,4 @@ PostgreSQL n'a pas de `lastrowid` natif : l'adaptateur lit la dernière valeur d
 
 ## Après cette étape
 
-[Palier suivant : Valider l'intégration](postgres-validate.md)
+[Palier suivant : Vérifier votre environnement](postgres-validate.md)

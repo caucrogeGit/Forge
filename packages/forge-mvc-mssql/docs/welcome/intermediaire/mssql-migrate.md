@@ -2,7 +2,7 @@
 
 Objectif : modifier le schéma SQL Server par migrations.
 
-**Ce que vous allez apprendre :** les commandes `migration:*` du cœur fonctionnent sur SQL Server, sur une base déjà préparée.
+**Ce que vous allez apprendre :** les commandes `migration:*` du cœur fonctionnent sur SQL Server, sur la base provisionnée par `db:init`.
 
 Premier palier du **niveau intermédiaire**.
 
@@ -40,4 +40,4 @@ La migration s'exécute sur SQL Server ; `forge_migrations` enregistre son passa
 
 ## Après cette étape
 
-[Palier suivant : État du support Alpha](mssql-status.md)
+[Palier suivant : État du support](mssql-status.md)

@@ -40,4 +40,4 @@ La migration s'exécute sur PostgreSQL ; `forge_migrations` enregistre son passa
 
 ## Après cette étape
 
-[Palier suivant : État du support Alpha](postgres-status.md)
+[Palier suivant : État du support](postgres-status.md)

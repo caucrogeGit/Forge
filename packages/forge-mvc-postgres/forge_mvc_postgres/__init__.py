@@ -2,9 +2,9 @@
 """forge-mvc-postgres — backend BDD PostgreSQL pour Forge (ADR-054).
 
 Le cœur découvre ce backend via l'entry point ``forge_mvc.db_backend``.
-Statut Alpha : la logique de dialecte et la traduction de paramètres sont
-testées unitairement ; l'intégration avec un serveur PostgreSQL est à valider
-côté développeur (base client-serveur, voir README).
+Niveau plein (promotion ADR-084) : dialecte, traduction de paramètres,
+provisioning ``db:init`` et intégration serveur (couche DB, migrations)
+validés en CI contre un vrai PostgreSQL.
 """
 from forge_mvc_postgres.backend import PostgreSQLBackend
 

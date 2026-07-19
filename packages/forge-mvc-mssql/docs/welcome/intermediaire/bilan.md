@@ -1,18 +1,18 @@
 # Bilan du niveau intermédiaire
 
-Vous savez faire évoluer le schéma SQL Server et vous connaissez le périmètre Alpha.
+Vous savez faire évoluer le schéma SQL Server et vous connaissez le périmètre du support.
 
 ## Ce que vous avez appris
 
 - `migration:status` / `migration:make` / `migration:apply` fonctionnent sur SQL Server ;
-- ce qui marche (dialecte, paramètres natifs, `db:apply`, migrations, runtime) ;
-- ce qui reste (provisioning `db:init`, validation d'intégration, diff incrémental).
+- ce qui est garanti (provisioning `db:init`, dialecte, paramètres natifs, `db:apply`, migrations et runtime validés en CI) ;
+- ce qui reste à votre charge (pilote ODBC système, compte `DB_ADMIN_*` existant).
 
 ## Points clés
 
-- statut Alpha : préparez la base à la main, le reste suit le flux du cœur ;
+- niveau plein (ADR-084) : `db:init` provisionne, le reste suit le flux du cœur ;
 - les formes gardées remplacent `IF NOT EXISTS` ;
-- valider sur un serveur réel fait avancer le backend.
+- l'escape hatch `DB_APP_PRIVILEGES` au-delà du DML reste propre à MariaDB.
 
 ## Après ce niveau
 

@@ -5,6 +5,15 @@
 
 ### Ajouté
 
+- **PostgreSQL et SQL Server promus au niveau plein (révision ADR-084 du 2026-07-19).**
+  Les quatre backends BDD sont désormais au même niveau de support.
+  Ce qui a été livré pour la promotion :
+  identité d'insertion fiabilisée (`PG-INSERT-IDENTITY-001` : `lastval()` sous garde savepoint ; `MSSQL-INSERT-IDENTITY-001` : `SCOPE_IDENTITY()` exécuté dans le lot de l'INSERT, corrige un `lastrowid` toujours NULL) ;
+  `forge db:init` génère et exécute (`--run`) le provisioning PostgreSQL (rôles, base, droits DML présents et futurs, registre des migrations) et SQL Server (logins, users, `GRANT ON SCHEMA::dbo`, lots `GO`), l'escape hatch `DB_APP_PRIVILEGES` au-delà du DML restant propre à MariaDB (refus explicite, règle B) (`PG-DB-INIT-PROVISIONING-001`, `MSSQL-DB-INIT-PROVISIONING-001`) ;
+  deux jobs CI exécutent les suites d'intégration `-m db_pg` / `-m db_mssql` contre de vrais serveurs (PostgreSQL 16, SQL Server 2022), avec le même garde anti « vert avec 0 test » que MariaDB (`CI-DB-POSTGRES-001`, `CI-DB-MSSQL-001`) ;
+  les chemins de génération (entités, `auth:init`, relations `many_to_one`) et le runner de migrations (application, idempotence, dry-run, refus CHANGED, rollback réel, introspection) sont validés dialectalement et face aux vrais serveurs (`PG/MSSQL-DIALECT-PARITY-TESTS-001`, `PG/MSSQL-MIGRATIONS-INTEGRATION-001`).
+  Classifieurs PyPI des deux paquets : `3 - Alpha` vers `4 - Beta` ; mentions Alpha retirées des docs, parcours welcome, landing et briefing agent.
+
 - **Moteur d'entités extrait du cœur : opt-in `forge-mvc-entities` (ADR-070).** Toute la
   génération et la modélisation de la couche de données quitte le cœur (`cli/entities`) pour un
   paquet opt-in : `make:entity`, `make:relation` (`many_to_one` et `many_to_many`), le normaliseur

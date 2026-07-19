@@ -7,11 +7,9 @@ Depuis l'ADR-054, le cœur de Forge est agnostique BDD : il découvre le backend
 installé via un entry point. Ce paquet ajoute **SQL Server** à la liste des
 choix de SGBD du développeur.
 
-!!! warning "Statut Alpha"
-    La logique de dialecte (types, DDL Transact-SQL) est **testée
-    unitairement**. L'**intégration avec un serveur SQL Server** (pilote ODBC)
-    et le **provisioning par la CLI** (`forge db:init`) restent à
-    valider/câbler. À ce stade, créez le schéma manuellement (voir plus bas).
+!!! note "Niveau plein"
+    Backend au **niveau plein** (ADR-084, révision du 2026-07-19).
+    `forge db:init` provisionne SQL Server (`--run` pour exécuter), l'identité d'insertion est fiable, et l'intégration est validée en CI contre un vrai SQL Server 2022 (pilote ODBC Driver 18).
 
 ## Installation
 
@@ -28,7 +26,8 @@ SQL Server est **client-serveur** : un serveur SQL Server doit être joignable
 
 - **Paramètres** : pyodbc utilise nativement les `?` de Forge (aucune traduction).
 - **Identité** : clé primaire auto-incrémentée via `BIGINT IDENTITY(1,1)`.
-- **Insertion** : `lastrowid` via `SCOPE_IDENTITY()`.
+- **Insertion** : `lastrowid` via `SCOPE_IDENTITY()`, exécuté dans le même
+  lot que l'INSERT.
 - **Identifiants** : entre crochets `[...]`.
 - **Idempotence** : SQL Server n'a pas `IF NOT EXISTS` ; le dialecte émet des
   formes gardées (`IF OBJECT_ID(...) IS NULL` pour les tables, `IF NOT EXISTS
@@ -41,11 +40,20 @@ SQL Server est **client-serveur** : un serveur SQL Server doit être joignable
 Connexion via l'environnement (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_APP_LOGIN`,
 `DB_APP_PWD`, et `DB_ODBC_DRIVER` au besoin). Un seul backend BDD par projet.
 
-## Limites connues (Alpha)
+## Provisioning
 
-- `forge db:init` ne provisionne pas encore SQL Server : créez la base et le
-  login/utilisateur à la main, puis appliquez le SQL des entités généré par
-  `make:crud`.
+`forge db:init` génère et affiche le SQL de provisioning SQL Server
+(logins d'administration et applicatif, base, users, `GRANT` sur
+`SCHEMA::dbo`, table `forge_migrations`), en lots séparés par `GO` pour
+`sqlcmd`.
+`forge db:init --run` l'exécute avec le compte `DB_ADMIN_*` (qui doit
+exister sur le serveur) : la base, la connexion et l'utilisateur
+applicatifs et le registre des migrations sont créés.
+
+## Limites connues
+
+- L'escape hatch `DB_APP_PRIVILEGES` au-delà du DML (SELECT, INSERT,
+  UPDATE, DELETE) est propre à MariaDB : refus explicite sur SQL Server.
 - L'introspection de diff compare des noms de types SQL Server : le suivi
   incrémental de schéma peut être imparfait.
 

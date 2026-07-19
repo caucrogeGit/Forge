@@ -2,7 +2,7 @@
 
 Objectif : créer une table dans SQL Server à partir d'une entité.
 
-**Ce que vous allez apprendre :** sur une base existante, `forge db:apply` applique le schéma SQL de vos entités.
+**Ce que vous allez apprendre :** sur la base provisionnée au palier précédent, `forge db:apply` applique le schéma SQL de vos entités.
 
 Deuxième palier du **niveau débutant**.
 

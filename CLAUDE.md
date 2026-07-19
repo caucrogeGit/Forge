@@ -149,7 +149,7 @@ d'utilisateurs externes ni de code applicatif externe à protéger.
 - `forge-mvc-sessions-db` : store de session persistant (`DbSessionStore`), concurrence optimiste ; `sessions:init`/`sessions:gc` (ADR-054/071/072)
 - `forge-mvc-audit`, `forge-mvc-settings`, `forge-mvc-jobs`, `forge-mvc-notifications`, `forge-mvc-import-export` : opt-ins applicatifs adossés à la base (migration + `<opt-in>:init`, ADR-071)
 - `forge-mvc-deploy` : outillage de déploiement opt-in CLI-only (`deploy:init`/`deploy:check`, ADR-053)
-- Backends BDD (ADR-054) : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres` (Alpha), `forge-mvc-mssql` (Alpha) ; exclusifs, découverts par entry points `forge_mvc.db_backend`
+- Backends BDD (ADR-054) : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres`, `forge-mvc-mssql`, tous au niveau plein (promotion ADR-084) ; exclusifs, découverts par entry points `forge_mvc.db_backend`
 
 **Hors scope Forge** (à charge de l'application) :
 

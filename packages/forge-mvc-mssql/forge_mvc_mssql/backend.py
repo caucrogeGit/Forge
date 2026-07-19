@@ -19,9 +19,10 @@ via ``SCOPE_IDENTITY()`` exécuté dans le même lot que l'INSERT
 (MSSQL-INSERT-IDENTITY-001 : dans un lot séparé, ``SCOPE_IDENTITY()`` sort de
 la portée de l'INSERT et renvoie toujours NULL).
 
-Statut Alpha : la logique (dialecte) est testée unitairement ; l'intégration
-serveur et le provisioning CLI restent à valider/câbler. pyodbc est importé
-paresseusement (l'usage du dialecte ne le requiert pas).
+Niveau plein (promotion ADR-084) : dialecte, provisioning `db:init` et
+intégration (couche DB, migrations, introspection) validés en CI contre un
+vrai serveur SQL Server. pyodbc est importé paresseusement (l'usage du
+dialecte ne le requiert pas).
 
 Pilote ODBC : par défaut « ODBC Driver 18 for SQL Server », surchargeable via la
 variable d'environnement ``DB_ODBC_DRIVER``.

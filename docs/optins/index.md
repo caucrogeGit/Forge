@@ -65,8 +65,8 @@ Vue d'ensemble et aide au choix : [Bases de données dans Forge](../guide/bases-
 |---------|--------|----------|
 | [MariaDB](../mariadb/reference.md) | MariaDB / MySQL | RC |
 | [SQLite](../sqlite/reference.md) | SQLite (sans serveur) | RC |
-| [PostgreSQL](../postgres/reference.md) | PostgreSQL | Alpha |
-| [SQL Server](../mssql/reference.md) | SQL Server | Alpha |
+| [PostgreSQL](../postgres/reference.md) | PostgreSQL | RC |
+| [SQL Server](../mssql/reference.md) | SQL Server | RC |
 
 ## Outils de développement
 

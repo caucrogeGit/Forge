@@ -1,18 +1,18 @@
 # Bilan du niveau débutant
 
-Vous savez démarrer une base SQL Server avec Forge (en mode Alpha).
+Vous savez démarrer une base SQL Server avec Forge.
 
 ## Ce que vous avez appris
 
 - le cœur découvre `forge-mvc-mssql` par entry point ;
-- en Alpha, base et login se créent à la main (provisioning CLI non câblé) ;
-- `forge db:apply` applique le schéma sur la base existante ;
+- `forge db:init` affiche le SQL de provisioning et `--run` l'exécute (compte `DB_ADMIN_*` existant) ;
+- `forge db:apply` applique le schéma des entités ;
 - `pyodbc` utilise les `?` nativement.
 
 ## Points clés
 
 - SQL Server est un serveur et requiert un pilote ODBC ;
-- statut Alpha : provisioning manuel, intégration à valider ;
+- niveau plein (ADR-084) : provisioning par `db:init`, intégration validée en CI ;
 - un seul backend BDD par projet.
 
 ## Après ce niveau

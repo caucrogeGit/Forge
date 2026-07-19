@@ -6,24 +6,20 @@ Ce document explique ce que fait l'opt-in `forge-mvc-mssql`, ce qu'il expose, et
 
 Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend installé par un entry point et n'en utilise qu'un seul par projet.
 
-!!! warning "Statut Alpha"
-    La logique de dialecte (Transact-SQL) est **testée unitairement**, mais l'**intégration serveur** (pilote ODBC) et le **provisioning par `db:init`** restent à valider/câbler.
+!!! note "Niveau plein"
+    Backend au **niveau plein** (ADR-084, révision du 2026-07-19) : `db:init` provisionne SQL Server, l'identité d'insertion est fiable, et l'intégration est validée en CI contre un vrai SQL Server 2022.
 
-    À ce stade, créez la base et le login à la main, puis utilisez `db:apply` / `migration:*`.
+    Un pilote ODBC système reste requis sur la machine cliente (« ODBC Driver 18 for SQL Server » par défaut).
 
 ??? note "1. Rôle du module"
 
     Le cœur génère le SQL et pilote les commandes BDD ; un backend les fait parler à un vrai serveur.
 
-    `forge-mvc-mssql` fournit ce backend pour SQL Server : un adaptateur de connexion `pyodbc` conforme aux attentes du cœur, et un dialecte Transact-SQL.
+    `forge-mvc-mssql` fournit ce backend pour SQL Server : un adaptateur de connexion `pyodbc` conforme aux attentes du cœur, un dialecte Transact-SQL, et le **provisioning** de la base et des comptes par `db:init`.
 
     Bonne nouvelle côté paramètres : `pyodbc` utilise nativement les `?` de Forge, donc aucune traduction.
 
 ??? note "2. Installation et désinstallation"
-
-    !!! warning "Backend Alpha"
-        SQL Server est un backend **Alpha** : le dialecte et l'adaptateur sont testés, mais l'intégration sur un vrai serveur reste à valider.
-        À réserver aux essais, pas encore à la production.
 
     SQL Server est **client-serveur** : un serveur doit être joignable.
     Le pilote est `pyodbc`, qui requiert un pilote ODBC système.
@@ -75,6 +71,14 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
     `forge doctor` confirme le backend résolu (`mssql`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=mssql`.
 
+    `forge db:init` **affiche** le SQL de provisioning dérivé de `env/`, sans se connecter (ADR-067) : logins d'administration et applicatif, base, utilisateurs, `GRANT` sur `SCHEMA::dbo`, table `forge_migrations`, en lots séparés par `GO` pour `sqlcmd` :
+
+    ```bash
+    forge db:init
+    ```
+
+    `forge db:init --run` exécute ce provisioning avec le compte `DB_ADMIN_*`, qui doit exister sur le serveur : la base, la connexion et l'utilisateur applicatifs et le registre des migrations sont créés.
+
     La progression guidée, pas à pas : [Installation de forge-mvc-mssql](welcome/debutant/mssql-welcome.md).
 
     ### Désinstallation
@@ -110,7 +114,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | Paquet | `forge-mvc-mssql` |
     | Module | `forge_mvc_mssql` |
     | Catégorie | Bases de données (ADR-055) |
-    | Statut | **Alpha** (dialecte testé, intégration à valider) |
+    | Statut | **niveau plein** (ADR-084 ; intégration validée en CI contre SQL Server 2022) |
     | Couche | backend BDD opt-in **exclusif** (un seul par projet) |
     | Dépend de | `forge-mvc`, `pyodbc`, un pilote ODBC, un serveur SQL Server |
     | Découverte | entry point `forge_mvc.db_backend` nommé `mssql` |
@@ -118,7 +122,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | Paramètres | `?` natifs (pyodbc) : aucune traduction |
     | Identité | `BIGINT IDENTITY(1,1)` |
     | Pilote ODBC | « ODBC Driver 18 for SQL Server » par défaut (`DB_ODBC_DRIVER`) |
-    | Provisioning CLI | **pas encore câblé** : création base + login manuelle |
+    | Provisioning | **oui** : `db:init` affiche le SQL ; `--run` l'exécute avec `DB_ADMIN_*` |
     | Décision d'architecture | ADR-054 |
     | Installation | `pip install --pre forge-mvc-mssql` |
 
@@ -215,22 +219,19 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | Utiliser SQL Server | installer `forge-mvc-mssql` + pilote ODBC + serveur |
     | Forcer ce backend | `DB_BACKEND=mssql` |
     | Choisir le pilote ODBC | `DB_ODBC_DRIVER` |
-    | Créer base et login | **à la main** (Alpha) |
-    | Appliquer le schéma | `forge db:apply` (sur une base existante) |
+    | Provisionner base + comptes | `forge db:init` (avec `DB_ADMIN_*`) |
+    | Appliquer le schéma | `forge db:apply` |
     | Faire évoluer le schéma | `forge migration:*` |
 
-??? note "8. Exemple d'utilisation (Alpha)"
-
-    ```sql
-    -- 1. Préparer base et login à la main (provisioning CLI non câblé)
-    CREATE DATABASE mon_projet;
-    CREATE LOGIN mon_projet WITH PASSWORD = '...';
-    -- puis CREATE USER + rôles dans la base
-    ```
+??? note "8. Exemple d'utilisation"
 
     ```bash
-    # 2. Installer le backend + pilote ODBC, configurer env/dev
+    # 1. Installer le backend + pilote ODBC, configurer env/dev
     pip install --pre forge-mvc-mssql
+    forge db:config
+
+    # 2. Provisionner la base et les comptes (DB_ADMIN_* existant)
+    forge db:init --run
 
     # 3. Appliquer le schéma
     forge db:apply
@@ -239,15 +240,19 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     Le code applicatif utilise `core.database.db`, comme avec tout autre backend.
 
     !!! tip "Aide-mémoire"
-        En Alpha :
-
-        - créez base et login à la main ;
-        - `db:apply` / `migration:*` fonctionnent sur la base existante ;
+        - `db:init` affiche le SQL de provisioning ; `--run` l'exécute avec `DB_ADMIN_*` ;
+        - `db:apply` / `migration:*` suivent le flux du cœur ;
         - `?` est natif (pyodbc), pas de traduction.
 
-??? note "9. Statut Alpha, ODBC et dialecte"
+??? note "9. Statut, ODBC et dialecte"
 
-    Le dialecte Transact-SQL est testé unitairement ; l'**intégration** sur un vrai serveur reste à valider côté projet.
+    Le backend est au **niveau plein** (ADR-084, révision du 2026-07-19).
+
+    L'intégration est validée en CI contre un vrai SQL Server 2022 (pilote ODBC Driver 18) : couche BDD (insertion, lecture, `rowcount`, anti-injection, transactions, clés étrangères) et runner de migrations (application, idempotence, dry-run, refus `CHANGED`, rollback réel, introspection `INFORMATION_SCHEMA`).
+
+    L'identité d'insertion (`lastrowid` de `db.insert`) est fiable : `SCOPE_IDENTITY()` est exécuté dans le même lot que l'INSERT.
+
+    L'escape hatch `DB_APP_PRIVILEGES` au-delà du DML (SELECT, INSERT, UPDATE, DELETE) reste propre à MariaDB : `db:init` le refuse explicitement sur SQL Server.
 
     SQL Server n'a pas `IF NOT EXISTS` pour les tables : le dialecte émet des **formes gardées** (`IF OBJECT_ID(...) IS NULL`).
 

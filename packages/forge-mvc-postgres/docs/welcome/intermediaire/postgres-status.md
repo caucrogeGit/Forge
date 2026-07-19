@@ -1,34 +1,38 @@
-# État du support Alpha
+# État du support
 
-Objectif : savoir ce qui fonctionne et ce qui reste à faire pour PostgreSQL.
+Objectif : connaître le niveau de support de PostgreSQL dans Forge.
 
-**Ce que vous allez apprendre :** le périmètre exact du statut Alpha, pour éviter les mauvaises surprises.
+**Ce que vous allez apprendre :** ce que garantit le niveau plein (ADR-084) pour ce backend.
 
 Deuxième palier du **niveau intermédiaire**.
 
-## Ce qui fonctionne
+## Le niveau plein
+
+PostgreSQL est un backend au **niveau plein** depuis la révision de l'ADR-084 du 2026-07-19.
+Ce niveau signifie que les chemins de génération SQL passent par le dialecte PostgreSQL et que l'intégration est prouvée contre un vrai serveur.
+
+## Ce qui est garanti
 
 | Domaine | État |
 |---|---|
-| Dialecte (types, DDL) | testé unitairement |
-| Traduction des paramètres `?` vers `%s` | testée unitairement |
-| `db:apply` sur une base existante | fonctionnel |
-| `migration:*` | fonctionnel |
+| Provisioning par `db:init` | câblé : SQL affiché, `--run` l'exécute |
+| Identité d'insertion (`lastrowid`) | fiable : `lastval()` sous garde savepoint |
+| Couche BDD (insertion, lecture, `rowcount`, anti-injection, transactions, clés étrangères) | validée en CI contre PostgreSQL 16 |
+| Runner de migrations (application, idempotence, dry-run, refus CHANGED, rollback réel, introspection) | validé en CI contre PostgreSQL 16 |
+| `db:apply` / `migration:*` | fonctionnels |
 | Runtime (`core.database.db`) | fonctionnel (connexion psycopg) |
 
-## Ce qui reste
+## Limites
 
 | Domaine | État |
 |---|---|
-| Provisioning par `db:init` | **non câblé** (base + rôle à la main) |
-| Validation d'intégration sur serveur | à confirmer côté projet |
+| `DB_APP_PRIVILEGES` au-delà du DML | propre à MariaDB : refus explicite sur PostgreSQL |
 | Diff incrémental de schéma | imparfait (noms de types PostgreSQL) |
 
-!!! warning "Préparez la base vous-même"
-    Tant que `db:init` n'est pas câblé pour PostgreSQL, créez la base et le rôle avec les outils PostgreSQL.
+!!! note "Référence"
+    Le niveau de support des backends BDD est défini par l'ADR-084.
 
-!!! note "Contribuer"
-    Valider l'intégration sur un vrai serveur (local ou Docker) et remonter les écarts aide à faire passer le backend en bêta.
+    Les quatre backends livrés sont au niveau plein depuis la révision du 2026-07-19.
 
 ## Après cette étape
 

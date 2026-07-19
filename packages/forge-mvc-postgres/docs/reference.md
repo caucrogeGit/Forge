@@ -6,10 +6,10 @@ Ce document explique ce que fait l'opt-in `forge-mvc-postgres`, ce qu'il expose,
 
 Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend installé par un entry point et n'en utilise qu'un seul par projet.
 
-!!! warning "Statut Alpha"
-    La logique de dialecte et la traduction des paramètres sont **testées unitairement**, mais l'**intégration serveur** et le **provisioning par `db:init`** restent à valider/câbler.
+!!! note "Niveau plein"
+    Backend au **niveau plein** (ADR-084, révision du 2026-07-19) : l'intégration est validée en CI contre un vrai PostgreSQL 16 (couche BDD et runner de migrations).
 
-    À ce stade, créez la base et le rôle à la main, puis utilisez `db:apply` / `migration:*`.
+    `forge db:init` génère et affiche le SQL de provisioning ; `forge db:init --run` l'exécute.
 
 ??? note "1. Rôle du module"
 
@@ -21,9 +21,8 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
 ??? note "2. Installation et désinstallation"
 
-    !!! warning "Backend Alpha"
-        PostgreSQL est un backend **Alpha** : le dialecte et l'adaptateur sont testés, mais l'intégration sur un vrai serveur reste à valider.
-        À réserver aux essais, pas encore à la production.
+    !!! note "Backend au niveau plein"
+        PostgreSQL est un backend au **niveau plein** (ADR-084) : dialecte, adaptateur et intégration sont validés en CI contre un vrai PostgreSQL 16.
 
     PostgreSQL est **client-serveur** : un serveur doit être joignable.
     Le pilote est `psycopg` (v3).
@@ -72,6 +71,14 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     DB_APP_PWD=...
     ```
 
+    `forge db:init` **affiche** le SQL de provisioning PostgreSQL (rôles admin et applicatif, base, GRANT, `ALTER DEFAULT PRIVILEGES`, table `forge_migrations`), dérivé de `env/`, sans se connecter :
+
+    ```bash
+    forge db:init
+    ```
+
+    Pour que Forge exécute le provisioning lui-même, utilisez `forge db:init --run` : le compte `DB_ADMIN_*` doit exister côté serveur ; `--run` crée la base, le rôle applicatif et le registre de migrations.
+
     `forge doctor` confirme le backend résolu (`postgres`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=postgres`.
 
     La progression guidée, pas à pas : [Installation de forge-mvc-postgres](welcome/debutant/postgres-welcome.md).
@@ -109,15 +116,15 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | Paquet | `forge-mvc-postgres` |
     | Module | `forge_mvc_postgres` |
     | Catégorie | Bases de données (ADR-055) |
-    | Statut | **Alpha** (dialecte testé, intégration à valider) |
+    | Statut | **niveau plein** (ADR-084 ; intégration validée en CI contre PostgreSQL 16) |
     | Couche | backend BDD opt-in **exclusif** (un seul par projet) |
     | Dépend de | `forge-mvc`, `psycopg` (v3), un serveur PostgreSQL |
     | Découverte | entry point `forge_mvc.db_backend` nommé `postgres` |
     | Sélection | automatique si seul installé ; sinon `DB_BACKEND=postgres` |
     | Paramètres | `?` traduits en `%s` à l'exécution |
     | Identité | `BIGSERIAL` |
-    | Provisioning CLI | **pas encore câblé** : création base + rôle manuelle |
-    | Décision d'architecture | ADR-054 |
+    | Provisioning CLI | `db:init` affiche le SQL ; `--run` l'exécute |
+    | Décision d'architecture | ADR-054, ADR-084 |
     | Installation | `pip install --pre forge-mvc-postgres` |
 
 ??? note "5. Schémas UML"
@@ -172,7 +179,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
     À retenir :
 
-    - le backend enveloppe `psycopg` (curseur lignes-dict, lastrowid via `lastval()`) ;
+    - le backend enveloppe `psycopg` (curseur lignes-dict, lastrowid via `lastval()` sous garde savepoint) ;
     - les paramètres `?` de Forge sont traduits en `%s` ;
     - le dialecte gère `BIGSERIAL` et les `CREATE INDEX` séparés ;
     - `psycopg` est importé paresseusement (l'usage du dialecte ne le requiert pas).
@@ -200,7 +207,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
     - la traduction `?` vers `%s` est transparente pour le cœur ;
     - les littéraux chaîne sont préservés à la traduction ;
-    - `lastrowid` est obtenu via `SELECT lastval()` ;
+    - `lastrowid` est obtenu via `lastval()` sous garde savepoint (`PG-INSERT-IDENTITY-001`) ;
     - le SQL généré reste celui de Forge, juste adapté au format psycopg.
 
 ??? note "6. Ce que fournit le backend"
@@ -208,7 +215,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | Élément | Rôle |
     |---|---|
     | `PostgreSQLBackend` | implémente le contrat `DatabaseBackend` |
-    | Adaptateur `psycopg` | curseur lignes-dict (`dict_row`), `lastrowid` via `lastval()` |
+    | Adaptateur `psycopg` | curseur lignes-dict (`dict_row`), `lastrowid` via `lastval()` sous garde savepoint |
     | `translate_placeholders` | traduit `?` en `%s` |
     | `PostgreSQLDialect` | `BIGSERIAL`, `CREATE INDEX` séparés, guillemets doubles, `information_schema` |
     | Entry point | `forge_mvc.db_backend = postgres` |
@@ -219,20 +226,19 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     |---|---|
     | Utiliser PostgreSQL | installer `forge-mvc-postgres` + un serveur PostgreSQL |
     | Forcer ce backend | `DB_BACKEND=postgres` |
-    | Créer base et rôle | **à la main** (Alpha) : `createdb`, `CREATE ROLE` |
-    | Appliquer le schéma | `forge db:apply` (sur une base existante) |
+    | Provisionner base et rôles | `forge db:init` (affiche le SQL) ; `forge db:init --run` (exécute) |
+    | Appliquer le schéma | `forge db:apply` (sur la base provisionnée) |
     | Faire évoluer le schéma | `forge migration:*` |
 
-??? note "8. Exemple d'utilisation (Alpha)"
+??? note "8. Exemple d'utilisation"
 
     ```bash
-    # 1. Préparer base et rôle à la main (provisioning CLI non câblé)
-    createdb mon_projet
-    psql -c "CREATE ROLE mon_projet LOGIN PASSWORD '...';"
-    psql -c "GRANT ALL ON DATABASE mon_projet TO mon_projet;"
-
-    # 2. Installer le backend et configurer env/dev (DB_APP_*, DB_ADMIN_*, DB_NAME)
+    # 1. Installer le backend et configurer env/dev (DB_APP_*, DB_ADMIN_*, DB_NAME)
     pip install --pre forge-mvc-postgres
+    forge db:config
+
+    # 2. Provisionner : base, rôle applicatif, registre de migrations
+    forge db:init --run
 
     # 3. Appliquer le schéma
     forge db:apply
@@ -241,23 +247,21 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     Le code applicatif utilise `core.database.db`, comme avec tout autre backend.
 
     !!! tip "Aide-mémoire"
-        En Alpha :
-
-        - créez la base et le rôle à la main ;
-        - `db:apply` / `migration:*` fonctionnent sur la base existante ;
+        - `db:init` affiche le SQL de provisioning ; `--run` l'exécute (le compte `DB_ADMIN_*` doit exister) ;
+        - `db:apply` / `migration:*` suivent le flux du cœur ;
         - `?` est traduit en `%s` automatiquement.
 
-??? note "9. Statut Alpha et limites"
+??? note "9. Statut et limites"
 
-    Le dialecte (types, DDL) et la traduction des paramètres sont testés unitairement.
-    L'**intégration** sur un vrai serveur reste à valider côté projet.
+    PostgreSQL est un backend au **niveau plein** (ADR-084, révision du 2026-07-19).
 
-    Le **provisioning par `db:init`** n'est pas encore câblé pour PostgreSQL : créez la base et le rôle manuellement en attendant.
+    L'intégration est validée en CI contre un vrai PostgreSQL 16 : couche BDD (insertion, lecture, `rowcount`, anti-injection, transactions, clés étrangères) et runner de migrations (application, idempotence, dry-run, refus CHANGED, rollback réel, introspection `information_schema`).
 
-    !!! warning "À valider sur un serveur"
-        Tester réellement PostgreSQL demande un serveur (local ou conteneur Docker).
+    Le **provisioning par `db:init`** est câblé : le SQL est affiché par défaut, `--run` l'exécute (le compte `DB_ADMIN_*` doit exister).
 
-        `db:init` peut signaler que le provisioning n'est pas pris en charge pour ce backend : c'est attendu (Alpha).
+    !!! note "Limites"
+        - l'escape hatch `DB_APP_PRIVILEGES` au-delà du DML (SELECT, INSERT, UPDATE, DELETE) reste propre à MariaDB : refus explicite sur PostgreSQL ;
+        - l'introspection de diff compare des noms de types PostgreSQL : le suivi incrémental de schéma peut être imparfait.
 
     !!! note "Dialecte PostgreSQL"
         `BIGSERIAL` pour l'identité, `CREATE INDEX` séparés, guillemets doubles, introspection via `information_schema`.

@@ -4,7 +4,7 @@
 
 Acceptée, Forge 1.0.0-rc.x (ticket `DB-BACKEND-OPTIN-STRATEGY-001`).
 Le cœur est agnostique BDD (plus aucun pilote SGBD en dépendance) et découvre les backends par entry points exclusifs.
-Quatre backends sont livrés en opt-in : `forge-mvc-mariadb` et `forge-mvc-sqlite` (complets, bout en bout), `forge-mvc-postgres` et `forge-mvc-mssql` (Alpha, intégration réelle à valider).
+Quatre backends sont livrés en opt-in : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres` et `forge-mvc-mssql`, tous au niveau plein (PostgreSQL et MSSQL promus par la révision d'ADR-084 du 2026-07-19).
 
 ---
 

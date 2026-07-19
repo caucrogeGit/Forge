@@ -3,31 +3,31 @@
 !!! note "Prérequis : installer l'opt-in"
     Installez `forge-mvc-postgres` avant de commencer : voir sa [référence](../../reference.md).
 
-Objectif : premier contact avec le backend **opt-in** `forge-mvc-postgres` (Alpha).
+Objectif : premier contact avec le backend **opt-in** `forge-mvc-postgres`.
 
-**Ce que vous allez apprendre :** comme le provisioning CLI n'est pas encore câblé, on crée la base et le rôle à la main, puis Forge prend le relais.
+**Ce que vous allez apprendre :** `forge db:init` provisionne la base et le rôle applicatif, puis Forge prend le relais.
 
 Premier palier du **niveau débutant** de la progression PostgreSQL.
 
-!!! warning "Alpha : provisioning manuel"
-    `forge db:init` ne provisionne pas encore PostgreSQL.
+!!! note "Provisioning par la CLI"
+    `forge db:init` affiche le SQL de provisioning (rôles, base, droits, table `forge_migrations`).
 
-    On crée donc la base et le rôle avec les outils PostgreSQL, puis on utilise `db:apply`.
+    `forge db:init --run` l'exécute : le compte `DB_ADMIN_*` doit exister côté serveur.
 
 ## Ce que ce palier montre
 
-- créer la base et le rôle PostgreSQL ;
+- provisionner la base et le rôle PostgreSQL avec `db:init` ;
 - vérifier que le cœur résout le backend.
 
-## 1. Créer base et rôle
+## 1. Provisionner base et rôle
 
 ```bash
-createdb mon_projet
-psql -c "CREATE ROLE mon_projet LOGIN PASSWORD 'motdepasse';"
-psql -c "GRANT ALL ON DATABASE mon_projet TO mon_projet;"
+forge db:init        # affiche le SQL de provisioning
+forge db:init --run  # crée la base, le rôle applicatif et le registre de migrations
 ```
 
-(En conteneur Docker, exécutez ces commandes dans le conteneur PostgreSQL.)
+Le compte `DB_ADMIN_*` renseigné dans `env/dev` doit exister côté serveur.
+(En conteneur Docker, exécutez ces commandes depuis le projet, le serveur restant joignable via `DB_HOST`/`DB_PORT`.)
 
 ## 2. Vérifier le backend
 

@@ -1,10 +1,15 @@
-# Valider l'intégration
+# Vérifier votre environnement
 
 Objectif : confirmer que SQL Server fonctionne de bout en bout sur votre serveur.
 
-**Ce que vous allez apprendre :** comment vérifier la chaîne complète, puisque l'intégration est à valider (Alpha).
+**Ce que vous allez apprendre :** comment vérifier la chaîne complète sur votre environnement.
 
 Deuxième palier du **niveau avancé**.
+
+!!! note "L'intégration est validée en amont"
+    La CI de Forge valide le backend contre un vrai SQL Server 2022 : couche BDD et runner de migrations.
+
+    Cette vérification-ci porte sur **votre** environnement : serveur joignable, pilote ODBC présent, configuration `env/` correcte.
 
 ## Démarrer un serveur de test
 
@@ -20,25 +25,17 @@ et configurez `env/dev`.
 
 ## Vérifier la chaîne
 
-1. créer base et login (palier débutant) ;
+1. provisionner (`forge db:init --run`, palier débutant) ;
 2. `forge db:apply` (création de tables) ;
 3. une migration (`migration:make` puis `migration:apply`) ;
 4. lecture/écriture via `core.database.db`.
 
-Si ces quatre étapes passent, l'intégration runtime est bonne sur votre serveur.
-
-## Ce qui n'est pas couvert
-
-- le provisioning par `db:init` (création automatique base + login) ;
-- le diff incrémental fin (noms de types SQL Server).
+Si ces quatre étapes passent, la chaîne est bonne sur votre environnement.
 
 !!! warning "Pilote ODBC indispensable"
     Sans pilote ODBC compatible, `pyodbc` ne peut pas se connecter.
 
     Vérifiez sa présence avant de tester (le nom se règle via `DB_ODBC_DRIVER`).
-
-!!! note "Remonter les écarts"
-    Documenter ce qui marche ou casse sur un vrai serveur aide à faire passer le backend de Alpha à bêta.
 
 ## Après cette étape
 

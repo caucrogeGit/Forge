@@ -124,7 +124,7 @@ def test_rendu_sqlite_insertion_et_cascade_fonctionnent() -> None:
         conn.close()
 
 
-# ── Jamais le SQL d'un autre dialecte (postgres/mssql, niveau Alpha) ──────────
+# ── Jamais le SQL d'un autre dialecte (postgres/mssql) ────────────────────────
 
 @pytest.mark.parametrize("table_name", sorted(CONSTANTS))
 def test_rendus_postgres_et_mssql_sans_traits_mariadb(table_name: str) -> None:

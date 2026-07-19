@@ -22,12 +22,12 @@ Les commandes `forge db:init`, `forge db:apply` et les migrations passent toutes
 |---------|--------|----------------|----------|------------|
 | `forge-mvc-sqlite` | SQLite | Non (un fichier) | RC | démarrer, prototyper, tester |
 | `forge-mvc-mariadb` | MariaDB / MySQL | Oui | RC | production de référence |
-| `forge-mvc-postgres` | PostgreSQL | Oui | Alpha | PostgreSQL (en validation) |
-| `forge-mvc-mssql` | SQL Server | Oui | Alpha | SQL Server (en validation) |
+| `forge-mvc-postgres` | PostgreSQL | Oui | RC | production sur PostgreSQL |
+| `forge-mvc-mssql` | SQL Server | Oui | RC | production sur SQL Server |
 
-!!! warning "Backends Alpha"
-    PostgreSQL et SQL Server sont en Alpha : le dialecte et l'adaptateur sont testés, l'intégration de bout en bout reste à valider.
-    Pour la production, préférez MariaDB ; pour démarrer sans serveur, SQLite.
+!!! note "Quatre backends au niveau plein"
+    Les quatre backends sont au niveau plein (ADR-084, révision du 2026-07-19) : dialecte, provisioning `db:init` et intégration validés en continu contre de vrais serveurs.
+    MariaDB reste la référence historique de production ; SQLite reste le démarrage sans serveur.
 
 ## 3. SQLite, sans serveur
 
@@ -52,9 +52,9 @@ pip install --pre forge-mvc-mariadb
 Documentation : [backend MariaDB](../mariadb/index.md) et sa [progression pas à pas](../mariadb/welcome/debutant/mariadb-welcome.md).
 Pour installer le serveur et les comptes, voir aussi [Préparer MariaDB](../install/mariadb.md).
 
-## 5. PostgreSQL (Alpha)
+## 5. PostgreSQL
 
-PostgreSQL est disponible en Alpha : le dialecte et l'adaptateur sont en place et testés, l'intégration complète est en cours de validation.
+PostgreSQL est un backend de niveau plein : dialecte, provisioning `forge db:init` (affiché par défaut, `--run` pour exécuter) et intégration validés en CI contre un vrai serveur.
 
 ```bash
 pip install --pre forge-mvc-postgres
@@ -62,9 +62,10 @@ pip install --pre forge-mvc-postgres
 
 Documentation : [backend PostgreSQL](../postgres/index.md).
 
-## 6. SQL Server (Alpha)
+## 6. SQL Server
 
-SQL Server est disponible en Alpha, au même stade que PostgreSQL.
+SQL Server est un backend de niveau plein, au même stade que PostgreSQL.
+Il requiert un pilote ODBC système (« ODBC Driver 18 for SQL Server » par défaut).
 
 ```bash
 pip install --pre forge-mvc-mssql
@@ -76,8 +77,8 @@ Documentation : [backend SQL Server](../mssql/index.md).
 
 !!! tip "Aide au choix"
     - Vous débutez, prototypez ou testez : **SQLite** (aucun serveur).
-    - Vous visez la production : **MariaDB** (client-serveur, éprouvé).
-    - Vous avez une contrainte PostgreSQL ou SQL Server : les backends existent en **Alpha**, à valider sur votre environnement.
+    - Vous visez la production : **MariaDB** (client-serveur, éprouvé), la référence historique de Forge.
+    - Vous avez une contrainte PostgreSQL ou SQL Server : les deux backends sont au **niveau plein**, choisissez celui de votre environnement.
 
 Le passage d'un backend à l'autre se fait en changeant l'opt-in installé et la configuration de connexion ; le code applicatif (modèles, SQL, contrôleurs) ne change pas.
 
