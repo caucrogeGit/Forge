@@ -166,7 +166,9 @@ Marqueurs canoniques (déclarés dans `pytest.ini`, `--strict-markers` actif, do
 
 - `meta` : test de cohérence projet (doc, version, charte), pas un test fonctionnel ;
 - `smoke` : test de fumée d'un paquet opt-in (import, API publique, `py.typed`) ;
-- `db` : test d'intégration nécessitant MariaDB (sauté en local sans base, requis en CI via `FORGE_REQUIRE_DB=1`) ;
+- `db` : test d'intégration nécessitant une vraie base (sauté en local sans base ; MariaDB par défaut, requis en CI via `FORGE_REQUIRE_DB=1`) ;
+- `db_pg` : test d'intégration nécessitant un vrai PostgreSQL ; se combine à `db` (forme liste), requis en CI via `FORGE_REQUIRE_DB_PG=1` (ADR-084) ;
+- `db_mssql` : test d'intégration nécessitant un vrai SQL Server ; se combine à `db` (forme liste), requis en CI via `FORGE_REQUIRE_DB_MSSQL=1` (ADR-084) ;
 - `docs` : test de prose pure, ne casse que par édition de la documentation du dépôt (`TESTS-DOCS-MARKER-001`).
 
 Règle : tout test appartient à exactement une couche.

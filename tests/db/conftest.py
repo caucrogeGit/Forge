@@ -18,6 +18,8 @@ import os
 import pytest
 
 _REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
+_REQUIRE_DB_PG = os.environ.get("FORGE_REQUIRE_DB_PG") == "1"
+_REQUIRE_DB_MSSQL = os.environ.get("FORGE_REQUIRE_DB_MSSQL") == "1"
 
 
 def _db_params() -> dict[str, object]:
@@ -66,4 +68,94 @@ def real_db():
 
     # ADR-054 : le pool vit dans le backend actif. reset_backend() le ferme
     # proprement (close()) et force une nouvelle résolution ensuite.
+    reset_backend()
+
+
+@pytest.fixture()
+def real_pg_db(monkeypatch: pytest.MonkeyPatch):
+    """Configure Forge sur le PostgreSQL de test (backend actif : postgres).
+
+    Portée fonction : psycopg n'utilise pas de pool nommé, et la fixture doit
+    rendre le backend de la session (reset_backend + env restauré par
+    monkeypatch) en sortant. Paramètres lus dans FORGE_TEST_PG_*, avec des
+    valeurs par défaut adaptées au service PostgreSQL de la CI.
+    """
+    pytest.importorskip("psycopg", reason="psycopg (backend forge-mvc-postgres) absent")
+    import core.forge as forge
+    from core.database import connection
+    from core.database.backend import reset_backend
+
+    monkeypatch.setenv("DB_BACKEND", "postgres")
+    monkeypatch.setenv("DB_HOST", os.environ.get("FORGE_TEST_PG_HOST", "127.0.0.1"))
+    monkeypatch.setenv("DB_PORT", os.environ.get("FORGE_TEST_PG_PORT", "5432"))
+    monkeypatch.setenv("DB_APP_LOGIN", os.environ.get("FORGE_TEST_PG_USER", "postgres"))
+    monkeypatch.setenv("DB_APP_PWD", os.environ.get("FORGE_TEST_PG_PASSWORD", "forge_test_pg"))
+    monkeypatch.setenv("DB_NAME", os.environ.get("FORGE_TEST_PG_NAME", "forge_test"))
+    forge.configure(app_name="forge_test")
+    reset_backend()
+    try:
+        probe = connection.get_connection()
+        connection.close_connection(probe)
+    except Exception as error:  # noqa: BLE001 — toute erreur de connexion = base indisponible
+        reset_backend()
+        message = f"PostgreSQL de test injoignable : {error}"
+        if _REQUIRE_DB_PG:
+            pytest.fail(message + " (FORGE_REQUIRE_DB_PG=1)")
+        pytest.skip(message + " (test d'intégration sauté en local)")
+
+    yield
+
+    reset_backend()
+
+
+@pytest.fixture()
+def real_mssql_db(monkeypatch: pytest.MonkeyPatch):
+    """Configure Forge sur le SQL Server de test (backend actif : mssql).
+
+    Le conteneur SQL Server ne crée aucune base au démarrage : la fixture crée
+    la base de test au besoin via la connexion d'administration (master), hors
+    transaction. Paramètres lus dans FORGE_TEST_MSSQL_*, avec des valeurs par
+    défaut adaptées au service SQL Server de la CI.
+    """
+    pytest.importorskip("pyodbc", reason="pyodbc (backend forge-mvc-mssql) absent")
+    import core.forge as forge
+    from core.database import connection
+    from core.database.backend import get_backend, reset_backend
+
+    user = os.environ.get("FORGE_TEST_MSSQL_USER", "sa")
+    password = os.environ.get("FORGE_TEST_MSSQL_PASSWORD", "Forge#Test#2026")
+    db_name = os.environ.get("FORGE_TEST_MSSQL_NAME", "forge_test")
+    monkeypatch.setenv("DB_BACKEND", "mssql")
+    monkeypatch.setenv("DB_HOST", os.environ.get("FORGE_TEST_MSSQL_HOST", "127.0.0.1"))
+    monkeypatch.setenv("DB_PORT", os.environ.get("FORGE_TEST_MSSQL_PORT", "1433"))
+    monkeypatch.setenv("DB_APP_LOGIN", user)
+    monkeypatch.setenv("DB_APP_PWD", password)
+    monkeypatch.setenv("DB_ADMIN_LOGIN", user)
+    monkeypatch.setenv("DB_ADMIN_PWD", password)
+    monkeypatch.setenv("DB_NAME", db_name)
+    forge.configure(app_name="forge_test")
+    reset_backend()
+    try:
+        backend = get_backend()
+        admin = backend.get_admin_connection()  # base de maintenance master
+        try:
+            admin.autocommit = True
+            cursor = admin.cursor()
+            # db_name vient de l'environnement de test, jamais d'une entrée
+            # utilisateur (CREATE DATABASE n'accepte pas de paramètre lié).
+            cursor.execute(f"IF DB_ID(N'{db_name}') IS NULL CREATE DATABASE [{db_name}]")
+            cursor.close()
+        finally:
+            backend.close_connection(admin)
+        probe = connection.get_connection()
+        connection.close_connection(probe)
+    except Exception as error:  # noqa: BLE001 — toute erreur de connexion = base indisponible
+        reset_backend()
+        message = f"SQL Server de test injoignable : {error}"
+        if _REQUIRE_DB_MSSQL:
+            pytest.fail(message + " (FORGE_REQUIRE_DB_MSSQL=1)")
+        pytest.skip(message + " (test d'intégration sauté en local)")
+
+    yield
+
     reset_backend()
