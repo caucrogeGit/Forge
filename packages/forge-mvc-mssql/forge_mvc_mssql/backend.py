@@ -15,7 +15,9 @@ Le cœur attend un curseur avec ``dictionary=...``, ``commit``/``rollback``/
 ``close``, ``autocommit``, et sur le curseur ``execute``/``fetchone``/
 ``fetchall``/``lastrowid``/``rowcount``. pyodbc ne renvoie pas de dicts ni de
 lastrowid : l'adaptateur convertit via ``cursor.description`` et lit l'identité
-via ``SCOPE_IDENTITY()``.
+via ``SCOPE_IDENTITY()`` exécuté dans le même lot que l'INSERT
+(MSSQL-INSERT-IDENTITY-001 : dans un lot séparé, ``SCOPE_IDENTITY()`` sort de
+la portée de l'INSERT et renvoie toujours NULL).
 
 Statut Alpha : la logique (dialecte) est testée unitairement ; l'intégration
 serveur et le provisioning CLI restent à valider/câbler. pyodbc est importé
@@ -26,6 +28,7 @@ variable d'environnement ``DB_ODBC_DRIVER``.
 """
 import logging
 import os
+import re
 from typing import Any
 
 from forge_mvc_mssql.dialect import MSSQLDialect
@@ -34,6 +37,13 @@ logger = logging.getLogger(__name__)
 
 _DEFAULT_ODBC_DRIVER = "ODBC Driver 18 for SQL Server"
 
+# Détection d'un INSERT à identité récupérable : la lecture de SCOPE_IDENTITY()
+# doit se faire dans le même lot (batch) que l'INSERT. On ne réécrit pas les
+# statements qui gèrent déjà leur identité (OUTPUT ... INSERTED, appel explicite
+# à SCOPE_IDENTITY()).
+_INSERT_STATEMENT = re.compile(r"^\s*insert\b", re.IGNORECASE)
+_HANDLES_IDENTITY = re.compile(r"\boutput\b|\bscope_identity\b", re.IGNORECASE)
+
 
 class _MsCursor:
     """Curseur pyodbc enveloppé : lignes-dict optionnelles et lastrowid."""
@@ -41,13 +51,49 @@ class _MsCursor:
     def __init__(self, cursor: Any, dictionary: bool) -> None:
         self._cursor = cursor
         self._dictionary = dictionary
+        self._lastrowid: "int | None" = None
+        self._insert_rowcount: "int | None" = None
 
     def execute(self, sql: str, params: "Any" = ()) -> "_MsCursor":
+        self._lastrowid = None
+        self._insert_rowcount = None
+        if _INSERT_STATEMENT.match(sql) and not _HANDLES_IDENTITY.search(sql):
+            return self._execute_insert(sql, params)
         bound = tuple(params)
         if bound:
             self._cursor.execute(sql, bound)
         else:
             self._cursor.execute(sql)
+        return self
+
+    def _execute_insert(self, sql: str, params: "Any") -> "_MsCursor":
+        # SCOPE_IDENTITY() n'est défini que dans la portée (le lot) qui a
+        # exécuté l'INSERT : un execute() séparé renverrait toujours NULL. On
+        # exécute donc l'INSERT et la lecture d'identité dans le même lot, puis
+        # on mémorise le rowcount de l'INSERT (avant de passer au résultat du
+        # SELECT) et l'identité, servis par `rowcount` et `lastrowid`.
+        batch = sql.rstrip().rstrip(";") + "; SELECT SCOPE_IDENTITY()"
+        bound = tuple(params)
+        if bound:
+            self._cursor.execute(batch, bound)
+        else:
+            self._cursor.execute(batch)
+        self._insert_rowcount = self._cursor.rowcount
+        try:
+            # Se positionner sur le jeu de résultats du SELECT : l'INSERT ne
+            # produit qu'un compteur (description None), sauf si NOCOUNT est
+            # actif (le lot s'ouvre alors directement sur le SELECT).
+            while self._cursor.description is None:
+                if not self._cursor.nextset():
+                    break
+            if self._cursor.description is not None:
+                row = self._cursor.fetchone()
+                if row and row[0] is not None:
+                    self._lastrowid = int(row[0])
+        except Exception:
+            # Identité indéterminable (table sans colonne identity, pilote
+            # sans nextset...) : l'INSERT est acquis, lastrowid reste None.
+            self._lastrowid = None
         return self
 
     def _columns(self) -> "list[str]":
@@ -70,16 +116,16 @@ class _MsCursor:
 
     @property
     def lastrowid(self) -> "int | None":
-        # SQL Server n'a pas de lastrowid ; SCOPE_IDENTITY() renvoie la dernière
-        # valeur d'identité générée dans la portée courante.
-        self._cursor.execute("SELECT SCOPE_IDENTITY()")
-        row = self._cursor.fetchone()
-        if row and row[0] is not None:
-            return int(row[0])
-        return None
+        # Identité capturée dans le lot de l'INSERT (voir _execute_insert) ;
+        # None si le dernier statement n'était pas un INSERT à identité.
+        return self._lastrowid
 
     @property
     def rowcount(self) -> int:
+        # Pour un INSERT batché, le rowcount vivant du curseur est celui du
+        # SELECT SCOPE_IDENTITY() : on sert celui de l'INSERT, capturé avant.
+        if self._insert_rowcount is not None:
+            return self._insert_rowcount
         return self._cursor.rowcount
 
     def close(self) -> None:
