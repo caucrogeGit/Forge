@@ -1,5 +1,10 @@
 # pyright: strict
-"""Provisioning MariaDB du projet Forge."""
+"""Provisioning des backends serveur du projet Forge (MariaDB, PostgreSQL, SQL Server).
+
+`forge db:init` génère et affiche le SQL de provisioning du backend actif
+(ADR-067) ; `--run` exécute. Les backends sans serveur (SQLite) sont
+initialisés localement, sans identifiants.
+"""
 
 from __future__ import annotations
 from typing import Any
@@ -257,6 +262,127 @@ def generate_provisioning_sql(cfg: ProvisioningEnv) -> str:
     )
 
 
+# PG/MSSQL-DB-INIT-PROVISIONING-001 : sur PostgreSQL et SQL Server, les droits
+# du compte applicatif sont posés au niveau du schéma (DML). L'escape hatch
+# DB_APP_PRIVILEGES au-delà du DML (CREATE, ALTER...) est propre au modèle de
+# grants MariaDB : on le refuse explicitement plutôt que de générer du SQL
+# inapplicable (ADR-084, règle B).
+_DML_PRIVILEGES = frozenset({"SELECT", "INSERT", "UPDATE", "DELETE"})
+
+
+def _require_dml_app_privileges(privileges: tuple[str, ...], backend_label: str) -> None:
+    extra = [p for p in privileges if p not in _DML_PRIVILEGES]
+    if extra:
+        raise DbInitError(
+            f"DB_APP_PRIVILEGES contient des privilèges non applicables au backend "
+            f"{backend_label} : {', '.join(extra)}. Au-delà du DML (SELECT, INSERT, "
+            "UPDATE, DELETE), l'extension des privilèges applicatifs n'est prise en "
+            "charge que sur MariaDB."
+        )
+
+
+def generate_provisioning_sql_postgres(cfg: ProvisioningEnv, migrations_ddl: str) -> str:
+    """Rend le script SQL de provisioning PostgreSQL dérivé de `env/` (ADR-067).
+
+    À exécuter par l'opérateur dans une session d'administration (ex. `sudo -u
+    postgres psql`). Forge ne se connecte pas et ne demande jamais le
+    superutilisateur du serveur. Les rôles PostgreSQL sont globaux au serveur
+    mais ne reçoivent de droits que sur la base du projet.
+    """
+    _require_dml_app_privileges(cfg.app_privileges, "postgres")
+    database = _pg_ident(cfg.db_name)
+    admin = _pg_ident(cfg.admin_login)
+    app = _pg_ident(cfg.app_login)
+    dml = ", ".join(cfg.app_privileges)
+    return (
+        "-- Généré par `forge db:init`. À exécuter dans une session\n"
+        "-- d'administration PostgreSQL (ex. `sudo -u postgres psql`).\n"
+        "-- Forge ne demande jamais le superutilisateur du serveur.\n"
+        "-- Si un rôle existe déjà, sa commande CREATE échoue sans conséquence\n"
+        "-- (le mot de passe existant n'est pas modifié).\n"
+        "\n"
+        "-- Compte d'administration de la base : DDL du schéma (db:apply, migrations).\n"
+        f"CREATE ROLE {admin} LOGIN PASSWORD {_pg_string(cfg.admin_password)};\n"
+        "\n"
+        "-- Compte applicatif : runtime, DML uniquement.\n"
+        f"CREATE ROLE {app} LOGIN PASSWORD {_pg_string(cfg.app_password)};\n"
+        "\n"
+        "-- Base du projet, possédée par le compte d'administration (encodage du\n"
+        "-- serveur ; DB_CHARSET/DB_COLLATION sont propres à MariaDB, ignorés ici).\n"
+        f"CREATE DATABASE {database} OWNER {admin};\n"
+        f"GRANT CONNECT ON DATABASE {database} TO {app};\n"
+        "\n"
+        "-- La suite s'exécute dans la base du projet (méta-commande psql).\n"
+        f"\\connect {database}\n"
+        "\n"
+        "-- Registre technique des migrations.\n"
+        f"{migrations_ddl};\n"
+        f"ALTER TABLE forge_migrations OWNER TO {admin};\n"
+        "\n"
+        "-- Droits DML de l'applicatif sur le schéma public, présents et futurs.\n"
+        f"GRANT USAGE ON SCHEMA public TO {app};\n"
+        f"GRANT {dml} ON ALL TABLES IN SCHEMA public TO {app};\n"
+        f"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO {app};\n"
+        f"ALTER DEFAULT PRIVILEGES FOR ROLE {admin} IN SCHEMA public\n"
+        f"  GRANT {dml} ON TABLES TO {app};\n"
+        f"ALTER DEFAULT PRIVILEGES FOR ROLE {admin} IN SCHEMA public\n"
+        f"  GRANT USAGE, SELECT ON SEQUENCES TO {app};\n"
+    )
+
+
+def generate_provisioning_sql_mssql(cfg: ProvisioningEnv, migrations_ddl: str) -> str:
+    """Rend le script SQL de provisioning SQL Server dérivé de `env/` (ADR-067).
+
+    À exécuter par l'opérateur dans une session d'administration (ex. `sqlcmd`
+    avec un compte administrateur du serveur). Forge ne se connecte pas et ne
+    demande jamais le compte `sa`. Les connexions (logins) sont globales au
+    serveur mais ne reçoivent de droits que sur la base du projet.
+    """
+    _require_dml_app_privileges(cfg.app_privileges, "mssql")
+    database = _ms_ident(cfg.db_name)
+    admin = _ms_ident(cfg.admin_login)
+    app = _ms_ident(cfg.app_login)
+    dml = ", ".join(cfg.app_privileges)
+    return (
+        "-- Généré par `forge db:init`. À exécuter dans une session\n"
+        "-- d'administration SQL Server (ex. `sqlcmd -S hôte -U <admin serveur>`).\n"
+        "-- Forge ne demande jamais le compte sa du serveur.\n"
+        "-- `GO` : séparateur de lots sqlcmd.\n"
+        "\n"
+        "-- Base du projet (collation du serveur par défaut ; DB_CHARSET/\n"
+        "-- DB_COLLATION sont propres à MariaDB, ignorés ici).\n"
+        f"IF DB_ID(N{_ms_string(cfg.db_name)}) IS NULL\n"
+        f"CREATE DATABASE {database};\n"
+        "GO\n"
+        "\n"
+        "-- Connexions serveur : administration de la base et applicatif\n"
+        "-- (les mots de passe existants ne sont pas modifiés).\n"
+        f"IF SUSER_ID(N{_ms_string(cfg.admin_login)}) IS NULL\n"
+        f"CREATE LOGIN {admin} WITH PASSWORD = N{_ms_string(cfg.admin_password)};\n"
+        f"IF SUSER_ID(N{_ms_string(cfg.app_login)}) IS NULL\n"
+        f"CREATE LOGIN {app} WITH PASSWORD = N{_ms_string(cfg.app_password)};\n"
+        "GO\n"
+        "\n"
+        f"USE {database};\n"
+        "GO\n"
+        "\n"
+        "-- Compte d'administration de la base : DDL du schéma (db:apply, migrations).\n"
+        f"IF DATABASE_PRINCIPAL_ID(N{_ms_string(cfg.admin_login)}) IS NULL\n"
+        f"CREATE USER {admin} FOR LOGIN {admin};\n"
+        f"ALTER ROLE db_owner ADD MEMBER {admin};\n"
+        "\n"
+        "-- Compte applicatif : runtime, DML uniquement.\n"
+        f"IF DATABASE_PRINCIPAL_ID(N{_ms_string(cfg.app_login)}) IS NULL\n"
+        f"CREATE USER {app} FOR LOGIN {app};\n"
+        f"GRANT {dml} ON SCHEMA::dbo TO {app};\n"
+        "GO\n"
+        "\n"
+        "-- Registre technique des migrations.\n"
+        f"{migrations_ddl};\n"
+        "GO\n"
+    )
+
+
 def _init_serverless(backend: Any) -> list[str]:
     """Init d'un backend sans serveur (ex. SQLite, ADR-054).
 
@@ -316,18 +442,20 @@ def init_project_database() -> list[str]:
         # Backend sans serveur (SQLite) : ni base ni comptes à créer.
         return _init_serverless(backend)
 
-    # Le provisioning ci-dessous (CREATE DATABASE / CREATE USER / GRANT) est
-    # spécifique à MariaDB. Pour les autres SGBD serveur (PostgreSQL, SQL
-    # Server), le provisioning automatique n'est pas encore implémenté : on
-    # révèle clairement la limite plutôt que d'exécuter du SQL MariaDB qui
-    # échouerait avec une erreur cryptique (charte, règle B).
+    # Chaque SGBD serveur a son propre provisioning (comptes, grants, registre
+    # des migrations). Un backend inconnu est refusé explicitement plutôt que
+    # d'exécuter le SQL d'un autre dialecte (charte, règle B ; ADR-084).
     backend_name = getattr(backend, "name", "")
+    if backend_name == "postgres":
+        return _init_postgres(backend)
+    if backend_name == "mssql":
+        return _init_mssql(backend)
     if backend_name != "mariadb":
         raise DbInitError(
-            f"`forge db:init` ne provisionne pas encore le backend "
-            f"« {backend_name} ». Créez la base et le compte applicatif à la "
-            f"main (voir le README du paquet forge-mvc-{backend_name}), puis "
-            f"lancez `forge db:apply` pour créer les tables."
+            f"`forge db:init` ne provisionne pas le backend « {backend_name} ». "
+            f"Créez la base et le compte applicatif à la main (voir le README du "
+            f"paquet forge-mvc-{backend_name}), puis lancez `forge db:apply` "
+            f"pour créer les tables."
         )
 
     cfg = load_db_init_config()
@@ -415,6 +543,173 @@ def init_project_database() -> list[str]:
     return actions
 
 
+def _init_postgres(backend: Any) -> list[str]:
+    """Provisioning PostgreSQL exécuté avec le compte d'administration (--run).
+
+    Comme sur MariaDB, `--run` ne crée jamais le compte d'administration
+    (DB_ADMIN_* doit exister, posé via le script affiché par `forge db:init`
+    ou par l'opérateur) : seulement la base, le rôle applicatif, les droits
+    DML et le registre des migrations.
+    """
+    cfg = load_provisioning_env()
+    _require_dml_app_privileges(cfg.app_privileges, "postgres")
+    dml = ", ".join(cfg.app_privileges)
+    actions: list[str] = []
+
+    connection = _connect_admin()
+    try:
+        # CREATE DATABASE s'exécute hors bloc de transaction.
+        connection.autocommit = True
+        cursor = connection.cursor()
+        try:
+            cursor.execute("SELECT 1 FROM pg_database WHERE datname = ?", (cfg.db_name,))
+            if cursor.fetchone() is not None:
+                actions.append(f"Base {cfg.db_name} déjà présente.")
+            else:
+                cursor.execute(f"CREATE DATABASE {_pg_ident(cfg.db_name)}")
+                actions.append(f"Base {cfg.db_name} créée.")
+
+            cursor.execute("SELECT 1 FROM pg_roles WHERE rolname = ?", (cfg.app_login,))
+            if cursor.fetchone() is not None:
+                actions.append(
+                    f"Rôle applicatif {cfg.app_login} déjà présent "
+                    "(mot de passe non modifié par forge db:init)."
+                )
+            else:
+                cursor.execute(
+                    f"CREATE ROLE {_pg_ident(cfg.app_login)} LOGIN "
+                    f"PASSWORD {_pg_string(cfg.app_password)}"
+                )
+                actions.append(f"Rôle applicatif {cfg.app_login} créé.")
+
+            cursor.execute(
+                f"GRANT CONNECT ON DATABASE {_pg_ident(cfg.db_name)} "
+                f"TO {_pg_ident(cfg.app_login)}"
+            )
+        finally:
+            cursor.close()
+    except DbInitError:
+        raise
+    except Exception as exc:
+        raise DbInitError(f"Provisioning PostgreSQL impossible : {exc}") from exc
+    finally:
+        backend.close_connection(connection)
+
+    # Suite dans la base du projet : registre des migrations et droits DML.
+    # ALTER DEFAULT PRIVILEGES sans FOR ROLE s'applique au rôle courant (le
+    # compte d'administration), celui qui créera les tables des migrations.
+    project = _connect_admin_project(cfg.db_name)
+    try:
+        cursor = project.cursor()
+        try:
+            app = _pg_ident(cfg.app_login)
+            cursor.execute(backend.dialect.forge_migrations_ddl())
+            cursor.execute(f"GRANT USAGE ON SCHEMA public TO {app}")
+            cursor.execute(f"GRANT {dml} ON ALL TABLES IN SCHEMA public TO {app}")
+            cursor.execute(
+                f"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO {app}"
+            )
+            cursor.execute(
+                f"ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT {dml} ON TABLES TO {app}"
+            )
+            cursor.execute(
+                f"ALTER DEFAULT PRIVILEGES IN SCHEMA public "
+                f"GRANT USAGE, SELECT ON SEQUENCES TO {app}"
+            )
+            project.commit()
+            actions.append("Table forge_migrations prête.")
+            actions.append(
+                f"Privilèges appliqués sur {cfg.db_name} à {cfg.app_login} ({dml})."
+            )
+        finally:
+            cursor.close()
+    except Exception as exc:
+        _rollback_quietly(project)
+        raise DbInitError(f"Provisioning PostgreSQL impossible : {exc}") from exc
+    finally:
+        backend.close_connection(project)
+
+    return actions
+
+
+def _init_mssql(backend: Any) -> list[str]:
+    """Provisioning SQL Server exécuté avec le compte d'administration (--run).
+
+    Comme sur MariaDB, `--run` ne crée jamais le compte d'administration :
+    seulement la base, la connexion et l'utilisateur applicatifs, les droits
+    DML et le registre des migrations.
+    """
+    cfg = load_provisioning_env()
+    _require_dml_app_privileges(cfg.app_privileges, "mssql")
+    dml = ", ".join(cfg.app_privileges)
+    actions: list[str] = []
+
+    connection = _connect_admin()
+    try:
+        # CREATE DATABASE s'exécute hors transaction.
+        connection.autocommit = True
+        cursor = connection.cursor()
+        try:
+            cursor.execute("SELECT 1 FROM sys.databases WHERE name = ?", (cfg.db_name,))
+            if cursor.fetchone() is not None:
+                actions.append(f"Base {cfg.db_name} déjà présente.")
+            else:
+                cursor.execute(f"CREATE DATABASE {_ms_ident(cfg.db_name)}")
+                actions.append(f"Base {cfg.db_name} créée.")
+
+            cursor.execute(
+                "SELECT 1 FROM sys.server_principals WHERE name = ?", (cfg.app_login,)
+            )
+            if cursor.fetchone() is not None:
+                actions.append(
+                    f"Connexion applicative {cfg.app_login} déjà présente "
+                    "(mot de passe non modifié par forge db:init)."
+                )
+            else:
+                cursor.execute(
+                    f"CREATE LOGIN {_ms_ident(cfg.app_login)} "
+                    f"WITH PASSWORD = N{_ms_string(cfg.app_password)}"
+                )
+                actions.append(f"Connexion applicative {cfg.app_login} créée.")
+        finally:
+            cursor.close()
+    except DbInitError:
+        raise
+    except Exception as exc:
+        raise DbInitError(f"Provisioning SQL Server impossible : {exc}") from exc
+    finally:
+        backend.close_connection(connection)
+
+    # Suite dans la base du projet : utilisateur, droits DML, migrations.
+    project = _connect_admin_project(cfg.db_name)
+    try:
+        project.autocommit = True
+        cursor = project.cursor()
+        try:
+            app = _ms_ident(cfg.app_login)
+            cursor.execute("SELECT DATABASE_PRINCIPAL_ID(?)", (cfg.app_login,))
+            row = cursor.fetchone()
+            if row is not None and row[0] is not None:
+                actions.append(f"Utilisateur applicatif {cfg.app_login} déjà présent.")
+            else:
+                cursor.execute(f"CREATE USER {app} FOR LOGIN {app}")
+                actions.append(f"Utilisateur applicatif {cfg.app_login} créé.")
+            cursor.execute(f"GRANT {dml} ON SCHEMA::dbo TO {app}")
+            cursor.execute(backend.dialect.forge_migrations_ddl())
+            actions.append("Table forge_migrations prête.")
+            actions.append(
+                f"Privilèges appliqués sur {cfg.db_name} à {cfg.app_login} ({dml})."
+            )
+        finally:
+            cursor.close()
+    except Exception as exc:
+        raise DbInitError(f"Provisioning SQL Server impossible : {exc}") from exc
+    finally:
+        backend.close_connection(project)
+
+    return actions
+
+
 def _print_actions(actions: list[str]) -> None:
     print("[OK] Base de données du projet prête.")
     for action in actions:
@@ -424,7 +719,8 @@ def _print_actions(actions: list[str]) -> None:
 def _dispatch_db_init(*, run: bool) -> None:
     """Aiguille `db:init` (ADR-067).
 
-    - défaut : **génère et affiche** le SQL de provisioning (MariaDB) ;
+    - défaut : **génère et affiche** le SQL de provisioning du backend actif
+      (MariaDB, PostgreSQL ou SQL Server) ;
     - `--run` : **exécute** le provisioning ;
     - backend sans serveur (SQLite) : initialisation locale, sans identifiants ;
     - autre backend serveur non pris en charge : erreur explicite.
@@ -439,20 +735,26 @@ def _dispatch_db_init(*, run: bool) -> None:
         return
 
     name = getattr(backend, "name", "")
-    if name != "mariadb":
+    if name not in ("mariadb", "postgres", "mssql"):
         verb = "exécute" if run else "génère le SQL de"
         raise DbInitError(
-            f"`forge db:init` ne {verb} pas encore le provisioning pour le backend "
+            f"`forge db:init` ne {verb} pas le provisioning pour le backend "
             f"« {name} ». Créez la base et les comptes à la main (voir le README du "
             f"paquet forge-mvc-{name}), puis `forge db:apply`."
         )
 
-    # MariaDB : vérification préalable dans les deux modes (ADR-067).
+    # Vérification préalable dans les deux modes (ADR-067).
     _check_required_env()
     if run:
         _print_actions(init_project_database())
+        return
+    cfg = load_provisioning_env()
+    if name == "postgres":
+        print(generate_provisioning_sql_postgres(cfg, backend.dialect.forge_migrations_ddl()))
+    elif name == "mssql":
+        print(generate_provisioning_sql_mssql(cfg, backend.dialect.forge_migrations_ddl()))
     else:
-        print(generate_provisioning_sql(load_provisioning_env()))
+        print(generate_provisioning_sql(cfg))
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -487,8 +789,40 @@ def _connect_admin():
         ) from exc
 
 
+def _connect_admin_project(db_name: str) -> Any:
+    from core.database.backend import get_backend
+
+    try:
+        # Connexion d'administration ciblant la base du projet (et non la base
+        # de maintenance du serveur) : migrations et grants s'y exécutent.
+        return get_backend().get_admin_connection(database=db_name)
+    except Exception as exc:
+        raise DbInitError(
+            f"Connexion d'administration à la base {db_name} impossible. "
+            "Vérifiez DB_ADMIN_* dans env/dev.\n"
+            f"  Cause : {exc}"
+        ) from exc
+
+
 def _quote_identifier(value: str) -> str:
     return "`" + value.replace("`", "``") + "`"
+
+
+def _pg_ident(value: str) -> str:
+    return '"' + value.replace('"', '""') + '"'
+
+
+def _pg_string(value: str) -> str:
+    # standard_conforming_strings (défaut PostgreSQL) : seule l'apostrophe se double.
+    return "'" + value.replace("'", "''") + "'"
+
+
+def _ms_ident(value: str) -> str:
+    return "[" + value.replace("]", "]]") + "]"
+
+
+def _ms_string(value: str) -> str:
+    return "'" + value.replace("'", "''") + "'"
 
 
 def _quote_string(value: str) -> str:

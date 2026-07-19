@@ -611,20 +611,18 @@ def test_db_init_quotes_database_before_creating_forge_migrations(monkeypatch):
     assert "USE `gestion``ventes`" in executed
 
 
-def test_db_init_refuse_provisioning_backend_serveur_non_mariadb(monkeypatch):
-    """db:init révèle clairement qu'il ne provisionne pas encore postgres/mssql
-    (backend serveur sans provisioning), au lieu d'exécuter du SQL MariaDB."""
-    pytest.importorskip("forge_mvc_postgres")
+def test_db_init_refuse_provisioning_backend_serveur_inconnu(monkeypatch):
+    """db:init refuse explicitement un backend serveur sans provisioning connu,
+    au lieu d'exécuter le SQL d'un autre dialecte (ADR-084). PostgreSQL et SQL
+    Server sont désormais provisionnés (PG/MSSQL-DB-INIT-PROVISIONING-001)."""
     from core.database import backend as backend_module
 
-    monkeypatch.setenv("DB_BACKEND", "postgres")
-    backend_module.reset_backend()
-    try:
-        with pytest.raises(DbInitError) as excinfo:
-            init_project_database()
-    finally:
-        backend_module.reset_backend()
+    fake = types.SimpleNamespace(name="oracle", requires_provisioning=True)
+    monkeypatch.setattr(backend_module, "get_backend", lambda: fake)
+
+    with pytest.raises(DbInitError) as excinfo:
+        init_project_database()
 
     message = str(excinfo.value)
-    assert "postgres" in message
+    assert "oracle" in message
     assert "db:apply" in message
