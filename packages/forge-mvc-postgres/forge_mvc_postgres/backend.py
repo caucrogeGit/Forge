@@ -43,10 +43,44 @@ class _PgCursor:
     @property
     def lastrowid(self) -> "int | None":
         # PostgreSQL n'a pas de lastrowid ; lastval() renvoie la dernière valeur
-        # de séquence générée dans la session (insertion dans une colonne serial).
-        self._cursor.execute("SELECT lastval()")
-        row = self._cursor.fetchone()
-        return row[0] if row else None
+        # de séquence générée dans la session (PK identity/serial, le modèle des
+        # tables Forge). PG-INSERT-IDENTITY-001 : si aucune séquence n'a été
+        # touchée, lastval() lève une erreur qui, en bloc de transaction,
+        # avorterait la transaction et ferait perdre l'INSERT au commit. La
+        # lecture est donc protégée par un savepoint, restauré en cas d'échec.
+        try:
+            self._cursor.execute("SAVEPOINT forge_lastrowid")
+        except Exception:
+            # Hors bloc de transaction (autocommit) : un échec de lastval()
+            # n'avorte rien, lecture directe sans garde.
+            return self._read_lastval()
+        value = self._read_lastval()
+        # Les erreurs de gestion du savepoint sont volontairement avalées : ce
+        # chemin ne doit jamais faire échouer une insertion acquise, et une
+        # connexion réellement morte resurgira au commit.
+        if value is None:
+            try:
+                self._cursor.execute("ROLLBACK TO SAVEPOINT forge_lastrowid")
+            except Exception:
+                pass
+        else:
+            try:
+                self._cursor.execute("RELEASE SAVEPOINT forge_lastrowid")
+            except Exception:
+                pass
+        return value
+
+    def _read_lastval(self) -> "int | None":
+        try:
+            self._cursor.execute("SELECT lastval()")
+            row = self._cursor.fetchone()
+        except Exception:
+            # « lastval is not yet defined in this session » : INSERT dans une
+            # table sans colonne à séquence. L'identité est indéterminable.
+            return None
+        if row and row[0] is not None:
+            return int(row[0])
+        return None
 
     @property
     def rowcount(self) -> int:
