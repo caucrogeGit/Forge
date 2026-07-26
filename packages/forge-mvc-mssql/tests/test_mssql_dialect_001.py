@@ -9,6 +9,14 @@ from forge_mvc_mssql.dialect import MSSQLDialect  # noqa: E402
 D = MSSQLDialect()
 
 
+def test_identity_storage_type() -> None:
+    # FK-IDENTITY-STORAGE-TYPE-001 : IDENTITY est une propriété de colonne, et
+    # SQL Server n'en admet qu'une par table, déjà prise par la clé primaire.
+    # Une clé étrangère typée IDENTITY rendrait le CREATE TABLE invalide.
+    assert D.identity_storage_type() == "BIGINT"
+    assert "IDENTITY" not in D.identity_storage_type()
+
+
 def test_types() -> None:
     assert D.identity_type() == "BIGINT IDENTITY(1,1)"
     assert D.string_type(120) == "NVARCHAR(120)"

@@ -110,10 +110,12 @@ def resolve_sql_and_python_type(field: dict[str, Any]) -> tuple[str, str]:
         return d.decimal_type(precision, scale), "float"
 
     if forge_type == "foreign_key":
-        # Clé étrangère de première classe (ADR-069) : même type que la PK visée.
-        # Toutes les PK Forge sont `identity_type()` (BIGINT UNSIGNED sur MariaDB),
-        # donc une FK vers n'importe quelle entité adopte ce type, backend-agnostique.
-        return d.identity_type(), "int"
+        # Clé étrangère de première classe (ADR-069) : la colonne doit STOCKER
+        # une valeur d'identité, pas en générer une. D'où `identity_storage_type()`
+        # et non `identity_type()`, qui décrit la forme auto-incrémentée de la PK
+        # (BIGSERIAL, IDENTITY) et attacherait une séquence à la FK
+        # (FK-IDENTITY-STORAGE-TYPE-001, révision de l'ADR-069).
+        return d.identity_storage_type(), "int"
 
     if forge_type in SIMPLE_PYTHON_TYPE:
         return d.simple_type(forge_type), SIMPLE_PYTHON_TYPE[forge_type]

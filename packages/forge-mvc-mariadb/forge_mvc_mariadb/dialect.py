@@ -48,6 +48,11 @@ class MariaDBDialect:
     def identity_type(self) -> str:
         return "BIGINT UNSIGNED"
 
+    def identity_storage_type(self) -> str:
+        # MariaDB : AUTO_INCREMENT est une clause à part, le type de colonne
+        # est déjà un type de stockage ordinaire. Les deux coïncident.
+        return "BIGINT UNSIGNED"
+
     def sql_families(self, sql_type: str) -> tuple[str, ...]:
         n = sql_type.strip().upper()
         if n == "DATE":

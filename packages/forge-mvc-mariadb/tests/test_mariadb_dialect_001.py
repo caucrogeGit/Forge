@@ -13,6 +13,12 @@ def test_identity_type() -> None:
     assert D.identity_type() == "BIGINT UNSIGNED"
 
 
+def test_identity_storage_type() -> None:
+    # FK-IDENTITY-STORAGE-TYPE-001 : sur MariaDB, AUTO_INCREMENT étant une
+    # clause séparée, stockage et forme auto-incrémentée coïncident.
+    assert D.identity_storage_type() == "BIGINT UNSIGNED"
+
+
 def test_string_et_decimal() -> None:
     assert D.string_type(120) == "VARCHAR(120)"
     assert D.decimal_type(10, 2) == "DECIMAL(10,2)"

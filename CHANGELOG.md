@@ -3,6 +3,19 @@
 
 ## [Non publié]
 
+### Corrigé
+
+- **Clés étrangères corrompues sur PostgreSQL et SQL Server (`FK-IDENTITY-STORAGE-TYPE-001`, révision de l'ADR-069).**
+  Un champ `foreign_key` recevait le type de la clé primaire auto-incrémentée (`dialect.identity_type()`), en s'appuyant sur une prémisse de l'ADR-069 vraie sur MariaDB et SQLite seulement.
+  Sur PostgreSQL, la colonne référençante était déclarée `BIGSERIAL` : elle recevait sa propre séquence et un `DEFAULT nextval()`, si bien qu'un `INSERT` omettant la clé étrangère, pourtant `NOT NULL`, était accepté et se voyait attribuer une valeur fabriquée pointant vers une ligne arbitraire de la table cible (vérifié sur PostgreSQL 17.10).
+  Sur SQL Server, la colonne était déclarée `BIGINT IDENTITY(1,1)`, ce qui rend le `CREATE TABLE` invalide : une table n'admet qu'une seule colonne IDENTITY, déjà prise par la clé primaire.
+  Le contrat `Dialect` gagne `identity_storage_type()` (`BIGINT UNSIGNED` sur MariaDB, `INTEGER` sur SQLite, `BIGINT` sur PostgreSQL et SQL Server), que les champs `foreign_key` consomment désormais ; la clé primaire continue d'employer `identity_type()`.
+  **MariaDB et SQLite ne changent pas de comportement** : les valeurs renvoyées sont identiques, aucun schéma existant n'est affecté.
+  **Schémas PostgreSQL et SQL Server déjà générés** : ils ne sont pas réparés automatiquement.
+  Pour les repérer sur PostgreSQL, chercher les colonnes de clé étrangère portant un `DEFAULT nextval()` :
+  `SELECT table_name, column_name, column_default FROM information_schema.columns WHERE column_default LIKE 'nextval%' AND column_name <> 'id';`
+  Chaque colonne listée doit être passée en `BIGINT` nu, avec suppression de la séquence associée.
+
 ### Ajouté
 
 - **PostgreSQL et SQL Server promus au niveau plein (révision ADR-084 du 2026-07-19).**

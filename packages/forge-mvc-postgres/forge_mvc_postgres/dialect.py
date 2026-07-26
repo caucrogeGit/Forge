@@ -45,6 +45,12 @@ class PostgreSQLDialect:
     def identity_type(self) -> str:
         return "BIGSERIAL"
 
+    def identity_storage_type(self) -> str:
+        # BIGSERIAL n'est pas un type : c'est un BIGINT plus une séquence et un
+        # DEFAULT nextval(). Une colonne de clé étrangère doit être un BIGINT nu,
+        # sans quoi elle se verrait attribuer une valeur toute seule.
+        return "BIGINT"
+
     def sql_families(self, sql_type: str) -> tuple[str, ...]:
         n = sql_type.strip().upper()
         if n == "DATE":

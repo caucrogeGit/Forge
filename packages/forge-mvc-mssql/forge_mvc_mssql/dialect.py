@@ -47,6 +47,12 @@ class MSSQLDialect:
     def identity_type(self) -> str:
         return "BIGINT IDENTITY(1,1)"
 
+    def identity_storage_type(self) -> str:
+        # IDENTITY est une propriété de colonne, pas un type. SQL Server
+        # n'admet qu'une seule colonne IDENTITY par table, déjà prise par la
+        # clé primaire : une clé étrangère doit être un BIGINT nu.
+        return "BIGINT"
+
     def sql_families(self, sql_type: str) -> tuple[str, ...]:
         n = sql_type.strip().upper()
         if n == "DATE":

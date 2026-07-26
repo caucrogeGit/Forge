@@ -63,6 +63,21 @@ class Dialect(Protocol):
         """Type colonne de la clé primaire auto-incrémentée `id`."""
         ...
 
+    def identity_storage_type(self) -> str:
+        """Type colonne pour **stocker** une valeur d'identité (clé étrangère).
+
+        À ne pas confondre avec `identity_type()`, qui décrit la forme DDL
+        d'une colonne **auto-incrémentée** (la clé primaire). Les deux
+        coïncident sur MariaDB (`BIGINT UNSIGNED`) et SQLite (`INTEGER`), mais
+        pas sur PostgreSQL (`BIGINT` contre `BIGSERIAL`) ni SQL Server
+        (`BIGINT` contre `BIGINT IDENTITY(1,1)`).
+
+        Employer `identity_type()` pour une clé étrangère y attacherait une
+        séquence ou une propriété IDENTITY : la colonne référençante se verrait
+        attribuer une valeur toute seule (FK-IDENTITY-STORAGE-TYPE-001).
+        """
+        ...
+
     def sql_families(self, sql_type: str) -> tuple[str, ...]:
         """Types Python compatibles avec ce type de colonne, dans ce dialecte.
 

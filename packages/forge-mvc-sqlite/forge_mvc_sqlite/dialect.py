@@ -46,6 +46,11 @@ class SQLiteDialect:
         # La clé primaire auto-incrémentée SQLite doit être de type INTEGER.
         return "INTEGER"
 
+    def identity_storage_type(self) -> str:
+        # SQLite : AUTOINCREMENT est une clause à part, portée par la colonne
+        # PK. INTEGER est déjà un type de stockage ordinaire.
+        return "INTEGER"
+
     def sql_families(self, sql_type: str) -> tuple[str, ...]:
         # Affinités SQLite : une même affinité couvre plusieurs familles Python
         # (TEXT stocke aussi dates et JSON ; INTEGER stocke aussi les booléens).

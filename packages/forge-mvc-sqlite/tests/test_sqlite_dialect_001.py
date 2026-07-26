@@ -13,6 +13,12 @@ from forge_mvc_sqlite.dialect import SQLiteDialect  # noqa: E402
 D = SQLiteDialect()
 
 
+def test_identity_storage_type() -> None:
+    # FK-IDENTITY-STORAGE-TYPE-001 : AUTOINCREMENT est une clause portée par la
+    # colonne PK ; INTEGER est déjà un type de stockage ordinaire.
+    assert D.identity_storage_type() == "INTEGER"
+
+
 def test_identity_et_string_et_decimal() -> None:
     assert D.identity_type() == "INTEGER"
     assert D.string_type(120) == "TEXT"  # SQLite ignore la longueur

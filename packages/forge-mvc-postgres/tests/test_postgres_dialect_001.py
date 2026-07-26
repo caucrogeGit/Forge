@@ -9,6 +9,14 @@ from forge_mvc_postgres.dialect import PostgreSQLDialect  # noqa: E402
 D = PostgreSQLDialect()
 
 
+def test_identity_storage_type() -> None:
+    # FK-IDENTITY-STORAGE-TYPE-001 : BIGSERIAL n'est pas un type mais un BIGINT
+    # doublé d'une séquence et d'un DEFAULT nextval(). Une colonne de clé
+    # étrangère doit être un BIGINT nu, sinon elle s'auto-alimente.
+    assert D.identity_storage_type() == "BIGINT"
+    assert "SERIAL" not in D.identity_storage_type()
+
+
 def test_types() -> None:
     assert D.identity_type() == "BIGSERIAL"
     assert D.string_type(120) == "VARCHAR(120)"

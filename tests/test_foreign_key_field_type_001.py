@@ -1,9 +1,17 @@
 """FOREIGN-KEY-FIELD-TYPE-001 (ADR-069, retour-013).
 
 La clé étrangère devient un **champ de première classe** de l'entité source :
-type `foreign_key` + `references`. Le normaliseur le résout au type de la PK visée
-(`identity_type()`, BIGINT UNSIGNED sur MariaDB) avec une colonne snake_case fidèle
-au dictionnaire. `make:relation` injecte ce champ dans le JSON de l'entité source.
+type `foreign_key` + `references`. Le normaliseur le résout au **type de stockage**
+d'une identité (`identity_storage_type()`, BIGINT UNSIGNED sur MariaDB) avec une
+colonne snake_case fidèle au dictionnaire. `make:relation` injecte ce champ dans le
+JSON de l'entité source.
+
+Note (FK-IDENTITY-STORAGE-TYPE-001, révision de l'ADR-069) : ce fichier s'exécute
+sous le backend MariaDB du conftest, où type de stockage et forme auto-incrémentée
+coïncident. La couverture **dialectale** des quatre backends vit dans
+`tests/test_fk_identity_storage_type_001.py` ; l'assertion ci-dessous est donc
+exprimée via le dialecte actif plutôt qu'en dur, pour ne plus figer un comportement
+propre à MariaDB.
 """
 from __future__ import annotations
 
@@ -19,6 +27,13 @@ def _entity(name: str, table: str, fields: list[dict]) -> dict:
     return {"schema_version": "1.0", "name": name, "table": table, "fields": fields}
 
 
+def _storage_type() -> str:
+    """Type de stockage d'une identité pour le backend actif (MariaDB ici)."""
+    from core.database.backend import get_backend
+
+    return get_backend().dialect.identity_storage_type()
+
+
 # ── Normalisation du type foreign_key ────────────────────────────────────────
 
 def test_foreign_key_normalise_vers_type_pk_et_colonne_snake():
@@ -28,7 +43,8 @@ def test_foreign_key_normalise_vers_type_pk_et_colonne_snake():
     ))
     fk = next(f for f in norm["fields"] if f["name"] == "annee_scolaire_id")
     assert fk["column"] == "annee_scolaire_id"        # snake_case, pas PascalCase
-    assert fk["sql_type"] == "BIGINT UNSIGNED"        # type de la PK visée
+    assert fk["sql_type"] == _storage_type()          # type de STOCKAGE d'une identité
+    assert fk["sql_type"] == "BIGINT UNSIGNED"        # valeur MariaDB du conftest
     assert fk["python_type"] == "int"
     assert fk["nullable"] is False                    # required -> NOT NULL
     assert fk["references"] == "AnneeScolaire"         # métadonnée conservée
