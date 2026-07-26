@@ -88,6 +88,7 @@ nav:
         - Génération PDF: features/pdf.md
         - ImageMagick (guide complet): features/imagemagick-logos.md
         - Outils interactifs: features/outils-interactifs.md
+        - Événements: features/evenements.md
 
     - Référence:
         - Commandes CLI: reference/cli-commands.md

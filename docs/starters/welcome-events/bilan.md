@@ -54,3 +54,9 @@ Vous venez d'en faire l'expérience ; vous êtes donc mieux placé qu'un mainten
 Ce code est le vôtre.
 Étendez-le, réduisez-le, ou supprimez-le si vos trois appels alignés se portaient très bien.
 C'est aussi une conclusion valable.
+
+## Voir aussi
+
+- [Événements](../../features/evenements.md) : le guide de référence, qui résume la position de Forge sans passer par ce parcours.
+- [ADR-052](../../adr/052-optin-strategy.md) : les critères d'admission des opt-ins et le classement de `events`.
+- [forge-mvc-jobs](../../jobs/reference.md) : la file de tâches, pour le découplage temporel.

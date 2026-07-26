@@ -11,6 +11,10 @@ pas un opt-in Forge ; il présente le décorateur `@events.on` comme un
 contre-exemple refusé et non comme une recommandation ; il renvoie à
 l'ADR-052 qui porte la décision ; et il maintient la distinction
 « les événements découplent le code, les jobs découplent le temps ».
+
+Couvre enfin le guide de doctrine `docs/features/evenements.md`
+(DOCS-EVENTS-DOCTRINE-001) et son appariement réciproque avec le
+parcours, sur le modèle du couple guide/parcours de welcome-outils.
 """
 from __future__ import annotations
 
@@ -22,6 +26,7 @@ pytestmark = [pytest.mark.meta, pytest.mark.docs]
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 EVENTS = PROJECT_ROOT / "docs" / "starters" / "welcome-events"
+GUIDE = PROJECT_ROOT / "docs" / "features" / "evenements.md"
 
 PAGES = (
     "installation.md",
@@ -143,6 +148,46 @@ def test_bilan_states_both_columns():
     assert "Vous avez gagné" in bilan and "Vous avez perdu" in bilan, (
         "Le bilan doit présenter gains ET pertes : c'est la leçon du parcours."
     )
+
+
+# ── Guide de doctrine (DOCS-EVENTS-DOCTRINE-001) ─────────────────────────────
+
+
+def test_guide_exists_and_links_parcours():
+    assert GUIDE.is_file(), "le guide docs/features/evenements.md doit exister"
+    text = GUIDE.read_text(encoding="utf-8")
+    assert "../starters/welcome-events/installation.md" in text, (
+        "Le guide doit renvoyer au parcours qui construit le registre."
+    )
+
+
+def test_bilan_points_to_guide():
+    assert _has("bilan.md", "../../features/evenements.md"), (
+        "Le bilan du parcours doit renvoyer au guide de référence."
+    )
+
+
+def test_guide_states_forge_provides_nothing():
+    """L'affirmation centrale du guide, celle qu'une refonte ne doit pas diluer."""
+    text = GUIDE.read_text(encoding="utf-8")
+    assert "Forge ne fournit aucun système d'événements" in text
+    assert "../adr/052-optin-strategy.md" in text, (
+        "Le guide doit citer l'ADR-052, qui porte la décision."
+    )
+
+
+def test_guide_keeps_events_versus_jobs():
+    text = GUIDE.read_text(encoding="utf-8")
+    assert "découplent le code" in text and "découplent le temps" in text
+    assert "../jobs/reference.md" in text
+
+
+def test_guide_shows_decorator_only_as_counter_example():
+    text = GUIDE.read_text(encoding="utf-8")
+    if "@events.on" in text:
+        assert any(marker in text for marker in REFUSAL_MARKERS), (
+            "Le guide cite `@events.on` sans le qualifier de motif refusé."
+        )
 
 
 @pytest.mark.parametrize("forbidden", FORBIDDEN_COMMANDS)
