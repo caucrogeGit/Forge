@@ -121,6 +121,11 @@ class TestNoBrokenInternalLinks:
     _OLD_INSTALLATION_MD = re.compile(
         r"(?<!\w)installation\.md(?!\w)"
     )
+    # Préambules légitimes des parcours (STARTERS-WELCOME-INSTALL-001) :
+    # `welcome/installation.md` pour les parcours d'opt-in, et
+    # `welcome-<sujet>/installation.md` pour les parcours cœur, qu'un guide
+    # de `docs/features/` peut légitimement citer (ex. welcome-events).
+    _WELCOME_PREAMBLE = re.compile(r"welcome[\w-]*/installation\.md")
 
     def _is_historical(self, path: Path) -> bool:
         rel = path.relative_to(PROJECT_ROOT).as_posix()
@@ -159,11 +164,11 @@ class TestNoBrokenInternalLinks:
                 continue
             text = md.read_text(encoding="utf-8")
             # Ignore le nouveau chemin `install/index.md` et les préambules
-            # légitimes `welcome/installation.md` des parcours et backends
-            # (STARTERS-WELCOME-INSTALL-001) : le contrôle ne vise que l'ancien
-            # `docs/installation.md` à plat.
-            stripped = text.replace("install/index.md", "").replace(
-                "welcome/installation.md", ""
+            # légitimes des parcours et backends (`welcome/installation.md`,
+            # `welcome-<sujet>/installation.md` — STARTERS-WELCOME-INSTALL-001) :
+            # le contrôle ne vise que l'ancien `docs/installation.md` à plat.
+            stripped = self._WELCOME_PREAMBLE.sub(
+                "", text.replace("install/index.md", "")
             )
             if self._OLD_INSTALLATION_MD.search(stripped):
                 offenders.append(rel)
