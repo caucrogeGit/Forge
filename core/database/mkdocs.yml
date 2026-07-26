@@ -9,3 +9,4 @@ nav:
       - Transactions (transaction.py): transaction.md
       - Pool de connexions (connection.py): connection.md
       - Chargeur de requêtes SQL (sql_loader.py): sql_loader.md
+      - Erreurs portables (errors.py): errors.md

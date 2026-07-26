@@ -128,3 +128,18 @@ class SQLiteBackend:
         """Ferme la connexion empruntée."""
         if connection is not None:
             connection.close()
+
+    def is_unique_violation(self, error: Exception) -> bool:
+        """Doublon SQLite : `sqlite3.IntegrityError` au message explicite.
+
+        SQLite n'expose ni SQLSTATE ni code d'erreur distinct sur l'exception ;
+        le message est le seul signal. Il est stable et documenté :
+        « UNIQUE constraint failed: table.colonne ». Les autres violations ont
+        leur propre libellé (« NOT NULL constraint failed », « FOREIGN KEY
+        constraint failed »), donc la discrimination reste sûre.
+        """
+        import sqlite3
+
+        if not isinstance(error, sqlite3.IntegrityError):
+            return False
+        return "UNIQUE constraint failed" in str(error)

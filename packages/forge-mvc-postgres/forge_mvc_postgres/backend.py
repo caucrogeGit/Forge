@@ -193,3 +193,13 @@ class PostgreSQLBackend:
     def close_connection(self, connection: Any) -> None:
         if connection is not None:
             connection.close()
+
+    def is_unique_violation(self, error: Exception) -> bool:
+        """Doublon PostgreSQL : SQLSTATE 23505 (`unique_violation`).
+
+        Le seul backend où le SQLSTATE discrimine réellement, PostgreSQL
+        distinguant 23505 (unicité), 23503 (clé étrangère) et 23502 (NOT NULL).
+        psycopg expose en plus la classe dédiée `errors.UniqueViolation` ; on
+        teste le SQLSTATE, qui couvre aussi les exceptions reconstruites.
+        """
+        return getattr(error, "sqlstate", None) == "23505"

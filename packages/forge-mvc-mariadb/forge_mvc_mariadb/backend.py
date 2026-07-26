@@ -111,6 +111,14 @@ class MariaDBBackend:
         if connection is not None:
             connection.close()
 
+    def is_unique_violation(self, error: Exception) -> bool:
+        """Doublon MariaDB : errno 1062 (ER_DUP_ENTRY).
+
+        Le SQLSTATE ne convient pas : MariaDB renvoie `23000` aussi bien pour
+        un doublon que pour un NOT NULL (errno 1048). Seul l'errno discrimine.
+        """
+        return getattr(error, "errno", None) == 1062
+
     def close(self) -> None:
         """Ferme le pool sous-jacent (réinitialisation, fin de session de test)."""
         if self._pool is not None:

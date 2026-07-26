@@ -3,6 +3,22 @@
 
 ## [Non publié]
 
+### Ajouté (contrat)
+
+- **Détection portable des violations d'unicité (`DB-UNIQUE-VIOLATION-CONTRACT-001`).**
+  Une application ne pouvait pas distinguer « ce courriel existe déjà » d'une panne sans attraper l'exception de son pilote, ce qui la rendait non portable et contredisait l'ADR-054.
+  Le contrat `DatabaseBackend` gagne `is_unique_violation(error)`, implémentée par les quatre backends ; `core.database.db` lève désormais `UniqueViolationError` (nouveau module `core/database/errors.py`), l'exception du pilote restant accessible via `__cause__`.
+  Toute exception que le backend ne confirme pas remonte **inchangée** : le cœur n'enveloppe pas ce qu'il ne sait pas qualifier.
+  Les quatre signaux ont été mesurés sur serveur réel, aucun n'est portable : MariaDB errno 1062, SQLite message « UNIQUE constraint failed », PostgreSQL SQLSTATE 23505, SQL Server numéro natif 2627.
+  Le SQLSTATE seul ne convient pas : MariaDB et SQL Server renvoient `23000` aussi bien pour un doublon que pour un `NOT NULL` ou une clé étrangère, si bien qu'une détection par SQLSTATE serait fausse sur la moitié des backends.
+  La méthode est portée par le backend et non par `Dialect`, car reconnaître une exception relève du pilote là où `Dialect` ne décrit que du SQL.
+  Documentation embarquée : `core/database/docs/errors.md`.
+
+- **Suppression de `DoublonError`** (même ticket).
+  Cette exception du cœur n'était ni levée, ni attrapée, ni générée nulle part ; sa seule documentation recommandait `except mariadb.IntegrityError`, propre à un backend, dans un cœur agnostique ; et son nom francophone contrevenait à l'ADR-003.
+  Elle est remplacée par `UniqueViolationError`, qui est, elle, réellement utilisable.
+  Le CRUD généré ne traite toujours pas la violation d'unicité : c'est l'objet du ticket `CRUD-DUP-HANDLING-001`, déjà inscrit à la roadmap, que ce contrat rend enfin réalisable de façon portable.
+
 ### Corrigé
 
 - **Clés étrangères corrompues sur PostgreSQL et SQL Server (`FK-IDENTITY-STORAGE-TYPE-001`, révision de l'ADR-069).**

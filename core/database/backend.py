@@ -335,6 +335,30 @@ class DatabaseBackend(Protocol):
         """Restitue/ferme la connexion empruntée."""
         ...
 
+    def is_unique_violation(self, error: Exception) -> bool:
+        """Vrai si `error` signale une violation de contrainte d'unicité.
+
+        La méthode est **sur le backend et non sur `Dialect`** : reconnaître
+        une exception relève du pilote, là où `Dialect` ne décrit que du SQL.
+
+        Aucun signal n'est portable, mesuré sur les quatre backends :
+
+            MariaDB      mariadb.IntegrityError          errno 1062
+            SQLite       sqlite3.IntegrityError          message « UNIQUE constraint failed »
+            PostgreSQL   psycopg.errors.UniqueViolation  sqlstate 23505
+            SQL Server   pyodbc.IntegrityError           numéro natif 2627
+
+        Piège à ne pas reproduire : le SQLSTATE ne suffit pas. MariaDB **et**
+        SQL Server renvoient `23000` aussi bien pour un doublon que pour un
+        NOT NULL (MariaDB errno 1048) ou une clé étrangère. Une détection par
+        SQLSTATE seul serait fausse sur la moitié des backends.
+
+        L'implémentation doit être **stricte** : dans le doute, renvoyer faux.
+        Un faux positif ferait passer une panne pour un doublon et afficherait
+        une erreur de formulaire trompeuse à l'utilisateur.
+        """
+        ...
+
 
 _backend: "DatabaseBackend | None" = None
 _lock = threading.Lock()

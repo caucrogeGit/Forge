@@ -233,3 +233,15 @@ class MSSQLBackend:
     def close_connection(self, connection: Any) -> None:
         if connection is not None:
             connection.close()
+
+    def is_unique_violation(self, error: Exception) -> bool:
+        """Doublon SQL Server : numéro natif 2627 (contrainte) ou 2601 (index).
+
+        Le SQLSTATE ne convient pas : SQL Server renvoie `23000` aussi bien
+        pour un doublon que pour une clé étrangère (erreur 547) ou un NOT NULL.
+        pyodbc n'expose pas le numéro natif en attribut, il figure dans le
+        message sous la forme « (2627) » ; on le cherche donc là, en restant
+        strict (à défaut de numéro reconnu, ce n'est pas un doublon).
+        """
+        message = str(error)
+        return "(2627)" in message or "(2601)" in message

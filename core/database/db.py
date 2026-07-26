@@ -2,7 +2,9 @@
 from collections.abc import Sequence
 from typing import Any
 
+from core.database.backend import get_backend
 from core.database.connection import get_connection, close_connection
+from core.database.errors import UniqueViolationError
 from core.database.transaction import Transaction
 
 
@@ -24,6 +26,18 @@ def execute(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None" = 
 def insert(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None" = None) -> int:
     """Exécute une insertion explicite et retourne lastrowid."""
     return _run_query(sql, params, tx=tx, dictionary=False, fetch="lastrowid")
+
+
+def _is_unique_violation(error: Exception) -> bool:
+    """Demande au backend actif si `error` est un doublon.
+
+    Enveloppé : un backend tiers qui n'implémenterait pas la méthode ne doit
+    jamais masquer l'erreur d'origine, laquelle remonte alors telle quelle.
+    """
+    try:
+        return bool(get_backend().is_unique_violation(error))
+    except Exception:
+        return False
 
 
 def _run_query(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None" = None,
@@ -52,9 +66,14 @@ def _run_query(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None"
         if owns_connection:
             connection.commit()
         return result
-    except Exception:
+    except Exception as error:
         if owns_connection and connection is not None:
             connection.rollback()
+        # Seul le doublon est qualifié (ADR-054) : sans cela une application
+        # devrait attraper l'exception de son pilote et ne serait portable sur
+        # aucun autre backend. Tout le reste remonte inchangé, sans enveloppe.
+        if _is_unique_violation(error):
+            raise UniqueViolationError(str(error)) from error
         raise
     finally:
         if cursor is not None:
