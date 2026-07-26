@@ -176,6 +176,13 @@ nav:
             - La façade Flash: starters/welcome-helpers/flash.md
             - Imports et usage: starters/welcome-helpers/imports-usage.md
             - Bilan: starters/welcome-helpers/bilan.md
+        - Progression événements (welcome-events):
+            - Préambule: starters/welcome-events/installation.md
+            - Le registre: starters/welcome-events/registre.md
+            - Le câblage visible: starters/welcome-events/cablage.md
+            - Le cas réel: starters/welcome-events/cas-reel.md
+            - Les angles morts: starters/welcome-events/angles-morts.md
+            - Bilan: starters/welcome-events/bilan.md
         - Progression outils interactifs (welcome-outils):
             - Présentation: starters/welcome-outils/index.md
             - Calculateur de sous-réseau (SSR pur): starters/welcome-outils/subnet-calculator.md

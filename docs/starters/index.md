@@ -78,6 +78,7 @@ Chaque opt-in a son propre parcours d'apprentissage. Suivez-le quand vous ajoute
 
 - [Infrastructure de test](../testing/welcome/debutant/testing-welcome.md) : tester Forge et ses opt-ins.
 - [Helpers](welcome-helpers/installation.md) : raccourcis et utilitaires applicatifs.
+- [Événements](welcome-events/installation.md) : construire un registre d'événements explicite dans son application, et savoir quand il ne vaut pas son prix.
 - [Markdown](welcome-markdown/installation.md) : rendre du contenu Markdown.
 - [Outils interactifs](welcome-outils/index.md) : construire un bac à sable d'outils (SSR pur et JavaScript local), voir aussi le guide [Outils interactifs](../features/outils-interactifs.md).
 
