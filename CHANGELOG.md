@@ -3,6 +3,15 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **Le CRUD généré traite les doublons (`CRUD-DUP-HANDLING-001`).**
+  Une entité pouvait déclarer un champ `unique` et le DDL créait bien la contrainte, mais le contrôleur généré n'entourait l'INSERT pour aucun champ unique : un doublon soumis remontait l'exception brute du pilote et produisait une 500, sur les quatre backends.
+  `create` et `update` attrapent désormais `UniqueViolationError` et réaffichent le formulaire avec l'erreur.
+  Avec un seul champ unique, l'erreur se pose sur ce champ et s'affiche sous lui ; avec plusieurs, l'exception ne dit pas laquelle des contraintes a sauté, une erreur globale est donc posée plutôt que d'en désigner une au hasard.
+  **Une entité sans champ unique produit exactement le même contrôleur qu'avant** : ni import, ni garde inutile.
+  Lacune ouverte depuis la bêta 13, rendue traitable de façon portable par `DB-UNIQUE-VIOLATION-CONTRACT-001`.
+
 ### Ajouté (contrat)
 
 - **Détection portable des violations d'unicité (`DB-UNIQUE-VIOLATION-CONTRACT-001`).**

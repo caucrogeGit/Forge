@@ -62,6 +62,9 @@ class _ControllerContext:
     allowed_sort_keys_repr: str
     filter_flds: list[dict[str, Any]]
     relation_filter_names: set[str]
+    # Champs porteurs d'une contrainte UNIQUE (CRUD-DUP-HANDLING-001). Vide =
+    # aucun garde anti-doublon n'est émis, la sortie reste celle d'avant.
+    unique_fields: list[str]
 
 
 def _render_export_csv(ctx: _ControllerContext) -> list[str]:
@@ -237,6 +240,65 @@ def _render_csv_escape(_ctx: _ControllerContext) -> list[str]:
     return csv_escape_lines
 
 
+def _duplicate_error_line(ctx: _ControllerContext, indent: str) -> str:
+    """Ligne qui rattache l'erreur de doublon (CRUD-DUP-HANDLING-001).
+
+    Avec un seul champ unique, l'erreur se pose dessus et s'affiche sous lui.
+    Avec plusieurs, l'exception ne dit pas laquelle des contraintes a sauté (le
+    nom n'est pas normalisé entre SGBD) : on pose alors une erreur globale
+    plutôt que d'en désigner une au hasard.
+    """
+    if len(ctx.unique_fields) == 1:
+        return (
+            f'{indent}form.add_error("{ctx.unique_fields[0]}", '
+            '"Cette valeur est déjà utilisée.")'
+        )
+    return (
+        f'{indent}form.add_error(None, "Une valeur saisie est déjà utilisée '
+        'pour un champ qui doit être unique.")'
+    )
+
+
+def _rerender_form_lines(ctx: _ControllerContext, indent: str, items: list[str]) -> list[str]:
+    """Bloc `validation_error` qui réaffiche le formulaire, à l'indentation donnée.
+
+    Partagé par la branche « formulaire invalide » et la branche « doublon »,
+    pour que les deux réaffichent strictement le même écran.
+    """
+    lines = [
+        f'{indent}return BaseController.validation_error("{ctx.view_dir}/form.html",',
+        f'{indent}    context={{',
+    ]
+    lines += [f'{indent}        {item}' for item in items]
+    lines += [
+        f'{indent}    }},',
+        f'{indent}    request=request)',
+    ]
+    return lines
+
+
+def _guard_duplicate(ctx: _ControllerContext, persist_lines: list[str],
+                     items: list[str], base_indent: str,
+                     pre_lines: list[str] | None = None) -> list[str]:
+    """Entoure les lignes de persistance d'un garde anti-doublon.
+
+    Sans champ unique, les lignes sont rendues telles quelles : la sortie du
+    générateur reste identique à ce qu'elle était pour ces entités.
+
+    `pre_lines` sert au réaffichage de `update`, qui doit relire les médias en
+    base avant de rendre le formulaire (l'entité existe déjà).
+    """
+    if not ctx.unique_fields:
+        return persist_lines
+    guarded = [f'{base_indent}try:']
+    guarded += [f'    {line}' for line in persist_lines]
+    guarded.append(f'{base_indent}except UniqueViolationError:')
+    guarded.append(_duplicate_error_line(ctx, base_indent + "    "))
+    guarded += pre_lines or []
+    guarded += _rerender_form_lines(ctx, base_indent + "    ", items)
+    return guarded
+
+
 def _render_create(ctx: _ControllerContext) -> list[str]:
     entity, snake, choice_options, generated_fields, ctrl_media_entries, many_to_many_relations = ctx.entity, ctx.snake, ctx.choice_options, ctx.generated_fields, ctx.ctrl_media_entries, ctx.m2m
     create_lines: list[str] = [
@@ -253,21 +315,18 @@ def _render_create(ctx: _ControllerContext) -> list[str]:
         create_lines.append(
             f'        {relation.field_name} = {entity}Controller._parse_many_ids(request, "{relation.field_name}")'
         )
-    create_lines += [
-        "        if not form.is_valid():",
-        f'            return BaseController.validation_error("{ctx.view_dir}/form.html",',
-        '                context={',
-        '                    "form": form,',
-        f'                    "action": "/{snake}/create",',
-        f'                    "titre": "Nouveau {snake}",',
+    # Contexte de réaffichage du formulaire, partagé par toutes les branches
+    # qui le rendent à nouveau (invalide, fichier refusé, doublon).
+    rerender_items = [
+        '"form": form,',
+        f'"action": "/{snake}/create",',
+        f'"titre": "Nouveau {snake}",',
     ]
     for relation in many_to_many_relations or []:
-        create_lines.append(f'                    "{relation.choices_key}": {relation.choices_function}(),')
-        create_lines.append(f'                    "{relation.selected_key}": {relation.field_name},')
-    create_lines += [
-        "                },",
-        "                request=request)",
-    ]
+        rerender_items.append(f'"{relation.choices_key}": {relation.choices_function}(),')
+        rerender_items.append(f'"{relation.selected_key}": {relation.field_name},')
+    create_lines.append("        if not form.is_valid():")
+    create_lines += _rerender_form_lines(ctx, "            ", rerender_items)
     # Slug auto-généré depuis son champ source (stable ensuite ; ADR-017).
     for _gen_name, _gen_source in generated_fields:
         create_lines.append(
@@ -287,25 +346,16 @@ def _render_create(ctx: _ControllerContext) -> list[str]:
                 f'                    form.fields["{mname}"].validate(_{mname}_f)',
                 f'                except Exception as _{mname}_exc:',
                 f'                    form.add_error("{mname}", getattr(_{mname}_exc, "messages", [str(_{mname}_exc)]))',
-                f'                    return BaseController.validation_error("{ctx.view_dir}/form.html",',
-                '                        context={',
-                '                            "form": form,',
-                f'                            "action": "/{snake}/create",',
-                f'                            "titre": "Nouveau {snake}",',
             ]
-            for relation in many_to_many_relations or []:
-                create_lines.append(f'                            "{relation.choices_key}": {relation.choices_function}(),')
-                create_lines.append(f'                            "{relation.selected_key}": {relation.field_name},')
-            create_lines += [
-                '                        },',
-                '                        request=request)',
-            ]
+            create_lines += _rerender_form_lines(ctx, "                    ", rerender_items)
         media_names_repr = "{" + ", ".join(f'"{e["name"]}"' for e in ctrl_media_entries) + "}"
         create_lines += [
             f'        _media_keys = {media_names_repr}',
             '        _sql_data = {k: v for k, v in form.cleaned_data.items() if k not in _media_keys}',
-            f'        created_id = add_{snake}(_sql_data)',
         ]
+        create_lines += _guard_duplicate(
+            ctx, [f'        created_id = add_{snake}(_sql_data)'], rerender_items, "        "
+        )
         for entry in ctrl_media_entries:
             mname = entry["name"]
             mrole = entry["role"]
@@ -331,9 +381,10 @@ def _render_create(ctx: _ControllerContext) -> list[str]:
                 ]
     else:
         if many_to_many_relations:
-            create_lines.append(f'        created_id = add_{snake}(form.cleaned_data)')
+            persist = [f'        created_id = add_{snake}(form.cleaned_data)']
         else:
-            create_lines.append(f'        add_{snake}(form.cleaned_data)')
+            persist = [f'        add_{snake}(form.cleaned_data)']
+        create_lines += _guard_duplicate(ctx, persist, rerender_items, "        ")
     for relation in many_to_many_relations or []:
         create_lines.append(f'        {relation.add_function}(created_id, {relation.field_name})')
     create_lines.append(
@@ -474,26 +525,35 @@ def _render_update(ctx: _ControllerContext) -> list[str]:
         update_lines.append(
             f'            {mname}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{mrole}")'
         )
-    update_lines += [
-        f'            return BaseController.validation_error("{ctx.view_dir}/form.html",',
-        "                context={",
-        '                    "form": form,',
-        f'                    "action": f"/{snake}/update/{{{pk_name}}}",',
-        f'                    "titre": "Modifier {snake}",',
+    # Contexte de réaffichage, partagé par les branches invalide / fichier
+    # refusé / doublon. Les médias sont relus en base : l'entité existe déjà.
+    rerender_items = [
+        '"form": form,',
+        f'"action": f"/{snake}/update/{{{pk_name}}}",',
+        f'"titre": "Modifier {snake}",',
     ]
     for relation in many_to_many_relations or []:
-        update_lines.append(f'                    "{relation.choices_key}": {relation.choices_function}(),')
-        update_lines.append(f'                    "{relation.selected_key}": {relation.field_name},')
+        rerender_items.append(f'"{relation.choices_key}": {relation.choices_function}(),')
+        rerender_items.append(f'"{relation.selected_key}": {relation.field_name},')
     for entry in show_singles:
-        mname = entry["name"]
-        update_lines.append(f'                    "{mname}_media": {mname}_media,')
+        rerender_items.append(f'"{entry["name"]}_media": {entry["name"]}_media,')
     for entry in show_multiples:
-        mname = entry["name"]
-        update_lines.append(f'                    "{mname}_media_list": {mname}_media_list,')
-    update_lines += [
-        "                },",
-        "                request=request)",
-    ]
+        rerender_items.append(f'"{entry["name"]}_media_list": {entry["name"]}_media_list,')
+
+    def _media_reload(indent: str) -> list[str]:
+        """Relecture des médias avant un réaffichage du formulaire."""
+        out: list[str] = []
+        for e in show_singles:
+            out.append(
+                f'{indent}{e["name"]}_media = get_cover_media("{snake}", {pk_name}, role="{e["role"]}")'
+            )
+        for e in show_multiples:
+            out.append(
+                f'{indent}{e["name"]}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{e["role"]}")'
+            )
+        return out
+
+    update_lines += _rerender_form_lines(ctx, "            ", rerender_items)
     for entry in show_multiples:
         mname = entry["name"]
         mrole = entry["role"]
@@ -506,45 +566,18 @@ def _render_update(ctx: _ControllerContext) -> list[str]:
             f'                except Exception as _{mname}_exc:',
             f'                    form.add_error("{mname}", getattr(_{mname}_exc, "messages", [str(_{mname}_exc)]))',
         ]
-        for single_entry in show_singles:
-            sname = single_entry["name"]
-            srole = single_entry["role"]
-            update_lines.append(
-                f'                    {sname}_media = get_cover_media("{snake}", {pk_name}, role="{srole}")'
-            )
-        for multi_entry in show_multiples:
-            m2name = multi_entry["name"]
-            m2role = multi_entry["role"]
-            update_lines.append(
-                f'                    {m2name}_media_list = list_media_for_entity("{snake}", {pk_name}, role="{m2role}")'
-            )
-        update_lines += [
-            f'                    return BaseController.validation_error("{ctx.view_dir}/form.html",',
-            '                        context={',
-            '                            "form": form,',
-            f'                            "action": f"/{snake}/update/{{{pk_name}}}",',
-            f'                            "titre": "Modifier {snake}",',
-        ]
-        for relation in many_to_many_relations or []:
-            update_lines.append(f'                            "{relation.choices_key}": {relation.choices_function}(),')
-            update_lines.append(f'                            "{relation.selected_key}": {relation.field_name},')
-        for single_entry in show_singles:
-            sname = single_entry["name"]
-            update_lines.append(f'                            "{sname}_media": {sname}_media,')
-        for multi_entry in show_multiples:
-            m2name = multi_entry["name"]
-            update_lines.append(f'                            "{m2name}_media_list": {m2name}_media_list,')
-        update_lines += [
-            '                        },',
-            '                        request=request)',
-        ]
+        update_lines += _media_reload("                    ")
+        update_lines += _rerender_form_lines(ctx, "                    ", rerender_items)
     if ctrl_media_entries:
         media_names_repr = "{" + ", ".join(f'"{e["name"]}"' for e in ctrl_media_entries) + "}"
         update_lines += [
             f'        _media_keys = {media_names_repr}',
             '        _sql_data = {k: v for k, v in form.cleaned_data.items() if k not in _media_keys}',
-            f'        update_{snake}({pk_name}, _sql_data)',
         ]
+        update_lines += _guard_duplicate(
+            ctx, [f'        update_{snake}({pk_name}, _sql_data)'],
+            rerender_items, "        ", pre_lines=_media_reload("            "),
+        )
         for entry in ctrl_media_entries:
             if entry.get("multiple", False):
                 continue
@@ -605,7 +638,10 @@ def _render_update(ctx: _ControllerContext) -> list[str]:
                 f'                attach_media_to_entity(_saved_{mname}, entity_name="{snake}", entity_id={pk_name}, role="{mrole}", position=0, alt_text=_{mname}_alt_new)',
             ]
     else:
-        update_lines.append(f'        update_{snake}({pk_name}, form.cleaned_data)')
+        update_lines += _guard_duplicate(
+            ctx, [f'        update_{snake}({pk_name}, form.cleaned_data)'],
+            rerender_items, "        ", pre_lines=_media_reload("            "),
+        )
     for relation in many_to_many_relations or []:
         update_lines.append(f'        {relation.sync_function}({pk_name}, {relation.field_name})')
     update_lines += [
@@ -749,6 +785,7 @@ def _render_preamble(
     choice_options: list[CrudManyToOneRelation],
     relations: list[CrudManyToOneRelation] | None,
     has_rbac: bool,
+    unique_fields: list[str],
 ) -> list[str]:
     """Préambule du module contrôleur (REFACTOR-BUILDERS-DECOMPOSE-002).
 
@@ -764,6 +801,10 @@ def _render_preamble(
     ]
     if generated_fields:
         lines.append("from core.http.slug import slugify")
+    if unique_fields:
+        # Doublon sur un champ UNIQUE : erreur de formulaire, pas une 500
+        # (CRUD-DUP-HANDLING-001). L'exception est portable entre backends.
+        lines.append("from core.database.errors import UniqueViolationError")
     if has_rbac:
         lines.append("from forge_mvc_rbac import require_permission")
     lines += [
@@ -868,6 +909,9 @@ def build_controller(
     non_pk = [f for f in _non_pk_fields(definition) if not _is_managed(f)]
     # Champs slug auto-générés : (nom, champ source) — calculés à la création.
     generated_fields = [(f["name"], f["source"]) for f in non_pk if _is_generated(f)]
+    # Champs UNIQUE : la contrainte existe déjà en base, mais l'INSERT n'était
+    # gardé pour aucun d'eux (CRUD-DUP-HANDLING-001), d'où une 500 sur doublon.
+    unique_fields = [f["name"] for f in non_pk if f.get("unique") is True]
     allowed_sort_keys = [f["name"] for f in non_pk] + [pk_name]
     allowed_sort_keys_repr = "{" + ", ".join(f'"{key}"' for key in allowed_sort_keys) + "}"
     choice_relations = _unique_choice_relations(relations)
@@ -903,6 +947,7 @@ def build_controller(
     lines: list[str] = _render_preamble(
         entity, snake, plural, non_pk, generated_fields, choice_imports,
         many_to_many_imports, ctrl_media_entries, choice_options, relations, bool(_rbac),
+        unique_fields,
     )
     lines.append(f"class {entity}Controller(BaseController):")
     lines += [
@@ -963,6 +1008,7 @@ def build_controller(
         ctrl_media_entries=ctrl_media_entries, m2m=many_to_many_relations or [],
         allowed_sort_keys_repr=allowed_sort_keys_repr,
         filter_flds=filter_flds, relation_filter_names=relation_filter_names,
+        unique_fields=unique_fields,
     )
     lines += _render_list_context(_ctx, pk_col)
 
