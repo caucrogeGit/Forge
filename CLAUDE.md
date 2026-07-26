@@ -36,6 +36,7 @@ ADR-018).
 - `forge-mvc-testing` (infrastructure de test partagée, dev-only : `FakeRequest` et plugin pytest ; ADR-041)
 - `forge-mvc-entities` (moteur d'entités : `make:entity`/`make:relation`/`make:crud`, normaliseur, migrations, provisioning `db:*` ; absorbe l'ancien `forge-mvc-pivot` ; extrait du core, ADR-070)
 - `forge-mvc-sessions-db` (store de session persistant adossé au backend BDD, ADR-054 ; provisioning ADR-071)
+- `forge-mvc-fixtures` (données de démo et de test rejouables, CLI-only : `fixtures:load`/`purge`/`generate`/`make-factory` ; ADR-074/076/077/078)
 - `forge-mvc-audit` (journal d'audit applicatif)
 - `forge-mvc-settings` (paramètres applicatifs persistés)
 - `forge-mvc-jobs` (file de tâches de fond adossée à la base)
@@ -147,6 +148,7 @@ d'utilisateurs externes ni de code applicatif externe à protéger.
 - `forge-mvc-testing` : infrastructure de test partagée réservée au développement (`FakeRequest` et plugin pytest), ADR-041
 - `forge-mvc-entities` : moteur d'entités extrait du cœur (ADR-070) ; `make:entity`/`make:relation`/`make:crud`, normaliseur canonique, `build:model`, migrations, provisioning `db:*` ; absorbe le pivot enrichi (`make:pivot-crud`, ADR-021)
 - `forge-mvc-sessions-db` : store de session persistant (`DbSessionStore`), concurrence optimiste ; `sessions:init`/`sessions:gc` (ADR-054/071/072)
+- `forge-mvc-fixtures` : données de démo et de test rejouables, opt-in CLI-only ; `fixtures:load`/`fixtures:purge`/`fixtures:generate`/`fixtures:make-factory`, classes factory, références entre fixtures et ordre par dépendances, hooks Python (ADR-074/076/077/078)
 - `forge-mvc-audit`, `forge-mvc-settings`, `forge-mvc-jobs`, `forge-mvc-notifications`, `forge-mvc-import-export` : opt-ins applicatifs adossés à la base (migration + `<opt-in>:init`, ADR-071)
 - `forge-mvc-deploy` : outillage de déploiement opt-in CLI-only (`deploy:init`/`deploy:check`, ADR-053)
 - Backends BDD (ADR-054) : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres`, `forge-mvc-mssql`, tous au niveau plein (promotion ADR-084) ; exclusifs, découverts par entry points `forge_mvc.db_backend`
@@ -241,6 +243,19 @@ structurante.
 | ADR-071 | `071-optin-db-provisioning-convention.md` | Convention unique de provisioning des opt-ins BDD (`migration:apply`) |
 | ADR-072 | `072-optin-cli-command-contract.md` | Contrat des commandes CLI d'opt-in : interception `--help`, amorçage config (`config: True`) |
 | ADR-073 | `073-app-views-namespace.md` | Namespace `app/` des vues applicatives (`APP_VIEWS_NAMESPACE`) |
+| ADR-074 | `074-fixtures-optin.md` | Opt-in fixtures : données de démo et de test rejouables |
+| ADR-075 | `075-dialect-literal-rendering.md` | Rendu des littéraux SQL confié au contrat `Dialect` |
+| ADR-076 | `076-fixtures-factory-generation.md` | Génération de fixtures par classes factory |
+| ADR-077 | `077-fixtures-reliees.md` | Fixtures reliées : colonnes réelles, références entre fixtures, ordre par dépendances |
+| ADR-078 | `078-fixtures-callable.md` | Fixtures callable : hooks Python dans le pipeline `fixtures:load` |
+| ADR-079 | `079-canonical-sql-statement-splitter.md` | Découpeur d'instructions SQL canonique dans le cœur |
+| ADR-080 | `080-auth-subject-validation.md` | Validation du sujet authentifié (`AuthMiddleware` et rendu) |
+| ADR-081 | `081-managed-timestamps.md` | Horodatages gérés par le framework (`make:crud`) |
+| ADR-082 | `082-skeleton-doc-style-adr.md` | Le squelette livre un ADR de style de documentation |
+| ADR-083 | `083-soft-delete.md` | Suppression logique (`options.soft_delete`) |
+| ADR-084 | `084-database-backend-support-tiers.md` | Niveaux de support des backends BDD pour la série 1.x |
+| ADR-085 | `085-canonical-route-wiring.md` | Câblage de routes canonique : fichier puis affichage |
+| ADR-086 | `086-entity-legacy-representation-elimination.md` | Élimination de la représentation legacy interne du moteur d'entités |
 
 Pour créer un nouvel ADR : `docs/adr/<numéro>-<sujet>.md`, suivre le format existant.
 
@@ -380,7 +395,7 @@ Les conventions opérationnelles de Forge sont consolidées dans
 - **D. Documentation** : MkDocs strict + liens hors `docs/`,
   `docs/history/` comme mémoire brute, section « Historique » dans la nav
 
-Note sur `packages/` : 26 sous-dossiers maintenus (liste exhaustive et à jour
+Note sur `packages/` : 27 sous-dossiers maintenus (liste exhaustive et à jour
 en section 1), chacun avec son propre `pyproject.toml`. Deux paquets ont été
 absorbés et supprimés : `forge-mvc-pivot` par `forge-mvc-entities` (ADR-070) et
 `forge-mvc-media` par `forge-mvc-images` (ADR-018) ; leurs shims de compatibilité
@@ -400,7 +415,7 @@ Les informations volatiles ne sont pas ici — voir section 8.
 
 **Prochaine refonte prévue** : tag majeur 2.0 (ou refonte intermédiaire si
 un changement architectural important le justifie).
-**Dernière refonte** : 2026-07 (resync opt-ins jusqu'à 26 paquets et ADR jusqu'à 073, `GOV-CLAUDE-MD-RESYNC-AUDIT-001`)
+**Dernière refonte** : 2026-07-26 (resync opt-ins jusqu'à 27 paquets et ADR jusqu'à 086, `GOV-CLAUDE-MD-RESYNC-086-001` ; refonte précédente : `GOV-CLAUDE-MD-RESYNC-AUDIT-001`, 26 paquets et ADR jusqu'à 073)
 
 ---
 
