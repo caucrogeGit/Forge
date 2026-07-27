@@ -19,6 +19,7 @@ Le rendu portable à utiliser est `core.database.table_ddl.render_create_table`
 """
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 import pytest
@@ -58,9 +59,12 @@ NON_PORTABLE_YET = {
     "packages/forge-mvc-jobs/forge_mvc_jobs/queue.py",
     "packages/forge-mvc-notifications/forge_mvc_notifications/store.py",
     "packages/forge-mvc-settings/forge_mvc_settings/store.py",
+    # forge-mvc-entities : les deux entrées RETIRÉES le 2026-07-27
+    # (OPTIN-DDL-ENTITIES-001). db_init.py dupliquait caractère pour
+    # caractère `Dialect.forge_migrations_ddl()`, qu'il appelle désormais ;
+    # migrations.py posait AUTO_INCREMENT en dur dans le chemin de diff et
+    # montrait un exemple MariaDB dans le gabarit de migration.
     # Non repérés par l'audit initial : DDL en Python, pas en .sql.
-    "packages/forge-mvc-entities/forge_mvc_entities/db_init.py",
-    "packages/forge-mvc-entities/forge_mvc_entities/migrations.py",
     # forge-mvc-iot/cli/doctor.py : RETIRÉ le 2026-07-27
     # (OPTIN-DDL-IOT-DOCTOR-001). Ses types MariaDB en dur étaient un
     # CONTRAT de colonnes attendu, pas du DDL : le controle passe désormais
@@ -100,8 +104,39 @@ def _shipped_sql_files() -> list[Path]:
 
 
 def _markers_in(path: Path) -> list[str]:
-    content = path.read_text(encoding="utf-8").upper()
-    return sorted(marker for marker in MARIADB_ONLY if marker in content)
+    """Constructions propres à MariaDB trouvées dans `path`.
+
+    Deux régimes, parce que les deux formats ne se prêtent pas au même
+    contrôle :
+
+    - **`.sql`** : tout le texte, sans distinction de casse. Un fichier SQL
+      n'a pas d'autre contenu que du SQL.
+    - **`.py`** : seules les **chaînes littérales**, et à la casse exacte.
+      Deux faux positifs sont ainsi évités. D'abord les identifiants : le nom
+      de champ `auto_increment` est du Python parfaitement portable, il
+      deviendrait `AUTO_INCREMENT` si l'on passait le fichier en majuscules.
+      Ensuite les clés de dictionnaire et messages : `field["auto_increment"]`
+      est une chaîne, mais en minuscules. Le SQL de ce dépôt écrit ses
+      mots-clés en majuscules, la casse suffit donc à discriminer.
+
+    Les docstrings sont incluses, et c'est voulu : un exemple SQL montré à
+    l'auteur d'un projet doit être portable lui aussi.
+    """
+    content = path.read_text(encoding="utf-8")
+    if path.suffix != ".py":
+        haystack = content.upper()
+        return sorted(marker for marker in MARIADB_ONLY if marker in haystack)
+
+    try:
+        tree = ast.parse(content)
+    except SyntaxError:  # pragma: no cover - un module cassé casse déjà ailleurs
+        return sorted(marker for marker in MARIADB_ONLY if marker in content)
+
+    haystack = "\n".join(
+        node.value for node in ast.walk(tree)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    )
+    return sorted(marker for marker in MARIADB_ONLY if marker in haystack)
 
 
 def _relative(path: Path) -> str:

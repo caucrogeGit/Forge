@@ -79,6 +79,10 @@ class MSSQLDialect:
         # IDENTITY(1,1) gère l'auto-incrément ; le type passé est ignoré.
         return f"{column} BIGINT IDENTITY(1,1)"
 
+    def auto_increment_clause(self) -> str:
+        # L'auto-increment est PORTE PAR LE TYPE (IDENTITY(1,1)) : aucun mot-cle.
+        return ""
+
     def emits_separate_primary_key(self) -> bool:
         return True
 

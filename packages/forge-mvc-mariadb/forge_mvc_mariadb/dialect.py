@@ -75,6 +75,10 @@ class MariaDBDialect:
     def auto_increment_column_ddl(self, column: str, sql_type: str) -> str:
         return f"{column} {sql_type} NOT NULL AUTO_INCREMENT"
 
+    def auto_increment_clause(self) -> str:
+        # MariaDB separe le type et l'auto-increment.
+        return "AUTO_INCREMENT"
+
     def emits_separate_primary_key(self) -> bool:
         return True
 

@@ -7,7 +7,9 @@ from forge_mvc_entities import db_init
 from forge_mvc_entities.db_init import DbInitError, init_project_database, load_db_init_config
 
 
-FORGE_MIGRATIONS_SQL = db_init.FORGE_MIGRATIONS_TABLE_SQL
+# La constante MariaDB est devenue une fonction rendue par le dialecte
+# (OPTIN-DDL-ENTITIES-001) : le DDL depend du backend actif.
+FORGE_MIGRATIONS_SQL = db_init.forge_migrations_table_sql()
 
 
 class _FakeMariadbError(Exception):

@@ -31,19 +31,21 @@ _ALLOWED_APP_PRIVILEGES = frozenset({
     "SELECT", "INSERT", "UPDATE", "DELETE",
     "CREATE", "ALTER", "DROP", "INDEX", "REFERENCES",
 })
-FORGE_MIGRATIONS_TABLE_SQL = """
-CREATE TABLE IF NOT EXISTS forge_migrations (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    version VARCHAR(64) NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    filename VARCHAR(255) NOT NULL,
-    checksum CHAR(64) NOT NULL,
-    applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    execution_ms INT NULL,
-    UNIQUE KEY uq_forge_migrations_version (version),
-    UNIQUE KEY uq_forge_migrations_filename (filename)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-""".strip()
+def forge_migrations_table_sql() -> str:
+    """DDL du registre technique `forge_migrations`, pour le backend actif.
+
+    Le DDL était auparavant une constante MariaDB écrite en dur, doublon
+    caractère pour caractère de `Dialect.forge_migrations_ddl()`, que le
+    contrat rendait déjà (`OPTIN-DDL-ENTITIES-001`). Le provisionnement
+    `db:init` produisait donc du SQL inexécutable sur les trois autres
+    backends, alors que le rendu correct existait à portée d'appel.
+
+    Fonction et non constante : le DDL dépend du backend, résolu à
+    l'exécution.
+    """
+    from core.database.backend import get_backend
+
+    return get_backend().dialect.forge_migrations_ddl()
 
 
 class DbInitError(ValueError):
@@ -248,7 +250,7 @@ def generate_provisioning_sql(cfg: ProvisioningEnv) -> str:
         "\n"
         "-- Registre technique des migrations (ne requiert que CREATE sur la base).\n"
         f"USE {database};\n"
-        f"{FORGE_MIGRATIONS_TABLE_SQL};\n"
+        f"{forge_migrations_table_sql()};\n"
         "\n"
         "-- Compte d'administration de la base : DDL du schéma (db:apply, migrations).\n"
         f"CREATE OR REPLACE USER {admin_user} IDENTIFIED BY {_quote_string(cfg.admin_password)};\n"
@@ -879,7 +881,7 @@ def _try_load_user_hosts(cursor: Any, login: str) -> list[str] | None:
 
 def _create_forge_migrations_table(cursor: Any, db_name: str) -> None:
     cursor.execute(f"USE {_quote_identifier(db_name)}")
-    cursor.execute(FORGE_MIGRATIONS_TABLE_SQL)
+    cursor.execute(forge_migrations_table_sql())
 
 
 def _rollback_quietly(connection: Any) -> None:

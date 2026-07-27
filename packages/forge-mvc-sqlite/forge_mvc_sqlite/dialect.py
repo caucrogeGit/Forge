@@ -69,6 +69,11 @@ class SQLiteDialect:
         # SQLite : la PK auto-incrémentée est portée par la colonne elle-même.
         return f"{column} {sql_type} PRIMARY KEY AUTOINCREMENT"
 
+    def auto_increment_clause(self) -> str:
+        # SQLite ne sait pas ajouter une colonne AUTOINCREMENT par ALTER TABLE :
+        # aucun mot-cle utilisable hors CREATE TABLE.
+        return ""
+
     def emits_separate_primary_key(self) -> bool:
         return False
 

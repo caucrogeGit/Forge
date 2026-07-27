@@ -688,7 +688,7 @@ def _migration_file_template(version: str, name: str) -> str:
         "\n"
         "-- Example:\n"
         "-- CREATE TABLE example (\n"
-        "--     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY\n"
+        f"--     {_example_identity_column()}\n"
         "-- );\n"
     )
 
@@ -931,11 +931,31 @@ def _validate_sql_identifier(identifier: str) -> str:
     return identifier
 
 
+def _example_identity_column() -> str:
+    """Ligne d'exemple d'une cle primaire auto-incrementee, pour le backend actif.
+
+    Le gabarit montrait une colonne au mot-clé d'auto-incrément MariaDB :
+    sur un projet PostgreSQL, l'exemple enseignait du SQL invalide
+    (OPTIN-DDL-ENTITIES-001).
+    """
+    from core.database.backend import get_backend
+
+    dialect = get_backend().dialect
+    return dialect.auto_increment_column_ddl("id", dialect.identity_type())
+
+
 def _sql_column_definition(field: dict[str, Any]) -> str:
     parts = [str(field["sql_type"])]
     parts.append("NULL" if field["nullable"] else "NOT NULL")
     if field["auto_increment"]:
-        parts.append("AUTO_INCREMENT")
+        # Le mot-cle depend du dialecte : MariaDB le separe du type, PostgreSQL
+        # et SQL Server le portent DANS le type et n'en veulent aucun
+        # (OPTIN-DDL-ENTITIES-001).
+        from core.database.backend import get_backend
+
+        clause = get_backend().dialect.auto_increment_clause()
+        if clause:
+            parts.append(clause)
     default_literal = sql_default_literal(field)
     if default_literal is not None:
         parts.append(f"DEFAULT {default_literal}")

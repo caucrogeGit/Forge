@@ -5,6 +5,15 @@
 
 ### Ajouté
 
+- **Le moteur d'entités ne pose plus de SQL MariaDB en dur (`OPTIN-DDL-ENTITIES-001`).**
+  `db_init.py` portait une constante `FORGE_MIGRATIONS_TABLE_SQL` doublon **caractère pour caractère** de `Dialect.forge_migrations_ddl()`, que le contrat rendait déjà : `forge db:init` produisait donc un registre de migrations inexécutable sur trois backends, alors que le rendu correct était à portée d'appel. Remplacée par `forge_migrations_table_sql()`, fonction et non constante puisque le DDL dépend du backend résolu à l'exécution.
+  `migrations.py` ajoutait le mot-clé `AUTO_INCREMENT` sans condition dans le chemin de diff (`migration:make --from-diff`), produisant du SQL invalide sur PostgreSQL et SQL Server où l'auto-incrément est porté **par le type**. Le contrat gagne `Dialect.auto_increment_clause()`, qui rend le mot-clé sur MariaDB et une chaîne vide ailleurs.
+  Le gabarit de migration vierge montrait en exemple une colonne à la syntaxe MariaDB : il enseignait du SQL invalide à un projet PostgreSQL. Il est rendu pour le backend actif.
+
+- **Cliquet de portabilité rendu précis (`OPTIN-DDL-GUARD-RATCHET-001`, suite).**
+  Le scan Python passait le fichier en majuscules, si bien que l'identifiant ordinaire `auto_increment` (nom de champ, clé de dictionnaire) déclenchait le garde-fou : un faux positif sur du code parfaitement portable.
+  Seules les **chaînes littérales** sont désormais inspectées, à la casse exacte. Le SQL de ce dépôt écrit ses mots-clés en majuscules, les identifiants Python en minuscules : la casse suffit à discriminer. Vérifié dans les deux sens, y compris qu'un vrai `CREATE TABLE` MariaDB déposé dans un paquet fait toujours échouer la suite.
+
 - **`forge iot:doctor` diagnostique enfin les quatre backends (`OPTIN-DDL-IOT-DOCTOR-001`).**
   Son contrôle de schéma interrogeait `INFORMATION_SCHEMA` par une requête écrite en dur, que SQLite ne possède pas, et comparait le résultat à des types MariaDB figés (`BIGINT UNSIGNED`, `DATETIME(6)`).
   Il signalait donc comme « type inattendu » un schéma PostgreSQL pourtant correct : un outil de diagnostic qui se trompait sur trois backends sur quatre.

@@ -77,6 +77,10 @@ class PostgreSQLDialect:
         # ignoré (la PK auto-incrémentée est toujours un serial).
         return f"{column} BIGSERIAL"
 
+    def auto_increment_clause(self) -> str:
+        # L'auto-increment est PORTE PAR LE TYPE (BIGSERIAL) : aucun mot-cle.
+        return ""
+
     def emits_separate_primary_key(self) -> bool:
         return True
 

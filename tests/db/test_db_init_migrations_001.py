@@ -29,7 +29,7 @@ import pytest
 
 from forge_mvc_entities import db_init
 from forge_mvc_entities import migrations as mig
-from forge_mvc_entities.db_init import FORGE_MIGRATIONS_TABLE_SQL
+from forge_mvc_entities.db_init import forge_migrations_table_sql
 
 pytestmark = pytest.mark.db
 
@@ -293,7 +293,7 @@ def migrated_db(harness: _DbHarness) -> Any:
     init = harness.connect(db_name)
     try:
         cur = init.cursor()
-        cur.execute(FORGE_MIGRATIONS_TABLE_SQL)
+        cur.execute(forge_migrations_table_sql())
         init.commit()
         cur.close()
     finally:

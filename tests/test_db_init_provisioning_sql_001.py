@@ -135,7 +135,18 @@ def test_check_env_refuse_db_name_invalide(monkeypatch):
 # ── Dispatch : défaut = génère, --run = exécute ──────────────────────────────
 
 def _fake_mariadb_backend():
-    return types.SimpleNamespace(name="mariadb", requires_provisioning=True)
+    """Backend factice, dialecte compris.
+
+    Le registre `forge_migrations` est désormais rendu par le dialecte au lieu
+    d'une constante MariaDB en dur (OPTIN-DDL-ENTITIES-001) : le faux backend
+    doit donc porter un dialecte, comme un vrai.
+    """
+    pytest.importorskip("forge_mvc_mariadb")
+    from forge_mvc_mariadb.dialect import MariaDBDialect
+
+    return types.SimpleNamespace(
+        name="mariadb", requires_provisioning=True, dialect=MariaDBDialect()
+    )
 
 
 def test_defaut_genere_le_sql_sans_executer(monkeypatch, capsys):

@@ -98,6 +98,21 @@ class Dialect(Protocol):
         """
         ...
 
+    def auto_increment_clause(self) -> str:
+        """Mot-clé d'auto-incrément à ajouter après le type, ou chaîne vide.
+
+        MariaDB sépare le type et l'auto-incrément (`BIGINT UNSIGNED` puis
+        `AUTO_INCREMENT`). PostgreSQL et SQL Server portent l'auto-incrément
+        **dans le type** (`BIGSERIAL`, `BIGINT IDENTITY(1,1)`) et renvoient
+        donc une chaîne vide : ajouter un mot-clé y produirait du SQL invalide.
+
+        Sert aux chemins qui composent une définition de colonne hors
+        `CREATE TABLE`, typiquement un `ALTER TABLE ... ADD COLUMN` issu d'un
+        diff. Pour la création de table, préférer `auto_increment_column_ddl()`,
+        qui rend la ligne complète.
+        """
+        ...
+
     def emits_separate_primary_key(self) -> bool:
         """Vrai si la PK s'exprime par une clause `PRIMARY KEY (col)` séparée.
 
