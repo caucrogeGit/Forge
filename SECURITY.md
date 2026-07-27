@@ -127,8 +127,13 @@ pip-audit -r requirements-dev.txt
   toutes les requêtes passent par des paramètres liés (`cursor.execute(sql, params)`,
   protocole binaire), et le jeu de caractères par défaut n'est pas big5.
   **Aucune version corrigée n'est disponible en amont** (1.1.14 est la dernière
-  publiée ; `pip-audit` ne liste aucune `fix version`). Le suivi reste ouvert :
-  le pin sera relevé dès qu'un correctif amont paraît.
+  publiée ; `pip-audit` ne liste aucune `fix version`).
+  Le suivi est **automatisé** : `tools/check_ignored_vulns.py` relit l'audit sans
+  les exclusions et **échoue** dès qu'un avis ignoré annonce une version
+  corrective. Il tourne chaque semaine (`dependency-audit.yml`, seule étape
+  bloquante de ce workflow) et à chaque validation de release. La dépendance est
+  déclarée en plage, `mariadb>=1.1.14,<1.2`, pour accueillir le correctif sans
+  changer le contrat.
 
 - **`GHSA-537c-gmf6-5ccf` — `cryptography` (opt-in MFA).** L'avis vise l'OpenSSL
   lié statiquement dans les wheels `cryptography` antérieures à `48.0.1`. Le pin

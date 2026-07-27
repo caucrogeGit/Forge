@@ -39,6 +39,17 @@ jobs:
         continue-on-error: true
         run: pip-audit -r requirements.txt
 
+      - name: Audit surface expédiée, cœur + opt-ins (informatif — non bloquant)
+        continue-on-error: true
+        run: pip-audit -r requirements-audit.txt
+
       - name: Audit dev dependencies (informatif — non bloquant)
         continue-on-error: true
         run: pip-audit -r requirements-dev.txt
+
+      # Seule étape BLOQUANTE de ce workflow, et elle ne signale pas une
+      # vulnérabilité : elle signale qu'un avis qu'on a choisi d'IGNORER a
+      # désormais un correctif amont. Sans elle, un `--ignore-vuln` survit à la
+      # publication du correctif et masque une vulnérabilité réparable.
+      - name: Un avis ignoré a-t-il un correctif ? (bloquant)
+        run: python tools/check_ignored_vulns.py requirements-audit.txt

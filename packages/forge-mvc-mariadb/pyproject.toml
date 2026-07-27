@@ -15,7 +15,7 @@ license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "mariadb", "database", "backend"]
 dependencies = [
     "forge-mvc>=1.0.0rc2,<2",
-    "mariadb==1.1.14",
+    "mariadb>=1.1.14,<1.2",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

@@ -5,6 +5,15 @@
 
 ### Corrigé
 
+- **Le garde de release audite enfin ce que Forge livre (`RELEASE-AUDIT-SHIPPED-SURFACE-001`).**
+  `tools/release-validate.sh` auditait `requirements.txt`, soit les **quatre** dépendances du cœur, en ignorant `requirements-audit.txt` qui agrège la surface réellement expédiée (Pillow, cryptography, psycopg, pyodbc...) — précisément celles qui portent des CVE. Le fichier existait pour cela, mais le garde ne le lisait pas.
+  Son verdict pytest se lisait par ailleurs dans le **texte** de sortie. Mesuré : une suite ne collectant aucun test affiche « no tests ran », que l'ancien motif comptait comme réussi, alors que pytest sort en **code 5**. Une erreur de configuration pouvait donc laisser passer une release **sans qu'un seul test ait tourné**. Le verdict vient désormais du code retour, avec un message propre au cas « aucun test collecté ».
+
+- **Bornes de dépendances : Pillow relevé, mariadb en plage (`DEPS-PILLOW-FLOOR-001`, `DEPS-MARIADB-PIN-RANGE-001`).**
+  La borne `Pillow>=10.3` autorisait des versions vulnérables sans que l'audit s'en aperçoive, celui-ci résolvant vers la borne haute. Mesuré avec `pip-audit` : 10.3, 11.0, 11.3, 12.0 et 12.2 portent des avis, **tous corrigés en 12.3.0**, première version propre. La borne devient `Pillow>=12.3,<13`, ce qui tranche l'arbitrage par la mesure plutôt que par estimation.
+  `mariadb==1.1.14` figeait une version portant `PYSEC-2026-217`, avis sans correctif amont, exclu de l'audit. La dépendance devient `mariadb>=1.1.14,<1.2` pour accueillir le correctif sans changer le contrat.
+  Surtout, une exclusion `--ignore-vuln` est une **dette** : sans surveillance, elle survit à la publication du correctif et masque une vulnérabilité réparable. Le nouveau `tools/check_ignored_vulns.py` relit l'audit **sans** les exclusions et échoue dès qu'un avis ignoré annonce une version corrective. C'est la **seule étape bloquante** de l'audit hebdomadaire, par ailleurs informatif, et elle est rejouée à chaque validation de release. Un garde-fou vérifie qu'aucun `--ignore-vuln` posé ailleurs n'échappe à cette surveillance.
+
 - **Le serveur de développement honore les réponses en flux (`SKELETON-DEVSERVER-STREAM-001`).**
   `Response.file()` (HTTP Range, `CORE-HTTP-FILE-RANGE-001`) laisse `body` vide et pose `stream` plus `content_length`. Le chemin WSGI le gérait depuis l'origine ; `_send_response` du serveur de développement annonçait `len(body)`, soit **0**, et n'écrivait jamais le flux.
   Mesuré sur un fichier de 5000 octets : `Content-Length: 0` et **zéro octet écrit**. Tout téléchargement, toute lecture vidéo ou audio et tout `/media/` étaient donc servis **vides** en développement, sans la moindre erreur. Le contrat Range du cœur était correct mais inobservable par un développeur.

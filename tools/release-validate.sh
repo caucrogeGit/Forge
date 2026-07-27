@@ -202,17 +202,22 @@ fi
 # ── 4. Tests ──────────────────────────────────────────────────────────────────
 echo ""
 echo "--- Exécution des tests (pytest -x -q) ---"
-PYTEST_OUT=$("$PYTHON_BIN" -m pytest -x -q 2>&1 || true)
-echo "$PYTEST_OUT" | tail -5
-if echo "$PYTEST_OUT" | grep -qE "passed|no tests ran"; then
-    if ! echo "$PYTEST_OUT" | grep -qE "^(FAILED|ERROR)"; then
-        _ok "Tests : OK"
-    else
-        _fail "Tests : échec"
-    fi
+# RELEASE-AUDIT-SHIPPED-SURFACE-001 : le verdict vient du CODE RETOUR, pas du
+# texte de sortie. L'ancien motif cherchait « passed|no tests ran » : une suite
+# ne collectant AUCUN test (pytest sort en 5) affichait « no tests ran » et
+# était comptée comme réussie. Une erreur de configuration pouvait donc laisser
+# passer une release sans qu'un seul test ait tourné.
+if PYTEST_OUT=$("$PYTHON_BIN" -m pytest -x -q 2>&1); then
+    PYTEST_CODE=0
 else
-    _fail "Tests : échec (voir sortie ci-dessus)"
+    PYTEST_CODE=$?
 fi
+echo "$PYTEST_OUT" | tail -5
+case "$PYTEST_CODE" in
+    0) _ok "Tests : OK" ;;
+    5) _fail "Tests : échec — aucun test collecté (pytest code 5), configuration à vérifier" ;;
+    *) _fail "Tests : échec (pytest code $PYTEST_CODE)" ;;
+esac
 
 # ── 5. Qualité de code ────────────────────────────────────────────────────────
 echo ""
@@ -273,6 +278,24 @@ else
     else
         _fail "pip-audit (requirements.txt) : vulnérabilités détectées"
         printf '%s\n' "$PIP_AUDIT_RT_OUT" | head -20 | sed 's/^/         /' || true
+    fi
+    # RELEASE-AUDIT-SHIPPED-SURFACE-001 : `requirements.txt` ne couvre que les
+    # 4 dépendances du cœur. La surface RÉELLEMENT EXPÉDIÉE inclut celles des
+    # opt-ins (Pillow, cryptography, psycopg, pyodbc...), agrégées dans
+    # `requirements-audit.txt` — précisément celles qui portent des CVE. Sans
+    # cette étape, le garde de release ignorait tout ce que Forge livre.
+    if PIP_AUDIT_SHIPPED_OUT=$("$PYTHON_BIN" -m pip_audit --ignore-vuln PYSEC-2026-217 -r requirements-audit.txt 2>&1); then
+        _ok "pip-audit (requirements-audit.txt, surface expédiée) : aucune vulnérabilité (hors PYSEC-2026-217 accepté)"
+    else
+        _fail "pip-audit (requirements-audit.txt, surface expédiée) : vulnérabilités détectées"
+        printf '%s\n' "$PIP_AUDIT_SHIPPED_OUT" | head -20 | sed 's/^/         /' || true
+    fi
+    # L'exclusion ci-dessus est une dette : on vérifie qu'elle reste justifiée.
+    if IGNORED_OUT=$("$PYTHON_BIN" tools/check_ignored_vulns.py requirements-audit.txt 2>&1); then
+        _ok "Avis ignorés : toujours sans correctif amont"
+    else
+        _fail "Avis ignorés : un correctif est paru, relever la borne et retirer l'exclusion"
+        printf '%s\n' "$IGNORED_OUT" | head -20 | sed 's/^/         /' || true
     fi
     if PIP_AUDIT_DEV_OUT=$("$PYTHON_BIN" -m pip_audit -r requirements-dev.txt 2>&1); then
         _ok "pip-audit (requirements-dev.txt) : aucune vulnérabilité"
