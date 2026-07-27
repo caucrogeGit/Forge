@@ -11,11 +11,27 @@ qui fournit son nom de paquet et son libellé.
 
 Idempotent, jamais d'écrasement silencieux : un fichier déjà présent au contenu
 identique est signalé OK, un fichier différent provoque un WARN sans modification.
+
+Deux sources de migration cohabitent le temps du chantier
+`OPTIN-DDL-DIALECTAL` :
+
+- **rendu dialectal** (cible) : le paquet expose un module ``tables`` avec une
+  liste ``MIGRATIONS`` de ``(nom de fichier, TableDefinition)``. Le SQL est
+  rendu pour le backend actif via ``core.database.table_ddl`` ;
+- **fichier figé** (héritage) : le paquet livre des ``.sql`` sous
+  ``<package>/migrations/``, copiés tels quels. L'audit
+  ``OPTIN-DDL-DIALECT-AUDIT-001`` a mesuré que ces fichiers ne s'exécutent que
+  sur MariaDB ; ils sont repris paquet par paquet, et le cliquet
+  ``tests/meta/test_optin_ddl_portability_ratchet_001.py`` empêche la liste de
+  grandir.
+
+Le SQL rendu reste **visible** : il est écrit dans ``mvc/migrations/``, relu
+puis appliqué par ``forge migration:apply`` (charte §7, ADR-071).
 """
 from __future__ import annotations
 
 from collections.abc import Iterator
-from importlib import resources
+from importlib import import_module, resources
 from pathlib import Path
 
 STATUS_OK = "[OK]"
@@ -24,8 +40,60 @@ STATUS_WARN = "[WARN]"
 STATUS_ERROR = "[ERREUR]"
 
 
+def _rendered_header(package: str, filename: str, backend_name: str) -> str:
+    return (
+        f"-- Migration Forge rendue pour le backend « {backend_name} ».\n"
+        f"-- Source : {package} (déclaration : {package}.tables).\n"
+        "--\n"
+        "-- Ce fichier a été GÉNÉRÉ par `forge <opt-in>:init` à partir d'une\n"
+        "-- description de table unique, rendue par le dialecte du backend\n"
+        "-- installé. Relisez-le, puis appliquez-le : forge migration:apply\n"
+        "--\n"
+        "-- Changer de backend en cours de projet suppose de reprovisionner :\n"
+        "-- le SQL rendu diffère, et `migration:apply` refuse une migration\n"
+        "-- déjà appliquée dont le contenu a changé.\n"
+        "\n"
+    )
+
+
+def _rendered_migrations(package: str) -> "list[tuple[str, bytes]] | None":
+    """Rend les migrations déclarées par ``<package>.tables``, si ce module existe.
+
+    Retourne ``None`` quand le paquet n'a pas encore été repris et livre encore
+    des ``.sql`` figés.
+    """
+    try:
+        module = import_module(f"{package}.tables")
+    except ModuleNotFoundError:
+        return None
+
+    declarations = getattr(module, "MIGRATIONS", None)
+    if not declarations:
+        return None
+
+    from core.database.backend import get_backend
+    from core.database.table_ddl import render_create_table
+
+    backend = get_backend()
+    out: list[tuple[str, bytes]] = []
+    for filename, table in declarations:
+        statements = render_create_table(table, backend.dialect)
+        body = _rendered_header(package, filename, backend.name) + "\n".join(statements) + "\n"
+        out.append((filename, body.encode("utf-8")))
+    return out
+
+
 def iter_migration_resources(package: str) -> Iterator[tuple[str, bytes]]:
-    """Itère ``(filename, content_bytes)`` pour chaque ``.sql`` de ``<package>/migrations``."""
+    """Itère ``(filename, content_bytes)`` pour chaque migration de ``package``.
+
+    Rend les migrations déclarées (``<package>.tables``) pour le backend actif ;
+    à défaut, copie les ``.sql`` figés de ``<package>/migrations``.
+    """
+    rendered = _rendered_migrations(package)
+    if rendered is not None:
+        yield from rendered
+        return
+
     anchor = resources.files(package) / "migrations"
     for entry in sorted(anchor.iterdir(), key=lambda e: e.name):
         if entry.name.endswith(".sql"):
@@ -54,7 +122,17 @@ def init_optin_migrations(package: str, label: str, project_root: Path) -> int:
     skipped_identical: list[str] = []
     skipped_different: list[str] = []
 
-    for name, content in iter_migration_resources(package):
+    try:
+        migrations = list(iter_migration_resources(package))
+    except Exception as error:  # noqa: BLE001 — message d'opérateur, pas de trace
+        # Une migration rendue exige un backend résolu (ADR-054). Sans lui, on
+        # explique au lieu de dérouler une pile d'appels.
+        print(f"{STATUS_ERROR} Impossible de préparer la migration {label} : {error}")
+        print("Conseil : installe un backend BDD (un seul par projet), par exemple")
+        print("          pip install forge-mvc-mariadb")
+        return 1
+
+    for name, content in migrations:
         target = target_dir / name
         if target.exists():
             if target.read_bytes() == content:

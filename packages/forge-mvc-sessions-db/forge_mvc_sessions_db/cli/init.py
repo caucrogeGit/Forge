@@ -1,9 +1,14 @@
 # pyright: strict
 """Commande ``forge sessions:init`` — adaptateur mince (CORE-OPTIN-INIT-HELPER-001).
 
-Copie les migrations SQL embarquées (forge_mvc_sessions_db/migrations/) vers
-``mvc/migrations/`` du projet, sans exécuter de SQL. Toute la logique
-(idempotence, non-écrasement, messages) vit dans
+Écrit la migration Sessions dans ``mvc/migrations/`` du projet, sans exécuter
+de SQL. Depuis ``OPTIN-DDL-SESSIONS-DB-001``, le SQL n'est plus copié d'un
+fichier figé : il est **rendu pour le backend actif** à partir de la
+description unique de ``forge_mvc_sessions_db.tables`` (voir
+``core.database.table_ddl``). Le fichier produit reste relisible avant
+``forge migration:apply``.
+
+Toute la logique (rendu, idempotence, non-écrasement, messages) vit dans
 ``cli._support.optin_migrations`` (ADR-071) ; ce module ne fournit que le nom
 de paquet et le libellé « Sessions ».
 """

@@ -5,6 +5,14 @@
 
 ### Ajouté
 
+- **`forge-mvc-sessions-db` passe au DDL dialectal (`OPTIN-DDL-SESSIONS-DB-001`), pilote du chantier.**
+  Le paquet ne livre plus de `.sql` figé : il déclare sa table une fois (`forge_mvc_sessions_db.tables`) et `forge sessions:init` rend le DDL du backend installé.
+  Le fichier remplacé portait lui-même l'aveu de sa limite, « DDL MariaDB, adaptez les types au backend actif si nécessaire » : l'adaptation n'est plus reportée sur l'auteur du projet.
+  La table de session s'installe et fonctionne désormais sur MariaDB, PostgreSQL et SQL Server, concurrence optimiste par la colonne `version` comprise, vérifié sur les trois serveurs.
+  Le mécanisme de rendu est porté par le helper partagé `cli/_support/optin_migrations.py` : les neuf opt-ins restants basculeront en déclarant leur table, sans autre changement.
+  `sessions:init` reste sans amorçage de config : rendre exige l'identité du backend (entry point, ADR-054), pas les identifiants de connexion, et aucune connexion n'est ouverte.
+  À noter sur MariaDB, pour les **nouveaux** projets : la colonne `data` devient `TEXT` au lieu de `LONGTEXT` (les tables existantes ne sont pas modifiées, la migration reste un `CREATE TABLE IF NOT EXISTS`).
+
 - **Rendu dialectal des tables d'infrastructure (`DB-TABLE-DDL-RENDERER-001`).**
   Nouveau module `core/database/table_ddl.py` : un paquet décrit sa table une fois (`TableDefinition`, `Column`, `Index`, `ForeignKey`) et `render_create_table()` produit le DDL correct pour le backend actif, en passant par le contrat `Dialect`.
   Le rendu retourne la liste des instructions : le `CREATE TABLE`, puis les `CREATE INDEX` séparés que PostgreSQL, SQLite et SQL Server exigent là où MariaDB les porte en ligne.

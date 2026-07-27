@@ -52,7 +52,8 @@ NON_PORTABLE_YET = {
     "packages/forge-mvc-notifications/forge_mvc_notifications/migrations/20260626150000_create_notifications.sql",
     "packages/forge-mvc-rbac/sql/rbac.sql",
     "packages/forge-mvc-rbac/sql/user_roles.sql",
-    "packages/forge-mvc-sessions-db/forge_mvc_sessions_db/migrations/20260710130000_create_forge_sessions.sql",
+    # forge-mvc-sessions-db : RETIRÉ le 2026-07-27 (OPTIN-DDL-SESSIONS-DB-001).
+    # Le paquet déclare sa table et le DDL est rendu par le dialecte actif.
     "packages/forge-mvc-settings/forge_mvc_settings/migrations/20260626120000_create_app_settings.sql",
     "packages/forge-mvc-video/forge_mvc_video/migrations/20260601120000_create_videos.sql",
 }

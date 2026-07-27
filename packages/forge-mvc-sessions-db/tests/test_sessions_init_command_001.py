@@ -1,8 +1,15 @@
 """Garde-fous des commandes `forge sessions:init` / `sessions:gc` (retour 016 F34/F35 ; ADR-071).
 
-Vérifie que le paquet embarque la migration `forge_sessions` (avec colonne
-`version`), que la commande la copie dans `mvc/migrations/` sans écraser un
-fichier divergent, et que le DDL ne pose pas de double horloge SGBD/Python (F37).
+Vérifie que le paquet **déclare** la table `forge_sessions` (avec colonne
+`version`), que la commande écrit sa migration dans `mvc/migrations/` sans
+écraser un fichier divergent, et que le DDL ne pose pas de double horloge
+SGBD/Python (F37).
+
+Depuis `OPTIN-DDL-SESSIONS-DB-001`, le paquet ne livre plus de `.sql` figé :
+il déclare la table une fois (`forge_mvc_sessions_db.tables`) et le DDL est
+**rendu pour le backend actif**. Les invariants métier (colonne `version`,
+absence de double horloge) sont donc vérifiés sur le rendu, et pour chacun des
+quatre backends plutôt que pour le seul MariaDB.
 """
 from __future__ import annotations
 
@@ -20,18 +27,55 @@ from forge_mvc_sessions_db.cli.init import (
 PKG_ROOT = Path(forge_mvc_sessions_db.__file__).resolve().parent
 
 
-def test_ships_forge_sessions_migration() -> None:
-    sql_files = list((PKG_ROOT / "migrations").glob("*.sql"))
-    assert sql_files, "forge-mvc-sessions-db doit embarquer la migration forge_sessions"
-    sql = sql_files[0].read_text(encoding="utf-8")
-    assert "CREATE TABLE IF NOT EXISTS forge_sessions" in sql
+BACKENDS = ("mariadb", "sqlite", "postgres", "mssql")
+
+
+def _rendered(backend_name: str) -> str:
+    """DDL rendu par le paquet pour un backend donné."""
+    pytest.importorskip(f"forge_mvc_{backend_name}")
+    from core.database.table_ddl import render_create_table
+    from forge_mvc_sessions_db.tables import FORGE_SESSIONS
+
+    module = __import__(f"forge_mvc_{backend_name}.dialect", fromlist=["dialect"])
+    dialect_cls = next(
+        value for key, value in vars(module).items()
+        if key.endswith("Dialect") and isinstance(value, type)
+    )
+    return "\n".join(render_create_table(FORGE_SESSIONS, dialect_cls()))
+
+
+def test_declares_forge_sessions_table() -> None:
+    """Le paquet ne livre plus de SQL figé : il déclare la table."""
+    from forge_mvc_sessions_db.tables import FORGE_SESSIONS, MIGRATIONS
+
+    assert not (PKG_ROOT / "migrations").exists(), (
+        "forge-mvc-sessions-db ne doit plus embarquer de .sql fige "
+        "(OPTIN-DDL-SESSIONS-DB-001)."
+    )
+    assert FORGE_SESSIONS.name == "forge_sessions"
+    assert MIGRATIONS and MIGRATIONS[0][0].endswith("_create_forge_sessions.sql")
+
+
+@pytest.mark.parametrize("backend_name", BACKENDS)
+def test_rendered_ddl_carries_business_invariants(backend_name: str) -> None:
+    sql = _rendered(backend_name)
+    assert "forge_sessions" in sql
     # F36 : colonne version pour la concurrence optimiste.
     assert "version" in sql
     # F37 : pas de double horloge (aucune autorité SGBD sur les horodatages).
-    # On inspecte les lignes de définition, hors commentaires SQL (`-- ...`).
     ddl = "\n".join(line for line in sql.splitlines() if not line.strip().startswith("--"))
     assert "DEFAULT CURRENT_TIMESTAMP" not in ddl
-    assert "ON UPDATE" not in ddl
+    assert "ON UPDATE" not in ddl.upper()
+
+
+@pytest.mark.parametrize("backend_name", BACKENDS)
+def test_rendered_ddl_is_portable(backend_name: str) -> None:
+    """Le défaut mesuré par l'audit ne doit pas revenir par le rendu."""
+    sql = _rendered(backend_name).upper()
+    if backend_name == "mariadb":
+        return
+    for marker in ("AUTO_INCREMENT", "UNSIGNED", "ENGINE=", "LONGTEXT"):
+        assert marker not in sql, f"{backend_name} : DDL contenant {marker}"
 
 
 def test_init_copies_migration_into_mvc_migrations(tmp_path: Path) -> None:

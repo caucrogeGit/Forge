@@ -94,6 +94,9 @@ def test_sessions_commands_declare_config_correctly():
     from forge_mvc_sessions_db.commands import COMMANDS
 
     assert COMMANDS["sessions:gc"].get("config") is True
+    # `sessions:init` rend son DDL depuis OPTIN-DDL-SESSIONS-DB-001, mais rendre
+    # n'exige que l'identité du backend (entry point, ADR-054), pas les
+    # identifiants de connexion : la commande reste sans amorçage de config.
     assert "config" not in COMMANDS["sessions:init"]
 
 
