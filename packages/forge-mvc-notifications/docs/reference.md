@@ -90,7 +90,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
     | API publique | `notify`, `get_notifications`, `unread_count`, `mark_read`, `mark_all_read`, `Notification` |
-    | Table SQL | `notifications` (`TABLE_NAME`, `CREATE_TABLE_SQL`) |
+    | Table SQL | `notifications` (`TABLE_NAME`) |
     | Limite de lecture | `MAX_LIMIT` = 1000 entrées |
     | Exception liée | `NotificationError` si destinataire/message vide ou limite invalide |
     | Périmètre | in-app (V1) ; livraison email/push à charge de l'application |
@@ -208,7 +208,6 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     | `Notification` | dataclass | `id`, `recipient`, `type`, `message`, `data`, `read`, `created_at` |
     | `NotificationError` | exception (`ValueError`) | destinataire/message vide ou limite invalide |
     | `TABLE_NAME` | `"notifications"` | nom de la table |
-    | `CREATE_TABLE_SQL` | constante SQL | création de la table |
     | `MAX_LIMIT` | `1000` | plafond du paramètre `limit` |
 
     `recipient` est un identifiant applicatif (par exemple `"eleve.42"` ou un login).
@@ -226,7 +225,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     | Ne montrer que les non lues | `unread_only=True` |
     | Afficher un badge | `unread_count(recipient)` |
     | Marquer lu | `mark_read(id)` / `mark_all_read(recipient)` |
-    | Créer la table | `CREATE_TABLE_SQL` ou `forge notifications:init` |
+    | Créer la table | `forge notifications:init` puis `forge migration:apply` |
 
 ??? note "8. Exemples d'utilisation"
 
@@ -266,7 +265,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     !!! warning "Création de la table"
         Les fonctions supposent la table `notifications` présente.
 
-        Créez-la avec `forge notifications:init` (ou exécutez `CREATE_TABLE_SQL`) avant le premier appel.
+        Créez-la avec `forge notifications:init` puis `forge migration:apply`, avant le premier appel.
 
     !!! note "Périmètre in-app"
         La V1 stocke des notifications **in-app** (lignes en base).

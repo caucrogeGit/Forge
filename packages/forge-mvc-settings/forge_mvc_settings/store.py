@@ -33,16 +33,6 @@ SettingValue = str | int | bool | float
 # (`qcm.session_duration`), jamais d'espace ni de caractère arbitraire.
 _KEY_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_.]{0,190}$")
 
-CREATE_TABLE_SQL = (
-    "CREATE TABLE IF NOT EXISTS app_settings (\n"
-    "    setting_key   VARCHAR(191) NOT NULL,\n"
-    "    setting_value TEXT NOT NULL,\n"
-    "    value_type    VARCHAR(16) NOT NULL DEFAULT 'str',\n"
-    "    updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP "
-    "ON UPDATE CURRENT_TIMESTAMP,\n"
-    "    PRIMARY KEY (setting_key)\n"
-    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
-)
 
 _SELECT_ONE_SQL = f"SELECT setting_value, value_type FROM {TABLE_NAME} WHERE setting_key = ?"
 _SELECT_ALL_SQL = f"SELECT setting_key, setting_value, value_type FROM {TABLE_NAME} ORDER BY setting_key"

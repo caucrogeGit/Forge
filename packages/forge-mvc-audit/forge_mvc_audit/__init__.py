@@ -11,7 +11,6 @@ applicative). La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 """
 from forge_mvc_audit.errors import AuditError
 from forge_mvc_audit.store import (
-    CREATE_TABLE_SQL,
     MAX_LIMIT,
     TABLE_NAME,
     AuditEntry,
@@ -26,7 +25,6 @@ __all__ = [
     "AuditEntry",
     "TABLE_NAME",
     "MAX_LIMIT",
-    "CREATE_TABLE_SQL",
     "record_audit",
     "get_audit_log",
 ]

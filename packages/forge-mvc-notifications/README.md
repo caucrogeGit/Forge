@@ -38,7 +38,7 @@ mark_read(1)
 
 L'API expose `notify`, `get_notifications`, `unread_count`, `mark_read`,
 `mark_all_read`, plus `Notification`, `NotificationError`, `TABLE_NAME`,
-`MAX_LIMIT` et `CREATE_TABLE_SQL`.
+`MAX_LIMIT`.
 
 ## Périmètre
 

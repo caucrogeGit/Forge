@@ -4,7 +4,7 @@ Objectif : comprendre pourquoi Settings est un opt-in, et comment le tester.
 
 **Ce que vous allez apprendre :** Forge Core ne dépend pas de `forge-mvc-settings`.
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
-Le paramètre `db` injectable et la constante `CREATE_TABLE_SQL` rendent le store vérifiable et auditable.
+Le paramètre `db` injectable et le schéma visible via la migration rendue.
 
 Deuxième palier du **niveau avancé** de la progression Settings.
 
@@ -12,14 +12,14 @@ Deuxième palier du **niveau avancé** de la progression Settings.
 
 - la règle de dépendance de l'opt-in ;
 - l'injection de `db` pour tester sans base réelle ;
-- la constante `CREATE_TABLE_SQL` exposée par le module.
+- La migration rendue garde le schéma visible.
 
 ## Fonctions Forge utilisées
 
 | Fonction | Rôle dans ce starter | Référence |
 |----------|----------------------|-----------|
 | `set_setting(key, value, *, db=...)` | Accepte un accès base injectable. | Opt-ins |
-| `CREATE_TABLE_SQL` | Définition SQL de la table, exposée pour inspection. | Opt-ins |
+| `TABLE_NAME` | Nom de la table ; son schéma vit dans la migration rendue. | Opt-ins |
 
 ## 1. La règle de dépendance
 
@@ -50,26 +50,33 @@ print(get_setting("maintenance", db=adapter_de_test))   # True
 - Par défaut, l'accès passe par `core.database.db`, le pool configuré par l'application.
 - En test, un adapter exposant `fetch_one`, `fetch_all` et `execute` suffit, sans base réelle.
 
-## 3. La constante CREATE_TABLE_SQL
+## 3. Le schéma reste visible
+Le paquet ne livre pas de SQL figé : il **déclare** sa table, et `forge settings:init`
+en écrit le DDL dans `mvc/migrations/`, rendu pour le backend que vous avez
+installé.
 
-```python
-from forge_mvc_settings import CREATE_TABLE_SQL, TABLE_NAME
-
-print(TABLE_NAME)         # app_settings
-print(CREATE_TABLE_SQL)   # CREATE TABLE IF NOT EXISTS app_settings ...
+```bash
+forge settings:init            # écrit la migration, sans rien exécuter
+forge migration:apply           # après l'avoir relue
 ```
 
-### Comprendre ce code
+```python
+from forge_mvc_settings import TABLE_NAME
 
-- `CREATE_TABLE_SQL` est la même définition que la migration embarquée.
-- Elle reste visible et auditable : le SQL n'est pas caché (principe 5, SQL visible).
-- `TABLE_NAME` vaut `app_settings`, le nom de la table de stockage.
+print(TABLE_NAME)   # "app_settings"
+```
+
+- `TABLE_NAME` vaut `"app_settings"` : le nom de la table.
+- Le SQL reste visible, et il est même **relu avant d'être appliqué** : rien
+  n'est exécuté dans votre dos (principe 5).
+- Il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server : la même
+  déclaration, rendue par le dialecte actif.
 
 ## À retenir
 
 - L'opt-in dépend du cœur, le cœur ignore l'opt-in.
 - Le paramètre `db` rend le store testable sans base réelle.
-- `CREATE_TABLE_SQL` et `TABLE_NAME` exposent le stockage pour inspection.
+- `TABLE_NAME` nomme le stockage ; la migration rendue en montre le schéma.
 
 ## Après ce starter
 

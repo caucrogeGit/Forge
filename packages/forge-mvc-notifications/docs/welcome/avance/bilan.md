@@ -8,7 +8,7 @@ Ce niveau cerne le périmètre du paquet, la livraison hors application et l'ind
 | Palier | Compétence acquise |
 |--------|--------------------|
 | 1, [Périmètre et livraison](notif-delivery.md) | Cerner le périmètre in-app et livrer hors application via `forge-mvc-jobs` et `forge-mvc-mail`. |
-| 2, [Indépendance du cœur](notif-independance.md) | Comprendre la règle de dépendance, injecter `db=`, utiliser `CREATE_TABLE_SQL`. |
+| 2, [Indépendance du cœur](notif-independance.md) | Comprendre la règle de dépendance, injecter `db=`, lire la migration rendue. |
 
 Vous savez situer le paquet dans l'écosystème Forge et l'utiliser de façon testable.
 

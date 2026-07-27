@@ -29,19 +29,6 @@ TABLE_NAME = "notifications"
 #: Plafond strict du nombre de notifications lues d'un coup.
 MAX_LIMIT = 1000
 
-CREATE_TABLE_SQL = (
-    "CREATE TABLE IF NOT EXISTS notifications (\n"
-    "    id          INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
-    "    recipient   VARCHAR(191) NOT NULL,\n"
-    "    type        VARCHAR(64) NOT NULL DEFAULT 'info',\n"
-    "    message     TEXT NOT NULL,\n"
-    "    data        TEXT NOT NULL,\n"
-    "    read_at     DATETIME NULL,\n"
-    "    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
-    "    KEY idx_notif_recipient (recipient, read_at),\n"
-    "    KEY idx_notif_created (created_at)\n"
-    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
-)
 
 _INSERT_SQL = (
     f"INSERT INTO {TABLE_NAME} (recipient, type, message, data) VALUES (?, ?, ?, ?)"

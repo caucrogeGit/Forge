@@ -45,7 +45,6 @@ Synthèse de l'API de `forge-mvc-jobs`, à garder sous la main.
 | Nom | Valeur ou rôle |
 |-----|----------------|
 | `TABLE_NAME` | `"jobs"` |
-| `CREATE_TABLE_SQL` | SQL de création de la table `jobs`. |
 | `JobError` | Levée sur tâche invalide (texte vide, essais négatifs, charge non-JSON). |
 
 ## Le modèle web et worker

@@ -8,7 +8,7 @@ Ce niveau ajoute la robustesse : règles de clé, gestion des erreurs et indépe
 | Palier | Compétence acquise |
 |--------|--------------------|
 | 1, [Les règles de clé](settings-keys.md) | Former une clé hiérarchique et rattraper `SettingsError`. |
-| 2, [Indépendance du cœur](settings-independance.md) | Règle de dépendance, paramètre `db` injectable, `CREATE_TABLE_SQL`. |
+| 2, [Indépendance du cœur](settings-independance.md) | Règle de dépendance, paramètre `db` injectable, schéma via la migration rendue. |
 
 Vous avez parcouru tout le socle des paramètres applicatifs.
 

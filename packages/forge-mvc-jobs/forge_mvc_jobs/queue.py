@@ -36,24 +36,6 @@ TABLE_NAME = "jobs"
 #: Un gestionnaire de tâche : reçoit la charge utile (dict) désérialisée.
 JobHandler = Callable[[dict[str, Any]], object]
 
-CREATE_TABLE_SQL = (
-    "CREATE TABLE IF NOT EXISTS jobs (\n"
-    "    id           INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
-    "    queue        VARCHAR(191) NOT NULL DEFAULT 'default',\n"
-    "    task         VARCHAR(191) NOT NULL,\n"
-    "    payload      TEXT NOT NULL,\n"
-    "    status       VARCHAR(16) NOT NULL DEFAULT 'pending',\n"
-    "    attempts     INT NOT NULL DEFAULT 0,\n"
-    "    max_attempts INT NOT NULL DEFAULT 1,\n"
-    "    available_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
-    "    last_error   TEXT NULL,\n"
-    "    claim_token  VARCHAR(64) NULL,\n"
-    "    created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
-    "    started_at   DATETIME NULL,\n"
-    "    finished_at  DATETIME NULL,\n"
-    "    KEY idx_jobs_claim (queue, status, available_at)\n"
-    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
-)
 
 _INSERT_SQL = (
     f"INSERT INTO {TABLE_NAME} (queue, task, payload, max_attempts, available_at) "

@@ -38,7 +38,6 @@ Toutes ces fonctions acceptent un paramètre `db=` injectable (défaut `core.dat
 |-----|----------------|
 | `TABLE_NAME` | `app_settings` |
 | `SUPPORTED_TYPES` | `("str", "int", "bool", "float")` |
-| `CREATE_TABLE_SQL` | Définition SQL de la table, exposée pour inspection. |
 | `SettingsError` | Levée sur clé invalide ou type non supporté. |
 
 ## Rappel

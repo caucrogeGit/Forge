@@ -11,7 +11,6 @@ synchrone. La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 """
 from forge_mvc_jobs.errors import JobError
 from forge_mvc_jobs.queue import (
-    CREATE_TABLE_SQL,
     TABLE_NAME,
     Job,
     JobHandler,
@@ -30,7 +29,6 @@ __all__ = [
     "Job",
     "JobHandler",
     "TABLE_NAME",
-    "CREATE_TABLE_SQL",
     "enqueue",
     "process_one",
     "drain",

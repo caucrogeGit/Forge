@@ -4,7 +4,7 @@ Objectif : comprendre pourquoi Jobs est un opt-in, et comment l'isoler pour les 
 
 **Ce que vous allez apprendre :** Forge Core ne dépend pas de `forge-mvc-jobs`.
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
-Le paramètre `db=` rend la file injectable, ce qui facilite les tests, et la constante `CREATE_TABLE_SQL` décrit la table en SQL visible.
+Le paramètre `db=` rend la file injectable, ce qui facilite les tests, et le schéma visible via la migration rendue.
 
 Deuxième palier du **niveau avancé** de la progression Jobs.
 
@@ -12,7 +12,7 @@ Deuxième palier du **niveau avancé** de la progression Jobs.
 
 - la règle de dépendance de l'opt-in ;
 - le paramètre `db=` injectable pour les tests ;
-- la constante `CREATE_TABLE_SQL`.
+- le schéma visible via la migration rendue.
 
 ## La règle de dépendance
 
@@ -50,24 +50,35 @@ def test_envoi(db):
 - Dans un test, vous passez une base de test ; en production, vous laissez la valeur par défaut.
 - Le gestionnaire de test enregistre simplement les appels, sans effet de bord réel.
 
-## La constante CREATE_TABLE_SQL
+## Le schéma reste visible
 
-```python
-from forge_mvc_jobs import CREATE_TABLE_SQL, TABLE_NAME
+Le paquet ne livre pas de SQL figé : il **déclare** sa table, et `forge jobs:init`
+en écrit le DDL dans `mvc/migrations/`, rendu pour le backend que vous avez
+installé.
 
-print(TABLE_NAME)        # "jobs"
-print(CREATE_TABLE_SQL)  # le SQL de création de la table
+```bash
+forge jobs:init            # écrit la migration, sans rien exécuter
+cat mvc/migrations/*_create_jobs.sql   # relisez-la
+forge migration:apply           # puis appliquez-la
 ```
 
-- `TABLE_NAME` vaut `"jobs"` : le nom de la table de la file.
-- `CREATE_TABLE_SQL` est le SQL de création, lisible et auditable.
-- Le SQL reste visible : rien n'est généré dans votre dos.
+```python
+from forge_mvc_jobs import TABLE_NAME
+
+print(TABLE_NAME)   # "jobs"
+```
+
+- `TABLE_NAME` vaut `"jobs"` : le nom de la table.
+- Le SQL reste visible, et il est même **relu avant d'être appliqué** : rien
+  n'est exécuté dans votre dos (principe 5).
+- Il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server : la même
+  déclaration, rendue par le dialecte actif.
 
 ## À retenir
 
 - L'opt-in dépend du cœur ; le cœur ignore l'opt-in.
 - `db=` rend la file injectable, ce qui simplifie les tests.
-- `TABLE_NAME` et `CREATE_TABLE_SQL` exposent la table en SQL visible.
+- `TABLE_NAME` nomme la table ; la migration rendue en montre le schéma.
 
 ## Après ce starter
 

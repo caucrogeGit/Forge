@@ -4,7 +4,7 @@ Objectif : comprendre pourquoi les notifications sont un opt-in, et non une briq
 
 **Ce que vous allez apprendre :** Forge Core ne dépend pas de `forge-mvc-notifications`.
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
-Le paramètre `db=` rend les fonctions testables, et la constante `CREATE_TABLE_SQL` documente le schéma.
+Le paramètre `db=` rend les fonctions testables, et le schéma visible via la migration rendue.
 
 Deuxième palier du **niveau avancé** de la progression Notifications.
 
@@ -12,7 +12,7 @@ Deuxième palier du **niveau avancé** de la progression Notifications.
 
 - la règle de dépendance de l'opt-in ;
 - l'injection de connexion via `db=` ;
-- la constante de schéma `CREATE_TABLE_SQL`.
+- le schéma visible via la migration rendue.
 
 ## La règle
 
@@ -29,14 +29,14 @@ L'application décide ce qu'elle notifie et où elle l'affiche.
 ## Injecter une connexion pour les tests
 
 ```python
-from forge_mvc_notifications import notify, get_notifications, CREATE_TABLE_SQL
+from forge_mvc_notifications import notify, get_notifications, TABLE_NAME
 
 # Chaque fonction accepte db= pour cibler une connexion précise.
 notify("eleve.42", "Test", db=connexion_de_test)
 notifications = get_notifications("eleve.42", db=connexion_de_test)
 
 # Le schéma de la table est exposé comme constante.
-print(CREATE_TABLE_SQL)
+print(TABLE_NAME)
 ```
 
 ### Comprendre ce code
@@ -44,7 +44,7 @@ print(CREATE_TABLE_SQL)
 - Chaque fonction (`notify`, `get_notifications`, `unread_count`, `mark_read`, `mark_all_read`) accepte `db=`.
 - Sans `db=`, les fonctions utilisent la connexion configurée par le cœur.
 - Avec `db=`, vous ciblez une connexion précise, par exemple une base de test isolée.
-- `CREATE_TABLE_SQL` expose le schéma SQL de la table `notifications`, utile pour préparer une base de test.
+- Le schéma vit dans la migration écrite par `forge notifications:init`, rendue pour le backend installé et relue avant application.
 
 ## Ce que cela vous apporte
 
@@ -56,7 +56,7 @@ print(CREATE_TABLE_SQL)
 
 - L'opt-in dépend du cœur, le cœur ignore l'opt-in.
 - Toutes les fonctions acceptent `db=` pour injecter une connexion.
-- `CREATE_TABLE_SQL` documente et reproduit le schéma de la table.
+- La migration rendue documente le schéma et sert à le reproduire.
 
 ## Après ce starter
 

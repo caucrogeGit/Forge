@@ -4,7 +4,7 @@ Objectif : comprendre pourquoi l'audit est un opt-in, et non une brique du cœur
 
 **Ce que vous allez apprendre :** Forge Core ne dépend pas de `forge-mvc-audit`.
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
-Vous verrez aussi le paramètre `db=` injectable pour les tests et la constante `CREATE_TABLE_SQL`.
+Vous verrez aussi le paramètre `db=` injectable pour les tests et le schéma visible via la migration rendue.
 
 Deuxième palier du **niveau avancé** de la progression Audit.
 
@@ -12,7 +12,7 @@ Deuxième palier du **niveau avancé** de la progression Audit.
 
 - la règle de dépendance de l'opt-in ;
 - le paramètre `db=` injectable pour les tests ;
-- la constante `CREATE_TABLE_SQL`.
+- le schéma visible via la migration rendue.
 
 ## La règle de dépendance
 
@@ -42,23 +42,33 @@ entrees = get_audit_log(action="eleve.cree", db=db)
 - Par défaut, `db` vaut l'accès base du cœur (`core.database.db`).
 - En test, on passe un double qui expose `insert` et `fetch_all`, sans toucher à une vraie base.
 
-## 2. La constante CREATE_TABLE_SQL
+## 2. Le schéma reste visible
+Le paquet ne livre pas de SQL figé : il **déclare** sa table, et `forge audit:init`
+en écrit le DDL dans `mvc/migrations/`, rendu pour le backend que vous avez
+installé.
 
-```python
-from forge_mvc_audit import CREATE_TABLE_SQL
-
-print(CREATE_TABLE_SQL)
+```bash
+forge audit:init            # écrit la migration, sans rien exécuter
+forge migration:apply           # après l'avoir relue
 ```
 
-- `CREATE_TABLE_SQL` est le SQL de création de la table `audit_log`.
-- Le SQL reste visible : aucune création de schéma cachée.
-- En usage normal, on ne l'exécute pas à la main ; on applique la migration via `forge audit:init` puis `forge migration:apply`.
+```python
+from forge_mvc_audit import TABLE_NAME
+
+print(TABLE_NAME)   # "audit_log"
+```
+
+- `TABLE_NAME` vaut `"audit_log"` : le nom de la table.
+- Le SQL reste visible, et il est même **relu avant d'être appliqué** : rien
+  n'est exécuté dans votre dos (principe 5).
+- Il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server : la même
+  déclaration, rendue par le dialecte actif.
 
 ## À retenir
 
 - L'opt-in dépend du cœur ; le cœur ignore l'opt-in.
 - `db=` permet d'injecter une base factice dans les tests.
-- `CREATE_TABLE_SQL` garde le schéma visible et auditable.
+- La migration rendue garde le schéma visible et auditable.
 
 ## Après ce starter
 

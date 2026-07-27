@@ -8,7 +8,7 @@ Ce niveau prend de la hauteur : quand recourir à une file, le modèle sans brok
 | Palier | Compétence acquise |
 |--------|--------------------|
 | 1, [Quand utiliser Jobs](jobs-perimeter.md) | Déporter un travail lourd hors requête ; modèle sans broker ; limite de la version. |
-| 2, [Indépendance du cœur](jobs-independance.md) | Comprendre la règle de dépendance ; `db=` injectable ; `CREATE_TABLE_SQL`. |
+| 2, [Indépendance du cœur](jobs-independance.md) | Comprendre la règle de dépendance ; `db=` injectable ; schéma via la migration rendue. |
 
 Vous avez parcouru tout le socle de la file de tâches.
 

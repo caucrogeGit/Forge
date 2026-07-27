@@ -11,7 +11,6 @@ La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 """
 from forge_mvc_settings.errors import SettingsError
 from forge_mvc_settings.store import (
-    CREATE_TABLE_SQL,
     SUPPORTED_TYPES,
     TABLE_NAME,
     delete_setting,
@@ -26,7 +25,6 @@ __all__ = [
     "SettingsError",
     "TABLE_NAME",
     "SUPPORTED_TYPES",
-    "CREATE_TABLE_SQL",
     "get_setting",
     "set_setting",
     "get_all_settings",

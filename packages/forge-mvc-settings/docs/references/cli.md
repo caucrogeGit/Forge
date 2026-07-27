@@ -30,7 +30,7 @@ Si le dossier `mvc/` est absent, la commande s'arrête avec un message clair (`[
 ## 3. La migration
 
 La migration crée la table avec `CREATE TABLE IF NOT EXISTS`, ce qui la rend sûre même si la table existe déjà.
-La même définition est exposée par la constante `CREATE_TABLE_SQL` du module, pour inspection ou usage programmatique.
+Le DDL est rendu pour le backend installé : la migration écrite dans `mvc/migrations/` en est la source unique, relue avant application.
 
 ## 4. Voir aussi
 

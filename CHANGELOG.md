@@ -5,6 +5,19 @@
 
 ### Ajouté
 
+### Retiré
+
+- **Suppression des constantes `CREATE_TABLE_SQL` (`OPTIN-DDL-CONSTANTS-001`), rupture d'API publique.**
+  `forge-mvc-jobs`, `forge-mvc-audit`, `forge-mvc-settings` et `forge-mvc-notifications` exposaient chacun une constante portant le DDL de leur table, écrit en MariaDB.
+  Leur documentation présentait explicitement **deux** chemins pour créer la même table, « `CREATE_TABLE_SQL` **ou** `forge <opt-in>:init` », ce que le principe 11 proscrit. Aucun code applicatif ne les exécutait.
+  Une constante ne pouvait par ailleurs plus être correcte : le DDL dépend du backend, résolu à l'exécution.
+  **Chemin unique désormais** : `forge <opt-in>:init` écrit la migration rendue pour le backend installé, puis `forge migration:apply` l'applique.
+  Le SQL reste visible, et il l'est même mieux : il est relu dans `mvc/migrations/` **avant** d'être appliqué, au lieu d'être imprimé depuis une constante.
+  Les quatre parcours welcome gardent leur section sur la visibilité du schéma, recentrée sur la migration rendue.
+  Rupture assumée sans alias déprécié, conformément à la convention pré-1.0 du dépôt, et avant publication : rc2 reste la dernière version publiée.
+
+### Corrigé (suite)
+
 - **Le moteur d'entités ne pose plus de SQL MariaDB en dur (`OPTIN-DDL-ENTITIES-001`).**
   `db_init.py` portait une constante `FORGE_MIGRATIONS_TABLE_SQL` doublon **caractère pour caractère** de `Dialect.forge_migrations_ddl()`, que le contrat rendait déjà : `forge db:init` produisait donc un registre de migrations inexécutable sur trois backends, alors que le rendu correct était à portée d'appel. Remplacée par `forge_migrations_table_sql()`, fonction et non constante puisque le DDL dépend du backend résolu à l'exécution.
   `migrations.py` ajoutait le mot-clé `AUTO_INCREMENT` sans condition dans le chemin de diff (`migration:make --from-diff`), produisant du SQL invalide sur PostgreSQL et SQL Server où l'auto-incrément est porté **par le type**. Le contrat gagne `Dialect.auto_increment_clause()`, qui rend le mot-clé sur MariaDB et une chaîne vide ailleurs.

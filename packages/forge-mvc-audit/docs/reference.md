@@ -89,7 +89,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
     | API publique | `record_audit`, `get_audit_log`, `AuditEntry` |
-    | Table SQL | `audit_log` (`TABLE_NAME`, `CREATE_TABLE_SQL`) |
+    | Table SQL | `audit_log` (`TABLE_NAME`) |
     | Limite de lecture | `MAX_LIMIT` = 1000 entrées |
     | Exception liée | `AuditError` si l'action est vide ou la limite invalide |
     | Cadre | ADR-008 (Forge fournit la table et le helper) |
@@ -199,7 +199,6 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     | `AuditEntry` | dataclass | une entrée : `id`, `actor`, `action`, `target_type`, `target_id`, `details`, `created_at` |
     | `AuditError` | exception (`ValueError`) | action vide ou limite invalide |
     | `TABLE_NAME` | `"audit_log"` | nom de la table |
-    | `CREATE_TABLE_SQL` | constante SQL | création de la table |
     | `MAX_LIMIT` | `1000` | plafond du paramètre `limit` |
 
     Le paramètre `action` est obligatoire : c'est une chaîne applicative (par exemple `"eleve.create"`, `"note.update"`).
@@ -216,7 +215,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     | Ajouter un détail libre | paramètre `details=...` |
     | Relire les dernières traces | `get_audit_log(limit=...)` |
     | Filtrer le journal | `actor=`, `action=`, `target_type=`, `target_id=` |
-    | Créer la table | `CREATE_TABLE_SQL` ou `forge audit:init` |
+    | Créer la table | `forge audit:init` puis `forge migration:apply` |
 
 ??? note "8. Exemples d'utilisation"
 
@@ -263,7 +262,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     !!! warning "Création de la table"
         Les fonctions supposent la table `audit_log` présente.
 
-        Créez-la avec `forge audit:init` (ou exécutez `CREATE_TABLE_SQL`) avant le premier appel.
+        Créez-la avec `forge audit:init` puis `forge migration:apply`, avant le premier appel.
 
     !!! note "Périmètre borné"
         `forge-mvc-audit` est un journal d'audit **applicatif**, pas un SIEM de cybersécurité.

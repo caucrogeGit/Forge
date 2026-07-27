@@ -12,7 +12,6 @@ cœur, jamais l'inverse.
 """
 from forge_mvc_notifications.errors import NotificationError
 from forge_mvc_notifications.store import (
-    CREATE_TABLE_SQL,
     MAX_LIMIT,
     TABLE_NAME,
     Notification,
@@ -30,7 +29,6 @@ __all__ = [
     "Notification",
     "TABLE_NAME",
     "MAX_LIMIT",
-    "CREATE_TABLE_SQL",
     "notify",
     "get_notifications",
     "unread_count",

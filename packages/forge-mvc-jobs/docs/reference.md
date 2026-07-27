@@ -90,7 +90,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
     | API publique | `enqueue`, `process_one`, `drain`, `run_worker`, `pending_count`, `get_job`, `Job`, `JobHandler` |
-    | Table SQL | `jobs` (`TABLE_NAME`, `CREATE_TABLE_SQL`) |
+    | Table SQL | `jobs` (`TABLE_NAME`) |
     | Exception liée | `JobError` si la tâche est invalide |
     | Contrainte | runtime synchrone (WSGI), sans broker ni async |
     | Installation | `pip install --pre forge-mvc-jobs` |
@@ -212,7 +212,6 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     | `JobHandler` | `Callable[[dict], object]` | gestionnaire d'une tâche |
     | `JobError` | exception (`ValueError`) | tâche invalide |
     | `TABLE_NAME` | `"jobs"` | nom de la table |
-    | `CREATE_TABLE_SQL` | constante SQL | création de la table |
 
     `handlers` associe un nom de tâche à un `JobHandler` (`{"send_emails": envoyer_emails}`).
 
@@ -229,7 +228,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     | Vider la file (cron) | `drain(handlers)` |
     | Worker persistant | `run_worker(handlers)` |
     | Superviser | `pending_count()`, `get_job(id)` |
-    | Créer la table | `CREATE_TABLE_SQL` ou `forge jobs:init` |
+    | Créer la table | `forge jobs:init` puis `forge migration:apply` |
 
 ??? note "8. Exemples d'utilisation"
 
@@ -277,7 +276,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     !!! warning "Création de la table"
         Les fonctions supposent la table `jobs` présente.
 
-        Créez-la avec `forge jobs:init` (ou exécutez `CREATE_TABLE_SQL`) avant le premier appel.
+        Créez-la avec `forge jobs:init` puis `forge migration:apply`, avant le premier appel.
 
     !!! warning "Le worker tourne à part"
         `run_worker` et `drain` s'exécutent dans un **process distinct** du serveur web (service systemd, cron).

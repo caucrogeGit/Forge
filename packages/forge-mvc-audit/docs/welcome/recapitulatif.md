@@ -42,7 +42,6 @@ Les filtres se combinent en ET ; `limit < 1` lève `AuditError`.
 |-----|----------------|
 | `TABLE_NAME` | `audit_log` |
 | `MAX_LIMIT` | `1000` |
-| `CREATE_TABLE_SQL` | SQL de création de la table (schéma visible). |
 | `AuditError` | Levée sur action vide ou `limit < 1`. |
 
 ## Mise en place de la table

@@ -33,7 +33,6 @@ Synthèse de l'API de `forge-mvc-notifications`, à garder sous la main.
 | `Notification` | Objet immuable : `id`, `recipient`, `type`, `message`, `data`, `read`, `created_at`. |
 | `TABLE_NAME` | `notifications` |
 | `MAX_LIMIT` | `1000` |
-| `CREATE_TABLE_SQL` | Schéma SQL de la table `notifications`. |
 | `NotificationError` | Levée sur argument manquant, `data` non-JSON ou `limit < 1`. |
 
 ## Mise en place de la table

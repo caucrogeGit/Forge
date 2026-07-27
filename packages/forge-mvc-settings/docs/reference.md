@@ -89,7 +89,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
     | API publique | `get_setting`, `set_setting`, `get_all_settings`, `delete_setting` |
-    | Table SQL | `app_settings` (`TABLE_NAME`, `CREATE_TABLE_SQL`) |
+    | Table SQL | `app_settings` (`TABLE_NAME`) |
     | Types supportés | `str`, `int`, `bool`, `float` (`SUPPORTED_TYPES`) |
     | Exception liée | `SettingsError` si la clé est invalide ou le type non supporté |
     | Stratégie opt-in | ADR-052 |
@@ -186,7 +186,6 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     | `delete_setting` | `delete_setting(key, *, db=None) -> bool` | supprime un paramètre, `True` s'il existait |
     | `SettingsError` | exception (`ValueError`) | clé invalide ou type non supporté |
     | `TABLE_NAME` | `"app_settings"` | nom de la table |
-    | `CREATE_TABLE_SQL` | constante SQL | création de la table |
     | `SUPPORTED_TYPES` | `("str", "int", "bool", "float")` | types de valeurs acceptés |
 
     Le paramètre `db` est l'exécuteur de base de données.
@@ -201,7 +200,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     | Lire un réglage avec repli | `get_setting(key, default=...)` |
     | Lire tous les réglages | `get_all_settings()` |
     | Supprimer un réglage | `delete_setting(key)` |
-    | Créer la table | `CREATE_TABLE_SQL` ou `forge settings:init` |
+    | Créer la table | `forge settings:init` puis `forge migration:apply` |
     | Injecter un exécuteur de test | paramètre `db=...` |
 
 ??? note "8. Exemples d'utilisation"
@@ -251,7 +250,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     !!! warning "Création de la table"
         Les fonctions supposent la table `app_settings` présente.
 
-        Créez-la avec `forge settings:init` (ou exécutez `CREATE_TABLE_SQL`) avant le premier appel.
+        Créez-la avec `forge settings:init` puis `forge migration:apply`, avant le premier appel.
 
     !!! note "SQL visible et exécuteur injecté"
         Le module ne crée jamais de connexion : il reçoit un exécuteur (`execute`, `fetch_one`, `fetch_all`).

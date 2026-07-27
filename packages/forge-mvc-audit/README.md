@@ -36,7 +36,7 @@ for entree in get_audit_log(limit=20, actor="prof.dupont"):
 ```
 
 L'API expose `record_audit`, `get_audit_log`, `AuditEntry`, plus `AuditError`,
-`TABLE_NAME`, `MAX_LIMIT` et `CREATE_TABLE_SQL`.
+`TABLE_NAME` et `MAX_LIMIT`.
 
 ## Périmètre
 

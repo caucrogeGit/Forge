@@ -7,11 +7,25 @@ import pytest
 
 forge_mvc_notifications = pytest.importorskip("forge_mvc_notifications")
 
-from forge_mvc_notifications import CREATE_TABLE_SQL, TABLE_NAME
+from forge_mvc_notifications import TABLE_NAME
 
 PKG_ROOT = Path(forge_mvc_notifications.__file__).resolve().parent
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
+
+def _rendered_ddl() -> str:
+    """DDL de la table, rendu pour le backend actif.
+
+    La constante de schéma du module est supprimée
+    (`OPTIN-DDL-CONSTANTS-001`) : deux façons officielles de créer la même
+    table contredisaient le principe 11. La source unique est la déclaration
+    `forge_mvc_notifications.tables`, rendue par le dialecte.
+    """
+    from core.database.backend import get_backend
+    from core.database.table_ddl import render_create_table
+    from forge_mvc_notifications.tables import NOTIFICATIONS
+
+    return chr(10).join(render_create_table(NOTIFICATIONS, get_backend().dialect))
 
 def test_core_n_importe_pas_le_paquet_notifications() -> None:
     core_dir = REPO_ROOT / "core"
@@ -44,6 +58,6 @@ def test_create_table_sql_coherent_avec_la_migration() -> None:
 
     sql = chr(10).join(render_create_table(NOTIFICATIONS, MariaDBDialect()))
     assert f"CREATE TABLE IF NOT EXISTS {TABLE_NAME}" in sql
-    assert f"CREATE TABLE IF NOT EXISTS {TABLE_NAME}" in CREATE_TABLE_SQL
+    assert f"CREATE TABLE IF NOT EXISTS {TABLE_NAME}" in _rendered_ddl()
     for column in ("recipient", "type", "message", "data", "read_at", "created_at"):
-        assert column in sql and column in CREATE_TABLE_SQL
+        assert column in sql and column in _rendered_ddl()

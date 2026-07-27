@@ -16,7 +16,6 @@ pytestmark = pytest.mark.db
 forge_mvc_notifications = pytest.importorskip("forge_mvc_notifications")
 
 from forge_mvc_notifications import (
-    CREATE_TABLE_SQL,
     get_notifications,
     mark_all_read,
     mark_read,
@@ -26,6 +25,20 @@ from forge_mvc_notifications import (
 
 _REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
 
+
+def _rendered_ddl() -> str:
+    """DDL de la table, rendu pour le backend actif.
+
+    La constante de schéma du module est supprimée
+    (`OPTIN-DDL-CONSTANTS-001`) : deux façons officielles de créer la même
+    table contredisaient le principe 11. La source unique est la déclaration
+    `forge_mvc_notifications.tables`, rendue par le dialecte.
+    """
+    from core.database.backend import get_backend
+    from core.database.table_ddl import render_create_table
+    from forge_mvc_notifications.tables import NOTIFICATIONS
+
+    return chr(10).join(render_create_table(NOTIFICATIONS, get_backend().dialect))
 
 def _params() -> dict[str, Any]:
     return {
@@ -96,7 +109,7 @@ def notif_db() -> Any:
     cur = admin.cursor()
     cur.execute(f"CREATE DATABASE `{db_name}`")
     cur.execute(f"USE `{db_name}`")
-    cur.execute(CREATE_TABLE_SQL)
+    cur.execute(_rendered_ddl())
     admin.commit()
     cur.close()
     try:

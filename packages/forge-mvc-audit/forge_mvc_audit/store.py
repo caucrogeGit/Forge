@@ -26,20 +26,6 @@ TABLE_NAME = "audit_log"
 #: Plafond strict du nombre de lignes lues d'un coup.
 MAX_LIMIT = 1000
 
-CREATE_TABLE_SQL = (
-    "CREATE TABLE IF NOT EXISTS audit_log (\n"
-    "    id          INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
-    "    actor       VARCHAR(191) NULL,\n"
-    "    action      VARCHAR(191) NOT NULL,\n"
-    "    target_type VARCHAR(191) NULL,\n"
-    "    target_id   VARCHAR(191) NULL,\n"
-    "    details     TEXT NULL,\n"
-    "    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
-    "    KEY idx_audit_action (action),\n"
-    "    KEY idx_audit_target (target_type, target_id),\n"
-    "    KEY idx_audit_created (created_at)\n"
-    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
-)
 
 _INSERT_SQL = (
     f"INSERT INTO {TABLE_NAME} (actor, action, target_type, target_id, details) "

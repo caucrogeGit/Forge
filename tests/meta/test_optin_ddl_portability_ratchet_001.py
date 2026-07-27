@@ -53,12 +53,11 @@ MARIADB_ONLY = {
 # et cinq autres emplacements dans des paquets que l'audit n'avait pas
 # identifiés (dont `mail` et `stats`).
 NON_PORTABLE_YET = {
-    # Constantes CREATE_TABLE_SQL : doublon de la migration, API publique
-    # documentée (18 pages) — conversion en ticket dédié.
-    "packages/forge-mvc-audit/forge_mvc_audit/store.py",
-    "packages/forge-mvc-jobs/forge_mvc_jobs/queue.py",
-    "packages/forge-mvc-notifications/forge_mvc_notifications/store.py",
-    "packages/forge-mvc-settings/forge_mvc_settings/store.py",
+    # Constantes CREATE_TABLE_SQL : les quatre ont été SUPPRIMÉES le 2026-07-27
+    # (OPTIN-DDL-CONSTANTS-001). Elles doublonnaient la migration et offraient
+    # une seconde façon officielle de créer la même table, contre le principe 11.
+    # La source unique est désormais la déclaration `<paquet>.tables`, rendue par
+    # `<opt-in>:init` puis appliquée par `forge migration:apply`.
     # forge-mvc-entities : les deux entrées RETIRÉES le 2026-07-27
     # (OPTIN-DDL-ENTITIES-001). db_init.py dupliquait caractère pour
     # caractère `Dialect.forge_migrations_ddl()`, qu'il appelle désormais ;

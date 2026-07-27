@@ -40,7 +40,7 @@ en_maintenance = get_setting("maintenance")     # False (bool)
 ```
 
 L'API expose `get_setting`, `set_setting`, `get_all_settings`, `delete_setting`,
-plus `SettingsError`, `TABLE_NAME`, `SUPPORTED_TYPES` et `CREATE_TABLE_SQL`.
+plus `SettingsError`, `TABLE_NAME` et `SUPPORTED_TYPES`.
 
 ## Périmètre
 
