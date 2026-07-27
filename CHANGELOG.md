@@ -5,6 +5,15 @@
 
 ### Ajouté
 
+- **Les générateurs décident d'après la nature du champ, plus d'après un nom de type SQL (`OPTIN-SQL-TYPE-BRANCHING-001`).**
+  Correctif de l'audit `OPTIN-SQL-TYPE-BRANCHING-AUDIT-001`, voie « décider à partir du type Forge ».
+  Le code testait des préfixes de types (`VARCHAR`, `TEXT`, `LONGTEXT`, `DATE`), qui appartiennent au dialecte. Sur SQL Server, dont les types commencent par `NVARCHAR`, aucune condition n'était vraie et **la fonctionnalité disparaissait sans la moindre erreur**.
+  Effets corrigés, mesurés : le CRUD généré retrouve sa recherche `LIKE`, ses `textarea` et ses libellés de relation sur SQL Server ; les filtres de liste sont de nouveau acceptés sur SQLite et SQL Server.
+  **Deux défauts de plus que l'audit n'avait listés** ont été trouvés en corrigeant : un champ de formulaire `date` était refusé sur SQLite, et `datetime` sur SQLite comme sur SQL Server.
+  Le résolveur propage désormais `forge_type`, la nature Forge du champ, et expose trois prédicats consommés par les générateurs : `is_long_text`, `is_text_like`, `is_list_filterable`. Cela va dans le sens de l'ADR-086, dont le ticket 2 prévoit exactement des accesseurs canoniques à la place des clés du dict interne.
+  Le repli `"BIGINT UNSIGNED"` de `make_crud` devient `dialect.identity_storage_type()`.
+  **Les fichiers d'entité au format legacy V1 gardent leur comportement d'origine** : n'ayant pas de nature déclarée, ils continuent d'être jugés sur leur type SQL, ce qui est exact pour eux puisqu'ils datent de l'époque mono-backend. Le double régime est explicite dans le code.
+
 - **`mail` et `stats` passent au DDL dialectal (`OPTIN-DDL-MAIL-STATS-001`) : le chantier de portabilité du DDL est terminé.**
   Les deux derniers `CREATE TABLE` MariaDB écrits en dur, jamais repérés par l'audit initial qui ne scannait que les fichiers `.sql`, sont remplacés par une déclaration rendue pour le backend installé.
   Le champ `status` de `mail_log` portait un `ENUM('sent', 'failed', 'skipped')`, type que ni SQLite ni SQL Server ne connaissent et que PostgreSQL n'offre qu'au prix d'un `CREATE TYPE` séparé. Il devient une chaîne courte, comme le `status` de `forge-mvc-jobs` : la valeur est produite par le code, pas saisie par un utilisateur.

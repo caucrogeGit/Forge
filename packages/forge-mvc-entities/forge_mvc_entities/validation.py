@@ -14,6 +14,10 @@ from typing import Any, cast
 ALLOWED_PYTHON_TYPES = {"int", "str", "float", "bool", "date", "datetime"}
 ALLOWED_FIELD_KEYS = {
     "name",
+    # Nature Forge du champ, conservée par le résolveur pour que les
+    # générateurs décident sans lire un nom de type SQL
+    # (OPTIN-SQL-TYPE-BRANCHING-001).
+    "forge_type",
     "column",
     "python_type",
     "sql_type",
@@ -527,6 +531,10 @@ def _normalize_field_data(
         normalized_field["source"] = field["source"]
     if "managed" in field and isinstance(field.get("managed"), str):
         normalized_field["managed"] = field["managed"]
+    # Nature Forge du champ : propagée telle quelle pour que les générateurs
+    # décident sans lire un nom de type SQL (OPTIN-SQL-TYPE-BRANCHING-001).
+    if "forge_type" in field and isinstance(field.get("forge_type"), str):
+        normalized_field["forge_type"] = field["forge_type"]
     return normalized_field
 
 
@@ -694,11 +702,11 @@ def _validate_field_consistency(field: dict[str, Any], index: int, issues: list[
 
     form = field.get("form")
     if isinstance(form, dict) and isinstance(cast("dict[str, Any]", form).get("field"), str):
-        _validate_form_field(cast("dict[str, Any]", form)["field"], sql_type, path, issues)
+        _validate_form_field(cast("dict[str, Any]", form)["field"], field, path, issues)
 
     lst = field.get("list")
-    if isinstance(lst, dict) and cast("dict[str, Any]", lst).get("filter") is True and isinstance(sql_type, str):
-        _validate_list_filter(sql_type, path, issues)
+    if isinstance(lst, dict) and cast("dict[str, Any]", lst).get("filter") is True:
+        _validate_list_filter(field, path, issues)
 
 
 def _validate_constraints(
@@ -797,7 +805,7 @@ def _validate_default(
 
 def _validate_form_field(
     form_field: str,
-    sql_type: Any,
+    field: dict[str, Any],
     path: str,
     issues: list[EntityDefinitionIssue],
 ) -> None:
@@ -818,55 +826,67 @@ def _validate_form_field(
         )
         return
 
-    if not isinstance(sql_type, str):
+    # Décision sur la NATURE du champ, pas sur son type SQL : les noms de types
+    # appartiennent au dialecte. Un `date` vaut `DATE` en MariaDB mais `TEXT` en
+    # SQLite, un `datetime` vaut `DATETIME2` en SQL Server : ces formulaires
+    # étaient REFUSÉS hors MariaDB (OPTIN-SQL-TYPE-BRANCHING-001).
+    from forge_mvc_entities.field_resolver import is_text_like
+
+    if not isinstance(field.get("python_type"), str):
         return
 
-    normalized = _normalize_sql_type(sql_type)
     if form_field in _TEXT_FORM_FIELD_VALUES:
-        if not any(normalized.startswith(prefix) for prefix in _TEXT_FORM_FIELD_SQL_PREFIXES):
+        if not is_text_like(field):
             _add_issue(
                 issues,
                 f"{path}.form.field",
-                f"'{form_field}' requiert un sql_type textuel compatible",
+                f"'{form_field}' requiert un champ de nature textuelle",
             )
         return
 
     if form_field == "date":
-        if normalized != "DATE":
-            _add_issue(
-                issues,
-                f"{path}.form.field",
-                "'date' requiert sql_type='DATE'",
-            )
+        if not _is_temporal(field, "date"):
+            _add_issue(issues, f"{path}.form.field", "'date' requiert un champ de type 'date'")
         return
 
-    if form_field == "datetime" and normalized not in {"DATETIME", "TIMESTAMP"}:
+    if form_field == "datetime" and not _is_temporal(field, "datetime"):
         _add_issue(
             issues,
             f"{path}.form.field",
-            "'datetime' requiert sql_type='DATETIME' ou sql_type='TIMESTAMP'",
+            "'datetime' requiert un champ de type 'datetime'",
         )
 
 
-def _validate_list_filter(sql_type: str, path: str, issues: list[EntityDefinitionIssue]) -> None:
-    normalized = _normalize_sql_type(sql_type)
-    if normalized in _LIST_FILTER_SUPPORTED_SQL_EXACT:
+def _is_temporal(field: dict[str, Any], kind: str) -> None | bool:
+    """Le champ est-il de la nature temporelle demandée (`date` ou `datetime`) ?
+
+    Sur un champ canonique, la nature suffit et vaut pour les quatre backends.
+    Sur un champ legacy V1, on compare le type SQL comme auparavant : ces
+    fichiers datent de l'époque mono-backend (OPTIN-SQL-TYPE-BRANCHING-001).
+    """
+    if isinstance(field.get("forge_type"), str) and field["forge_type"]:
+        return field.get("python_type") == kind or field.get("forge_type") == kind
+    sql_type = _normalize_sql_type(str(field.get("sql_type", "")))
+    if kind == "date":
+        return sql_type == "DATE"
+    return sql_type in {"DATETIME", "TIMESTAMP"}
+
+
+def _validate_list_filter(field: dict[str, Any], path: str, issues: list[EntityDefinitionIssue]) -> None:
+    """Un filtre de liste suppose une égalité exacte sur une valeur courte.
+
+    Le contrôle portait sur des préfixes de types SQL (`VARCHAR`, `INT`...),
+    donc propres à MariaDB : sur SQLite (`TEXT` pour tout) et sur SQL Server
+    (`NVARCHAR`), un filtre pourtant légitime était refusé
+    (OPTIN-SQL-TYPE-BRANCHING-001).
+    """
+    from forge_mvc_entities.field_resolver import is_list_filterable
+
+    if is_list_filterable(field):
         return
-    for prefix in _LIST_FILTER_SUPPORTED_SQL_PREFIXES:
-        if normalized.startswith(prefix):
-            return
-    for prefix in _LIST_FILTER_UNSUPPORTED_SQL_PREFIXES:
-        if normalized.startswith(prefix):
-            _add_issue(
-                issues,
-                f"{path}.list.filter",
-                f"list.filter=true n'est pas supporte pour le type SQL '{sql_type}'"
-                " — types supportes : VARCHAR, CHAR, INT*, BOOL/BOOLEAN",
-            )
-            return
     _add_issue(
         issues,
         f"{path}.list.filter",
-        f"list.filter=true n'est pas supporte pour le type SQL '{sql_type}'"
-        " — types supportes : VARCHAR, CHAR, INT*, BOOL/BOOLEAN",
+        "list.filter=true n'est pas supporte pour ce champ"
+        " — natures supportees : texte court, entier, booleen",
     )

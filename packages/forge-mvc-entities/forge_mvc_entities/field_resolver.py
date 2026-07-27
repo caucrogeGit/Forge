@@ -185,6 +185,7 @@ def _identity_field() -> dict[str, Any]:
     return {
         "name": "id",
         "column": IDENTITY_COLUMN,
+        "forge_type": "identity",
         "sql_type": dialect().identity_type(),
         "python_type": "int",
         "nullable": False,
@@ -225,6 +226,11 @@ def _resolve_business_field(field: dict[str, Any]) -> dict[str, Any]:
     resolved: dict[str, Any] = {
         "name": field["name"],
         "column": column_of(field),
+        # Type Forge conservé : les générateurs décident d'après la NATURE du
+        # champ, jamais d'après un nom de type SQL, qui appartient au dialecte
+        # (OPTIN-SQL-TYPE-BRANCHING-001). Va dans le sens de l'ADR-086 : la
+        # représentation interne se rapproche du canonique.
+        "forge_type": forge_type,
         "sql_type": sql_type,
         "python_type": python_type,
         "nullable": nullable_of(field),
@@ -276,3 +282,88 @@ def resolve_entity_fields(entity: dict[str, Any]) -> list[dict[str, Any]]:
         fields.append(_system_datetime_field("deleted_at", nullable=True, managed="soft_delete"))
 
     return fields
+
+
+# ── Prédicats de nature, pour les générateurs (OPTIN-SQL-TYPE-BRANCHING-001) ──
+# Les générateurs testaient des préfixes de types SQL (`VARCHAR`, `LONGTEXT`...)
+# pour décider d'un comportement. Ces préfixes appartiennent au dialecte : sur
+# SQL Server, dont les types commencent par `NVARCHAR`, aucune condition n'était
+# vraie et la fonctionnalité disparaissait sans la moindre erreur.
+#
+# Ces prédicats répondent à la même question sur la **nature** du champ, qui ne
+# dépend d'aucun SGBD.
+
+#: Types Forge dont la valeur est un texte long : saisie multiligne, non
+#: filtrable en liste (une clause d'égalité sur un texte long n'a pas de sens).
+_LONG_TEXT_TYPES = frozenset({"text", "json"})
+
+
+#: Préfixes MariaDB, employés UNIQUEMENT en repli pour un fichier au format
+#: legacy V1, que Forge lit encore directement (ADR-012). Ces fichiers ont été
+#: écrits à l'époque où MariaDB était le seul backend : leurs types SQL sont
+#: donc bien du MariaDB, et le repli est exact pour eux.
+_LEGACY_LONG_TEXT_PREFIXES = ("TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT")
+
+
+def is_long_text(field: dict[str, Any]) -> bool:
+    """Le champ contient-il un texte long (saisie multiligne) ?
+
+    Répond d'après la **nature** du champ dès que celle-ci est connue, ce qui
+    est le cas de tout contrat canonique : le résolveur propage `forge_type`.
+
+    Repli sur le type SQL pour un champ issu d'un fichier legacy V1, qui n'a
+    pas de nature déclarée. Ce repli n'est pas une réintroduction du défaut :
+    ces fichiers datent de l'époque mono-backend, leurs types SQL sont du
+    MariaDB, et le chemin canonique — celui de tous les projets actuels — ne
+    l'emprunte jamais.
+    """
+    forge_type = field.get("forge_type")
+    if isinstance(forge_type, str) and forge_type:
+        return forge_type in _LONG_TEXT_TYPES
+    sql_type = str(field.get("sql_type", "")).upper()
+    return any(sql_type.startswith(p) for p in _LEGACY_LONG_TEXT_PREFIXES)
+
+
+#: Préfixes MariaDB des types textuels, repli legacy (voir `is_long_text`).
+_LEGACY_TEXT_PREFIXES = ("CHAR", "VARCHAR", "TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT")
+
+
+def is_text_like(field: dict[str, Any]) -> bool:
+    """La valeur du champ est-elle du texte ?
+
+    Sur un champ canonique, s'appuie sur `python_type`, déjà indépendant du
+    dialecte : couvre `string`, `text`, `email`, `password`, `slug` et `json`,
+    exactement l'ensemble que l'ancien test de préfixes retenait sur MariaDB.
+
+    Repli sur le type SQL pour un champ legacy V1, où il sert aussi de contrôle
+    de **cohérence** : un `sql_type` entier associé à un `python_type` textuel
+    est une incohérence que le repli continue de signaler.
+    """
+    if isinstance(field.get("forge_type"), str) and field["forge_type"]:
+        return field.get("python_type", "") == "str"
+    sql_type = str(field.get("sql_type", "")).upper()
+    return any(sql_type.startswith(p) for p in _LEGACY_TEXT_PREFIXES)
+
+
+def is_list_filterable(field: dict[str, Any]) -> bool:
+    """Le champ peut-il servir de filtre de liste (égalité exacte) ?
+
+    Textes courts, entiers et booléens. Un texte long, une date ou un nombre à
+    virgule ne s'y prêtent pas, comme le retenait déjà l'ancien test.
+    """
+    if not (isinstance(field.get("forge_type"), str) and field["forge_type"]):
+        # Champ legacy V1 : contrôle inchangé sur le type SQL (voir
+        # `is_long_text` pour le pourquoi de ce double régime).
+        sql_type = str(field.get("sql_type", "")).upper()
+        if sql_type in {"BOOL", "BOOLEAN"}:
+            return True
+        if any(sql_type.startswith(p) for p in _LEGACY_LONG_TEXT_PREFIXES):
+            return False
+        return any(
+            sql_type.startswith(p)
+            for p in ("VARCHAR", "CHAR", "INT", "BIGINT", "SMALLINT", "TINYINT", "MEDIUMINT")
+        )
+    python_type = field.get("python_type", "")
+    if python_type in {"int", "bool"}:
+        return True
+    return python_type == "str" and not is_long_text(field)

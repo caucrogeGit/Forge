@@ -7,6 +7,7 @@ from __future__ import annotations
 from typing import Any, cast
 
 from forge_mvc_entities.crud.context import CrudManyToOneRelation
+from forge_mvc_entities.field_resolver import is_long_text, is_text_like
 
 # Source unique de _to_snake (principe 11) : re-export depuis validation, qui
 # en porte la définition canonique. Les modules CRUD continuent de l'importer
@@ -111,8 +112,11 @@ _HTML_TYPE_FROM_FORM_FIELD: dict[str, str] = {
 def _is_textarea(f: dict[str, Any]) -> bool:
     if cast("dict[str, Any]", f.get("form") or {}).get("field") == "textarea":
         return True
-    sql = f.get("sql_type", "").upper()
-    return any(sql.startswith(p) for p in ("TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT"))
+    # Décision sur la NATURE du champ, pas sur son type SQL : les préfixes
+    # (`TEXT`, `LONGTEXT`) appartiennent au dialecte, et SQL Server, dont les
+    # types commencent par `NVARCHAR`, n'en satisfaisait aucun — le textarea
+    # disparaissait sans erreur (OPTIN-SQL-TYPE-BRANCHING-001).
+    return is_long_text(f)
 
 
 def _html_input_type(f: dict[str, Any]) -> str:
@@ -151,8 +155,9 @@ def _text_search_fields(
     for f in _non_pk_fields(definition):
         if f["name"] in relation_field_names:
             continue
-        sql = f.get("sql_type", "").upper()
-        if any(sql.startswith(p) for p in ("VARCHAR", "CHAR", "TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT")):
+        # Même raison qu'au-dessus : sur SQL Server aucune colonne n'était
+        # retenue, donc le CRUD généré perdait toute sa recherche en silence.
+        if is_text_like(f):
             out.append(f)
     return out
 

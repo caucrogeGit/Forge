@@ -201,28 +201,28 @@ class TestFormFieldValeurs:
         entity = _base_entity(
             _field_with_form("valeur", "INT", "str", form_field)
         )
-        with pytest.raises(EntityDefinitionError, match="sql_type textuel"):
+        with pytest.raises(EntityDefinitionError, match="nature textuelle"):
             validate_entity_definition(entity, source="test.json")
 
     def test_form_field_date_avec_VARCHAR_refuse(self):
         entity = _base_entity(
             _field_with_form("debut", "VARCHAR(10)", "date", "date")
         )
-        with pytest.raises(EntityDefinitionError, match="requiert sql_type='DATE'"):
+        with pytest.raises(EntityDefinitionError, match="requiert un champ de type 'date'"):
             validate_entity_definition(entity, source="test.json")
 
     def test_form_field_datetime_avec_DATE_refuse(self):
         entity = _base_entity(
             _field_with_form("cree_le", "DATE", "datetime", "datetime")
         )
-        with pytest.raises(EntityDefinitionError, match="DATETIME"):
+        with pytest.raises(EntityDefinitionError, match="type 'datetime'"):
             validate_entity_definition(entity, source="test.json")
 
     def test_form_field_datetime_avec_VARCHAR_refuse(self):
         entity = _base_entity(
             _field_with_form("cree_le", "VARCHAR(30)", "datetime", "datetime")
         )
-        with pytest.raises(EntityDefinitionError, match="DATETIME"):
+        with pytest.raises(EntityDefinitionError, match="type 'datetime'"):
             validate_entity_definition(entity, source="test.json")
 
 

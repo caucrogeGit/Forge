@@ -41,6 +41,7 @@ from forge_mvc_entities.canonical_model_normalizer import (
     CanonicalNormalizationError,
     normalize_canonical_entity_for_model_build,
 )
+from forge_mvc_entities.field_resolver import dialect
 from forge_mvc_entities.relations import (
     EntityRelationsError,
 )
@@ -182,8 +183,12 @@ def _inject_relation_fk_fields(
         definition["fields"].append({
             "name": rel.field_name,
             "column": rel.field_column,
+            "forge_type": "foreign_key",
             "python_type": "int",
-            "sql_type": rel.fk_sql_type or "BIGINT UNSIGNED",
+            # Repli dialectal : le type MariaDB en dur posait une colonne
+            # invalide sur les autres backends (OPTIN-SQL-TYPE-BRANCHING-001,
+            # meme correctif que FK-IDENTITY-STORAGE-TYPE-001).
+            "sql_type": rel.fk_sql_type or dialect().identity_storage_type(),
             "nullable": rel.fk_nullable,
             "primary_key": False,
             "auto_increment": False,
