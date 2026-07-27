@@ -46,14 +46,30 @@ def build_count_sql(resource: AdminResource) -> str:
 
 
 def build_list_sql(resource: AdminResource) -> str:
-    """`SELECT <colonnes> FROM <table> ORDER BY <tri> ASC LIMIT ? OFFSET ?`."""
+    """`SELECT <colonnes> FROM <table> ORDER BY <tri> ASC` + pagination du dialecte.
+
+    La clause de pagination et l'ordre de ses paramètres viennent du backend
+    actif : T-SQL ignore `LIMIT` et annonce le décalage en premier. Lire
+    `list_params()` pour les valeurs, jamais supposer l'ordre.
+    """
+    from core.database.backend import get_backend
+
     columns = ", ".join(_ident(col) for col in resource.list_fields)
     table = _ident(resource.table)
     order_by = _ident(_order_column(resource))
     return (
         f"SELECT {columns} FROM {table} "
-        f"ORDER BY {order_by} ASC LIMIT ? OFFSET ?"
+        f"ORDER BY {order_by} ASC"
+        f"{get_backend().dialect.pagination_clause()}"
     )
+
+
+def list_params(*, limit: int, offset: int) -> list[int]:
+    """Paramètres de `build_list_sql()`, dans l'ordre attendu par le dialecte."""
+    from core.database.backend import get_backend
+
+    values = {"limit": limit, "offset": offset}
+    return [values[name] for name in get_backend().dialect.pagination_param_order()]
 
 
 def detail_columns(resource: AdminResource) -> tuple[str, ...]:
@@ -154,4 +170,7 @@ def list_rows(
     offset: int,
 ) -> list[dict[str, Any]]:
     """Page de lignes de la table (colonnes = `list_fields`), triée et bornée."""
-    return fetch_all(build_list_sql(resource), (limit, offset))
+    return fetch_all(
+        build_list_sql(resource),
+        tuple(list_params(limit=limit, offset=offset)),
+    )

@@ -5,6 +5,12 @@
 
 ### Corrigé
 
+- **Les cinq opt-ins qui bornaient leurs lectures en MySQL suivent le dialecte (`OPTIN-RUNTIME-PAGINATION-DIALECT-001`).**
+  Suite immédiate du ticket ci-dessous, sur le SQL que les opt-ins **exécutent** et non sur du code généré : `forge-mvc-admin`, `forge-mvc-audit`, `forge-mvc-iot`, `forge-mvc-mail` et `forge-mvc-notifications` écrivaient `LIMIT ?`, donc échouaient sur SQL Server à chaque lecture bornée.
+  Le contrat `Dialect` reçoit `limit_clause()`, distincte de `pagination_clause()` : elle ne porte qu'un paramètre, donc aucun ordre à consulter. SQL Server reçoit `OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY`, les trois autres gardent `LIMIT ?`.
+  **Rupture d'API publique dans `forge-mvc-iot`** : les constantes `SELECT_IOT_EVENTS_RECENT_SQL` et `SELECT_IOT_EVENTS_BY_DEVICE_SQL` deviennent les fonctions `select_iot_events_recent_sql()` et `select_iot_events_by_device_sql()`. Même raison que la suppression des `CREATE_TABLE_SQL` : une constante figée à l'import ne peut plus être correcte quand le SQL dépend d'un backend résolu à l'exécution. Ces lectures restent publiques et lisibles, conformément au principe 5. `COUNT_IOT_EVENTS_BY_DEVICE_SQL` reste une constante : ne bornant rien, elle ne dépend d'aucun dialecte.
+  Vérifié sur un serveur SQL Server réel : les six requêtes réellement produites par les cinq opt-ins s'exécutent, là où l'ancienne forme est rejetée avec « Incorrect syntax near 'LIMIT' ».
+
 - **La pagination du CRUD généré suit le dialecte (`ENTITIES-CRUD-PAGINATION-DIALECT-001`).**
   Le modèle généré assemblait sa pagination en `LIMIT ? OFFSET ?`, syntaxe MySQL codée en dur. **T-SQL ne connaît pas `LIMIT`** : tout CRUD généré sur SQL Server échouait dès qu'il listait des enregistrements, alors que l'ADR-084 promeut ce backend au niveau plein. Mesuré sur un serveur réel, l'ancienne forme est rejetée avec « Incorrect syntax near 'LIMIT' ».
   La clause rejoint le contrat `Dialect`, avec `pagination_clause()` et `pagination_param_order()`. SQL Server reçoit `OFFSET ? ROWS FETCH NEXT ? ROWS ONLY` ; MariaDB, SQLite et PostgreSQL gardent `LIMIT ? OFFSET ?`, au caractère près.

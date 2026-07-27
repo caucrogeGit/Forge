@@ -293,6 +293,18 @@ class Dialect(Protocol):
         """
         ...
 
+    def limit_clause(self) -> str:
+        """Clause bornant le nombre de lignes **sans décalage**, après le `ORDER BY`.
+
+        MariaDB, SQLite et PostgreSQL écrivent `LIMIT ?`. SQL Server n'a pas de
+        forme paramétrée équivalente en suffixe : il passe par
+        `OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY`, qui exige un `ORDER BY`.
+
+        Distincte de `pagination_clause()`, qui prend deux paramètres. Celle-ci
+        n'en porte qu'un, donc aucun ordre à consulter.
+        """
+        ...
+
     def pagination_param_order(self) -> "tuple[str, str]":
         """Ordre des deux paramètres de `pagination_clause()`.
 

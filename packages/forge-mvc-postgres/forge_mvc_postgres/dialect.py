@@ -180,6 +180,9 @@ class PostgreSQLDialect:
     def pagination_clause(self) -> str:
         return " LIMIT ? OFFSET ?"
 
+    def limit_clause(self) -> str:
+        return " LIMIT ?"
+
     def pagination_param_order(self) -> tuple[str, str]:
         return ("limit", "offset")
 

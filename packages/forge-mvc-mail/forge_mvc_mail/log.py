@@ -18,13 +18,22 @@ INSERT INTO mail_log
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """
 
-_SELECT_SQL = """
+_SELECT_BASE_SQL = """
 SELECT id, message_type, to_email, subject, transport, status,
        error_message, related_entity, related_id, created_at, sent_at
 FROM mail_log
-ORDER BY id DESC
-LIMIT ?
-"""
+ORDER BY id DESC"""
+
+
+def _select_sql() -> str:
+    """Lecture du journal, bornée par la clause du backend actif.
+
+    La borne ne peut pas être figée dans une constante : T-SQL ne connaît pas
+    `LIMIT` et le backend n'est résolu qu'à l'exécution.
+    """
+    from core.database.backend import get_backend
+
+    return _SELECT_BASE_SQL + get_backend().dialect.limit_clause() + "\n"
 
 
 @dataclass
@@ -89,4 +98,4 @@ class MailLogger:
 
     @classmethod
     def fetch_recent(cls, limit: int = 20) -> list[dict[str, Any]]:
-        return _db_fetch_all(_SELECT_SQL, (limit,))
+        return _db_fetch_all(_select_sql(), (limit,))

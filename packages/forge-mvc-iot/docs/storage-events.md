@@ -303,13 +303,19 @@ Les requêtes de lecture sont publiques pour rester lisibles (charte v2 §5) :
 
 ```python
 from forge_mvc_iot.storage import (
-    SELECT_IOT_EVENTS_RECENT_SQL,
-    SELECT_IOT_EVENTS_BY_DEVICE_SQL,
+    select_iot_events_recent_sql,
+    select_iot_events_by_device_sql,
     COUNT_IOT_EVENTS_BY_DEVICE_SQL,
 )
 ```
 
 Toutes utilisent les placeholders qmark `?` (cohérent avec le reste de Forge) et la table `iot_events`.
+
+Les deux lectures bornées sont des **fonctions** et non des constantes.
+La clause qui borne le nombre de lignes dépend du backend, résolu à l'exécution : MariaDB, SQLite et PostgreSQL écrivent `LIMIT ?`, là où SQL Server, qui ne connaît pas `LIMIT`, exige `OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY`.
+Une constante figée à l'import ne pourrait donc plus être correcte sur les quatre backends.
+
+Le comptage reste une constante : ne bornant rien, il ne dépend d'aucun dialecte.
 
 ## Hors périmètre de ce ticket
 - **Pas d'API HTTP** : lecture JSON par `IOT-HTTP-API-001`.

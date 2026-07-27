@@ -41,8 +41,8 @@ __all__ = [
     "MAX_LIMIT",
     "DbAdapter",
     "IotEventRepository",
-    "SELECT_IOT_EVENTS_RECENT_SQL",
-    "SELECT_IOT_EVENTS_BY_DEVICE_SQL",
+    "select_iot_events_recent_sql",
+    "select_iot_events_by_device_sql",
     "COUNT_IOT_EVENTS_BY_DEVICE_SQL",
 ]
 
@@ -61,26 +61,45 @@ erroné côté caller."""
 _READ_COLUMNS = ("id", *COLUMNS)
 _READ_COLUMNS_SQL = ", ".join(_READ_COLUMNS)
 
-SELECT_IOT_EVENTS_RECENT_SQL = (
-    f"SELECT {_READ_COLUMNS_SQL} "
-    f"FROM {TABLE_NAME} "
-    "ORDER BY received_at DESC "
-    "LIMIT ?"
-)
+def _limit_clause() -> str:
+    """Borne du nombre de lignes, rendue par le backend actif."""
+    from core.database.backend import get_backend
 
-SELECT_IOT_EVENTS_BY_DEVICE_SQL = (
-    f"SELECT {_READ_COLUMNS_SQL} "
-    f"FROM {TABLE_NAME} "
-    "WHERE site = ? AND device_id = ? "
-    "ORDER BY received_at DESC "
-    "LIMIT ?"
-)
+    return get_backend().dialect.limit_clause()
+
+
+def select_iot_events_recent_sql() -> str:
+    """`SELECT ... FROM iot_events ORDER BY received_at DESC` + borne du dialecte.
+
+    Fonction et non constante : la borne dépend du backend, résolu à
+    l'exécution (T-SQL ne connaît pas `LIMIT`). Reste publique et lisible,
+    conformément au principe 5.
+    """
+    return (
+        f"SELECT {_READ_COLUMNS_SQL} "
+        f"FROM {TABLE_NAME} "
+        "ORDER BY received_at DESC"
+        f"{_limit_clause()}"
+    )
+
+
+def select_iot_events_by_device_sql() -> str:
+    """Idem, restreint à un couple `site` / `device_id`."""
+    return (
+        f"SELECT {_READ_COLUMNS_SQL} "
+        f"FROM {TABLE_NAME} "
+        "WHERE site = ? AND device_id = ? "
+        "ORDER BY received_at DESC"
+        f"{_limit_clause()}"
+    )
+
 
 COUNT_IOT_EVENTS_BY_DEVICE_SQL = (
     f"SELECT COUNT(*) AS n "
     f"FROM {TABLE_NAME} "
     "WHERE site = ? AND device_id = ?"
 )
+"""Reste une constante : ce comptage ne borne rien, donc ne dépend d'aucun dialecte."""
 
 
 class DbAdapter(Protocol):
@@ -184,7 +203,7 @@ class IotEventRepository:
             sinon.
         """
         checked = _validate_limit(limit)
-        rows = self._db.fetch_all(SELECT_IOT_EVENTS_RECENT_SQL, (checked,))
+        rows = self._db.fetch_all(select_iot_events_recent_sql(), (checked,))
         return [_row_to_event_dict(row) for row in rows]
 
     def find_by_device(
@@ -197,7 +216,7 @@ class IotEventRepository:
         """Retourne les événements d'un device, ordre `received_at` DESC."""
         checked = _validate_limit(limit)
         rows = self._db.fetch_all(
-            SELECT_IOT_EVENTS_BY_DEVICE_SQL, (site, device_id, checked),
+            select_iot_events_by_device_sql(), (site, device_id, checked),
         )
         return [_row_to_event_dict(row) for row in rows]
 

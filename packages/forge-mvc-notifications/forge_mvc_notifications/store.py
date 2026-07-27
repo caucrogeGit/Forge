@@ -110,7 +110,13 @@ def get_notifications(
     params: list[object] = [recipient]
     if unread_only:
         where += " AND read_at IS NULL"
-    sql = f"SELECT {_SELECT_COLUMNS} FROM {TABLE_NAME} {where} ORDER BY id DESC LIMIT ?"
+    from core.database.backend import get_backend
+
+    # La borne appartient au dialecte : T-SQL ne connaît pas LIMIT.
+    sql = (
+        f"SELECT {_SELECT_COLUMNS} FROM {TABLE_NAME} {where} ORDER BY id DESC"
+        f"{get_backend().dialect.limit_clause()}"
+    )
     params.append(limit)
     rows = (db if db is not None else _db_module()).fetch_all(sql, params)
     return [

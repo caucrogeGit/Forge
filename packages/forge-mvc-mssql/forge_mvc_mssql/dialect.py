@@ -189,6 +189,10 @@ class MSSQLDialect:
         # T-SQL n'a pas de LIMIT. Cette forme exige un ORDER BY dans la requête.
         return " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
 
+    def limit_clause(self) -> str:
+        # Pas de LIMIT en T-SQL ; le décalage nul est explicite. Exige un ORDER BY.
+        return " OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY"
+
     def pagination_param_order(self) -> tuple[str, str]:
         # Le décalage est annoncé avant le nombre de lignes, contrairement à LIMIT.
         return ("offset", "limit")

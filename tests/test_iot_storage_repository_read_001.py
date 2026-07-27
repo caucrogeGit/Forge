@@ -26,10 +26,17 @@ from forge_mvc_iot.storage.repository import (
     COUNT_IOT_EVENTS_BY_DEVICE_SQL,
     DEFAULT_LIMIT,
     MAX_LIMIT,
-    SELECT_IOT_EVENTS_BY_DEVICE_SQL,
-    SELECT_IOT_EVENTS_RECENT_SQL,
     IotEventRepository,
+    select_iot_events_by_device_sql,
+    select_iot_events_recent_sql,
 )
+
+def _limit_clause() -> str:
+    """Borne attendue pour le backend actif (conftest : mariadb)."""
+    from core.database.backend import get_backend
+
+    return get_backend().dialect.limit_clause()
+
 
 PROJECT_ROOT = Path(__file__).parent.parent
 IOT_PKG_DIR = PROJECT_ROOT / "packages" / "forge-mvc-iot"
@@ -70,10 +77,10 @@ class TestReadSqlConstants:
     """Les requêtes SQL sont visibles et lisibles (charte v2 §5)."""
 
     def test_select_recent_targets_iot_events_with_order_and_limit(self):
-        sql = SELECT_IOT_EVENTS_RECENT_SQL
+        sql = select_iot_events_recent_sql()
         assert "FROM iot_events" in sql
         assert "ORDER BY received_at DESC" in sql
-        assert sql.endswith("LIMIT ?")
+        assert sql.endswith(_limit_clause())
         # Toutes les colonnes lisibles (id + COLUMNS).
         for col in (
             "id", "site", "device_id", "kind", "value",
@@ -82,11 +89,11 @@ class TestReadSqlConstants:
             assert col in sql
 
     def test_select_by_device_uses_where_site_and_device_id(self):
-        sql = SELECT_IOT_EVENTS_BY_DEVICE_SQL
+        sql = select_iot_events_by_device_sql()
         assert "FROM iot_events" in sql
         assert "WHERE site = ? AND device_id = ?" in sql
         assert "ORDER BY received_at DESC" in sql
-        assert sql.endswith("LIMIT ?")
+        assert sql.endswith(_limit_clause())
 
     def test_count_by_device_returns_n(self):
         sql = COUNT_IOT_EVENTS_BY_DEVICE_SQL
@@ -97,8 +104,8 @@ class TestReadSqlConstants:
 
     def test_no_select_uses_named_placeholders(self):
         for sql in (
-            SELECT_IOT_EVENTS_RECENT_SQL,
-            SELECT_IOT_EVENTS_BY_DEVICE_SQL,
+            select_iot_events_recent_sql(),
+            select_iot_events_by_device_sql(),
             COUNT_IOT_EVENTS_BY_DEVICE_SQL,
         ):
             assert "%s" not in sql
@@ -117,7 +124,7 @@ class TestListRecent:
         repo = IotEventRepository(db_adapter=adapter)
         repo.list_recent()
         adapter.fetch_all.assert_called_once_with(
-            SELECT_IOT_EVENTS_RECENT_SQL, (DEFAULT_LIMIT,),
+            select_iot_events_recent_sql(), (DEFAULT_LIMIT,),
         )
 
     def test_custom_limit_is_forwarded(self):
@@ -126,7 +133,7 @@ class TestListRecent:
         repo = IotEventRepository(db_adapter=adapter)
         repo.list_recent(limit=7)
         adapter.fetch_all.assert_called_once_with(
-            SELECT_IOT_EVENTS_RECENT_SQL, (7,),
+            select_iot_events_recent_sql(), (7,),
         )
 
     def test_returns_list_of_dicts_with_metadata_parsed(self):
@@ -177,7 +184,7 @@ class TestFindByDevice:
         repo = IotEventRepository(db_adapter=adapter)
         repo.find_by_device("atelier", "esp32-001")
         adapter.fetch_all.assert_called_once_with(
-            SELECT_IOT_EVENTS_BY_DEVICE_SQL,
+            select_iot_events_by_device_sql(),
             ("atelier", "esp32-001", DEFAULT_LIMIT),
         )
 
@@ -187,7 +194,7 @@ class TestFindByDevice:
         repo = IotEventRepository(db_adapter=adapter)
         repo.find_by_device("atelier", "esp32-001", limit=5)
         adapter.fetch_all.assert_called_once_with(
-            SELECT_IOT_EVENTS_BY_DEVICE_SQL,
+            select_iot_events_by_device_sql(),
             ("atelier", "esp32-001", 5),
         )
 
@@ -292,7 +299,7 @@ class TestLimitValidation:
         repo = IotEventRepository(db_adapter=adapter)
         repo.list_recent(limit=MAX_LIMIT)  # ne doit pas lever
         adapter.fetch_all.assert_called_once_with(
-            SELECT_IOT_EVENTS_RECENT_SQL, (MAX_LIMIT,),
+            select_iot_events_recent_sql(), (MAX_LIMIT,),
         )
 
     @pytest.mark.parametrize("bad", ["10", 3.5, None, [10]])
@@ -347,11 +354,11 @@ class TestRepositoryStaysFocused:
 
 
 class TestStoragePublicApi:
-    def test_read_constants_exported(self):
+    def test_read_sql_exported(self):
         from forge_mvc_iot import storage as storage_pkg
         for name in (
-            "SELECT_IOT_EVENTS_RECENT_SQL",
-            "SELECT_IOT_EVENTS_BY_DEVICE_SQL",
+            "select_iot_events_recent_sql",
+            "select_iot_events_by_device_sql",
             "COUNT_IOT_EVENTS_BY_DEVICE_SQL",
             "DEFAULT_LIMIT",
             "MAX_LIMIT",
