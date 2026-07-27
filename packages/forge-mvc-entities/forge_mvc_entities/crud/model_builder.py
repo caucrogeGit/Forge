@@ -26,6 +26,7 @@ from forge_mvc_entities.crud.relations_loader import (
     _unique_choice_relations,
     _unique_many_to_many_choice_relations,
 )
+from forge_mvc_entities.field_resolver import dialect
 
 
 def _column_value_expr(field: dict[str, Any]) -> str:
@@ -53,6 +54,12 @@ def _render_model_query(
     Extrait de `build_model` à iso-sortie.
     """
     search_fields = _text_search_fields(definition, relations)
+    # Pagination : la syntaxe et l'ordre des paramètres appartiennent au
+    # dialecte (T-SQL ignore LIMIT et annonce le décalage en premier). Les deux
+    # sont lus ensemble, sur le même dialecte, pour qu'ils ne divergent pas.
+    active_dialect = dialect()
+    page_clause = active_dialect.pagination_clause()
+    page_params = ", ".join(active_dialect.pagination_param_order())
     qualifier = f"{table}." if relations else ""
     # Suppression logique (ADR-083) : toute lecture filtre deleted_at IS NULL.
     soft_col = _soft_delete_column(definition)
@@ -113,10 +120,10 @@ def _render_model_query(
         '            clauses.append(col + " = ?")',
         "            params.append(val)",
         "    if clauses:",
-        '        sql = base + " WHERE " + " AND ".join(clauses) + " ORDER BY " + sort_col + " " + sort_dir + " LIMIT ? OFFSET ?"',
+        f'        sql = base + " WHERE " + " AND ".join(clauses) + " ORDER BY " + sort_col + " " + sort_dir + "{page_clause}"',
         "    else:",
-        '        sql = base + " ORDER BY " + sort_col + " " + sort_dir + " LIMIT ? OFFSET ?"',
-        "    params.extend([limit, offset])",
+        f'        sql = base + " ORDER BY " + sort_col + " " + sort_dir + "{page_clause}"',
+        f"    params.extend([{page_params}])",
         "    return fetch_all(sql, params)",
         "",
     ]

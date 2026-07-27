@@ -3,6 +3,16 @@
 
 ## [Non publié]
 
+### Corrigé
+
+- **La pagination du CRUD généré suit le dialecte (`ENTITIES-CRUD-PAGINATION-DIALECT-001`).**
+  Le modèle généré assemblait sa pagination en `LIMIT ? OFFSET ?`, syntaxe MySQL codée en dur. **T-SQL ne connaît pas `LIMIT`** : tout CRUD généré sur SQL Server échouait dès qu'il listait des enregistrements, alors que l'ADR-084 promeut ce backend au niveau plein. Mesuré sur un serveur réel, l'ancienne forme est rejetée avec « Incorrect syntax near 'LIMIT' ».
+  La clause rejoint le contrat `Dialect`, avec `pagination_clause()` et `pagination_param_order()`. SQL Server reçoit `OFFSET ? ROWS FETCH NEXT ? ROWS ONLY` ; MariaDB, SQLite et PostgreSQL gardent `LIMIT ? OFFSET ?`, au caractère près.
+  **Les deux méthodes vont par paire** : T-SQL annonce le décalage **avant** le nombre de lignes, donc une clause lue sans son ordre produirait une pagination inversée, silencieuse et fausse. Le générateur les lit ensemble, sur le même dialecte.
+  Vérifié de bout en bout sur SQL Server et SQLite : à `offset=3, limit=3`, la requête générée rend bien les lignes 4 à 6. Le garde-fou contrôle le **comportement** de la requête, pas seulement le texte émis.
+
+  À signaler, découvert au balayage et **volontairement laissé hors périmètre** : cinq opt-ins écrivent la même syntaxe MySQL dans leur SQL d'exécution, `forge-mvc-admin`, `forge-mvc-audit`, `forge-mvc-iot`, `forge-mvc-mail` et `forge-mvc-notifications`. La plupart utilisent `LIMIT ?` sans décalage, cas que le trait posé ici ne couvre pas encore. Suivi par `OPTIN-RUNTIME-PAGINATION-DIALECT-001`.
+
 ### Ajouté
 
 - **Les générateurs décident d'après la nature du champ, plus d'après un nom de type SQL (`OPTIN-SQL-TYPE-BRANCHING-001`).**

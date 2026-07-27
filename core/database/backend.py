@@ -278,6 +278,32 @@ class Dialect(Protocol):
         """
         ...
 
+    # ── Pagination (DML) ─────────────────────────────────────────────────────
+
+    def pagination_clause(self) -> str:
+        """Clause de pagination paramétrée, à placer **après** le `ORDER BY`.
+
+        MariaDB, SQLite et PostgreSQL partagent `LIMIT ? OFFSET ?`. SQL Server
+        n'a pas de `LIMIT` : il écrit `OFFSET ? ROWS FETCH NEXT ? ROWS ONLY`,
+        forme qui **exige** un `ORDER BY` dans la requête.
+
+        La clause porte toujours exactement deux marqueurs `?`, dont l'ordre
+        n'est pas le même partout : le lire dans `pagination_param_order()`,
+        jamais le supposer.
+        """
+        ...
+
+    def pagination_param_order(self) -> "tuple[str, str]":
+        """Ordre des deux paramètres de `pagination_clause()`.
+
+        Rend `("limit", "offset")` pour la forme `LIMIT ? OFFSET ?`, et
+        `("offset", "limit")` pour la forme T-SQL, qui annonce le décalage
+        avant le nombre de lignes. Les deux méthodes vont par paire : une
+        clause lue sans son ordre produit une pagination inversée, silencieuse
+        et fausse.
+        """
+        ...
+
     # ── DDL des relations many_to_one (ADR-084) ──────────────────────────────
 
     def add_foreign_key_sql(

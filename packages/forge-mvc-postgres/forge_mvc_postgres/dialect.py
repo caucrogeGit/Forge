@@ -175,6 +175,14 @@ class PostgreSQLDialect:
     def collated_table_suffix(self) -> str:
         return ""
 
+    # ── Pagination (DML) ─────────────────────────────────────────────────────
+
+    def pagination_clause(self) -> str:
+        return " LIMIT ? OFFSET ?"
+
+    def pagination_param_order(self) -> tuple[str, str]:
+        return ("limit", "offset")
+
     # ── DDL des relations many_to_one (ADR-084) ──────────────────────────────
 
     def add_foreign_key_sql(

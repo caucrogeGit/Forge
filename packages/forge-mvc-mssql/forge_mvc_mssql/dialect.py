@@ -183,6 +183,16 @@ class MSSQLDialect:
     def collated_table_suffix(self) -> str:
         return ""
 
+    # ── Pagination (DML) ─────────────────────────────────────────────────────
+
+    def pagination_clause(self) -> str:
+        # T-SQL n'a pas de LIMIT. Cette forme exige un ORDER BY dans la requête.
+        return " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"
+
+    def pagination_param_order(self) -> tuple[str, str]:
+        # Le décalage est annoncé avant le nombre de lignes, contrairement à LIMIT.
+        return ("offset", "limit")
+
     # ── DDL des relations many_to_one (ADR-084) ──────────────────────────────
 
     def add_foreign_key_sql(
