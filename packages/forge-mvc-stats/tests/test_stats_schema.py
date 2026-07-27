@@ -89,8 +89,19 @@ def test_schema_sql_contient_category_varchar():
 
 
 def test_schema_sql_contient_metadata_json():
+    """Le type JSON est celui du dialecte, pas un litteral MariaDB.
+
+    Le DDL est desormais rendu (OPTIN-DDL-MAIL-STATS-001) : MariaDB mappe
+    `json` sur LONGTEXT, PostgreSQL sur JSONB, SQL Server sur NVARCHAR(MAX).
+    On verifie que la colonne existe et accepte du texte, pas un nom de type
+    propre a un moteur.
+    """
+    from core.database.backend import get_backend
+
     sql = get_stats_events_schema_sql()
-    assert "metadata JSON" in sql
+    assert "metadata " in sql
+    expected = get_backend().dialect.simple_type("json")
+    assert f"metadata {expected}" in sql
 
 
 def test_schema_sql_contient_created_at_datetime():

@@ -5,14 +5,18 @@ serveurs réels que les 12 fichiers SQL livrés par 10 opt-ins étaient
 inexécutables ailleurs que sur MariaDB, alors que l'ADR-084 déclare les quatre
 backends au niveau plein.
 
-Ce garde-fou est un **cliquet**, sur le modèle de la strictness par paliers de
-l'ADR-036 : la liste des contrevenants connus ne peut que **diminuer**.
+Ce garde-fou était un **cliquet**, sur le modèle de la strictness par paliers
+de l'ADR-036 : la liste des contrevenants ne pouvait que diminuer, entrée par
+entrée, au fil des conversions.
 
-- un fichier SQL **hors liste** qui emploie une construction propre à MariaDB
-  fait échouer le test : aucun nouvel opt-in ne peut réintroduire le défaut ;
-- un fichier **dans la liste** qui n'en emploie plus fait aussi échouer le
-  test, avec le message « retirez-le de la liste » : le cliquet se resserre au
-  fil des corrections et ne peut pas se relâcher en silence.
+**Le cliquet est arrivé au bout : `NON_PORTABLE_YET` est vide.** Le garde-fou
+devient donc un invariant absolu — aucun paquet ne livre de SQL propre à
+MariaDB, ni en `.sql`, ni en dur dans un module Python.
+
+La liste est conservée, vide, plutôt que supprimée : elle documente le
+mécanisme et reste le point d'entrée si une exception temporaire devait un
+jour être tolérée. Les deux sens du contrôle restent actifs, donc une entrée
+ajoutée sans être justifiée échouerait aussitôt qu'elle serait corrigée.
 
 Le rendu portable à utiliser est `core.database.table_ddl.render_create_table`
 (`DB-TABLE-DDL-RENDERER-001`), qui passe par le contrat `Dialect`.
@@ -68,8 +72,10 @@ NON_PORTABLE_YET = {
     # (OPTIN-DDL-IOT-DOCTOR-001). Ses types MariaDB en dur étaient un
     # CONTRAT de colonnes attendu, pas du DDL : le controle passe désormais
     # par Dialect.introspect_columns et compare des familles de types.
-    "packages/forge-mvc-mail/forge_mvc_mail/cli.py",
-    "packages/forge-mvc-stats/forge_mvc_stats/schema.py",
+    # forge-mvc-mail et forge-mvc-stats : RETIRÉS le 2026-07-27
+    # (OPTIN-DDL-MAIL-STATS-001). Ils déclarent désormais leur table et le DDL
+    # est rendu par le dialecte. LE CLIQUET EST VIDE : plus aucun paquet ne
+    # livre de SQL propre à MariaDB.
 }
 
 
@@ -78,7 +84,19 @@ def _shipped_sql_files() -> list[Path]:
 
     Le scan couvre le **Python** en plus du `.sql` : supprimer un fichier figé
     tout en laissant la même table écrite en dur dans une constante Python
-    rendrait le cliquet vert sans rien avoir corrigé.
+    rendrait le garde-fou vert sans rien avoir corrigé.
+
+Le scan se limite aux modules contenant `CREATE TABLE`, c'est-à-dire à
+    l'**émission de DDL**, qui est l'objet de ce garde-fou.
+
+    Élargir à tous les modules révèle une autre famille de défaut, distincte :
+    du code qui **branche sur des noms de types MariaDB** (`LONGTEXT`,
+    `UNSIGNED`) pour décider d'un comportement, par exemple choisir un widget
+    de formulaire. Sur PostgreSQL ces noms n'apparaissent jamais, donc la
+    branche ne se déclenche pas. Cinq modules sont concernés
+    (`entities/crud/utils.py`, `make_crud.py`, `relations.py`,
+    `validation.py`, `iot/cli/doctor.py`). Cela relève d'un audit propre, pas
+    d'un élargissement discret de celui-ci.
 
     Sont exclus : les backends BDD, dont le dialecte MariaDB émet légitimement
     ces constructions puisque c'est son travail ; et les tests, qui doivent
@@ -143,17 +161,22 @@ def _relative(path: Path) -> str:
 
 
 def test_le_scan_trouve_bien_du_sql_a_auditer() -> None:
-    """Sans ce contrôle, un scan cassé rendrait le cliquet vert par accident.
+    """Sans ce contrôle, un scan cassé rendrait le garde-fou vert par accident.
 
-    Le seuil suit la taille du cliquet : tant qu'il reste des fichiers listés,
-    le scan doit au moins les retrouver. Quand le cliquet sera vide, ce contrôle
-    deviendra sans objet et pourra disparaître avec lui.
+    Le cliquet étant vide, le seuil ne peut plus suivre sa taille : on vérifie
+    donc que le scan trouve toujours des modules porteurs de `CREATE TABLE`.
+    S'il n'en trouvait plus aucun, ce serait le scan qui serait cassé, pas le
+    dépôt qui serait devenu parfait.
     """
-    assert len(_shipped_sql_files()) >= len(NON_PORTABLE_YET)
+    scanned = _shipped_sql_files()
+    assert len(scanned) >= 2, (
+        f"Le scan ne couvre que {len(scanned)} fichiers : verifier "
+        "_shipped_sql_files() avant de conclure que tout est portable."
+    )
 
 
-def test_aucun_nouveau_fichier_non_portable() -> None:
-    """Le cliquet ne grandit pas : un opt-in neuf doit être portable d'emblée."""
+def test_aucun_fichier_non_portable() -> None:
+    """Aucun paquet ne livre de SQL propre à MariaDB. Invariant absolu."""
     offenders: list[str] = []
     for path in _shipped_sql_files():
         rel = _relative(path)

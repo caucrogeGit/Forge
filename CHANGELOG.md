@@ -5,6 +5,14 @@
 
 ### Ajouté
 
+- **`mail` et `stats` passent au DDL dialectal (`OPTIN-DDL-MAIL-STATS-001`) : le chantier de portabilité du DDL est terminé.**
+  Les deux derniers `CREATE TABLE` MariaDB écrits en dur, jamais repérés par l'audit initial qui ne scannait que les fichiers `.sql`, sont remplacés par une déclaration rendue pour le backend installé.
+  Le champ `status` de `mail_log` portait un `ENUM('sent', 'failed', 'skipped')`, type que ni SQLite ni SQL Server ne connaissent et que PostgreSQL n'offre qu'au prix d'un `CREATE TYPE` séparé. Il devient une chaîne courte, comme le `status` de `forge-mvc-jobs` : la valeur est produite par le code, pas saisie par un utilisateur.
+  Sur MariaDB et pour les nouveaux projets, la colonne `metadata` de `forge_stats_events` passe de `JSON` à `LONGTEXT`, mapping propre au dialecte ; elle devient `JSONB` sur PostgreSQL, ce qui est meilleur.
+  **Le garde-fou de portabilité n'a plus aucune entrée** : il cesse d'être un cliquet pour devenir un invariant absolu, aucun paquet ne livrant plus de SQL propre à MariaDB.
+
+  À signaler, découvert en élargissant le scan et **volontairement laissé hors périmètre** : cinq modules branchent sur des noms de types MariaDB (`LONGTEXT`, `UNSIGNED`) pour décider d'un comportement, par exemple choisir un widget de formulaire. Sur PostgreSQL ces noms n'apparaissent jamais, donc la branche ne se déclenche pas. C'est une famille de défaut distincte de l'émission de DDL, qui mérite son propre audit ; elle est documentée dans le garde-fou.
+
 ### Retiré
 
 - **Suppression des constantes `CREATE_TABLE_SQL` (`OPTIN-DDL-CONSTANTS-001`), rupture d'API publique.**

@@ -13,6 +13,8 @@ import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+
+from core.database.table_ddl import Column, TableDefinition, render_create_table
 from typing import Any, Literal
 
 import cli._support.output as out
@@ -23,21 +25,35 @@ _STORAGE_DIR   = Path("storage") / "mail"
 _SQL_DIR       = Path("mvc") / "models" / "sql"
 _VALID_TRANSPORTS = frozenset({"null", "fake", "console", "log", "smtp"})
 
-_MAIL_LOG_SQL = """\
-CREATE TABLE IF NOT EXISTS mail_log (
-    id             INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    message_type   VARCHAR(100) NOT NULL DEFAULT '',
-    to_email       VARCHAR(255) NOT NULL DEFAULT '',
-    subject        VARCHAR(500) NOT NULL DEFAULT '',
-    transport      VARCHAR(50)  NOT NULL DEFAULT '',
-    status         ENUM('sent', 'failed', 'skipped') NOT NULL,
-    error_message  TEXT,
-    related_entity VARCHAR(100),
-    related_id     INT,
-    created_at     DATETIME     NOT NULL,
-    sent_at        DATETIME
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-"""
+MAIL_LOG = TableDefinition(
+    name="mail_log",
+    columns=[
+        Column("id", "identity"),
+        Column("message_type", "string", length=100, default=""),
+        Column("to_email", "string", length=255, default=""),
+        Column("subject", "string", length=500, default=""),
+        Column("transport", "string", length=50, default=""),
+        # Le champ portait un ENUM('sent','failed','skipped') MariaDB, type
+        # que ni SQLite ni SQL Server ne connaissent et que PostgreSQL n'offre
+        # qu'au prix d'un CREATE TYPE separe. Une chaine courte, comme le
+        # `status` de forge-mvc-jobs, est portable et suffit : la valeur est
+        # produite par le code, pas saisie par un utilisateur.
+        Column("status", "string", length=16),
+        Column("error_message", "text", nullable=True),
+        Column("related_entity", "string", length=100, nullable=True),
+        Column("related_id", "integer", nullable=True),
+        Column("created_at", "datetime"),
+        Column("sent_at", "datetime", nullable=True),
+    ],
+    primary_key=["id"],
+)
+
+
+def mail_log_sql() -> str:
+    """DDL de `mail_log`, rendu pour le backend installe."""
+    from core.database.backend import get_backend
+
+    return "\n".join(render_create_table(MAIL_LOG, get_backend().dialect)) + "\n"
 
 _SAMPLE_SUBJECT = "Test Forge — {{ date }}"
 _SAMPLE_TEXT = """\
@@ -104,7 +120,7 @@ def cmd_mail_init(args: list[str], root: Path | None = None) -> None:
 
     sql_dir = root / _SQL_DIR
     sql_dir.mkdir(parents=True, exist_ok=True)
-    _write_if_new(sql_dir / "mail_log.sql", _MAIL_LOG_SQL)
+    _write_if_new(sql_dir / "mail_log.sql", mail_log_sql())
 
     ctx_path = root / "sample.json"
     if not ctx_path.exists():
