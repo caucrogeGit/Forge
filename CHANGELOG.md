@@ -5,6 +5,13 @@
 
 ### Ajouté
 
+- **`iot` et `video` passent au DDL dialectal (`OPTIN-DDL-IOT-001`, `OPTIN-DDL-VIDEO-001`) : plus aucun fichier SQL figé dans `packages/`.**
+  Ces deux paquets demandaient un changement de code : leur commande `doctor` lisait le fichier de migration à l'exécution, via `importlib.resources`, pour vérifier l'installation.
+  `check_migration_present()` interroge désormais la déclaration. Le contrôle garde son rôle et gagne en robustesse : il ne dépend plus de `[tool.setuptools.package-data]`, dont l'oubli était précisément le risque que l'ancienne lecture cherchait à couvrir. Les entrées `migrations/*.sql` des deux `pyproject.toml` sont retirées, devenues sans objet.
+  Le rendu gagne `UniqueConstraint`, contrainte d'unicité nommée, qui préserve à l'identique le `UNIQUE KEY uq_videos_uuid (uuid)` de `videos` sur MariaDB tout en rendant `CONSTRAINT ... UNIQUE` ailleurs. Aucune page de documentation à réécrire.
+  Deux tests d'intégration qui montaient leur schéma depuis le fichier `.sql` le rendent maintenant par le dialecte : ils ne pouvaient tourner que sur MariaDB, ils sont désormais corrects sur les quatre backends.
+  Précision : `received_at` (IoT) et les horodatages vidéo passent de `DATETIME(6)` au type datetime du dialecte, ce qui perd la microseconde **sur MariaDB seul** ; PostgreSQL et SQL Server la conservent. L'ordre des événements IoT d'une même seconde reste départagé par la clé primaire croissante.
+
 - **Cinq opt-ins de plus passent au DDL dialectal (`OPTIN-DDL-BATCH-001`).**
   `audit`, `jobs`, `settings`, `notifications` et `images` déclarent leur table dans `tables.py` au lieu de livrer un `.sql` figé ; leur `<opt-in>:init` rend le DDL du backend installé.
   Plus aucun fichier SQL figé n'est livré par ces paquets.

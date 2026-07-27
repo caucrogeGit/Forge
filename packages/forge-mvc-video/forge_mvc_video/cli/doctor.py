@@ -72,24 +72,24 @@ def check_config_loadable() -> CheckResult:
 
 
 def check_migration_present() -> CheckResult:
-    """Vérifie la présence du fichier ``*_create_videos.sql`` packagé.
+    """Vérifie que le paquet déclare bien sa migration.
 
-    Lecture via ``importlib.resources`` — fonctionne en install éditable, en
-    wheel et en sdist (``[tool.setuptools.package-data]`` embarque les ``.sql``).
+    Le paquet ne livre plus de fichier SQL figé : il décrit sa table une fois
+    et le DDL est rendu pour le backend installé (`OPTIN-DDL-VIDEO-001`). Le
+    contrôle porte donc sur la déclaration.
+
+    Il reste ce qu'il était, une vérification d'installation du paquet, et il
+    gagne en robustesse : il ne dépend plus de
+    ``[tool.setuptools.package-data]``, dont l'oubli était précisément le
+    risque que l'ancienne lecture de ressource cherchait à couvrir.
     """
     try:
-        from importlib import resources
-
-        anchor = resources.files("forge_mvc_video") / "migrations"
-        candidates = sorted(
-            entry.name for entry in anchor.iterdir()
-            if entry.name.endswith("_create_videos.sql")
-        )
-    except (ImportError, ModuleNotFoundError, FileNotFoundError) as exc:  # pragma: no cover
-        return CheckResult("fail", "migration", f"ressources illisibles : {exc}")
-    if not candidates:
-        return CheckResult("fail", "migration", "*_create_videos.sql introuvable dans le package")
-    return CheckResult("ok", "migration", candidates[0])
+        from forge_mvc_video.tables import MIGRATIONS
+    except (ImportError, ModuleNotFoundError) as exc:  # pragma: no cover
+        return CheckResult("fail", "migration", f"déclaration illisible : {exc}")
+    if not MIGRATIONS:
+        return CheckResult("fail", "migration", "aucune migration déclarée par le paquet")
+    return CheckResult("ok", "migration", MIGRATIONS[0][0])
 
 
 def _check_binary(name: str, bin_value: str, purpose: str) -> CheckResult:

@@ -6,14 +6,15 @@ aucune base.
 """
 from __future__ import annotations
 
-from importlib import resources
 
 
 def _migration_sql() -> str:
-    anchor = resources.files("forge_mvc_video") / "migrations"
-    files = [e for e in anchor.iterdir() if e.name.endswith("_create_videos.sql")]
-    assert len(files) == 1, f"une seule migration videos attendue, trouvé {files}"
-    return files[0].read_text(encoding="utf-8")
+    # Le .sql fige est remplace par une declaration rendue (OPTIN-DDL-VIDEO-001).
+    from core.database.table_ddl import render_create_table
+    from forge_mvc_mariadb.dialect import MariaDBDialect
+    from forge_mvc_video.tables import VIDEOS
+
+    return chr(10).join(render_create_table(VIDEOS, MariaDBDialect()))
 
 
 def test_migration_creates_videos_table_idempotent():

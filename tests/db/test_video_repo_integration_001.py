@@ -10,7 +10,6 @@ Marqués `db` : sautés en local sans base, imposés en CI.
 """
 from __future__ import annotations
 
-from pathlib import Path
 
 import pytest
 
@@ -27,11 +26,19 @@ from forge_mvc_video.storage.repository import (
 
 
 def _ddl_statements() -> list[str]:
-    migrations = Path(forge_mvc_video.__file__).resolve().parent / "migrations"
-    sql_file = next(iter(sorted(migrations.glob("*.sql"))))
-    raw = sql_file.read_text(encoding="utf-8")
-    sql = "\n".join(l for l in raw.splitlines() if not l.strip().startswith("--"))
-    return [s.strip() for s in sql.split(";") if s.strip()]
+    """DDL de la table videos, rendu pour le backend actif.
+
+    Le paquet ne livre plus de .sql fige (OPTIN-DDL-VIDEO-001) : la table est
+    declaree une fois et rendue par le dialecte. Le test d'integration profite
+    au passage d'un DDL correct sur les quatre backends, la ou il ne pouvait
+    tourner que sur MariaDB.
+    """
+    from core.database.backend import get_backend
+    from core.database.table_ddl import render_create_table
+    from forge_mvc_video.tables import VIDEOS
+
+    statements = render_create_table(VIDEOS, get_backend().dialect)
+    return [stmt.strip().rstrip(";") for stmt in statements if stmt.strip()]
 
 
 @pytest.fixture()

@@ -58,13 +58,6 @@ NON_PORTABLE_YET = {
     "packages/forge-mvc-jobs/forge_mvc_jobs/queue.py",
     "packages/forge-mvc-notifications/forge_mvc_notifications/store.py",
     "packages/forge-mvc-settings/forge_mvc_settings/store.py",
-    # forge-mvc-iot et forge-mvc-video : conversion REPORTÉE à leurs propres
-    # tickets. Contrairement aux autres, leur commande `doctor` LIT le fichier
-    # de migration à l'exécution (importlib.resources) pour vérifier
-    # l'installation du paquet : supprimer le fichier casse la commande. Leur
-    # basculement demande un changement de code, pas seulement une déclaration.
-    "packages/forge-mvc-iot/forge_mvc_iot/migrations/20260528120000_create_iot_events.sql",
-    "packages/forge-mvc-video/forge_mvc_video/migrations/20260601120000_create_videos.sql",
     # Non repérés par l'audit initial : DDL en Python, pas en .sql.
     "packages/forge-mvc-entities/forge_mvc_entities/db_init.py",
     "packages/forge-mvc-entities/forge_mvc_entities/migrations.py",

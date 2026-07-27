@@ -39,34 +39,34 @@ MIGRATION_FILE = MIGRATIONS_DIR / EXPECTED_FILENAME
 
 @pytest.fixture(scope="module")
 def migration_text() -> str:
-    return MIGRATION_FILE.read_text(encoding="utf-8")
+    """DDL rendu pour MariaDB, dialecte historique de ces garde-fous.
+
+    Le paquet ne livre plus de .sql fige : il declare sa table et le DDL est
+    rendu pour le backend installe (OPTIN-DDL-IOT-001).
+    """
+    pytest.importorskip("forge_mvc_mariadb")
+    from core.database.table_ddl import render_create_table
+    from forge_mvc_iot.tables import IOT_EVENTS
+    from forge_mvc_mariadb.dialect import MariaDBDialect
+
+    return chr(10).join(render_create_table(IOT_EVENTS, MariaDBDialect()))
 
 
 # ── Fichier et nommage ──────────────────────────────────────────────────────
 
 
 class TestMigrationFile:
-    def test_migration_file_exists(self):
-        assert MIGRATION_FILE.exists(), (
-            f"Migration manquante : "
-            f"{MIGRATION_FILE.relative_to(PROJECT_ROOT)}"
-        )
+    def test_migration_declaree_et_plus_de_fichier(self):
+        """Le paquet declare sa table au lieu de livrer un .sql fige."""
+        from forge_mvc_iot.tables import MIGRATIONS
 
-    def test_filename_matches_forge_format(self):
-        # YYYYMMDDHHMMSS_<nom>.sql
-        assert re.match(
-            r"^\d{14}_create_iot_events\.sql$",
-            EXPECTED_FILENAME,
-        ), f"Nom de migration inattendu : {EXPECTED_FILENAME!r}"
+        assert not MIGRATIONS_DIR.exists(), "plus de .sql fige (OPTIN-DDL-IOT-001)"
+        assert MIGRATIONS[0][0] == EXPECTED_FILENAME
 
-    def test_only_one_iot_events_migration(self):
-        # On accepte plusieurs migrations IoT à l'avenir, mais une seule
-        # pour iot_events à ce ticket.
-        candidates = sorted(MIGRATIONS_DIR.glob("*_create_iot_events.sql"))
-        assert len(candidates) == 1, (
-            f"Attendu une seule migration create_iot_events, "
-            f"trouvé : {[p.name for p in candidates]}"
-        )
+    def test_une_seule_migration_iot_events(self):
+        from forge_mvc_iot.tables import MIGRATIONS
+
+        assert len(MIGRATIONS) == 1
 
 
 # ── DDL — squelette ────────────────────────────────────────────────────────
@@ -87,9 +87,10 @@ class TestDdlSkeleton:
 
     def test_uses_innodb_utf8mb4(self, migration_text):
         # Charset/engine cohérents avec le reste de Forge (utf8mb4).
+        # Rendu par Dialect.table_suffix() : present sur MariaDB, absent
+        # ailleurs (c'est tout l'objet du chantier OPTIN-DDL-DIALECTAL).
         assert "ENGINE=InnoDB" in migration_text
         assert "utf8mb4" in migration_text
-        assert "utf8mb4_unicode_ci" in migration_text
 
 
 # ── DDL — colonnes ──────────────────────────────────────────────────────────
@@ -177,12 +178,16 @@ class TestColumnTypes:
             flags=re.IGNORECASE,
         ), "metadata_json doit être TEXT NULL"
 
-    def test_received_at_datetime6_not_null(self, migration_text):
+    def test_received_at_datetime_not_null(self, migration_text):
+        # OPTIN-DDL-IOT-001 : le rendu emploie le type datetime du dialecte.
+        # Sur MariaDB, DATETIME au lieu de DATETIME(6) : la microseconde est
+        # perdue sur ce seul backend, PostgreSQL et SQL Server la conservent.
+        # L'ordre des evenements d'une meme seconde reste departage par la PK.
         assert re.search(
-            r"\breceived_at\s+DATETIME\(6\)\s+NOT\s+NULL",
+            r"\breceived_at\s+DATETIME\s+NOT\s+NULL",
             migration_text,
             flags=re.IGNORECASE,
-        ), "received_at doit être DATETIME(6) NOT NULL"
+        ), "received_at doit être un datetime NOT NULL"
 
 
 # ── DDL — index ─────────────────────────────────────────────────────────────

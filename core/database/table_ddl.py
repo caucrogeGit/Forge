@@ -31,6 +31,7 @@ from core.database.backend import Dialect
 __all__ = [
     "Column",
     "Index",
+    "UniqueConstraint",
     "ForeignKey",
     "TableDefinition",
     "render_create_table",
@@ -97,6 +98,27 @@ class Index:
 
 
 @dataclass(frozen=True)
+class UniqueConstraint:
+    """Contrainte d'unicité **nommée**, sur une ou plusieurs colonnes.
+
+    À préférer à `Column(unique=True)` quand le nom compte : pouvoir la
+    supprimer par son nom, ou simplement conserver un nom existant. Chaque
+    dialecte rend sa forme (`UNIQUE KEY nom (col)` en MariaDB,
+    `CONSTRAINT nom UNIQUE (col)` ailleurs ; SQLite omet le nom, qu'il
+    n'accepte pas dans une contrainte de table).
+    """
+
+    name: str
+    columns: "str | Sequence[str]"
+
+    @property
+    def column_names(self) -> "list[str]":
+        if isinstance(self.columns, str):
+            return [self.columns]
+        return list(self.columns)
+
+
+@dataclass(frozen=True)
 class ForeignKey:
     column: str
     ref_table: str
@@ -110,6 +132,7 @@ class TableDefinition:
     columns: Sequence[Column]
     primary_key: Sequence[str]
     indexes: Sequence[Index] = field(default_factory=tuple)
+    unique_constraints: Sequence[UniqueConstraint] = field(default_factory=tuple)
     foreign_keys: Sequence[ForeignKey] = field(default_factory=tuple)
 
 
@@ -168,6 +191,9 @@ def render_create_table(table: TableDefinition, dialect: Dialect) -> list[str]:
     for column in table.columns:
         if column.unique and not dialect.unique_is_column_constraint():
             body.append(dialect.unique_constraint_ddl(table.name, column.name, column.name))
+
+    for unique in table.unique_constraints:
+        body.append(dialect.named_unique(unique.name, unique.column_names))
 
     for fk in table.foreign_keys:
         on_delete = _ON_DELETE_ALIASES.get(fk.on_delete.upper(), fk.on_delete.upper())

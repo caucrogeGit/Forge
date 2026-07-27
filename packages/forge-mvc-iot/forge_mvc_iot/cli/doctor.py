@@ -146,42 +146,39 @@ def check_config_loadable(env: Mapping[str, str] | None = None) -> CheckResult:
 
 
 def check_migration_present() -> CheckResult:
-    """Vérifie la présence du fichier ``*_create_iot_events.sql``.
+    """Vérifie que le paquet déclare bien sa migration.
 
-    Lit la ressource via ``importlib.resources.files("forge_mvc_iot") /
-    "migrations"`` — fonctionne identiquement en install éditable, en
-    wheel et en sdist (dès que ``[tool.setuptools.package-data]``
-    embarque les ``.sql``, ce qui est le cas depuis
-    ``IOT-PACKAGE-DATA-MIGRATIONS-001``).
+    Le paquet ne livre plus de fichier SQL figé : il décrit sa table une fois
+    et le DDL est rendu pour le backend installé (`OPTIN-DDL-IOT-001`). Le
+    contrôle porte donc sur la déclaration.
+
+    Il reste ce qu'il était, une vérification d'installation du paquet, et il
+    gagne en robustesse : il ne dépend plus de
+    ``[tool.setuptools.package-data]``, dont l'oubli était précisément le
+    risque que l'ancienne lecture de ressource cherchait à couvrir
+    (``IOT-PACKAGE-DATA-MIGRATIONS-001``).
     """
     try:
-        from importlib import resources
-
-        anchor = resources.files("forge_mvc_iot") / "migrations"
-        candidates = sorted(
-            entry.name for entry in anchor.iterdir()
-            if entry.name.endswith("_create_iot_events.sql")
-        )
-    except (ImportError, ModuleNotFoundError, FileNotFoundError) as exc:
+        from forge_mvc_iot.tables import MIGRATIONS
+    except (ImportError, ModuleNotFoundError) as exc:
         return CheckResult(
             status="warn",
             label="migration iot_events",
-            detail=f"ressource indisponible : {exc}",
+            detail=f"déclaration indisponible : {exc}",
         )
-    if not candidates:
+    if not MIGRATIONS:
         return CheckResult(
             status="fail",
             label="migration iot_events",
             detail=(
-                "aucun *_create_iot_events.sql sous forge_mvc_iot/migrations/ — "
-                "vérifier l'installation (pip install -e packages/forge-mvc-iot) "
-                "et [tool.setuptools.package-data] dans pyproject.toml"
+                "aucune migration déclarée par forge_mvc_iot.tables — "
+                "vérifier l'installation (pip install -e packages/forge-mvc-iot)"
             ),
         )
     return CheckResult(
         status="ok",
         label="migration iot_events",
-        detail=f"présente ({candidates[0]})",
+        detail=f"déclarée ({MIGRATIONS[0][0]})",
     )
 
 

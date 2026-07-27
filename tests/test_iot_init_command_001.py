@@ -12,7 +12,6 @@ Aucun SQL exécuté, aucune connexion MariaDB. Les tests utilisent
 
 from __future__ import annotations
 
-from importlib import resources
 from pathlib import Path
 
 import pytest
@@ -63,14 +62,20 @@ class TestResourcesIteration:
         names = {name for name, _ in iter_iot_migration_resources()}
         assert EXPECTED_FILENAME in names
 
-    def test_content_matches_resource(self):
+    def test_content_matches_rendered_declaration(self):
+        """Le contenu produit est le DDL rendu, non un fichier copie.
+
+        Le paquet ne livre plus de .sql fige (OPTIN-DDL-IOT-001) : la source
+        est la declaration, rendue pour le backend actif.
+        """
+        from core.database.backend import get_backend
+        from core.database.table_ddl import render_create_table
+        from forge_mvc_iot.tables import IOT_EVENTS
+
         items = dict(iter_iot_migration_resources())
-        # On vérifie l'égalité bit-à-bit avec ce que renvoie
-        # importlib.resources directement.
-        anchor = resources.files("forge_mvc_iot") / "migrations"
-        for name, content in items.items():
-            expected = (anchor / name).read_bytes()
-            assert content == expected
+        rendered = chr(10).join(render_create_table(IOT_EVENTS, get_backend().dialect))
+        for _name, content in items.items():
+            assert rendered in content.decode("utf-8")
 
 
 # ── Cas normal — copie ─────────────────────────────────────────────────────
@@ -85,14 +90,17 @@ class TestCopiesMigration:
         target = tmp_path / "mvc" / "migrations" / EXPECTED_FILENAME
         assert target.exists()
 
-    def test_copied_content_matches_resource(self, tmp_path, capsys):
+    def test_written_content_matches_rendered_declaration(self, tmp_path, capsys):
+        from core.database.backend import get_backend
+        from core.database.table_ddl import render_create_table
+        from forge_mvc_iot.tables import IOT_EVENTS
+
         _make_forge_project(tmp_path)
         init_iot_migrations(tmp_path)
         capsys.readouterr()
         target = tmp_path / "mvc" / "migrations" / EXPECTED_FILENAME
-        anchor = resources.files("forge_mvc_iot") / "migrations"
-        expected = (anchor / EXPECTED_FILENAME).read_bytes()
-        assert target.read_bytes() == expected
+        rendered = chr(10).join(render_create_table(IOT_EVENTS, get_backend().dialect))
+        assert rendered in target.read_text(encoding="utf-8")
 
     def test_creates_migrations_dir_if_missing(self, tmp_path, capsys):
         _make_forge_project(tmp_path, with_migrations_dir=False)
