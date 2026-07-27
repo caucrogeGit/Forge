@@ -5,6 +5,20 @@
 
 ### Ajouté
 
+- **Rendu dialectal des tables d'infrastructure (`DB-TABLE-DDL-RENDERER-001`).**
+  Nouveau module `core/database/table_ddl.py` : un paquet décrit sa table une fois (`TableDefinition`, `Column`, `Index`, `ForeignKey`) et `render_create_table()` produit le DDL correct pour le backend actif, en passant par le contrat `Dialect`.
+  Le rendu retourne la liste des instructions : le `CREATE TABLE`, puis les `CREATE INDEX` séparés que PostgreSQL, SQLite et SQL Server exigent là où MariaDB les porte en ligne.
+  Le SQL reste visible : `<opt-in>:init` écrit le texte produit dans `mvc/migrations/`, où l'auteur le relit avant application (ADR-071 inchangé, seule la production du fichier change).
+  Vérifié en exécution sur MariaDB, PostgreSQL 17.10 et SQL Server 2022, table sans identité comme table avec identité, horodatages et clé étrangère.
+  `ON DELETE RESTRICT` est normalisé en `NO ACTION`, que SQL Server est seul à ne pas comprendre.
+  Documentation embarquée : `core/database/docs/table_ddl.md`.
+
+- **Cliquet de portabilité du DDL des opt-ins (`OPTIN-DDL-GUARD-RATCHET-001`).**
+  L'audit `OPTIN-DDL-DIALECT-AUDIT-001` a mesuré que 12 fichiers SQL livrés par 10 opt-ins étaient inexécutables ailleurs que sur MariaDB.
+  Le garde-fou fige cette liste et interdit qu'elle grandisse : un paquet neuf livrant du SQL propre à MariaDB fait échouer la suite.
+  Il se resserre aussi tout seul, un fichier corrigé mais laissé dans la liste faisant également échouer le test, avec le message qui demande de l'en retirer.
+  La dérive s'arrête donc avant même que les dix paquets soient repris.
+
 - **Le CRUD généré traite les doublons (`CRUD-DUP-HANDLING-001`).**
   Une entité pouvait déclarer un champ `unique` et le DDL créait bien la contrainte, mais le contrôleur généré n'entourait l'INSERT pour aucun champ unique : un doublon soumis remontait l'exception brute du pilote et produisait une 500, sur les quatre backends.
   `create` et `update` attrapent désormais `UniqueViolationError` et réaffichent le formulaire avec l'erreur.

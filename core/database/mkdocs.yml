@@ -10,3 +10,4 @@ nav:
       - Pool de connexions (connection.py): connection.md
       - Chargeur de requêtes SQL (sql_loader.py): sql_loader.md
       - Erreurs portables (errors.py): errors.md
+      - Rendu dialectal de table (table_ddl.py): table_ddl.md
