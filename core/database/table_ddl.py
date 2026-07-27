@@ -79,8 +79,21 @@ class Column:
 
 @dataclass(frozen=True)
 class Index:
+    """Index simple ou composite.
+
+    `columns` accepte un nom seul ou une suite de noms. Le contrat `Dialect`
+    reçoit la liste jointe, convention déjà suivie par le rendu du socle auth
+    (`cli/security/auth_sql.py`).
+    """
+
     name: str
-    column: str
+    columns: "str | Sequence[str]"
+
+    @property
+    def column_list(self) -> str:
+        if isinstance(self.columns, str):
+            return self.columns
+        return ", ".join(self.columns)
 
 
 @dataclass(frozen=True)
@@ -165,7 +178,7 @@ def render_create_table(table: TableDefinition, dialect: Dialect) -> list[str]:
 
     if dialect.inline_indexes():
         for index in table.indexes:
-            body.append(dialect.index_clause(index.name, index.column))
+            body.append(dialect.index_clause(index.name, index.column_list))
 
     statements = [
         dialect.create_table_opening(table.name)
@@ -177,7 +190,7 @@ def render_create_table(table: TableDefinition, dialect: Dialect) -> list[str]:
     ]
     if not dialect.inline_indexes():
         statements += [
-            dialect.create_index_sql(table.name, index.name, index.column)
+            dialect.create_index_sql(table.name, index.name, index.column_list)
             for index in table.indexes
         ]
     return statements

@@ -30,7 +30,10 @@ def test_ships_py_typed() -> None:
     assert py_typed.is_file(), f"{MODULE} doit embarquer py.typed (PEP 561)"
 
 
-def test_ships_migration() -> None:
+def test_declares_its_table() -> None:
+    """Le .sql fige est remplace par une declaration rendue par le dialecte
+    (OPTIN-DDL-DIALECTAL) : le paquet declare, il n'embarque plus de SQL."""
     assert mod.__file__ is not None
-    sql = list((Path(mod.__file__).parent / "migrations").glob("*.sql"))
-    assert sql, f"{MODULE} doit embarquer au moins une migration .sql"
+    assert not (Path(mod.__file__).parent / "migrations").exists()
+    tables = __import__("forge_mvc_audit.tables", fromlist=["tables"])
+    assert tables.MIGRATIONS, f"{MODULE} doit declarer ses migrations"

@@ -34,10 +34,16 @@ _MEDIA_COLUMNS = (
 )
 
 
-def test_ships_media_migration() -> None:
-    migrations = list((PKG_ROOT / "migrations").glob("*.sql"))
-    assert migrations, "forge-mvc-images doit embarquer au moins une migration .sql"
-    sql = migrations[0].read_text(encoding="utf-8")
+def test_declares_media_table() -> None:
+    """Le .sql fige est remplace par une declaration rendue par le dialecte
+    (OPTIN-DDL-DIALECTAL) ; on verifie les colonnes sur le rendu MariaDB."""
+    pytest.importorskip("forge_mvc_mariadb")
+    from core.database.table_ddl import render_create_table
+    from forge_mvc_images.tables import MEDIA
+    from forge_mvc_mariadb.dialect import MariaDBDialect
+
+    assert not (PKG_ROOT / "migrations").exists()
+    sql = chr(10).join(render_create_table(MEDIA, MariaDBDialect()))
     assert "CREATE TABLE IF NOT EXISTS media" in sql
     for column in _MEDIA_COLUMNS:
         assert column in sql, f"colonne {column} absente de la migration media"

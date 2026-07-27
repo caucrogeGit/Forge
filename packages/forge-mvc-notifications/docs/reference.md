@@ -284,3 +284,12 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
 - [Initialisation (notifications:init)](references/cli.md) : création de la table.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `NotificationError`.
 - [Welcome-Notifications](welcome/debutant/notif-welcome.md) : parcours d'apprentissage.
+
+## Déclaration de table
+
+Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py`
+(`NOTIFICATIONS`, plus la liste `MIGRATIONS`).
+Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit
+dans `mvc/migrations/` par `forge notifications:init` (chantier `OPTIN-DDL-DIALECTAL`).
+Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
+MariaDB, SQLite, PostgreSQL comme SQL Server.

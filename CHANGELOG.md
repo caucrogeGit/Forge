@@ -5,6 +5,14 @@
 
 ### Ajouté
 
+- **Cinq opt-ins de plus passent au DDL dialectal (`OPTIN-DDL-BATCH-001`).**
+  `audit`, `jobs`, `settings`, `notifications` et `images` déclarent leur table dans `tables.py` au lieu de livrer un `.sql` figé ; leur `<opt-in>:init` rend le DDL du backend installé.
+  Plus aucun fichier SQL figé n'est livré par ces paquets.
+  **Le cliquet est étendu au code Python.** Supprimer un `.sql` en laissant la même table écrite en dur dans une constante Python aurait rendu le garde-fou vert sans rien corriger.
+  Cette extension a révélé que l'audit initial **sous-comptait** : il ne scannait que le `.sql` et avait manqué du DDL MariaDB dans `mail`, `stats`, `entities` et le `doctor` d'`iot`.
+  **`iot` et `video` sont reportés** à leurs propres tickets : contrairement aux autres, leur commande `doctor` lit le fichier de migration à l'exécution pour vérifier l'installation du paquet ; les supprimer casse la commande, leur bascule demande donc un changement de code.
+  À noter : `iot` et `video` déclaraient `DATETIME(6)` ; leur conversion fera perdre la microseconde sur MariaDB seul, PostgreSQL et SQL Server la conservant.
+
 - **Nouvelle commande `forge rbac:init` (`OPTIN-DDL-RBAC-INIT-001`).**
   Les tables `roles`, `permissions` et `role_permissions` n'avaient **aucun chemin de provisioning utilisable** : le paquet n'exposait pas de commande d'initialisation, son `sql/rbac.sql` n'était pas livré dans le wheel, et le README renvoyait vers `docs/features/rbac.md`, document inexistant.
   Un utilisateur installant `forge-mvc-rbac` depuis PyPI ne pouvait donc pas créer ses tables, alors que `forge auth:init` lui écrivait un `user_roles.sql` portant une clé étrangère vers `roles`.

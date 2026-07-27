@@ -288,3 +288,12 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
 - [Galerie (media_gallery.py)](references/media_gallery.md) : galerie, couverture, URLs.
 - [Guide média](media.md) : vue d'ensemble applicative.
 - [Welcome-Images](welcome/debutant/images-welcome.md) : parcours d'apprentissage.
+
+## Déclaration de table
+
+Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py`
+(`MEDIA`, plus la liste `MIGRATIONS`).
+Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit
+dans `mvc/migrations/` par `forge images:init` (chantier `OPTIN-DDL-DIALECTAL`).
+Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
+MariaDB, SQLite, PostgreSQL comme SQL Server.

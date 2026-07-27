@@ -42,32 +42,65 @@ MARIADB_ONLY = {
 # Fichiers encore non portables au 2026-07-27. Cette liste ne doit JAMAIS
 # grandir. Retirez une entrée quand le paquet correspondant est passé au rendu
 # dialectal ; n'en ajoutez aucune.
+# Tous les fichiers `.sql` figés livrés par un paquet ont été convertis au
+# 2026-07-27 : sessions-db, rbac et mfa, puis audit, images, iot, jobs,
+# notifications, settings et video. Aucun ne subsiste.
+#
+# Restent des DDL écrits en dur dans du **Python**, que le scan initial de
+# l'audit avait manqués parce qu'il ne regardait que le `.sql` : quatre
+# constantes `CREATE_TABLE_SQL` doublonnant une migration désormais dialectale,
+# et cinq autres emplacements dans des paquets que l'audit n'avait pas
+# identifiés (dont `mail` et `stats`).
 NON_PORTABLE_YET = {
-    "packages/forge-mvc-audit/forge_mvc_audit/migrations/20260626130000_create_audit_log.sql",
-    "packages/forge-mvc-images/forge_mvc_images/migrations/20260710120000_create_media.sql",
+    # Constantes CREATE_TABLE_SQL : doublon de la migration, API publique
+    # documentée (18 pages) — conversion en ticket dédié.
+    "packages/forge-mvc-audit/forge_mvc_audit/store.py",
+    "packages/forge-mvc-jobs/forge_mvc_jobs/queue.py",
+    "packages/forge-mvc-notifications/forge_mvc_notifications/store.py",
+    "packages/forge-mvc-settings/forge_mvc_settings/store.py",
+    # forge-mvc-iot et forge-mvc-video : conversion REPORTÉE à leurs propres
+    # tickets. Contrairement aux autres, leur commande `doctor` LIT le fichier
+    # de migration à l'exécution (importlib.resources) pour vérifier
+    # l'installation du paquet : supprimer le fichier casse la commande. Leur
+    # basculement demande un changement de code, pas seulement une déclaration.
     "packages/forge-mvc-iot/forge_mvc_iot/migrations/20260528120000_create_iot_events.sql",
-    "packages/forge-mvc-jobs/forge_mvc_jobs/migrations/20260626140000_create_jobs.sql",
-    # forge-mvc-mfa : les deux fichiers ont été RETIRÉS le 2026-07-27
-    # (OPTIN-DDL-DEAD-SQL-CLEANUP-001). Ils doublonnaient, en MariaDB seul, la
-    # spécification déjà dialectale de cli/security/auth_sql.py, que
-    # `forge auth:init` rend pour le backend actif. Plus aucun code ne les lisait.
-    "packages/forge-mvc-notifications/forge_mvc_notifications/migrations/20260626150000_create_notifications.sql",
-    # forge-mvc-rbac : les deux fichiers ont été RETIRÉS le 2026-07-27.
-    # `user_roles.sql` doublonnait auth_sql.py (OPTIN-DDL-DEAD-SQL-CLEANUP-001) ;
-    # `rbac.sql` est remplacé par la déclaration forge_mvc_rbac.tables, rendue
-    # par la nouvelle commande `forge rbac:init` (OPTIN-DDL-RBAC-INIT-001).
-    # forge-mvc-sessions-db : RETIRÉ le 2026-07-27 (OPTIN-DDL-SESSIONS-DB-001).
-    # Le paquet déclare sa table et le DDL est rendu par le dialecte actif.
-    "packages/forge-mvc-settings/forge_mvc_settings/migrations/20260626120000_create_app_settings.sql",
     "packages/forge-mvc-video/forge_mvc_video/migrations/20260601120000_create_videos.sql",
+    # Non repérés par l'audit initial : DDL en Python, pas en .sql.
+    "packages/forge-mvc-entities/forge_mvc_entities/db_init.py",
+    "packages/forge-mvc-entities/forge_mvc_entities/migrations.py",
+    "packages/forge-mvc-iot/forge_mvc_iot/cli/doctor.py",
+    "packages/forge-mvc-mail/forge_mvc_mail/cli.py",
+    "packages/forge-mvc-stats/forge_mvc_stats/schema.py",
 }
 
 
 def _shipped_sql_files() -> list[Path]:
-    return [
+    """Fichiers SQL et modules Python livrés par un paquet, susceptibles de DDL.
+
+    Le scan couvre le **Python** en plus du `.sql` : supprimer un fichier figé
+    tout en laissant la même table écrite en dur dans une constante Python
+    rendrait le cliquet vert sans rien avoir corrigé.
+
+    Sont exclus : les backends BDD, dont le dialecte MariaDB émet légitimement
+    ces constructions puisque c'est son travail ; et les tests, qui doivent
+    pouvoir citer ces chaînes pour les vérifier.
+    """
+    out = [
         path for path in sorted(PACKAGES.rglob("*.sql"))
         if "/build/" not in path.as_posix()
     ]
+    for path in sorted(PACKAGES.rglob("*.py")):
+        posix = path.as_posix()
+        if "/build/" in posix or "/tests/" in posix or "/dialect.py" in posix:
+            continue
+        if "/forge-mvc-mariadb/" in posix or "/forge-mvc-sqlite/" in posix:
+            continue
+        if "/forge-mvc-postgres/" in posix or "/forge-mvc-mssql/" in posix:
+            continue
+        if "CREATE TABLE" not in path.read_text(encoding="utf-8"):
+            continue
+        out.append(path)
+    return out
 
 
 def _markers_in(path: Path) -> list[str]:

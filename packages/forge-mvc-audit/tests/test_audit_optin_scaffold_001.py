@@ -34,9 +34,18 @@ def test_dependances_minimales() -> None:
 
 
 def test_create_table_sql_coherent_avec_la_migration() -> None:
-    migrations = list((PKG_ROOT / "migrations").glob("*.sql"))
-    assert migrations, "au moins une migration .sql attendue"
-    sql = migrations[0].read_text(encoding="utf-8")
+    """Coherence entre la constante historique et le DDL rendu.
+
+    La migration figee est remplacee par une declaration rendue par le
+    dialecte (OPTIN-DDL-DIALECTAL) ; on compare donc au rendu MariaDB,
+    dialecte de la constante. La constante elle-meme reste a convertir.
+    """
+    pytest.importorskip("forge_mvc_mariadb")
+    from core.database.table_ddl import render_create_table
+    from forge_mvc_mariadb.dialect import MariaDBDialect
+    from forge_mvc_audit.tables import AUDIT_LOG
+
+    sql = chr(10).join(render_create_table(AUDIT_LOG, MariaDBDialect()))
     assert f"CREATE TABLE IF NOT EXISTS {TABLE_NAME}" in sql
     assert f"CREATE TABLE IF NOT EXISTS {TABLE_NAME}" in CREATE_TABLE_SQL
     for column in ("actor", "action", "target_type", "target_id", "details", "created_at"):

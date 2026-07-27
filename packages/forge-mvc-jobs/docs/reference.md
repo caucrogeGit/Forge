@@ -295,3 +295,12 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
 - [Initialisation (jobs:init)](references/cli.md) : création de la table.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `JobError`.
 - [Welcome-Jobs](welcome/debutant/jobs-welcome.md) : parcours d'apprentissage.
+
+## Déclaration de table
+
+Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py`
+(`JOBS`, plus la liste `MIGRATIONS`).
+Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit
+dans `mvc/migrations/` par `forge jobs:init` (chantier `OPTIN-DDL-DIALECTAL`).
+Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
+MariaDB, SQLite, PostgreSQL comme SQL Server.
