@@ -5,6 +5,12 @@
 
 ### Corrigé
 
+- **Le serveur de développement honore les réponses en flux (`SKELETON-DEVSERVER-STREAM-001`).**
+  `Response.file()` (HTTP Range, `CORE-HTTP-FILE-RANGE-001`) laisse `body` vide et pose `stream` plus `content_length`. Le chemin WSGI le gérait depuis l'origine ; `_send_response` du serveur de développement annonçait `len(body)`, soit **0**, et n'écrivait jamais le flux.
+  Mesuré sur un fichier de 5000 octets : `Content-Length: 0` et **zéro octet écrit**. Tout téléchargement, toute lecture vidéo ou audio et tout `/media/` étaient donc servis **vides** en développement, sans la moindre erreur. Le contrat Range du cœur était correct mais inobservable par un développeur.
+  Le serveur suit désormais le contrat du chemin WSGI, et une déconnexion du client en cours d'envoi est tracée plutôt que remontée : les en-têtes sont déjà partis, il n'y a plus de réponse d'erreur possible.
+  Test de bout en bout sur une socket réelle, requête `Range` comprise : `200` complet, `206` avec `Content-Range`, `416` hors limites.
+
 - **Un jeu de caractères inconnu ne fait plus tomber une requête multipart (`CORE-MULTIPART-CHARSET-001`).**
   Le décodage d'un champ multipart utilise le jeu de caractères **déclaré par le client**. `bytes.decode()` lève `UnicodeDecodeError` sur des octets invalides, mais `LookupError` sur un encodage inconnu, et seule la première était interceptée.
   N'importe quel client pouvait donc provoquer une **500** en envoyant `charset=charset-bidon` dans une part de formulaire, sans authentification. Le champ indécodable vaut désormais la chaîne vide, comme toute valeur illisible. Un jeu de caractères légitime non UTF-8 continue de se décoder : le correctif n'est pas un repli systématique.

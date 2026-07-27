@@ -270,9 +270,21 @@ class RequestHandler(BaseHTTPRequestHandler):
         une route applicative qui définit explicitement un de ces headers
         garde la main. Voir `WSGI-SECURITY-HEADERS-001`.
         """
+        # Corps : soit un itérable de streaming (Response.file → Range/206,
+        # CORE-HTTP-FILE-RANGE-001), soit le `body` bytes habituel. Même contrat
+        # que le chemin WSGI (`core/app/wsgi.py`) : dans le cas streaming,
+        # `Content-Length` vient de `response.content_length`, taille de la
+        # tranche servie, et non de `len(body)` qui vaut alors zéro.
+        stream = getattr(response, "stream", None)
+        content_length = (
+            (getattr(response, "content_length", None) or 0)
+            if stream is not None else
+            len(response.body)
+        )
+
         self.send_response(response.status)
         self.send_header("Content-Type", response.content_type)
-        self.send_header("Content-Length", str(len(response.body)))
+        self.send_header("Content-Length", str(content_length))
 
         # Couche de défense partagée avec le chemin WSGI : un seul helper,
         # un seul contrat. `include_hsts=True` : le serveur de dev sait quand
@@ -292,7 +304,17 @@ class RequestHandler(BaseHTTPRequestHandler):
         for cookie in getattr(response, "set_cookies", []):
             self.send_header("Set-Cookie", str(cookie))
         self.end_headers()
-        self.wfile.write(response.body)
+        if stream is None:
+            self.wfile.write(response.body)
+            return
+        try:
+            for chunk in stream:
+                self.wfile.write(chunk)
+        except (BrokenPipeError, ConnectionResetError):
+            # Le client a coupé en cours de téléchargement (lecteur vidéo qui
+            # saute, onglet fermé). Les en-têtes sont déjà partis : il n'y a
+            # plus de réponse d'erreur à envoyer, seulement une trace.
+            logger.info("Client déconnecté pendant l'envoi de %s", self.path)
 
     def _serve_static(self, path: str) -> None:
         """
