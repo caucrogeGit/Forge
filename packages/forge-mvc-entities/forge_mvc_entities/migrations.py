@@ -906,11 +906,42 @@ def _normalize_sql_type(value: str) -> str:
     return re.sub(r"\s+", " ", value.strip().upper())
 
 
+def _type_arguments(sql_type: str) -> str:
+    """Arguments entre parenthèses d'un type SQL, normalisés (« 10,2 »)."""
+    match = re.search(r"\(([^)]*)\)", sql_type)
+    return re.sub(r"\s+", "", match.group(1)).upper() if match else ""
+
+
+def _same_type(expected: str, actual: str) -> bool:
+    """Deux types désignent-ils la même chose pour le backend actif ?
+
+    Comparer les chaînes ne marche pas hors MariaDB : l'introspection de
+    PostgreSQL rend `character varying(255)` là où le générateur écrit
+    `VARCHAR(255)`, et SQL Server `NVARCHAR(255)` en majuscules propres. La
+    comparaison porte donc sur la **famille** du type, que le contrat
+    `Dialect` expose déjà, puis sur ses arguments.
+
+    Les arguments ne départagent que si les deux côtés en portent : un type
+    sans parenthèses n'apprend rien sur la longueur de l'autre, et le signaler
+    produirait une différence là où il n'y en a pas.
+    """
+    from core.database.backend import get_backend
+
+    dialect = get_backend().dialect
+    if dialect.sql_families(expected) != dialect.sql_families(actual):
+        return False
+    expected_args = _type_arguments(expected)
+    actual_args = _type_arguments(actual)
+    if expected_args and actual_args:
+        return expected_args == actual_args
+    return True
+
+
 def _column_changes(expected: ExpectedColumn, actual: ActualColumn) -> list[str]:
     changes: list[str] = []
     expected_type = _normalize_sql_type(expected.sql_type)
     actual_type = _normalize_sql_type(actual.sql_type)
-    if expected_type != actual_type:
+    if not _same_type(expected.sql_type, actual.sql_type):
         changes.append(f"type attendu {expected_type}, trouvé {actual_type}")
     if expected.nullable != actual.nullable:
         changes.append(

@@ -30,6 +30,24 @@ _FLOAT_PREFIXES = ("FLOAT", "DOUBLE", "REAL", "DECIMAL", "NUMERIC")
 _STRING_PREFIXES = ("CHAR", "VARCHAR", "TEXT", "JSON", "JSONB", "UUID")
 
 
+def _sized_type(data_type: str, length: Any, precision: Any, scale: Any) -> str:
+    """Recompose un type introspecté avec sa longueur ou sa précision.
+
+    `information_schema.data_type` ne porte que le nom (« character varying »,
+    « numeric ») : sans cette recomposition, un diff de schéma ne peut pas
+    comparer `VARCHAR(255)` à ce qui est réellement en base.
+
+    La précision n'est ajoutée qu'aux types décimaux : PostgreSQL renseigne
+    `numeric_precision` pour tous les numériques, y compris `integer`, où
+    elle ne fait pas partie de la déclaration.
+    """
+    if length is not None:
+        return f"{data_type}({int(length)})"
+    if data_type.lower() in {"numeric", "decimal"} and precision is not None:
+        return f"{data_type}({int(precision)},{int(scale or 0)})"
+    return data_type
+
+
 class PostgreSQLDialect:
     """Traits SQL de PostgreSQL."""
 
@@ -233,7 +251,8 @@ class PostgreSQLDialect:
             # dans un autre schéma ferait remonter ses colonnes en plus des
             # bonnes, entrelacées par `ordinal_position`.
             cursor.execute(
-                "SELECT column_name, data_type, is_nullable, column_default "
+                "SELECT column_name, data_type, is_nullable, column_default, "
+                "character_maximum_length, numeric_precision, numeric_scale "
                 "FROM information_schema.columns "
                 "WHERE table_name = ? AND table_schema = current_schema() "
                 "ORDER BY ordinal_position",
@@ -245,7 +264,7 @@ class PostgreSQLDialect:
         return [
             (
                 str(row[0]),
-                str(row[1]),
+                _sized_type(str(row[1]), row[4], row[5], row[6]),
                 str(row[2]).upper() == "YES",
                 str(row[3] or "").lower().startswith("nextval"),
             )

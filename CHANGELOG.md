@@ -5,6 +5,12 @@
 
 ### Corrigé
 
+- **Le diff de schéma compare des familles de types, plus des chaînes (`ENTITIES-DIFF-TYPE-FAMILIES-001`).**
+  `forge migration:diff` confrontait deux **chaînes** de types. Hors MariaDB elles ne coïncident jamais : l'introspection de PostgreSQL rend `character varying` là où le générateur écrit `VARCHAR(255)`, et SQL Server `NVARCHAR` sans longueur. La commande déclarait donc **chaque colonne modifiée** sur une table pourtant conforme, et `migration:make --from-diff` refusait de produire quoi que ce soit en criant au « diff risqué ».
+  Trois défauts distincts, corrigés ensemble : la comparaison porte désormais sur la **famille** du type, que le contrat `Dialect` exposait déjà, puis sur ses arguments ; l'introspection de PostgreSQL et de SQL Server recompose la **longueur**, publiée par `information_schema` dans une colonne séparée ; SQLite ne rapporte plus sa clé primaire comme nullable, `PRAGMA table_info` annonçant `notnull = 0` sur un `INTEGER PRIMARY KEY` dont il refuse pourtant les NULL.
+  Deux arguments ne départagent que si les **deux** côtés en portent : un type sans parenthèses n'apprend rien sur la longueur de l'autre, et le signaler créerait une différence là où il n'y en a pas.
+  Test d'or sur serveurs réels : une table créée depuis le DDL généré donne un diff **vide** sur SQLite, PostgreSQL et SQL Server. Contrôle négatif au même endroit, tout aussi important : une longueur, une famille ou une nullabilité qui diffèrent restent détectées, le correctif ne rendant pas le diff aveugle.
+
 - **L'introspection de PostgreSQL et de SQL Server se borne au schéma courant (`DB-INTROSPECTION-SCHEMA-FILTER-001`).**
   `introspect_columns` ne filtrait que sur le **nom** de la table. `information_schema` exposant toutes les tables visibles de la base, une homonyme dans un autre schéma faisait remonter ses colonnes en plus des bonnes, **entrelacées** par la position ordinale.
   Mesuré sur serveurs réels, pour une table de deux colonnes et une homonyme de trois : l'introspection rendait `['id', 'autre_a', 'autre_b', 'titre', 'autre_c']`. Le diff de migration voyait donc des colonnes fantômes et proposait de les supprimer.

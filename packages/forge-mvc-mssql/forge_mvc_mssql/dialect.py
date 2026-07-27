@@ -32,6 +32,25 @@ _STRING_PREFIXES = ("CHAR", "VARCHAR", "NCHAR", "NVARCHAR", "TEXT", "NTEXT", "UN
 _DATETIME_PREFIXES = ("DATETIME", "SMALLDATETIME")
 
 
+def _sized_type(data_type: str, length: Any, precision: Any, scale: Any) -> str:
+    """Recompose un type introspecté avec sa longueur ou sa précision.
+
+    `INFORMATION_SCHEMA.DATA_TYPE` ne porte que le nom (« NVARCHAR »,
+    « DECIMAL ») : sans cette recomposition, un diff de schéma ne peut pas
+    comparer `NVARCHAR(255)` à ce qui est réellement en base.
+
+    Une longueur de -1 signale `MAX` en T-SQL. La précision n'est ajoutée
+    qu'aux types décimaux : SQL Server renseigne `NUMERIC_PRECISION` pour tous
+    les numériques, y compris `INT`, où elle ne fait pas partie de la
+    déclaration.
+    """
+    if length is not None:
+        return f"{data_type}(MAX)" if int(length) == -1 else f"{data_type}({int(length)})"
+    if data_type.upper() in {"DECIMAL", "NUMERIC"} and precision is not None:
+        return f"{data_type}({int(precision)},{int(scale or 0)})"
+    return data_type
+
+
 class MSSQLDialect:
     """Traits SQL de Microsoft SQL Server."""
 
@@ -251,7 +270,8 @@ class MSSQLDialect:
             # `OBJECT_ID` sur un nom non qualifié.
             cursor.execute(
                 "SELECT c.COLUMN_NAME, c.DATA_TYPE, c.IS_NULLABLE, "
-                "COLUMNPROPERTY(OBJECT_ID(?), c.COLUMN_NAME, 'IsIdentity') "
+                "COLUMNPROPERTY(OBJECT_ID(?), c.COLUMN_NAME, 'IsIdentity'), "
+                "c.CHARACTER_MAXIMUM_LENGTH, c.NUMERIC_PRECISION, c.NUMERIC_SCALE "
                 "FROM INFORMATION_SCHEMA.COLUMNS c "
                 "WHERE c.TABLE_NAME = ? AND c.TABLE_SCHEMA = SCHEMA_NAME() "
                 "ORDER BY c.ORDINAL_POSITION",
@@ -263,7 +283,7 @@ class MSSQLDialect:
         return [
             (
                 str(row[0]),
-                str(row[1]).upper(),
+                _sized_type(str(row[1]).upper(), row[4], row[5], row[6]),
                 str(row[2]).upper() == "YES",
                 bool(row[3]),
             )

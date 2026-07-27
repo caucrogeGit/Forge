@@ -13,6 +13,16 @@ from core.database.literals import escape_string, render_literal_value
 
 _SAFE_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 
+
+def _is_rowid_alias(row: Any) -> bool:
+    """Vrai si la colonne est un `INTEGER PRIMARY KEY`, alias du rowid.
+
+    C'est la seule colonne que SQLite auto-incrémente, et la seule dont il
+    refuse les NULL sans le déclarer dans `PRAGMA table_info`.
+    """
+    return bool(row[5]) and str(row[2]).upper() == "INTEGER"
+
+
 # Types Forge « simples » → affinité SQLite.
 _SIMPLE_TYPES: dict[str, str] = {
     "text":        "TEXT",
@@ -250,12 +260,17 @@ class SQLiteDialect:
         finally:
             cursor.close()
         # row : (cid, name, type, notnull, dflt_value, pk)
+        #
+        # `INTEGER PRIMARY KEY` est l'alias du rowid : SQLite le déclare
+        # `notnull = 0` alors qu'il refuse toute valeur NULL. Le rapporter
+        # nullable ferait voir une différence à chaque diff de clé primaire,
+        # sur une colonne pourtant conforme.
         return [
             (
                 str(row[1]),
                 str(row[2]),
-                int(row[3]) == 0,
-                bool(row[5]) and str(row[2]).upper() == "INTEGER",
+                int(row[3]) == 0 and not _is_rowid_alias(row),
+                _is_rowid_alias(row),
             )
             for row in rows
         ]
