@@ -16,8 +16,8 @@ Pour tout le reste, utiliser `core.database.db`.
 
 Depuis ADR-054, le cœur est agnostique BDD : ce module ne connaît plus de SGBD.
 Il délègue l'acquisition et la restitution des connexions au backend actif,
-résolu par `core.database.backend.get_backend()` (opt-in installé, ou repli
-MariaDB intégré tant que l'extraction n'est pas faite).
+résolu par `core.database.backend.get_backend()`, qui exige qu'un opt-in de
+backend soit installé : il n'existe aucun repli intégré.
 
 Chaque requête HTTP emprunte une connexion et la restitue à l'appel de
 `close_connection()`. Selon le backend, la connexion retourne à un pool

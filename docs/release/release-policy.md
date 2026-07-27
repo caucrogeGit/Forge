@@ -125,7 +125,7 @@ Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la
 ### Expérimental : stable en usage, interface peut évoluer
 
 - `forge module:*`, `forge deploy:*`.
-- Backends de session `FileSessionStore`, `MariaDbSessionStore`.
+- Backends de session `FileSessionStore`, `DbSessionStore` (opt-in `forge-mvc-sessions-db`).
 - Pages publiques (`make:public-*`).
 
 ---

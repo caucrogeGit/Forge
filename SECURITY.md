@@ -162,8 +162,10 @@ Forge utilise des **sessions mémoire** par défaut.
 
 **Forge ne doit pas être utilisé pour des systèmes critiques sans audit de sécurité externe préalable.**
 
-Forge fournit trois backends : `MemorySessionStore` (défaut, mono-processus),
-`FileSessionStore` (persistance JSON sur disque) et `MariaDbSessionStore` (sessions
-partagées entre processus). Voir `core/sessions/` et ADR-002.
+Le cœur fournit deux backends : `MemorySessionStore` (défaut, mono-processus)
+et `FileSessionStore` (persistance JSON sur disque). Voir `core/sessions/`.
+Le partage entre processus demande l'opt-in `forge-mvc-sessions-db`, qui
+apporte `DbSessionStore`, adossé au backend de base de données actif
+(ADR-054). Voir ADR-002.
 
 Voir aussi [ADR-002 — Stratégie de session](docs/adr/002-session-strategy.md).
