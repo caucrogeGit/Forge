@@ -31,6 +31,8 @@ minuscules ``ok`` / ``warn`` / ``fail`` / ``skip``, dataclass
 
 from __future__ import annotations
 
+import os
+import re
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Any, Literal
@@ -330,140 +332,127 @@ def check_database_table(fetch_one_func: _FetchOne | None = None) -> CheckResult
 # une divergence donne un WARN clair, jamais une réparation automatique.
 
 
-@dataclass(frozen=True)
-class _ColumnContract:
-    """Contrat attendu pour une colonne de ``iot_events``.
-
-    - ``data_type`` : valeur attendue de ``INFORMATION_SCHEMA.DATA_TYPE``
-      (minuscule, ex. ``varchar``, ``bigint``, ``double``) ;
-    - ``display``   : forme lisible attendue affichée dans les messages
-      (ex. ``VARCHAR(64)``, ``BIGINT UNSIGNED``) ; sert aussi de référence
-      de longueur / précision pour ``varchar`` et ``datetime`` ;
-    - ``nullable``  : ``True`` si la colonne doit accepter ``NULL`` ;
-    - ``unsigned`` / ``auto_increment`` : attributs supplémentaires
-      vérifiés via ``COLUMN_TYPE`` et ``EXTRA``.
-    """
-
-    name: str
-    data_type: str
-    display: str
-    nullable: bool
-    unsigned: bool = False
-    auto_increment: bool = False
-
-
-# Ordre canonique aligné sur la migration (id en tête, puis COLUMNS).
-_SCHEMA_CONTRACT: tuple[_ColumnContract, ...] = (
-    _ColumnContract("id", "bigint", "BIGINT UNSIGNED", nullable=False,
-                    unsigned=True, auto_increment=True),
-    _ColumnContract("site", "varchar", "VARCHAR(64)", nullable=False),
-    _ColumnContract("device_id", "varchar", "VARCHAR(64)", nullable=False),
-    _ColumnContract("kind", "varchar", "VARCHAR(64)", nullable=False),
-    _ColumnContract("value", "double", "DOUBLE", nullable=False),
-    _ColumnContract("unit", "varchar", "VARCHAR(32)", nullable=False),
-    _ColumnContract("timestamp", "varchar", "VARCHAR(40)", nullable=False),
-    _ColumnContract("metadata_json", "text", "TEXT", nullable=True),
-    _ColumnContract("received_at", "datetime", "DATETIME(6)", nullable=False),
-)
-
 _SCHEMA_HINT = (
     "Conseil : vérifie la migration Forge IoT ou recrée la table "
     "dans un environnement de test."
 )
 
 
-def _row_value(row: Mapping[str, Any], key: str) -> str:
-    """Lit une colonne INFORMATION_SCHEMA quelle que soit la casse de la clé.
-
-    Selon le connecteur, les clés peuvent être renvoyées en majuscules
-    (``COLUMN_NAME``) ou minuscules (``column_name``). On normalise.
-    """
-    for candidate in (key, key.lower(), key.upper()):
-        if candidate in row:
-            value = row[candidate]
-            return "" if value is None else str(value)
-    return ""
-
-
-def _type_matches(contract: _ColumnContract, data_type: str, column_type: str) -> bool:
-    """Vérifie que le type SQL observé respecte le contrat.
-
-    Comparaison tolérante à la largeur d'affichage des entiers
-    (``bigint(20)`` vs ``bigint``) : pour ``bigint`` on s'appuie sur
-    ``data_type`` + l'attribut ``unsigned``. Pour ``varchar`` et
-    ``datetime``, la longueur / précision est significative et comparée
-    à ``display``.
-    """
-    dt = data_type.strip().lower()
-    ct = column_type.strip().lower()
-    if dt != contract.data_type:
-        return False
-    if contract.unsigned != ("unsigned" in ct):
-        return False
-    expected = contract.display.lower()
-    if contract.data_type in ("varchar", "char", "datetime"):
-        return ct == expected
-    # bigint / double / text : data_type (+ unsigned déjà vérifié) suffit.
-    return True
-
-
-def check_database_schema(*, fetch_all_func: _FetchAll | None = None) -> CheckResult:
+def check_database_schema(
+    *,
+    fetch_all_func: _FetchAll | None = None,
+    introspect_func: "Callable[[], list[tuple[str, str, bool, bool]]] | None" = None,
+) -> CheckResult:
     """Vérifie que le schéma réel de ``iot_events`` respecte le contrat IoT.
 
-    Lit ``INFORMATION_SCHEMA.COLUMNS`` (plus propre et plus testable qu'un
-    parsing de ``SHOW CREATE TABLE``) et compare colonnes, types, nullabilité
-    et l'``AUTO_INCREMENT`` de ``id`` au contrat ``_SCHEMA_CONTRACT``.
+    L'introspection passe par ``Dialect.introspect_columns`` : elle fonctionne
+    sur les quatre backends, là où la requête ``INFORMATION_SCHEMA`` écrite en
+    dur ne valait que pour MariaDB et n'existe même pas sur SQLite
+    (``OPTIN-DDL-IOT-DOCTOR-001``).
 
-    Le paramètre ``fetch_all_func`` permet l'injection en test (mock). Par
-    défaut, utilise ``core.database.db.fetch_all`` — import différé, comme
-    ``check_database_table``.
+    Sont comparés le **nom**, la **famille** du type, la **nullabilité** et
+    l'auto-incrément de ``id``. Pas le type exact : l'introspection ne le
+    normalise pas entre SGBD (voir ``_expected_columns``).
+
+    ``fetch_all_func`` reste accepté pour compatibilité des tests existants ;
+    quand il est fourni, il est ignoré au profit de l'introspection dialectale.
 
     Retourne :
 
     - ``ok``   si toutes les colonnes attendues sont conformes ;
-    - ``warn`` si une colonne manque, a un type / nullable inattendu, ou si
-      ``id`` n'est pas ``AUTO_INCREMENT`` — problèmes réparables, la base
-      reste joignable ;
-    - ``fail`` uniquement si la lecture système échoue (driver introuvable,
-      requête ``INFORMATION_SCHEMA`` impossible).
+    - ``warn`` si une colonne manque ou diverge — réparable, base joignable ;
+    - ``fail`` uniquement si la lecture système échoue.
 
-    Les colonnes **supplémentaires** (non prévues par le contrat) sont
-    tolérées : une migration future peut en ajouter sans casser le contrat
-    actuel.
+    Les colonnes **supplémentaires** sont tolérées : une migration future peut
+    en ajouter sans casser le contrat actuel.
     """
-    if fetch_all_func is None:
+    if introspect_func is not None:
+        # Injection de test : on court-circuite backend et connexion.
         try:
-            from core.database.db import fetch_all as fetch_all_func  # noqa: PLC0415
-        except ImportError as exc:
+            observed_rows = introspect_func()
+        except Exception as exc:
             return CheckResult(
                 status="fail",
                 label="schéma iot_events",
-                detail=f"core.database.db introuvable : {exc}",
+                detail=f"lecture du schéma impossible — {type(exc).__name__}: {exc}",
             )
+        return _compare_schema(observed_rows, _DEFAULT_DIALECT_FOR_TESTS())
 
-    sql = (
-        "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_TYPE, IS_NULLABLE, EXTRA "
-        "FROM INFORMATION_SCHEMA.COLUMNS "
-        "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'iot_events' "
-        "ORDER BY ORDINAL_POSITION"
-    )
     try:
-        rows = fetch_all_func(sql, ())
+        from core.database.backend import get_backend
+        from core.database.connection import close_connection, get_connection
+    except ImportError as exc:
+        return CheckResult(
+            status="fail",
+            label="schéma iot_events",
+            detail=f"couche base introuvable : {exc}",
+        )
+
+    backend = get_backend()
+    connection = None
+    try:
+        connection = get_connection()
+        observed_rows = backend.dialect.introspect_columns(
+            connection, "iot_events", os.environ.get("DB_NAME", "")
+        )
     except Exception as exc:
-        # Échec de lecture système (connexion, droits sur INFORMATION_SCHEMA).
-        # Message sobre : type d'erreur, pas de stacktrace ni de SQL brut.
         return CheckResult(
             status="fail",
             label="schéma iot_events",
             detail=f"lecture du schéma impossible — {type(exc).__name__}: {exc}",
         )
+    finally:
+        if connection is not None:
+            try:
+                close_connection(connection)
+            except Exception:  # pragma: no cover - fermeture best effort
+                pass
 
-    rows = rows or []
-    observed = {_row_value(r, "COLUMN_NAME"): r for r in rows}
+    return _compare_schema(observed_rows, backend.dialect)
 
+
+def _declared_length(sql_type: str) -> "int | None":
+    """Longueur entre parenthèses d'un type SQL, si le moteur la fournit.
+
+    MariaDB renvoie ``varchar(64)`` à l'introspection, PostgreSQL
+    ``character varying`` et SQL Server ``NVARCHAR`` : la longueur n'est
+    comparable que lorsque les deux côtés la portent. Ailleurs, la
+    vérification dégrade proprement au lieu d'inventer un écart.
+    """
+    match = re.search(r"\((\d+)\)", sql_type)
+    return int(match.group(1)) if match else None
+
+
+def _DEFAULT_DIALECT_FOR_TESTS() -> Any:
+    """Dialecte du backend actif, résolu paresseusement (injection de test)."""
+    from core.database.backend import get_backend
+
+    return get_backend().dialect
+
+
+def _compare_schema(
+    observed_rows: "list[tuple[str, str, bool, bool]]", dialect: Any
+) -> CheckResult:
+    """Compare le schéma observé au contrat dérivé de la déclaration.
+
+    Le contrat était auparavant écrit en dur en types MariaDB
+    (``BIGINT UNSIGNED``, ``DATETIME(6)``...), ce qui rendait le diagnostic
+    faux sur les trois autres backends : le `doctor` signalait comme « type
+    inattendu » un schéma PostgreSQL pourtant correct
+    (``OPTIN-DDL-IOT-DOCTOR-001``). Il est désormais dérivé de
+    ``forge_mvc_iot.tables`` et du dialecte actif.
+
+    La comparaison de type porte sur la **famille** (`int`, `str`,
+    `datetime`...) et non sur le type exact, parce que
+    ``Dialect.introspect_columns`` ne normalise pas les types entre SGBD et
+    perd la longueur : MariaDB renvoie ``varchar(64)``, PostgreSQL
+    ``character varying``, SQL Server ``NVARCHAR`` (mesuré sur serveurs
+    réels). La famille est le seul niveau comparable de façon portable, et
+    c'est celui qui porte le sens : la colonne stocke-t-elle la bonne nature
+    de valeur. La longueur reste vérifiée quand les deux côtés la portent.
+    """
+    observed = {name: (sql_type, nullable, auto) for name, sql_type, nullable, auto in observed_rows}
     if not observed:
-        # Aucune colonne : la table n'existe pas (ou plus). Le check
-        # check_database_table couvre déjà ce cas en amont — on reste sobre.
         return CheckResult(
             status="warn",
             label="schéma iot_events",
@@ -471,46 +460,49 @@ def check_database_schema(*, fetch_all_func: _FetchAll | None = None) -> CheckRe
             lines=(_SCHEMA_HINT,),
         )
 
+    from core.database.table_ddl import column_sql_type
+    from forge_mvc_iot.tables import IOT_EVENTS
+
     issues: list[str] = []
-    for contract in _SCHEMA_CONTRACT:
-        row = observed.get(contract.name)
+    for column in IOT_EVENTS.columns:
+        row = observed.get(column.name)
         if row is None:
-            issues.append(f"colonne manquante : {contract.name}")
+            issues.append(f"colonne manquante : {column.name}")
             continue
+        observed_type, observed_nullable, observed_auto = row
+        expected_type = column_sql_type(column, dialect)
 
-        data_type = _row_value(row, "DATA_TYPE")
-        column_type = _row_value(row, "COLUMN_TYPE")
-        is_nullable = _row_value(row, "IS_NULLABLE")
-        extra = _row_value(row, "EXTRA")
-
-        if not _type_matches(contract, data_type, column_type):
-            observed_type = column_type.upper() if column_type else data_type.upper()
+        expected_families = dialect.sql_families(expected_type)
+        observed_families = dialect.sql_families(observed_type)
+        if expected_families and observed_families and not (set(expected_families) & set(observed_families)):
             issues.append(
-                f"type inattendu pour {contract.name} : "
-                f"attendu {contract.display}, obtenu {observed_type}"
+                f"type inattendu pour {column.name} : attendu {expected_type}, "
+                f"obtenu {observed_type}"
             )
+        else:
+            expected_len = _declared_length(expected_type)
+            observed_len = _declared_length(observed_type)
+            if expected_len is not None and observed_len is not None and expected_len != observed_len:
+                issues.append(
+                    f"longueur inattendue pour {column.name} : attendu "
+                    f"{expected_type}, obtenu {observed_type}"
+                )
 
-        observed_nullable = is_nullable.strip().upper() == "YES"
-        if observed_nullable != contract.nullable:
-            attendu = "NULL" if contract.nullable else "NOT NULL"
+        if bool(observed_nullable) != column.nullable:
+            attendu = "NULL" if column.nullable else "NOT NULL"
             obtenu = "NULL" if observed_nullable else "NOT NULL"
             issues.append(
-                f"nullable inattendu pour {contract.name} : "
-                f"attendu {attendu}, obtenu {obtenu}"
+                f"nullable inattendu pour {column.name} : attendu {attendu}, obtenu {obtenu}"
             )
 
-        if contract.auto_increment and "auto_increment" not in extra.lower():
+        if column.type == "identity" and not observed_auto:
             issues.append(
-                f"{contract.name} sans AUTO_INCREMENT — "
-                f"la colonne {contract.name} doit être AUTO_INCREMENT"
+                f"{column.name} sans auto-incrément — la clé primaire doit être "
+                "auto-incrémentée"
             )
 
     if not issues:
-        return CheckResult(
-            status="ok",
-            label="schéma iot_events",
-            detail="conforme",
-        )
+        return CheckResult(status="ok", label="schéma iot_events", detail="conforme")
 
     return CheckResult(
         status="warn",

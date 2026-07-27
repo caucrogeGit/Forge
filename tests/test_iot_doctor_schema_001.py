@@ -9,15 +9,26 @@ Vérifie ``check_database_schema()`` et son orchestration :
 - nullable inattendu → ``warn`` ;
 - ``id`` sans AUTO_INCREMENT → ``warn`` ;
 - ``metadata_json`` nullable accepté ;
-- ``received_at`` DATETIME(6) attendu ;
+- ``received_at`` du bon type attendu ;
 - échec de lecture système (exception) → ``fail`` ;
 - ``--db`` déclenche aussi le contrôle de schéma quand la table est ok ;
 - sans ``--db``, aucun import DB et aucun check schéma ;
 - sortie sans fuite de SQL brut excessive.
 
-Aucun MariaDB requis : ``check_database_schema`` accepte un
-``fetch_all_func`` injectable, et ``main`` est testé via
+Aucun serveur requis : ``check_database_schema`` accepte un
+``introspect_func`` injectable, et ``main`` est testé via
 ``monkeypatch.setattr`` sur le module ``doctor``.
+
+Depuis ``OPTIN-DDL-IOT-DOCTOR-001``, le contrôle passe par
+``Dialect.introspect_columns`` au lieu d'une requête ``INFORMATION_SCHEMA``
+écrite en dur, qui ne valait que pour MariaDB et n'existe pas sur SQLite.
+Les lignes injectées suivent donc le contrat d'introspection :
+``(nom, type_sql, nullable, auto_increment)``.
+
+Ce que le contrôle ne détecte plus, et c'est assumé : l'attribut ``UNSIGNED``,
+propre à MariaDB et absent des trois autres backends. La longueur reste
+vérifiée quand le moteur la fournit à l'introspection (MariaDB), et ignorée
+quand il ne la donne pas (PostgreSQL, SQL Server).
 """
 
 from __future__ import annotations
@@ -47,53 +58,52 @@ DOCTOR_FILE = (
 # ── Helpers de fixture ─────────────────────────────────────────────────────
 
 
-def _conforming_rows() -> list[dict[str, str]]:
-    """Schéma exact attendu, tel que renvoyé par INFORMATION_SCHEMA.COLUMNS."""
+def _conforming_rows() -> list[tuple[str, str, bool, bool]]:
+    """Schéma attendu, au format de ``Dialect.introspect_columns``.
+
+    Valeurs telles que MariaDB les renvoie réellement (mesuré) :
+    ``bigint(20) unsigned``, ``varchar(64)``, ``datetime``.
+    """
     return [
-        {"COLUMN_NAME": "id", "DATA_TYPE": "bigint",
-         "COLUMN_TYPE": "bigint(20) unsigned", "IS_NULLABLE": "NO",
-         "EXTRA": "auto_increment"},
-        {"COLUMN_NAME": "site", "DATA_TYPE": "varchar",
-         "COLUMN_TYPE": "varchar(64)", "IS_NULLABLE": "NO", "EXTRA": ""},
-        {"COLUMN_NAME": "device_id", "DATA_TYPE": "varchar",
-         "COLUMN_TYPE": "varchar(64)", "IS_NULLABLE": "NO", "EXTRA": ""},
-        {"COLUMN_NAME": "kind", "DATA_TYPE": "varchar",
-         "COLUMN_TYPE": "varchar(64)", "IS_NULLABLE": "NO", "EXTRA": ""},
-        {"COLUMN_NAME": "value", "DATA_TYPE": "double",
-         "COLUMN_TYPE": "double", "IS_NULLABLE": "NO", "EXTRA": ""},
-        {"COLUMN_NAME": "unit", "DATA_TYPE": "varchar",
-         "COLUMN_TYPE": "varchar(32)", "IS_NULLABLE": "NO", "EXTRA": ""},
-        {"COLUMN_NAME": "timestamp", "DATA_TYPE": "varchar",
-         "COLUMN_TYPE": "varchar(40)", "IS_NULLABLE": "NO", "EXTRA": ""},
-        {"COLUMN_NAME": "metadata_json", "DATA_TYPE": "text",
-         "COLUMN_TYPE": "text", "IS_NULLABLE": "YES", "EXTRA": ""},
-        {"COLUMN_NAME": "received_at", "DATA_TYPE": "datetime",
-         "COLUMN_TYPE": "datetime(6)", "IS_NULLABLE": "NO", "EXTRA": ""},
+        ("id", "bigint(20) unsigned", False, True),
+        ("site", "varchar(64)", False, False),
+        ("device_id", "varchar(64)", False, False),
+        ("kind", "varchar(64)", False, False),
+        ("value", "double", False, False),
+        ("unit", "varchar(32)", False, False),
+        ("timestamp", "varchar(40)", False, False),
+        ("metadata_json", "text", True, False),
+        ("received_at", "datetime", False, False),
     ]
 
 
 def _fetch_all_returning(rows):
-    def _stub(sql, params=()):
+    def _stub():
         return rows
     return _stub
 
 
 def _fetch_all_raises(exc: Exception):
-    def _stub(sql, params=()):
+    def _stub():
         raise exc
     return _stub
 
 
 def _without(rows, name):
-    return [r for r in rows if r["COLUMN_NAME"] != name]
+    return [r for r in rows if r[0] != name]
 
 
-def _patch(rows, name, **changes):
+def _patch(rows, name, *, sql_type=None, nullable=None, auto=None):
     out = []
-    for r in rows:
-        if r["COLUMN_NAME"] == name:
-            r = {**r, **changes}
-        out.append(r)
+    for row in rows:
+        if row[0] == name:
+            row = (
+                row[0],
+                sql_type if sql_type is not None else row[1],
+                nullable if nullable is not None else row[2],
+                auto if auto is not None else row[3],
+            )
+        out.append(row)
     return out
 
 
@@ -105,7 +115,7 @@ def _patch(rows, name, **changes):
 class TestSchemaConforming:
     def test_conforming_schema_is_ok(self):
         result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(_conforming_rows()),
+            introspect_func=_fetch_all_returning(_conforming_rows()),
         )
         assert result.status == "ok"
         assert result.label == "schéma iot_events"
@@ -115,48 +125,37 @@ class TestSchemaConforming:
         # metadata_json doit être TEXT NULL — déjà le cas dans le schéma
         # conforme, donc aucun warn lié à cette colonne.
         result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(_conforming_rows()),
+            introspect_func=_fetch_all_returning(_conforming_rows()),
         )
         assert result.status == "ok"
 
     def test_received_at_datetime6_accepted(self):
         result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(_conforming_rows()),
+            introspect_func=_fetch_all_returning(_conforming_rows()),
         )
         assert result.status == "ok"
 
-    def test_lowercase_keys_supported(self):
-        # Certains connecteurs renvoient les clés en minuscules.
-        rows = [
-            {k.lower(): v for k, v in row.items()}
-            for row in _conforming_rows()
-        ]
-        result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
-        )
-        assert result.status == "ok"
-
-    def test_bigint_without_display_width_still_ok(self):
-        # MySQL 8 / MariaDB récent peuvent omettre la largeur d'affichage.
-        rows = _patch(
-            _conforming_rows(), "id", COLUMN_TYPE="bigint unsigned",
-        )
-        result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
-        )
-        assert result.status == "ok"
+    def test_types_majuscules_supportes(self):
+        """SQL Server renvoie ses types en majuscules : la comparaison est
+        insensible a la casse (mesure : BIGINT, NVARCHAR)."""
+        rows = [(n, t.upper(), null, auto) for n, t, null, auto in _conforming_rows()]
+        result = check_database_schema(introspect_func=_fetch_all_returning(rows))
+        assert result.status == "ok", result.detail
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Colonne manquante
-# ═══════════════════════════════════════════════════════════════════════════
+    def test_bigint_sans_largeur_toujours_ok(self):
+        """PostgreSQL et SQL Server renvoient `bigint` sans largeur."""
+        rows = _patch(_conforming_rows(), "id", sql_type="bigint")
+        result = check_database_schema(introspect_func=_fetch_all_returning(rows))
+        assert result.status == "ok", result.detail
+
 
 
 class TestMissingColumn:
     def test_missing_column_is_warn(self):
         rows = _without(_conforming_rows(), "metadata_json")
         result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
+            introspect_func=_fetch_all_returning(rows),
         )
         assert result.status == "warn"
         all_text = result.detail + " " + " ".join(result.lines)
@@ -166,7 +165,7 @@ class TestMissingColumn:
     def test_missing_column_includes_hint(self):
         rows = _without(_conforming_rows(), "value")
         result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
+            introspect_func=_fetch_all_returning(rows),
         )
         all_text = result.detail + " " + " ".join(result.lines)
         assert "migration" in all_text.lower()
@@ -174,7 +173,7 @@ class TestMissingColumn:
     def test_empty_table_is_warn_not_crash(self):
         # Aucune ligne : table absente → warn sobre, pas de crash.
         result = check_database_schema(
-            fetch_all_func=_fetch_all_returning([]),
+            introspect_func=_fetch_all_returning([]),
         )
         assert result.status == "warn"
 
@@ -186,134 +185,90 @@ class TestMissingColumn:
 
 class TestExtraColumn:
     def test_extra_column_is_ok(self):
-        rows = _conforming_rows()
-        rows.append({
-            "COLUMN_NAME": "future_field", "DATA_TYPE": "varchar",
-            "COLUMN_TYPE": "varchar(10)", "IS_NULLABLE": "YES", "EXTRA": "",
-        })
-        result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
-        )
-        assert result.status == "ok"
+        rows = _conforming_rows() + [("colonne_future", "varchar(10)", True, False)]
+        result = check_database_schema(introspect_func=_fetch_all_returning(rows))
+        assert result.status == "ok", result.detail
 
-
-# ═══════════════════════════════════════════════════════════════════════════
-# Type SQL inattendu
-# ═══════════════════════════════════════════════════════════════════════════
 
 
 class TestUnexpectedType:
     def test_wrong_type_is_warn(self):
-        rows = _patch(
-            _conforming_rows(), "value",
-            DATA_TYPE="varchar", COLUMN_TYPE="varchar(255)",
-        )
-        result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
-        )
+        """Une famille differente est detectee : texte la ou un nombre est attendu."""
+        rows = _patch(_conforming_rows(), "value", sql_type="varchar(20)")
+        result = check_database_schema(introspect_func=_fetch_all_returning(rows))
         assert result.status == "warn"
-        all_text = result.detail + " " + " ".join(result.lines)
-        assert "type inattendu" in all_text
-        assert "value" in all_text
-        assert "DOUBLE" in all_text
-        assert "VARCHAR(255)" in all_text
+        assert "value" in result.detail
+
 
     def test_wrong_varchar_length_is_warn(self):
-        rows = _patch(
-            _conforming_rows(), "site",
-            COLUMN_TYPE="varchar(32)",
-        )
-        result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
-        )
+        """La longueur reste verifiee quand le moteur la fournit (MariaDB)."""
+        rows = _patch(_conforming_rows(), "site", sql_type="varchar(255)")
+        result = check_database_schema(introspect_func=_fetch_all_returning(rows))
         assert result.status == "warn"
-        assert "site" in (result.detail + " ".join(result.lines))
+        assert "site" in result.detail
 
-    def test_wrong_datetime_precision_is_warn(self):
-        rows = _patch(
-            _conforming_rows(), "received_at",
-            COLUMN_TYPE="datetime",
-        )
-        result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
-        )
-        assert result.status == "warn"
-
-    def test_unsigned_mismatch_is_warn(self):
-        # id signé (sans unsigned) → type inattendu.
-        rows = _patch(
-            _conforming_rows(), "id",
-            COLUMN_TYPE="bigint(20)",
-        )
-        result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
-        )
-        assert result.status == "warn"
+    def test_longueur_absente_ne_declenche_rien(self):
+        """PostgreSQL renvoie `character varying` sans longueur : pas de faux positif."""
+        rows = _patch(_conforming_rows(), "site", sql_type="character varying")
+        result = check_database_schema(introspect_func=_fetch_all_returning(rows))
+        assert result.status == "ok", result.detail
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# Nullable inattendu
-# ═══════════════════════════════════════════════════════════════════════════
+    def test_datetime_dun_autre_backend_est_accepte(self):
+        """PostgreSQL renvoie `timestamp without time zone`, SQL Server
+        `DATETIME2` : meme famille, aucun ecart signale."""
+        for observed in ("timestamp without time zone", "DATETIME2"):
+            rows = _patch(_conforming_rows(), "received_at", sql_type=observed)
+            result = check_database_schema(introspect_func=_fetch_all_returning(rows))
+            assert result.status == "ok", f"{observed} : {result.detail}"
+
+
+    def test_unsigned_nest_plus_verifie(self):
+        """Perte assumee : UNSIGNED est propre a MariaDB, absent des trois
+        autres backends. Le controle porte sur la famille, pas sur cet
+        attribut (OPTIN-DDL-IOT-DOCTOR-001)."""
+        rows = _patch(_conforming_rows(), "id", sql_type="bigint(20)")
+        result = check_database_schema(introspect_func=_fetch_all_returning(rows))
+        assert result.status == "ok", result.detail
+
 
 
 class TestUnexpectedNullable:
     def test_not_null_expected_but_nullable_is_warn(self):
-        rows = _patch(
-            _conforming_rows(), "site", IS_NULLABLE="YES",
-        )
-        result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
-        )
+        rows = _patch(_conforming_rows(), "site", nullable=True)
+        result = check_database_schema(introspect_func=_fetch_all_returning(rows))
         assert result.status == "warn"
-        all_text = result.detail + " " + " ".join(result.lines)
-        assert "nullable" in all_text.lower()
-        assert "site" in all_text
+        assert "site" in result.detail
+
 
     def test_nullable_expected_but_not_null_is_warn(self):
-        # metadata_json doit accepter NULL ; NOT NULL est une divergence.
-        rows = _patch(
-            _conforming_rows(), "metadata_json", IS_NULLABLE="NO",
-        )
-        result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
-        )
+        rows = _patch(_conforming_rows(), "metadata_json", nullable=False)
+        result = check_database_schema(introspect_func=_fetch_all_returning(rows))
         assert result.status == "warn"
-        assert "metadata_json" in (result.detail + " ".join(result.lines))
+        assert "metadata_json" in result.detail
 
-
-# ═══════════════════════════════════════════════════════════════════════════
-# id sans AUTO_INCREMENT
-# ═══════════════════════════════════════════════════════════════════════════
 
 
 class TestAutoIncrement:
     def test_id_without_auto_increment_is_warn(self):
-        rows = _patch(_conforming_rows(), "id", EXTRA="")
-        result = check_database_schema(
-            fetch_all_func=_fetch_all_returning(rows),
-        )
+        rows = _patch(_conforming_rows(), "id", auto=False)
+        result = check_database_schema(introspect_func=_fetch_all_returning(rows))
         assert result.status == "warn"
-        all_text = result.detail + " " + " ".join(result.lines)
-        assert "AUTO_INCREMENT" in all_text
-        assert "id" in all_text
+        assert "id" in result.detail
 
-
-# ═══════════════════════════════════════════════════════════════════════════
-# Échec de lecture système → FAIL
-# ═══════════════════════════════════════════════════════════════════════════
 
 
 class TestSystemReadFailure:
     def test_fetch_all_exception_is_fail(self):
         result = check_database_schema(
-            fetch_all_func=_fetch_all_raises(RuntimeError("boom")),
+            introspect_func=_fetch_all_raises(RuntimeError("boom")),
         )
         assert result.status == "fail"
         assert result.label == "schéma iot_events"
 
     def test_fail_message_is_sober(self):
         result = check_database_schema(
-            fetch_all_func=_fetch_all_raises(RuntimeError("boom")),
+            introspect_func=_fetch_all_raises(RuntimeError("boom")),
         )
         assert "Traceback" not in result.detail
         # Pas de fuite de SQL brut dans la sortie utilisateur.

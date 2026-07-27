@@ -35,6 +35,7 @@ __all__ = [
     "ForeignKey",
     "TableDefinition",
     "render_create_table",
+    "column_sql_type",
     "NO_DEFAULT",
 ]
 
@@ -153,6 +154,15 @@ def _column_sql_type(column: Column, dialect: Dialect) -> str:
     if kind in _SIMPLE:
         return dialect.simple_type(kind)
     raise ValueError(f"Colonne '{column.name}' : type Forge inconnu : {kind!r}.")
+
+
+def column_sql_type(column: Column, dialect: Dialect) -> str:
+    """Type SQL d'une colonne pour `dialect`.
+
+    Exposé pour les outils qui doivent comparer un schéma observé au schéma
+    attendu (par exemple un `doctor` d'opt-in) sans reconstruire le DDL entier.
+    """
+    return _column_sql_type(column, dialect)
 
 
 def _column_lines(table: TableDefinition, dialect: Dialect) -> list[str]:

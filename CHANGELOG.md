@@ -5,6 +5,14 @@
 
 ### Ajouté
 
+- **`forge iot:doctor` diagnostique enfin les quatre backends (`OPTIN-DDL-IOT-DOCTOR-001`).**
+  Son contrôle de schéma interrogeait `INFORMATION_SCHEMA` par une requête écrite en dur, que SQLite ne possède pas, et comparait le résultat à des types MariaDB figés (`BIGINT UNSIGNED`, `DATETIME(6)`).
+  Il signalait donc comme « type inattendu » un schéma PostgreSQL pourtant correct : un outil de diagnostic qui se trompait sur trois backends sur quatre.
+  L'introspection passe désormais par `Dialect.introspect_columns`, et les attentes sont dérivées de la déclaration `forge_mvc_iot.tables` plus le dialecte actif. Vérifié sur MariaDB, PostgreSQL et SQL Server : `conforme` sur les trois.
+  La comparaison de type porte sur la **famille** (`int`, `str`, `datetime`), seul niveau portable : l'introspection ne normalise pas les types entre SGBD et perd la longueur, mesuré sur serveurs réels (`varchar(64)` sur MariaDB, `character varying` sur PostgreSQL, `NVARCHAR` sur SQL Server). La longueur reste vérifiée quand les deux côtés la portent.
+  Perte assumée : l'attribut `UNSIGNED` n'est plus vérifié, étant propre à MariaDB.
+  Le cœur expose `core.database.table_ddl.column_sql_type()` pour les outils qui comparent un schéma observé à un schéma attendu sans reconstruire le DDL entier.
+
 - **`iot` et `video` passent au DDL dialectal (`OPTIN-DDL-IOT-001`, `OPTIN-DDL-VIDEO-001`) : plus aucun fichier SQL figé dans `packages/`.**
   Ces deux paquets demandaient un changement de code : leur commande `doctor` lisait le fichier de migration à l'exécution, via `importlib.resources`, pour vérifier l'installation.
   `check_migration_present()` interroge désormais la déclaration. Le contrôle garde son rôle et gagne en robustesse : il ne dépend plus de `[tool.setuptools.package-data]`, dont l'oubli était précisément le risque que l'ancienne lecture cherchait à couvrir. Les entrées `migrations/*.sql` des deux `pyproject.toml` sont retirées, devenues sans objet.

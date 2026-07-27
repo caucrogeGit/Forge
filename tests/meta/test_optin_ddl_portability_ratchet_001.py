@@ -61,7 +61,10 @@ NON_PORTABLE_YET = {
     # Non repérés par l'audit initial : DDL en Python, pas en .sql.
     "packages/forge-mvc-entities/forge_mvc_entities/db_init.py",
     "packages/forge-mvc-entities/forge_mvc_entities/migrations.py",
-    "packages/forge-mvc-iot/forge_mvc_iot/cli/doctor.py",
+    # forge-mvc-iot/cli/doctor.py : RETIRÉ le 2026-07-27
+    # (OPTIN-DDL-IOT-DOCTOR-001). Ses types MariaDB en dur étaient un
+    # CONTRAT de colonnes attendu, pas du DDL : le controle passe désormais
+    # par Dialect.introspect_columns et compare des familles de types.
     "packages/forge-mvc-mail/forge_mvc_mail/cli.py",
     "packages/forge-mvc-stats/forge_mvc_stats/schema.py",
 }
