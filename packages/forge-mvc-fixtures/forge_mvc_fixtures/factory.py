@@ -129,11 +129,21 @@ class Fixture:
     #: Entités ou tables à charger avant celle-ci (ordre topologique, ADR-077/078).
     depends_on: tuple[str, ...] = ()
 
-    def load(self) -> None:
+    def load(self, *, tx: "Transaction | None" = None) -> None:
         """Persiste les données de la fixture. À surcharger.
 
         Écrit en base via ``core.database.db`` (connexion applicative), ou appelle
         une fonction applicative qui le fait (importeur, calcul d'agrégats).
+
+        ``fixtures:load`` déroule tout le chargement dans **une seule
+        transaction** et fournit ``tx``, exactement comme ``purge()`` : propagez-le
+        à vos ``db.execute`` pour que vos écritures soient annulées avec le reste
+        en cas d'échec, et pour que ``--no-fk-checks`` les couvre (la
+        désactivation des contraintes est une variable de session, donc propre à
+        une connexion). Sans ``tx``, vos écritures repartiraient sur d'autres
+        connexions du pool, hors de la transaction.
+
+        Gardez donc la signature ``load(self, *, tx=None)`` et propagez ``tx``.
         """
         raise NotImplementedError(
             f"{type(self).__name__} doit définir load() (écriture en base)."

@@ -88,7 +88,7 @@ class TestF49AppImport:
             "from mvc.services.importer import do_import\n"
             "class RefFixture(Fixture):\n"
             "    tables = ('ref',)\n"
-            "    def load(self):\n"
+            "    def load(self, *, tx=None):\n"
             "        do_import(db)\n"
         )
         _write(root, "mvc/fixtures/referentiel.py", src)
@@ -135,7 +135,7 @@ class TestF50ProviderOrder:
             "from forge_mvc_fixtures import Fixture\n"
             "class ReferentielFixture(Fixture):\n"
             "    tables = ('niveau_classe',)\n"
-            "    def load(self): ...\n"
+            "    def load(self, *, tx=None): ...\n"
         )
         _write(root, "mvc/fixtures/referentiel.py", src)
 
@@ -180,7 +180,7 @@ class TestF51ReferenceOrder:
             "from core.database import db\n"
             "class ComptesFixture(Fixture):\n"
             "    tables = ('users', 'user_roles')\n"
-            "    def load(self):\n"
+            "    def load(self, *, tx=None):\n"
             "        db.execute(\"INSERT INTO users (email) VALUES ('a@b.fr')\")\n",
         )
         _write(
@@ -287,7 +287,7 @@ class TestF52ForeignKeyWrap:
             "from core.database import db\n"
             "class RefFixture(Fixture):\n"
             "    tables = ('referentiel_niveau_classe', 'niveau_classe')\n"
-            "    def load(self): ...\n"
+            "    def load(self, *, tx=None): ...\n"
         )
         _write(tmp_path, "mvc/fixtures/referentiel.py", src)
 
@@ -329,7 +329,7 @@ class TestF52ForeignKeyWrap:
             "from forge_mvc_fixtures import Fixture\n"
             "class RefFixture(Fixture):\n"
             "    tables = ('a', 'b')\n"
-            "    def load(self): ...\n",
+            "    def load(self, *, tx=None): ...\n",
         )
         _write(tmp_path, "mvc/fixtures/ville.sql", "INSERT INTO ville (nom) VALUES ('Lyon');")
 

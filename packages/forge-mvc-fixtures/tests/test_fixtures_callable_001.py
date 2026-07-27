@@ -60,7 +60,7 @@ from core.database import db
 class DemoFixture(Fixture):
     tables = ("demo",)
 
-    def load(self) -> None:
+    def load(self, *, tx=None) -> None:
         db.execute("INSERT INTO demo (x) VALUES (1)")
 '''
 
@@ -118,9 +118,9 @@ class TestDiscovery:
         src = (
             "from forge_mvc_fixtures import Fixture\n"
             "class A(Fixture):\n"
-            "    def load(self): ...\n"
+            "    def load(self, *, tx=None): ...\n"
             "class B(Fixture):\n"
-            "    def load(self): ...\n"
+            "    def load(self, *, tx=None): ...\n"
         )
         _write_callable(tmp_path, "two.py", src)
         with pytest.raises(FixtureDiscoveryError, match="une seule par fichier"):
@@ -142,7 +142,7 @@ class TestOrdering:
             "from forge_mvc_fixtures import Fixture\n"
             "class ImportFixture(Fixture):\n"
             "    depends_on = ('Eleve',)\n"
-            "    def load(self): ...\n"
+            "    def load(self, *, tx=None): ...\n"
         )
         _write_callable(tmp_path, "import_data.py", src)
         units = order_load_units(
@@ -199,7 +199,7 @@ class TestLoad:
         src = (
             "from forge_mvc_fixtures import Fixture\n"
             "class BoomFixture(Fixture):\n"
-            "    def load(self):\n"
+            "    def load(self, *, tx=None):\n"
             "        raise RuntimeError('boom')\n"
         )
         _write_callable(tmp_path, "boom.py", src)
@@ -236,7 +236,7 @@ class TestPurgeCallable:
             "from forge_mvc_fixtures import Fixture\n"
             "from core.database import db\n"
             "class CustomFixture(Fixture):\n"
-            "    def load(self): ...\n"
+            "    def load(self, *, tx=None): ...\n"
             "    def purge(self, *, tx=None):\n"
             "        db.execute('DELETE FROM custom WHERE Seed = 1', tx=tx)\n"
         )

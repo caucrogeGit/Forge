@@ -5,6 +5,11 @@
 
 ### Corrigé
 
+- **`fixtures:load` charge dans une transaction unique (`FIXTURES-LOAD-SINGLE-TX-001`).**
+  Chaque instruction s'exécutait sur sa propre connexion. Deux conséquences, mesurées : un échec à mi-parcours laissait la base **à moitié peuplée**, sans rien pour revenir en arrière ; et `--no-fk-checks` était **sans effet**, la désactivation des contraintes étant une variable de session, donc propre à une connexion aussitôt rendue au pool, quand les insertions suivantes repartaient sur d'autres connexions. Rien ne le signalait.
+  Le chargement suit désormais le modèle de la purge (F52-bis) : une transaction, une connexion, `tx` propagé jusqu'aux fixtures Python.
+  **Rupture d'API dans `forge-mvc-fixtures`** : `Fixture.load()` prend `tx`, comme `purge()` depuis F52-bis. L'asymétrie était l'anomalie. Écrivez `def load(self, *, tx=None)` et propagez `tx` à vos `db.execute`. Une fixture qui ne l'accepte pas est **refusée avec un message qui indique la correction**, plutôt que d'être appelée sans `tx` : un repli silencieux sortirait ses écritures de la transaction sans le dire.
+
 - **Le diff de schéma compare des familles de types, plus des chaînes (`ENTITIES-DIFF-TYPE-FAMILIES-001`).**
   `forge migration:diff` confrontait deux **chaînes** de types. Hors MariaDB elles ne coïncident jamais : l'introspection de PostgreSQL rend `character varying` là où le générateur écrit `VARCHAR(255)`, et SQL Server `NVARCHAR` sans longueur. La commande déclarait donc **chaque colonne modifiée** sur une table pourtant conforme, et `migration:make --from-diff` refusait de produire quoi que ce soit en criant au « diff risqué ».
   Trois défauts distincts, corrigés ensemble : la comparaison porte désormais sur la **famille** du type, que le contrat `Dialect` exposait déjà, puis sur ses arguments ; l'introspection de PostgreSQL et de SQL Server recompose la **longueur**, publiée par `information_schema` dans une colonne séparée ; SQLite ne rapporte plus sa clé primaire comme nullable, `PRAGMA table_info` annonçant `notnull = 0` sur un `INTEGER PRIMARY KEY` dont il refuse pourtant les NULL.

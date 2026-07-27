@@ -294,11 +294,12 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
         tables = ("matiere", "niveau")      # pour l'ordre et la purge
         depends_on = ("annee_scolaire",)    # exécutée après ces tables
 
-        def load(self) -> None:
+        def load(self, *, tx=None) -> None:
             import_referentiel("data/referentiel.json")   # écrit via core.database.db
     ```
 
-    - `load(self)` écrit en base **comme le reste du projet** (`from core.database import db`, ou une fonction applicative qui le fait) : le SQL reste paramétré et visible dans le code appelé (principe 7).
+    - `load(self, *, tx=None)` écrit en base **comme le reste du projet** (`from core.database import db`, ou une fonction applicative qui le fait) : le SQL reste paramétré et visible dans le code appelé (principe 7).
+    - Propagez `tx` à vos `db.execute`, comme le fait déjà `purge()`. Le chargement se déroule dans **une seule transaction** : sans `tx`, vos écritures repartiraient sur d'autres connexions du pool, échapperaient à l'annulation en cas d'échec, et `--no-fk-checks` ne les couvrirait pas. Une fixture qui déclare `load(self)` sans `tx` est refusée, avec un message qui indique la correction.
     - `tables` et `depends_on` placent la fixture dans l'ordre de chargement (tri topologique unifié avec les `.sql`) ; un préfixe numérique (`50_referentiel.py`) ordonne les callable entre elles.
     - `purge(self)` (surchargeable) démonte la fixture ; par défaut, vide les `tables` déclarées.
 

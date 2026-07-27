@@ -53,6 +53,40 @@ class FixtureDiscoveryError(Exception):
     """Un fichier ``mvc/fixtures/*.py`` n'a pas pu être importé ou est ambigu."""
 
 
+class _LoadFailure(Exception):
+    """Échec de chargement portant son message déjà rédigé.
+
+    Interne : sortir de la transaction par une exception est ce qui déclenche le
+    rollback, mais le message précis (fichier, instruction fautive) est construit
+    au point d'échec. Cette classe le transporte jusqu'à l'affichage.
+    """
+
+
+def _require_tx_parameter(fixture: "Fixture", file_name: str) -> None:
+    """Refuse une fixture dont ``load()`` n'accepte pas ``tx``, en l'expliquant.
+
+    Le chargement se déroule dans une transaction unique et passe ``tx``, comme
+    la purge le fait depuis F52-bis. Une fixture écrite avant ce changement
+    lèverait un ``TypeError`` obscur sur un argument inattendu : mieux vaut
+    l'annoncer clairement, plutôt que d'appeler ``load()`` sans ``tx`` en
+    silence, ce qui sortirait ses écritures de la transaction sans le dire.
+    """
+    import inspect
+
+    parameters = inspect.signature(fixture.load).parameters
+    accepts_tx = "tx" in parameters or any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD
+        for parameter in parameters.values()
+    )
+    if not accepts_tx:
+        raise _LoadFailure(
+            f"La fixture {file_name} définit load(self) sans paramètre 'tx'.\n"
+            f"Le chargement se déroule dans une transaction unique : écrivez "
+            f"« def load(self, *, tx=None) » et propagez tx à vos db.execute, "
+            f"comme le fait déjà purge()."
+        )
+
+
 @dataclass(frozen=True)
 class LoadUnit:
     """Une unité du pipeline de chargement : un ``.sql`` ou une fixture callable."""
@@ -445,41 +479,60 @@ def load_fixtures(
                 "le chargement s'appuie sur l'ordre topologique seul."
             )
 
+    from core.database.transaction import transaction
+
     sql_count = 0
     callable_count = 0
     statement_count = 0
+    # Tout le chargement tient dans UNE transaction, sur le modèle de la purge
+    # (F52-bis). Deux raisons distinctes :
+    # - un échec à mi-parcours laissait la base à moitié peuplée, sans rien pour
+    #   revenir en arrière ;
+    # - la désactivation des contraintes FK est une variable de SESSION, donc
+    #   propre à une connexion : émise hors transaction, elle s'appliquait à une
+    #   connexion rendue au pool aussitôt, et les insertions suivantes
+    #   repartaient sur des connexions où les FK étaient toujours actives.
+    #   `--no-fk-checks` était donc sans effet, sans le moindre message.
     try:
-        for statement in disable_ddl:
-            db.execute(statement)
-        for unit in units:
-            if unit.kind == "callable" and unit.fixture is not None:
-                try:
-                    unit.fixture().load()
-                except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
-                    print(
-                        f"Erreur en exécutant la fixture {unit.path.name} : {exc}",
-                        file=sys.stderr,
-                    )
-                    return 1
-                callable_count += 1
-                continue
-            # ADR-079 : le découpeur canonique gère lui-même les commentaires.
-            statements = split_sql_statements(unit.path.read_text(encoding="utf-8"))
-            for statement in statements:
-                try:
-                    db.execute(statement)
-                except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
-                    print(
-                        f"Erreur en chargeant {unit.path.name} : {exc}\n"
-                        f"Instruction : {statement}",
-                        file=sys.stderr,
-                    )
-                    return 1
-                statement_count += 1
-            sql_count += 1
-    finally:
-        for statement in enable_ddl:
-            db.execute(statement)
+        with transaction() as tx:
+            for statement in disable_ddl:
+                db.execute(statement, tx=tx)
+            try:
+                for unit in units:
+                    if unit.kind == "callable" and unit.fixture is not None:
+                        fixture = unit.fixture()
+                        _require_tx_parameter(fixture, unit.path.name)
+                        try:
+                            fixture.load(tx=tx)
+                        except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
+                            raise _LoadFailure(
+                                f"Erreur en exécutant la fixture {unit.path.name} : {exc}"
+                            ) from exc
+                        callable_count += 1
+                        continue
+                    # ADR-079 : le découpeur canonique gère lui-même les commentaires.
+                    statements = split_sql_statements(unit.path.read_text(encoding="utf-8"))
+                    for statement in statements:
+                        try:
+                            db.execute(statement, tx=tx)
+                        except Exception as exc:  # noqa: BLE001 — on rapporte la cause précise
+                            raise _LoadFailure(
+                                f"Erreur en chargeant {unit.path.name} : {exc}\n"
+                                f"Instruction : {statement}"
+                            ) from exc
+                        statement_count += 1
+                    sql_count += 1
+            finally:
+                # Réactiver les FK sur la MÊME connexion avant de la rendre au
+                # pool : variable de session, que le rollback ne remet pas.
+                for statement in enable_ddl:
+                    db.execute(statement, tx=tx)
+    except _LoadFailure as failure:
+        print(f"{failure} (chargement annulé)", file=sys.stderr)
+        return 1
+    except Exception as exc:  # noqa: BLE001 — la transaction a été annulée (rollback)
+        print(f"Erreur en chargeant (chargement annulé) : {exc}", file=sys.stderr)
+        return 1
 
     print(
         f"{STATUS_OK} {sql_count} fichier(s) SQL ({statement_count} instruction(s)) "

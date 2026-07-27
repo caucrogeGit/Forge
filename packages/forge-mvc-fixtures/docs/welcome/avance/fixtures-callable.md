@@ -27,7 +27,7 @@ class ReferentielFixture(Fixture):
     tables = ("matiere", "niveau")      # tables peuplées : pour l'ordre et la purge
     depends_on = ("annee_scolaire",)    # exécutée après ces tables
 
-    def load(self) -> None:
+    def load(self, *, tx=None) -> None:
         import_referentiel("data/referentiel.json")
 ```
 
@@ -53,16 +53,22 @@ class BilanFixture(Fixture):
     tables = ("bilan_classe",)
     depends_on = ("inscription_eleve",)   # après les inscriptions
 
-    def load(self) -> None:
+    def load(self, *, tx=None) -> None:
         rows = db.fetch_all(
-            "SELECT ClasseId, COUNT(*) AS n FROM inscription_eleve GROUP BY ClasseId"
+            "SELECT ClasseId, COUNT(*) AS n FROM inscription_eleve GROUP BY ClasseId",
+            tx=tx,
         )
         for row in rows:
             db.execute(
                 "INSERT INTO bilan_classe (ClasseId, Effectif) VALUES (?, ?)",
                 (row["ClasseId"], row["n"]),
+                tx=tx,
             )
 ```
+
+`fixtures:load` déroule tout le chargement dans **une seule transaction** et vous passe `tx`.
+Propagez-le à vos `db.execute` et `db.fetch_all` : sans lui, vos écritures repartiraient sur d'autres connexions du pool, échapperaient à l'annulation si une fixture suivante échoue, et `--no-fk-checks` ne les couvrirait pas, la désactivation des contraintes étant une variable de session.
+Une fixture qui déclare `load(self)` sans `tx` est refusée, avec un message qui indique la correction.
 
 Un préfixe numérique dans le nom du fichier ordonne les fixtures callable entre elles : `50_referentiel.py` avant `90_bilan.py`.
 
@@ -95,7 +101,7 @@ Pour un démontage sur-mesure (l'inverse exact de votre `load()`), surchargez `p
 class ReferentielFixture(Fixture):
     tables = ("matiere", "niveau")
 
-    def load(self) -> None:
+    def load(self, *, tx=None) -> None:
         import_referentiel("data/referentiel.json")
 
     def purge(self, *, tx=None) -> None:        # optionnel : sur-mesure
