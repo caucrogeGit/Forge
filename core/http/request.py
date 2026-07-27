@@ -421,7 +421,13 @@ class Request:
             else:
                 try:
                     value = payload.decode(part.get_content_charset() or "utf-8")
-                except UnicodeDecodeError:
+                except (UnicodeDecodeError, LookupError):
+                    # Le jeu de caractères vient de la requête : un client peut
+                    # en déclarer un inconnu (`LookupError`) aussi bien
+                    # qu'envoyer des octets invalides (`UnicodeDecodeError`).
+                    # Dans les deux cas le champ n'est pas décodable : il vaut
+                    # la chaîne vide, comme toute valeur illisible, plutôt que
+                    # de faire remonter une 500 sur une entrée non fiable.
                     value = ""
                 body.setdefault(name, []).append(value)
         return body, files

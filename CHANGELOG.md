@@ -5,6 +5,10 @@
 
 ### Corrigé
 
+- **Un jeu de caractères inconnu ne fait plus tomber une requête multipart (`CORE-MULTIPART-CHARSET-001`).**
+  Le décodage d'un champ multipart utilise le jeu de caractères **déclaré par le client**. `bytes.decode()` lève `UnicodeDecodeError` sur des octets invalides, mais `LookupError` sur un encodage inconnu, et seule la première était interceptée.
+  N'importe quel client pouvait donc provoquer une **500** en envoyant `charset=charset-bidon` dans une part de formulaire, sans authentification. Le champ indécodable vaut désormais la chaîne vide, comme toute valeur illisible. Un jeu de caractères légitime non UTF-8 continue de se décoder : le correctif n'est pas un repli systématique.
+
 - **`fixtures:load` charge dans une transaction unique (`FIXTURES-LOAD-SINGLE-TX-001`).**
   Chaque instruction s'exécutait sur sa propre connexion. Deux conséquences, mesurées : un échec à mi-parcours laissait la base **à moitié peuplée**, sans rien pour revenir en arrière ; et `--no-fk-checks` était **sans effet**, la désactivation des contraintes étant une variable de session, donc propre à une connexion aussitôt rendue au pool, quand les insertions suivantes repartaient sur d'autres connexions. Rien ne le signalait.
   Le chargement suit désormais le modèle de la purge (F52-bis) : une transaction, une connexion, `tx` propagé jusqu'aux fixtures Python.
