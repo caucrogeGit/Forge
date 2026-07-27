@@ -153,7 +153,8 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "audit:init":         "Prépare le journal d'audit applicatif (forge-mvc-audit).",
     "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
     "notifications:init": "Prépare les notifications in-app (forge-mvc-notifications).",
-    "sessions:init":      "Copie la migration Sessions vers mvc/migrations/ (idempotent, sans appliquer).",
+    "rbac:init":          "Génère les migrations RBAC (roles, permissions, role_permissions) vers mvc/migrations/.",
+    "sessions:init":      "Génère la migration Sessions vers mvc/migrations/ (idempotent, sans appliquer).",
     "sessions:gc":        "Purge les sessions expirées (à brancher sur cron/systemd).",
     "fixtures:load":         "Charge les fixtures mvc/fixtures/*.sql (affiche ; --run exécute).",
     "fixtures:purge":        "Vide les tables ciblées par les fixtures (affiche ; --run exécute).",
@@ -272,6 +273,36 @@ Limites:
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "rbac:init": """\
+Usage:
+  forge rbac:init
+
+Description:
+  Prépare les migrations SQL de l'opt-in forge-mvc-rbac (tables roles,
+  permissions, role_permissions) dans mvc/migrations/, sans exécuter de
+  SQL (ADR-071).
+
+  Le SQL est RENDU pour le backend de base de données installé : le
+  fichier obtenu est idiomatique pour MariaDB, SQLite, PostgreSQL ou
+  SQL Server selon le cas.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - écrit trois migrations dans mvc/migrations/, dans l'ordre des
+    dépendances (role_permissions référence roles et permissions).
+
+Prérequis:
+  - forge-mvc-rbac installé (pip install --pre forge-mvc-rbac) ;
+  - un backend BDD installé (un seul par projet, ADR-054) ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - n'exécute aucun SQL et n'ouvre aucune connexion ;
+  - lancer ensuite forge migration:apply pour appliquer les migrations ;
+  - la table pivot user_roles relève de forge auth:init, pas de cette
+    commande.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
     "sessions:init": """\
 Usage:
   forge sessions:init
@@ -280,15 +311,20 @@ Description:
   Prépare la migration SQL de l'opt-in forge-mvc-sessions-db (table
   forge_sessions) dans mvc/migrations/, sans exécuter de SQL (ADR-071).
 
+  Le SQL est RENDU pour le backend de base de données installé : le
+  fichier obtenu est idiomatique pour MariaDB, SQLite, PostgreSQL ou
+  SQL Server selon le cas.
+
 Effets (write-if-new — aucun fichier existant n'est écrasé) :
-  - copie la migration embarquée du paquet vers mvc/migrations/.
+  - écrit la migration rendue dans mvc/migrations/.
 
 Prérequis:
   - forge-mvc-sessions-db installé (pip install --pre forge-mvc-sessions-db) ;
+  - un backend BDD installé (un seul par projet, ADR-054) ;
   - être à la racine d'un projet Forge (dossier mvc/).
 
 Limites:
-  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - n'exécute aucun SQL et n'ouvre aucune connexion ;
   - lancer ensuite forge migration:apply pour appliquer la migration.
 
 Options:

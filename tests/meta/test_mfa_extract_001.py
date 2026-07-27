@@ -289,13 +289,24 @@ class TestNoShimImportsRemain:
 
 
 class TestSqlFilesMoved:
-    def test_mfa_factors_sql_at_new_path(self):
-        sql = _MFA_PKG / "sql" / "auth_mfa_factors.sql"
-        assert sql.exists(), f"SQL manquant : {sql}"
+    def test_mfa_factors_declare_par_le_socle_auth(self):
+        """Le .sql doublon est supprime : la source est cli/security/auth_sql.py."""
+        assert not (_MFA_PKG / "sql").exists()
+        from cli.security.auth_sql import render_auth_sql
 
-    def test_mfa_recovery_codes_sql_at_new_path(self):
-        sql = _MFA_PKG / "sql" / "auth_mfa_recovery_codes.sql"
-        assert sql.exists(), f"SQL manquant : {sql}"
+        pytest.importorskip("forge_mvc_mariadb")
+        from forge_mvc_mariadb.dialect import MariaDBDialect
+
+        assert "auth_mfa_factors" in render_auth_sql("auth_mfa_factors", MariaDBDialect())
+
+    def test_mfa_recovery_codes_declare_par_le_socle_auth(self):
+        from cli.security.auth_sql import render_auth_sql
+
+        pytest.importorskip("forge_mvc_mariadb")
+        from forge_mvc_mariadb.dialect import MariaDBDialect
+
+        assert "auth_mfa_recovery_codes" in render_auth_sql(
+            "auth_mfa_recovery_codes", MariaDBDialect())
 
     def test_mfa_factors_sql_not_at_old_path(self):
         old = _REPO_ROOT / "mvc" / "models" / "sql" / "auth_mfa_factors.sql"
@@ -306,12 +317,22 @@ class TestSqlFilesMoved:
         assert not old.exists(), f"SQL encore à l'ancienne adresse : {old}"
 
     def test_mfa_factors_sql_content(self):
-        sql = (_MFA_PKG / "sql" / "auth_mfa_factors.sql").read_text(encoding="utf-8")
+        from cli.security.auth_sql import render_auth_sql
+
+        pytest.importorskip("forge_mvc_mariadb")
+        from forge_mvc_mariadb.dialect import MariaDBDialect
+
+        sql = render_auth_sql("auth_mfa_factors", MariaDBDialect())
         assert "auth_mfa_factors" in sql
         assert "totp_secret" in sql
 
     def test_mfa_recovery_codes_sql_content(self):
-        sql = (_MFA_PKG / "sql" / "auth_mfa_recovery_codes.sql").read_text(encoding="utf-8")
+        from cli.security.auth_sql import render_auth_sql
+
+        pytest.importorskip("forge_mvc_mariadb")
+        from forge_mvc_mariadb.dialect import MariaDBDialect
+
+        sql = render_auth_sql("auth_mfa_recovery_codes", MariaDBDialect())
         assert "auth_mfa_recovery_codes" in sql
 
 

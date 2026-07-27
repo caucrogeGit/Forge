@@ -1,4 +1,11 @@
-"""Tests AUTH-USER-RBAC-001 — association optionnelle user_roles."""
+"""Tests AUTH-USER-RBAC-001 — association optionnelle user_roles.
+
+Les invariants de colonnes étaient vérifiés sur
+`packages/forge-mvc-rbac/sql/user_roles.sql`, fichier que plus aucun code ne
+lisait et qui doublonnait la spécification dialectale de
+`cli/security/auth_sql.py`. Supprimé (`OPTIN-DDL-DEAD-SQL-CLEANUP-001`) ;
+les invariants portent désormais sur le **rendu réel**.
+"""
 
 from __future__ import annotations
 
@@ -21,9 +28,15 @@ from forge_mvc_rbac import (
 )
 from core.auth.exceptions import InvalidAuthUserError
 from cli.security.auth import USER_ROLES_SQL, cmd_auth_init
+from cli.security.auth_sql import render_auth_sql
+
+pytest.importorskip("forge_mvc_mariadb")
+from forge_mvc_mariadb.dialect import MariaDBDialect  # noqa: E402
 
 
-SQL_FILE = Path("packages/forge-mvc-rbac/sql/user_roles.sql")
+def _source_sql() -> str:
+    """DDL rendu pour MariaDB, dialecte historique de ces garde-fous."""
+    return render_auth_sql("user_roles", MariaDBDialect())
 
 
 def _normalized(sql: str) -> str:
@@ -111,41 +124,42 @@ class TestAuthUserRoleContract:
 
 class TestUserRolesSql:
     def test_sql_file_exists(self):
-        assert SQL_FILE.exists()
+        assert not Path("packages/forge-mvc-rbac/sql/user_roles.sql").exists()
+        assert "user_roles" in _source_sql()
 
     def test_sql_contains_create_table(self):
-        sql = SQL_FILE.read_text(encoding="utf-8")
+        sql = _source_sql()
         assert "CREATE TABLE IF NOT EXISTS user_roles" in sql
 
     def test_sql_contains_required_columns(self):
-        sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+        sql = _normalized(_source_sql())
 
         assert "user_id INT NOT NULL" in sql
         assert "role_id INT NOT NULL" in sql
         assert "created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" in sql
 
     def test_sql_contains_primary_key_user_role(self):
-        sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+        sql = _normalized(_source_sql())
         assert "PRIMARY KEY (user_id, role_id)" in sql
 
     def test_sql_contains_user_index(self):
-        sql = SQL_FILE.read_text(encoding="utf-8")
+        sql = _source_sql()
         assert "idx_user_roles_user_id" in sql
 
     def test_sql_contains_role_index(self):
-        sql = SQL_FILE.read_text(encoding="utf-8")
+        sql = _source_sql()
         assert "idx_user_roles_role_id" in sql
 
     def test_sql_contains_fk_to_users(self):
-        sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+        sql = _normalized(_source_sql())
         assert "REFERENCES users(id)" in sql
 
     def test_sql_contains_fk_to_roles(self):
-        sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+        sql = _normalized(_source_sql())
         assert "REFERENCES roles(id)" in sql
 
     def test_sql_constant_matches_file(self):
-        assert SQL_FILE.read_text(encoding="utf-8") == USER_ROLES_SQL
+        assert _source_sql() == USER_ROLES_SQL
 
 
 class TestAuthInitUserRoles:

@@ -93,6 +93,9 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Opt-ins applicatifs (ADR-052)
     "settings:init", "audit:init", "jobs:init", "notifications:init",
     "sessions:init", "sessions:gc",
+    # RBAC : provisionnement de roles/permissions/role_permissions
+    # (OPTIN-DDL-RBAC-INIT-001). La table pivot user_roles reste à auth:init.
+    "rbac:init",
     # Fixtures (ADR-074, ADR-076)
     "fixtures:load", "fixtures:purge", "fixtures:generate", "fixtures:make-factory",
 })

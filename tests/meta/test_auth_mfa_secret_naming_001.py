@@ -95,9 +95,13 @@ class TestEncryptedSecret:
 
 class TestSqlColumnName:
     def test_sql_file_uses_totp_secret(self):
-        from pathlib import Path
-        sql_path = Path(__file__).resolve().parents[2] / "packages" / "forge-mvc-mfa" / "sql" / "auth_mfa_factors.sql"
-        content = sql_path.read_text(encoding="utf-8")
+        # Le .sql doublon est supprime (OPTIN-DDL-DEAD-SQL-CLEANUP-001) : on
+        # inspecte la source dialectale, rendue pour MariaDB.
+        pytest.importorskip("forge_mvc_mariadb")
+        from cli.security.auth_sql import render_auth_sql
+        from forge_mvc_mariadb.dialect import MariaDBDialect
+
+        content = render_auth_sql("auth_mfa_factors", MariaDBDialect())
         assert "totp_secret VARCHAR(255) NOT NULL" in content
         assert "secret_hash" not in content
 

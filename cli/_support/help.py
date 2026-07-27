@@ -135,7 +135,8 @@ Opt-ins applicatifs
   audit:init          Prépare le journal d'audit applicatif (forge-mvc-audit).
   jobs:init           Prépare la file de tâches de fond (forge-mvc-jobs).
   notifications:init  Prépare les notifications in-app (forge-mvc-notifications).
-  sessions:init       Copie la migration Sessions du package vers mvc/migrations/ (idempotent, sans appliquer).
+  rbac:init           Génère les migrations RBAC (roles, permissions, role_permissions) vers mvc/migrations/.
+  sessions:init       Génère la migration Sessions vers mvc/migrations/ (idempotent, sans appliquer).
   sessions:gc         Purge les sessions expirées (à brancher sur cron/systemd).
 
 Fixtures (démo/test)

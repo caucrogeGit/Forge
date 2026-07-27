@@ -13,7 +13,13 @@ _RBAC: dict[str, str | bool] = {
     "exit_rc": False,
 }
 
+# `rbac:init` a son propre module : il n'entre pas dans le dispatch interne de
+# `forge_mvc_rbac.cli` (contrat/audit), il écrit des migrations comme les autres
+# opt-ins adossés à la base (ADR-071). Sans amorçage de config : rendre le DDL
+# n'exige que l'identité du backend (entry point, ADR-054), pas les identifiants
+# de connexion, et aucune connexion n'est ouverte (charte §7).
 COMMANDS: dict[str, dict[str, str | bool]] = {
+    "rbac:init": {"module": "forge_mvc_rbac.cli.init"},
     "rbac:validate": _RBAC,
     "rbac:audit": _RBAC,
 }

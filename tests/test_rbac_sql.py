@@ -1,14 +1,38 @@
-"""Tests de contrat SQL RBAC — AUTH-RBAC-001."""
+"""Tests de contrat SQL RBAC — AUTH-RBAC-001.
+
+Ces garde-fous portaient sur `packages/forge-mvc-rbac/sql/rbac.sql`, fichier
+non livre dans le wheel, lu par aucun code, et dont certains tests EXIGEAIENT
+des constructions propres a MariaDB (AUTO_INCREMENT, InnoDB, utf8mb4) : ils
+verrouillaient donc le defaut mesure par OPTIN-DDL-DIALECT-AUDIT-001.
+
+Le fichier est remplace par la declaration `forge_mvc_rbac.tables`, rendue par
+`forge rbac:init` pour le backend installe (OPTIN-DDL-RBAC-INIT-001). Les
+invariants de MODELE sont conserves et verifies sur le rendu MariaDB, ou
+AUTO_INCREMENT et InnoDB restent legitimes ; un controle de portabilite est
+ajoute pour les trois autres backends.
+"""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-SQL_FILE = Path("packages/forge-mvc-rbac/sql/rbac.sql")
+import pytest
+
+pytest.importorskip("forge_mvc_rbac")
+pytest.importorskip("forge_mvc_mariadb")
+
+from core.database.table_ddl import render_create_table  # noqa: E402
+from forge_mvc_mariadb.dialect import MariaDBDialect  # noqa: E402
 
 
 def _sql() -> str:
-    return SQL_FILE.read_text(encoding="utf-8")
+    """DDL rendu des trois tables RBAC, dialecte MariaDB (historique)."""
+    from forge_mvc_rbac.tables import MIGRATIONS
+
+    dialect = MariaDBDialect()
+    return "\n".join(
+        stmt for _name, table in MIGRATIONS for stmt in render_create_table(table, dialect)
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -16,8 +40,11 @@ def _sql() -> str:
 # ---------------------------------------------------------------------------
 
 
-def test_rbac_sql_existe():
-    assert SQL_FILE.is_file()
+def test_rbac_sql_source_est_la_declaration():
+    assert not Path("packages/forge-mvc-rbac/sql/rbac.sql").exists()
+    from forge_mvc_rbac.tables import MIGRATIONS
+
+    assert [t.name for _f, t in MIGRATIONS] == ["roles", "permissions", "role_permissions"]
 
 
 # ---------------------------------------------------------------------------
@@ -142,3 +169,26 @@ def test_sql_sans_terme_metier():
     sql = _sql().lower()
     for term in ("commune", "sejour", "hebergement", "reservation"):
         assert term not in sql, f"Terme métier '{term}' détecté dans rbac.sql"
+
+
+# ---------------------------------------------------------------------------
+# Portabilite : le defaut mesure par l'audit ne doit pas revenir
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("backend_name", ["sqlite", "postgres", "mssql"])
+def test_rendu_portable_hors_mariadb(backend_name: str) -> None:
+    pytest.importorskip(f"forge_mvc_{backend_name}")
+    from forge_mvc_rbac.tables import MIGRATIONS
+
+    module = __import__(f"forge_mvc_{backend_name}.dialect", fromlist=["dialect"])
+    dialect_cls = next(
+        value for key, value in vars(module).items()
+        if key.endswith("Dialect") and isinstance(value, type)
+    )
+    dialect = dialect_cls()
+    sql = "\n".join(
+        stmt for _name, table in MIGRATIONS for stmt in render_create_table(table, dialect)
+    ).upper()
+    for marker in ("AUTO_INCREMENT", "UNSIGNED", "ENGINE=", "INNODB", "UTF8MB4"):
+        assert marker not in sql, f"{backend_name} : DDL RBAC contenant {marker}"

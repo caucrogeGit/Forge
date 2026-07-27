@@ -47,11 +47,15 @@ NON_PORTABLE_YET = {
     "packages/forge-mvc-images/forge_mvc_images/migrations/20260710120000_create_media.sql",
     "packages/forge-mvc-iot/forge_mvc_iot/migrations/20260528120000_create_iot_events.sql",
     "packages/forge-mvc-jobs/forge_mvc_jobs/migrations/20260626140000_create_jobs.sql",
-    "packages/forge-mvc-mfa/sql/auth_mfa_factors.sql",
-    "packages/forge-mvc-mfa/sql/auth_mfa_recovery_codes.sql",
+    # forge-mvc-mfa : les deux fichiers ont été RETIRÉS le 2026-07-27
+    # (OPTIN-DDL-DEAD-SQL-CLEANUP-001). Ils doublonnaient, en MariaDB seul, la
+    # spécification déjà dialectale de cli/security/auth_sql.py, que
+    # `forge auth:init` rend pour le backend actif. Plus aucun code ne les lisait.
     "packages/forge-mvc-notifications/forge_mvc_notifications/migrations/20260626150000_create_notifications.sql",
-    "packages/forge-mvc-rbac/sql/rbac.sql",
-    "packages/forge-mvc-rbac/sql/user_roles.sql",
+    # forge-mvc-rbac : les deux fichiers ont été RETIRÉS le 2026-07-27.
+    # `user_roles.sql` doublonnait auth_sql.py (OPTIN-DDL-DEAD-SQL-CLEANUP-001) ;
+    # `rbac.sql` est remplacé par la déclaration forge_mvc_rbac.tables, rendue
+    # par la nouvelle commande `forge rbac:init` (OPTIN-DDL-RBAC-INIT-001).
     # forge-mvc-sessions-db : RETIRÉ le 2026-07-27 (OPTIN-DDL-SESSIONS-DB-001).
     # Le paquet déclare sa table et le DDL est rendu par le dialecte actif.
     "packages/forge-mvc-settings/forge_mvc_settings/migrations/20260626120000_create_app_settings.sql",
@@ -76,8 +80,13 @@ def _relative(path: Path) -> str:
 
 
 def test_le_scan_trouve_bien_du_sql_a_auditer() -> None:
-    """Sans ce contrôle, un scan cassé rendrait le cliquet vert par accident."""
-    assert len(_shipped_sql_files()) >= 10
+    """Sans ce contrôle, un scan cassé rendrait le cliquet vert par accident.
+
+    Le seuil suit la taille du cliquet : tant qu'il reste des fichiers listés,
+    le scan doit au moins les retrouver. Quand le cliquet sera vide, ce contrôle
+    deviendra sans objet et pourra disparaître avec lui.
+    """
+    assert len(_shipped_sql_files()) >= len(NON_PORTABLE_YET)
 
 
 def test_aucun_nouveau_fichier_non_portable() -> None:

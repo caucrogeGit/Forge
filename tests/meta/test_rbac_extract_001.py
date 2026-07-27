@@ -99,10 +99,32 @@ class TestRbacRemovedFromCore:
 
 
 class TestSqlMovedToModule:
+    """Le SQL a quitté le cœur ; il n'est plus un fichier mais une déclaration.
+
+    Les deux `.sql` du paquet ont été supprimés le 2026-07-27 : `rbac.sql` est
+    remplacé par `forge_mvc_rbac.tables` (rendu dialectal, OPTIN-DDL-RBAC-INIT-001)
+    et `user_roles.sql` doublonnait `cli/security/auth_sql.py`
+    (OPTIN-DDL-DEAD-SQL-CLEANUP-001). L'invariant conservé est que le cœur ne
+    porte plus ces tables en dur.
+    """
+
+    def test_rbac_tables_declarees_par_le_paquet(self):
+        pytest.importorskip("forge_mvc_rbac")
+        from forge_mvc_rbac.tables import MIGRATIONS
+
+        assert [t.name for _f, t in MIGRATIONS] == ["roles", "permissions", "role_permissions"]
+
+    def test_user_roles_declaree_par_le_socle_auth(self):
+        from cli.security.auth_sql import render_auth_sql
+
+        pytest.importorskip("forge_mvc_mariadb")
+        from forge_mvc_mariadb.dialect import MariaDBDialect
+
+        assert "user_roles" in render_auth_sql("user_roles", MariaDBDialect())
+
     @pytest.mark.parametrize("sql_file", ["rbac.sql", "user_roles.sql"])
-    def test_sql_in_module(self, sql_file):
-        sql_path = Path(f"packages/forge-mvc-rbac/sql/{sql_file}")
-        assert sql_path.exists(), f"{sql_file} doit être dans packages/forge-mvc-rbac/sql/"
+    def test_plus_de_fichier_sql_fige(self, sql_file):
+        assert not Path(f"packages/forge-mvc-rbac/sql/{sql_file}").exists()
 
 
 class TestNoCoreRbacImportsRemain:

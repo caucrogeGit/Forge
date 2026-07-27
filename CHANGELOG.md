@@ -5,6 +5,19 @@
 
 ### Ajouté
 
+- **Nouvelle commande `forge rbac:init` (`OPTIN-DDL-RBAC-INIT-001`).**
+  Les tables `roles`, `permissions` et `role_permissions` n'avaient **aucun chemin de provisioning utilisable** : le paquet n'exposait pas de commande d'initialisation, son `sql/rbac.sql` n'était pas livré dans le wheel, et le README renvoyait vers `docs/features/rbac.md`, document inexistant.
+  Un utilisateur installant `forge-mvc-rbac` depuis PyPI ne pouvait donc pas créer ses tables, alors que `forge auth:init` lui écrivait un `user_roles.sql` portant une clé étrangère vers `roles`.
+  `forge rbac:init` écrit désormais les trois migrations dans `mvc/migrations/`, dans l'ordre des dépendances, rendues pour le backend installé.
+  Vérifié sur MariaDB, PostgreSQL et SQL Server : les tables s'installent, l'unicité du slug est active et la cascade depuis `roles` fonctionne.
+  À noter : les clés primaires passent de `INT` à l'identité du dialecte (`BIGINT UNSIGNED` sur MariaDB), alignement sur le reste du provisioning Forge.
+
+- **Suppression de quatre fichiers SQL morts (`OPTIN-DDL-DEAD-SQL-CLEANUP-001`).**
+  `packages/forge-mvc-mfa/sql/auth_mfa_factors.sql`, `auth_mfa_recovery_codes.sql` et `packages/forge-mvc-rbac/sql/user_roles.sql` doublonnaient, en MariaDB seul, la spécification **déjà dialectale** de `cli/security/auth_sql.py` que `forge auth:init` rend pour le backend actif ; plus aucun code ne les lisait.
+  `packages/forge-mvc-rbac/sql/rbac.sql` est remplacé par la déclaration `forge_mvc_rbac.tables`.
+  Les garde-fous correspondants sont **généralisés plutôt que supprimés** : ils vérifient désormais le rendu réel, et pour les quatre backends au lieu du seul MariaDB.
+  Un test exigeait jusqu'ici la présence d'`AUTO_INCREMENT` : il verrouillait le défaut mesuré par l'audit, il vérifie maintenant la portabilité.
+
 - **`forge-mvc-sessions-db` passe au DDL dialectal (`OPTIN-DDL-SESSIONS-DB-001`), pilote du chantier.**
   Le paquet ne livre plus de `.sql` figé : il déclare sa table une fois (`forge_mvc_sessions_db.tables`) et `forge sessions:init` rend le DDL du backend installé.
   Le fichier remplacé portait lui-même l'aveu de sa limite, « DDL MariaDB, adaptez les types au backend actif si nécessaire » : l'adaptation n'est plus reportée sur l'auteur du projet.
