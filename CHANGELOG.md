@@ -5,6 +5,11 @@
 
 ### Corrigé
 
+- **L'introspection de PostgreSQL et de SQL Server se borne au schéma courant (`DB-INTROSPECTION-SCHEMA-FILTER-001`).**
+  `introspect_columns` ne filtrait que sur le **nom** de la table. `information_schema` exposant toutes les tables visibles de la base, une homonyme dans un autre schéma faisait remonter ses colonnes en plus des bonnes, **entrelacées** par la position ordinale.
+  Mesuré sur serveurs réels, pour une table de deux colonnes et une homonyme de trois : l'introspection rendait `['id', 'autre_a', 'autre_b', 'titre', 'autre_c']`. Le diff de migration voyait donc des colonnes fantômes et proposait de les supprimer.
+  PostgreSQL filtre désormais par `table_schema = current_schema()`, SQL Server par `TABLE_SCHEMA = SCHEMA_NAME()`, celui-là même que résout `OBJECT_ID` sur un nom non qualifié. MariaDB filtrait déjà par `TABLE_SCHEMA` ; SQLite n'a pas de schémas.
+
 - **Les cinq opt-ins qui bornaient leurs lectures en MySQL suivent le dialecte (`OPTIN-RUNTIME-PAGINATION-DIALECT-001`).**
   Suite immédiate du ticket ci-dessous, sur le SQL que les opt-ins **exécutent** et non sur du code généré : `forge-mvc-admin`, `forge-mvc-audit`, `forge-mvc-iot`, `forge-mvc-mail` et `forge-mvc-notifications` écrivaient `LIMIT ?`, donc échouaient sur SQL Server à chaque lecture bornée.
   Le contrat `Dialect` reçoit `limit_clause()`, distincte de `pagination_clause()` : elle ne porte qu'un paramètre, donc aucun ordre à consulter. SQL Server reçoit `OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY`, les trois autres gardent `LIMIT ?`.

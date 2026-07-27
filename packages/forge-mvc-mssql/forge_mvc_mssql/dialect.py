@@ -243,11 +243,17 @@ class MSSQLDialect:
         cursor = connection.cursor()
         try:
             # pyodbc utilise nativement les paramètres « ? ».
+            # Le filtre de schéma est indispensable : `INFORMATION_SCHEMA`
+            # expose toutes les tables visibles de la base, donc une homonyme
+            # dans un autre schéma ferait remonter ses colonnes en plus des
+            # bonnes, entrelacées par `ORDINAL_POSITION`. `SCHEMA_NAME()` rend
+            # le schéma par défaut de l'utilisateur, celui que résout aussi
+            # `OBJECT_ID` sur un nom non qualifié.
             cursor.execute(
                 "SELECT c.COLUMN_NAME, c.DATA_TYPE, c.IS_NULLABLE, "
                 "COLUMNPROPERTY(OBJECT_ID(?), c.COLUMN_NAME, 'IsIdentity') "
                 "FROM INFORMATION_SCHEMA.COLUMNS c "
-                "WHERE c.TABLE_NAME = ? "
+                "WHERE c.TABLE_NAME = ? AND c.TABLE_SCHEMA = SCHEMA_NAME() "
                 "ORDER BY c.ORDINAL_POSITION",
                 (table, table),
             )

@@ -228,10 +228,14 @@ class PostgreSQLDialect:
         cursor = connection.cursor()
         try:
             # Paramètres « ? » : l'adaptateur de connexion les traduit en « %s ».
+            # Le filtre de schéma est indispensable : `information_schema`
+            # expose toutes les tables visibles de la base, donc une homonyme
+            # dans un autre schéma ferait remonter ses colonnes en plus des
+            # bonnes, entrelacées par `ordinal_position`.
             cursor.execute(
                 "SELECT column_name, data_type, is_nullable, column_default "
                 "FROM information_schema.columns "
-                "WHERE table_name = ? "
+                "WHERE table_name = ? AND table_schema = current_schema() "
                 "ORDER BY ordinal_position",
                 (table,),
             )
