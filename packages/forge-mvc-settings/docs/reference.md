@@ -76,7 +76,62 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
     `forge opt-in:remove settings` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-settings`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-settings==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable settings --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    ```bash
+    forge settings:init
+    forge migration:apply
+    ```
+
+    `settings:init` copie la migration embarquée dans `mvc/migrations/` ;
+    `migration:apply` l'exécute et la trace (ADR-071).
+    Sans cette étape, le premier appel échoue sur une table absente.
+
+    #### 4. Le brancher là où il agit
+
+    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
+    à poser.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     `forge-mvc-settings` ajoute une commande :
 
@@ -84,7 +139,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     |---|---|---|
     | `settings:init` | Crée la table `app_settings` (DDL fournie). | `forge settings:init` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -100,7 +155,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     | Stratégie opt-in | ADR-052 |
     | Installation | `pip install --pre forge-mvc-settings` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -181,7 +236,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     - `get_setting` recoerce la valeur selon le type stocké ;
     - `get_setting` renvoie `default` si la clé est absente.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -197,7 +252,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
 
     S'il est omis, le module utilise le backend BDD actif du projet.
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -208,7 +263,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     | Créer la table | `forge settings:init` puis `forge migration:apply` |
     | Injecter un exécuteur de test | paramètre `db=...` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Écrire et lire un paramètre
 
@@ -246,7 +301,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
         - `set_setting` / `get_setting` pour une clé ;
         - `get_all_settings` / `delete_setting` pour gérer l'ensemble.
 
-??? note "9. Clés, types et injection"
+??? note "10. Clés, types et injection"
 
     Les clés sont des chaînes ; une clé vide ou non textuelle lève `SettingsError`.
 

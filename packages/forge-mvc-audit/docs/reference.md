@@ -76,7 +76,62 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
     `forge opt-in:remove audit` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-audit`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-audit==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable audit --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    ```bash
+    forge audit:init
+    forge migration:apply
+    ```
+
+    `audit:init` copie la migration embarquée dans `mvc/migrations/` ;
+    `migration:apply` l'exécute et la trace (ADR-071).
+    Sans cette étape, le premier appel échoue sur une table absente.
+
+    #### 4. Le brancher là où il agit
+
+    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
+    à poser.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     `forge-mvc-audit` ajoute une commande :
 
@@ -84,7 +139,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     |---|---|---|
     | `audit:init` | Crée la table `audit_log` (DDL fournie). | `forge audit:init` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -100,7 +155,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     | Cadre | ADR-008 (Forge fournit la table et le helper) |
     | Installation | `pip install --pre forge-mvc-audit` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -195,7 +250,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     - les filtres (`actor`, `action`, `target_type`, `target_id`) sont optionnels ;
     - `limit` est plafonné à `MAX_LIMIT`.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -210,7 +265,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
 
     Le paramètre `db` est l'exécuteur de base de données ; omis, il utilise le backend BDD actif.
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -222,7 +277,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     | Filtrer le journal | `actor=`, `action=`, `target_type=`, `target_id=` |
     | Créer la table | `forge audit:init` puis `forge migration:apply` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Tracer une action
 
@@ -258,7 +313,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
         - `record_audit` pour écrire une trace ;
         - `get_audit_log` pour relire, avec des filtres optionnels.
 
-??? note "9. Périmètre, validation et injection"
+??? note "10. Périmètre, validation et injection"
 
     L'action est obligatoire et non vide ; sinon `record_audit` lève `AuditError`.
 

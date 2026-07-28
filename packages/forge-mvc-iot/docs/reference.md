@@ -75,7 +75,63 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
     `forge opt-in:remove iot` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-iot`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-iot==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable iot --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    ```bash
+    forge iot:init
+    forge migration:apply
+    ```
+
+    `iot:init` copie la migration embarquée dans `mvc/migrations/` ;
+    `migration:apply` l'exécute et la trace (ADR-071).
+    Sans cette étape, le premier appel échoue sur une table absente.
+
+    #### 4. Le brancher là où il agit
+
+    Ses routes montent avec celles des autres opt-ins, par l'appel
+    `register_optins(router)` déjà présent dans `mvc/routes/__init__.py`.
+    Rien de plus à écrire.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     `forge-mvc-iot` ajoute ces commandes :
 
@@ -86,7 +142,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | `iot:simulate` | Publie des mesures MQTT factices (sans capteur). | `forge iot:simulate` |
     | `iot:listen` | Écoute le broker et insère dans `iot_events`. | `forge iot:listen` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -102,7 +158,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | Exposition | API HTTP JSON (`register_iot_routes`) |
     | Installation | `pip install --pre forge-mvc-iot` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -194,7 +250,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     - un message non conforme au contrat est rejeté ;
     - l'API HTTP expose les mesures en JSON, sans toucher au broker.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -204,7 +260,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | `IotEventRepository` | classe | `insert`, `list_recent`, `find_by_device`, `count_by_device` |
     | `IotConfig` | dataclass | configuration (broker, topics, TLS) |
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -215,7 +271,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | Exposer en JSON | `register_iot_routes(router)` |
     | Lire par appareil | `IotEventRepository.find_by_device(...)` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Brancher l'API HTTP JSON
 
@@ -246,7 +302,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
         - réception : `iot:listen` (MQTT vers `iot_events`) ;
         - exposition : `register_iot_routes` (HTTP JSON depuis `iot_events`).
 
-??? note "9. MQTT, contrat et exécution"
+??? note "10. MQTT, contrat et exécution"
 
     Les messages MQTT suivent un **contrat** (site, appareil, métrique, valeur, horodatage) ; un message non conforme est rejeté à la réception.
 

@@ -76,7 +76,55 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
     `forge opt-in:remove fixtures` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-fixtures`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-fixtures==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable fixtures --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    Rien à faire : cet opt-in n'apporte aucune table.
+
+    #### 4. Le brancher là où il agit
+
+    Rien à brancher : il ajoute des commandes `forge`, sans surface de runtime.
+    Une application ne l'importe pas dans le chemin d'une requête.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     `forge-mvc-fixtures` ajoute quatre commandes.
 
@@ -91,7 +139,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     `generate` et `make-factory` écrivent un fichier en mode write-if-new (`--force` pour remplacer).
     `load` ordonne les fichiers par dépendances de clés étrangères (ADR-077) ; `--no-fk-checks` désactive les contraintes le temps du chargement pour les jeux non triables.
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -107,7 +155,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     | Rendu SQL | via `dialect.render_literal` (ADR-075), correct pour le backend installé |
     | Installation | `pip install --pre forge-mvc-fixtures` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Deux vues complémentaires : la classe de génération et le flux des commandes.
 
@@ -171,7 +219,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     - la génération produit un `.sql` **relu et versionné** ; le chargement reste `fixtures:load` (un seul mécanisme, principe 11) ;
     - chaque valeur est rendue par `dialect.render_literal` (correcte pour le backend installé, ADR-075).
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -185,7 +233,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
 
     La classe de base est importée par le code de factory de l'utilisateur (`from forge_mvc_fixtures import Factory`), exécuté par `fixtures:generate` ; ce n'est pas une API de runtime.
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -197,7 +245,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     | Cibler un autre environnement | `APP_ENV=test forge fixtures:load --run` |
     | Forcer en production (rare) | `--run --force` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Une factory
 
@@ -236,7 +284,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
         - à la main : un fichier dans `mvc/fixtures/`, puis `fixtures:load` ;
         - généré : `make-factory` puis `generate`, puis `fixtures:load`.
 
-??? note "9. Fixtures reliées : références et ordre de chargement (ADR-077)"
+??? note "10. Fixtures reliées : références et ordre de chargement (ADR-077)"
 
     Un jeu de démo réaliste relie des tables : un `eleve` pointe un compte `users`, une `classe` pointe une `annee_scolaire`.
     Trois mécanismes rendent ce cas natif, sans bricolage dans l'application.
@@ -283,7 +331,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     `fixtures:generate` lit le contrat de l'entité et **ajoute automatiquement** `CreatedAt`/`UpdatedAt` aux `INSERT` quand la factory ne les fournit pas, avec un horodatage déterministe constant (fixtures reproductibles, pas de `NOW()`).
     Une colonne déjà posée par la factory est respectée, jamais écrasée ; une entité sans timestamps n'est pas touchée.
 
-??? note "10. Fixtures callable (hooks Python, ADR-078)"
+??? note "11. Fixtures callable (hooks Python, ADR-078)"
 
     Deux étapes d'un seed réaliste ne sont pas des données statiques et ne peuvent pas s'écrire en `.sql` : l'**import** d'un référentiel depuis une source (un JSON canonique), et des **valeurs calculées** (un agrégat).
     Pour ces cas, une **fixture callable** exécute du code Python dans le même pipeline que les `.sql`.
@@ -314,7 +362,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
 
     Frontière (principe 11) : la fixture callable n'est **pas** une deuxième façon d'insérer du statique (cela reste des `.sql`), mais le recours pour ce que le SQL statique ne peut pas exprimer.
 
-??? note "11. Frontière avec la migration de seed"
+??? note "12. Frontière avec la migration de seed"
 
     Une seule façon officielle par besoin (principe 11) :
 

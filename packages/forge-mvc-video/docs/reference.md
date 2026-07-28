@@ -83,7 +83,63 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
     `forge opt-in:remove video` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-video`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-video==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable video --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    ```bash
+    forge video:init
+    forge migration:apply
+    ```
+
+    `video:init` copie la migration embarquée dans `mvc/migrations/` ;
+    `migration:apply` l'exécute et la trace (ADR-071).
+    Sans cette étape, le premier appel échoue sur une table absente.
+
+    #### 4. Le brancher là où il agit
+
+    Ses routes montent avec celles des autres opt-ins, par l'appel
+    `register_optins(router)` déjà présent dans `mvc/routes/__init__.py`.
+    Rien de plus à écrire.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     `forge-mvc-video` ajoute ces commandes :
 
@@ -95,7 +151,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     | `video:process` | Transcode une vidéo (par `id` ou `--pending`). | `forge video:process --pending` |
     | `video:cleanup` | Purge les vidéos `failed` et fichiers orphelins. | `forge video:cleanup` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -112,7 +168,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     | Modèle d'exécution | worker-CLI : transcodage hors requête HTTP |
     | Installation | `pip install --pre forge-mvc-video` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -201,7 +257,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     - la lecture honore l'en-tête `Range` (streaming) ;
     - une vidéo n'est lisible qu'une fois `ready`.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -215,7 +271,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
 
     Les fonctions de pipeline sont surtout appelées par les commandes `video:*` (worker), pas pendant une requête.
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -227,7 +283,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     | Configurer le module | `FORGE_VIDEO_*` / `load_video_config` |
     | Nettoyer | `forge video:cleanup --apply` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Brancher les routes de lecture
 
@@ -258,7 +314,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
         - traiter hors requête (`video:process`) ;
         - lire en streaming (routes branchées par `register_video_routes`).
 
-??? note "9. Dépendances externes et exécution différée"
+??? note "10. Dépendances externes et exécution différée"
 
     `ffmpeg` et `ffprobe` doivent être installés sur la machine ; `forge video:doctor` le vérifie.
 

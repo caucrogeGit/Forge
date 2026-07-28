@@ -72,7 +72,55 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
     `forge opt-in:remove mail` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-mail`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-mail==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable mail --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    Rien à faire : cet opt-in n'apporte aucune table.
+
+    #### 4. Le brancher là où il agit
+
+    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
+    à poser.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     `forge-mvc-mail` ajoute ces commandes (entry point `forge_mvc.commands`) :
 
@@ -84,7 +132,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     | `mail:render` | Rend un gabarit sans envoi (prévisualisation). | `forge mail:render bienvenue --context ctx.json` |
     | `mail:logs` | Derniers enregistrements de `mail_log`. | `forge mail:logs --limit 20` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -102,7 +150,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     | Décisions d'architecture | ADR-022 (extraction), ADR-031 (config via environnement) |
     | Installation | `pip install --pre forge-mvc-mail` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -187,7 +235,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     - le résultat est un `TransportResult` (succès et détail) ;
     - en cas d'échec SMTP, `MailSendError` est interceptée en `TransportResult(success=False)`.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -201,7 +249,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     | `MailLogger`, `MailLogRecord` | classes | journal des envois |
     | exceptions | `MailError`, `MailConfigurationError`, `MailSendError`, `MailTemplateError`, `MailValidationError` | erreurs |
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -213,7 +261,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     | Vérifier la configuration | `forge mail:doctor` |
     | Relire les envois | `forge mail:logs` |
 
-??? note "8. Configuration (`MAIL_*`)"
+??? note "9. Configuration (`MAIL_*`)"
 
     Le mail est lu directement depuis l'environnement (ADR-031), sans passer par le noyau.
 
@@ -248,7 +296,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     | `smtp` | Connexion SMTP réelle via `smtplib`. À n'utiliser qu'avec un vrai serveur. |
 
 
-??? note "9. Envoi par code"
+??? note "10. Envoi par code"
 
     ### Envoi simple
 
@@ -304,7 +352,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
         - un transport : le canal ;
         - `Mailer` : envoyer et journaliser.
 
-??? note "10. Journal `mail_log` et exceptions"
+??? note "11. Journal `mail_log` et exceptions"
 
     La table `mail_log` (optionnelle, `MAIL_LOG_ENABLED=true`) trace les envois sans stocker le corps : `message_type`, `to_email`, `subject`, `transport`, `status`, métadonnées.
 

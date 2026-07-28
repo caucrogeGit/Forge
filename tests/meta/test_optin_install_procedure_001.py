@@ -120,6 +120,53 @@ def test_la_procedure_dit_que_la_migration_appliquee_ne_se_supprime_pas() -> Non
 
 # ── Chaque référence renvoie à la procédure, sans la redire ─────────────────
 
+def test_chaque_reference_a_son_chapitre_de_mise_en_service() -> None:
+    """Installer et mettre en service sont deux gestes distincts, donc deux chapitres.
+
+    Le chapitre « 2. Installation » répond à « comment obtenir le paquet ».
+    Il ne répond pas à « qu'est-ce qu'il me reste à faire pour que ça marche »,
+    question dont l'utilisateur devait reconstituer seul la réponse.
+    """
+    offenders = [
+        name for name, ref in _references()
+        if '??? note "3. Mise en service"' not in ref.read_text(encoding="utf-8")
+    ]
+
+    assert offenders == [], (
+        "Ces références n'ont pas de chapitre de mise en service distinct de "
+        f"l'installation : {offenders}"
+    )
+
+
+@pytest.mark.parametrize("titre", [
+    "#### 1. L'épingler",
+    "#### 2. L'inscrire",
+    "#### 3. Poser sa base",
+    "#### 4. Le brancher là où il agit",
+    "#### 5. Le prouver",
+])
+def test_le_chapitre_de_mise_en_service_couvre_les_cinq_points(titre: str) -> None:
+    offenders = [
+        name for name, ref in _references()
+        if titre not in ref.read_text(encoding="utf-8")
+    ]
+
+    assert offenders == [], f"point « {titre} » absent de : {offenders}"
+
+
+def test_la_numerotation_des_chapitres_reste_continue() -> None:
+    """L'insertion d'un chapitre renumérote les suivants, sans trou ni doublon."""
+    offenders: list[str] = []
+    for name, ref in _references():
+        numeros = [
+            int(n) for n in re.findall(r'^\?\?\? note "(\d+)\. ', ref.read_text(encoding="utf-8"), re.M)
+        ]
+        if numeros and numeros != list(range(1, len(numeros) + 1)):
+            offenders.append(f"{name} : {numeros}")
+
+    assert offenders == [], f"numérotation de chapitres cassée : {offenders}"
+
+
 def test_chaque_reference_renvoie_a_la_procedure_canonique() -> None:
     offenders = [
         name for name, ref in _references()

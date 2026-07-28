@@ -80,11 +80,66 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
     `forge opt-in:remove images` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-images`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-images==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable images --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    ```bash
+    forge images:init
+    forge migration:apply
+    ```
+
+    `images:init` copie la migration embarquée dans `mvc/migrations/` ;
+    `migration:apply` l'exécute et la trace (ADR-071).
+    Sans cette étape, le premier appel échoue sur une table absente.
+
+    #### 4. Le brancher là où il agit
+
+    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
+    à poser.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -101,7 +156,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     | Décision d'architecture | ADR-018 (remplace `forge-mvc-media`) |
     | Installation | `pip install --pre forge-mvc-images` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -198,7 +253,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     - l'association média / entité est persistée par la couche médias ;
     - la galerie et la couverture se lisent par entité.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     ### Traitement d'image
 
@@ -222,7 +277,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     | `media_url` | `media_url(path) -> str` | URL publique d'un média |
     | autres | `update_media_alt_text`, `update_media_position`, `delete_media`, `get_media_record` | gestion fine |
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -234,7 +289,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     | Choisir une couverture | `get_cover_media(...)` |
     | Construire l'URL d'un média | `media_url(path)` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Recevoir une image et la relier à une entité
 
@@ -265,7 +320,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
         - traitement : `save_image_upload` (vérifie, écrit, variantes) ;
         - médias : `attach_media_to_entity`, `get_media_gallery`, `get_cover_media`.
 
-??? note "9. Sécurité, variantes et dépendances"
+??? note "10. Sécurité, variantes et dépendances"
 
     `verify_image_content` confirme que les octets sont une vraie image avant toute écriture, et protège contre les bombes de décompression.
 

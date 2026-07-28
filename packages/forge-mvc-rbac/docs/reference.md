@@ -92,7 +92,63 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
     `forge opt-in:remove rbac` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-rbac`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-rbac==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable rbac --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    ```bash
+    forge rbac:init
+    forge migration:apply
+    ```
+
+    `rbac:init` copie la migration embarquée dans `mvc/migrations/` ;
+    `migration:apply` l'exécute et la trace (ADR-071).
+    Sans cette étape, le premier appel échoue sur une table absente.
+
+    #### 4. Le brancher là où il agit
+
+    Il se branche dans `app.py`, là où l'application compose ses middlewares et ses
+    fournisseurs de contexte. Ce câblage vous appartient : Forge ne l'écrit jamais à
+    votre place (principe 9).
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     `forge-mvc-rbac` ajoute ces commandes :
 
@@ -101,7 +157,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     | `rbac:validate` | Valide `mvc/security/rbac.json` contre le schéma. | `forge rbac:validate` |
     | `rbac:audit` | Audit de cohérence fonctionnelle du contrat. | `forge rbac:audit` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -118,7 +174,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     | Décisions d'architecture | ADR-014 (emplacement du contrat), ADR-056 (schéma + outillage) |
     | Installation | `pip install --pre forge-mvc-rbac` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -207,7 +263,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     - une permission manquante renvoie 403 (jamais un accès par défaut) ;
     - le contrat décrit qui peut quoi, hors du code.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     ### Trois gardes de route (selon le contexte)
 
@@ -232,7 +288,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     | `Role`, `Permission`, `PermissionDenied` | modèle RBAC |
     | `make_can`, `make_auth_jinja_can`, `make_auth_jinja_context_with_can` | helper `can()` pour les templates |
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -243,7 +299,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     | Décrire les droits | `mvc/security/rbac.json` |
     | Vérifier le contrat | `forge rbac:validate` / `forge rbac:audit` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Protéger une route par le contrat (recommandé)
 
@@ -275,7 +331,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
         - base (`require_user_permission`) : permissions de l'utilisateur connecté ;
         - bas niveau (`require_permission`) : permissions déjà chargées.
 
-??? note "9. Contrat, sécurité et validation"
+??? note "10. Contrat, sécurité et validation"
 
     Le contrat `mvc/security/rbac.json` décrit les rôles et les permissions, séparément du schéma d'entité (ADR-014).
     Son schéma `rbac.schema.json` est embarqué par cet opt-in (ADR-056).
@@ -295,7 +351,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-rbac` ; le provider Jinja `can()` se branche au chargement du paquet (mécanisme de loader, ADR-046).
 
-??? note "10. RBAC léger core ou RBAC complet opt-in ?"
+??? note "11. RBAC léger core ou RBAC complet opt-in ?"
 
     Forge distingue deux niveaux d'autorisation :
 
@@ -335,7 +391,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     La dépendance va dans un seul sens : `forge-mvc-rbac` → `core`.
     `core/auth/audit.py` peut nommer des événements d'audit RBAC génériques : ce vocabulaire est assumé dans le core (ADR-011), il ne représente pas une dépendance fonctionnelle vers le module opt-in.
 
-??? note "11. Modèle contrat autonome (résolveur, garde par préfixe, provider)"
+??? note "12. Modèle contrat autonome (résolveur, garde par préfixe, provider)"
 
     Ces trois briques rendent le **modèle contrat** (`rbac.json`) autonome sous l'auth moderne, sans les tables du modèle table.
 

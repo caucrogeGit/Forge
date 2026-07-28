@@ -107,11 +107,60 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
     `forge opt-in:remove mfa` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-mfa`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-mfa==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable mfa --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    Rien à faire : cet opt-in n'apporte aucune table.
+
+    #### 4. Le brancher là où il agit
+
+    Il se branche dans `app.py`, là où l'application compose ses middlewares et ses
+    fournisseurs de contexte. Ce câblage vous appartient : Forge ne l'écrit jamais à
+    votre place (principe 9).
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -127,7 +176,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     | Persistance | applicative (ADR-008) : `AuthMfaFactor`, codes de récupération |
     | Installation | `pip install --pre forge-mvc-mfa` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -226,7 +275,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     - un code de récupération est une alternative au code TOTP ;
     - le challenge est limité en tentatives et en durée (anti-bruteforce).
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     ### Secret et chiffrement
 
@@ -267,7 +316,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     `MFA_FACTOR_TOTP`, `MFA_FACTOR_RECOVERY`, `MFA_STATUS_ACTIVE` / `PENDING` / `DISABLED`, fenêtres et tentatives du challenge et de la revalidation.
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -277,7 +326,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     | Protéger une action sensible | `require_recent_mfa(...)` |
     | Fournir un secours | `create_recovery_codes` / `consume_recovery_code` |
 
-??? note "8. Exemple : challenge à la connexion"
+??? note "9. Exemple : challenge à la connexion"
 
     ```python
     from forge_mvc_mfa import (
@@ -306,7 +355,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         - revalider avant le sensible ;
         - récupérer via codes à usage unique.
 
-??? note "9. Sécurité des secrets"
+??? note "10. Sécurité des secrets"
 
     Le secret TOTP est chiffré au repos avec Fernet (`cryptography`) et la clé `FORGE_MFA_SECRET_KEY` ; il n'est jamais stocké en clair.
 
@@ -328,7 +377,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-mfa` : la dépendance va de l'opt-in vers le cœur.
 
-??? note "10. Politique de stockage des secrets MFA"
+??? note "11. Politique de stockage des secrets MFA"
 
     ### Statut actuel
 

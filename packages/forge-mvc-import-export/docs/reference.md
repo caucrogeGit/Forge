@@ -66,11 +66,59 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
     `forge opt-in:remove import-export` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-import-export`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-import-export==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable import-export --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    Rien à faire : cet opt-in n'apporte aucune table.
+
+    #### 4. Le brancher là où il agit
+
+    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
+    à poser.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -85,7 +133,7 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     | Exception | `CsvImportError` |
     | Installation | `pip install --pre forge-mvc-import-export` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -178,7 +226,7 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     - l'insertion réelle est déléguée à l'application (le SQL lui appartient) ;
     - `partial=True` permet d'insérer les valides même s'il y a des erreurs.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -193,7 +241,7 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
 
     `insert` est une fonction `dict -> object` fournie par l'application (elle exécute le SQL d'insertion de votre modèle).
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -204,7 +252,7 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     | Exporter des données | `to_csv(rows, columns)` |
     | Coercer des valeurs | `coerce_int`, `coerce_float`, `coerce_bool` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Importer un CSV
 
@@ -240,7 +288,7 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
         - import : `parse_csv` puis `import_rows(specs, insert)` -> `ImportReport` ;
         - export : `to_csv(rows, columns)`.
 
-??? note "9. Validation, rapport et frontière"
+??? note "10. Validation, rapport et frontière"
 
     La validation est par champ (`FieldSpec`) : champ requis manquant ou coercition impossible produit un `RowError` précis (numéro de ligne, champ, message).
 

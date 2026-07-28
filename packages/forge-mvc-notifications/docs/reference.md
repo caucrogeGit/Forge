@@ -77,7 +77,62 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
     `forge opt-in:remove notifications` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-notifications`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-notifications==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable notifications --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    ```bash
+    forge notifications:init
+    forge migration:apply
+    ```
+
+    `notifications:init` copie la migration embarquée dans `mvc/migrations/` ;
+    `migration:apply` l'exécute et la trace (ADR-071).
+    Sans cette étape, le premier appel échoue sur une table absente.
+
+    #### 4. Le brancher là où il agit
+
+    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
+    à poser.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     `forge-mvc-notifications` ajoute une commande :
 
@@ -85,7 +140,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     |---|---|---|
     | `notifications:init` | Crée la table `notifications` (DDL fournie). | `forge notifications:init` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -101,7 +156,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     | Périmètre | in-app (V1) ; livraison email/push à charge de l'application |
     | Installation | `pip install --pre forge-mvc-notifications` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -201,7 +256,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     - `mark_read` / `mark_all_read` basculent l'état lu ;
     - `unread_count` donne le nombre de non lues (pour un badge).
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -219,7 +274,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
 
     `data` est un complément libre sérialisé en JSON ; `db` est l'exécuteur, omis il utilise le backend actif.
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -232,7 +287,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     | Marquer lu | `mark_read(id)` / `mark_all_read(recipient)` |
     | Créer la table | `forge notifications:init` puis `forge migration:apply` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Notifier puis afficher les non lues
 
@@ -261,7 +316,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
         - `get_notifications` / `unread_count` pour lire ;
         - `mark_read` / `mark_all_read` pour marquer lu.
 
-??? note "9. Périmètre, validation et injection"
+??? note "10. Périmètre, validation et injection"
 
     `recipient` et `message` sont obligatoires ; sinon `notify` lève `NotificationError`.
 

@@ -76,11 +76,66 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     Le cœur revient alors à son store par défaut (`MemorySessionStore`).
     `forge opt-in:remove sessions-db` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-sessions-db`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-sessions-db==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable sessions-db --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    ```bash
+    forge sessions:init
+    forge migration:apply
+    ```
+
+    `sessions:init` copie la migration embarquée dans `mvc/migrations/` ;
+    `migration:apply` l'exécute et la trace (ADR-071).
+    Sans cette étape, le premier appel échoue sur une table absente.
+
+    #### 4. Le brancher là où il agit
+
+    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
+    à poser.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -97,7 +152,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     | Décision d'architecture | ADR-054 (backends BDD et extraction du store de session) |
     | Installation | `pip install --pre forge-mvc-sessions-db` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Le diagramme de classe montre l'implémentation du contrat ; le diagramme de séquence montre le cycle d'une session persistée.
 
@@ -168,7 +223,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
     L'horodatage comparé (`?`) est calculé côté Python, jamais par une fonction SQL propriétaire.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Nom | Signature | Rôle |
     |---|---|---|
@@ -185,7 +240,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
     Le module expose aussi `set_flash` / `get_flash` pour les messages flash.
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Store recommandé |
     |---|---|
@@ -194,7 +249,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     | Production multi-worker (Gunicorn, uWSGI) | `DbSessionStore` (cet opt-in) |
     | Déploiement multi-nœud derrière la même base | `DbSessionStore` (cet opt-in) |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Configurer le store
 
@@ -244,7 +299,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
     Les exécuteurs `fetch_one` / `execute` sont injectables : les tests n'ont pas besoin d'une base.
 
-??? note "9. Portabilité et exécuteurs injectés"
+??? note "10. Portabilité et exécuteurs injectés"
 
     Le store délègue tout son SQL aux callables `fetch_one` / `execute`, qui pointent par défaut vers `core.database.db`.
 

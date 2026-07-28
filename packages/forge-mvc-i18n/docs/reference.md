@@ -66,7 +66,55 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
     `forge opt-in:remove i18n` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-i18n`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-i18n==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable i18n --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    Rien à faire : cet opt-in n'apporte aucune table.
+
+    #### 4. Le brancher là où il agit
+
+    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
+    à poser.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     `forge-mvc-i18n` ajoute ces commandes (le noyau garde un repli no-op, ADR-027) :
 
@@ -75,7 +123,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | `i18n:init` | Initialise les fichiers de traduction. | `forge i18n:init` |
     | `i18n:check` | Vérifie la complétude des traductions entre locales. | `forge i18n:check` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -93,7 +141,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | Décision d'architecture | ADR-027 (extraction, repli no-op du cœur) |
     | Installation | `pip install --pre forge-mvc-i18n` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -177,7 +225,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     - en dernier recours, `trans` renvoie la clé (pas d'erreur d'affichage) ;
     - le chargement passe par un cache pour éviter de relire le fichier.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -190,7 +238,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | `clear_translation_cache` | `clear_translation_cache() -> None` | vide le cache des catalogues |
     | `I18nError`, `TranslationCatalogError` | exceptions | erreurs (locale invalide, catalogue illisible) |
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -202,7 +250,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | Vérifier les manques | `forge i18n:check` |
     | Recharger après édition | `clear_translation_cache()` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Catalogue et traduction
 
@@ -239,7 +287,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
         - `{{ trans("clé") }}` dans les templates ;
         - `i18n:check` pour repérer les clés manquantes.
 
-??? note "9. Repli, cache et intégration"
+??? note "10. Repli, cache et intégration"
 
     Le repli est en cascade : locale demandée, puis locale de fallback, puis la clé elle-même.
 

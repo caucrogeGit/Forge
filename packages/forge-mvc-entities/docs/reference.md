@@ -53,7 +53,50 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     Restent l'épinglage dans `requirements.txt`, au même commit que `forge-mvc`, et la preuve par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-entities`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-entities==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    Rien à faire : ses commandes sont découvertes par l'entry point
+    `forge_mvc.commands` dès l'installation (ADR-070).
+
+    #### 3. Poser sa base
+
+    Rien à faire : cet opt-in n'apporte aucune table.
+
+    #### 4. Le brancher là où il agit
+
+    Rien à brancher : il ajoute des commandes `forge`, sans surface de runtime.
+    Une application ne l'importe pas dans le chemin d'une requête.
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     Le moteur d'entités ajoute ces commandes (découvertes dès l'installation, entry point `forge_mvc.commands`) :
 
@@ -70,7 +113,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     | `migration:make` / `migration:apply` | Génère / applique les migrations. | `forge migration:apply` |
     | `db:config` / `db:init` / `db:apply` | Configure, provisionne et applique le schéma. | `forge db:init --run` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -86,7 +129,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     | Décisions d'architecture | ADR-070 (extraction), ADR-021/057 (pivot), ADR-054 (dialecte), ADR-069 (`foreign_key`) |
     | Installation | `pip install --pre forge-mvc-entities` (opt-in explicite, non installé par `forge new`) |
 
-??? note "5. Le workflow de modélisation"
+??? note "6. Le workflow de modélisation"
 
     La chaîne de base va du contrat à l'application, chaque étape à SQL visible.
 
@@ -100,7 +143,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
 
     Apprentissage guidé, pas à pas : [Welcome-Entités](welcome/debutant/entity-welcome.md).
 
-??? note "6. Le pivot enrichi"
+??? note "7. Le pivot enrichi"
 
     Un pivot **enrichi** est une association `many_to_many` dont la table de liaison **porte des attributs** : entre un `Article` et un `Tag`, la table `article_tag` peut stocker une `position` et un drapeau `epingle`.
 
@@ -242,7 +285,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-entities` : la dépendance va de l'opt-in vers le cœur.
 
-??? note "7. Connexion sans serveur (`serverless_db.py`)"
+??? note "8. Connexion sans serveur (`serverless_db.py`)"
 
     `configure_serverless_db` fournit la connexion runtime d'un backend BDD **sans serveur** (SQLite, ADR-054), qui n'a pas de comptes d'administration `DB_ADMIN_*`.
     Elle est utilisée hors du flux `db:init` / `db:apply`, réservé aux SGBD serveur.

@@ -66,7 +66,56 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
     `forge opt-in:remove admin` affiche la commande `pip uninstall` sans l'exécuter.
 
-??? note "3. Commandes"
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-admin`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
+    #### 1. L'épingler
+
+    ```text
+    forge-mvc-admin==<version de forge-mvc>
+    ```
+
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, l'opt-in n'existe que sur votre machine.
+
+    #### 2. L'inscrire
+
+    ```bash
+    forge opt-in:enable admin --apply
+    ```
+
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
+    projet.
+    `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
+
+    #### 3. Poser sa base
+
+    Rien à faire : cet opt-in n'apporte aucune table.
+
+    #### 4. Le brancher là où il agit
+
+    Il se branche dans `app.py`, là où l'application compose ses middlewares et ses
+    fournisseurs de contexte. Ce câblage vous appartient : Forge ne l'écrit jamais à
+    votre place (principe 9).
+
+    #### 5. Le prouver
+
+    ```bash
+    make check
+    forge doctor
+    ```
+
+    Puis un premier usage réel.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
+    opérationnel : il est seulement présent.
+
+
+??? note "4. Commandes"
 
     `forge-mvc-admin` ajoute ces commandes :
 
@@ -75,7 +124,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     | `admin:init` | Prépare la structure `mvc/admin/` (write-if-new). | `forge admin:init` |
     | `admin:doctor` | Vérifie la cohérence des ressources avec les contrats d'entité (lecture seule). | `forge admin:doctor` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -91,7 +140,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     | Exceptions | `AdminError`, `AdminResourceError`, `AdminRegistryError` |
     | Installation | `pip install --pre forge-mvc-admin` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -173,7 +222,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     - le contrôleur s'appuie sur la ressource pour savoir quoi afficher ;
     - les templates du back-office sont embarqués (ADR-046).
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -185,7 +234,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     | `AdminController` | classe | contrôleur des écrans CRUD |
     | `AdminError`, `AdminResourceError`, `AdminRegistryError` | exceptions | erreurs |
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -195,7 +244,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     | Exiger une permission | `register_admin_routes(router, permission="admin.access")` |
     | Vérifier la cohérence | `forge admin:doctor` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Déclarer une ressource et brancher le back-office
 
@@ -227,7 +276,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
         - `registry.register` la collecte ;
         - `register_admin_routes` branche les écrans sécurisés.
 
-??? note "9. Sécurité, templates et cohérence"
+??? note "10. Sécurité, templates et cohérence"
 
     Les routes du back-office exigent une session authentifiée et protègent les écritures par CSRF ; une permission RBAC peut être requise via `permission=`.
 
