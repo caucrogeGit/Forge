@@ -82,33 +82,26 @@ Les 11 principes (résumé — la formulation canonique est dans `CHARTE_DOC.md`
 - C — Toute rupture d'API publique passe par une release majeure
 - D — Les tests testent le code, pas la documentation
 
-## 2.1 Directive de style francophone pour la documentation
+## 2.1 Style rédactionnel de la documentation
 
-Claude doit appliquer systématiquement un style documentaire français
-sur toute documentation Forge.
+**La règle vit dans l'[ADR-087](docs/adr/087-documentation-style-canonical.md)**,
+source unique du style documentaire de Forge. La lire avant toute rédaction.
 
-- Langue : rédiger l'intégralité du texte en français, sauf citations,
-noms de commandes, symboles de code ou termes techniques indispensables.
-- Formulations : employer des tournures françaises claires et directes,
-  éviter les anglicismes inutiles, privilégier le vocabulaire français
-  adapté au contexte technique.
-- Caractères : utiliser la typographie française correcte ; éviter le
-  tiret cadratin (U+2014) dans la documentation, ainsi que les formules de style
-  typographiquement anglo-saxonnes. Préférer la virgule, le point-virgule,
-  les deux-points, ou le trait d'union court si nécessaire.
-- Ponctuation : respecter les espaces insécables avant `;`, `:`, `?`, `!`
-  et les guillemets français `« »` lorsque cela est pertinent.
-- Portée : cette directive concerne tous les fichiers de documentation,
-  les guides, les pages MkDocs, les README, les tickets de documentation,
-  et toutes les propositions d'édition produites par Claude.
+Rappel des sept règles, sans valeur normative propre : français ; une phrase par
+ligne ; pas de tiret cadratin (U+2014) ; ponctuation française ; au plus un
+deux-points par phrase ; liens internes vérifiés au build strict ; anglicismes
+évités.
 
-Claude doit toujours relire la documentation produite pour vérifier que
-la langue, les formulations et les caractères sont conformes à ce style
-francophone.
+Portée : tous les fichiers de documentation, les guides, les pages MkDocs, les
+README, la documentation embarquée des paquets, et toute proposition d'édition.
 
-**Note** : cette règle est contraignante pour les corrections de contenu
-et pour la génération de nouveaux documents, pas uniquement pour les
-exemples de code ou les notes internes.
+Claude relit systématiquement ce qu'il produit pour vérifier cette conformité.
+Deux règles sont figées par un garde-fou
+(`tests/meta/test_doc_style_ratchet_001.py`) ; les autres relèvent du jugement.
+
+**Note** : la règle est contraignante pour les corrections de contenu comme pour
+la génération de nouveaux documents, pas seulement pour les exemples de code ou
+les notes internes.
 
 **Note pré-1.0** (convention pratique, pas dans la charte formelle) : avant le
 tag 1.0.0 stable (phase bêta en cours), les ruptures internes (suppressions,

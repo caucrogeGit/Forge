@@ -3,6 +3,16 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **Un ADR canonique pour le style rédactionnel de la documentation (`ADR-087`).**
+  Forge imposait ces règles à sa documentation depuis longtemps, mais elles vivaient dans `CLAUDE.md` §2.1, une directive refondue à chaque version majeure, sans date ni motivation.
+  Or l'ADR-082 fait poser dans **chaque projet** un `docs/adr/002-style-documentation.md` : Forge prescrivait donc à ses utilisateurs un ADR pour une règle qu'il s'appliquait sans ADR, et les deux énoncés avaient déjà divergé.
+  L'ADR-087 devient la source unique de sept règles, dont une nouvelle, **au plus un deux-points par phrase**, qui attrape l'empilement de propositions dans une phrase à rallonge.
+  `CLAUDE.md` y renvoie et cesse de les énoncer en double ; le gabarit projet déclare en dériver et reçoit la règle manquante.
+  Deux règles se contrôlant sans ambiguïté, l'absence de tiret cadratin et l'unicité du deux-points, un **cliquet** les fige : le fonds existant est gelé en l'état, 67 et 71 fichiers, et ces listes ne peuvent que décroître. Aucune campagne de réécriture n'est imposée, aucune nouvelle infraction n'est admise.
+  Les cinq autres règles relèvent du jugement : un contrôle approximatif produirait des faux positifs qui feraient désactiver l'ensemble.
+
 ### Corrigé
 
 - **La neutralisation de l'injection CSV rejoint le cœur (`CRUD-CSV-ESCAPE-CORE-001`).**

@@ -89,8 +89,10 @@ Sans règle explicite, le style dérive : mélange de langues, ponctuation
 irrégulière, caractères typographiques hétérogènes, phrases empilées sur une
 seule ligne difficiles à relire en diff.
 
-Forge applique déjà ces conventions à sa propre documentation.
-Ce projet les reprend à son compte pour partir sur une base saine.
+Forge applique déjà ces conventions à sa propre documentation, actées par son
+ADR-087 (style rédactionnel canonique), dont les règles ci-dessous dérivent.
+Ce projet les reprend à son compte pour partir sur une base saine, et reste
+libre de les étendre : cet ADR lui appartient.
 
 ## Décision
 
@@ -107,9 +109,12 @@ Toute documentation du projet respecte les règles suivantes.
 4. **Ponctuation française** : espaces insécables avant les signes doubles
    (deux-points, point-virgule, point d'interrogation, point d'exclamation) et
    autour des guillemets français.
-5. **Liens internes** vers le fichier `.md` cible, vérifiés au build strict de
+5. **Au plus un deux-points par phrase**, réservé à l'énumération, à la citation
+   ou à la conséquence annoncée.
+   Sinon, une virgule pour l'incise, ou un point et une phrase nouvelle.
+6. **Liens internes** vers le fichier `.md` cible, vérifiés au build strict de
    la documentation.
-6. **Éviter les anglicismes** inutiles et les tournures calquées sur l'anglais.
+7. **Éviter les anglicismes** inutiles et les tournures calquées sur l'anglais.
 
 Cette décision porte sur la rédaction, pas sur le fond : elle s'applique aux
 corrections comme aux nouveaux documents.

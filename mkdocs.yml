@@ -344,6 +344,7 @@ nav:
             - ADR-084 Niveaux de support des backends BDD: adr/084-database-backend-support-tiers.md
             - ADR-085 Câblage de routes canonique: adr/085-canonical-route-wiring.md
             - ADR-086 Élimination représentation legacy interne: adr/086-entity-legacy-representation-elimination.md
+            - ADR-087 Style rédactionnel canonique de la documentation: adr/087-documentation-style-canonical.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md
