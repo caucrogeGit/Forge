@@ -370,7 +370,7 @@ def test_le_prerequis_de_venv_est_hors_des_onglets() -> None:
             continue
 
         position_avertissement = texte.index("externally-managed-environment")
-        premier_canal = texte.find("#### Depuis PyPI")
+        premier_canal = texte.find("#### A. Depuis PyPI")
         if premier_canal == -1 or position_avertissement > premier_canal:
             offenders.append(f"{reference.parts[-3]} : après le premier canal")
 
@@ -419,7 +419,7 @@ def test_les_deux_canaux_sont_visibles_en_sous_titres() -> None:
     offenders: list[str] = []
     for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
         texte = reference.read_text(encoding="utf-8")
-        for titre in ("#### Depuis PyPI (stable)", "#### Depuis Git (avant-garde)"):
+        for titre in ("#### A. Depuis PyPI (stable)", "#### B. Depuis Git (avant-garde)"):
             if titre not in texte:
                 offenders.append(f"{reference.parts[-3]} : {titre}")
 
@@ -443,4 +443,28 @@ def test_le_chapitre_d_installation_ne_reprend_pas_la_mise_en_service() -> None:
             offenders.append(name)
 
     assert offenders == [], f"mise en service encore dans le chapitre 2 : {offenders}"
+
+
+def test_le_choix_des_canaux_est_annonce_apres_le_prerequis() -> None:
+    """L'annonce du choix vient après le prérequis, qui vaut pour les deux.
+
+    La phrase ne figurait que dans **une** référence sur 27 : les 26 autres
+    enchaînaient sur le premier canal sans dire qu'il en existait un second.
+    Les canaux sont lettrés A et B, ce qui nomme le choix et permet d'y
+    renvoyer ailleurs sans ambiguïté.
+    """
+    offenders: list[str] = []
+    for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        texte = reference.read_text(encoding="utf-8")
+        nom = reference.parts[-3]
+        if "Deux canaux, au choix." not in texte:
+            offenders.append(f"{nom} : choix non annoncé")
+            continue
+        annonce = texte.index("Deux canaux, au choix.")
+        prerequis = texte.index("externally-managed-environment")
+        canal_a = texte.index("#### A. Depuis PyPI")
+        if not prerequis < annonce < canal_a:
+            offenders.append(f"{nom} : annonce mal placée")
+
+    assert offenders == [], offenders
 

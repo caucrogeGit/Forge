@@ -31,7 +31,9 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    #### Depuis PyPI (stable)
+    Deux canaux, au choix.
+
+    #### A. Depuis PyPI (stable)
 
     La dernière version publiée :
 
@@ -39,7 +41,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     pip install forge-mvc-testing
     ```
 
-    #### Depuis Git (avant-garde)
+    #### B. Depuis Git (avant-garde)
 
     Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 

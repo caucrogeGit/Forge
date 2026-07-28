@@ -29,7 +29,9 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    #### Depuis PyPI (stable)
+    Deux canaux, au choix.
+
+    #### A. Depuis PyPI (stable)
 
     La dernière version publiée :
 
@@ -37,7 +39,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     pip install --pre forge-mvc-deploy
     ```
 
-    #### Depuis Git (avant-garde)
+    #### B. Depuis Git (avant-garde)
 
     Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 

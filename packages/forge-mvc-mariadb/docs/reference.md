@@ -22,8 +22,6 @@ Forge n'impose aucun backend de référence.
 
     #### Installer le paquet
 
-    Deux canaux, au choix.
-
     !!! warning "Prérequis : activez le venv du projet"
 
         Quelle que soit la source, installez **dans le venv du projet** :
@@ -37,7 +35,9 @@ Forge n'impose aucun backend de référence.
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    #### Depuis PyPI (stable)
+    Deux canaux, au choix.
+
+    #### A. Depuis PyPI (stable)
 
     La dernière version publiée :
 
@@ -45,7 +45,7 @@ Forge n'impose aucun backend de référence.
     pip install --pre forge-mvc-mariadb
     ```
 
-    #### Depuis Git (avant-garde)
+    #### B. Depuis Git (avant-garde)
 
     Les nouveautés pas encore publiées, ou si votre projet a été créé depuis `main`.
     Installez le CLI `forge-mvc` **et** le backend à la même version : sinon `db:config` et `db:init` se désynchronisent du backend.

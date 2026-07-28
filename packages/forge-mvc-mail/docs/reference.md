@@ -35,7 +35,9 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    #### Depuis PyPI (stable)
+    Deux canaux, au choix.
+
+    #### A. Depuis PyPI (stable)
 
     La dernière version publiée :
 
@@ -43,7 +45,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     pip install --pre forge-mvc-mail
     ```
 
-    #### Depuis Git (avant-garde)
+    #### B. Depuis Git (avant-garde)
 
     Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 

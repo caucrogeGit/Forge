@@ -28,7 +28,9 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    #### Depuis PyPI (stable)
+    Deux canaux, au choix.
+
+    #### A. Depuis PyPI (stable)
 
     La dernière version publiée :
 
@@ -36,7 +38,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     pip install --pre forge-mvc-iot
     ```
 
-    #### Depuis Git (avant-garde)
+    #### B. Depuis Git (avant-garde)
 
     Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 

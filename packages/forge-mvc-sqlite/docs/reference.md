@@ -33,7 +33,9 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    #### Depuis PyPI (stable)
+    Deux canaux, au choix.
+
+    #### A. Depuis PyPI (stable)
 
     La dernière version publiée :
 
@@ -41,7 +43,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     pip install --pre forge-mvc-sqlite
     ```
 
-    #### Depuis Git (avant-garde)
+    #### B. Depuis Git (avant-garde)
 
     Cœur puis backend depuis git, dans le venv du projet, à la même version (le backend trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 

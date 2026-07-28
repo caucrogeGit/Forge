@@ -29,7 +29,9 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    #### Depuis PyPI (stable)
+    Deux canaux, au choix.
+
+    #### A. Depuis PyPI (stable)
 
     La dernière version publiée :
 
@@ -37,7 +39,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     pip install --pre forge-mvc-audit
     ```
 
-    #### Depuis Git (avant-garde)
+    #### B. Depuis Git (avant-garde)
 
     Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 

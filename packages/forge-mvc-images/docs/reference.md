@@ -30,7 +30,9 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    #### Depuis PyPI (stable)
+    Deux canaux, au choix.
+
+    #### A. Depuis PyPI (stable)
 
     La dernière version publiée :
 
@@ -38,7 +40,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     pip install --pre forge-mvc-images
     ```
 
-    #### Depuis Git (avant-garde)
+    #### B. Depuis Git (avant-garde)
 
     Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 

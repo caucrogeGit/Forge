@@ -29,7 +29,9 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    #### Depuis PyPI (stable)
+    Deux canaux, au choix.
+
+    #### A. Depuis PyPI (stable)
 
     La dernière version publiée :
 
@@ -37,7 +39,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     pip install --pre forge-mvc-audio
     ```
 
-    #### Depuis Git (avant-garde)
+    #### B. Depuis Git (avant-garde)
 
     Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 

@@ -27,7 +27,9 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    #### Depuis PyPI (stable)
+    Deux canaux, au choix.
+
+    #### A. Depuis PyPI (stable)
 
     La dernière version publiée :
 
@@ -35,7 +37,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     pip install --pre forge-mvc-sessions-db
     ```
 
-    #### Depuis Git (avant-garde)
+    #### B. Depuis Git (avant-garde)
 
     Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
