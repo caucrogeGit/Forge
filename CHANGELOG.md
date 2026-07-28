@@ -68,6 +68,12 @@
   Le chargement suit désormais le modèle de la purge (F52-bis) : une transaction, une connexion, `tx` propagé jusqu'aux fixtures Python.
   **Rupture d'API dans `forge-mvc-fixtures`** : `Fixture.load()` prend `tx`, comme `purge()` depuis F52-bis. L'asymétrie était l'anomalie. Écrivez `def load(self, *, tx=None)` et propagez `tx` à vos `db.execute`. Une fixture qui ne l'accepte pas est **refusée avec un message qui indique la correction**, plutôt que d'être appelée sans `tx` : un repli silencieux sortirait ses écritures de la transaction sans le dire.
 
+- **Trois accrocs du parcours d'utilisation (`USAGE-JOURNEY-GAPS-001`).**
+  Trouvés en déroulant le parcours documenté de bout en bout sur un vrai serveur, avec de vrais comptes séparés.
+  **`build:model` exigeait `relations.json`**, alors qu'`entity:validate` le déclarait « optionnel », que le squelette ne le livre pas et que seul `make:relation` l'écrit. Un projet à une entité **sans relation**, le cas le plus courant au premier jour, ne pouvait pas franchir cette étape. L'absence vaut désormais « aucune relation », et `sync:relations` s'aligne.
+  **`db:config` écrivait hors d'un projet Forge**, posant ses fichiers dans n'importe quel dossier, quand `db:init` refuse ensuite d'y travailler faute de `config.py`. Il exige maintenant le même projet, et n'écrit rien sinon.
+  **`forge doctor` rassurait à tort** : son contrôle de base était codé en dur en avertissement, avec le message « normal avant configuration ou db:init », même sur un projet configuré et migré. Seul avertissement, il laissait `doctor` **sortir en 0**, donc un contrôle de déploiement passer avec une base morte. Sur un projet dont les accès sont renseignés, l'échec devient une **erreur** et le message oriente le diagnostic ; un projet non configuré garde son avertissement.
+
 - **Injection SQL par antislash dans les littéraux MariaDB (`MARIADB-LITERAL-BACKSLASH-001`).**
   MariaDB est le **seul** des quatre backends où l'antislash échappe dans un littéral : `NO_BACKSLASH_ESCAPES` y est désactivé par défaut. Le rendu ne doublait que l'apostrophe, ce que prescrit la norme SQL et qui suffit à PostgreSQL, SQLite et SQL Server.
   Deux trous, mesurés sur serveur réel. Une valeur terminée par un antislash échappait le guillemet fermant et cassait l'instruction. Et `a\' OR 1=1 -- ` refermait la chaîne : **la suite devenait exécutable**, le serveur évaluait la condition et rendait `1`.

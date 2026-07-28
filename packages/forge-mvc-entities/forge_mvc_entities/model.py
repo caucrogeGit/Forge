@@ -60,13 +60,21 @@ class ModelValidationError(ValueError):
 
 
 def sync_relations(entities_root: Path) -> Path:
+    """Régénère `relations.sql` depuis `relations.json`.
+
+    L'absence du contrat vaut **aucune relation**, comme pour `build:model` :
+    le squelette ne livre pas ce fichier, seul `make:relation` l'écrit, et un
+    projet peut n'avoir aucune relation.
+    """
     relations_path = entities_root / "relations.json"
-    relations_data = _read_json_file(relations_path)
-    validated_relations = validate_relations_definition(
-        relations_data,
-        source=str(relations_path),
-        entities_root=entities_root,
-    )
+    validated_relations: list[ValidatedRelation | ValidatedCanonicalManyToManyRelation] = []
+    if relations_path.exists():
+        relations_data = _read_json_file(relations_path)
+        validated_relations = validate_relations_definition(
+            relations_data,
+            source=str(relations_path),
+            entities_root=entities_root,
+        )
     output_path = entities_root / "relations.sql"
     output_path.write_text(generate_relations_sql(validated_relations), encoding="utf-8")
     return output_path
@@ -283,7 +291,13 @@ def _validate_model_or_raise(
     relations_path = entities_root / "relations.json"
     validated_relations: list[ValidatedRelation | ValidatedCanonicalManyToManyRelation] = []
     if not relations_path.exists():
-        blocks.append(f"{relations_path}: fichier introuvable")
+        # Absence = aucune relation, pas une erreur. `entity:validate` le
+        # déclarait déjà « optionnel » ; `build:model` échouait pourtant
+        # dessus, et le squelette ne livre pas ce fichier (seul `make:relation`
+        # l'écrit). Un projet à une entité SANS relation ne pouvait donc pas
+        # franchir `build:model`, alors que c'est le cas le plus courant au
+        # premier jour.
+        pass
     else:
         try:
             relations_data = _read_json_file(relations_path)

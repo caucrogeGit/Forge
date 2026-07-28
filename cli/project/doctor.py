@@ -190,6 +190,26 @@ def check_node() -> CheckResult:
     return CheckResult("ok", "Node.js / npm", "npm disponible")
 
 
+def _database_is_configured(root: Path) -> bool:
+    """Le projet a-t-il des accès BDD renseignés dans `env/dev` ?
+
+    `db:config` y pose les clés vides ; c'est leur **remplissage** qui marque
+    la configuration effective. Tant que `DB_NAME` ou l'identifiant applicatif
+    sont vides, l'absence de connexion est normale et attendue.
+    """
+    fichier = root / "env" / "dev"
+    if not fichier.is_file():
+        return False
+    valeurs: dict[str, str] = {}
+    for ligne in fichier.read_text(encoding="utf-8").splitlines():
+        nu = ligne.strip()
+        if not nu or nu.startswith("#") or "=" not in nu:
+            continue
+        cle, _, valeur = nu.partition("=")
+        valeurs[cle.strip()] = valeur.strip()
+    return bool(valeurs.get("DB_NAME")) and bool(valeurs.get("DB_APP_LOGIN"))
+
+
 def check_db(root: Path, _config: "ModuleType | None") -> CheckResult:
     """Vérifie la base via le backend actif (ADR-054/060), sans supposer de SGBD.
 
@@ -220,6 +240,15 @@ def check_db(root: Path, _config: "ModuleType | None") -> CheckResult:
         backend.close_connection(conn)
         return CheckResult("ok", "Base de données", f"connexion OK (backend {name})")
     except Exception as exc:  # noqa: BLE001 — connexion non établie
+        # Un projet dont les accès sont renseignés a été configuré : une
+        # connexion impossible n'y est plus « normale », c'est une panne. La
+        # rapporter en avertissement laissait `doctor` sortir en 0, donc un
+        # contrôle de déploiement passer avec une base morte.
+        if _database_is_configured(root):
+            return CheckResult("fail", "Base de données",
+                               f"connexion via le backend {name} impossible alors que le projet "
+                               f"est configuré — serveur joignable ? accès à jour dans env/ ? "
+                               f"({exc})")
         return CheckResult("warn", "Base de données",
                            f"connexion via le backend {name} impossible — "
                            f"normal avant configuration ou db:init ({exc})")

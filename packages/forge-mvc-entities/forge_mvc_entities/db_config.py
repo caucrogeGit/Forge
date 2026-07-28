@@ -217,10 +217,21 @@ def _report_removal(name: str, removed: dict[str, list[tuple[str, bool]]]) -> No
 def main(argv: "list[str] | None" = None) -> int:
     # L'aide `--help` est servie par le dispatcher central (HELP_TEXTS_RICH).
     args = list(argv) if argv is not None else []
+    racine = Path.cwd()
+
+    # `db:config` écrit dans `env/` : il doit exiger un projet Forge, comme
+    # `db:init` et `db:apply`. Sans ce contrôle, il posait ses fichiers dans
+    # n'importe quel dossier, et `db:init` refusait ensuite d'y travailler.
+    if not (racine / "config.py").exists():
+        print(
+            f"[ERREUR] Projet Forge introuvable : config.py absent dans {racine.as_posix()}.",
+        )
+        return 1
+
     try:
         if "--remove" in args:
-            return remove_backend_env(Path.cwd())
-        return configure_backend_env(Path.cwd())
+            return remove_backend_env(racine)
+        return configure_backend_env(racine)
     except RuntimeError as exc:
         # Aucun backend installé, ou plusieurs sans DB_BACKEND (ADR-054) : le
         # message de résolution est déjà explicite.
