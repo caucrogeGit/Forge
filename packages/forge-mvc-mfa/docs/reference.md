@@ -62,7 +62,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable mfa
+    forge opt-in:enable mfa --apply
     ```
 
 
@@ -91,6 +91,11 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     ```
 
     `auth:init` écrit `mvc/models/sql/auth_mfa_factors.sql` et `auth_mfa_recovery_codes.sql` (persistance applicative, ADR-008) ; `db:apply` les crée.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 

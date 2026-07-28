@@ -44,7 +44,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable audit
+    forge opt-in:enable audit --apply
     ```
 
 
@@ -60,6 +60,11 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
 
     `audit:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
     Sans cette table, `record_audit` et `get_audit_log` échouent au premier appel.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 

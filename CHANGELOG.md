@@ -15,6 +15,12 @@
 
 ### Corrigé
 
+- **La documentation d'installation des opt-ins donnait une commande qui ne fait rien (`DOC-OPTIN-INSTALL-PROCEDURE-001`).**
+  Les pages de référence écrivaient `forge opt-in:enable <nom>`, or cette commande est en **dry-run par défaut** : sans `--apply`, rien n'est écrit. **19 références sur 22** donnaient donc une instruction qui laisse croire l'opt-in activé alors que `optins/registry.py` reste inchangé. Corrigé partout.
+  Deux des cinq gestes de mise en service n'étaient documentés **nulle part** : l'épinglage dans `requirements.txt`, sans lequel l'opt-in n'existe que sur la machine qui l'a installé, et la preuve par un premier usage réel. La procédure canonique en cinq points vit désormais dans `docs/install/opt-ins.md`, et les 22 références y renvoient au lieu de la redire.
+  La référence RBAC faisait par ailleurs **copier trente lignes de `CREATE TABLE ... ENGINE=InnoDB`** à la main, syntaxe propre à MariaDB, alors que `rbac:init` existe depuis le chantier du DDL dialectal et produit un DDL portable sur les quatre backends. Elle donne maintenant la commande.
+  Un garde-fou fige l'ensemble, dont l'interdiction de documenter `opt-in:enable` sans `--apply` et celle de faire copier du DDL à la main.
+
 - **La neutralisation de l'injection CSV rejoint le cœur (`CRUD-CSV-ESCAPE-CORE-001`).**
   `make:crud` **recopiait** dans chaque contrôleur sa défense contre l'injection de formule CSV. Mesuré sur une application réelle de 50 entités : **36 exemplaires identiques**.
   Deux défauts en un. La règle était **incomplète** : elle n'examinait que le premier caractère, alors qu'un tableur ignore une tabulation ou un retour chariot de tête, si bien que `"\t=1+1"` s'ouvrait comme la formule `=1+1`. Et elle était **incorrigible** : Forge ne réécrit jamais le code utilisateur (principe 9), donc aucune correction n'atteignait les fichiers déjà générés.

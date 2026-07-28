@@ -49,6 +49,10 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
 
     Les commandes du moteur sont alors découvertes automatiquement (entry point `forge_mvc.commands`, ADR-070) ; aucun `opt-in:enable` n'est requis.
 
+    Opt-in **CLI-only** : il n'a ni table ni branchement dans `app.py`.
+    Restent l'épinglage dans `requirements.txt`, au même commit que `forge-mvc`, et la preuve par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
 ??? note "3. Commandes"
 
     Le moteur d'entités ajoute ces commandes (découvertes dès l'installation, entry point `forge_mvc.commands`) :

@@ -44,7 +44,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable rbac
+    forge opt-in:enable rbac --apply
     ```
 
 
@@ -64,38 +64,23 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     forge db:apply
     ```
 
-    Les tables de base `roles`, `permissions`, `role_permissions` ne sont pas provisionnées par le socle auth ; créez-les avant le premier appel du chemin base :
+    Les tables de base `roles`, `permissions`, `role_permissions` ne sont pas provisionnées par le socle auth.
+    Créez-les avant le premier appel du chemin base :
 
-    ```sql
-    CREATE TABLE IF NOT EXISTS roles (
-        id          INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        name        VARCHAR(100) NOT NULL,
-        slug        VARCHAR(100) NOT NULL UNIQUE,
-        description TEXT         NULL,
-        created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-    CREATE TABLE IF NOT EXISTS permissions (
-        id          INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        code        VARCHAR(150) NOT NULL UNIQUE,
-        label       VARCHAR(255) NULL,
-        description TEXT         NULL,
-        created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-    CREATE TABLE IF NOT EXISTS role_permissions (
-        role_id       INT NOT NULL,
-        permission_id INT NOT NULL,
-        PRIMARY KEY (role_id, permission_id),
-        CONSTRAINT fk_rp_role
-            FOREIGN KEY (role_id)       REFERENCES roles(id)       ON DELETE CASCADE,
-        CONSTRAINT fk_rp_permission
-            FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE,
-        INDEX idx_rp_permission (permission_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ```bash
+    forge rbac:init
+    forge migration:apply
     ```
 
+    `rbac:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute (ADR-071).
+    Le DDL est rendu pour le **backend installé** : MariaDB, SQLite, PostgreSQL ou SQL Server (ADR-054).
+
     Sans ces tables, `require_user_permission` échoue dès la résolution des permissions.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 

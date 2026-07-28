@@ -44,12 +44,17 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable import-export
+    forge opt-in:enable import-export --apply
     ```
 
 
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
     `forge opt-in:install import-export` affiche la commande `pip` sans l'exécuter.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 

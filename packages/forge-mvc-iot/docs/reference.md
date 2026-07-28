@@ -43,7 +43,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable iot
+    forge opt-in:enable iot --apply
     ```
 
 
@@ -59,6 +59,11 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
 
     `iot:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
     Sans cette table, le premier message reçu échoue.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 

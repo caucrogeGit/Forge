@@ -44,7 +44,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable settings
+    forge opt-in:enable settings --apply
     ```
 
 
@@ -60,6 +60,11 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
 
     `settings:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
     Sans cette table, `get_setting` et `set_setting` échouent au premier appel.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 

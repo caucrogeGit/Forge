@@ -103,6 +103,83 @@ Dans ce cas, ils doivent aussi être branchés explicitement.
 
 ---
 
+## Rendre un opt-in opérationnel : les cinq points
+
+Les deux étapes ci-dessus décrivent le **cycle de vie** de l’opt-in, présence et activation (ADR-016).
+Les rendre **opérationnels dans un projet** en demande trois de plus.
+
+Un paquet installé par `pip` ne fait rien tant que ces cinq points ne sont pas faits.
+Cette liste est la **procédure canonique** ; la page de référence de chaque opt-in en donne les commandes exactes.
+
+### 1. L’épingler
+
+Une ligne dans `requirements.txt`, au même commit ou à la même version que `forge-mvc`.
+
+Sans elle, l’opt-in n’existe que sur votre machine.
+Un collègue, un serveur ou une intégration continue qui installe depuis `requirements.txt` ne l’aura pas.
+
+Forge est un monorepo : les paquets d’une même version se supposent alignés.
+Monter `forge-mvc` sans monter ses opt-ins, ou l’inverse, produit des contrats désynchronisés difficiles à diagnostiquer.
+
+### 2. L’inscrire
+
+```bash
+forge opt-in:enable <nom> --apply
+```
+
+Cette commande ajoute l’opt-in à `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
+Pour un opt-in de type `route`, c’est aussi ce qui monte ses routes.
+
+`--apply` est **obligatoire** : sans lui, la commande travaille en simulation et n’écrit rien.
+
+### 3. Poser sa base
+
+Si l’opt-in apporte des tables :
+
+```bash
+forge <nom>:init
+forge migration:apply
+```
+
+`<nom>:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l’exécute (ADR-071).
+
+Cette étape est celle qu’on oublie le plus souvent, et son oubli ne se voit qu’au premier appel, sous la forme d’une erreur SQL sur une table absente.
+La page de référence de l’opt-in indique s’il a une commande `:init`.
+
+### 4. Le brancher là où il agit
+
+Cela dépend du type de l’opt-in, indiqué par `forge opt-in:list` et par sa page de référence.
+
+| Type | Où le brancher |
+| --- | --- |
+| `route` | ses routes montent par `register_optins(router)` ; rien de plus |
+| `crosscutting` | dans `app.py` : middleware, fournisseur de contexte |
+| `library` | un import dans le code qui s’en sert |
+| `cli` | rien à brancher, il ajoute des commandes |
+
+Si l’opt-in attend une clé, un secret ou une adresse de service, la poser dans `env/`, jamais dans le dépôt.
+
+### 5. Le prouver
+
+```bash
+make check
+forge doctor
+```
+
+Puis un premier usage réel.
+
+Un opt-in installé, inscrit et provisionné qu’aucun écran n’appelle n’est pas opérationnel : il est seulement présent.
+Tant qu’un chemin réel ne l’a pas traversé, rien ne distingue une intégration correcte d’une intégration à moitié faite.
+
+### Désinstaller
+
+Les mêmes points en sens inverse, avec une exception.
+
+**La migration déjà appliquée ne se supprime pas.**
+Si les tables doivent partir, elles partent par une **nouvelle** migration, jamais en retirant l’ancienne : l’historique des migrations est un journal, pas un brouillon.
+
+---
+
 ## Lister les opt-ins disponibles
 
 Depuis un projet Forge :
@@ -342,14 +419,10 @@ Cette forme est plus explicite et reste la plus lisible dans la documentation.
 
 Installer un package opt-in ne veut pas dire que tout est configuré dans le projet.
 
-Selon la brique, il peut rester à faire :
+`pip install` ne couvre que le premier des cinq points de la procédure canonique ci-dessus, et encore, sans l’épinglage.
+Restent l’inscription au registre, le provisionnement de la base, le branchement et la preuve.
 
-* brancher l’opt-in avec `forge opt-in:enable <nom> --apply` ;
-* ajouter des variables dans `env/dev` ;
-* initialiser des migrations ;
-* appliquer des migrations SQL ;
-* lancer une commande de diagnostic propre à l’opt-in ;
-* consulter la documentation dédiée.
+Voir [Rendre un opt-in opérationnel : les cinq points](#rendre-un-opt-in-operationnel-les-cinq-points).
 
 Exemple pour IoT :
 

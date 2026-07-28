@@ -47,12 +47,17 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable workflow
+    forge opt-in:enable workflow --apply
     ```
 
 
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
     `forge opt-in:install workflow` affiche la commande `pip` sans l'exécuter.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 

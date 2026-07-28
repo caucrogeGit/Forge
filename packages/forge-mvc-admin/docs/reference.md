@@ -44,12 +44,17 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable admin
+    forge opt-in:enable admin --apply
     ```
 
 
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in se greffe ensuite dans vos flux : décorateurs, starter).
     `forge opt-in:install admin` affiche la commande `pip` sans l'exécuter.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 

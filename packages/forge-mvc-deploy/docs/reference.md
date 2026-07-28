@@ -44,12 +44,17 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable deploy
+    forge opt-in:enable deploy --apply
     ```
 
 
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in expose ses commandes CLI).
     `forge opt-in:install deploy` affiche la commande `pip` sans l'exécuter.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 

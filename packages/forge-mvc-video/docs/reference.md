@@ -44,7 +44,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable video
+    forge opt-in:enable video --apply
     ```
 
 
@@ -67,6 +67,11 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     ```
 
     `video:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 

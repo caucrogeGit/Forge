@@ -52,7 +52,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     Puis activez l'opt-in :
 
     ```bash
-    forge opt-in:enable fixtures
+    forge opt-in:enable fixtures --apply
     ```
 
     `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061).
@@ -60,6 +60,11 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     `forge opt-in:install fixtures` affiche la commande `pip` sans l'exécuter.
 
     La génération (`fixtures:generate`) s'appuie sur **Faker**, tiré en dépendance de l'opt-in.
+
+    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
+    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
+    prouver par un premier usage réel.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     ### Désinstallation
 
