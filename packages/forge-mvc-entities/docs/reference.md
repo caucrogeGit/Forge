@@ -37,29 +37,23 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
+    La dernière version publiée :
 
-        ```bash
-        pip install --pre forge-mvc-entities
-        ```
+    ```bash
+    pip install --pre forge-mvc-entities
+    ```
 
-    === "Depuis Git (avant-garde)"
+    #### Depuis Git (avant-garde)
 
-        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-entities"
-        ```
-
-    Les commandes du moteur sont alors découvertes automatiquement (entry point `forge_mvc.commands`, ADR-070) ; aucun `opt-in:enable` n'est requis.
-
-    Opt-in **CLI-only** : il n'a ni table ni branchement dans `app.py`.
-    Restent l'épinglage dans `requirements.txt`, au même commit que `forge-mvc`, et la preuve par un premier usage réel.
-    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-entities"
+    ```
 
 ??? note "3. Mise en service"
 

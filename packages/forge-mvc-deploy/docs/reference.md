@@ -29,38 +29,23 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
-
-        ```bash
-        pip install --pre forge-mvc-deploy
-        ```
-
-    === "Depuis Git (avant-garde)"
-
-        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
-
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-deploy"
-        ```
-
-    Puis activez l'opt-in :
+    La dernière version publiée :
 
     ```bash
-    forge opt-in:enable deploy --apply
+    pip install --pre forge-mvc-deploy
     ```
 
+    #### Depuis Git (avant-garde)
 
-    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in expose ses commandes CLI).
-    `forge opt-in:install deploy` affiche la commande `pip` sans l'exécuter.
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
-    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
-    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
-    prouver par un premier usage réel.
-    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-deploy"
+    ```
 
 ??? note "3. Mise en service"
 

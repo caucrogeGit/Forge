@@ -37,25 +37,25 @@ Forge n'impose aucun backend de référence.
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
+    La dernière version publiée :
 
-        ```bash
-        pip install --pre forge-mvc-mariadb
-        ```
+    ```bash
+    pip install --pre forge-mvc-mariadb
+    ```
 
-    === "Depuis Git (avant-garde)"
+    #### Depuis Git (avant-garde)
 
-        Les nouveautés pas encore publiées, ou si votre projet a été créé depuis `main`.
-        Installez le CLI `forge-mvc` **et** le backend à la même version : sinon `db:config` et `db:init` se désynchronisent du backend.
-        On installe le **cœur d'abord** (depuis git, avec ses dépendances), puis le backend : celui-ci trouve alors le cœur git déjà en place et n'a pas besoin d'une version publiée sur PyPI.
+    Les nouveautés pas encore publiées, ou si votre projet a été créé depuis `main`.
+    Installez le CLI `forge-mvc` **et** le backend à la même version : sinon `db:config` et `db:init` se désynchronisent du backend.
+    On installe le **cœur d'abord** (depuis git, avec ses dépendances), puis le backend : celui-ci trouve alors le cœur git déjà en place et n'a pas besoin d'une version publiée sur PyPI.
 
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mariadb"
-        ```
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mariadb"
+    ```
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire, contrairement aux opt-ins de route.
 

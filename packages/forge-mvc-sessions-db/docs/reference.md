@@ -27,23 +27,23 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
+    La dernière version publiée :
 
-        ```bash
-        pip install --pre forge-mvc-sessions-db
-        ```
+    ```bash
+    pip install --pre forge-mvc-sessions-db
+    ```
 
-    === "Depuis Git (avant-garde)"
+    #### Depuis Git (avant-garde)
 
-        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-sessions-db"
-        ```
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-sessions-db"
+    ```
 
     Cet opt-in est une bibliothèque : on l'importe et on passe le store à `forge.configure`, il n'y a pas de câblage de routes.
 
@@ -53,25 +53,6 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
     forge.configure(session_store=DbSessionStore(ttl=3600))
     ```
-
-    `forge opt-in:install sessions-db` affiche la commande `pip` sans l'exécuter.
-
-    Puis provisionnez la table `forge_sessions`, prérequis dur du module : sans elle, la première requête de session échoue par une erreur SQL.
-
-    ```bash
-    forge sessions:init
-    forge migration:apply
-    ```
-
-    `sessions:init` copie la migration embarquée dans `mvc/migrations/` (write-if-new, sans l'exécuter) ; `forge migration:apply` l'applique et la trace dans `forge_migrations` (convention de provisioning des opt-ins, ADR-071).
-    Le DDL est écrit pour MariaDB : adaptez les types au backend actif si nécessaire (par exemple `TEXT` au lieu de `LONGTEXT`, et un `CREATE INDEX` séparé sur SQLite ou PostgreSQL).
-
-    La table porte une colonne `version` : le store l'utilise pour une concurrence optimiste (aucune écriture concurrente n'est perdue, le message flash est rendu une seule fois).
-
-    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
-    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
-    prouver par un premier usage réel.
-    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
 ??? note "3. Mise en service"
 

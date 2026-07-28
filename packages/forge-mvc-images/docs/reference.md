@@ -30,51 +30,23 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
-
-        ```bash
-        pip install --pre forge-mvc-images
-        ```
-
-    === "Depuis Git (avant-garde)"
-
-        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
-
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-images"
-        ```
-
-    Puis activez l'opt-in :
+    La dernière version publiée :
 
     ```bash
-    forge opt-in:enable images --apply
+    pip install --pre forge-mvc-images
     ```
 
+    #### Depuis Git (avant-garde)
 
-    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
-    `forge opt-in:install images` affiche la commande `pip` sans l'exécuter.
-
-    La couche traitement (`save_image_upload`, `verify_image_content`, variantes) fonctionne dès l'installation.
-    La couche médias applicative (`attach_media_to_entity`, `get_media_gallery`, `get_cover_media`) exige en plus une table `media`, prérequis dur.
-
-    Créez-la avec la migration embarquée :
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
     ```bash
-    forge images:init
-    forge migration:apply
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-images"
     ```
-
-    `images:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
-    Sans cette table, tout appel de la couche médias échoue au premier `INSERT INTO media`.
-
-    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
-    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
-    prouver par un premier usage réel.
-    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
 ??? note "3. Mise en service"
 

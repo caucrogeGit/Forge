@@ -358,7 +358,7 @@ def test_le_prerequis_de_venv_est_hors_des_onglets() -> None:
     onglet, donc celui affiché par défaut : l'avertissement était caché à la
     majorité des lecteurs.
 
-    Il est désormais **avant** les onglets, et formulé en prérequis plutôt
+    Il est désormais **avant** les deux canaux, et formulé en prérequis plutôt
     qu'en dépannage : mieux vaut éviter l'erreur que la réparer, la plupart de
     ceux qui échouent cherchant la réponse ailleurs que dans la page.
     """
@@ -370,9 +370,9 @@ def test_le_prerequis_de_venv_est_hors_des_onglets() -> None:
             continue
 
         position_avertissement = texte.index("externally-managed-environment")
-        premier_onglet = texte.find('=== "Depuis PyPI')
-        if premier_onglet == -1 or position_avertissement > premier_onglet:
-            offenders.append(f"{reference.parts[-3]} : enfermé dans un onglet")
+        premier_canal = texte.find("#### Depuis PyPI")
+        if premier_canal == -1 or position_avertissement > premier_canal:
+            offenders.append(f"{reference.parts[-3]} : après le premier canal")
 
     assert offenders == [], offenders
 
@@ -385,4 +385,62 @@ def test_le_prerequis_donne_la_commande_d_activation() -> None:
     ]
 
     assert offenders == [], offenders
+
+
+# ── Plus d'onglets : ils rendaient les sections liables par URL ──────────────
+
+def test_aucun_bloc_a_onglets_dans_les_references() -> None:
+    """Les onglets de Material sont des **ancres**, pas des boutons.
+
+    Lu dans le bundle du thème : chaque étiquette d'onglet voit son contenu
+    remplacé par `<a href="#__tabbed_1_2">`, et le fragment d'URL sélectionne
+    l'onglet en retour. Cliquer un onglet écrit donc ce fragment dans l'URL ;
+    le fragment désignant un élément situé dans un `<details>`, le navigateur
+    déplie et fait défiler pour le révéler.
+
+    Le chapitre d'installation s'ouvrait ainsi tout seul, et l'effet se
+    reproduisait à chaque changement d'onglet. Deux sous-titres suppriment le
+    mécanisme, au lieu d'en contourner les effets : ils montrent en outre les
+    deux canaux d'un coup, se trouvent au `Ctrl+F` et s'impriment.
+    """
+    offenders: list[str] = []
+    for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        for number, line in enumerate(reference.read_text(encoding="utf-8").splitlines(), 1):
+            if line.strip().startswith('=== "'):
+                offenders.append(f"{reference.parts[-3]}:{number}")
+
+    assert offenders == [], (
+        "Un bloc à onglets rend la section liable par URL et déplie le chapitre "
+        f"qui la contient : {offenders}"
+    )
+
+
+def test_les_deux_canaux_sont_visibles_en_sous_titres() -> None:
+    offenders: list[str] = []
+    for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        texte = reference.read_text(encoding="utf-8")
+        for titre in ("#### Depuis PyPI (stable)", "#### Depuis Git (avant-garde)"):
+            if titre not in texte:
+                offenders.append(f"{reference.parts[-3]} : {titre}")
+
+    assert offenders == [], offenders
+
+
+def test_le_chapitre_d_installation_ne_reprend_pas_la_mise_en_service() -> None:
+    """Chaque geste à un seul endroit (principe 11).
+
+    Le chapitre 2 gardait `opt-in:enable` et les commandes `:init`, désormais
+    portées par le chapitre 3. Placés après le canal Git, ils se lisaient de
+    surcroît comme s'ils lui étaient propres.
+    """
+    offenders: list[str] = []
+    for name, ref in _references():
+        texte = ref.read_text(encoding="utf-8")
+        chapitre = re.search(
+            r'^\?\?\? note "2\. Installation"\n(.*?)^\?\?\? note "3\.', texte, re.M | re.S
+        )
+        if chapitre and re.search(r"opt-in:enable|migration:apply", chapitre.group(1)):
+            offenders.append(name)
+
+    assert offenders == [], f"mise en service encore dans le chapitre 2 : {offenders}"
 

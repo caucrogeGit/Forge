@@ -33,51 +33,23 @@ Aucun cookie visiteur, aucune IP.
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
-
-        ```bash
-        pip install --pre forge-mvc-stats
-        ```
-
-    === "Depuis Git (avant-garde)"
-
-        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
-
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-stats"
-        ```
-
-    Puis activez l'opt-in :
+    La dernière version publiée :
 
     ```bash
-    forge opt-in:enable stats --apply
+    pip install --pre forge-mvc-stats
     ```
 
+    #### Depuis Git (avant-garde)
 
-    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in s'importe et s'utilise directement, sans route).
-    `forge opt-in:install stats` affiche la commande `pip` sans l'exécuter.
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
-    Puis créez la table `forge_stats_events`, prérequis dur du module.
-
-    Cet opt-in n'expose aucune commande CLI : appliquez une fois, comme migration applicative, le `CREATE TABLE` fourni par `get_stats_events_schema_sql()` :
-
-    ```python
-    import core.database.db as db
-    from forge_mvc_stats import get_stats_events_schema_sql
-
-    db.execute(get_stats_events_schema_sql())
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-stats"
     ```
-
-    Sans cette table, `track_event` échoue au premier appel.
-
-    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
-    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
-    prouver par un premier usage réel.
-    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
 ??? note "3. Mise en service"
 

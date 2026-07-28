@@ -33,23 +33,23 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
+    La dernière version publiée :
 
-        ```bash
-        pip install --pre forge-mvc-sqlite
-        ```
+    ```bash
+    pip install --pre forge-mvc-sqlite
+    ```
 
-    === "Depuis Git (avant-garde)"
+    #### Depuis Git (avant-garde)
 
-        Cœur puis backend depuis git, dans le venv du projet, à la même version (le backend trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    Cœur puis backend depuis git, dans le venv du projet, à la même version (le backend trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-sqlite"
-        ```
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-sqlite"
+    ```
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
 ??? note "3. Mise en service"

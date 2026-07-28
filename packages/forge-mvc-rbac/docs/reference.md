@@ -29,64 +29,23 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
-
-        ```bash
-        pip install --pre forge-mvc-rbac
-        ```
-
-    === "Depuis Git (avant-garde)"
-
-        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
-
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-rbac"
-        ```
-
-    Puis activez l'opt-in :
+    La dernière version publiée :
 
     ```bash
-    forge opt-in:enable rbac --apply
+    pip install --pre forge-mvc-rbac
     ```
 
+    #### Depuis Git (avant-garde)
 
-    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in se greffe ensuite dans vos flux : décorateurs, starter).
-    `forge opt-in:install rbac` affiche la commande `pip` sans l'exécuter.
-
-    Selon le chemin retenu, une étape base peut être un prérequis dur.
-
-    Le chemin recommandé (`require_contract_permission`, contrat `mvc/security/rbac.json`) n'utilise pas la base : aucune table requise.
-
-    Le chemin basé base (`require_user_permission`, `auth_user_can`) suppose en revanche des tables présentes.
-
-    La liaison utilisateur/rôle `user_roles` fait partie du socle d'authentification : le cœur l'écrit via `forge auth:init` dès que `forge-mvc-rbac` est installé.
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
     ```bash
-    forge auth:init
-    forge db:apply
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-rbac"
     ```
-
-    Les tables de base `roles`, `permissions`, `role_permissions` ne sont pas provisionnées par le socle auth.
-    Créez-les avant le premier appel du chemin base :
-
-    ```bash
-    forge rbac:init
-    forge migration:apply
-    ```
-
-    `rbac:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute (ADR-071).
-    Le DDL est rendu pour le **backend installé** : MariaDB, SQLite, PostgreSQL ou SQL Server (ADR-054).
-
-    Sans ces tables, `require_user_permission` échoue dès la résolution des permissions.
-
-    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
-    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
-    prouver par un premier usage réel.
-    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
 ??? note "3. Mise en service"
 

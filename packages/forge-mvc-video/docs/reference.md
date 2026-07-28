@@ -29,55 +29,23 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
-
-        ```bash
-        pip install --pre forge-mvc-video
-        ```
-
-    === "Depuis Git (avant-garde)"
-
-        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
-
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-video"
-        ```
-
-    Puis activez l'opt-in :
+    La dernière version publiée :
 
     ```bash
-    forge opt-in:enable video --apply
+    pip install --pre forge-mvc-video
     ```
 
+    #### Depuis Git (avant-garde)
 
-    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes/__init__.py`.
-    `forge opt-in:install video` affiche la commande `pip` sans l'exécuter.
-
-    Puis installez les binaires externes `ffmpeg` et `ffprobe`, requis pour le sondage et le transcodage :
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
     ```bash
-    forge video:doctor
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-video"
     ```
-
-    `video:doctor` vérifie leur présence ; sans eux, `video:process` échoue.
-
-    Créez enfin la table `videos`, prérequis dur du module :
-
-    ```bash
-    forge video:init
-    forge migration:apply
-    ```
-
-    `video:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute.
-
-    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
-    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
-    prouver par un premier usage réel.
-    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
 ??? note "3. Mise en service"
 

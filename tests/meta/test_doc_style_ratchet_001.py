@@ -149,7 +149,6 @@ MULTI_COLON_LEGACY = frozenset({
     "packages/forge-mvc-mssql/docs/reference.md",
     "packages/forge-mvc-rbac/docs/references/jinja.md",
     "packages/forge-mvc-rbac/docs/welcome/avance/rbac-request-roles.md",
-    "packages/forge-mvc-stats/docs/reference.md",
     "packages/forge-mvc-stats/docs/welcome/intermediaire/bilan.md",
     "storage/logs/errors.dev.md",
     "tests/fixtures/app/storage/logs/errors.dev.md",

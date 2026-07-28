@@ -47,61 +47,23 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
-
-        ```bash
-        pip install --pre forge-mvc-mfa
-        ```
-
-    === "Depuis Git (avant-garde)"
-
-        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
-
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mfa"
-        ```
-
-    Puis activez l'opt-in :
+    La dernière version publiée :
 
     ```bash
-    forge opt-in:enable mfa --apply
+    pip install --pre forge-mvc-mfa
     ```
 
+    #### Depuis Git (avant-garde)
 
-    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) (l'opt-in se greffe ensuite dans vos flux : décorateurs, starter).
-    `forge opt-in:install mfa` affiche la commande `pip` sans l'exécuter.
-
-    Puis posez la clé de chiffrement `FORGE_MFA_SECRET_KEY`, prérequis dur du module.
-
-    Le secret TOTP est chiffré au repos (Fernet) : sans cette clé, MFA lève `MfaSecretKeyMissing` dès le premier usage.
-    Générez une clé, puis reportez-la dans l'environnement du projet (jamais dans le dépôt) :
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
     ```bash
-    python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mfa"
     ```
-
-    Placez la valeur sous `FORGE_MFA_SECRET_KEY` dans `env/dev` et l'environnement de production.
-    Appelez `validate_mfa_secret_key_config()` au démarrage pour échouer tôt si la clé manque.
-
-    Créez enfin les tables de persistance `auth_mfa_factors` et `auth_mfa_recovery_codes`, lues et écrites par l'enrôlement, le challenge et les codes de récupération.
-
-    Ces tables font partie du socle d'authentification (clé étrangère vers `users(id)`) : le cœur les provisionne via `forge auth:init`, qui écrit leur DDL dès que `forge-mvc-mfa` est installé.
-
-    ```bash
-    forge auth:init
-    forge db:apply
-    ```
-
-    `auth:init` écrit `mvc/models/sql/auth_mfa_factors.sql` et `auth_mfa_recovery_codes.sql` (persistance applicative, ADR-008) ; `db:apply` les crée.
-
-    Ces gestes ne suffisent pas à rendre l'opt-in **opérationnel** : il reste à l'épingler dans
-    `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
-    prouver par un premier usage réel.
-    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
 ??? note "3. Mise en service"
 

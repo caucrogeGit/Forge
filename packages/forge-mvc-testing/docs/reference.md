@@ -31,26 +31,23 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    === "Depuis PyPI (stable)"
+    #### Depuis PyPI (stable)
 
-        La dernière version publiée :
+    La dernière version publiée :
 
-        ```bash
-        pip install forge-mvc-testing
-        ```
+    ```bash
+    pip install forge-mvc-testing
+    ```
 
-    === "Depuis Git (avant-garde)"
+    #### Depuis Git (avant-garde)
 
-        Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
+    Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
-        ```bash
-        source .venv/bin/activate
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main"
-        pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-testing"
-        ```
-
-    Le plugin pytest et `FakeRequest` sont disponibles dès l'installation.
-    Ce n'est pas un opt-in applicatif : il n'y a pas d'`opt-in:enable`.
+    ```bash
+    source .venv/bin/activate
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main"
+    pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-testing"
+    ```
 
 ??? note "3. Commandes"
 
