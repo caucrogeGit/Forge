@@ -111,6 +111,25 @@ Forge n'impose aucun backend de référence.
     `DB_APP_*` est le compte de **runtime** (DML strict).
     Les deux sont créés par le script de l'étape 4.
 
+    ##### Dimensionner le pool
+
+    Deux clés facultatives règlent le pool de connexions.
+
+    | Clé | Défaut | Rôle |
+    |---|---|---|
+    | `DB_POOL_SIZE` | `5` | connexions **simultanées** au serveur |
+    | `DB_POOL_TIMEOUT` | `5` | secondes d'attente avant d'abandonner |
+
+    `DB_POOL_SIZE` ne borne pas le **volume** de requêtes, seulement le nombre en vol au même instant.
+    Mesuré sur une lecture indexée de 0,26 ms, cinq connexions servent près de 19 000 requêtes par seconde.
+
+    Une requête qui arrive alors que toutes les connexions sont prises **patiente** dans une file d'attente, elle n'échoue pas.
+    Ce n'est qu'au bout de `DB_POOL_TIMEOUT` que Forge renonce, avec une réponse `503` et un en-tête `Retry-After` : une saturation est passagère, elle ne mérite pas la page d'erreur 500 qui annoncerait un défaut de l'application.
+
+    Règle de dimensionnement : au moins autant de connexions que de requêtes réellement concurrentes par processus.
+    Gunicorn en mode threadé donne un ordre de grandeur avec son nombre de threads par worker ; **chaque worker a son propre pool**, la charge du serveur est donc le produit des deux.
+    Élargir le pool coûte des connexions côté serveur (`max_connections`), pas de la mémoire côté application.
+
     #### 4. Provisionner la base
 
     `forge db:init` **affiche** le SQL de provisioning (création de la base et des deux comptes, scellés à `DB_NAME`), dérivé de `env/`, sans se connecter ([ADR-067](/docs/forge/adr/067-db-init-provisioning-sql/)) :

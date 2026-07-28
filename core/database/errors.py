@@ -41,3 +41,32 @@ class UniqueViolationError(DatabaseError):
     SGBD ; si l'application doit le distinguer, elle vérifie elle-même
     avant d'insérer.
     """
+
+
+class DatabaseUnavailableError(DatabaseError):
+    """Aucune connexion disponible : surcharge passagère, pas une panne.
+
+    Levée quand un backend à pool ne peut pas fournir de connexion dans le
+    délai imparti, toutes étant occupées. La demande n'a rien d'invalide et
+    l'application n'a aucun défaut : elle est simplement arrivée pendant une
+    pointe.
+
+    C'est une condition de **capacité**, ce qui appelle une réponse HTTP
+    ``503 Service Unavailable`` avec ``Retry-After``, jamais un ``500``. Un
+    500 annonce un bug du serveur et envoie chercher une erreur dans le code,
+    là où le remède est d'élargir le pool (``DB_POOL_SIZE``) ou de réduire la
+    durée des requêtes.
+
+    Le cœur la traduit en 503 dans `core.app.application`. Une application
+    peut aussi l'attraper pour dégrader un écran plutôt que le refuser :
+
+        from core.database.errors import DatabaseUnavailableError
+
+        try:
+            lignes = derniers_articles()
+        except DatabaseUnavailableError:
+            lignes = []      # la page s'affiche sans sa liste
+
+    Ce que cette erreur ne dit **pas** : combien de temps attendre. Le délai
+    d'attente écoulé est le seul fait établi.
+    """

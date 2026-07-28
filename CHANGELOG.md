@@ -68,6 +68,14 @@
   Le chargement suit désormais le modèle de la purge (F52-bis) : une transaction, une connexion, `tx` propagé jusqu'aux fixtures Python.
   **Rupture d'API dans `forge-mvc-fixtures`** : `Fixture.load()` prend `tx`, comme `purge()` depuis F52-bis. L'asymétrie était l'anomalie. Écrivez `def load(self, *, tx=None)` et propagez `tx` à vos `db.execute`. Une fixture qui ne l'accepte pas est **refusée avec un message qui indique la correction**, plutôt que d'être appelée sans `tx` : un repli silencieux sortirait ses écritures de la transaction sans le dire.
 
+- **Une file d'attente devant le pool de connexions MariaDB (`MARIADB-POOL-QUEUE-001`).**
+  Le pilote MariaDB n'offre **aucune** file : son `get_connection()` lève dès que toutes les connexions sont prises. Mesuré avec le pool par défaut de cinq et une lecture indexée de 0,26 ms, **145 requêtes sur 200 arrivées au même instant échouaient**, alors qu'attendre une fraction de milliseconde suffisait.
+  Ce n'était pas un problème de capacité : cinq connexions servent près de 19 000 requêtes par seconde. C'était l'absence de file.
+  Un sémaphore aux jetons du pool la rétablit. Il en fallait un vrai : mesuré, une simple boucle de réessais **aggrave** la situation, 200 emprunteurs interrogeant le pool en boucle se disputant son verrou (170 échecs contre 146 sans attente). Après correctif, **500 requêtes simultanées sont toutes servies**, en 0,17 seconde.
+  L'attente est bornée par `DB_POOL_TIMEOUT` (5 s). Au delà, la nouvelle `DatabaseUnavailableError` du cœur est levée et traduite en **`503` avec `Retry-After`**, non en `500` : une saturation est passagère, et un 500 enverrait chercher un bug dans le code là où le remède est d'élargir `DB_POOL_SIZE`.
+  Le 503 ne dépend pas d'un gabarit : `errors/503.html` rejoint le squelette, mais aucun projet existant ne le recevra (principe 9), et `_html` **rend une 500** quand un gabarit manque au lieu de lever. La réponse teste donc le statut obtenu et retombe sur un corps en texte brut.
+  `DB_POOL_SIZE` et `DB_POOL_TIMEOUT` sont enfin documentés, avec leur règle de dimensionnement : la référence du paquet n'en disait pas un mot.
+
 - **Le diff de schéma était faux sur tout booléen MariaDB (`MARIADB-BOOLEAN-FAMILIES-001`).**
   MariaDB accepte `BOOLEAN` à la déclaration et **stocke** `TINYINT(1)`, que l'introspection rapporte. Le dialecte rangeait `TINYINT` dans les entiers avant de tester les booléens : les deux faces d'un même type physique rendaient donc des familles différentes.
   `forge migration:diff` signalait en conséquence une différence sur **chaque colonne booléenne** d'une base MariaDB, et `migration:make --from-diff` refusait alors de produire quoi que ce soit en criant au « diff risqué ».

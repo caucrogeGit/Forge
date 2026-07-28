@@ -5,6 +5,7 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from core.app.api_routes_loader import load_api_routes as _load_api_routes
+from core.database.errors import DatabaseUnavailableError
 from core.http.helpers import html as _html
 from core.http.router import Router
 from core.errors.runtime_error_logger import (
@@ -18,6 +19,40 @@ if TYPE_CHECKING:
     from core.http.response import Response
 
 logger = logging.getLogger(__name__)
+
+
+def _service_unavailable() -> Response:
+    """Réponse 503, sans dépendre d'un gabarit que le projet n'a peut-être pas.
+
+    `errors/503.html` est livré par le squelette, mais Forge n'écrit jamais
+    dans un projet existant (principe 9) : une application créée avant cette
+    page ne l'a pas. Faire échouer le rendu la ferait retomber en 500, soit
+    exactement le message trompeur que ce 503 corrige.
+
+    Le repli est volontairement minimal, en texte brut : à ce stade la base est
+    saturée, ce n'est pas le moment de solliciter davantage le serveur.
+    """
+    from core.http.response import Response
+
+    try:
+        rendue = _html("errors/503.html", 503)
+    except Exception:  # noqa: BLE001 - moteur de rendu indisponible
+        rendue = None
+    if rendue is not None and rendue.status == 503:
+        return rendue
+
+    # `_html` ne lève pas quand le gabarit manque : il **rend une 500**, ce qui
+    # écraserait le code que l'on vient de choisir. On teste donc le statut
+    # obtenu, pas la levée d'une exception.
+    return Response(
+            status=503,
+            body=(
+                "Service momentanement indisponible.\n"
+                "Le service recoit plus de demandes qu'il ne peut en traiter ; "
+                "reessayez dans quelques instants.\n"
+            ).encode("utf-8"),
+            content_type="text/plain; charset=utf-8",
+        )
 
 
 class Application:
@@ -79,6 +114,19 @@ class Application:
                         return denied
 
             return route.handler(request)
+
+        except DatabaseUnavailableError:
+            # Surcharge passagère, pas un défaut de l'application : toutes les
+            # connexions étaient prises et aucune ne s'est libérée à temps
+            # (MARIADB-POOL-QUEUE-001). Un 500 annoncerait un bug du serveur et
+            # enverrait chercher une erreur dans le code, là où le remède est
+            # d'élargir `DB_POOL_SIZE` ou de raccourcir les requêtes.
+            logger.warning(
+                "Base indisponible (capacité) — %s %s", request.method, request.path
+            )
+            response = _service_unavailable()
+            response.headers["Retry-After"] = "2"
+            return response
 
         except Exception as _exc:
             logger.exception("Erreur non gérée — %s %s", request.method, request.path)

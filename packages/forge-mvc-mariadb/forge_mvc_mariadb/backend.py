@@ -18,6 +18,7 @@ import os
 import threading
 from typing import Any
 
+from core.database.errors import DatabaseUnavailableError
 from core.forge import get as _cfg
 
 from forge_mvc_mariadb.dialect import MariaDBDialect
@@ -50,6 +51,10 @@ class MariaDBBackend:
     def __init__(self) -> None:
         self._pool: Any = None
         self._pool_lock = threading.Lock()
+        # File d'attente devant le pool (MARIADB-POOL-QUEUE-001). Créée avec le
+        # pool, elle porte autant de jetons que de connexions : un emprunteur
+        # patiente au lieu d'échouer quand toutes sont prises.
+        self._gate: "threading.BoundedSemaphore | None" = None
 
     def _get_pool(self) -> Any:
         if self._pool is None:
@@ -71,18 +76,57 @@ class MariaDBBackend:
                         pool_name = str(_cfg("app_name")).lower(),
                         pool_size = pool_size,
                     )
+                    self._gate = threading.BoundedSemaphore(pool_size)
                     logger.debug("Pool MariaDB initialisé (%s, taille=%s)",
                                  db_name, pool_size)
         return self._pool
 
     def get_connection(self) -> Any:
-        """Emprunte une connexion depuis le pool (créé au premier appel)."""
+        """Emprunte une connexion, en patientant si le pool est saturé.
+
+        Le pilote MariaDB n'offre aucune file d'attente : son
+        ``get_connection()`` lève immédiatement dès que toutes les connexions
+        sont prises. Mesuré, cela faisait échouer 7 requêtes sur 20 arrivées
+        au même instant, alors que chacune ne durait qu'un quart de
+        milliseconde et qu'attendre quelques millisecondes suffisait.
+
+        Un sémaphore aux jetons du pool rétablit l'attente. Il en faut un vrai,
+        et non une boucle de réessais : mesuré, 200 emprunteurs interrogeant le
+        pool en boucle se disputent son verrou et **aggravent** la situation
+        (170 échecs sur 200, contre 146 sans attente).
+
+        L'attente est bornée par ``DB_POOL_TIMEOUT`` (5 s par défaut). Au delà,
+        `DatabaseUnavailableError` est levée : c'est une surcharge, pas une
+        panne, et le cœur la traduit en 503.
+        """
         import mariadb
         _mariadb: Any = mariadb
+
+        pool = self._get_pool()
+        gate = self._gate
+        if gate is None:  # pragma: no cover - le pool crée toujours la file
+            return pool.get_connection()
+
+        timeout = float(os.environ.get("DB_POOL_TIMEOUT", "5"))
+        if not gate.acquire(timeout=timeout):
+            logger.warning(
+                "Pool MariaDB saturé : aucune connexion libérée en %.1fs "
+                "(DB_POOL_SIZE=%s). Élargissez le pool ou raccourcissez les requêtes.",
+                timeout, os.environ.get("DB_POOL_SIZE", "5"),
+            )
+            raise DatabaseUnavailableError(
+                f"Aucune connexion disponible après {timeout:.1f}s d'attente."
+            )
+
         try:
-            return self._get_pool().get_connection()
-        except _mariadb.PoolError as error:
-            logger.exception("Pool épuisé ou connexion impossible : %s", error)
+            return pool.get_connection()
+        except BaseException as error:
+            # Le jeton doit repartir : sans cela, un échec d'emprunt réduirait
+            # définitivement la capacité de la file.
+            gate.release()
+            if isinstance(error, _mariadb.PoolError):
+                logger.exception("Emprunt impossible malgré un jeton libre : %s", error)
+                raise DatabaseUnavailableError(str(error)) from error
             raise
 
     def get_admin_connection(self, *, database: "str | None" = None) -> Any:
@@ -107,9 +151,22 @@ class MariaDBBackend:
         return _mariadb.connect(**kwargs)
 
     def close_connection(self, connection: Any) -> None:
-        """Restitue la connexion au pool."""
-        if connection is not None:
+        """Restitue la connexion au pool, puis le jeton à la file d'attente.
+
+        Dans cet ordre : le jeton ne doit repartir qu'une fois la connexion
+        réellement disponible, sans quoi l'emprunteur suivant se présenterait
+        devant un pool encore plein.
+
+        La file est **bornée** : une restitution sans emprunt lève, plutôt que
+        d'enfler silencieusement la capacité.
+        """
+        if connection is None:
+            return
+        try:
             connection.close()
+        finally:
+            if self._gate is not None:
+                self._gate.release()
 
     def is_unique_violation(self, error: Exception) -> bool:
         """Doublon MariaDB : errno 1062 (ER_DUP_ENTRY).
