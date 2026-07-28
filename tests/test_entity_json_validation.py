@@ -189,7 +189,22 @@ def test_auto_increment_requires_integer_primary_key():
     assert "requiert un sql_type entier compatible" in message
 
 
-def test_bool_requires_bool_or_boolean_sql_type():
+def test_bool_accepte_le_type_reellement_utilise_par_le_backend():
+    """MARIADB-BOOLEAN-FAMILIES-001 : `TINYINT(1)` est le booléen de MariaDB.
+
+    Ce test exigeait auparavant le **refus** de `TINYINT(1)` avec
+    `python_type='bool'`, pour pousser vers l'alias `BOOLEAN`. Or les deux sont
+    le même type physique : MariaDB accepte `BOOLEAN` à la déclaration et
+    stocke `TINYINT(1)`, que l'introspection rapporte.
+
+    Le refus était de surcroît propre à MariaDB : SQLite acceptait déjà
+    `INTEGER` avec `python_type='bool'`, son type booléen rendant lui aussi
+    deux familles.
+
+    Un contrôle de compatibilité doit dire ce qui est **possible**, pas ce qui
+    est préféré. La préférence pour `BOOLEAN` reste portée par le générateur,
+    qui l'écrit, et par la documentation.
+    """
     data = valid_entity()
     data["fields"].append(
         {
@@ -197,6 +212,25 @@ def test_bool_requires_bool_or_boolean_sql_type():
             "column": "Actif",
             "python_type": "bool",
             "sql_type": "TINYINT(1)",
+            "nullable": False,
+            "primary_key": False,
+            "auto_increment": False,
+            "constraints": {},
+        }
+    )
+
+    validate_entity_definition(data, source="contact.json")
+
+
+def test_bool_refuse_un_sql_type_reellement_incompatible():
+    """Le contrôle reste utile : une chaîne ne peut pas porter un booléen."""
+    data = valid_entity()
+    data["fields"].append(
+        {
+            "name": "actif",
+            "column": "Actif",
+            "python_type": "bool",
+            "sql_type": "VARCHAR(10)",
             "nullable": False,
             "primary_key": False,
             "auto_increment": False,

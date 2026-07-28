@@ -13,8 +13,13 @@ Le contrôle négatif est aussi important que le positif : une vraie dérive doi
 rester détectée, sans quoi le correctif aurait simplement rendu le diff
 aveugle.
 
-Marqués `db` + `db_pg` / `db_mssql` : sautés sans serveur, requis en CI via
-FORGE_REQUIRE_DB_PG=1 / FORGE_REQUIRE_DB_MSSQL=1.
+MariaDB a rejoint ce test d'or après coup, et y a révélé son propre défaut :
+`BOOLEAN`, écrit par le générateur, est **stocké** `TINYINT(1)`, et les deux
+rendaient des familles différentes. Le backend en était absent parce que son
+serveur n'était pas joignable à la livraison du diff par familles.
+
+Marqués `db`, plus `db_pg` / `db_mssql` pour les deux backends qui ont leur
+propre job de CI : sautés sans serveur, requis via FORGE_REQUIRE_DB*=1.
 """
 from __future__ import annotations
 
@@ -100,6 +105,11 @@ def _fresh_table(database: str) -> Iterator[Any]:
 
 
 @pytest.fixture()
+def mariadb_table(real_db: None) -> Iterator[Any]:
+    yield from _fresh_table("forge_test")
+
+
+@pytest.fixture()
 def pg_table(real_pg_db: None) -> Iterator[Any]:
     yield from _fresh_table("forge_test")
 
@@ -139,6 +149,21 @@ def _assert_derive_detectee(connection: Any) -> None:
         "Golden", TABLE, drifted, [c for c in actual if c.name == "titre"],
     )
     assert report.table_status != "OK", "une vraie dérive de longueur doit rester vue"
+
+
+def test_mariadb_table_fraiche_donne_un_diff_vide(mariadb_table: Any) -> None:
+    """Le backend le plus employé, et le dernier arrivé dans ce test d'or.
+
+    Il en était absent parce que le serveur n'était pas joignable à la
+    livraison du diff par familles. Un défaut y dormait donc :
+    `BOOLEAN`, écrit par le générateur, est stocké `TINYINT(1)` par MariaDB, et
+    les deux rendaient des familles différentes.
+    """
+    _assert_diff_vide(mariadb_table)
+
+
+def test_mariadb_une_vraie_derive_reste_detectee(mariadb_table: Any) -> None:
+    _assert_derive_detectee(mariadb_table)
 
 
 @pytest.mark.db_pg

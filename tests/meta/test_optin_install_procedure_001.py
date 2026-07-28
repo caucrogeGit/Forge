@@ -445,26 +445,20 @@ def test_le_chapitre_d_installation_ne_reprend_pas_la_mise_en_service() -> None:
     assert offenders == [], f"mise en service encore dans le chapitre 2 : {offenders}"
 
 
-def test_le_choix_des_canaux_est_annonce_apres_le_prerequis() -> None:
-    """L'annonce du choix vient après le prérequis, qui vaut pour les deux.
+def test_le_prerequis_precede_les_deux_canaux() -> None:
+    """L'ordre qui compte : activer le venv avant de choisir un canal.
 
-    La phrase ne figurait que dans **une** référence sur 27 : les 26 autres
-    enchaînaient sur le premier canal sans dire qu'il en existait un second.
-    Les canaux sont lettrés A et B, ce qui nomme le choix et permet d'y
-    renvoyer ailleurs sans ambiguïté.
+    Le prérequis vaut pour les deux canaux, il vient donc avant eux. C'est le
+    seul invariant d'ordre à figer ; la façon d'introduire le choix, phrase
+    d'annonce ou titre « Installer le paquet », est un choix de rédaction en
+    cours d'essai sur la référence pilote (mariadb).
     """
     offenders: list[str] = []
     for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
         texte = reference.read_text(encoding="utf-8")
-        nom = reference.parts[-3]
-        if "Deux canaux, au choix." not in texte:
-            offenders.append(f"{nom} : choix non annoncé")
-            continue
-        annonce = texte.index("Deux canaux, au choix.")
         prerequis = texte.index("externally-managed-environment")
         canal_a = texte.index("#### A. Depuis PyPI")
-        if not prerequis < annonce < canal_a:
-            offenders.append(f"{nom} : annonce mal placée")
+        if prerequis > canal_a:
+            offenders.append(f"{reference.parts[-3]} : prérequis après le canal A")
 
     assert offenders == [], offenders
-

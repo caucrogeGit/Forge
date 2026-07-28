@@ -35,6 +35,27 @@
   font-size: 0.8rem;
 }
 
+/* DOCS-INSTALL-CANAL-001, Canaux d'installation (« A. Depuis PyPI »,
+   « B. Depuis Git ») décalés sous la phrase qui les annonce, à la façon d'un
+   arbre. Le décalage porte sur le bloc entier, titre ET contenu, d'où
+   l'enveloppe `<div class="canal">` plutôt qu'une règle sur le seul titre.
+   L'attribut `markdown` est inutile ici : une balise de bloc suivie d'une ligne
+   vide laisse Markdown reprendre son travail.
+
+   Une liste Markdown aurait donné le même décalage sans CSS, mais les titres
+   `####` alimentent le sommaire latéral de la page (et fournissent une ancre
+   par canal) : une liste aurait fait perdre cette navigation. */
+.md-typeset .canal {
+  margin-left: 1.2rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--md-default-fg-color--lightest, rgba(0, 0, 0, 0.12));
+}
+
+/* Le titre du canal ouvre le bloc : pas de marge haute superflue. */
+.md-typeset .canal > h4:first-child {
+  margin-top: 0.4rem;
+}
+
 /* DOCS-INLINE-CODE-001, Mettre en valeur le code en ligne (`...`).
    Cible le code EN LIGNE uniquement (pas les blocs `pre`, dont la coloration
    syntaxique reste intacte). Teinte d'accent + fine bordure pour qu'il ressorte

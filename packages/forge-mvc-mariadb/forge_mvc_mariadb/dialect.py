@@ -55,6 +55,19 @@ class MariaDBDialect:
 
     def sql_families(self, sql_type: str) -> tuple[str, ...]:
         n = sql_type.strip().upper()
+        # `BOOLEAN` est un ALIAS de `TINYINT(1)` : MariaDB accepte le premier et
+        # stocke le second, que l'introspection rapporte. Les deux désignent donc
+        # le même type physique et doivent rendre les mêmes familles, sans quoi
+        # un diff de schéma signale une différence sur chaque colonne booléenne.
+        #
+        # Le test doit précéder celui des entiers, `TINYINT(1)` commençant par
+        # `TINYINT`. Un `TINYINT` sans largeur reste un petit entier.
+        #
+        # Deux familles plutôt qu'une, sur le modèle de `forge-mvc-sqlite` dont
+        # l'`INTEGER` rend déjà `("int", "bool")` : le type est réellement les
+        # deux, et la validation `python_type` accepte l'un comme l'autre.
+        if n in {"BOOL", "BOOLEAN"} or n.startswith("TINYINT(1)"):
+            return ("int", "bool")
         if n == "DATE":
             return ("date",)
         if n in {"DATETIME", "TIMESTAMP"}:
@@ -68,8 +81,6 @@ class MariaDBDialect:
         for prefix in _STRING_PREFIXES:
             if n.startswith(prefix):
                 return ("str",)
-        if n in {"BOOL", "BOOLEAN"}:
-            return ("bool",)
         return ()
 
     def auto_increment_column_ddl(self, column: str, sql_type: str) -> str:

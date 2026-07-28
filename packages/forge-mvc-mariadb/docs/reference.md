@@ -20,8 +20,6 @@ Forge n'impose aucun backend de référence.
     Le pilote `mariadb` est installé avec l'opt-in.
     L'installation pose le paquet ; la **mise en service** fait l'objet du chapitre suivant.
 
-    #### Installer le paquet
-
     !!! warning "Prérequis : activez le venv du projet"
 
         Quelle que soit la source, installez **dans le venv du projet** :
@@ -35,7 +33,9 @@ Forge n'impose aucun backend de référence.
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    Deux canaux, au choix.
+    #### Installer le paquet
+
+    <div class="canal">
 
     #### A. Depuis PyPI (stable)
 
@@ -45,6 +45,10 @@ Forge n'impose aucun backend de référence.
     pip install --pre forge-mvc-mariadb
     ```
 
+    </div>
+
+    <div class="canal">
+
     #### B. Depuis Git (avant-garde)
 
     Les nouveautés pas encore publiées, ou si votre projet a été créé depuis `main`.
@@ -52,10 +56,11 @@ Forge n'impose aucun backend de référence.
     On installe le **cœur d'abord** (depuis git, avec ses dépendances), puis le backend : celui-ci trouve alors le cœur git déjà en place et n'a pas besoin d'une version publiée sur PyPI.
 
     ```bash
-    source .venv/bin/activate
     pip install "git+https://github.com/caucrogeGit/Forge.git@main"
     pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mariadb"
     ```
+
+    </div>
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire, contrairement aux opt-ins de route.
 
@@ -183,7 +188,7 @@ Forge n'impose aucun backend de référence.
 
     Le diagramme de séquence montre le provisioning puis une requête runtime.
 
-    ### 5.1 Diagramme de classe
+    #### Diagramme de classe
 
     Le diagramme de classe montre que le cœur résout un `DatabaseBackend` par entry point, et que `forge-mvc-mariadb` le fournit avec son pool et son dialecte.
 
@@ -232,7 +237,7 @@ Forge n'impose aucun backend de référence.
     - la connexion d'administration (`DB_ADMIN_*`) sert le provisioning et la DDL ;
     - le dialecte traduit types et DDL en SQL MariaDB.
 
-    ### 5.2 Diagramme de séquence
+    #### Diagramme de séquence
 
     Le diagramme de séquence montre le provisioning par `db:init`, puis une requête runtime.
 
