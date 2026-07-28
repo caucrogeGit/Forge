@@ -99,10 +99,13 @@ def test_purge_load_idempotent_multi_table_callable(related_tables, tmp_path: Pa
         "from core.database import db\n"
         "class ReferentielFixture(Fixture):\n"
         "    tables = ('child', 'parent')\n"  # ordre défavorable exprès
-        "    def load(self):\n"
-        "        db.execute(\"INSERT INTO parent (nom) VALUES ('P')\")\n"
-        "        pid = db.fetch_all('SELECT Id FROM parent')[0]['Id']\n"
-        "        db.execute('INSERT INTO child (parent_id) VALUES (?)', (pid,))\n",
+        # FIXTURES-LOAD-SINGLE-TX-001 : le chargement tient dans une
+        # transaction unique et fournit `tx`, comme la purge. Une fixture qui
+        # ne le propage pas écrirait hors de cette transaction.
+        "    def load(self, *, tx=None):\n"
+        "        db.execute(\"INSERT INTO parent (nom) VALUES ('P')\", tx=tx)\n"
+        "        pid = db.fetch_all('SELECT Id FROM parent', tx=tx)[0]['Id']\n"
+        "        db.execute('INSERT INTO child (parent_id) VALUES (?)', (pid,), tx=tx)\n",
         encoding="utf-8",
     )
 

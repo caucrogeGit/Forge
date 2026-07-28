@@ -47,28 +47,52 @@ def real_db():
 
     params = _db_params()
     # ADR-060 : le backend lit la config de connexion runtime dans l'environnement.
-    os.environ["DB_HOST"] = str(params["host"])
-    os.environ["DB_PORT"] = str(params["port"])
-    os.environ["DB_APP_LOGIN"] = str(params["user"])
-    os.environ["DB_APP_PWD"] = str(params["password"])
-    os.environ["DB_NAME"] = str(params["name"])
-    os.environ["DB_POOL_SIZE"] = "2"
+    #
+    # Ces clés doivent être RESTAURÉES en fin de session. `monkeypatch` est à
+    # portée fonction et ne convient pas ici (la fixture est à portée session
+    # pour le pool nommé), d'où la sauvegarde manuelle. Sans elle, `DB_APP_LOGIN`
+    # restait à `root` pour tous les tests suivants du même processus : le
+    # contrôle de sécurité prod y voyait à juste titre l'application tournant
+    # sous le compte d'administration, et échouait. Le défaut ne se voyait ni en
+    # CI, qui sépare les jobs `db` et `not db`, ni en local sans base ; mais
+    # `tools/release-validate.sh` lance la suite ENTIÈRE, donc le garde de
+    # release pouvait échouer pour une raison étrangère à la release.
+    overrides = {
+        "DB_HOST": str(params["host"]),
+        "DB_PORT": str(params["port"]),
+        "DB_APP_LOGIN": str(params["user"]),
+        "DB_APP_PWD": str(params["password"]),
+        "DB_NAME": str(params["name"]),
+        "DB_POOL_SIZE": "2",
+    }
+    previous = {key: os.environ.get(key) for key in overrides}
+    os.environ.update(overrides)
     forge.configure(app_name="forge_test")
+
+    def _restore() -> None:
+        for key, value in previous.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
 
     try:
         probe = connection.get_connection()  # crée le pool nommé une fois
         connection.close_connection(probe)
     except Exception as error:  # noqa: BLE001 — toute erreur de connexion = base indisponible
+        _restore()
         message = f"MariaDB de test injoignable : {error}"
         if _REQUIRE_DB:
             pytest.fail(message + " (FORGE_REQUIRE_DB=1)")
         pytest.skip(message + " (test d'intégration sauté en local)")
 
-    yield
-
-    # ADR-054 : le pool vit dans le backend actif. reset_backend() le ferme
-    # proprement (close()) et force une nouvelle résolution ensuite.
-    reset_backend()
+    try:
+        yield
+    finally:
+        # ADR-054 : le pool vit dans le backend actif. reset_backend() le ferme
+        # proprement (close()) et force une nouvelle résolution ensuite.
+        reset_backend()
+        _restore()
 
 
 @pytest.fixture()

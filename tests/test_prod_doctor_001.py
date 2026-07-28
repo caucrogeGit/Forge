@@ -28,9 +28,22 @@ def _cfg(**overrides) -> SimpleNamespace:
 
 @pytest.fixture(autouse=True)
 def _restrictive_extensions_env(monkeypatch):
-    """Par défaut, UPLOAD_ALLOWED_EXTENSIONS non vide : pas d'avertissement
-    d'extensions. Les tests qui veulent le déclencher vident la variable."""
+    """État de départ explicite : uploads bornés et privilèges DB séparés.
+
+    `UPLOAD_ALLOWED_EXTENSIONS` non vide : pas d'avertissement d'extensions.
+    Les tests qui veulent le déclencher vident la variable.
+
+    Les logins DB sont posés ici parce que, depuis l'ADR-060,
+    `check_prod_security` les lit dans **l'environnement** et non sur l'objet
+    config. Sans ce point de départ, le module dépendait de l'environnement
+    ambiant : la fixture d'intégration MariaDB pose `DB_APP_LOGIN=root` pour
+    toute la session, et ces tests échouaient alors dans une exécution
+    complète, alors même que le code contrôlé était correct. Les tests qui
+    vérifient un défaut de séparation surchargent ces valeurs.
+    """
     monkeypatch.setenv("UPLOAD_ALLOWED_EXTENSIONS", "jpg,png,pdf")
+    monkeypatch.setenv("DB_APP_LOGIN", "forge_app")
+    monkeypatch.setenv("DB_ADMIN_LOGIN", "forge_admin")
 
 
 class TestProdSecurity:
