@@ -68,6 +68,12 @@
   Le chargement suit désormais le modèle de la purge (F52-bis) : une transaction, une connexion, `tx` propagé jusqu'aux fixtures Python.
   **Rupture d'API dans `forge-mvc-fixtures`** : `Fixture.load()` prend `tx`, comme `purge()` depuis F52-bis. L'asymétrie était l'anomalie. Écrivez `def load(self, *, tx=None)` et propagez `tx` à vos `db.execute`. Une fixture qui ne l'accepte pas est **refusée avec un message qui indique la correction**, plutôt que d'être appelée sans `tx` : un repli silencieux sortirait ses écritures de la transaction sans le dire.
 
+- **Injection SQL par antislash dans les littéraux MariaDB (`MARIADB-LITERAL-BACKSLASH-001`).**
+  MariaDB est le **seul** des quatre backends où l'antislash échappe dans un littéral : `NO_BACKSLASH_ESCAPES` y est désactivé par défaut. Le rendu ne doublait que l'apostrophe, ce que prescrit la norme SQL et qui suffit à PostgreSQL, SQLite et SQL Server.
+  Deux trous, mesurés sur serveur réel. Une valeur terminée par un antislash échappait le guillemet fermant et cassait l'instruction. Et `a\' OR 1=1 -- ` refermait la chaîne : **la suite devenait exécutable**, le serveur évaluait la condition et rendait `1`.
+  **Surface** : le SQL écrit dans des **artefacts** (ADR-075), fixtures générées et valeurs par défaut de DDL, à partir de données contenant un antislash. Le chemin de requête ordinaire n'est pas concerné, il passe par des paramètres liés.
+  Le correctif vit dans le dialecte MariaDB, non dans le cœur, qui implémente correctement la norme pour les trois autres backends. Vérifié sur les trois serveurs : eux rendaient la charge intacte.
+
 - **Une file d'attente devant le pool de connexions MariaDB (`MARIADB-POOL-QUEUE-001`).**
   Le pilote MariaDB n'offre **aucune** file : son `get_connection()` lève dès que toutes les connexions sont prises. Mesuré avec le pool par défaut de cinq et une lecture indexée de 0,26 ms, **145 requêtes sur 200 arrivées au même instant échouaient**, alors qu'attendre une fraction de milliseconde suffisait.
   Ce n'était pas un problème de capacité : cinq connexions servent près de 19 000 requêtes par seconde. C'était l'absence de file.

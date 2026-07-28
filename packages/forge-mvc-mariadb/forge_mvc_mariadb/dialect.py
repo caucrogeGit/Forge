@@ -9,7 +9,7 @@ ne rien changer au SQL généré tant que le backend est MariaDB.
 """
 from typing import Any
 
-from core.database.literals import escape_string, render_literal_value
+from core.database.literals import render_literal_value
 
 # Types Forge « simples » → type de colonne MariaDB.
 # boolean → BOOLEAN (et non TINYINT(1)) : voir la note du normaliseur.
@@ -31,6 +31,32 @@ _SIMPLE_TYPES: dict[str, str] = {
 _INTEGER_PREFIXES = ("INT", "BIGINT", "SMALLINT", "TINYINT", "MEDIUMINT")
 _FLOAT_PREFIXES = ("FLOAT", "DOUBLE", "REAL", "DECIMAL", "NUMERIC")
 _STRING_PREFIXES = ("CHAR", "VARCHAR", "TEXT", "TINYTEXT", "MEDIUMTEXT", "LONGTEXT")
+
+
+def _escape_mariadb_string(value: str, *, national: bool = False) -> str:
+    """Littéral de chaîne MariaDB : antislash **et** apostrophe échappés.
+
+    MariaDB est le seul des quatre backends où l'antislash est un caractère
+    d'échappement dans les littéraux, `NO_BACKSLASH_ESCAPES` étant désactivé par
+    défaut. Doubler la seule apostrophe, ce que fait la norme SQL et donc
+    `core.database.literals.escape_string`, y laisse deux trous mesurés :
+
+    - une valeur terminée par un antislash échappe le guillemet fermant et
+      laisse la chaîne ouverte, ce qui casse l'instruction ;
+    - une valeur comme ``a\\' OR 1=1 -- `` referme la chaîne et **exécute** la
+      suite. Vérifié sur serveur : la requête rendait 1.
+
+    PostgreSQL (`standard_conforming_strings` à `on`), SQLite et SQL Server
+    traitent l'antislash comme un caractère ordinaire ; eux gardent
+    `escape_string`. Le correctif appartient donc au dialecte MariaDB, pas au
+    cœur, qui implémente correctement la norme.
+
+    L'antislash est traité **avant** l'apostrophe : l'ordre inverse
+    échapperait les antislashes que l'on vient d'introduire.
+    """
+    protege = value.replace("\\", "\\\\").replace("'", "''")
+    prefix = "N" if national else ""
+    return f"{prefix}'{protege}'"
 
 
 class MariaDBDialect:
@@ -129,9 +155,9 @@ class MariaDBDialect:
             value,
             bool_true="1",
             bool_false="0",
-            render_string=escape_string,
-            render_date=lambda d: escape_string(d.isoformat()),
-            render_datetime=lambda dt: escape_string(dt.strftime("%Y-%m-%d %H:%M:%S")),
+            render_string=_escape_mariadb_string,
+            render_date=lambda d: _escape_mariadb_string(d.isoformat()),
+            render_datetime=lambda dt: _escape_mariadb_string(dt.strftime("%Y-%m-%d %H:%M:%S")),
         )
 
     def add_columns_sql(self, table: str, columns: "list[tuple[str, str]]") -> str:

@@ -117,6 +117,14 @@ pip-audit -r requirements.txt
 pip-audit -r requirements-dev.txt
 ```
 
+### Corrigées
+
+- **Injection SQL par antislash dans les littéraux MariaDB** (`MARIADB-LITERAL-BACKSLASH-001`, corrigé le 2026-07-28).
+  MariaDB est le seul des quatre backends où l'antislash échappe dans un littéral (`NO_BACKSLASH_ESCAPES` désactivé par défaut).
+  Le rendu de littéral ne doublait que l'apostrophe, ce que prescrit la norme SQL : une valeur comme `a\' OR 1=1 -- ` refermait la chaîne et la suite devenait exécutable, ce qu'un test sur serveur réel a confirmé.
+  **Surface** : le SQL écrit dans des artefacts (ADR-075), c'est-à-dire les fixtures générées et les valeurs par défaut de DDL, à partir de données contenant un antislash. Le chemin de requête ordinaire n'était pas concerné, il passe par des paramètres liés.
+  PostgreSQL, SQLite et SQL Server n'étaient pas exposés, vérifié sur serveurs réels.
+
 ### Vulnérabilités connues suivies
 
 - **`PYSEC-2026-217` — `mariadb` 1.1.14 (runtime).** L'avis concerne le connecteur
