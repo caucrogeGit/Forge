@@ -120,15 +120,33 @@ def test_la_procedure_dit_que_la_migration_appliquee_ne_se_supprime_pas() -> Non
 
 # ── Chaque référence renvoie à la procédure, sans la redire ─────────────────
 
+#: `forge-mvc-testing` est une infrastructure de développement (ADR-041) : elle
+#: s'installe dans `requirements-dev.txt` et n'a rien à mettre en service.
+SANS_MISE_EN_SERVICE = {"forge-mvc-testing"}
+
+
+def _toutes_references() -> "list[tuple[str, Path]]":
+    """Les 27 paquets, backends BDD compris, et non les seuls opt-ins catalogués."""
+    return [
+        (ref.parts[-3], ref)
+        for ref in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md"))
+        if ref.parts[-3] not in SANS_MISE_EN_SERVICE
+    ]
+
+
 def test_chaque_reference_a_son_chapitre_de_mise_en_service() -> None:
     """Installer et mettre en service sont deux gestes distincts, donc deux chapitres.
 
     Le chapitre « 2. Installation » répond à « comment obtenir le paquet ».
     Il ne répond pas à « qu'est-ce qu'il me reste à faire pour que ça marche »,
     question dont l'utilisateur devait reconstituer seul la réponse.
+
+    Les backends de base de données sont concernés au même titre : leur
+    séquence propre (`db:config`, accès, `db:init`, `doctor`) **est** une mise
+    en service, et elle était noyée dans le chapitre d'installation.
     """
     offenders = [
-        name for name, ref in _references()
+        name for name, ref in _toutes_references()
         if '??? note "3. Mise en service"' not in ref.read_text(encoding="utf-8")
     ]
 
@@ -146,12 +164,38 @@ def test_chaque_reference_a_son_chapitre_de_mise_en_service() -> None:
     "#### 5. Le prouver",
 ])
 def test_le_chapitre_de_mise_en_service_couvre_les_cinq_points(titre: str) -> None:
+    """Vaut pour les opt-ins catalogués.
+
+    Un backend a sa propre séquence (`db:config`, accès, `db:init`, `doctor`) :
+    seul l'épinglage lui est commun, le reste n'a pas d'équivalent.
+    """
     offenders = [
         name for name, ref in _references()
         if titre not in ref.read_text(encoding="utf-8")
     ]
 
     assert offenders == [], f"point « {titre} » absent de : {offenders}"
+
+
+def test_tout_chapitre_de_mise_en_service_commence_par_l_epinglage() -> None:
+    """Le seul point commun aux opt-ins et aux backends."""
+    offenders = [
+        name for name, ref in _toutes_references()
+        if "#### 1. L'épingler" not in ref.read_text(encoding="utf-8")
+    ]
+
+    assert offenders == [], offenders
+
+
+def test_l_epinglage_n_est_pas_documente_en_double() -> None:
+    """Il appartient à la mise en service, pas à l'installation (principe 11)."""
+    offenders: list[str] = []
+    for name, ref in _toutes_references():
+        texte = ref.read_text(encoding="utf-8")
+        if texte.count(f"{name}==<version de forge-mvc>") > 1:
+            offenders.append(name)
+
+    assert offenders == [], f"épinglage documenté deux fois : {offenders}"
 
 
 def test_la_numerotation_des_chapitres_reste_continue() -> None:

@@ -49,17 +49,40 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
+    ### Désinstallation
 
-    **Épinglez-le dans `requirements.txt`**, à la même version ou au même commit que `forge-mvc` :
+    Retirez d'abord la configuration des fichiers d'environnement, puis le paquet :
+
+    ```bash
+    forge db:config --remove
+    pip uninstall forge-mvc-mssql
+    ```
+
+    `db:config --remove` retire les clés `DB_*` posées par `db:config` des trois fichiers d'environnement (les valeurs renseignées sont perdues ; ADR-064).
+    Un backend n'a pas de commande `disable` : découvert par entry point (ADR-054), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
+    Si besoin, supprimez aussi la base et le compte créés par `db:init`.
+
+??? note "3. Mise en service"
+
+    Installer le paquet ne suffit pas à le rendre opérationnel.
+    Voici les gestes propres à `forge-mvc-mssql`, dans l'ordre.
+
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
+    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points),
+    adaptée à un backend : il n'y a pas d'inscription au registre, le cœur le découvre par
+    son entry point.
+
+    #### 1. L'épingler
 
     ```text
     forge-mvc-mssql==<version de forge-mvc>
     ```
 
-    Sans cette ligne, le pilote n'existe que sur votre machine.
-    Un collègue, un serveur ou une intégration continue qui installe depuis `requirements.txt`
-    démarre sans backend, et l'application ne peut atteindre aucune base.
-    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
+    Sans cette ligne, le pilote n'existe que sur votre machine, et l'application démarre
+    sans backend chez un collègue, sur un serveur ou en intégration continue.
+
+    #### 2. Configurer, provisionner et vérifier
 
     `forge db:config` amorce les variables du backend dans `env/example`, `env/dev` et `env/prod` (write-if-missing, sans secret ; ADR-064) :
 
@@ -92,20 +115,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
     La progression guidée, pas à pas : [Installation de forge-mvc-mssql](welcome/debutant/mssql-welcome.md).
 
-    ### Désinstallation
-
-    Retirez d'abord la configuration des fichiers d'environnement, puis le paquet :
-
-    ```bash
-    forge db:config --remove
-    pip uninstall forge-mvc-mssql
-    ```
-
-    `db:config --remove` retire les clés `DB_*` posées par `db:config` des trois fichiers d'environnement (les valeurs renseignées sont perdues ; ADR-064).
-    Un backend n'a pas de commande `disable` : découvert par entry point (ADR-054), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
-    Si besoin, supprimez aussi la base et le compte créés par `db:init`.
-
-??? note "3. Commandes"
+??? note "4. Commandes"
 
     Ce backend n'ajoute aucune commande : il est découvert par l'entry point `forge_mvc.db_backend` et fournit, au runtime, un dialecte SQL et un adaptateur de connexion.
     Les commandes de base de données que vous utilisez avec lui sont fournies par le moteur d'entités (`forge-mvc-entities`) :
@@ -118,7 +128,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | `migration:make` | Génère une migration depuis l'écart de schéma. | `forge migration:make` |
     | `migration:apply` | Applique les migrations en attente. | `forge migration:apply` |
 
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -137,7 +147,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | Décision d'architecture | ADR-054 |
     | Installation | `pip install --pre forge-mvc-mssql` |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires du backend.
 
@@ -214,7 +224,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     - `lastrowid` est obtenu via `SELECT SCOPE_IDENTITY()` ;
     - un pilote ODBC doit être installé sur la machine.
 
-??? note "6. Ce que fournit le backend"
+??? note "7. Ce que fournit le backend"
 
     | Élément | Rôle |
     |---|---|
@@ -223,7 +233,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | `MSSQLDialect` | `BIGINT IDENTITY(1,1)`, crochets, `CREATE INDEX` gardés, `INFORMATION_SCHEMA` |
     | Entry point | `forge_mvc.db_backend = mssql` |
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -234,7 +244,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | Appliquer le schéma | `forge db:apply` |
     | Faire évoluer le schéma | `forge migration:*` |
 
-??? note "8. Exemple d'utilisation"
+??? note "9. Exemple d'utilisation"
 
     ```bash
     # 1. Installer le backend + pilote ODBC, configurer env/dev
@@ -255,7 +265,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         - `db:apply` / `migration:*` suivent le flux du cœur ;
         - `?` est natif (pyodbc), pas de traduction.
 
-??? note "9. Statut, ODBC et dialecte"
+??? note "10. Statut, ODBC et dialecte"
 
     Le backend est au **niveau plein** (ADR-084, révision du 2026-07-19).
 
