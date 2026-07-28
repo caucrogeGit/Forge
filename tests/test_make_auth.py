@@ -12,6 +12,7 @@ from pathlib import Path
 from cli.security import make_auth as ma
 from cli.security.make_auth import (
     AUTH_CONTROLLER,
+    AUTH_USER_MODEL,
     AUTH_NAV_ANCHOR,
     AUTH_NAV_BLOCK,
     AUTH_ROUTES_FILE,
@@ -46,7 +47,9 @@ def test_controleur_cable_sur_le_backend_auth():
     assert "login_user(request, user)" in AUTH_CONTROLLER
     assert "regenerate_session(session_id)" in AUTH_CONTROLLER
     assert "logout_user(request)" in AUTH_CONTROLLER
-    assert "FROM users WHERE email = ?" in AUTH_CONTROLLER
+    # MAKE-AUTH-MODEL-LAYER-001 : le SQL a quitté le contrôleur pour le modèle.
+    assert "FROM users WHERE email = ?" not in AUTH_CONTROLLER
+    assert "from mvc.models.user_model import load_user_by_email" in AUTH_CONTROLLER
     assert 'BaseController.redirect("/login")' in AUTH_CONTROLLER
 
 
@@ -163,3 +166,34 @@ def test_render_injecte_is_authenticated():
     src = Path("core/mvc/controller/base_controller.py").read_text(encoding="utf-8")
     assert '"is_authenticated"' in src
     assert "is_authenticated(request)" in src
+
+
+def test_le_loader_sql_vit_dans_le_modele(tmp_path: Path):
+    """MAKE-AUTH-MODEL-LAYER-001 : le contrôleur appelle, le modèle interroge.
+
+    Le scaffold d'authentification portait sa requête SQL dans le contrôleur,
+    en contradiction avec la séparation que `make:crud` produit et que la
+    documentation Forge enseigne. Un générateur ne peut pas enseigner une
+    doctrine qu'il enfreint lui-même.
+    """
+    assert "FROM users WHERE email = ?" in AUTH_USER_MODEL
+    assert "def load_user_by_email" in AUTH_USER_MODEL
+    assert "from core.database.db import fetch_one" in AUTH_USER_MODEL
+
+    result = make_auth(root=tmp_path)
+    modele = tmp_path / "mvc" / "models" / "user_model.py"
+    assert modele.as_posix() in result.created
+    ast.parse(modele.read_text(encoding="utf-8"))
+
+
+def test_aucun_sql_dans_le_controleur_genere(tmp_path: Path):
+    """Garde-fou de cause : le contrôleur n'accède plus à la base."""
+    make_auth(root=tmp_path)
+    controleur = (tmp_path / "mvc" / "controllers" / "auth_controller.py").read_text(
+        encoding="utf-8"
+    )
+
+    for interdit in ("SELECT", "fetch_one", "core.database"):
+        assert interdit not in controleur, (
+            f"le contrôleur d'authentification généré contient encore « {interdit} »"
+        )

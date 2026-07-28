@@ -39,21 +39,13 @@ logout. Le loader charge un utilisateur par email pour `authenticate_user` (cœu
 """
 from core.auth.rate_limit import is_login_rate_limited, record_login_attempt
 from core.auth.session import authenticate_user, login_user, logout_user
-from core.database.db import fetch_one
 from core.http.request import Request
 from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 from core.security.cookies import clear_session_cookie, set_session_cookie
 from core.security.session import get_session, get_session_id, regenerate_session
 from core.sessions.manager import get_session_store
-
-
-def load_user_by_email(email: str):
-    """Charge un utilisateur du socle `users` par email (loader d'authenticate_user)."""
-    return fetch_one(
-        "SELECT id, email, password_hash, is_active FROM users WHERE email = ?",
-        (email,),
-    )
+from mvc.models.user_model import load_user_by_email
 
 
 class AuthController(BaseController):
@@ -114,6 +106,35 @@ class AuthController(BaseController):
         response = BaseController.redirect("/login")
         clear_session_cookie(response)
         return response
+'''
+
+
+AUTH_USER_MODEL = '''\
+"""Modèle du socle `users` (généré par forge make:auth).
+
+Le SQL de l'application vit dans les modèles, jamais dans les contrôleurs : le
+contrôleur reçoit la requête, appelle le modèle et rend une réponse. C'est la
+même séparation que celle produite par `forge make:crud`.
+
+Le SQL reste **visible et paramétré** (charte, principe 5) : aucune couche
+d'abstraction ne le masque, et les valeurs passent par des paramètres liés.
+"""
+from typing import Any
+
+from core.database.db import fetch_one
+
+
+def load_user_by_email(email: str) -> dict[str, Any] | None:
+    """Charge un utilisateur du socle `users` par email.
+
+    C'est le loader attendu par `authenticate_user` du cœur. Il rend la ligne
+    complète nécessaire à la vérification du mot de passe et au contrôle
+    d'activation, ou `None` si aucun compte ne porte cet email.
+    """
+    return fetch_one(
+        "SELECT id, email, password_hash, is_active FROM users WHERE email = ?",
+        (email,),
+    )
 '''
 
 
@@ -257,6 +278,9 @@ def make_auth(root: Path | None = None, views_namespace: str = "") -> MakeAuthRe
     # view_dir est figé dans le chemin écrit ET dans les render(...) du contrôleur.
     view_dir = entity_view_dir("auth", views_namespace)
     controller = AUTH_CONTROLLER.replace('"auth/login.html"', f'"{view_dir}/login.html"')
+    # Le loader SQL vit dans un modèle, pas dans le contrôleur : même séparation
+    # que `make:crud` (ticket MAKE-AUTH-MODEL-LAYER-001).
+    _write_if_new(base / "mvc" / "models" / "user_model.py", AUTH_USER_MODEL, result)
     _write_if_new(base / "mvc" / "controllers" / "auth_controller.py", controller, result)
     _write_if_new(base / "mvc" / "views" / view_dir / "login.html", AUTH_LOGIN_VIEW, result)
     # ADR-068 : les routes du contrôleur auth vivent dans leur propre fichier ;

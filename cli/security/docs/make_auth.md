@@ -17,6 +17,7 @@ Il se place après `auth:init` : `auth:init` crée les comptes et le SQL, `make:
 
 Écriture en mode write-if-new (aucun fichier existant n'est écrasé) :
 
+- `mvc/models/user_model.py` : `load_user_by_email`, le loader SQL du socle `users` ;
 - `mvc/controllers/auth_controller.py` : `login_form` (GET), `login` (POST), `logout` (POST) ;
 - `mvc/views/app/auth/login.html` : le formulaire de connexion (sous le namespace `APP_VIEWS_NAMESPACE`, `app` par défaut ; ADR-073) ;
 - `mvc/routes/auth_routes.py` : les routes du contrôleur.
@@ -32,6 +33,10 @@ Le bloc affiche « Connexion » (lien vers `/login`) pour un visiteur, ou « Dé
 Le contrôleur s'appuie sur le socle standard `users` (produit par `forge auth:init`) :
 
 - `login` : `authenticate_user(email, password, load_user_by_email)` du cœur, puis `login_user`, puis régénération de session anti-fixation (`regenerate_session`) et réémission du cookie ;
+
+Le loader `load_user_by_email` est **importé depuis `mvc/models/user_model.py`** : le SQL vit dans le modèle, jamais dans le contrôleur.
+C'est la séparation que produit déjà `make:crud`, et celle que la documentation Forge enseigne ; un générateur ne peut pas prescrire une doctrine qu'il enfreint lui-même.
+Le SQL y reste **visible et paramétré** (principe 5) : aucune couche ne le masque.
 - `logout` : `logout_user`, suppression du cookie, redirection vers `/login`.
 
 ## 4. Prérequis
