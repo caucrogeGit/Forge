@@ -13,4 +13,5 @@ nav:
       - Le nonce CSP (csp.py): csp.md
       - Les en-têtes de sécurité (headers.py): headers.md
       - Auth d'API par jeton (api_auth.py): api_auth.md
+      - Export CSV sans injection (csv_export.py): csv-export.md
       - Hachage legacy (hashing.py): hashing.md

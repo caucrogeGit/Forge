@@ -68,7 +68,10 @@ class _ControllerContext:
 
 
 def _render_export_csv(ctx: _ControllerContext) -> list[str]:
-    plural, entity = ctx.plural, ctx.entity
+    # `entity` n'est plus nécessaire ici : l'échappement CSV ne passe plus par
+    # une méthode de la classe générée mais par `core.security.csv_export`
+    # (ticket CRUD-CSV-ESCAPE-CORE-001).
+    plural = ctx.plural
     allowed_sort_keys_repr = ctx.allowed_sort_keys_repr
     filter_flds = ctx.filter_flds
     relation_filter_names = ctx.relation_filter_names
@@ -124,7 +127,7 @@ def _render_export_csv(ctx: _ControllerContext) -> list[str]:
         "        writer = csv.writer(output, quoting=csv.QUOTE_ALL)",
         "        writer.writerow([header for header, _ in _CSV_COLS])",
         "        for row in rows:",
-        f'            writer.writerow([{entity}Controller._csv_escape(str(row.get(key) or "")) for _, key in _CSV_COLS])',
+        '            writer.writerow([escape_csv_field(str(row.get(key) or "")) for _, key in _CSV_COLS])',
         '        content = output.getvalue().encode("utf-8")',
         "        return Response(",
         "            200,",
@@ -229,15 +232,20 @@ def _render_bulk_delete_confirm(ctx: _ControllerContext) -> list[str]:
 
 
 def _render_csv_escape(_ctx: _ControllerContext) -> list[str]:
-    csv_escape_lines: list[str] = [
-        "",
-        "    @staticmethod",
-        "    def _csv_escape(value: str) -> str:",
-        '        if value and value[0] in ("=", "+", "-", "@"):',
-        '            return "\'" + value',
-        "        return value",
-    ]
-    return csv_escape_lines
+    """Plus rien à rendre : la neutralisation vient du cœur.
+
+    Le contrôleur généré portait sa propre copie de la règle anti-injection de
+    formule CSV. Recopiée dans chaque contrôleur, elle devenait incorrigible :
+    Forge ne réécrit jamais le code utilisateur (principe 9), donc une règle
+    incomplète le restait dans tous les fichiers déjà générés. Elle vit
+    désormais dans `core.security.csv_export.escape_csv_field`, que le
+    contrôleur **appelle**.
+
+    La fonction est conservée, vide, pour garder la trace de ce choix à
+    l'endroit où la duplication se produisait (ticket
+    `CRUD-CSV-ESCAPE-CORE-001`).
+    """
+    return []
 
 
 def _duplicate_error_line(ctx: _ControllerContext, indent: str) -> str:
@@ -796,6 +804,7 @@ def _render_preamble(
     lines: list[str] = [
         "import csv",
         "import io",
+        "from core.security.csv_export import escape_csv_field",
         "from core.http.request import Request",
         "from core.http.response import Response",
     ]

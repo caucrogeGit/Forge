@@ -249,38 +249,26 @@ class TestCSVCols:
 # ---------------------------------------------------------------------------
 
 class TestCSVEscape:
-    def test_csv_escape_presente(self):
-        assert "_csv_escape" in _ctrl()
+    """CRUD-CSV-ESCAPE-CORE-001 : la règle vient du cœur, plus d'une copie.
 
-    def test_csv_escape_prefixe_egal(self):
-        c = _ctrl()
-        idx = c.find("def _csv_escape")
-        bloc = c[idx: idx + 300]
-        assert '"="' in bloc or "'='" in bloc
+    Le contrôleur généré portait sa propre `_csv_escape`. Recopiée dans chaque
+    contrôleur, elle devenait incorrigible : Forge ne réécrit jamais le code
+    utilisateur. Elle vit désormais dans `core.security.csv_export`, que le
+    contrôleur importe et appelle. Le détail de la règle est vérifié dans
+    `tests/test_csv_escape_core_001.py`, à sa nouvelle adresse.
+    """
 
-    def test_csv_escape_prefixe_plus(self):
-        c = _ctrl()
-        idx = c.find("def _csv_escape")
-        bloc = c[idx: idx + 300]
-        assert '"+"' in bloc or "'+'" in bloc
+    def test_la_regle_n_est_plus_recopiee(self):
+        assert "_csv_escape" not in _ctrl()
 
-    def test_csv_escape_prefixe_moins(self):
-        c = _ctrl()
-        idx = c.find("def _csv_escape")
-        bloc = c[idx: idx + 300]
-        assert '"-"' in bloc or "'-'" in bloc
+    def test_le_controleur_importe_la_primitive_du_coeur(self):
+        assert "from core.security.csv_export import escape_csv_field" in _ctrl()
 
-    def test_csv_escape_prefixe_arobase(self):
-        c = _ctrl()
-        idx = c.find("def _csv_escape")
-        bloc = c[idx: idx + 300]
-        assert '"@"' in bloc or "'@'" in bloc
+    def test_la_primitive_neutralise_les_declencheurs_de_formule(self):
+        from core.security.csv_export import escape_csv_field
 
-    def test_csv_escape_ajoute_apostrophe(self):
-        c = _ctrl()
-        idx = c.find("def _csv_escape")
-        bloc = c[idx: idx + 300]
-        assert "\"'\"" in bloc or "\"'\" +" in bloc
+        for trigger in ("=", "+", "-", "@"):
+            assert escape_csv_field(f"{trigger}1+1") == f"'{trigger}1+1"
 
 
 # ---------------------------------------------------------------------------
@@ -353,7 +341,7 @@ class TestExportCsvMethode:
         c = _ctrl()
         idx = c.find("def export_csv")
         bloc = c[idx: idx + 1200]
-        assert "_csv_escape" in bloc
+        assert "escape_csv_field(" in bloc
 
     def test_export_csv_utilise_csv_cols(self):
         c = _ctrl()
