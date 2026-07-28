@@ -18,6 +18,19 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
 
     Infrastructure de test réservée au développement (ADR-041), listée dans `requirements-dev.txt` :
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -35,12 +48,6 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-testing"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
-
 
     Le plugin pytest et `FakeRequest` sont disponibles dès l'installation.
     Ce n'est pas un opt-in applicatif : il n'y a pas d'`opt-in:enable`.
@@ -110,6 +117,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
 
         FakeRequest ..> Request : imite (duck typing)
         plugin --> FakeRequest : fournit via fake_request
+
     ```
 
     À retenir :
@@ -138,6 +146,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
             Ctrl-->>Test: Response
             Test->>Test: assertions
         end
+
     ```
 
     À retenir :
@@ -187,6 +196,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
         req = FakeRequest("POST", "/article/create", body={"title": "Bonjour"})
         response = create(req)
         assert response.status == 200
+
     ```
 
     ### 8.2 Via la fixture
@@ -195,6 +205,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     def test_avec_fixture(fake_request):
         req = fake_request("GET", "/article?id=7")
         ...
+
     ```
 
     Les nettoyages entre tests sont automatiques (fixtures autouse du plugin).

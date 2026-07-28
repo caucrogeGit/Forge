@@ -34,6 +34,19 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -51,11 +64,6 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mfa"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -232,6 +240,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         enrolment --> secret_crypto : chiffre le secret
         challenge --> AuthMfaFactor : vérifie
         recovery --> AuthMfaFactor : alternative TOTP
+
     ```
 
     À retenir :
@@ -264,6 +273,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         else MFA inactif
             Login->>Session: ouvre la session directement
         end
+
     ```
 
     À retenir :
@@ -329,20 +339,24 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     ```python
     from forge_mvc_mfa import (
         is_mfa_enabled, start_mfa_challenge, verify_mfa_challenge,
+
     )
 
     # Après vérification du mot de passe :
     if is_mfa_enabled(user):
         start_mfa_challenge(request, user_id=user["id"])
         return redirect("/login/mfa")     # demander le code TOTP
+
     else:
         open_session(request, user)       # pas de MFA : session directe
 
     # Sur la page de saisie du code :
     if verify_mfa_challenge(request, code=request.form("code")):
         open_session(request, user)
+
     else:
         return Response.text("Code invalide", status=401)
+
     ```
 
     !!! tip "Aide-mémoire"

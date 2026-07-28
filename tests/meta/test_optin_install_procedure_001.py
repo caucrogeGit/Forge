@@ -346,3 +346,43 @@ def test_les_chapitres_ne_sont_jamais_deplies_par_defaut() -> None:
                 offenders.append(f"{ref.parts[-3]}:{number}")
 
     assert offenders == [], f"chapitres dépliés par défaut : {offenders}"
+
+
+# ── Le prérequis de venv vaut pour les deux canaux d'installation ───────────
+
+def test_le_prerequis_de_venv_est_hors_des_onglets() -> None:
+    """PEP 668 ne dépend pas du canal, mais de l'endroit où `pip` s'exécute.
+
+    L'avertissement vivait dans le seul onglet « Depuis Git », alors que la
+    commande de l'onglet PyPI heurte le même verrou. Or PyPI est le premier
+    onglet, donc celui affiché par défaut : l'avertissement était caché à la
+    majorité des lecteurs.
+
+    Il est désormais **avant** les onglets, et formulé en prérequis plutôt
+    qu'en dépannage : mieux vaut éviter l'erreur que la réparer, la plupart de
+    ceux qui échouent cherchant la réponse ailleurs que dans la page.
+    """
+    offenders: list[str] = []
+    for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        texte = reference.read_text(encoding="utf-8")
+        if "externally-managed-environment" not in texte:
+            offenders.append(f"{reference.parts[-3]} : avertissement absent")
+            continue
+
+        position_avertissement = texte.index("externally-managed-environment")
+        premier_onglet = texte.find('=== "Depuis PyPI')
+        if premier_onglet == -1 or position_avertissement > premier_onglet:
+            offenders.append(f"{reference.parts[-3]} : enfermé dans un onglet")
+
+    assert offenders == [], offenders
+
+
+def test_le_prerequis_donne_la_commande_d_activation() -> None:
+    """Un avertissement sans le geste qui l'évite ne sert à rien."""
+    offenders = [
+        ref.parts[-3] for ref in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md"))
+        if "source .venv/bin/activate" not in ref.read_text(encoding="utf-8")
+    ]
+
+    assert offenders == [], offenders
+

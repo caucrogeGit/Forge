@@ -16,6 +16,19 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -33,11 +46,6 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-admin"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -184,6 +192,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
         http --> AdminRegistry : lit
         http --> AdminController : branche
         AdminController --> AdminResource : pilote les écrans
+
     ```
 
     À retenir :
@@ -211,6 +220,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
         Ctrl->>Reg: get(slug) -> AdminResource
         Ctrl->>DB: lit les lignes (list_fields, pagination)
         Ctrl-->>Admin: liste rendue (template embarqué)
+
     ```
 
     À retenir :
@@ -258,11 +268,13 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
         list_fields=("title", "status"),
         form_fields=("title", "body", "status"),
         table="article",
+
     ))
 
 
     def register(router) -> None:
         register_admin_routes(router, permission="admin.access")
+
     ```
 
     `forge opt-in:enable admin --apply` crée la couche ; le branchement reste explicite.

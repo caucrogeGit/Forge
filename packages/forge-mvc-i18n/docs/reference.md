@@ -16,6 +16,19 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -33,11 +46,6 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-i18n"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -184,6 +192,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
         translator --> catalogues : charge (avec cache)
         JinjaRenderer --> translator : expose trans()
         translator ..> I18nError : peut lever
+
     ```
 
     À retenir :
@@ -214,6 +223,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
             Cat-->>Trans: traduction (ou la clé elle-même)
         end
         Trans-->>App: chaîne traduite
+
     ```
 
     À retenir :

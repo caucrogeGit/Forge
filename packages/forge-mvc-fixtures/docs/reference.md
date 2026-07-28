@@ -24,6 +24,19 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -41,11 +54,6 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-fixtures"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -183,6 +191,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
 
         VilleFactory --|> Factory : sous-classe (mvc/fixtures/factories/)
         Factory ..> FactoryError : lève si mal définie
+
     ```
 
     À retenir :
@@ -210,6 +219,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
         Gen-->>Dev: affiche + écrit mvc/fixtures/ville.sql
         Dev->>Load: forge fixtures:load --run
         Load->>Base: exécute les INSERT
+
     ```
 
     À retenir :
@@ -263,6 +273,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
                     "Prefecture": i == 0,       # condition
                 })
             return villes
+
     ```
 
     Les clés du dict sont les **colonnes réelles** de la table, pas les noms de champs du contrat : `Nom`, `CodePostal` (PascalCase), une clé étrangère gardant son nom snake (`user_id`).
@@ -302,6 +313,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
             "Nom": self.faker.last_name(),
             "UserId": self.reference("users", "Email", "prof.durand@ecole.fr"),
         } for _ in range(count)]
+
     ```
 
     `fixtures:generate` rend `self.reference(...)` en **sous-requête SQL**, résolue à la charge contre les vrais `Id` :
@@ -347,6 +359,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
 
         def load(self, *, tx=None) -> None:
             import_referentiel("data/referentiel.json")   # écrit via core.database.db
+
     ```
 
     - `load(self, *, tx=None)` écrit en base **comme le reste du projet** (`from core.database import db`, ou une fonction applicative qui le fait) : le SQL reste paramétré et visible dans le code appelé (principe 7).

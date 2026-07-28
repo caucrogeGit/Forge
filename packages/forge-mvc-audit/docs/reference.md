@@ -16,6 +16,19 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -33,11 +46,6 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-audit"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -210,6 +218,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
         DBExecutor --> audit_log : lit / écrit
         audit --> AuditEntry : renvoie 0..*
         audit ..> AuditError : peut lever
+
     ```
 
     À retenir :
@@ -239,6 +248,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
         Audit->>DB: fetch_all(SELECT filtré, params)
         DB-->>Audit: lignes
         Audit-->>App: list[AuditEntry] (plus récentes d'abord)
+
     ```
 
     À retenir :
@@ -288,6 +298,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
         target_type="note",
         target_id=42,
         details="note passée de 12 à 14",
+
     )
     ```
 
@@ -301,6 +312,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
 
     for entry in sur_les_notes:
         print(entry.created_at, entry.actor, entry.details)
+
     ```
 
     `get_audit_log` renvoie des `AuditEntry`, les plus récents d'abord.

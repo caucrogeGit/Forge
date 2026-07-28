@@ -16,6 +16,19 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -33,11 +46,6 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-video"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -217,6 +225,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
         pipeline --> files : stocke
         http --> files : sert (HTTP Range)
         pipeline --> config : lit FORGE_VIDEO_*
+
     ```
 
     À retenir :
@@ -246,6 +255,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
         Proc-->>Op: vidéo "ready"
         Navigateur->>Routes: GET la vidéo (avec Range)
         Routes-->>Navigateur: flux MP4 (206 Partial Content)
+
     ```
 
     À retenir :
@@ -292,6 +302,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
 
     def register(router) -> None:
         register_video_routes(router)
+
     ```
 
     `forge opt-in:enable video --apply` crée cette couche ; le branchement reste explicite.

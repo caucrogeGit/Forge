@@ -24,6 +24,19 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
 
     Le squelette est livré sans moteur d'entités (comme sans backend, ADR-060) : on l'installe explicitement quand on veut une couche de données.
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -41,11 +54,6 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-entities"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Les commandes du moteur sont alors découvertes automatiquement (entry point `forge_mvc.commands`, ADR-070) ; aucun `opt-in:enable` n'est requis.
 
@@ -217,6 +225,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
         PivotAdvancedService --> PivotFieldConstraint : valide selon
         PivotAdvancedService --> Executor : exécuteur injecté
         Executor --> pivot_table : SQL
+
     ```
 
     Le diagramme de séquence montre l'attachement d'un cours à un élève avec une note.
@@ -236,6 +245,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
         Svc->>Exec: fetch_all(SELECT)
         Exec-->>Svc: lignes
         Svc-->>App: list[PivotRow]
+
     ```
 
     À retenir :
@@ -278,6 +288,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
         pivot_constraints=[PivotFieldConstraint("note", required=True)],
         unique_pair=True,
         fetch_one=db.fetch_one, fetch_all=db.fetch_all, execute=db.execute,
+
     )
 
     service.attach(eleve_id=1, target_id=7, pivot_data={"note": 14})

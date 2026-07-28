@@ -22,6 +22,19 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -39,11 +52,6 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mail"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -198,6 +206,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
         LogTransport --|> BaseTransport
         NullTransport --|> BaseTransport
         FakeTransport --|> BaseTransport
+
     ```
 
     À retenir :
@@ -224,6 +233,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
         Transport-->>Mailer: TransportResult (succès / détail)
         Mailer->>Log: journalise (si MAIL_LOG_ENABLED)
         Mailer-->>App: TransportResult
+
     ```
 
     À retenir :
@@ -305,6 +315,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
         subject="Bienvenue",
         to="utilisateur@example.com",
         body_text="Bienvenue dans l'application.",
+
     )
     result = Mailer.from_config().send(message)
     ```
@@ -319,12 +330,14 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
         "bienvenue",
         {"prenom": "Alice", "lien": "https://exemple.com/activer/abc123"},
         to="alice@example.com",
+
     )
     Mailer.from_config().send(
         message,
         message_type="bienvenue",
         related_entity="contact",
         related_id=42,
+
     )
     ```
 

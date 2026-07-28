@@ -16,6 +16,19 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -33,11 +46,6 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-audio"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -194,6 +202,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
         transcode --> ffmpeg : ffmpeg
         probe --> AudioMetadata : renvoie
         http --> Disk : sert par uuid (HTTP Range)
+
     ```
 
     À retenir :
@@ -226,6 +235,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
         Trans-->>Op: MP3 écrit
         Navigateur->>Routes: GET l'audio (avec Range)
         Routes-->>Navigateur: flux MP3 (206 Partial Content)
+
     ```
 
     À retenir :
@@ -281,6 +291,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
 
     def register(router) -> None:
         register_audio_routes(router)
+
     ```
 
     !!! tip "Aide-mémoire"

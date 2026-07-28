@@ -24,6 +24,19 @@ Forge n'impose aucun backend de référence.
 
     Deux canaux, au choix.
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -37,20 +50,12 @@ Forge n'impose aucun backend de référence.
         Les nouveautés pas encore publiées, ou si votre projet a été créé depuis `main`.
         Installez le CLI `forge-mvc` **et** le backend à la même version : sinon `db:config` et `db:init` se désynchronisent du backend.
         On installe le **cœur d'abord** (depuis git, avec ses dépendances), puis le backend : celui-ci trouve alors le cœur git déjà en place et n'a pas besoin d'une version publiée sur PyPI.
-        Ces commandes s'installent **dans le venv du projet** : activez-le d'abord.
 
         ```bash
         source .venv/bin/activate
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mariadb"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            `pip` les refuse alors, pour ne pas écraser les paquets gérés par `apt`.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
-            Le venv de projet créé par `forge new` n'est pas concerné : il n'a pas ce verrou.
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire, contrairement aux opt-ins de route.
 
@@ -217,6 +222,7 @@ Forge n'impose aucun backend de référence.
         MariaDBBackend ..|> DatabaseBackend : implémente
         MariaDBBackend --> MariaDBDialect : dialecte
         MariaDBBackend --> Serveur : pool / admin
+
     ```
 
     À retenir :
@@ -247,6 +253,7 @@ Forge n'impose aucun backend de référence.
         Note over Core,Server: au runtime, l'application utilise DB_APP_*
         Core->>Backend: get_connection() (pool, DB_APP_*)
         Backend->>Server: requête DML
+
     ```
 
     À retenir :

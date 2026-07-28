@@ -19,6 +19,19 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -36,11 +49,6 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-qrcode"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -181,6 +189,7 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
         QrCodeResponse ..> QrCodeError : peut lever
         Controller --> QrCodeResponse : appelle
         Controller --> Response : retourne
+
     ```
 
     À retenir :
@@ -211,6 +220,7 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
         QrResp-->>Controleur: Response (image)
         Controleur-->>Forge: Retourne la Response
         Forge-->>Navigateur: Renvoie l'image du QR Code
+
     ```
 
     À retenir :
@@ -268,6 +278,7 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
     def show(request: Request) -> Response:
         url = request.query("url", default="https://forgemvc.com")
         return QrCodeResponse.from_text(url, fmt="png")
+
     ```
 
     La réponse porte `Content-Type: image/png` et le navigateur affiche l'image.
@@ -277,6 +288,7 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
     ```python
     def show_svg(request: Request) -> Response:
         return QrCodeResponse.from_text("https://forgemvc.com", fmt="svg")
+
     ```
 
     !!! tip "Aide-mémoire"

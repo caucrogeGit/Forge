@@ -24,6 +24,19 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     SQL Server est **client-serveur** : un serveur doit être joignable.
     Le pilote est `pyodbc`, qui requiert un pilote ODBC système.
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -41,12 +54,6 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mssql"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
-
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
 ??? note "3. Mise en service"
@@ -189,6 +196,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         MSSQLBackend ..|> DatabaseBackend : implémente
         MSSQLBackend --> pyodbc : connexion
         MSSQLBackend --> MSSQLDialect : dialecte
+
     ```
 
     À retenir :
@@ -215,6 +223,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         Server-->>ODBC: lignes
         Backend->>Backend: convertit en dicts (cursor.description)
         Backend-->>Core: lignes (dict)
+
     ```
 
     À retenir :

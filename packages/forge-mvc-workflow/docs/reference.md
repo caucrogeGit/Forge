@@ -19,6 +19,19 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -36,11 +49,6 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-workflow"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -192,6 +200,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
         status --> WorkflowStatus : produit
         WorkflowTransition --> WorkflowStatus : relie
         jinja --> WorkflowStatus : affiche
+
     ```
 
     À retenir :
@@ -221,6 +230,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
         end
         App->>WF: get_available_transitions(TRANSITIONS, "publie")
         WF-->>App: transitions possibles (pour l'UI)
+
     ```
 
     À retenir :
@@ -265,14 +275,17 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
         make_status("brouillon", "Brouillon", color="gray", is_initial=True),
         make_status("publie", "Publié", color="green"),
         make_status("archive", "Archivé", color="slate", is_final=True),
+
     ]
     TRANSITIONS = [
         make_transition("brouillon", "publie"),
         make_transition("publie", "archive"),
+
     ]
 
     if can_transition(TRANSITIONS, "brouillon", "publie"):
         article["status"] = "publie"      # l'application persiste
+
     ```
 
     ### 8.2 Afficher un badge dans un template

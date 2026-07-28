@@ -17,6 +17,19 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -34,11 +47,6 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-images"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Puis activez l'opt-in :
 
@@ -209,6 +217,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
         processing --> MediaRecord : renvoie
         media --> files : chemins / service
         processing ..> media : alimente
+
     ```
 
     À retenir :
@@ -242,6 +251,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
         Ctrl->>Img: get_media_gallery("article", 7)
         Img->>DB: lit les médias liés
         Img-->>Ctrl: galerie (URLs via media_url)
+
     ```
 
     À retenir :
@@ -299,6 +309,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
         saved = save_image_upload(request.file("photo"))
         attach_media_to_entity(saved, "article", 7, role="gallery")
         return Response.text("Photo ajoutée.")
+
     ```
 
     `save_image_upload` vérifie le contenu, écrit l'original et génère les variantes.

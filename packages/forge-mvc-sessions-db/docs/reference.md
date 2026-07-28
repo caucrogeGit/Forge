@@ -14,6 +14,19 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
 ??? note "2. Installation"
 
+    !!! warning "Prérequis : activez le venv du projet"
+
+        Quelle que soit la source, installez **dans le venv du projet** :
+
+        ```bash
+        source .venv/bin/activate
+        ```
+
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
+        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
+        gérés par `apt`, et affiche `externally-managed-environment`.
+        Le venv de projet créé par `forge new` n'a pas ce verrou.
+
     === "Depuis PyPI (stable)"
 
         La dernière version publiée :
@@ -31,11 +44,6 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
         pip install "git+https://github.com/caucrogeGit/Forge.git@main"
         pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-sessions-db"
         ```
-
-        !!! warning "Erreur « externally-managed-environment » ?"
-
-            Lancées hors d'un venv, ces commandes visent le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
-            La cible correcte est le venv du projet (`source .venv/bin/activate`), jamais le Python système.
 
     Cet opt-in est une bibliothèque : on l'importe et on passe le store à `forge.configure`, il n'y a pas de câblage de routes.
 
@@ -193,6 +201,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
         }
         SessionStore <|.. DbSessionStore : implémente
         DbSessionStore ..> forge_sessions : lit / écrit via core.database.db
+
     ```
 
     Ce que le diagramme révèle :
@@ -217,6 +226,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
         Store-->>App: dict de session
         App->>Store: cleanup_expired()
         Store->>DB: DELETE WHERE expire_at < ?
+
     ```
 
     L'horodatage comparé (`?`) est calculé côté Python, jamais par une fonction SQL propriétaire.
