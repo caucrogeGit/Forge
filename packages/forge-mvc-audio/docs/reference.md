@@ -14,9 +14,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
 
     Sa sobriété est un choix : pas de table SQL, pas de suivi de jobs ; tout est synchrone et le service retrouve les fichiers par `uuid`.
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -55,16 +53,6 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable audio
-    pip uninstall forge-mvc-audio
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
-    `forge opt-in:remove audio` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -115,7 +103,17 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable audio
+    pip uninstall forge-mvc-audio
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
+    `forge opt-in:remove audio` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     `forge-mvc-audio` ajoute une commande :
 
@@ -123,7 +121,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     |---|---|---|
     | `audio:doctor` | Diagnostic (paquet, config, `ffmpeg`/`ffprobe`). | `forge audio:doctor` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -141,7 +139,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     | Exceptions | `AudioIngestError`, `AudioProbeError`, `FfmpegError` |
     | Installation | `pip install --pre forge-mvc-audio` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -237,7 +235,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     - la lecture honore l'en-tête `Range` ;
     - rien n'est suivi en base : l'application gère ses propres références d'`uuid`.
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -250,7 +248,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     | `AudioMetadata` | dataclass | durée, codec, bitrate, canaux |
     | `AudioIngestError`, `AudioProbeError`, `FfmpegError` | exceptions | erreurs d'ingestion, de sondage, de transcodage |
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -261,7 +259,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     | Brancher la lecture | `register_audio_routes(router)` |
     | Configurer le module | `load_audio_config(...)` |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Ingérer puis transcoder
 
@@ -293,7 +291,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
         - `transcode_to_mp3` pour convertir ;
         - `register_audio_routes` pour lire.
 
-??? note "10. Sobriété, uuid et dépendances"
+??? note "11. Sobriété, uuid et dépendances"
 
     Le module est **sans état** : pas de table, pas de file de jobs.
     L'application garde elle-même la trace des `uuid` qu'elle a ingérés.

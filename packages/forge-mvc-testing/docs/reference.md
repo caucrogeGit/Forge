@@ -14,9 +14,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
 
     Le plugin s'active automatiquement dès que le paquet est installé (point d'entrée `pytest11`).
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     Infrastructure de test réservée au développement (ADR-041), listée dans `requirements-dev.txt` :
 
@@ -47,17 +45,17 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     Le plugin pytest et `FakeRequest` sont disponibles dès l'installation.
     Ce n'est pas un opt-in applicatif : il n'y a pas d'`opt-in:enable`.
 
-    ### Désinstallation
+??? note "3. Commandes"
+
+    `forge-mvc-testing` n'expose aucune commande `forge` : c'est un **plugin pytest** (point d'entrée `pytest11`) qui s'active automatiquement dès l'installation, plus l'utilitaire `FakeRequest` à importer dans les tests.
+
+??? note "4. Désinstallation"
 
     ```bash
     pip uninstall forge-mvc-testing
     ```
 
-??? note "3. Commandes"
-
-    `forge-mvc-testing` n'expose aucune commande `forge` : c'est un **plugin pytest** (point d'entrée `pytest11`) qui s'active automatiquement dès l'installation, plus l'utilitaire `FakeRequest` à importer dans les tests.
-
-??? note "4. Vue d'ensemble rapide"
+??? note "5. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -72,7 +70,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     | Portée | **jamais** une dépendance runtime (ADR-041) |
     | Installation | `pip install --pre forge-mvc-testing` (dev) |
 
-??? note "5. Schémas UML"
+??? note "6. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires du paquet.
 
@@ -149,7 +147,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     - chaque test démarre d'un état propre (fixtures autouse) ;
     - on teste un contrôleur en lui passant une `FakeRequest`.
 
-??? note "6. API publique"
+??? note "7. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -166,7 +164,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
 
     Le plugin s'active par le point d'entrée `pytest11` : aucune configuration `conftest` n'est requise.
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -176,7 +174,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     | Partir d'un état propre | fixtures autouse (automatiques) |
     | Obtenir une requête prête | fixture `fake_request` |
 
-??? note "8. Exemples d'utilisation"
+??? note "9. Exemples d'utilisation"
 
     ### 8.1 Tester un contrôleur
 
@@ -207,7 +205,7 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
         - `FakeRequest` : une `Request` sans serveur HTTP ;
         - le plugin pytest : noyau configuré + état propre entre tests.
 
-??? note "9. Dev-only et isolation"
+??? note "10. Dev-only et isolation"
 
     Ce paquet ne sert qu'aux tests : il n'est jamais installé en production et n'est pas importé par le runtime (ADR-041).
 

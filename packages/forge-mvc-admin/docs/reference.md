@@ -14,9 +14,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
 
     Le câblage reste **explicite** : on enregistre les ressources et on branche les routes soi-même (couche `optins/`), sans découverte magique.
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -55,16 +53,6 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable admin
-    pip uninstall forge-mvc-admin
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
-    `forge opt-in:remove admin` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -115,7 +103,17 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable admin
+    pip uninstall forge-mvc-admin
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
+    `forge opt-in:remove admin` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     `forge-mvc-admin` ajoute ces commandes :
 
@@ -124,7 +122,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     | `admin:init` | Prépare la structure `mvc/admin/` (write-if-new). | `forge admin:init` |
     | `admin:doctor` | Vérifie la cohérence des ressources avec les contrats d'entité (lecture seule). | `forge admin:doctor` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -140,7 +138,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     | Exceptions | `AdminError`, `AdminResourceError`, `AdminRegistryError` |
     | Installation | `pip install --pre forge-mvc-admin` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -222,7 +220,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     - le contrôleur s'appuie sur la ressource pour savoir quoi afficher ;
     - les templates du back-office sont embarqués (ADR-046).
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -234,7 +232,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     | `AdminController` | classe | contrôleur des écrans CRUD |
     | `AdminError`, `AdminResourceError`, `AdminRegistryError` | exceptions | erreurs |
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -244,7 +242,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     | Exiger une permission | `register_admin_routes(router, permission="admin.access")` |
     | Vérifier la cohérence | `forge admin:doctor` |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Déclarer une ressource et brancher le back-office
 
@@ -276,7 +274,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
         - `registry.register` la collecte ;
         - `register_admin_routes` branche les écrans sécurisés.
 
-??? note "10. Sécurité, templates et cohérence"
+??? note "11. Sécurité, templates et cohérence"
 
     Les routes du back-office exigent une session authentifiée et protègent les écritures par CSRF ; une permission RBAC peut être requise via `permission=`.
 

@@ -14,9 +14,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
 
     Quand une clé manque dans la locale demandée, il bascule sur la **locale de repli** ; si elle manque toujours, il renvoie la clé elle-même (jamais une erreur d'affichage).
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -55,16 +53,6 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable i18n
-    pip uninstall forge-mvc-i18n
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-    `forge opt-in:remove i18n` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -114,7 +102,17 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable i18n
+    pip uninstall forge-mvc-i18n
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove i18n` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     `forge-mvc-i18n` ajoute ces commandes (le noyau garde un repli no-op, ADR-027) :
 
@@ -123,7 +121,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | `i18n:init` | Initialise les fichiers de traduction. | `forge i18n:init` |
     | `i18n:check` | Vérifie la complétude des traductions entre locales. | `forge i18n:check` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -141,7 +139,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | Décision d'architecture | ADR-027 (extraction, repli no-op du cœur) |
     | Installation | `pip install --pre forge-mvc-i18n` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -225,7 +223,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     - en dernier recours, `trans` renvoie la clé (pas d'erreur d'affichage) ;
     - le chargement passe par un cache pour éviter de relire le fichier.
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -238,7 +236,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | `clear_translation_cache` | `clear_translation_cache() -> None` | vide le cache des catalogues |
     | `I18nError`, `TranslationCatalogError` | exceptions | erreurs (locale invalide, catalogue illisible) |
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -250,7 +248,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | Vérifier les manques | `forge i18n:check` |
     | Recharger après édition | `clear_translation_cache()` |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Catalogue et traduction
 
@@ -287,7 +285,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
         - `{{ trans("clé") }}` dans les templates ;
         - `i18n:check` pour repérer les clés manquantes.
 
-??? note "10. Repli, cache et intégration"
+??? note "11. Repli, cache et intégration"
 
     Le repli est en cascade : locale demandée, puis locale de fallback, puis la clé elle-même.
 

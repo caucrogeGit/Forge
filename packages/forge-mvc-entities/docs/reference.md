@@ -96,7 +96,26 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    pip uninstall forge-mvc-entities
+    ```
+
+    Retirez aussi sa ligne de `requirements.txt`.
+
+    Il n'y a pas d'`opt-in:disable` : le moteur est découvert par son entry point
+    `forge_mvc.commands` (ADR-070), donc retirer le paquet suffit à ce que le cœur ne le
+    voie plus.
+
+    Ce que la désinstallation **ne fait pas** : vos contrats d'entités
+    (`mvc/entities/*.json`), le code généré et les migrations déjà appliquées restent en
+    place. C'est voulu : ils vous appartiennent (principe 4).
+    Sans le moteur, les commandes `make:entity`, `make:crud`, `migration:*` et `db:*`
+    disparaissent simplement de `forge`, mais l'application continue de tourner sur le code
+    déjà généré.
+
+??? note "5. Commandes"
 
     Le moteur d'entités ajoute ces commandes (découvertes dès l'installation, entry point `forge_mvc.commands`) :
 
@@ -113,7 +132,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     | `migration:make` / `migration:apply` | Génère / applique les migrations. | `forge migration:apply` |
     | `db:config` / `db:init` / `db:apply` | Configure, provisionne et applique le schéma. | `forge db:init --run` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -129,7 +148,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     | Décisions d'architecture | ADR-070 (extraction), ADR-021/057 (pivot), ADR-054 (dialecte), ADR-069 (`foreign_key`) |
     | Installation | `pip install --pre forge-mvc-entities` (opt-in explicite, non installé par `forge new`) |
 
-??? note "6. Le workflow de modélisation"
+??? note "7. Le workflow de modélisation"
 
     La chaîne de base va du contrat à l'application, chaque étape à SQL visible.
 
@@ -143,7 +162,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
 
     Apprentissage guidé, pas à pas : [Welcome-Entités](welcome/debutant/entity-welcome.md).
 
-??? note "7. Le pivot enrichi"
+??? note "8. Le pivot enrichi"
 
     Un pivot **enrichi** est une association `many_to_many` dont la table de liaison **porte des attributs** : entre un `Article` et un `Tag`, la table `article_tag` peut stocker une `position` et un drapeau `epingle`.
 
@@ -285,7 +304,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-entities` : la dépendance va de l'opt-in vers le cœur.
 
-??? note "8. Connexion sans serveur (`serverless_db.py`)"
+??? note "9. Connexion sans serveur (`serverless_db.py`)"
 
     `configure_serverless_db` fournit la connexion runtime d'un backend BDD **sans serveur** (SQLite, ADR-054), qui n'a pas de comptes d'administration `DB_ADMIN_*`.
     Elle est utilisée hors du flux `db:init` / `db:apply`, réservé aux SGBD serveur.

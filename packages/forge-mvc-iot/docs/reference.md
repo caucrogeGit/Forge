@@ -13,9 +13,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
 
     L'écoute MQTT tourne dans un process séparé (`iot:listen`), pas dans le serveur web ; l'API HTTP, elle, se branche sur le routeur du projet (modèle opt-in de type route).
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -64,16 +62,6 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable iot
-    pip uninstall forge-mvc-iot
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
-    `forge opt-in:remove iot` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -131,7 +119,17 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable iot
+    pip uninstall forge-mvc-iot
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
+    `forge opt-in:remove iot` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     `forge-mvc-iot` ajoute ces commandes :
 
@@ -142,7 +140,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | `iot:simulate` | Publie des mesures MQTT factices (sans capteur). | `forge iot:simulate` |
     | `iot:listen` | Écoute le broker et insère dans `iot_events`. | `forge iot:listen` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -158,7 +156,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | Exposition | API HTTP JSON (`register_iot_routes`) |
     | Installation | `pip install --pre forge-mvc-iot` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -250,7 +248,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     - un message non conforme au contrat est rejeté ;
     - l'API HTTP expose les mesures en JSON, sans toucher au broker.
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -260,7 +258,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | `IotEventRepository` | classe | `insert`, `list_recent`, `find_by_device`, `count_by_device` |
     | `IotConfig` | dataclass | configuration (broker, topics, TLS) |
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -271,7 +269,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | Exposer en JSON | `register_iot_routes(router)` |
     | Lire par appareil | `IotEventRepository.find_by_device(...)` |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Brancher l'API HTTP JSON
 
@@ -302,7 +300,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
         - réception : `iot:listen` (MQTT vers `iot_events`) ;
         - exposition : `register_iot_routes` (HTTP JSON depuis `iot_events`).
 
-??? note "10. MQTT, contrat et exécution"
+??? note "11. MQTT, contrat et exécution"
 
     Les messages MQTT suivent un **contrat** (site, appareil, métrique, valeur, horodatage) ; un message non conforme est rejeté à la réception.
 

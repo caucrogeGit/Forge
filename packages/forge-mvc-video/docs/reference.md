@@ -14,9 +14,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
 
     Il branche aussi ses **routes** de lecture sur le routeur du projet, via la couche `optins/` (modèle opt-in de type route).
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -72,16 +70,6 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable video
-    pip uninstall forge-mvc-video
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
-    `forge opt-in:remove video` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -139,7 +127,17 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable video
+    pip uninstall forge-mvc-video
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
+    `forge opt-in:remove video` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     `forge-mvc-video` ajoute ces commandes :
 
@@ -151,7 +149,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     | `video:process` | Transcode une vidéo (par `id` ou `--pending`). | `forge video:process --pending` |
     | `video:cleanup` | Purge les vidéos `failed` et fichiers orphelins. | `forge video:cleanup` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -168,7 +166,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     | Modèle d'exécution | worker-CLI : transcodage hors requête HTTP |
     | Installation | `pip install --pre forge-mvc-video` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -257,7 +255,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     - la lecture honore l'en-tête `Range` (streaming) ;
     - une vidéo n'est lisible qu'une fois `ready`.
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -271,7 +269,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
 
     Les fonctions de pipeline sont surtout appelées par les commandes `video:*` (worker), pas pendant une requête.
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -283,7 +281,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     | Configurer le module | `FORGE_VIDEO_*` / `load_video_config` |
     | Nettoyer | `forge video:cleanup --apply` |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Brancher les routes de lecture
 
@@ -314,7 +312,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
         - traiter hors requête (`video:process`) ;
         - lire en streaming (routes branchées par `register_video_routes`).
 
-??? note "10. Dépendances externes et exécution différée"
+??? note "11. Dépendances externes et exécution différée"
 
     `ffmpeg` et `ffprobe` doivent être installés sur la machine ; `forge video:doctor` le vérifie.
 

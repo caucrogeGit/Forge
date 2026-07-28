@@ -19,7 +19,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
     Particularité technique : Forge génère des paramètres `?` ; l'adaptateur les **traduit** en `%s` (format psycopg) à l'exécution.
 
-??? note "2. Installation et désinstallation"
+??? note "2. Installation"
 
     !!! note "Backend au niveau plein"
         PostgreSQL est un backend au **niveau plein** (ADR-084) : dialecte, adaptateur et intégration sont validés en CI contre un vrai PostgreSQL 16.
@@ -52,19 +52,6 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
-    ### Désinstallation
-
-    Retirez d'abord la configuration des fichiers d'environnement, puis le paquet :
-
-    ```bash
-    forge db:config --remove
-    pip uninstall forge-mvc-postgres
-    ```
-
-    `db:config --remove` retire les clés `DB_*` posées par `db:config` des trois fichiers d'environnement (les valeurs renseignées sont perdues ; ADR-064).
-    Un backend n'a pas de commande `disable` : découvert par entry point (ADR-054), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
-    Si besoin, supprimez aussi la base et le compte créés par `db:init`.
-
 ??? note "3. Mise en service"
 
     Installer le paquet ne suffit pas à le rendre opérationnel.
@@ -117,7 +104,20 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
     La progression guidée, pas à pas : [Installation de forge-mvc-postgres](welcome/debutant/postgres-welcome.md).
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    Retirez d'abord la configuration des fichiers d'environnement, puis le paquet :
+
+    ```bash
+    forge db:config --remove
+    pip uninstall forge-mvc-postgres
+    ```
+
+    `db:config --remove` retire les clés `DB_*` posées par `db:config` des trois fichiers d'environnement (les valeurs renseignées sont perdues ; ADR-064).
+    Un backend n'a pas de commande `disable` : découvert par entry point (ADR-054), retirer le paquet suffit ensuite à ce que le cœur ne le voie plus.
+    Si besoin, supprimez aussi la base et le compte créés par `db:init`.
+
+??? note "5. Commandes"
 
     Ce backend n'ajoute aucune commande : il est découvert par l'entry point `forge_mvc.db_backend` et fournit, au runtime, un dialecte SQL et un adaptateur de connexion.
     Les commandes de base de données que vous utilisez avec lui sont fournies par le moteur d'entités (`forge-mvc-entities`) :
@@ -130,7 +130,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | `migration:make` | Génère une migration depuis l'écart de schéma. | `forge migration:make` |
     | `migration:apply` | Applique les migrations en attente. | `forge migration:apply` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -148,7 +148,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | Décision d'architecture | ADR-054, ADR-084 |
     | Installation | `pip install --pre forge-mvc-postgres` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires du backend.
 
@@ -231,7 +231,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     - `lastrowid` est obtenu via `lastval()` sous garde savepoint (`PG-INSERT-IDENTITY-001`) ;
     - le SQL généré reste celui de Forge, juste adapté au format psycopg.
 
-??? note "7. Ce que fournit le backend"
+??? note "8. Ce que fournit le backend"
 
     | Élément | Rôle |
     |---|---|
@@ -241,7 +241,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | `PostgreSQLDialect` | `BIGSERIAL`, `CREATE INDEX` séparés, guillemets doubles, `information_schema` |
     | Entry point | `forge_mvc.db_backend = postgres` |
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -251,7 +251,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | Appliquer le schéma | `forge db:apply` (sur la base provisionnée) |
     | Faire évoluer le schéma | `forge migration:*` |
 
-??? note "9. Exemple d'utilisation"
+??? note "10. Exemple d'utilisation"
 
     ```bash
     # 1. Installer le backend et configurer env/dev (DB_APP_*, DB_ADMIN_*, DB_NAME)
@@ -272,7 +272,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         - `db:apply` / `migration:*` suivent le flux du cœur ;
         - `?` est traduit en `%s` automatiquement.
 
-??? note "10. Statut et limites"
+??? note "11. Statut et limites"
 
     PostgreSQL est un backend au **niveau plein** (ADR-084, révision du 2026-07-19).
 

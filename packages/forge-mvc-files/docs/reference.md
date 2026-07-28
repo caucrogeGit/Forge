@@ -14,9 +14,7 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
 
     La **validation pure** (extension, MIME, taille) reste dans le cœur (`core.forms.upload_validation`, ADR-019) et est réexportée ici : le cœur ne peut pas dépendre d'un opt-in (ADR-004).
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -55,16 +53,6 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable files
-    pip uninstall forge-mvc-files
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-    `forge opt-in:remove files` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -114,7 +102,17 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable files
+    pip uninstall forge-mvc-files
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove files` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     `forge-mvc-files` ajoute ces commandes :
 
@@ -123,7 +121,7 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
     | `upload:init` | Initialise les dossiers de stockage d'upload. | `forge upload:init` |
     | `media:init` | Initialise les dossiers de stockage média. | `forge media:init` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -140,7 +138,7 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
     | Décisions d'architecture | ADR-019 (extraction), ADR-020 (primitives) |
     | Installation | `pip install --pre forge-mvc-files` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -238,7 +236,7 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
     - `serve_media_file` répond `206 Partial Content` si la requête envoie un `Range` ;
     - le chemin servi est validé pour rester sous la racine de stockage.
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -257,7 +255,7 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
 
     `file` est un objet d'upload duck-typé (champ multipart, fichier Python, wrapper applicatif).
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -269,7 +267,7 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
     | Limiter les uploads abusifs | `is_upload_rate_limited(...)` |
     | Gérer un upload refusé | intercepter `UploadError` |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Enregistrer un upload depuis un contrôleur
 
@@ -307,7 +305,7 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
         - `save_upload` pour entrer (valide, sécurise, écrit) ;
         - `serve_media_file` pour sortir (streaming, Range).
 
-??? note "10. Sécurité, stockage et validation"
+??? note "11. Sécurité, stockage et validation"
 
     Les noms de fichiers fournis par le navigateur ne sont jamais utilisés tels quels : `secure_filename` neutralise les chemins (anti-traversal).
 

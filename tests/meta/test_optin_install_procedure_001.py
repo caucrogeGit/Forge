@@ -311,3 +311,38 @@ def test_aucune_reference_ne_fait_copier_du_ddl_a_la_main() -> None:
         "Ces références font copier du DDL MariaDB à la main, inutilisable sur "
         f"les autres backends : {offenders}"
     )
+
+# ── Structure des chapitres : installer, mettre en service, désinstaller ─────
+
+def test_le_chapitre_d_installation_ne_porte_plus_la_desinstallation() -> None:
+    """Trois gestes distincts, trois chapitres.
+
+    « 2. Installation et désinstallation » mélangeait l'obtention du paquet et
+    son retrait, deux moments qui n'arrivent jamais ensemble.
+    """
+    offenders = [
+        name for name, ref in _toutes_references()
+        if '??? note "2. Installation et désinstallation"' in ref.read_text(encoding="utf-8")
+    ]
+
+    assert offenders == [], f"chapitre 2 encore mixte : {offenders}"
+
+
+def test_la_desinstallation_a_son_chapitre_apres_la_mise_en_service() -> None:
+    offenders = [
+        name for name, ref in _toutes_references()
+        if '??? note "4. Désinstallation"' not in ref.read_text(encoding="utf-8")
+    ]
+
+    assert offenders == [], f"pas de chapitre de désinstallation : {offenders}"
+
+
+def test_les_chapitres_ne_sont_jamais_deplies_par_defaut() -> None:
+    """`???+` ouvre l'accordéon au chargement ; la page en compte une dizaine."""
+    offenders: list[str] = []
+    for ref in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        for number, line in enumerate(ref.read_text(encoding="utf-8").splitlines(), 1):
+            if line.startswith("???+"):
+                offenders.append(f"{ref.parts[-3]}:{number}")
+
+    assert offenders == [], f"chapitres dépliés par défaut : {offenders}"

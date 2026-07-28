@@ -17,9 +17,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
 
     Il fournit aussi des **helpers Jinja** pour afficher un statut sous forme de badge coloré, sans logique dans le template.
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -58,16 +56,6 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable workflow
-    pip uninstall forge-mvc-workflow
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-    `forge opt-in:remove workflow` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -117,11 +105,21 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable workflow
+    pip uninstall forge-mvc-workflow
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove workflow` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -137,7 +135,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     | Décision d'architecture | ADR-004 (opt-in officiel) |
     | Installation | `pip install --pre forge-mvc-workflow` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -232,7 +230,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     - `get_available_transitions` alimente les boutons/menus de l'UI ;
     - une transition non déclarée est refusée.
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -246,7 +244,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     | helpers Jinja | `workflow_status_badge`, `workflow_status_badge_class`, `workflow_status_color`, `workflow_status_label`, `make_workflow_jinja_helpers` | affichage |
     | `WorkflowStatusError`, `WorkflowTransitionError` | exceptions | nom invalide, transition invalide |
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -256,7 +254,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     | Valider la configuration | `validate_statuses` / `validate_transitions` |
     | Afficher un badge | `workflow_status_badge(...)` (Jinja) |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Déclarer et vérifier
 
@@ -292,7 +290,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
         - `can_transition` / `get_available_transitions` pour la logique ;
         - les helpers Jinja pour l'affichage.
 
-??? note "10. Persistance et validation"
+??? note "11. Persistance et validation"
 
     L'opt-in ne crée **aucune table** : le statut courant est un simple champ de votre entité, que vous mettez à jour vous-même après un `can_transition` positif.
 

@@ -14,9 +14,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
 
     Son périmètre est **borné** : c'est un audit applicatif, pas un SIEM de cybersécurité (cohérent avec ADR-008, la décision de tracer reste applicative).
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -65,16 +63,6 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable audit
-    pip uninstall forge-mvc-audit
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-    `forge opt-in:remove audit` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -131,7 +119,17 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable audit
+    pip uninstall forge-mvc-audit
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove audit` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     `forge-mvc-audit` ajoute une commande :
 
@@ -139,7 +137,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     |---|---|---|
     | `audit:init` | Crée la table `audit_log` (DDL fournie). | `forge audit:init` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -155,7 +153,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     | Cadre | ADR-008 (Forge fournit la table et le helper) |
     | Installation | `pip install --pre forge-mvc-audit` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -250,7 +248,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     - les filtres (`actor`, `action`, `target_type`, `target_id`) sont optionnels ;
     - `limit` est plafonné à `MAX_LIMIT`.
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -265,7 +263,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
 
     Le paramètre `db` est l'exécuteur de base de données ; omis, il utilise le backend BDD actif.
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -277,7 +275,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     | Filtrer le journal | `actor=`, `action=`, `target_type=`, `target_id=` |
     | Créer la table | `forge audit:init` puis `forge migration:apply` |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Tracer une action
 
@@ -313,7 +311,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
         - `record_audit` pour écrire une trace ;
         - `get_audit_log` pour relire, avec des filtres optionnels.
 
-??? note "10. Périmètre, validation et injection"
+??? note "11. Périmètre, validation et injection"
 
     L'action est obligatoire et non vide ; sinon `record_audit` lève `AuditError`.
 

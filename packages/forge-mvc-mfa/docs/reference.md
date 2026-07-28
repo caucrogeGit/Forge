@@ -32,9 +32,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     Forge fournit les helpers et les contrats ; la **persistance** des facteurs et des codes reste applicative (ADR-008).
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -97,16 +95,6 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable mfa
-    pip uninstall forge-mvc-mfa
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
-    `forge opt-in:remove mfa` affiche la commande `pip uninstall` sans l'exécuter.
-
 ??? note "3. Mise en service"
 
     Installer le paquet ne suffit pas à le rendre opérationnel.
@@ -156,11 +144,21 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable mfa
+    pip uninstall forge-mvc-mfa
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
+    `forge opt-in:remove mfa` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -176,7 +174,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     | Persistance | applicative (ADR-008) : `AuthMfaFactor`, codes de récupération |
     | Installation | `pip install --pre forge-mvc-mfa` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -275,7 +273,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     - un code de récupération est une alternative au code TOTP ;
     - le challenge est limité en tentatives et en durée (anti-bruteforce).
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     ### Secret et chiffrement
 
@@ -316,7 +314,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     `MFA_FACTOR_TOTP`, `MFA_FACTOR_RECOVERY`, `MFA_STATUS_ACTIVE` / `PENDING` / `DISABLED`, fenêtres et tentatives du challenge et de la revalidation.
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -326,7 +324,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     | Protéger une action sensible | `require_recent_mfa(...)` |
     | Fournir un secours | `create_recovery_codes` / `consume_recovery_code` |
 
-??? note "9. Exemple : challenge à la connexion"
+??? note "10. Exemple : challenge à la connexion"
 
     ```python
     from forge_mvc_mfa import (
@@ -355,7 +353,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         - revalider avant le sensible ;
         - récupérer via codes à usage unique.
 
-??? note "10. Sécurité des secrets"
+??? note "11. Sécurité des secrets"
 
     Le secret TOTP est chiffré au repos avec Fernet (`cryptography`) et la clé `FORGE_MFA_SECRET_KEY` ; il n'est jamais stocké en clair.
 
@@ -377,7 +375,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-mfa` : la dépendance va de l'opt-in vers le cœur.
 
-??? note "11. Politique de stockage des secrets MFA"
+??? note "12. Politique de stockage des secrets MFA"
 
     ### Statut actuel
 

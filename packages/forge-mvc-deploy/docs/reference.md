@@ -14,9 +14,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
 
     Il reste un outil de **préparation** : il écrit des fichiers que vous relisez et adaptez, il ne déploie pas à votre place et ne tourne pas dans le serveur.
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -55,16 +53,6 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable deploy
-    pip uninstall forge-mvc-deploy
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
-    `forge opt-in:remove deploy` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -114,7 +102,17 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable deploy
+    pip uninstall forge-mvc-deploy
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre, sans toucher au paquet.
+    `forge opt-in:remove deploy` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     `forge-mvc-deploy` ajoute ces commandes (opt-in CLI-only) :
 
@@ -123,7 +121,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     | `deploy:init` | Génère `wsgi.py`, la config Nginx, l'unité systemd et un README (write-if-new). | `forge deploy:init` |
     | `deploy:check` | Vérifie la configuration de déploiement. | `forge deploy:check` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -138,7 +136,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     | Décision d'architecture | ADR-053 (extraction, opt-in CLI-only) |
     | Installation | `pip install --pre forge-mvc-deploy` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -219,7 +217,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     - le serveur de développement (`python app.py`) ne sert pas la production.
 
 
-??? note "7. Contextes d'utilisation"
+??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -229,7 +227,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     | Mettre derrière un proxy | configuration Nginx générée |
     | Gérer le service | unité systemd générée |
 
-??? note "8. Exemple d'utilisation"
+??? note "9. Exemple d'utilisation"
 
     ```bash
     # 1. Générer les fichiers (ne réécrit pas l'existant)
@@ -250,7 +248,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
         - `deploy:init` génère, `deploy:check` vérifie ;
         - en production, Nginx devant Gunicorn servant `wsgi:application`.
 
-??? note "9. CLI-only et adaptation"
+??? note "10. CLI-only et adaptation"
 
     `forge-mvc-deploy` n'a pas d'API runtime : il sert uniquement à préparer le déploiement.
     Une application ne l'importe pas à l'exécution.

@@ -18,9 +18,7 @@ Aucun cookie visiteur, aucune IP.
 
     L'agrégation se fait par **comptage** (ADR-037) : `count_stats_events` renvoie des totaux groupés, pas des séries temporelles complexes.
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -73,16 +71,6 @@ Aucun cookie visiteur, aucune IP.
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable stats
-    pip uninstall forge-mvc-stats
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-    `forge opt-in:remove stats` affiche la commande `pip uninstall` sans l'exécuter.
-
 ??? note "3. Mise en service"
 
     Installer le paquet ne suffit pas à le rendre opérationnel.
@@ -131,11 +119,21 @@ Aucun cookie visiteur, aucune IP.
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable stats
+    pip uninstall forge-mvc-stats
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove stats` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -152,7 +150,7 @@ Aucun cookie visiteur, aucune IP.
     | Décision d'architecture | ADR-037 (agrégation par comptage) |
     | Installation | `pip install --pre forge-mvc-stats` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -240,7 +238,7 @@ Aucun cookie visiteur, aucune IP.
     - `count_stats_events` agrège par la dimension demandée (`group_by`) ;
     - les lectures passent par `fetch_all`, fourni par l'application.
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -255,7 +253,7 @@ Aucun cookie visiteur, aucune IP.
 
     `execute` et `fetch_all` sont des callables fournis par l'application (par exemple `db.execute`, `db.fetch_all`).
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -266,7 +264,7 @@ Aucun cookie visiteur, aucune IP.
     | Compter par dimension | `count_stats_events(fetch_all, group_by=...)` |
     | Créer la table | `get_stats_events_schema_sql()` |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Tracer un événement
 
@@ -295,7 +293,7 @@ Aucun cookie visiteur, aucune IP.
         - `track_event` pour écrire ;
         - `list_stats_events` (détail) et `count_stats_events` (agrégat).
 
-??? note "10. Tracking explicite et exécuteur injecté"
+??? note "11. Tracking explicite et exécuteur injecté"
 
     Forge ne trace rien de lui-même : pas de middleware caché, pas de cookie, pas d'IP.
     Le développeur décide quoi compter avec `track_event`.

@@ -15,9 +15,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
 
     La vérification du contenu est une **sécurité** : on confirme que les octets sont bien une image avant toute écriture (garde anti-bombe de décompression), car le type MIME annoncé est falsifiable.
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -69,16 +67,6 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable images
-    pip uninstall forge-mvc-images
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-    `forge opt-in:remove images` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -135,11 +123,21 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable images
+    pip uninstall forge-mvc-images
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove images` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -156,7 +154,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     | Décision d'architecture | ADR-018 (remplace `forge-mvc-media`) |
     | Installation | `pip install --pre forge-mvc-images` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -253,7 +251,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     - l'association média / entité est persistée par la couche médias ;
     - la galerie et la couverture se lisent par entité.
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     ### Traitement d'image
 
@@ -277,7 +275,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     | `media_url` | `media_url(path) -> str` | URL publique d'un média |
     | autres | `update_media_alt_text`, `update_media_position`, `delete_media`, `get_media_record` | gestion fine |
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -289,7 +287,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     | Choisir une couverture | `get_cover_media(...)` |
     | Construire l'URL d'un média | `media_url(path)` |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Recevoir une image et la relier à une entité
 
@@ -320,7 +318,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
         - traitement : `save_image_upload` (vérifie, écrit, variantes) ;
         - médias : `attach_media_to_entity`, `get_media_gallery`, `get_cover_media`.
 
-??? note "10. Sécurité, variantes et dépendances"
+??? note "11. Sécurité, variantes et dépendances"
 
     `verify_image_content` confirme que les octets sont une vraie image avant toute écriture, et protège contre les bombes de décompression.
 

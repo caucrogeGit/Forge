@@ -15,9 +15,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     Il reste fidèle au modèle WSGI synchrone : **pas de broker, pas de Celery/Redis, pas d'async**.
     La file est une table SQL ; le worker est un simple process Python.
 
-??? note "2. Installation et désinstallation"
-
-    ### Installation
+??? note "2. Installation"
 
     === "Depuis PyPI (stable)"
 
@@ -66,16 +64,6 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     `requirements.txt`, à provisionner sa base s'il en a une, à le brancher là où il agit et à le
     prouver par un premier usage réel.
     Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
-
-    ### Désinstallation
-
-    ```bash
-    forge opt-in:disable jobs
-    pip uninstall forge-mvc-jobs
-    ```
-
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
-    `forge opt-in:remove jobs` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Mise en service"
 
@@ -132,7 +120,17 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     opérationnel : il est seulement présent.
 
 
-??? note "4. Commandes"
+??? note "4. Désinstallation"
+
+    ```bash
+    forge opt-in:disable jobs
+    pip uninstall forge-mvc-jobs
+    ```
+
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre (le code n'était pas câblé), sans toucher au paquet.
+    `forge opt-in:remove jobs` affiche la commande `pip uninstall` sans l'exécuter.
+
+??? note "5. Commandes"
 
     `forge-mvc-jobs` ajoute une commande :
 
@@ -140,7 +138,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     |---|---|---|
     | `jobs:init` | Crée la table `jobs` (DDL fournie). | `forge jobs:init` |
 
-??? note "5. Vue d'ensemble rapide"
+??? note "6. Vue d'ensemble rapide"
 
     | Élément | Valeur |
     |---|---|
@@ -155,7 +153,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     | Contrainte | runtime synchrone (WSGI), sans broker ni async |
     | Installation | `pip install --pre forge-mvc-jobs` |
 
-??? note "6. Schémas UML"
+??? note "7. Schémas UML"
 
     Les deux schémas suivants montrent deux vues complémentaires de l'opt-in.
 
@@ -258,7 +256,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     - `process_one` traite une tâche, `drain` vide la file, `run_worker` boucle ;
     - un gestionnaire manquant marque la tâche `failed`.
 
-??? note "7. API publique"
+??? note "8. API publique"
 
     | Élément | Signature | Rôle |
     |---|---|---|
@@ -277,7 +275,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
 
     `db` est l'exécuteur ; omis, il utilise le backend BDD actif.
 
-??? note "8. Contextes d'utilisation"
+??? note "9. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
@@ -290,7 +288,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     | Superviser | `pending_count()`, `get_job(id)` |
     | Créer la table | `forge jobs:init` puis `forge migration:apply` |
 
-??? note "9. Exemples d'utilisation"
+??? note "10. Exemples d'utilisation"
 
     ### 8.1 Enfiler depuis un contrôleur
 
@@ -327,7 +325,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
         - côté requête : `enqueue` ;
         - côté worker : `drain` (cron) ou `run_worker` (persistant), avec vos `handlers`.
 
-??? note "10. Ré-essais, files et injection"
+??? note "11. Ré-essais, files et injection"
 
     Une tâche échouée est ré-essayée tant que `attempts < max_attempts`, sinon marquée `failed` (avec `last_error`).
 
