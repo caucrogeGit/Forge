@@ -53,6 +53,17 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
 
+    **Épinglez-le dans `requirements.txt`**, à la même version ou au même commit que `forge-mvc` :
+
+    ```text
+    forge-mvc-postgres==<version de forge-mvc>
+    ```
+
+    Sans cette ligne, le pilote n'existe que sur votre machine.
+    Un collègue, un serveur ou une intégration continue qui installe depuis `requirements.txt`
+    démarre sans backend, et l'application ne peut atteindre aucune base.
+    Voir la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+
     `forge db:config` amorce les variables du backend dans `env/example`, `env/dev` et `env/prod` (write-if-missing, sans secret ; ADR-064) :
 
     ```bash

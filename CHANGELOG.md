@@ -19,7 +19,8 @@
   Les pages de référence écrivaient `forge opt-in:enable <nom>`, or cette commande est en **dry-run par défaut** : sans `--apply`, rien n'est écrit. **19 références sur 22** donnaient donc une instruction qui laisse croire l'opt-in activé alors que `optins/registry.py` reste inchangé. Corrigé partout.
   Deux des cinq gestes de mise en service n'étaient documentés **nulle part** : l'épinglage dans `requirements.txt`, sans lequel l'opt-in n'existe que sur la machine qui l'a installé, et la preuve par un premier usage réel. La procédure canonique en cinq points vit désormais dans `docs/install/opt-ins.md`, et les 22 références y renvoient au lieu de la redire.
   La référence RBAC faisait par ailleurs **copier trente lignes de `CREATE TABLE ... ENGINE=InnoDB`** à la main, syntaxe propre à MariaDB, alors que `rbac:init` existe depuis le chantier du DDL dialectal et produit un DDL portable sur les quatre backends. Elle donne maintenant la commande.
-  Un garde-fou fige l'ensemble, dont l'interdiction de documenter `opt-in:enable` sans `--apply` et celle de faire copier du DDL à la main.
+  **Les quatre backends de base de données ne mentionnaient pas non plus l'épinglage**, alors que c'est chez eux qu'il est le plus vital : sans pilote épinglé, un collègue ou un serveur qui installe depuis `requirements.txt` démarre sans backend et l'application n'atteint aucune base. Les quatre pages le documentent désormais, à leur étape 1.
+  Un garde-fou fige l'ensemble, dont l'interdiction de documenter `opt-in:enable` sans `--apply`, celle de faire copier du DDL à la main, et l'obligation pour **les 27 paquets** d'indiquer leur épinglage.
 
 - **La neutralisation de l'injection CSV rejoint le cœur (`CRUD-CSV-ESCAPE-CORE-001`).**
   `make:crud` **recopiait** dans chaque contrôleur sa défense contre l'injection de formule CSV. Mesuré sur une application réelle de 50 entités : **36 exemplaires identiques**.

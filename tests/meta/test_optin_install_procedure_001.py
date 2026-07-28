@@ -132,6 +132,38 @@ def test_chaque_reference_renvoie_a_la_procedure_canonique() -> None:
     )
 
 
+def test_toute_reference_documente_l_epinglage() -> None:
+    """Le geste qui manquait, et le plus coûteux à découvrir tard.
+
+    Un paquet installé sans être épinglé n'existe que sur la machine de celui
+    qui l'a installé. Le cas des backends BDD est le plus grave : sans pilote,
+    l'application n'atteint aucune base, et la panne se produit chez le
+    collègue, sur le serveur ou en intégration continue, jamais chez l'auteur.
+
+    Les backends et `forge-mvc-testing` sont hors catalogue mais **pas hors
+    règle** : seul le fichier d'épinglage change, `requirements-dev.txt` pour
+    l'infrastructure de test réservée au développement (ADR-041).
+    """
+    offenders: list[str] = []
+    for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        texte = reference.read_text(encoding="utf-8")
+        if "requirements.txt" not in texte and "requirements-dev.txt" not in texte:
+            offenders.append(reference.parts[-3])
+
+    assert offenders == [], (
+        "Ces références n'indiquent pas d'épingler le paquet ; leur lecteur "
+        f"obtient une installation qui ne survit pas à un clone : {offenders}"
+    )
+
+
+def test_les_paquets_hors_catalogue_sont_bien_ceux_attendus() -> None:
+    """Garde la liste d'exclusion honnête : un nouveau paquet ne s'y glisse pas."""
+    distributions = {p.parts[-1] for p in PROJECT_ROOT.glob("packages/*") if p.is_dir()}
+    catalogues = {optin.package_dist for optin in _catalogue().values()}  # type: ignore[attr-defined]
+
+    assert distributions - catalogues == HORS_CATALOGUE
+
+
 def test_le_catalogue_et_les_references_se_correspondent() -> None:
     """Un opt-in du catalogue sans page de référence n'est pas documenté."""
     manquantes = [
