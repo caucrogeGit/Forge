@@ -74,7 +74,7 @@ class FilesWelcomeController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.files_welcome_controller import FilesWelcomeController
 
 with router.group("", public=True) as public:

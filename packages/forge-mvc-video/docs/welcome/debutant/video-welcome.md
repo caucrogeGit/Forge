@@ -81,10 +81,10 @@ class VideoWelcomeController(BaseController):
 
 ## La route
 
-Ajoutez les deux routes dans le groupe public de `mvc/routes.py`.
+Ajoutez les deux routes dans le groupe public de `mvc/routes/__init__.py`.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.video_welcome_controller import VideoWelcomeController
 
 with router.group("", public=True) as public:

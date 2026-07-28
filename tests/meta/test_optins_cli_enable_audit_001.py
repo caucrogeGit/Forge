@@ -52,7 +52,7 @@ class TestCommandContract:
         assert "optins/registry.py" in _text()
 
     def test_mentions_routes_file(self):
-        assert "mvc/routes.py" in _text()
+        assert "mvc/routes/__init__.py" in _text()
 
 
 class TestLockedRules:

@@ -155,10 +155,10 @@ Créez le gabarit ci-dessous : il porte le formulaire et la liste des derniers �
 
 ## La route
 
-Déclarez les deux routes (`GET` pour la page, `POST` pour l'injection) dans `mvc/routes.py`, à l'intérieur du groupe public.
+Déclarez les deux routes (`GET` pour la page, `POST` pour l'injection) dans `mvc/routes/__init__.py`, à l'intérieur du groupe public.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.iot_simulate_controller import IotSimulateController
 
 with router.group("", public=True) as public:

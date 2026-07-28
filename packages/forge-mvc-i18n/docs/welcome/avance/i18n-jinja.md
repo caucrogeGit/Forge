@@ -59,7 +59,7 @@ class I18nPageController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.i18n_page_controller import I18nPageController
 
 with router.group("", public=True) as public:

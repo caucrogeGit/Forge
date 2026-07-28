@@ -17,7 +17,7 @@ la route exige ``Authorization: Bearer <token>`` ; sinon elle est ouverte
 (mode local/pédagogique). L'auth vit dans ce module, **jamais** dans Forge Core.
 
 Le module reste **opt-in** : l'application appelle ``register_video_routes``
-explicitement (couche ``optins/video/``). Aucune écriture dans ``mvc/routes.py``.
+explicitement (couche ``optins/video/``). Aucune écriture dans ``mvc/routes/__init__.py``.
 """
 from __future__ import annotations
 

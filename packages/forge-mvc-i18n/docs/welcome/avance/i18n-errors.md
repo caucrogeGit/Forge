@@ -51,7 +51,7 @@ class I18nErrorsController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.i18n_errors_controller import I18nErrorsController
 
 with router.group("", public=True) as public:

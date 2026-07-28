@@ -154,7 +154,7 @@ class MfaChallengeController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.mfa_challenge_controller import MfaChallengeController
 
 with router.group("", public=True) as public:

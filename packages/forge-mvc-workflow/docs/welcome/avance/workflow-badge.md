@@ -85,10 +85,10 @@ class WorkflowBadgeController(BaseController):
 
 ## La route
 
-Dans le groupe public de `mvc/routes.py`, ajoutez l'import et la route :
+Dans le groupe public de `mvc/routes/__init__.py`, ajoutez l'import et la route :
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.workflow_badge_controller import WorkflowBadgeController
 
 with router.group("", public=True) as public:

@@ -85,10 +85,10 @@ class IotDeviceController(BaseController):
 
 ## La route
 
-Déclarez la route paramétrée dans `mvc/routes.py`, à l'intérieur du groupe public.
+Déclarez la route paramétrée dans `mvc/routes/__init__.py`, à l'intérieur du groupe public.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.iot_device_controller import IotDeviceController
 
 with router.group("", public=True) as public:

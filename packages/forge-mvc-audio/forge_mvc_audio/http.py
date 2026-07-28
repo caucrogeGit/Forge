@@ -16,7 +16,7 @@ ouverte (mode local/pédagogique). L'auth vit dans ce module, **jamais** dans
 Forge Core.
 
 Le module reste **opt-in** : l'application appelle ``register_audio_routes``
-explicitement. Aucune écriture dans ``mvc/routes.py`` (charte §9).
+explicitement. Aucune écriture dans ``mvc/routes/__init__.py`` (charte §9).
 """
 from __future__ import annotations
 

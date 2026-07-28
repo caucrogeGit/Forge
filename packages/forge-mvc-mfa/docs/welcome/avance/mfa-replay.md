@@ -120,7 +120,7 @@ class MfaReplayController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.mfa_replay_controller import MfaReplayController
 
 with router.group("", public=True) as public:

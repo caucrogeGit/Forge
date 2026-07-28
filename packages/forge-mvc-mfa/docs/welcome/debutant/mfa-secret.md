@@ -85,7 +85,7 @@ class MfaSecretController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.mfa_secret_controller import MfaSecretController
 
 with router.group("", public=True) as public:

@@ -63,7 +63,7 @@ class I18nWelcomeController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.i18n_welcome_controller import I18nWelcomeController
 
 with router.group("", public=True) as public:

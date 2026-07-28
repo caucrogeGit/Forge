@@ -2,7 +2,7 @@
 
 Rapide et sans base de données : importe le routeur du projet et vérifie que la
 route d'accueil publique est résolue. Si ce test passe, le câblage
-`mvc/routes.py` -> contrôleurs -> `optins/registry.py` est sain.
+`mvc/routes/` -> contrôleurs -> `optins/registry.py` est sain.
 
 Point de départ pour vos propres tests : `pytest -m smoke` pour ce niveau,
 `pytest` pour toute la suite. Marqueurs disponibles dans `pytest.ini`.
@@ -14,7 +14,7 @@ from mvc.routes import router
 
 @pytest.mark.smoke
 def test_le_routeur_du_projet_se_charge():
-    assert router.iter_routes(), "aucune route enregistrée dans mvc/routes.py"
+    assert router.iter_routes(), "aucune route enregistrée dans mvc/routes/"
 
 
 @pytest.mark.smoke

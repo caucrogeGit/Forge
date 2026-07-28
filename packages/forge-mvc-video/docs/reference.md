@@ -48,7 +48,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     ```
 
 
-    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
+    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes/__init__.py`.
     `forge opt-in:install video` affiche la commande `pip` sans l'exécuter.
 
     Puis installez les binaires externes `ffmpeg` et `ffprobe`, requis pour le sondage et le transcodage :
@@ -75,7 +75,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     pip uninstall forge-mvc-video
     ```
 
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
     `forge opt-in:remove video` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Commandes"

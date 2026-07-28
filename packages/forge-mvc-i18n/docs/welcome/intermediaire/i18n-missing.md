@@ -48,7 +48,7 @@ class I18nMissingController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.i18n_missing_controller import I18nMissingController
 
 with router.group("", public=True) as public:

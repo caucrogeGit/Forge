@@ -96,7 +96,7 @@ class FileServeController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.file_serve_controller import FileServeController
 
 with router.group("", public=True) as public:

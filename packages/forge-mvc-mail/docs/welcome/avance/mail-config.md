@@ -69,10 +69,10 @@ Le mot de passe n'est jamais affiché, seule sa présence est indiquée.
     ```
 
 ??? note "Route"
-    Dans `mvc/routes.py`, ajoutez l'import puis la route à l'intérieur du groupe public :
+    Dans `mvc/routes/__init__.py`, ajoutez l'import puis la route à l'intérieur du groupe public :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from mvc.controllers.mail_config_controller import MailConfigController
 
     with router.group("", public=True) as public:

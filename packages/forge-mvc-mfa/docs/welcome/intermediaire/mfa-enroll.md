@@ -143,7 +143,7 @@ class MfaEnrollController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.mfa_enroll_controller import MfaEnrollController
 
 with router.group("", public=True) as public:

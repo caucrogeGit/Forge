@@ -132,10 +132,10 @@ class AudioTranscodeController(BaseController):
 
 ## La route
 
-Déclarez les deux routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+Déclarez les deux routes dans `mvc/routes/__init__.py`, à l'intérieur du groupe public.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.audio_transcode_controller import AudioTranscodeController
 
 with router.group("", public=True) as public:

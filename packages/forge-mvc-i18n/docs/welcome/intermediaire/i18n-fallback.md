@@ -69,7 +69,7 @@ class I18nFallbackController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.i18n_fallback_controller import I18nFallbackController
 
 with router.group("", public=True) as public:

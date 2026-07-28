@@ -106,7 +106,7 @@ class FileSafePathController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.file_safe_path_controller import FileSafePathController
 
 with router.group("", public=True) as public:

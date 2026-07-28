@@ -136,10 +136,10 @@ Le contrôleur rend `image_safety/index.html` : créez ce fichier.
 
 ## La route
 
-Déclarez les trois routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+Déclarez les trois routes dans `mvc/routes/__init__.py`, à l'intérieur du groupe public.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.image_safety_controller import ImageSafetyController
 
 with router.group("", public=True) as public:

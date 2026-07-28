@@ -96,10 +96,10 @@ class StatsAdminSqlController(BaseController):
 
 ## La route
 
-Dans `mvc/routes.py`, ajoutez l'import en tête de fichier et la route dans le groupe public.
+Dans `mvc/routes/__init__.py`, ajoutez l'import en tête de fichier et la route dans le groupe public.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.stats_admin_sql_controller import StatsAdminSqlController
 
 with router.group("", public=True) as public:

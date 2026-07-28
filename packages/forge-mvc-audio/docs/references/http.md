@@ -10,7 +10,7 @@ Une fois un audio ingéré et transcodé, il faut pouvoir le **lire** depuis le 
 Ce module branche une route de **lecture en streaming**, avec support du *seek* (HTTP Range), pour qu'un lecteur audio puisse avancer dans la piste sans tout télécharger.
 
 Le module est **sans état** et reste **opt-in** : c'est l'application qui appelle `register_audio_routes` explicitement.
-Aucune écriture dans `mvc/routes.py` (charte §9).
+Aucune écriture dans `mvc/routes/__init__.py` (charte §9).
 
 ## 2. Brancher la route dans Forge
 

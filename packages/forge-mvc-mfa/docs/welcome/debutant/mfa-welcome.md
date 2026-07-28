@@ -80,7 +80,7 @@ class MfaWelcomeController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.mfa_welcome_controller import MfaWelcomeController
 
 with router.group("", public=True) as public:

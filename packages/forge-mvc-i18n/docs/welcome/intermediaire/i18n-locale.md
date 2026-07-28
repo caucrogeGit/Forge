@@ -59,7 +59,7 @@ class I18nLocaleController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.i18n_locale_controller import I18nLocaleController
 
 with router.group("", public=True) as public:

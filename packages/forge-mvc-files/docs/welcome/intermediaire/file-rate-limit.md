@@ -126,7 +126,7 @@ class FileRateLimitController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.file_rate_limit_controller import FileRateLimitController
 
 with router.group("", public=True) as public:

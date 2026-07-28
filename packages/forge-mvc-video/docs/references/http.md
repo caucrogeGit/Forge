@@ -9,7 +9,7 @@ Le fichier de code correspondant est `forge_mvc_video/http.py`.
 Une fois la vidéo traitée, il faut la **lire** depuis le navigateur.
 Ce module branche une route de lecture en streaming avec support HTTP **Range** (seek), pour qu'un lecteur vidéo puisse avancer sans tout télécharger.
 
-Le module reste **opt-in** : l'application appelle `register_video_routes` explicitement, sans écriture dans `mvc/routes.py`.
+Le module reste **opt-in** : l'application appelle `register_video_routes` explicitement, sans écriture dans `mvc/routes/__init__.py`.
 
 ## 2. Brancher la route
 

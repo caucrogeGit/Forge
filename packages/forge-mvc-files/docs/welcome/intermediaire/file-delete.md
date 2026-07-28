@@ -113,7 +113,7 @@ class FileDeleteController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.file_delete_controller import FileDeleteController
 
 with router.group("", public=True) as public:

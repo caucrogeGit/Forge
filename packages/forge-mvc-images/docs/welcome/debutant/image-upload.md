@@ -133,10 +133,10 @@ Le contrôleur rend `image_upload/index.html` : créez ce fichier.
 
 ## La route
 
-Déclarez les deux routes dans `mvc/routes.py`, à l'intérieur du groupe public.
+Déclarez les deux routes dans `mvc/routes/__init__.py`, à l'intérieur du groupe public.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.image_upload_controller import ImageUploadController
 
 with router.group("", public=True) as public:

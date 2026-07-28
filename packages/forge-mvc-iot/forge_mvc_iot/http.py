@@ -13,7 +13,7 @@ Branche trois routes GET sur un ``Router`` Forge :
 Aucun SQL n'est écrit dans les handlers : toute la lecture passe par le
 repository. Le module reste **opt-in** : l'application appelle
 explicitement ``register_iot_routes(router)`` pour les enregistrer.
-Aucune modification automatique de ``mvc/routes.py``.
+Aucune modification automatique de ``mvc/routes/__init__.py``.
 
 Sécurité (IOT-HTTP-API-AUTH-001) : protection **optionnelle** par token
 Bearer. Si ``FORGE_IOT_API_TOKEN`` est défini, les trois routes exigent
@@ -268,7 +268,7 @@ def register_iot_routes(
     """Enregistre les routes Forge IoT sur un ``Router`` Forge.
 
     L'application appelle cette fonction **explicitement** depuis son
-    ``mvc/routes.py`` — Forge Core n'enregistre rien automatiquement.
+    ``mvc/routes/__init__.py`` — Forge Core n'enregistre rien automatiquement.
 
     Parameters
     ----------

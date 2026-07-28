@@ -69,7 +69,7 @@ class I18nCatalogController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.i18n_catalog_controller import I18nCatalogController
 
 with router.group("", public=True) as public:

@@ -99,10 +99,10 @@ L'email s'affiche alors dans la console du serveur, aucun serveur SMTP n'est req
     ```
 
 ??? note "Route"
-    Dans `mvc/routes.py`, ajoutez l'import du contrôleur puis les deux routes à l'intérieur du groupe public :
+    Dans `mvc/routes/__init__.py`, ajoutez l'import du contrôleur puis les deux routes à l'intérieur du groupe public :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from mvc.controllers.mail_welcome_controller import MailWelcomeController
 
     with router.group("", public=True) as public:

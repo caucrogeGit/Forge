@@ -115,10 +115,10 @@ Créez le gabarit ci-dessous : il récapitule la configuration de connexion et r
 
 ## La route
 
-Déclarez la route dans `mvc/routes.py`, à l'intérieur du groupe public.
+Déclarez la route dans `mvc/routes/__init__.py`, à l'intérieur du groupe public.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.iot_subscriber_controller import IotSubscriberController
 
 with router.group("", public=True) as public:

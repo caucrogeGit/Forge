@@ -75,10 +75,10 @@ La page dégrade proprement si le template est absent.
     ```
 
 ??? note "Route"
-    Dans `mvc/routes.py`, ajoutez l'import puis la route à l'intérieur du groupe public :
+    Dans `mvc/routes/__init__.py`, ajoutez l'import puis la route à l'intérieur du groupe public :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from mvc.controllers.mail_template_controller import MailTemplateController
 
     with router.group("", public=True) as public:

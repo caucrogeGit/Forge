@@ -76,12 +76,14 @@ La documentation complète d'installation est sur
 ## Exemple minimal
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
+from core.http.router import Router
 from mvc.controllers.home_controller import HomeController
 
-routes = [
-    ("GET", "/", HomeController.index, {"public": True}),
-]
+router = Router()
+
+with router.group("", public=True) as public:
+    public.add("GET", "/", HomeController.index, name="home-index")
 ```
 
 ```python

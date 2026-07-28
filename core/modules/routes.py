@@ -72,7 +72,7 @@ def _module_import_path(source_dir: Path, routes_path: str) -> str:
 
 
 def _format_lines_to_add(module_name: str) -> str:
-    """Retourne les lignes à copier dans mvc/routes.py pour activer le module."""
+    """Retourne les lignes à copier dans mvc/routes/__init__.py pour activer le module."""
     alias = f"register_{module_name}_routes"
     return (
         f"from mvc.routes_{module_name} import {alias}\n"
@@ -86,7 +86,7 @@ def _module_routes_file_content(module_name: str, import_path: str, alias: str) 
         f'"""Routes du module Forge "{module_name}".\n'
         f"\n"
         f"Fichier genere par `forge module:routes {module_name}`. Regenerable.\n"
-        f"Pour activer ces routes, ajoutez dans mvc/routes.py :\n"
+        f"Pour activer ces routes, ajoutez dans mvc/routes/__init__.py :\n"
         f"\n"
         f"    from mvc.routes_{module_name} import {alias}\n"
         f"    {alias}(router)\n"
@@ -143,7 +143,7 @@ def generate_module_routes(
 ) -> ModuleRouteGenerationResult:
     """Génère un fichier de routes dédié mvc/routes_<module>.py.
 
-    Ne modifie jamais mvc/routes.py. Le développeur copie les lignes
+    Ne modifie jamais mvc/routes/__init__.py. Le développeur copie les lignes
     affichées dans son fichier de routes.
     """
     manifest, source_dir, routes_path = _load_and_validate_module(

@@ -32,7 +32,7 @@ class RouteEntry:
     def __init__(self, method: str | list[str], pattern: str, handler: Handler,
                  *, name: str | None = None, public: bool = False,
                  csrf: bool = True, api: bool = False) -> None:
-        # Validation à l'enregistrement (donc dans le frame de mvc/routes.py).
+        # Validation à l'enregistrement (donc dans le frame de mvc/routes/).
         # Un handler non appelable ne casserait sinon qu'au dispatch
         # (`route.handler(request)`), erreur différée pointant le routeur et
         # non la ligne de routes.py fautive.

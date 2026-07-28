@@ -47,7 +47,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     ```
 
 
-    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
+    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes/__init__.py`.
     `forge opt-in:install iot` affiche la commande `pip` sans l'exécuter.
 
     Puis créez la table `iot_events`, prérequis dur du module :
@@ -67,7 +67,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     pip uninstall forge-mvc-iot
     ```
 
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
     `forge opt-in:remove iot` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Commandes"

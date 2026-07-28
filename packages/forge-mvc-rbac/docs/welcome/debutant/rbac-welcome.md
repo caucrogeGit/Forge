@@ -124,10 +124,10 @@ Ce contrat sert tout le parcours : il déclare une entité `Article`, ses permis
 
 ## La route
 
-Ajoutez l'import et les deux routes dans le groupe public de `mvc/routes.py` :
+Ajoutez l'import et les deux routes dans le groupe public de `mvc/routes/__init__.py` :
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.rbac_welcome_controller import RbacWelcomeController
 
 with router.group("", public=True) as public:

@@ -149,10 +149,10 @@ Créez le gabarit ci-dessous : formulaire de saisie, affichage de la `Measuremen
 
 ## La route
 
-Déclarez les deux routes (`GET` pour la page, `POST` pour la validation) dans `mvc/routes.py`, à l'intérieur du groupe public.
+Déclarez les deux routes (`GET` pour la page, `POST` pour la validation) dans `mvc/routes/__init__.py`, à l'intérieur du groupe public.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.iot_contract_controller import IotContractController
 
 with router.group("", public=True) as public:

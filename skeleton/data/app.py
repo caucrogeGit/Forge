@@ -18,7 +18,8 @@ La gestion de l'authentification (login, logout, protection des routes) est
 entièrement du ressort de l'application : voir mvc/controllers/auth_controller.py.
 Le framework fournit uniquement les outils (sessions, CSRF, hashing, décorateurs).
 
-Les routes sont déclarées dans mvc/routes.py.
+Les routes sont déclarées dans le package mvc/routes/ (un fichier par contrôleur,
+branchés dans mvc/routes/__init__.py — ADR-068).
 La configuration (hôte, port, certificats) est dans config.py.
 Les classes Request et Response sont dans core/http/request.py
 et core/http/response.py.

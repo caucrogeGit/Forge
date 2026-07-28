@@ -65,10 +65,10 @@ En production, on choisit `ConsoleTransport`, `LogTransport`, `NullTransport` ou
     ```
 
 ??? note "Route"
-    Dans `mvc/routes.py`, ajoutez l'import puis la route à l'intérieur du groupe public :
+    Dans `mvc/routes/__init__.py`, ajoutez l'import puis la route à l'intérieur du groupe public :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from mvc.controllers.mail_transport_controller import MailTransportController
 
     with router.group("", public=True) as public:

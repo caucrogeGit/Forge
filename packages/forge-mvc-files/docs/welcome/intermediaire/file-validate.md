@@ -128,7 +128,7 @@ class FileValidateController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.file_validate_controller import FileValidateController
 
 with router.group("", public=True) as public:

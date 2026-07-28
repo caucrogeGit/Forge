@@ -40,11 +40,11 @@ Le fichier est servi en streaming ; un lecteur vidéo peut se positionner grâce
 
 ## La route
 
-Branchez la route de lecture officielle dans `mvc/routes.py`.
+Branchez la route de lecture officielle dans `mvc/routes/__init__.py`.
 Le code métier vit dans le paquet `forge-mvc-video` ; on ne fait que le brancher.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from forge_mvc_video import register_video_routes
 
 register_video_routes(router)

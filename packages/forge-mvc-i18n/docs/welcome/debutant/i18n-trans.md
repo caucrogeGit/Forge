@@ -55,7 +55,7 @@ Ouvrez `/i18n-trans?lang=fr` puis `/i18n-trans?lang=en`.
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.i18n_trans_controller import I18nTransController
 
 with router.group("", public=True) as public:

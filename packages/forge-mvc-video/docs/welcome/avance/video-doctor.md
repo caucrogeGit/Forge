@@ -93,10 +93,10 @@ class VideoDoctorController(BaseController):
 
 ## La route
 
-Ajoutez la route dans le groupe public de `mvc/routes.py`.
+Ajoutez la route dans le groupe public de `mvc/routes/__init__.py`.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.video_doctor_controller import VideoDoctorController
 
 with router.group("", public=True) as public:

@@ -64,10 +64,10 @@ On inspecte les champs du message composé, sans l'envoyer.
     ```
 
 ??? note "Route"
-    Dans `mvc/routes.py`, ajoutez l'import puis la route à l'intérieur du groupe public :
+    Dans `mvc/routes/__init__.py`, ajoutez l'import puis la route à l'intérieur du groupe public :
 
     ```python
-    # mvc/routes.py
+    # mvc/routes/__init__.py
     from mvc.controllers.mail_message_controller import MailMessageController
 
     with router.group("", public=True) as public:

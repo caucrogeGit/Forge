@@ -153,7 +153,7 @@ Motifs de chemin reconnus :
 
 | Besoin | Élément |
 |---|---|
-| Déclarer les routes de l'application | `mvc/routes.py`, par groupes |
+| Déclarer les routes de l'application | `mvc/routes/`, un fichier par contrôleur, par groupes |
 | Séparer routes publiques et protégées | `router.group(..., public=True)` |
 | Ajouter les routes d'un opt-in | `register_<module>_routes(router)` |
 | Résoudre une requête vers un gestionnaire | `router.resolve(method, path)` |

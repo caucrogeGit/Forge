@@ -5,6 +5,20 @@
 
 ### Corrigé
 
+- **La neutralisation de l'injection CSV rejoint le cœur (`CRUD-CSV-ESCAPE-CORE-001`).**
+  `make:crud` **recopiait** dans chaque contrôleur sa défense contre l'injection de formule CSV. Mesuré sur une application réelle de 50 entités : **36 exemplaires identiques**.
+  Deux défauts en un. La règle était **incomplète** : elle n'examinait que le premier caractère, alors qu'un tableur ignore une tabulation ou un retour chariot de tête, si bien que `"\t=1+1"` s'ouvrait comme la formule `=1+1`. Et elle était **incorrigible** : Forge ne réécrit jamais le code utilisateur (principe 9), donc aucune correction n'atteignait les fichiers déjà générés.
+  La règle vit désormais dans `core.security.csv_export.escape_csv_field`, que le contrôleur généré **appelle**. Un `pip install --upgrade` corrige toutes les applications. Un garde-fou interdit désormais à tout générateur de recopier une primitive de sécurité.
+
+- **`make:auth` ne met plus de SQL dans le contrôleur (`MAKE-AUTH-MODEL-LAYER-001`).**
+  Le scaffold d'authentification portait sa requête `SELECT ... FROM users` directement dans le contrôleur généré, en contradiction avec la séparation que `make:crud` produit et que la documentation Forge enseigne. Un générateur ne peut pas prescrire une doctrine qu'il enfreint.
+  `make:auth` génère désormais `mvc/models/user_model.py`, qui porte `load_user_by_email` ; le contrôleur l'importe. Le SQL y reste visible et paramétré (principe 5).
+
+- **Plus aucune référence au défunt `mvc/routes.py` (`DOC-ROUTES-PACKAGE-REFS-001`).**
+  L'ADR-068 a remplacé ce fichier par le package `mvc/routes/`, mais **194 références** au chemin disparu ont survécu dans 107 fichiers. Trois d'entre elles étaient des **messages affichés à l'utilisateur** par `forge module:routes`, l'invitant à éditer un fichier inexistant ; les autres vivaient dans le squelette, sa suite de tests, la documentation du routeur et les parcours d'apprentissage de quinze opt-ins.
+  L'exemple minimal du README était doublement périmé : il citait le chemin disparu **et** enseignait la forme `routes = [...]` que le cœur ne connaît plus ; il montre désormais `Router()` et ses groupes.
+  Les archives sont préservées : `docs/history/`, les ADR et `docs/roadmap/` décrivent l'état de leur époque.
+
 - **Le garde de release audite enfin ce que Forge livre (`RELEASE-AUDIT-SHIPPED-SURFACE-001`).**
   `tools/release-validate.sh` auditait `requirements.txt`, soit les **quatre** dépendances du cœur, en ignorant `requirements-audit.txt` qui agrège la surface réellement expédiée (Pillow, cryptography, psycopg, pyodbc...) — précisément celles qui portent des CVE. Le fichier existait pour cela, mais le garde ne le lisait pas.
   Son verdict pytest se lisait par ailleurs dans le **texte** de sortie. Mesuré : une suite ne collectant aucun test affiche « no tests ran », que l'ancien motif comptait comme réussi, alors que pytest sort en **code 5**. Une erreur de configuration pouvait donc laisser passer une release **sans qu'un seul test ait tourné**. Le verdict vient désormais du code retour, avec un message propre au cas « aucun test collecté ».

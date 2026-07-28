@@ -20,10 +20,10 @@ Toutes les routes sont :
 ## Branchement explicite
 
 Le module IoT reste **opt-in** : Forge Core n'enregistre rien automatiquement.
-L'application déclare les routes elle-même depuis son `mvc/routes.py` :
+L'application déclare les routes elle-même depuis son `mvc/routes/__init__.py` :
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from forge_mvc_iot import register_iot_routes
 
 def setup_routes(router):

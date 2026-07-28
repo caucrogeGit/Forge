@@ -48,7 +48,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     ```
 
 
-    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes.py`.
+    `opt-in:enable` inscrit l'opt-in dans `optins/registry.py` (ADR-061) et câble ses routes dans `mvc/routes/__init__.py`.
     `forge opt-in:install audio` affiche la commande `pip` sans l'exécuter.
 
     ### Désinstallation
@@ -58,7 +58,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     pip uninstall forge-mvc-audio
     ```
 
-    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes.py`, sans toucher au paquet.
+    `opt-in:disable` est l'inverse d'`enable` : il dé-inscrit du registre et débranche les routes de `mvc/routes/__init__.py`, sans toucher au paquet.
     `forge opt-in:remove audio` affiche la commande `pip uninstall` sans l'exécuter.
 
 ??? note "3. Commandes"

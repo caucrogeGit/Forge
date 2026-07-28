@@ -9,7 +9,7 @@ Pour aller plus loin et exiger une **permission**, le projet active l'option exp
 
 ## Activer la permission
 
-Dans le branchement (`mvc/routes.py`), passez une permission :
+Dans le branchement (`mvc/routes/__init__.py`), passez une permission :
 
 ```python
 register_admin_routes(router, permission="admin.access")

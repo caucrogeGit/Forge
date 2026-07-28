@@ -33,10 +33,10 @@ Téléversez un audio au palier précédent, notez son `uuid`, puis ouvrez `http
 ## La route
 
 Ce palier ne crée **aucun contrôleur** : le code de lecture vit dans le paquet `forge-mvc-audio` ; on ne fait que le brancher.
-Ajoutez ces lignes dans `mvc/routes.py` (au niveau du module, pas dans un groupe : `register_audio_routes` déclare ses propres routes) :
+Ajoutez ces lignes dans `mvc/routes/__init__.py` (au niveau du module, pas dans un groupe : `register_audio_routes` déclare ses propres routes) :
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 # Branche la route de lecture officielle de Forge Audio (streaming HTTP Range) :
 #   GET /audio/{uuid}
 # Le code métier vit dans le paquet forge-mvc-audio ; on ne fait que le brancher.

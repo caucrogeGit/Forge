@@ -146,7 +146,7 @@ class MfaRecoveryController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.mfa_recovery_controller import MfaRecoveryController
 
 with router.group("", public=True) as public:

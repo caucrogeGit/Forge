@@ -1,7 +1,7 @@
 # La génération des routes de module dans Forge
 
 Brancher les routes d'un module ne se fait jamais par injection silencieuse.
-Le sous-module `routes` génère un fichier dédié `mvc/routes_<module>.py`, puis affiche les deux lignes que le développeur copie lui-même dans `mvc/routes.py`.
+Le sous-module `routes` génère un fichier dédié `mvc/routes_<module>.py`, puis affiche les deux lignes que le développeur copie lui-même dans `mvc/routes/__init__.py`.
 C'est une application directe du principe : pas d'écriture invisible dans le code utilisateur.
 
 ## 1. Rôle
@@ -10,7 +10,7 @@ C'est une application directe du principe : pas d'écriture invisible dans le co
 
 À partir d'un module présent au registre et déclarant `routes` dans `provides`, il calcule le chemin d'import du fichier de routes source, génère un petit fichier `mvc/routes_<module>.py` qui réexporte la fonction d'enregistrement, et retourne les lignes à ajouter à la main dans le routeur de l'application.
 
-Le fichier `mvc/routes.py` n'est jamais modifié par Forge.
+Le fichier `mvc/routes/__init__.py` n'est jamais modifié par Forge.
 Si le fichier généré existe déjà, la génération est refusée plutôt qu'écrasée.
 
 ## 2. Vue d'ensemble rapide
@@ -19,7 +19,7 @@ Si le fichier généré existe déjà, la génération est refusée plutôt qu'�
 |---|---|
 | Module Python | `core.modules.routes` |
 | Couche | Système de modules (cœur) |
-| Rôle | générer un fichier de routes dédié, sans toucher `mvc/routes.py` |
+| Rôle | générer un fichier de routes dédié, sans toucher `mvc/routes/__init__.py` |
 | Fichier généré | `mvc/routes_<module>.py` |
 | Fichier de routes utilisateur | `mvc/module_routes.py` (constante `MODULE_ROUTES_FILE`) |
 | Objet lié | `ModuleRouteGenerationResult`, `ModuleManifest` |
@@ -81,7 +81,7 @@ sequenceDiagram
     participant Registry as Registre
     participant Manifest as load_module_manifest
     participant Disque as mvc/routes_module.py
-    participant Routes as mvc/routes.py
+    participant Routes as mvc/routes/__init__.py
 
     Developpeur->>Generate: generate_module_routes(module, dry_run)
     Generate->>Registry: module installé ?
@@ -103,7 +103,7 @@ sequenceDiagram
 
 À retenir :
 
-- Forge écrit `mvc/routes_<module>.py`, jamais `mvc/routes.py` ;
+- Forge écrit `mvc/routes_<module>.py`, jamais `mvc/routes/__init__.py` ;
 - le branchement final reste un geste manuel et conscient du développeur ;
 - un module sans `routes` dans `provides` provoque une `ModuleRouteInjectionError`.
 
@@ -137,7 +137,7 @@ from core.modules.routes import (
 )
 
 apercu = generate_module_routes("blog", dry_run=True)
-print("À ajouter dans mvc/routes.py :")
+print("À ajouter dans mvc/routes/__init__.py :")
 print(apercu.lines_to_add)
 
 try:
@@ -153,7 +153,7 @@ Le développeur colle ensuite les deux lignes affichées dans son routeur.
 
 ## 7. Pas d'écriture invisible
 
-!!! warning "mvc/routes.py n'est jamais modifié"
+!!! warning "mvc/routes/__init__.py n'est jamais modifié"
     `routes` se limite à créer `mvc/routes_<module>.py` et à afficher les lignes à copier.
     Le branchement dans le routeur de l'application reste un geste manuel, conforme au principe de préservation du code utilisateur.
 

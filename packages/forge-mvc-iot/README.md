@@ -97,7 +97,7 @@ forge iot:doctor --mqtt  →  forge iot:simulate  →  forge iot:listen
 
 ## API HTTP
 
-Branchement **explicite** dans `mvc/routes.py` (jamais automatique) :
+Branchement **explicite** dans `mvc/routes/__init__.py` (jamais automatique) :
 
 ```python
 from forge_mvc_iot import register_iot_routes

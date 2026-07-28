@@ -357,7 +357,7 @@ Forge suit trois modes :
 - **Forge lit** — lit des fichiers existants pour analyse
 
 Forge **ne réécrit jamais silencieusement** un fichier applicatif.
-Si un ticket pourrait modifier `mvc/routes.py`, `mvc/controllers/*.py` ou tout
+Si un ticket pourrait modifier `mvc/routes/`, `mvc/controllers/*.py` ou tout
 fichier sous contrôle utilisateur — **arrêter et proposer une alternative**.
 
 ---

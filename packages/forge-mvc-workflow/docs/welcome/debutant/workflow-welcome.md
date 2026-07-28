@@ -88,10 +88,10 @@ class WorkflowWelcomeController(BaseController):
 
 ## La route
 
-Dans le groupe public de `mvc/routes.py`, ajoutez l'import et les deux routes :
+Dans le groupe public de `mvc/routes/__init__.py`, ajoutez l'import et les deux routes :
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.workflow_welcome_controller import WorkflowWelcomeController
 
 with router.group("", public=True) as public:

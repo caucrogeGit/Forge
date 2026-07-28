@@ -110,7 +110,7 @@ class MfaVerifyController(BaseController):
 ## La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.mfa_verify_controller import MfaVerifyController
 
 with router.group("", public=True) as public:

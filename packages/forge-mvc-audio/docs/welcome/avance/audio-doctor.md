@@ -81,10 +81,10 @@ class AudioDoctorController(BaseController):
 
 ## La route
 
-Déclarez la route dans `mvc/routes.py`, à l'intérieur du groupe public.
+Déclarez la route dans `mvc/routes/__init__.py`, à l'intérieur du groupe public.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.audio_doctor_controller import AudioDoctorController
 
 with router.group("", public=True) as public:

@@ -46,10 +46,10 @@ Si `FORGE_IOT_API_TOKEN` est défini, ajoutez l'en-tête `Authorization: Bearer 
 ## La route
 
 Ce palier n'a **pas** de contrôleur à créer : le code métier des trois routes vit dans le paquet opt-in `forge-mvc-iot`.
-Votre application se contente de le **brancher** via `register_iot_routes(router)`, ajouté dans `mvc/routes.py`.
+Votre application se contente de le **brancher** via `register_iot_routes(router)`, ajouté dans `mvc/routes/__init__.py`.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from forge_mvc_iot import register_iot_routes
 
 register_iot_routes(router)

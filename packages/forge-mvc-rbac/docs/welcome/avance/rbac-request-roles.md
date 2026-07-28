@@ -65,10 +65,10 @@ class RbacRequestRolesController(BaseController):
 ## La route
 
 Ce palier renvoie du JSON directement (`Response.json`), il n'a donc pas de vue.
-Ajoutez l'import et la route dans le groupe public de `mvc/routes.py` :
+Ajoutez l'import et la route dans le groupe public de `mvc/routes/__init__.py` :
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.rbac_request_roles_controller import RbacRequestRolesController
 
 with router.group("", public=True) as public:

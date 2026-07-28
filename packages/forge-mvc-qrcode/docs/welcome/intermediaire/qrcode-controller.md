@@ -46,7 +46,7 @@ class QrCodeController(BaseController):
 ## 2. La route
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.qrcode_controller import QrCodeController
 
 with router.group("", public=True) as public:

@@ -12,7 +12,7 @@
 
 !!! success "Implémenté pour `iot` (OPTINS-CLI-ENABLE-IOT-001 + OPTINS-CLI-ENABLE-ROUTES-APPLY-001)"
     Ce contrat est désormais **réalisé** pour le premier opt-in : `forge optin:enable iot` existe (dry-run par défaut, `--apply` pour écrire, idempotent).
-    Le branchement de `mvc/routes.py` est implémenté par `OPTINS-CLI-ENABLE-ROUTES-APPLY-001` : insertion **uniquement si la structure est reconnue** (`router = Router()`), **sans marqueurs** (l'idempotence repose sur la présence de l'appel `register_optins`) ; structure ambiguë ou fichier absent → `[WARN]` + instruction manuelle, aucune écriture.
+    Le branchement de `mvc/routes/__init__.py` est implémenté par `OPTINS-CLI-ENABLE-ROUTES-APPLY-001` : insertion **uniquement si la structure est reconnue** (`router = Router()`), **sans marqueurs** (l'idempotence repose sur la présence de l'appel `register_optins`) ; structure ambiguë ou fichier absent → `[WARN]` + instruction manuelle, aucune écriture.
     Ce document reste la **référence de conception** ; voir la [référence CLI](../reference/cli-commands.md#opt-ins-branchement-projet).
     `forge opt-in:enable` couvre désormais les **trois opt-ins de type `route`** (`iot`, `video`, `audio`), seuls à posséder leurs propres routes et donc à recevoir la couche `optins/`.
     Les opt-ins `library` (`workflow`, `stats`, `images`, `files`, `mail`, `pivot`, `i18n`) et `crosscutting` (`mfa`, `rbac`) ne se branchent pas par cette couche : ils s'utilisent par import direct ou par décorateurs, sans câblage `optins/`.
@@ -29,11 +29,11 @@ Définir précisément ce qu'une commande `forge optin:enable <name>` aura le dr
 
 ## Pourquoi ne pas coder directement
 
-`forge optin:enable` est une commande **sensible** : elle touche potentiellement `optins/`, `mvc/routes.py`, `mvc/migrations/`, un README local et des fichiers de configuration.
+`forge optin:enable` est une commande **sensible** : elle touche potentiellement `optins/`, `mvc/routes/__init__.py`, `mvc/migrations/`, un README local et des fichiers de configuration.
 Coder trop vite risquerait d'introduire :
 
 - de la **magie cachée** (charte v2 §3), un branchement deviné plutôt qu'écrit ;
-- une **écriture invisible** dans le code utilisateur (charte v2 §9), une modification non maîtrisée de `mvc/routes.py` ;
+- une **écriture invisible** dans le code utilisateur (charte v2 §9), une modification non maîtrisée de `mvc/routes/__init__.py` ;
 - des modifications **difficiles à relire ou à annuler**.
 
 D'où cet audit préalable : on verrouille le contrat **avant** d'écrire la moindre ligne.
@@ -51,9 +51,9 @@ forge optin:enable <name>
 | Option | Effet envisagé |
 |---|---|
 | `--dry-run` | n'écrit **rien** ; affiche ce qui serait créé / modifié (patch, instructions). **Doit exister dès la v1.** |
-| `--apply` | autorise la modification réelle de `mvc/routes.py` (sinon : instruction manuelle affichée). |
+| `--apply` | autorise la modification réelle de `mvc/routes/__init__.py` (sinon : instruction manuelle affichée). |
 | `--no-migrations` | ne touche pas à `mvc/migrations/` (l'utilisateur fera `forge iot:init` lui-même). |
-| `--no-routes` | crée la couche `optins/` mais ne propose pas de brancher `mvc/routes.py`. |
+| `--no-routes` | crée la couche `optins/` mais ne propose pas de brancher `mvc/routes/__init__.py`. |
 
 Pas de `forge optin:disable` dans cette trajectoire (hors périmètre, à auditer séparément si besoin).
 
@@ -62,7 +62,7 @@ Pas de `forge optin:disable` dans cette trajectoire (hors périmètre, à audite
 La commande **n'invente rien** : elle matérialise le modèle déjà documenté, identique à celui généré par le starter `welcome-optin-iot`.
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from optins.registry import register_optins
 
 register_optins(router)
@@ -119,16 +119,16 @@ Deux fichiers existants peuvent devoir évoluer, traités avec **prudence maxima
 S'il existe déjà, la commande doit **ajouter** l'appel de l'opt-in (`register_iot`) **sans réécrire** le reste du fichier (qui peut contenir d'autres opt-ins ou du code manuel).
 Si la forme du registre n'est pas reconnue de façon non ambiguë → **WARN + instruction manuelle**, pas de réécriture.
 
-### `mvc/routes.py`
+### `mvc/routes/__init__.py`
 
 C'est le point le plus sensible (code utilisateur, charte v2 §9).
 Politique **retenue et implémentée** (`OPTINS-CLI-ENABLE-ROUTES-APPLY-001`) :
 
-- **en dry-run** : la commande **n'écrit pas** dans `mvc/routes.py`, elle annonce le branchement (`serait branché`) ;
+- **en dry-run** : la commande **n'écrit pas** dans `mvc/routes/__init__.py`, elle annonce le branchement (`serait branché`) ;
 - **avec `--apply`, si la structure est reconnue** (présence de `router = Router()`, même heuristique que `make:public-page`) : elle insère l'import `from optins.registry import register_optins` (près des imports) et l'appel `register_optins(router)` (en fin de fichier), **idempotemment** ;
 - **sans marqueurs** : l'idempotence repose sur la présence de l'appel `register_optins(router)` (un 2e `--apply` ne duplique rien).
   Choix délibéré pour ne pas ajouter de bruit `# forge-optin: …` dans le fichier utilisateur ;
-- si `mvc/routes.py` a une **structure non reconnue** (ou est absent) → **WARN + instruction manuelle**, jamais d'insertion « au jugé ».
+- si `mvc/routes/__init__.py` a une **structure non reconnue** (ou est absent) → **WARN + instruction manuelle**, jamais d'insertion « au jugé ».
 
 ### `mvc/migrations/`
 
@@ -156,7 +156,7 @@ Deuxième appel attendu (aucun doublon) :
 Règles :
 
 - aucun **doublon** dans `optins/registry.py` (l'appel `register_iot` n'est ajouté qu'une fois) ;
-- aucun **doublon** dans `mvc/routes.py` (l'import et l'appel `register_optins(router)` ne sont insérés qu'une fois ; si l'appel est déjà là → `[OK] déjà branché`) ;
+- aucun **doublon** dans `mvc/routes/__init__.py` (l'import et l'appel `register_optins(router)` ne sont insérés qu'une fois ; si l'appel est déjà là → `[OK] déjà branché`) ;
 - un fichier **déjà présent et identique** → `[OK]` silencieux, exit 0 ;
 - un fichier **présent mais différent** → voir conflits.
 
@@ -169,7 +169,7 @@ En cas d'ambiguïté → **WARN + instructions manuelles**, exit non bloquant.
 |---|---|
 | `optins/iot/routes.py` existe et **diffère** | `[WARN]` : ne pas écraser ; afficher le contenu attendu / un diff, laisser l'utilisateur décider |
 | `optins/registry.py` existe avec du **code manuel** | `[WARN]` : ne pas réécrire ; afficher la ligne à ajouter |
-| `mvc/routes.py` a une **structure non reconnue** | `[WARN]` : afficher l'instruction de branchement manuelle |
+| `mvc/routes/__init__.py` a une **structure non reconnue** | `[WARN]` : afficher l'instruction de branchement manuelle |
 | la **migration existe déjà** dans `mvc/migrations/` | `[OK]` idempotent (déléguer à `forge iot:init`, déjà idempotent) |
 | `forge-mvc-iot` **n'est pas installé** | `[ERREUR]` claire : `pip install forge-mvc-iot`, ne rien écrire qui dépende du paquet |
 
@@ -178,7 +178,7 @@ En cas d'ambiguïté → **WARN + instructions manuelles**, exit non bloquant.
 `--dry-run` est **obligatoire dès la première version** :
 
 - n'écrit **aucun** fichier, ne modifie **rien** ;
-- affiche la liste de ce qui **serait** créé, le patch qui **serait** appliqué à `mvc/routes.py`, et les commandes migrations suggérées ;
+- affiche la liste de ce qui **serait** créé, le patch qui **serait** appliqué à `mvc/routes/__init__.py`, et les commandes migrations suggérées ;
 - exit 0.
 
 C'est le mode de **revue** : on voit l'effet complet avant de l'appliquer.
@@ -190,7 +190,7 @@ Cohérent avec l'esprit `forge iot:init` (copie idempotente, sans exécuter le S
 
 1. crée `optins/` + `optins/iot/` (write-if-new) ;
 2. ajoute `register_iot` dans `optins/registry.py` (idempotent) ;
-3. propose (ou applique avec `--apply`) le branchement `register_optins(router)` dans `mvc/routes.py` ;
+3. propose (ou applique avec `--apply`) le branchement `register_optins(router)` dans `mvc/routes/__init__.py` ;
 4. rappelle `forge iot:init` + `forge migration:apply` pour la table `iot_events` ;
 5. renvoie vers la doc IoT officielle.
 
@@ -206,7 +206,7 @@ Ne sont **pas** réalisés ici :
 - pas de `forge optin:disable` ;
 - pas de modification de `forge.py` ni de `cli/` ;
 - pas de génération automatique de fichiers ;
-- pas de modification de `mvc/routes.py` ;
+- pas de modification de `mvc/routes/__init__.py` ;
 - pas de modification du starter `welcome-optin-iot` ;
 - pas de modification du paquet `forge-mvc-iot` ;
 - pas de support `rbac` / `media` / `workflow` / `stats` / `mfa`.

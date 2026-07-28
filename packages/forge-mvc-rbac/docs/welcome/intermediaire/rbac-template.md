@@ -93,10 +93,10 @@ Créez la vue `mvc/views/rbac_template/index.html` :
 
 ## La route
 
-Ajoutez l'import et la route dans le groupe public de `mvc/routes.py` :
+Ajoutez l'import et la route dans le groupe public de `mvc/routes/__init__.py` :
 
 ```python
-# mvc/routes.py
+# mvc/routes/__init__.py
 from mvc.controllers.rbac_template_controller import RbacTemplateController
 
 with router.group("", public=True) as public:
