@@ -115,14 +115,19 @@ class Application:
 
             return route.handler(request)
 
-        except DatabaseUnavailableError:
-            # Surcharge passagère, pas un défaut de l'application : toutes les
-            # connexions étaient prises et aucune ne s'est libérée à temps
-            # (MARIADB-POOL-QUEUE-001). Un 500 annoncerait un bug du serveur et
-            # enverrait chercher une erreur dans le code, là où le remède est
-            # d'élargir `DB_POOL_SIZE` ou de raccourcir les requêtes.
+        except DatabaseUnavailableError as _indispo:
+            # Condition passagère, pas un défaut de l'application : soit toutes
+            # les connexions étaient prises et aucune ne s'est libérée à temps
+            # (MARIADB-POOL-QUEUE-001), soit celle empruntée avait été fermée
+            # par le serveur (DB-CONNECTION-LOST-503-001). Un 500 annoncerait un
+            # bug du serveur et enverrait chercher une erreur dans le code.
+            #
+            # Le message de l'erreur distingue les deux, et l'exploitant en a
+            # besoin : élargir `DB_POOL_SIZE` ne répare pas un serveur qui
+            # redémarre, et attendre ne répare pas un pool trop étroit.
             logger.warning(
-                "Base indisponible (capacité) — %s %s", request.method, request.path
+                "Base indisponible — %s %s : %s",
+                request.method, request.path, _indispo,
             )
             response = _service_unavailable()
             response.headers["Retry-After"] = "2"

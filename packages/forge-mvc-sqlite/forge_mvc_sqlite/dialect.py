@@ -116,8 +116,14 @@ class SQLiteDialect:
             ")"
         )
 
+    def supports_transactional_ddl(self) -> bool:
+        """Vrai : SQLite journalise la DDL comme le reste, le rollback la défait."""
+        return True
+
     def quote_identifier(self, name: str) -> str:
-        return f'"{name}"'
+        # Le guillemet contenu dans le nom se double, sans quoi il referme la
+        # citation et la suite du nom devient de la syntaxe.
+        return '"' + name.replace('"', '""') + '"'
 
     def render_literal(self, value: object) -> str:
         # SQLite : pas de booléen ni de date natifs (0/1 et chaîne ISO), ADR-075.

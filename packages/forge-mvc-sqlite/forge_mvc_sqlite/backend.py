@@ -143,3 +143,12 @@ class SQLiteBackend:
         if not isinstance(error, sqlite3.IntegrityError):
             return False
         return "UNIQUE constraint failed" in str(error)
+
+    def is_connection_lost(self, error: Exception) -> bool:
+        """Toujours faux : SQLite est sans serveur, il n'y a rien à perdre.
+
+        Le fichier est ouvert par le processus lui-même. Un échec d'accès y
+        est une panne de disque ou de permission, durable, qui appelle un 500
+        et non l'invitation à réessayer que porte `DatabaseUnavailableError`.
+        """
+        return False

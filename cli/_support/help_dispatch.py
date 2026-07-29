@@ -1644,7 +1644,13 @@ ATTENTION:
     (CREATE TABLE, ALTER TABLE, INSERT, etc.) ;
   - vérifier l'état avec forge migration:status AVANT d'appliquer ;
   - en cas d'erreur SQL, la migration en cours est annulée mais les
-    migrations déjà appliquées sont conservées.
+    migrations déjà appliquées sont conservées ;
+  - sur MariaDB, l'annulation ne défait PAS la DDL déjà exécutée : le
+    moteur valide implicitement chaque CREATE/ALTER/DROP. Les
+    instructions passées avant l'erreur persistent, la migration n'est
+    pas enregistrée, et la relance butera sur ce qui existe déjà. Le
+    message d'échec le détaille. PostgreSQL, SQL Server et SQLite
+    annulent bien la migration entière.
 
 Prérequis:
   - DB_APP_* configurés dans env/dev ;

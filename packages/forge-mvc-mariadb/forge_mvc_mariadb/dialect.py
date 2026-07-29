@@ -146,8 +146,20 @@ class MariaDBDialect:
             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
         )
 
+    def supports_transactional_ddl(self) -> bool:
+        """Faux : MariaDB valide implicitement autour de chaque instruction DDL.
+
+        Seul des quatre backends dans ce cas. Mesuré : une migration à deux
+        `CREATE TABLE` dont le second est fautif laisse la première table en
+        place malgré le `ROLLBACK`, là où PostgreSQL et SQL Server annulent
+        les deux.
+        """
+        return False
+
     def quote_identifier(self, name: str) -> str:
-        return f"`{name}`"
+        # Le backtick contenu dans le nom se double, sans quoi il referme la
+        # citation et la suite du nom devient de la syntaxe.
+        return "`" + name.replace("`", "``") + "`"
 
     def render_literal(self, value: object) -> str:
         # Booléens 1/0, dates en chaîne ISO quotée (ADR-075).

@@ -245,3 +245,21 @@ class MSSQLBackend:
         """
         message = str(error)
         return "(2627)" in message or "(2601)" in message
+
+    def is_connection_lost(self, error: Exception) -> bool:
+        """Connexion coupée SQL Server : classe SQLSTATE 08.
+
+        Contrairement au doublon, le SQLSTATE discrimine ici parfaitement :
+        la classe `08` est celle des « connection exception » de la norme, que
+        le pilote ODBC respecte. Mesuré en tuant la session côté serveur, les
+        deux requêtes suivantes rendent `08S01` (« Communication link
+        failure »).
+
+        pyodbc place le SQLSTATE en premier argument de l'exception ; c'est là
+        qu'on le lit, la classe d'exception (`OperationalError`) étant trop
+        large à elle seule.
+        """
+        args = getattr(error, "args", ())
+        if not args or not isinstance(args[0], str):
+            return False
+        return args[0].startswith("08")

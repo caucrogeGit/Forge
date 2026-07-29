@@ -203,3 +203,27 @@ class PostgreSQLBackend:
         teste le SQLSTATE, qui couvre aussi les exceptions reconstruites.
         """
         return getattr(error, "sqlstate", None) == "23505"
+
+    def is_connection_lost(self, error: Exception) -> bool:
+        """Connexion coupée PostgreSQL : classe SQLSTATE 08, arrêts 57Pxx.
+
+        La classe `08` est celle des « connection exception » de la norme.
+        S'y ajoutent les arrêts décidés par le serveur, mesurés : `57P01`
+        (`admin_shutdown`, rendu quand le backend est terminé), `57P02`
+        (`crash_shutdown`) et `57P03` (`cannot_connect_now`, redémarrage en
+        cours).
+
+        Un troisième cas n'a pas de SQLSTATE du tout : une fois la connexion
+        constatée morte, psycopg lève une `OperationalError` née côté client,
+        sans réponse du serveur donc sans code. Mesuré, la deuxième requête
+        après coupure donne « the connection is lost », `sqlstate` à `None`.
+        L'absence de SQLSTATE **sur une `OperationalError`** est justement le
+        signal que l'erreur ne vient pas du serveur ; les erreurs de requête,
+        elles, en portent toujours un.
+        """
+        import psycopg
+
+        sqlstate = getattr(error, "sqlstate", None)
+        if isinstance(sqlstate, str):
+            return sqlstate.startswith("08") or sqlstate in {"57P01", "57P02", "57P03"}
+        return isinstance(error, psycopg.OperationalError)

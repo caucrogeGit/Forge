@@ -126,6 +126,11 @@ Forge n'impose aucun backend de référence.
     Une requête qui arrive alors que toutes les connexions sont prises **patiente** dans une file d'attente, elle n'échoue pas.
     Ce n'est qu'au bout de `DB_POOL_TIMEOUT` que Forge renonce, avec une réponse `503` et un en-tête `Retry-After` : une saturation est passagère, elle ne mérite pas la page d'erreur 500 qui annoncerait un défaut de l'application.
 
+    Une seconde situation rend le même `503` : la connexion empruntée avait été fermée par le serveur, sans que le pool le sache.
+    C'est le cas après un redémarrage ou une bascule, et après une longue inactivité (`wait_timeout`).
+    Le pilote revalide au delà d'une demi-seconde d'inactivité, mais en deçà il livre la connexion morte.
+    Le journal distingue les deux causes, ce qui évite d'élargir un pool qui n'était pas en cause.
+
     Règle de dimensionnement : au moins autant de connexions que de requêtes réellement concurrentes par processus.
     Gunicorn en mode threadé donne un ordre de grandeur avec son nombre de threads par worker ; **chaque worker a son propre pool**, la charge du serveur est donc le produit des deux.
     Élargir le pool coûte des connexions côté serveur (`max_connections`), pas de la mémoire côté application.
@@ -346,6 +351,17 @@ Forge n'impose aucun backend de référence.
         Le dialecte gère `AUTO_INCREMENT`, `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`, les index dans le `CREATE TABLE`, les backticks.
 
         Le SQL généré reste lisible (principe 5).
+
+    !!! warning "Une migration qui échoue en cours de route ne s'annule pas"
+        MariaDB valide implicitement autour de chaque instruction de définition (`CREATE`, `ALTER`, `DROP`).
+        Une migration dont la troisième instruction échoue laisse donc les deux premières en place, malgré l'annulation.
+        C'est le seul des quatre backends dans ce cas : PostgreSQL, SQL Server et SQLite annulent la migration entière.
+
+        La migration n'étant pas enregistrée au journal, `migration:apply` la rejouera depuis le début et butera sur ce qui existe déjà.
+        Forge le dit dans le message d'échec, en nommant l'instruction fautive et le nombre d'instructions qui persistent.
+        Le rattrapage est manuel : défaire en base les effets des instructions déjà passées, puis relancer.
+
+        La parade est en amont : appliquer d'abord la migration sur une base de test, et relire son SQL avec `forge migration:apply --dry-run`, qui l'imprime sans rien exécuter.
 
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-mariadb` : il le découvre par entry point ([ADR-054](/docs/forge/adr/054-database-backend-optins/)).

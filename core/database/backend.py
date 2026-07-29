@@ -149,8 +149,48 @@ class Dialect(Protocol):
         """DDL de la table technique `forge_migrations`, propre au dialecte."""
         ...
 
+    def supports_transactional_ddl(self) -> bool:
+        """Vrai si un `ROLLBACK` défait aussi la DDL déjà exécutée.
+
+        Vérifié sur serveur réel avec une migration à deux `CREATE TABLE` dont
+        le second est fautif :
+
+            PostgreSQL   annule les deux            → vrai
+            SQL Server   annule les deux            → vrai
+            SQLite       annule les deux            → vrai
+            MariaDB      garde la première table    → **faux**
+
+        MariaDB valide implicitement avant et après chaque instruction de
+        définition (`CREATE`, `ALTER`, `DROP`) : la transaction ouverte est
+        close à son insu, et le `ROLLBACK` qui suit ne trouve plus rien à
+        défaire. Ce n'est pas un défaut du pilote, c'est le moteur.
+
+        Le moteur de migrations lit cette capacité pour dire la vérité quand
+        une migration échoue en cours de route. Il ne **change pas** de
+        stratégie selon la réponse : Forge ne peut pas rendre transactionnel ce
+        qui ne l'est pas, et prétendre le contraire par un jeu de compensations
+        écrites à l'aveugle serait exactement la magie que la charte refuse
+        (principe 3). Il révèle l'état réellement atteint, à charge de
+        l'opérateur de le rattraper (règle B).
+        """
+        ...
+
     def quote_identifier(self, name: str) -> str:
-        """Échappe un identifiant SQL (backticks MariaDB, guillemets SQLite)."""
+        """Échappe un identifiant SQL (backticks MariaDB, guillemets SQLite).
+
+        Le délimiteur présent **dans** le nom doit être doublé, faute de quoi
+        il referme la citation et la suite du nom devient de la syntaxe :
+        ``a`b`` rendu ``` `a`b` ``` sort de la citation dès le deuxième
+        caractère. Chaque dialecte double le sien : `` ` `` pour MariaDB,
+        ``"`` pour SQLite et PostgreSQL, ``]`` pour SQL Server.
+
+        Les identifiants que Forge produit sont contraints en amont
+        (``^[a-z][a-z0-9_]*$`` dans les schémas JSON, `_IDENTIFIER_RE` dans
+        `forge_mvc_entities.service`) et n'atteignent donc jamais ce cas. La
+        méthode appartient malgré tout au contrat public, qui l'engage pour
+        toute entrée (principe 10) : un appelant direct ne connaît pas cette
+        contrainte amont.
+        """
         ...
 
     # ── DML (rendu de littéraux, ADR-075) ────────────────────────────────────
@@ -409,6 +449,39 @@ class DatabaseBackend(Protocol):
         L'implémentation doit être **stricte** : dans le doute, renvoyer faux.
         Un faux positif ferait passer une panne pour un doublon et afficherait
         une erreur de formulaire trompeuse à l'utilisateur.
+        """
+        ...
+
+    def is_connection_lost(self, error: Exception) -> bool:
+        """Vrai si `error` signale une connexion coupée, non une requête fautive.
+
+        Le cas courant n'est pas la panne durable mais la connexion **périmée
+        dans le pool** : le serveur l'a fermée de son côté (``wait_timeout``,
+        redémarrage, bascule) et le pilote la remet en circulation sans le
+        savoir. Mesuré sur MariaDB, le pilote ne revalide qu'au delà d'une
+        demi-seconde d'inactivité ; en deçà il livre la connexion morte, et
+        l'exception du pilote traverse jusqu'à la page d'erreur.
+
+        Signaux relevés sur les quatre backends, en tuant la connexion côté
+        serveur puis en rejouant une requête :
+
+            MariaDB      mariadb.InterfaceError          errno 2006, 2013
+            PostgreSQL   psycopg.OperationalError        sqlstate 57P01 puis aucun
+            SQL Server   pyodbc.OperationalError         sqlstate 08S01
+            SQLite       sans objet (pas de serveur)
+
+        Comme pour `is_unique_violation`, aucun signal n'est portable et la
+        méthode appartient au backend, seul à connaître son pilote.
+
+        Le cœur la traduit en `DatabaseUnavailableError`, donc en **503 avec
+        `Retry-After`** : la coupure est passagère et l'emprunt suivant
+        réussira, là où un 500 enverrait chercher un bug inexistant dans le
+        code applicatif. Forge ne rejoue **pas** la requête à la place de
+        l'appelant : réémettre en silence une écriture dont on ignore si le
+        serveur l'a reçue serait de la magie cachée (principe 3).
+
+        Même exigence de stricte : dans le doute, renvoyer faux. Un faux
+        positif masquerait une vraie panne derrière une invitation à réessayer.
         """
         ...
 

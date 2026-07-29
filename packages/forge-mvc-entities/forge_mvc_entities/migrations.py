@@ -654,10 +654,12 @@ def _apply_one_migration(connection: Any, migration: MigrationFile) -> None:
     statements = split_sql_statements(sql)
     start = time.perf_counter()
     cursor = connection.cursor()
+    executed = 0
     try:
         try:
             for statement in statements:
                 cursor.execute(statement)
+                executed += 1
             execution_ms = int((time.perf_counter() - start) * 1000)
             cursor.execute(
                 INSERT_APPLIED_MIGRATION_SQL,
@@ -673,10 +675,77 @@ def _apply_one_migration(connection: Any, migration: MigrationFile) -> None:
         except Exception as exc:
             _rollback_quietly(connection)
             raise MigrationError(
-                f"{migration.filename}: erreur SQL pendant l'application : {exc}"
+                _failed_migration_report(migration, statements, executed, exc)
             ) from exc
     finally:
         cursor.close()
+
+
+def _failed_migration_report(
+    migration: MigrationFile,
+    statements: "list[str]",
+    executed: int,
+    error: Exception,
+) -> str:
+    """Rapport d'échec d'une migration, situé dans le fichier et dans le temps.
+
+    Le message ne disait que le nom du fichier et l'erreur du pilote. Sur une
+    migration de quarante instructions, cela ne permet ni de savoir laquelle a
+    échoué, ni ce qui a déjà pris effet.
+
+    Deux faits manquaient, et le second est le plus lourd. Quand le backend ne
+    sait pas annuler la DDL (MariaDB, voir `Dialect.supports_transactional_ddl`),
+    les instructions déjà passées **restent en base** alors que le journal
+    n'enregistre pas la migration. Relancer `migration:apply` les rejoue et
+    échoue sur « already exists ». Taire ce décalage laissait l'opérateur
+    devant un projet bloqué sans lui dire pourquoi.
+    """
+    numero = executed + 1
+    fautive = statements[executed] if executed < len(statements) else ""
+    if not fautive:
+        situation = (
+            f"l'enregistrement au journal, après les {len(statements)} instructions"
+        )
+    else:
+        extrait = " ".join(fautive.split())
+        if len(extrait) > 120:
+            extrait = extrait[:117] + "..."
+        situation = f"l'instruction {numero} sur {len(statements)} : {extrait}"
+
+    lignes = [
+        f"{migration.filename}: erreur SQL sur {situation}",
+        f"  {error}",
+    ]
+
+    if executed and not _ddl_is_transactional():
+        lignes += [
+            "",
+            f"  Les {executed} instructions précédentes ont pris effet et "
+            "PERSISTENT : ce backend valide implicitement chaque instruction de "
+            "définition, l'annulation ne les a pas défaites.",
+            "  La migration n'est pas enregistrée au journal, donc "
+            "`migration:apply` la rejouera depuis le début et butera sur ce qui "
+            "existe déjà.",
+            "  Corrigez le fichier, puis défaites à la main en base les effets "
+            f"des instructions 1 à {executed} avant de relancer.",
+        ]
+
+    return "\n".join(lignes)
+
+
+def _ddl_is_transactional() -> bool:
+    """Le backend actif sait-il annuler la DDL ? Dans le doute, on suppose oui.
+
+    Supposer oui est le choix prudent **pour le message** : on n'annonce pas
+    des effets persistants sans en être sûr. Un backend tiers qui n'implémente
+    pas la capacité reste donc silencieux plutôt que menaçant à tort.
+    """
+    from core.database.backend import get_backend
+
+    try:
+        return bool(get_backend().dialect.supports_transactional_ddl())
+    except Exception:
+        return True
 
 
 def _migration_file_template(version: str, name: str) -> str:

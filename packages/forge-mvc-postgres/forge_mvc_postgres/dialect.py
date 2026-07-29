@@ -131,8 +131,14 @@ class PostgreSQLDialect:
             ")"
         )
 
+    def supports_transactional_ddl(self) -> bool:
+        """Vrai : PostgreSQL annule la DDL comme le DML. Vérifié sur serveur réel."""
+        return True
+
     def quote_identifier(self, name: str) -> str:
-        return f'"{name}"'
+        # Le guillemet contenu dans le nom se double, sans quoi il referme la
+        # citation et la suite du nom devient de la syntaxe.
+        return '"' + name.replace('"', '""') + '"'
 
     def render_literal(self, value: object) -> str:
         # PostgreSQL : booléens TRUE/FALSE, dates typées DATE '...' / TIMESTAMP '...' (ADR-075).

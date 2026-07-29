@@ -134,8 +134,14 @@ class MSSQLDialect:
             ")"
         )
 
+    def supports_transactional_ddl(self) -> bool:
+        """Vrai : SQL Server annule la DDL comme le DML. Vérifié sur serveur réel."""
+        return True
+
     def quote_identifier(self, name: str) -> str:
-        return f"[{name}]"
+        # Seul le crochet fermant referme la citation : c'est lui qui se
+        # double, le crochet ouvrant étant ordinaire à l'intérieur.
+        return "[" + name.replace("]", "]]") + "]"
 
     def render_literal(self, value: object) -> str:
         # SQL Server : chaînes Unicode N'...', booléens (BIT) 1/0, dates ISO (ADR-075).

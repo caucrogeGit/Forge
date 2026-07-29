@@ -44,18 +44,31 @@ class UniqueViolationError(DatabaseError):
 
 
 class DatabaseUnavailableError(DatabaseError):
-    """Aucune connexion disponible : surcharge passagère, pas une panne.
+    """Pas de connexion utilisable : condition passagère, pas une panne.
 
-    Levée quand un backend à pool ne peut pas fournir de connexion dans le
+    Deux situations, de même nature du point de vue de l'appelant.
+
+    **Le pool est saturé.** Le backend ne peut fournir aucune connexion dans le
     délai imparti, toutes étant occupées. La demande n'a rien d'invalide et
     l'application n'a aucun défaut : elle est simplement arrivée pendant une
     pointe.
 
-    C'est une condition de **capacité**, ce qui appelle une réponse HTTP
-    ``503 Service Unavailable`` avec ``Retry-After``, jamais un ``500``. Un
-    500 annonce un bug du serveur et envoie chercher une erreur dans le code,
-    là où le remède est d'élargir le pool (``DB_POOL_SIZE``) ou de réduire la
-    durée des requêtes.
+    **La connexion était morte.** Le serveur l'avait fermée de son côté
+    (``wait_timeout``, redémarrage, bascule) et le pilote l'a remise en
+    circulation sans le savoir. L'emprunt suivant réussira, le pilote
+    rétablissant la connexion.
+
+    Dans les deux cas la requête n'a rien de fautif et réessayer suffit, ce qui
+    appelle une réponse HTTP ``503 Service Unavailable`` avec ``Retry-After``,
+    jamais un ``500``. Un 500 annonce un bug du serveur et envoie chercher une
+    erreur dans le code, là où le remède est d'élargir le pool
+    (``DB_POOL_SIZE``), de raccourcir les requêtes, ou simplement d'attendre
+    que le serveur ait fini de redémarrer.
+
+    Forge ne rejoue **pas** la requête à la place de l'appelant : réémettre en
+    silence une écriture dont on ignore si le serveur l'a reçue serait la magie
+    que le principe 3 refuse. Le réessai appartient au client HTTP, que
+    ``Retry-After`` renseigne.
 
     Le cœur la traduit en 503 dans `core.app.application`. Une application
     peut aussi l'attraper pour dégrader un écran plutôt que le refuser :
@@ -67,6 +80,7 @@ class DatabaseUnavailableError(DatabaseError):
         except DatabaseUnavailableError:
             lignes = []      # la page s'affiche sans sa liste
 
-    Ce que cette erreur ne dit **pas** : combien de temps attendre. Le délai
-    d'attente écoulé est le seul fait établi.
+    Ce que cette erreur ne dit **pas** : combien de temps attendre, ni laquelle
+    des deux situations s'est produite. Seul le fait qu'aucune connexion
+    utilisable n'a pu servir la requête est établi.
     """

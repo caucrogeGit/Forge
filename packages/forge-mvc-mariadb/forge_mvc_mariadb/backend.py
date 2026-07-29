@@ -176,6 +176,20 @@ class MariaDBBackend:
         """
         return getattr(error, "errno", None) == 1062
 
+    def is_connection_lost(self, error: Exception) -> bool:
+        """Connexion coupée MariaDB : errno 2006 et 2013, mesurés.
+
+        `2006` (« Server has gone away ») et `2013` (« Lost connection to
+        server during query ») sont les deux formes rendues selon que la
+        coupure est constatée avant ou pendant la requête. On y joint les
+        errno d'établissement `2002`/`2003` et `2055`, du même registre : le
+        serveur est hors d'atteinte, la requête n'a rien de fautif.
+
+        Le SQLSTATE ne discrimine pas : ces erreurs portent `HY000`, fourre-tout
+        du pilote. Seul l'errno sert, comme pour le doublon.
+        """
+        return getattr(error, "errno", None) in {2002, 2003, 2006, 2013, 2055}
+
     def close(self) -> None:
         """Ferme le pool sous-jacent (réinitialisation, fin de session de test)."""
         if self._pool is not None:
