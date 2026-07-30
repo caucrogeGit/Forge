@@ -237,6 +237,8 @@ class MSSQLBackend:
         ("DB_APP_PWD", ""),
         ("# Pilote ODBC installé sur la machine (voir la doc du backend).", ""),
         ("DB_ODBC_DRIVER", "ODBC Driver 18 for SQL Server"),
+        ("# Attente d'un verrou tenu par une autre transaction, avant un 503.", ""),
+        ("DB_POOL_TIMEOUT", "5"),
     ]
 
     def get_connection(self) -> Any:
@@ -259,6 +261,22 @@ class MSSQLBackend:
             f"TrustServerCertificate=yes"
         )
         raw: Any = odbc.connect(conn_str)
+        # Borne d'attente de verrou (DB-LOCK-WAIT-BOUND-001). Par défaut le
+        # serveur fait patienter INDÉFINIMENT une écriture derrière un verrou
+        # tenu (`LOCK_TIMEOUT` à -1) : une transaction coincée épuisait les
+        # workers un à un, sans un 503 ni une ligne de journal. La borne est
+        # `DB_POOL_TIMEOUT`, le temps qu'on accepte de patienter avant un 503.
+        # Posée à chaque connexion : le pooling ODBC remet les options SET à
+        # neuf entre deux réutilisations (`sp_reset_connection`). Le
+        # dépassement rend l'erreur native 1222, qualifiée en indisponibilité
+        # (DB-LOCK-TIMEOUT-QUALIFY-001). La connexion d'administration reste
+        # sans borne, une migration a le droit d'attendre.
+        lock_ms = max(1, int(float(os.environ.get("DB_POOL_TIMEOUT", "5")) * 1000))
+        try:
+            raw.execute(f"SET LOCK_TIMEOUT {lock_ms}")
+        except BaseException:
+            raw.close()
+            raise
         return _MsConnection(raw)
 
     def get_admin_connection(self, *, database: "str | None" = None) -> Any:

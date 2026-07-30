@@ -14,6 +14,7 @@ Le pool est créé au premier emprunt de connexion (lazy init). L'import du
 module ne produit aucun effet de bord réseau.
 """
 import logging
+import math
 import os
 import threading
 from typing import Any
@@ -143,6 +144,28 @@ class MariaDBBackend:
             raise
         with self._borrowed_lock:
             self._borrowed.add(id(connection))
+        # Borne d'attente de verrou (DB-LOCK-WAIT-BOUND-001). Par défaut le
+        # serveur fait patienter 50 s une écriture derrière un verrou tenu :
+        # une transaction coincée épuisait les workers un à un, sans un 503 ni
+        # une ligne de journal. La borne est celle de la file d'attente,
+        # `DB_POOL_TIMEOUT` : le temps qu'on accepte de patienter avant de
+        # rendre un 503, quelle que soit la ressource attendue. Le dépassement
+        # rend l'errno 1205, qualifié en indisponibilité
+        # (MARIADB-LOCK-WAIT-503-001). Posée à chaque emprunt : le pool remet
+        # la session à neuf entre deux emprunteurs. Les connexions
+        # d'administration restent sans borne, une migration a le droit
+        # d'attendre.
+        try:
+            cursor = connection.cursor()
+            cursor.execute(
+                f"SET SESSION innodb_lock_wait_timeout = {max(1, math.ceil(timeout))}"
+            )
+            cursor.close()
+        except BaseException:
+            # La connexion n'atteindra pas l'appelant : elle doit repartir,
+            # jeton et registre compris.
+            self.close_connection(connection)
+            raise
         return connection
 
     def get_admin_connection(self, *, database: "str | None" = None) -> Any:

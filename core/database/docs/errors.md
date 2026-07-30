@@ -65,8 +65,9 @@ Trois situations y répondent oui.
 | PostgreSQL | classe SQLSTATE `08`, arrêts `57P01` à `57P03`, `55P03` (attente de verrou bornée), et `OperationalError` sans SQLSTATE |
 | SQL Server | classe SQLSTATE `08`, erreur native 1222 (attente de verrou bornée) |
 
-L'attente de verrou n'est bornée que là où quelqu'un l'a bornée.
-MariaDB plafonne à 50 secondes par défaut (`innodb_lock_wait_timeout`) ; PostgreSQL et SQL Server attendent indéfiniment tant que `lock_timeout` ou `SET LOCK_TIMEOUT` n'est pas posé ; SQLite suit `DB_POOL_TIMEOUT`.
+Forge borne lui-même l'attente des connexions du **runtime** par `DB_POOL_TIMEOUT`, la variable qui nomme déjà le temps qu'on accepte de patienter avant un 503.
+Sans cette borne, mesuré, une transaction coincée faisait patienter les requêtes 50 secondes sur MariaDB (`innodb_lock_wait_timeout`) et indéfiniment sur PostgreSQL et SQL Server : les workers s'épuisaient un à un et le site figeait sans un 503 ni une ligne de journal.
+Les connexions d'administration restent sans borne, une migration ayant le droit d'attendre son verrou.
 
 Le cœur en fait un `503` avec `Retry-After`, jamais un `500`.
 Un `500` annonce un bug du serveur et envoie chercher une erreur dans le code, là où le remède est d'élargir `DB_POOL_SIZE`, de raccourcir les requêtes, ou simplement d'attendre.

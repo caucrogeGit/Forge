@@ -237,10 +237,23 @@ class PostgreSQLBackend:
         dbname = os.environ.get("DB_NAME", "")
         user = os.environ.get("DB_APP_LOGIN", "")
         password = os.environ.get("DB_APP_PWD", "")
+        # Borne d'attente de verrou (DB-LOCK-WAIT-BOUND-001). Par défaut le
+        # serveur fait patienter INDÉFINIMENT une écriture derrière un verrou
+        # tenu (`lock_timeout` à 0) : une transaction coincée épuisait les
+        # workers un à un, sans un 503 ni une ligne de journal. La borne est
+        # `DB_POOL_TIMEOUT`, le temps qu'on accepte de patienter avant un 503.
+        # Passée par `options`, elle devient la valeur DE SESSION par défaut :
+        # le `RESET ALL` de la remise à zéro du pool y revient au lieu de
+        # revenir à l'attente infinie. Le dépassement rend le SQLSTATE 55P03,
+        # qualifié en indisponibilité (DB-LOCK-TIMEOUT-QUALIFY-001). Les
+        # connexions d'administration restent sans borne, une migration a le
+        # droit d'attendre.
+        lock_ms = max(1, int(float(os.environ.get("DB_POOL_TIMEOUT", "5")) * 1000))
         return (
             f"host={host} port={port} "
             f"dbname={dbname} user={user} "
-            f"password={password}"
+            f"password={password} "
+            f"options='-c lock_timeout={lock_ms}'"
         )
 
     def _get_pool(self) -> Any:

@@ -28,9 +28,22 @@ pytest.importorskip("forge_mvc_mariadb")
 from forge_mvc_mariadb.backend import MariaDBBackend  # noqa: E402
 
 
+class _Curseur:
+    def execute(self, sql: str) -> None:
+        return None
+
+    def close(self) -> None:
+        return None
+
+
 class _Connexion:
     def __init__(self) -> None:
         self.fermetures = 0
+
+    def cursor(self) -> _Curseur:
+        # `get_connection` pose la borne d'attente de verrou à l'emprunt
+        # (DB-LOCK-WAIT-BOUND-001).
+        return _Curseur()
 
     def close(self) -> None:
         self.fermetures += 1

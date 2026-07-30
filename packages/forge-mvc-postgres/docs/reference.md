@@ -271,6 +271,10 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
         Le pool naît au premier emprunt, jamais à l'import, pour qu'il appartienne au processus fils de gunicorn et non au père.
 
+        `DB_POOL_TIMEOUT` borne aussi l'attente d'un **verrou** tenu par une autre transaction.
+        Sans elle, PostgreSQL attend indéfiniment (`lock_timeout` à 0) : une transaction coincée épuisait les workers un à un, sans un 503 ni une ligne de journal.
+        Le dépassement rend `503`, et les connexions d'administration restent sans borne, une migration ayant le droit d'attendre.
+
         Chaque connexion rendue est remise à zéro, curseurs, variables de session et tables temporaires compris.
         Rien de l'emprunteur précédent n'atteint le suivant.
 
