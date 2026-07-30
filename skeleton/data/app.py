@@ -87,7 +87,7 @@ from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFI
                     UPLOAD_MAX_SIZE,
                     APP_CSP_NONCE_ENABLED, APP_TRUSTED_PROXIES)
 import core.security.csp as _csp
-from core.security.headers import apply_security_headers
+from core.security.headers import apply_security_headers, assert_headers_are_safe
 import core.forge as forge
 from core.app.dev_server import (
     format_port_in_use_message,
@@ -282,6 +282,16 @@ class RequestHandler(BaseHTTPRequestHandler):
             if stream is not None else
             len(response.body)
         )
+
+        # CORE-HEADER-CRLF-001 : contrôle AVANT la première ligne. Ce serveur
+        # émet ses en-têtes un par un ; une fois `send_response` appelé, il est
+        # trop tard pour refuser la réponse.
+        _entetes_a_controler: dict[str, str] = {
+            str(k): str(v) for k, v in response.headers.items()
+        }
+        for _c in getattr(response, "set_cookies", []):
+            _entetes_a_controler[f"Set-Cookie::{len(_entetes_a_controler)}"] = str(_c)
+        assert_headers_are_safe(_entetes_a_controler)
 
         self.send_response(response.status)
         self.send_header("Content-Type", response.content_type)

@@ -48,7 +48,7 @@ from core.http.request import (
 )
 from core.http.response import Response
 from core.security import csp as _csp
-from core.security.headers import apply_security_headers
+from core.security.headers import apply_security_headers, assert_headers_are_safe
 
 
 _REASONS = {
@@ -178,6 +178,11 @@ def _response_to_wsgi(
         # setdefault la respecte.
         csp=_csp.build_csp_header(None),
     )
+
+    # CORE-HEADER-CRLF-001 : contrôle AVANT `start_response`, tant qu'aucune
+    # ligne n'est partie. Un saut de ligne dans une valeur découperait la
+    # réponse pour le client.
+    assert_headers_are_safe(headers_dict)
 
     headers: list[tuple[str, str]] = [
         ("Content-Type", response.content_type),
