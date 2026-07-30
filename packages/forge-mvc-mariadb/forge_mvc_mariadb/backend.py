@@ -46,6 +46,9 @@ class MariaDBBackend:
         ("# Compte applicatif : runtime, DML uniquement (SELECT, INSERT, UPDATE, DELETE).", ""),
         ("DB_APP_LOGIN", ""),
         ("DB_APP_PWD", ""),
+        ("# Pool de connexions : nombre de places, et attente avant de rendre un 503.", ""),
+        ("DB_POOL_SIZE", "5"),
+        ("DB_POOL_TIMEOUT", "5"),
     ]
 
     def __init__(self) -> None:
@@ -177,23 +180,37 @@ class MariaDBBackend:
         return getattr(error, "errno", None) == 1062
 
     def is_unavailable(self, error: Exception) -> bool:
-        """Indisponibilité MariaDB : la connexion coupée, errno 2006 et 2013.
+        """Indisponibilité MariaDB : la connexion coupée, ou le verrou tenu ailleurs.
 
-        Le serveur n'ayant pas de verrou de fichier, la seconde cause de la
-        famille (ressource prise) ne s'exprime pas ici : la saturation est
-        celle du pool, et le backend lève lui-même `DatabaseUnavailableError`
-        depuis sa file d'attente, sans passer par cette question.
+        **La connexion coupée.** `2006` (« Server has gone away ») et `2013`
+        (« Lost connection to server during query ») sont les deux formes
+        rendues selon que la coupure est constatée avant ou pendant la requête.
+        On y joint les errno d'établissement `2002`/`2003` et `2055`, du même
+        registre : le serveur est hors d'atteinte, la requête n'a rien de
+        fautif.
 
-        `2006` (« Server has gone away ») et `2013` (« Lost connection to
-        server during query ») sont les deux formes rendues selon que la
-        coupure est constatée avant ou pendant la requête. On y joint les
-        errno d'établissement `2002`/`2003` et `2055`, du même registre : le
-        serveur est hors d'atteinte, la requête n'a rien de fautif.
+        **La ressource prise.** `1205` (« Lock wait timeout exceeded »)
+        signale qu'une autre transaction tient le verrou depuis plus longtemps
+        que `innodb_lock_wait_timeout`. C'est de la contention pure, le jumeau
+        du verrou de fichier SQLite et de la saturation du pool : attendre
+        suffit, et l'appel suivant passera.
 
-        Le SQLSTATE ne discrimine pas : ces erreurs portent `HY000`, fourre-tout
-        du pilote. Seul l'errno sert, comme pour le doublon.
+        Ce que cette méthode **ne** reconnaît pas, et pourquoi. L'interblocage,
+        errno `1213` et SQLSTATE `40001`, sort de la famille bien qu'il soit
+        transitoire lui aussi : le critère est « attendre suffit », or attendre
+        n'y change rien. Deux transactions ont pris leurs verrous dans des
+        ordres incompatibles, InnoDB en a annulé une, et le remède est de
+        revoir cet ordre. Le 500 le laisse visible dans les journaux d'erreur,
+        là où un 503 le rangerait parmi les conditions de routine et rendrait
+        un défaut d'ordonnancement récurrent invisible
+        (MARIADB-LOCK-WAIT-503-001).
+
+        Le SQLSTATE ne discrimine pas la coupure ni l'attente : ces erreurs
+        portent `HY000`, fourre-tout du pilote. Seul l'errno sert, comme pour
+        le doublon. Signaux relevés en tuant la connexion, puis en tenant un
+        verrou depuis une seconde transaction.
         """
-        return getattr(error, "errno", None) in {2002, 2003, 2006, 2013, 2055}
+        return getattr(error, "errno", None) in {1205, 2002, 2003, 2006, 2013, 2055}
 
     def close(self) -> None:
         """Ferme le pool sous-jacent (réinitialisation, fin de session de test)."""

@@ -220,6 +220,9 @@ class PostgreSQLBackend:
         ("# Compte applicatif : runtime, DML uniquement (SELECT, INSERT, UPDATE, DELETE).", ""),
         ("DB_APP_LOGIN", ""),
         ("DB_APP_PWD", ""),
+        ("# Pool de connexions : nombre de places, et attente avant de rendre un 503.", ""),
+        ("DB_POOL_SIZE", "5"),
+        ("DB_POOL_TIMEOUT", "5"),
     ]
 
     def __init__(self) -> None:

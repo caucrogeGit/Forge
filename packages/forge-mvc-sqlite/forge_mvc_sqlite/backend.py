@@ -103,6 +103,8 @@ class SQLiteBackend:
     env_template: "list[tuple[str, str]]" = [
         ("# Chemin du fichier de base SQLite, relatif à la racine du projet (sans serveur ni comptes).", ""),
         ("DB_NAME", "storage/app.db"),
+        ("# Attente devant un fichier verrouillé par un autre écrivain, avant un 503.", ""),
+        ("DB_POOL_TIMEOUT", "5"),
     ]
 
     def get_connection(self) -> Any:
