@@ -323,7 +323,11 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     Les fixtures callable (chapitre 10) entrent dans le même graphe : une unité passe après **toute** unité qui fournit une table dont elle dépend, `.sql` comme `.py`.
     Repli sur l'ordre du nom de fichier si le graphe est absent ou en cas de cycle (le préfixe `01_`, `02_` reste un ordre déclaratif de secours).
 
-    Pour un jeu non triable (cycle de dépendances), `--no-fk-checks` encadre le chargement par la désactivation des contraintes du dialecte (`SET FOREIGN_KEY_CHECKS` en MariaDB, `PRAGMA foreign_keys` en SQLite, `session_replication_role` en PostgreSQL ; sans effet en SQL Server).
+    Pour un jeu non triable (cycle de dépendances), `--no-fk-checks` encadre le chargement par le levier du dialecte : `SET FOREIGN_KEY_CHECKS` en MariaDB, `PRAGMA defer_foreign_keys` en SQLite, `session_replication_role` en PostgreSQL, sans effet en SQL Server.
+
+    Le levier SQLite reporte la vérification au `COMMIT`, il ne la supprime pas.
+    Un enfant dont le parent n'existe toujours pas à la fin fait donc échouer le chargement entier, là où MariaDB l'aurait laissé passer.
+    C'est le cycle de dépendances que l'option sert à charger, pas un jeu incohérent.
 
     ### 9.4 Colonnes timestamps automatiques
 

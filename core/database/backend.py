@@ -256,10 +256,20 @@ class Dialect(Protocol):
         Utilisé par `fixtures:load --no-fk-checks` (ADR-077) pour charger un jeu
         non triable (cycle de dépendances FK) sans violer les contraintes :
         désactivation avant le chargement, réactivation après. Propre au SGBD
-        (`SET FOREIGN_KEY_CHECKS` en MariaDB, `PRAGMA foreign_keys` en SQLite,
-        `session_replication_role` en PostgreSQL). Renvoie une liste vide si le
-        dialecte n'expose pas de levier de session (SQL Server) : le chargement
-        s'appuie alors sur le seul ordre topologique.
+        (`SET FOREIGN_KEY_CHECKS` en MariaDB, `PRAGMA defer_foreign_keys` en
+        SQLite, `session_replication_role` en PostgreSQL). Renvoie une liste
+        vide si le dialecte n'expose pas de levier de session (SQL Server) : le
+        chargement s'appuie alors sur le seul ordre topologique.
+
+        Les instructions sont émises **dans** la transaction unique du
+        chargement, ce qui exclut les leviers que le SGBD n'accepte qu'au
+        dehors. C'est le cas de `PRAGMA foreign_keys`, sans effet une fois la
+        transaction ouverte, d'où le report SQLite (SQLITE-FOREIGN-KEYS-ON-001).
+
+        Le report n'est pas une désactivation : SQLite vérifie au `COMMIT` et
+        refuse encore un enfant sans parent, là où MariaDB laisse tout passer.
+        Un dialecte n'est pas tenu d'offrir la même force, seulement de dire ce
+        qu'il offre.
         """
         ...
 

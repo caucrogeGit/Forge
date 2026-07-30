@@ -160,8 +160,26 @@ class SQLiteDialect:
         return f"CREATE INDEX IF NOT EXISTS {name} ON {table} ({column});"
 
     def foreign_key_checks_ddl(self, *, enabled: bool) -> "list[str]":
-        # PRAGMA SQLite (ADR-077) ; sans effet dans une transaction ouverte.
-        return [f"PRAGMA foreign_keys = {'ON' if enabled else 'OFF'}"]
+        """Report des contraintes, seul levier utilisable là où il sert (ADR-077).
+
+        `fixtures:load --no-fk-checks` émet ces instructions **dans** la
+        transaction unique du chargement, et `PRAGMA foreign_keys` y est sans
+        effet : SQLite ne l'accepte que hors transaction. Tant que les
+        contraintes n'étaient pas armées, cela ne se voyait pas, l'ordre
+        n'ayant rien à désactiver ; armées (SQLITE-FOREIGN-KEYS-ON-001), il
+        aurait menti en silence.
+
+        `defer_foreign_keys`, lui, s'applique dans une transaction ouverte :
+        mesuré, il accepte un enfant inséré avant son parent et vérifie le tout
+        au `COMMIT`. Il se remet seul à la fin de la transaction, donc aucun
+        réglage ne fuit vers l'emprunteur suivant.
+
+        Ce que cela ne fait **pas**, et qui distingue SQLite de MariaDB : ce
+        n'est pas une désactivation. Un enfant dont le parent n'existe toujours
+        pas au `COMMIT` fait échouer le chargement entier. C'est le cycle de
+        dépendances que l'option sert à charger, pas un jeu incohérent.
+        """
+        return [f"PRAGMA defer_foreign_keys = {'OFF' if enabled else 'ON'}"]
 
     # ── DDL du socle Auth/User (ADR-084) ─────────────────────────────────────
 

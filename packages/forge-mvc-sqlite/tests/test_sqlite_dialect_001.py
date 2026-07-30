@@ -26,9 +26,11 @@ def test_identity_et_string_et_decimal() -> None:
 
 
 def test_foreign_key_checks_ddl() -> None:
-    # ADR-077 : PRAGMA SQLite (sans effet dans une transaction ouverte).
-    assert D.foreign_key_checks_ddl(enabled=False) == ["PRAGMA foreign_keys = OFF"]
-    assert D.foreign_key_checks_ddl(enabled=True) == ["PRAGMA foreign_keys = ON"]
+    # ADR-077, revu par SQLITE-FOREIGN-KEYS-ON-001 : `PRAGMA foreign_keys` est
+    # sans effet dans une transaction ouverte, or c'est là que fixtures:load
+    # l'émet. Seul `defer_foreign_keys` y agit.
+    assert D.foreign_key_checks_ddl(enabled=False) == ["PRAGMA defer_foreign_keys = ON"]
+    assert D.foreign_key_checks_ddl(enabled=True) == ["PRAGMA defer_foreign_keys = OFF"]
 
 
 @pytest.mark.parametrize(

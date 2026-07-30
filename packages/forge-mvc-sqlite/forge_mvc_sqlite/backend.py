@@ -108,9 +108,27 @@ class SQLiteBackend:
         """Ouvre une connexion SQLite sur le fichier configuré (`DB_NAME`).
 
         ADR-060 : le chemin du fichier est lu dans l'environnement (DB_NAME).
+
+        Les clés étrangères sont **armées à chaque emprunt**. SQLite les laisse
+        inactives par défaut, par compatibilité ascendante, et le réglage est
+        propre à la connexion : sans ce pragma, les contraintes que
+        `make:relation` écrit dans la DDL ne contraignaient rien. Mesuré, un
+        enfant orphelin passait et `ON DELETE CASCADE` ne cascadait pas, là où
+        les trois autres backends refusaient ou cascadaient
+        (SQLITE-FOREIGN-KEYS-ON-001).
+
+        Le sens de la dérive commandait de corriger : SQLite sert en
+        développement, les SGBD serveur en production. Un défaut d'intégrité ne
+        se voyait donc jamais chez le développeur, toujours chez l'utilisateur,
+        et sur des données déjà incohérentes.
+
+        L'ordre compte, et il est vérifié : le pragma est sans effet dans une
+        transaction ouverte. Armé ici, à l'emprunt, il survit au désarmement
+        d'autocommit que `core.database.transaction` opère juste après.
         """
         database = os.environ.get("DB_NAME", "")
         raw = sqlite3.connect(database, check_same_thread=False)
+        raw.execute("PRAGMA foreign_keys = ON")
         return _SQLiteConnection(raw)
 
     def get_admin_connection(self, *, database: "str | None" = None) -> Any:

@@ -284,6 +284,18 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
         Le SQL généré reste lisible (principe 5).
 
+    !!! note "Clés étrangères armées à chaque connexion"
+        SQLite laisse `PRAGMA foreign_keys` inactif par défaut, par compatibilité ascendante, et le réglage vaut pour une connexion seulement.
+        Le backend l'arme donc à chaque emprunt.
+        Sans lui, les contraintes écrites par `make:relation` ne contraignaient rien.
+        Un enfant orphelin entrait, et `ON DELETE CASCADE` ne cascadait pas.
+
+        La conséquence portait loin, car SQLite sert en développement et un SGBD serveur en production.
+        Le défaut ne se voyait jamais chez le développeur, toujours chez l'utilisateur, sur des données déjà incohérentes.
+
+        Une base SQLite créée avant cette version peut contenir des lignes orphelines.
+        Elles ne bloquent pas la lecture, mais toute écriture qui les toucherait sera désormais refusée.
+
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-sqlite` : il le découvre par entry point (ADR-054).
 
