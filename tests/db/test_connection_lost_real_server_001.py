@@ -141,6 +141,11 @@ def test_postgres_une_session_terminee_devient_une_indisponibilite(
     assert erreur is not None, "la session terminée devrait faire échouer la requête"
     assert backend.is_unavailable(erreur) is True
 
+    # La victime doit repartir, morte ou vive : depuis POSTGRES-POOL-001 elle
+    # occupe une place du pool tant qu'elle n'est pas rendue, et le pool la
+    # remplace de lui-même en constatant qu'elle ne répond plus.
+    backend.close_connection(victime)
+
     # Et le cœur traduit bien, sur une connexion neuve prise au backend.
     assert db.fetch_one("SELECT 1 AS v") == {"v": 1}
     assert issubclass(DatabaseUnavailableError, Exception)

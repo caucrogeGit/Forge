@@ -23,7 +23,10 @@ psycopg est importé paresseusement (l'usage du dialecte ne le requiert pas).
 """
 import logging
 import os
+import threading
 from typing import Any
+
+from core.database.errors import DatabaseUnavailableError
 
 from forge_mvc_postgres.dialect import PostgreSQLDialect
 from forge_mvc_postgres.translate import translate_placeholders
@@ -98,10 +101,33 @@ class _PgCursor:
 
 
 class _PgConnection:
-    """Connexion psycopg enveloppée, conforme aux attentes du cœur."""
+    """Connexion psycopg enveloppée, conforme aux attentes du cœur.
 
-    def __init__(self, connection: Any) -> None:
+    L'enveloppe sait d'où elle vient, et `close()` l'y renvoie : au pool si
+    elle en a été empruntée, au néant sinon. Sans cela, fermer une connexion
+    empruntée brûlait sa place définitivement, le pool ignorant qu'elle avait
+    disparu. Le piège n'est pas théorique, Forge y est tombé dans ses propres
+    tests d'intégration dès l'arrivée du pool (POSTGRES-POOL-001), et c'est en
+    outre le comportement du pilote MariaDB, dont `close()` restitue aussi.
+
+    La restitution n'a lieu qu'une fois : rendre deux fois la même connexion
+    corromprait le compte du pool.
+    """
+
+    def __init__(self, connection: Any, *, pool: Any = None) -> None:
         self._connection = connection
+        self._pool = pool
+        self._returned = False
+
+    @property
+    def pooled(self) -> bool:
+        """Vrai si cette connexion doit retourner au pool plutôt que se fermer."""
+        return self._pool is not None
+
+    @property
+    def raw(self) -> Any:
+        """Connexion psycopg sous-jacente."""
+        return self._connection
 
     def cursor(self, *, dictionary: bool = False) -> _PgCursor:
         if dictionary:
@@ -118,7 +144,12 @@ class _PgConnection:
         self._connection.rollback()
 
     def close(self) -> None:
-        self._connection.close()
+        if self._pool is None:
+            self._connection.close()
+            return
+        if not self._returned:
+            self._returned = True
+            self._pool.putconn(self._connection)
 
     @property
     def autocommit(self) -> Any:
@@ -127,6 +158,46 @@ class _PgConnection:
     @autocommit.setter
     def autocommit(self, value: Any) -> None:
         self._connection.autocommit = value
+
+
+def _reset_connection(connection: Any) -> None:
+    """Rend la connexion vierge avant qu'elle ne reparte au pool.
+
+    Le pool de psycopg annule bien la transaction en cours, mais rien d'autre :
+    mesuré, une table temporaire et un `application_name` posés par une requête
+    restaient visibles de l'emprunteur suivant. MariaDB, lui, isole
+    complètement ses emprunts, angle vérifié sain au troisième cycle de
+    pré-mortem : doter PostgreSQL d'un pool sans cette remise à zéro aurait
+    introduit une fuite d'état là où il n'y en avait pas, chaque requête
+    ouvrant jusque là sa propre connexion (POSTGRES-POOL-001).
+
+    Le nettoyage est celui de `DISCARD ALL`, **moins** les requêtes préparées.
+    Mesuré, les inclure casse la connexion suivante : `DISCARD ALL` exécute un
+    `DEALLOCATE ALL` côté serveur, alors que psycopg tient son propre catalogue
+    des requêtes qu'il a préparées. Il en réclame ensuite une que le serveur ne
+    connaît plus, et rend « l'instruction préparée _pg3_0 n'existe pas ». Ce
+    catalogue appartient au pilote, on ne le vide pas dans son dos ; et rien ne
+    fuit à le laisser, une requête préparée n'étant ni une donnée ni un réglage.
+
+    Les instructions retenues refusent de s'exécuter dans une transaction, d'où
+    l'annulation puis le passage temporaire en autocommit. Elles partent en un
+    seul lot, ce que psycopg autorise en l'absence de paramètre : mesuré,
+    0,117 ms contre 0,540 ms envoyées une à une, sur une restitution qui a lieu
+    à chaque requête HTTP.
+    """
+    connection.rollback()
+    previous = connection.autocommit
+    connection.autocommit = True
+    try:
+        connection.execute(
+            "CLOSE ALL;"          # curseurs restés ouverts
+            " RESET ALL;"         # variables de session (SET application_name...)
+            " DISCARD PLANS;"     # plans mis en cache
+            " DISCARD SEQUENCES;"
+            " DISCARD TEMP"       # tables temporaires
+        )
+    finally:
+        connection.autocommit = previous
 
 
 class PostgreSQLBackend:
@@ -151,10 +222,11 @@ class PostgreSQLBackend:
         ("DB_APP_PWD", ""),
     ]
 
-    def get_connection(self) -> Any:
-        import psycopg
+    def __init__(self) -> None:
+        self._pool: Any = None
+        self._pool_lock = threading.Lock()
 
-        pg: Any = psycopg
+    def _runtime_conninfo(self) -> str:
         # ADR-060/ADR-066 : config de connexion runtime lue dans l'environnement
         # (DB_HOST/DB_PORT partagés, identifiants applicatifs distincts).
         host = os.environ.get("DB_HOST", "localhost")
@@ -162,15 +234,91 @@ class PostgreSQLBackend:
         dbname = os.environ.get("DB_NAME", "")
         user = os.environ.get("DB_APP_LOGIN", "")
         password = os.environ.get("DB_APP_PWD", "")
-        conninfo = (
+        return (
             f"host={host} port={port} "
             f"dbname={dbname} user={user} "
             f"password={password}"
         )
-        raw: Any = pg.connect(conninfo)
-        return _PgConnection(raw)
+
+    def _get_pool(self) -> Any:
+        """Crée le pool au premier emprunt, jamais à l'import (POSTGRES-POOL-001).
+
+        La paresse n'est pas une commodité, c'est une nécessité : un pool né
+        avant le `fork` de gunicorn serait partagé entre les processus fils,
+        chacun croyant disposer de connexions que les autres utilisent. Créé au
+        premier emprunt, il naît dans le fils, comme celui de MariaDB.
+        """
+        if self._pool is None:
+            with self._pool_lock:
+                if self._pool is None:
+                    from psycopg_pool import ConnectionPool
+
+                    pool_class: Any = ConnectionPool
+                    size = max(1, int(os.environ.get("DB_POOL_SIZE", "5")))
+                    timeout = float(os.environ.get("DB_POOL_TIMEOUT", "5"))
+                    self._pool = pool_class(
+                        conninfo=self._runtime_conninfo(),
+                        min_size=1,
+                        max_size=size,
+                        timeout=timeout,
+                        # Revalidation avant remise en circulation : le serveur
+                        # peut avoir fermé la connexion de son côté pendant
+                        # qu'elle dormait dans le pool. Une requête vide coûte
+                        # une fraction de milliseconde, contre les douze que
+                        # coûtait l'ouverture d'une connexion neuve.
+                        check=pool_class.check_connection,
+                        # Remise à zéro de l'état de session à la restitution,
+                        # sans quoi tables temporaires et variables de session
+                        # passeraient d'un emprunteur au suivant.
+                        reset=_reset_connection,
+                        name=os.environ.get("DB_NAME", "forge") or "forge",
+                        open=True,
+                    )
+                    logger.debug("Pool PostgreSQL initialisé (taille=%s)", size)
+        return self._pool
+
+    def get_connection(self) -> Any:
+        """Emprunte une connexion au pool, en patientant s'il est saturé.
+
+        Avant ce pool, chaque requête ouvrait puis fermait une connexion
+        (POSTGRES-POOL-001). Mesuré sur serveur local, 12,12 ms contre 0,16 ms
+        sur une connexion déjà ouverte, soit un facteur 78 : une page à dix
+        requêtes payait 120 ms de connexion pure. MariaDB avait son pool et SQL
+        Server bénéficie de celui du gestionnaire ODBC ; PostgreSQL était le
+        seul à repartir de zéro à chaque fois. `DB_POOL_SIZE` et
+        `DB_POOL_TIMEOUT` y étaient de surcroît ignorés en silence.
+
+        L'attente est bornée par `DB_POOL_TIMEOUT` (5 s par défaut). Au delà,
+        `DatabaseUnavailableError` est levée, comme chez MariaDB : c'est une
+        surcharge, pas une panne, et le cœur la traduit en 503.
+        """
+        from psycopg_pool import PoolTimeout
+
+        pool = self._get_pool()
+        try:
+            raw: Any = pool.getconn()
+        except PoolTimeout as error:
+            logger.warning(
+                "Pool PostgreSQL saturé : aucune connexion libérée en %ss "
+                "(DB_POOL_SIZE=%s). Élargissez le pool ou raccourcissez les requêtes.",
+                os.environ.get("DB_POOL_TIMEOUT", "5"),
+                os.environ.get("DB_POOL_SIZE", "5"),
+            )
+            raise DatabaseUnavailableError(str(error)) from error
+        return _PgConnection(raw, pool=pool)
 
     def get_admin_connection(self, *, database: "str | None" = None) -> Any:
+        """Connexion d'administration, ouverte en direct et **hors pool**.
+
+        Le pool sert l'exécution, avec les identifiants applicatifs et une
+        taille dimensionnée pour le trafic HTTP. L'administration est d'une
+        autre nature : rare, ponctuelle, sous d'autres identifiants (ADR-033),
+        et parfois dirigée vers une autre base que celle du projet. La faire
+        passer par le pool mélangerait deux comptes dans un même jeu de
+        connexions réutilisées.
+
+        Sa restitution la ferme donc, au lieu de la rendre au pool.
+        """
         import psycopg
 
         pg: Any = psycopg
@@ -191,8 +339,25 @@ class PostgreSQLBackend:
         return _PgConnection(raw)
 
     def close_connection(self, connection: Any) -> None:
+        """Rend la connexion au pool, ou la ferme si elle n'en vient pas.
+
+        L'aiguillage appartient à l'enveloppe, qui seule sait d'où elle vient :
+        une connexion d'administration est ouverte en direct, hors pool, et la
+        restituer à un pool qui ne l'a jamais prêtée le corromprait. Le faire
+        ici sur un attribut plutôt que là-bas laisserait un `close()` direct
+        brûler une place, ce qui est arrivé.
+        """
         if connection is not None:
             connection.close()
+
+    def close(self) -> None:
+        """Ferme le pool sous-jacent (réinitialisation, fin de session de test)."""
+        if self._pool is not None:
+            try:
+                self._pool.close()
+            except Exception:  # noqa: BLE001 — fermeture best-effort
+                pass
+            self._pool = None
 
     def is_unique_violation(self, error: Exception) -> bool:
         """Doublon PostgreSQL : SQLSTATE 23505 (`unique_violation`).

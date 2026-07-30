@@ -255,10 +255,26 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     | Élément | Rôle |
     |---|---|
     | `PostgreSQLBackend` | implémente le contrat `DatabaseBackend` |
+    | Pool `psycopg_pool` | file d'attente, revalidation, remise à zéro de session entre deux emprunts |
     | Adaptateur `psycopg` | curseur lignes-dict (`dict_row`), `lastrowid` via `lastval()` sous garde savepoint |
     | `translate_placeholders` | traduit `?` en `%s` |
     | `PostgreSQLDialect` | `BIGSERIAL`, `CREATE INDEX` séparés, guillemets doubles, `information_schema` |
     | Entry point | `forge_mvc.db_backend = postgres` |
+
+    !!! note "Le pool de connexions"
+        Chaque requête empruntait auparavant une connexion neuve, puis la fermait.
+        Mesuré sur serveur local, 12,12 ms contre 0,16 ms sur une connexion déjà ouverte, soit une page à dix requêtes qui payait 120 ms de connexion pure.
+
+        Le pool est celui de `psycopg_pool`, écrit par les auteurs du pilote.
+        Sa taille se règle par `DB_POOL_SIZE` (5 par défaut) et son attente par `DB_POOL_TIMEOUT` (5 secondes), les deux mêmes variables que MariaDB.
+        Au delà de l'attente, Forge répond `503` avec `Retry-After` : le pool est saturé, ce n'est pas une panne.
+
+        Le pool naît au premier emprunt, jamais à l'import, pour qu'il appartienne au processus fils de gunicorn et non au père.
+
+        Chaque connexion rendue est remise à zéro, curseurs, variables de session et tables temporaires compris.
+        Rien de l'emprunteur précédent n'atteint le suivant.
+
+        La connexion d'administration reste **hors pool** : elle est ponctuelle, sous d'autres identifiants, et parfois dirigée vers une autre base.
 
 ??? note "9. Contextes d'utilisation"
 
