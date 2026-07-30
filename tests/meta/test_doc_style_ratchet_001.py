@@ -21,6 +21,7 @@ sources.
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -88,8 +89,6 @@ EM_DASH_LEGACY = frozenset({
     "packages/forge-mvc-mfa/README.md",
     "packages/forge-mvc-stats/README.md",
     "packages/forge-mvc-workflow/README.md",
-    "storage/logs/errors.dev.md",
-    "tests/fixtures/app/storage/logs/errors.dev.md",
 })
 
 MULTI_COLON_LEGACY = frozenset({
@@ -150,15 +149,32 @@ MULTI_COLON_LEGACY = frozenset({
     "packages/forge-mvc-rbac/docs/references/jinja.md",
     "packages/forge-mvc-rbac/docs/welcome/avance/rbac-request-roles.md",
     "packages/forge-mvc-stats/docs/welcome/intermediaire/bilan.md",
-    "storage/logs/errors.dev.md",
-    "tests/fixtures/app/storage/logs/errors.dev.md",
 })
 
 
 def _markdown_files() -> list[Path]:
+    """Les fichiers Markdown **suivis par Git**, et eux seuls.
+
+    Le parcours du disque scannait aussi ce que Git ignore, notamment les
+    journaux d'erreur du serveur de développement (`storage/logs/*.md`), qui
+    n'existent que sur la machine du développeur. Les listes gelées avaient
+    fini par en contenir deux : le cliquet passait en local, où ces fichiers
+    sont fautifs, et échouait en CI, où ils n'existent pas, en réclamant leur
+    retrait de la liste. La CI est restée rouge deux jours pour cette seule
+    raison (META-RATCHET-TRACKED-FILES-001).
+
+    S'en tenir aux fichiers suivis rend le verdict identique partout, et cadre
+    avec ce que le cliquet gouverne : la documentation que Forge publie, pas
+    les artefacts d'exécution d'un poste.
+    """
+    result = subprocess.run(
+        ["git", "ls-files", "-z", "--", "*.md"],
+        cwd=str(PROJECT_ROOT), capture_output=True, text=True, check=True,
+    )
     return sorted(
-        p for p in PROJECT_ROOT.rglob("*.md")
-        if not any(part in p.as_posix() for part in EXCLUDED_PARTS)
+        PROJECT_ROOT / nom
+        for nom in result.stdout.split("\0")
+        if nom and not any(part in nom for part in EXCLUDED_PARTS)
     )
 
 
