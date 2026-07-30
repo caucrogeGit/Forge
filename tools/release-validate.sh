@@ -396,7 +396,27 @@ if $WITH_PACKAGES; then
     fi
 fi
 
-# ── 14. Installation en environnement vierge (opt-in : --with-smoke) ─────────
+# ── 14. Complétude de la publication ─────────────────────────────────────────
+# RELEASE-PYPI-COMPLETENESS-GUARD-001 — croiser le dépôt, la construction et
+# PyPI. La rc2 a été publiée avec 24 distributions sur 27 : les trois absentes
+# étaient nées après la publication précédente, et rien ne le disait. Publier
+# une release sans une distribution que le dépôt porte la rend régressive pour
+# qui l'utilise — le cas mesuré est `forge-mvc-entities`, sans lequel
+# `make:entity`, `make:crud`, les migrations et `db:*` disparaissent.
+echo ""
+echo "--- Complétude de la publication (dépôt / build / PyPI) ---"
+_completeness_args=""
+$WITH_PACKAGES && _completeness_args="--check-build"
+if "$PYTHON_BIN" tools/check_pypi_completeness.py $_completeness_args \
+        >/tmp/relval_completeness.log 2>&1; then
+    _ok "Complétude : toute distribution du dépôt est publiable et publiée"
+    grep '\[WARN\]' /tmp/relval_completeness.log | sed 's/^/         /' || true
+else
+    _fail "Complétude : distribution(s) manquante(s) ou orpheline(s)"
+    sed 's/^/         /' /tmp/relval_completeness.log || true
+fi
+
+# ── 15. Installation en environnement vierge (opt-in : --with-smoke) ─────────
 # SMOKE-INSTALL-VIERGE-001 — preuve que `forge new` -> `pip install -r
 # requirements.txt` aboutit depuis des wheels construites localement, donc
 # indépendamment de la publication PyPI. C'est le garde-fou qui attrape un

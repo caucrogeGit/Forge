@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 #
-# Build des 13 paquets Forge (forge-mvc + les 12 opt-ins) dans ./dist/,
+# Build de toutes les distributions Forge (forge-mvc + les opt-ins de
+# packages/) dans ./dist/. Le compte n'est PAS écrit en dur : il a valu 13,
+# puis 25, puis 28, et un nombre figé dans un commentaire ne prévient de
+# rien quand un paquet neuf n'est pas publié (RELEASE-PYPI-COMPLETENESS-GUARD-001).
 # puis `twine check`. N'UPLOADE RIEN par défaut.
 #
 # Usage :
@@ -52,14 +55,14 @@ done
 echo "-- twine check --"
 twine check "$DIST"/*
 
-# 4. Récapitulatif (13 wheels + 13 sdists attendus)
+# 4. Récapitulatif (une wheel et une sdist par distribution du dépôt)
 n="$(ls -1 "$DIST" | wc -l | tr -d ' ')"
 echo "-- $n artefacts dans dist/ --"
 ls -1 "$DIST"
 
 # 5. Upload (uniquement si demandé explicitement)
 if [ "$MODE" = "--upload" ]; then
-    echo "-- twine upload (PyPI) — publication des 13 paquets --"
+    echo "-- twine upload (PyPI) — publication de toutes les distributions --"
     twine upload "$DIST"/*
     echo "Upload terminé."
 else
@@ -69,7 +72,7 @@ Build + twine check OK. RIEN n'a été publié.
 
 Étapes de publication (manuelles, dans l'ordre) :
 
-  # 1) Publier les 13 paquets sur PyPI
+  # 1) Publier toutes les distributions sur PyPI
   bash tools/release-build.sh --upload      # (ou : twine upload dist/*)
 
   # 2) Taguer la release
