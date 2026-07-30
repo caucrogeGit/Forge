@@ -102,7 +102,11 @@ def sqlite_backend(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("DB_BACKEND", "sqlite")
     backend_module.reset_backend()
     try:
-        yield backend_module.get_backend()
+        backend = backend_module.get_backend()
+        # SQLITE-RUNTIME-NO-CREATE-001 : la connexion d'exécution ne crée plus
+        # le fichier. On provisionne d'abord, comme le ferait `forge db:init`.
+        backend.get_admin_connection().close()
+        yield backend
     finally:
         backend_module.reset_backend()
 
