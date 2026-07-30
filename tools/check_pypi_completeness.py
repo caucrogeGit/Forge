@@ -80,9 +80,17 @@ def pypi_versions(nom: str, *, timeout: float = 10.0) -> "list[str] | None":
     d'avertir une fois le retrait fait, sans quoi il crierait pour toujours
     (PKG-ORPHAN-YANK-001).
     """
-    url = f"https://pypi.org/pypi/{nom}/json"
+    # PyPI sert cette réponse via un cache. Sans le lui interdire, le garde lit
+    # un état périmé : mesuré, il annonçait cinq versions encore installables
+    # alors qu'elles venaient d'être remisées, ce qui fait douter de son propre
+    # travail celui qui vient de le faire. Un garde qui répond à côté de
+    # l'action qu'il doit vérifier est pire qu'un garde absent.
+    requete = urllib.request.Request(
+        f"https://pypi.org/pypi/{nom}/json",
+        headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
+    )
     try:
-        with urllib.request.urlopen(url, timeout=timeout) as reponse:
+        with urllib.request.urlopen(requete, timeout=timeout) as reponse:
             releases = json.load(reponse).get("releases", {})
     except urllib.error.HTTPError as erreur:
         if erreur.code == 404:

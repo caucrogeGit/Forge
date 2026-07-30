@@ -106,6 +106,39 @@ def test_une_version_partiellement_retiree_reste_installable(
     assert guard.pypi_versions("forge-mvc-pivot") == ["1.0.0rc2"]
 
 
+def test_la_lecture_de_pypi_contourne_le_cache(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Un garde qui répond à côté de l'action qu'il vérifie est pire qu'absent.
+
+    Mesuré pendant le retrait : PyPI servait une réponse en cache, et le garde
+    annonçait cinq versions encore installables alors qu'elles venaient d'être
+    remisées. Celui qui vient de faire le geste doute alors de son travail.
+    """
+    vues: "list[object]" = []
+
+    class _Reponse:
+        def read(self) -> bytes:
+            return b'{"releases": {}}'
+
+        def __enter__(self) -> "_Reponse":
+            return self
+
+        def __exit__(self, *_: object) -> None:
+            return None
+
+    def _urlopen(requete: object, timeout: float = 0) -> "_Reponse":
+        vues.append(requete)
+        return _Reponse()
+
+    monkeypatch.setattr(guard.urllib.request, "urlopen", _urlopen)
+    guard.pypi_versions("forge-mvc-media")
+
+    entetes = getattr(vues[0], "headers", {})
+    normalisees = {cle.lower(): valeur for cle, valeur in entetes.items()}
+    assert normalisees.get("Cache-control".lower()) == "no-cache", (
+        f"requête sans interdiction de cache : {normalisees}"
+    )
+
+
 # ── La procédure, qui appartient à un humain ─────────────────────────────────
 
 def test_la_procedure_existe() -> None:
