@@ -11,7 +11,7 @@ Deux façons d'obtenir la même capacité coexistent, dont une morte, ce que le 
 
 ## Le geste : retirer, pas supprimer
 
-Le retrait PyPI, dit **yank**, laisse la version servie à qui l'épingle déjà dans son `requirements.txt`.
+Le retrait PyPI, dit **yank** en anglais et **« remiser »** dans l'interface française, laisse la version servie à qui l'épingle déjà dans son `requirements.txt`.
 Aucun projet existant ne casse.
 En revanche la version sort de toute résolution nouvelle : un `pip install` sans épinglage ne la choisira plus.
 
@@ -30,10 +30,14 @@ C'est pourquoi Forge ne supprime jamais, il retire.
 Le retrait se fait depuis l'interface PyPI, projet par projet.
 
 1. Ouvrir `https://pypi.org/manage/project/<nom>/releases/`.
-2. Pour chaque version, choisir « Yank ».
+2. Ouvrir une version, puis descendre jusqu'au cadre **bleu** « Version remisée » et cliquer son bouton.
+   Ne pas confondre avec le cadre **rouge** « Supprimer la version » juste en dessous, qui est irréversible et casse tout projet épinglé.
 3. Renseigner la raison, qui s'affichera à qui tente d'installer.
    Pour le pivot : `Absorbé par forge-mvc-entities (ADR-070) ; installez forge-mvc-entities.`
    Pour media : `Absorbé par forge-mvc-images (ADR-018) ; installez forge-mvc-images.`
+
+Le geste porte sur **une version à la fois**.
+Un paquet qui compte cinq versions publiées demande donc cinq remisages, et le garde ci-dessous indique combien il en reste.
 
 Le retrait est réversible : une version retirée par erreur se rétablit depuis la même page.
 
@@ -45,7 +49,7 @@ Le garde de complétude ne compte que les versions **installables**.
 python tools/check_pypi_completeness.py
 ```
 
-Tant qu'une version reste servie, la ligne `[WARN] ... ORPHELIN` s'affiche.
+Tant qu'une version reste servie, la ligne `[WARN] ... ORPHELIN` s'affiche, avec le nombre de versions encore installables et leur liste.
 Une fois toutes les versions retirées, elle disparaît d'elle-même.
 
 ## Quand un paquet est absorbé

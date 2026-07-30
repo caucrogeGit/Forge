@@ -142,10 +142,15 @@ def verifier(*, check_build: bool, offline_ok: bool) -> int:
             muets += 1
             continue
         if versions:
+            # Le compte, pas seulement la dernière : le retrait se fait version
+            # par version sur PyPI, et n'afficher que la plus récente laissait
+            # croire à un seul geste là où il y en avait cinq.
+            detail = ", ".join(versions) if len(versions) <= 6 else (
+                f"{versions[0]} … {versions[-1]}")
             avertissements.append(
-                f"{nom} : ORPHELIN sur PyPI ({versions[-1]}), {raison}. "
-                "Toujours installable, plus maintenu : à retirer (yank) ou à "
-                "remplacer par un shim, décision de release."
+                f"{nom} : ORPHELIN sur PyPI, {len(versions)} version(s) encore "
+                f"installable(s) ({detail}), {raison}. À remiser une par une "
+                "(voir docs/release/orphan-packages.md)."
             )
 
     if muets:
