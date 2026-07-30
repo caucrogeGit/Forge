@@ -100,6 +100,41 @@ if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
     exit 1
 fi
 
+# RELEASE-VALIDATE-INTERPRETER-001 — l'interpréteur doit être CELUI du projet.
+# Vérifier qu'un `python3` existe ne prouve rien : il en existe un sur toute
+# machine. Lancé sans venv actif, le script validait donc le Python du système,
+# où ni Forge ni l'outillage ne sont installés. Mesuré sur une validation
+# réelle : deux échecs sur trois étaient des faux positifs, un module d'opt-in
+# et mkdocs déclarés absents alors qu'ils sont installés dans le venv.
+# Le sens inverse est plus grave : un interpréteur portant une version ANCIENNE
+# de Forge donnerait un feu vert sur autre chose que ce qu'on publie.
+# La distribution INSTALLÉE, et non un simple `import core` : lancé depuis la
+# racine du dépôt, `python -c` ajoute le répertoire courant au chemin, si bien
+# que n'importe quel interpréteur importe `core` sans que Forge y soit installé.
+_FORGE_INSTALLED="$("$PYTHON_BIN" -c 'import importlib.metadata as m;print(m.version("forge-mvc"))' 2>/dev/null || true)"
+if [ -z "$_FORGE_INSTALLED" ]; then
+    printf "[FAIL]  L'interpréteur %s n'a pas la distribution forge-mvc installée.\n" \
+        "$(command -v "$PYTHON_BIN")" >&2
+    printf "         Activez l'environnement du projet : source .venv/bin/activate\n" >&2
+    printf "         ou désignez-le : PYTHON=.venv/bin/python bash tools/release-validate.sh ...\n" >&2
+    exit 1
+fi
+_FORGE_REPO_VERSION="$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml | head -1)"
+if [ -n "$_FORGE_REPO_VERSION" ] && [ "$_FORGE_INSTALLED" != "$_FORGE_REPO_VERSION" ]; then
+    printf "[FAIL]  L'interpréteur %s porte forge-mvc %s, alors qu'on valide %s.\n" \
+        "$(command -v "$PYTHON_BIN")" "$_FORGE_INSTALLED" "$_FORGE_REPO_VERSION" >&2
+    printf "         La validation porterait sur une autre version que celle publiée.\n" >&2
+    printf "         Réinstallez en éditable : pip install -e .\n" >&2
+    exit 1
+fi
+for _outil in pytest mkdocs ruff; do
+    if ! "$PYTHON_BIN" -c "import $_outil" >/dev/null 2>&1; then
+        printf "[FAIL]  L'outil %s est absent de %s.\n" "$_outil" "$(command -v "$PYTHON_BIN")" >&2
+        printf "         Installez les dépendances de développement, ou activez le venv du projet.\n" >&2
+        exit 1
+    fi
+done
+
 echo "=== Validation pré-release Forge ${VERSION:-<version non fournie>} ==="
 if $WITH_PACKAGES; then
     echo "Mode : --with-packages (build des distributions core + opt-ins + twine check)"
