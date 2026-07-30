@@ -301,8 +301,8 @@ class MSSQLBackend:
         message = str(error)
         return "(2627)" in message or "(2601)" in message
 
-    def is_connection_lost(self, error: Exception) -> bool:
-        """Connexion coupée SQL Server : classe SQLSTATE 08.
+    def is_unavailable(self, error: Exception) -> bool:
+        """Indisponibilité SQL Server : la connexion coupée, classe SQLSTATE 08.
 
         Contrairement au doublon, le SQLSTATE discrimine ici parfaitement :
         la classe `08` est celle des « connection exception » de la norme, que

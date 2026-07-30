@@ -176,8 +176,13 @@ class MariaDBBackend:
         """
         return getattr(error, "errno", None) == 1062
 
-    def is_connection_lost(self, error: Exception) -> bool:
-        """Connexion coupée MariaDB : errno 2006 et 2013, mesurés.
+    def is_unavailable(self, error: Exception) -> bool:
+        """Indisponibilité MariaDB : la connexion coupée, errno 2006 et 2013.
+
+        Le serveur n'ayant pas de verrou de fichier, la seconde cause de la
+        famille (ressource prise) ne s'exprime pas ici : la saturation est
+        celle du pool, et le backend lève lui-même `DatabaseUnavailableError`
+        depuis sa file d'attente, sans passer par cette question.
 
         `2006` (« Server has gone away ») et `2013` (« Lost connection to
         server during query ») sont les deux formes rendues selon que la

@@ -125,9 +125,17 @@ class SQLiteBackend:
         L'ordre compte, et il est vérifié : le pragma est sans effet dans une
         transaction ouverte. Armé ici, à l'emprunt, il survit au désarmement
         d'autocommit que `core.database.transaction` opère juste après.
+
+        Le temps d'attente devant un fichier verrouillé est lu dans
+        ``DB_POOL_TIMEOUT``, la variable que MariaDB emploie déjà pour attendre
+        devant un pool saturé. Les deux nomment la même chose, le temps qu'on
+        accepte de patienter avant de rendre un 503, et une seule façon
+        officielle vaut mieux que deux (principe 11). Sans elle, `sqlite3`
+        applique cinq secondes en dur, que rien ne permettait d'ajuster.
         """
         database = os.environ.get("DB_NAME", "")
-        raw = sqlite3.connect(database, check_same_thread=False)
+        timeout = float(os.environ.get("DB_POOL_TIMEOUT", "5"))
+        raw = sqlite3.connect(database, timeout=timeout, check_same_thread=False)
         raw.execute("PRAGMA foreign_keys = ON")
         return _SQLiteConnection(raw)
 
@@ -162,11 +170,30 @@ class SQLiteBackend:
             return False
         return "UNIQUE constraint failed" in str(error)
 
-    def is_connection_lost(self, error: Exception) -> bool:
-        """Toujours faux : SQLite est sans serveur, il n'y a rien à perdre.
+    def is_unavailable(self, error: Exception) -> bool:
+        """Indisponibilité SQLite : le fichier est verrouillé par un autre écrivain.
 
-        Le fichier est ouvert par le processus lui-même. Un échec d'accès y
-        est une panne de disque ou de permission, durable, qui appelle un 500
-        et non l'invitation à réessayer que porte `DatabaseUnavailableError`.
+        SQLite n'a pas de connexion à perdre, le fichier étant ouvert par le
+        processus lui-même. Il a en revanche l'autre cause de la famille, et
+        sous une forme plus stricte que les SGBD serveur : **un seul écrivain à
+        la fois**. Une sauvegarde, un `fixtures:load` ou un second processus qui
+        tient une transaction fait attendre l'écriture, puis échouer au delà du
+        délai. La condition est passagère, l'écrivain d'à côté finira, et
+        réessayer suffit : c'est le jumeau exact de la saturation du pool sur un
+        backend serveur (SQLITE-BUSY-503-001).
+
+        La discrimination se fait sur le **code** de SQLite, exposé par
+        `sqlite3` depuis Python 3.11, et non sur le message : `SQLITE_BUSY`
+        quand le verrou est tenu ailleurs, `SQLITE_LOCKED` quand il l'est dans
+        la même connexion. C'est plus solide que ce que peuvent faire les trois
+        autres backends, dont les pilotes n'exposent pas toujours de code.
+
+        Un échec de disque ou de permission, lui, reste durable : il n'entre pas
+        dans la famille et appelle bien un 500.
         """
-        return False
+        import sqlite3
+
+        if not isinstance(error, sqlite3.OperationalError):
+            return False
+        nom = getattr(error, "sqlite_errorname", "")
+        return isinstance(nom, str) and nom.startswith(("SQLITE_BUSY", "SQLITE_LOCKED"))

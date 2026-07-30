@@ -296,6 +296,17 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         Une base SQLite créée avant cette version peut contenir des lignes orphelines.
         Elles ne bloquent pas la lecture, mais toute écriture qui les toucherait sera désormais refusée.
 
+    !!! note "Fichier verrouillé, réponse 503"
+        SQLite n'admet qu'un écrivain à la fois.
+        Une sauvegarde, un `fixtures:load` ou un second processus qui tient une transaction fait attendre, puis échouer au delà du délai.
+        En mode journal par défaut, le verrou exclusif tient aussi les lecteurs à distance, donc c'est le site entier qui patiente.
+
+        Forge y voit une indisponibilité passagère et répond `503` avec `Retry-After`, comme devant un pool saturé.
+        Un `500` aurait envoyé chercher un bug dans le code applicatif, alors que le remède est d'attendre ou de raccourcir la transaction voisine.
+
+        Le temps d'attente se règle par `DB_POOL_TIMEOUT`, la variable que MariaDB emploie déjà pour patienter devant son pool.
+        Sa valeur par défaut est de cinq secondes.
+
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-sqlite` : il le découvre par entry point (ADR-054).
 

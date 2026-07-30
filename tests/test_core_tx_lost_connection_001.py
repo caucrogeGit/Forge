@@ -42,7 +42,7 @@ class _BackendFactice:
         self._perdue = perdue
         self._doublon = doublon
 
-    def is_connection_lost(self, error: Exception) -> bool:
+    def is_unavailable(self, error: Exception) -> bool:
         return self._perdue
 
     def is_unique_violation(self, error: Exception) -> bool:

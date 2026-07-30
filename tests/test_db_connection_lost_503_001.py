@@ -34,11 +34,11 @@ from core.database.errors import DatabaseUnavailableError, UniqueViolationError
 # ── Le contrat ───────────────────────────────────────────────────────────────
 
 def test_le_contrat_porte_la_question() -> None:
-    assert hasattr(DatabaseBackend, "is_connection_lost")
+    assert hasattr(DatabaseBackend, "is_unavailable")
 
 
 def test_le_contrat_dit_ou_elle_vit_et_pourquoi() -> None:
-    doc = DatabaseBackend.is_connection_lost.__doc__ or ""
+    doc = DatabaseBackend.is_unavailable.__doc__ or ""
 
     assert "503" in doc
     assert "Retry-After" in doc
@@ -56,7 +56,7 @@ def test_le_contrat_dit_ou_elle_vit_et_pourquoi() -> None:
 def test_les_quatre_backends_implementent(module: str, classe: str) -> None:
     importe = pytest.importorskip(module)
 
-    assert callable(getattr(getattr(importe, classe), "is_connection_lost"))
+    assert callable(getattr(getattr(importe, classe), "is_unavailable"))
 
 
 # ── Les signaux mesurés, backend par backend ─────────────────────────────────
@@ -82,7 +82,7 @@ def test_mariadb_discrimine_par_errno(errno: "int | None", attendu: bool) -> Non
     """Le SQLSTATE ne sert à rien ici : ces erreurs portent toutes `HY000`."""
     backend = pytest.importorskip("forge_mvc_mariadb.backend").MariaDBBackend()
 
-    assert backend.is_connection_lost(_ErreurPilote(errno=errno, sqlstate="HY000")) is attendu
+    assert backend.is_unavailable(_ErreurPilote(errno=errno, sqlstate="HY000")) is attendu
 
 
 @pytest.mark.parametrize(("sqlstate", "attendu"), [
@@ -95,7 +95,7 @@ def test_mariadb_discrimine_par_errno(errno: "int | None", attendu: bool) -> Non
 def test_postgres_discrimine_par_sqlstate(sqlstate: str, attendu: bool) -> None:
     backend = pytest.importorskip("forge_mvc_postgres.backend").PostgreSQLBackend()
 
-    assert backend.is_connection_lost(_ErreurPilote(sqlstate=sqlstate)) is attendu
+    assert backend.is_unavailable(_ErreurPilote(sqlstate=sqlstate)) is attendu
 
 
 def test_postgres_reconnait_l_erreur_sans_sqlstate() -> None:
@@ -110,13 +110,13 @@ def test_postgres_reconnait_l_erreur_sans_sqlstate() -> None:
 
     perdue = psycopg.OperationalError("the connection is lost")
 
-    assert backend.is_connection_lost(perdue) is True
+    assert backend.is_unavailable(perdue) is True
 
 
 def test_postgres_reste_strict_sur_les_autres_exceptions() -> None:
     backend = pytest.importorskip("forge_mvc_postgres.backend").PostgreSQLBackend()
 
-    assert backend.is_connection_lost(ValueError("rien à voir")) is False
+    assert backend.is_unavailable(ValueError("rien à voir")) is False
 
 
 @pytest.mark.parametrize(("sqlstate", "attendu"), [
@@ -130,22 +130,26 @@ def test_mssql_discrimine_par_classe_sqlstate(sqlstate: str, attendu: bool) -> N
     erreur = _ErreurPilote()
     erreur.args = (sqlstate, f"[{sqlstate}] message du pilote")
 
-    assert backend.is_connection_lost(erreur) is attendu
+    assert backend.is_unavailable(erreur) is attendu
 
 
 def test_mssql_reste_strict_sans_sqlstate() -> None:
     backend = pytest.importorskip("forge_mvc_mssql.backend").MSSQLBackend()
 
-    assert backend.is_connection_lost(_ErreurPilote("message nu")) is False
+    assert backend.is_unavailable(_ErreurPilote("message nu")) is False
 
 
 def test_sqlite_n_a_pas_de_connexion_a_perdre() -> None:
-    """Sans serveur, un échec d'accès est durable : il appelle un 500."""
+    """Sans serveur, une panne de disque est durable : elle appelle un 500.
+
+    SQLite a en revanche l'autre cause de la famille, le fichier verrouillé,
+    reconnue depuis `SQLITE-BUSY-503-001` et éprouvée dans le paquet du backend.
+    """
     import sqlite3
 
     backend = pytest.importorskip("forge_mvc_sqlite.backend").SQLiteBackend()
 
-    assert backend.is_connection_lost(sqlite3.OperationalError("disk I/O error")) is False
+    assert backend.is_unavailable(sqlite3.OperationalError("disk I/O error")) is False
 
 
 # ── La traduction par le cœur ────────────────────────────────────────────────
@@ -158,7 +162,7 @@ class _BackendFactice:
         self._doublon = doublon
         self.rollbacks = 0
 
-    def is_connection_lost(self, error: Exception) -> bool:
+    def is_unavailable(self, error: Exception) -> bool:
         return self._perdue
 
     def is_unique_violation(self, error: Exception) -> bool:

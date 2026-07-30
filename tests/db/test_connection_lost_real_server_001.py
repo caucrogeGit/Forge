@@ -1,6 +1,6 @@
 """DB-CONNECTION-LOST-503-001, mesure sur serveurs réels.
 
-`is_connection_lost` repose sur des codes relevés à la main en tuant une
+`is_unavailable` repose sur des codes relevés à la main en tuant une
 connexion côté serveur. Ces codes ne sont écrits nulle part de façon
 contractuelle : ils appartiennent au pilote et peuvent changer avec lui.
 Seul un test qui tue réellement la connexion prouve que la reconnaissance
@@ -85,7 +85,7 @@ def test_mariadb_reconnait_ses_deux_errno(real_db: None) -> None:
     for errno in (2006, 2013):
         erreur = mariadb.InterfaceError("coupure")
         erreur.errno = errno  # pyright: ignore[reportAttributeAccessIssue]
-        assert backend.is_connection_lost(erreur) is True
+        assert backend.is_unavailable(erreur) is True
 
 
 def test_mariadb_ne_confond_pas_avec_un_doublon(real_db: None) -> None:
@@ -103,7 +103,7 @@ def test_mariadb_ne_confond_pas_avec_un_doublon(real_db: None) -> None:
     finally:
         db.execute("DROP TABLE IF EXISTS forge_lost_dup")
 
-    assert get_backend().is_connection_lost(ValueError("rien à voir")) is False
+    assert get_backend().is_unavailable(ValueError("rien à voir")) is False
 
 
 # ── PostgreSQL ───────────────────────────────────────────────────────────────
@@ -139,7 +139,7 @@ def test_postgres_une_session_terminee_devient_une_indisponibilite(
         erreur = capture
 
     assert erreur is not None, "la session terminée devrait faire échouer la requête"
-    assert backend.is_connection_lost(erreur) is True
+    assert backend.is_unavailable(erreur) is True
 
     # Et le cœur traduit bien, sur une connexion neuve prise au backend.
     assert db.fetch_one("SELECT 1 AS v") == {"v": 1}
@@ -159,7 +159,7 @@ def test_postgres_ne_confond_pas_avec_une_erreur_de_requete(
         try:
             cursor.execute("SELECT * FROM table_qui_nexiste_pas_du_tout")
         except Exception as erreur:  # noqa: BLE001 — c'est le sujet du test
-            assert backend.is_connection_lost(erreur) is False
+            assert backend.is_unavailable(erreur) is False
         else:
             pytest.fail("la requête aurait dû échouer")
         finally:
@@ -197,7 +197,7 @@ def test_mssql_une_session_tuee_devient_une_indisponibilite(
         erreur = capture
 
     assert erreur is not None, "la session tuée devrait faire échouer la requête"
-    assert backend.is_connection_lost(erreur) is True, (
+    assert backend.is_unavailable(erreur) is True, (
         f"SQLSTATE inattendu : {getattr(erreur, 'args', ())}"
     )
 
@@ -214,7 +214,7 @@ def test_mssql_ne_confond_pas_avec_une_erreur_de_requete(
         try:
             cursor.execute("SELECT * FROM table_qui_nexiste_pas_du_tout")
         except Exception as erreur:  # noqa: BLE001 — c'est le sujet du test
-            assert backend.is_connection_lost(erreur) is False
+            assert backend.is_unavailable(erreur) is False
         else:
             pytest.fail("la requête aurait dû échouer")
         finally:

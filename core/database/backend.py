@@ -462,33 +462,47 @@ class DatabaseBackend(Protocol):
         """
         ...
 
-    def is_connection_lost(self, error: Exception) -> bool:
-        """Vrai si `error` signale une connexion coupée, non une requête fautive.
+    def is_unavailable(self, error: Exception) -> bool:
+        """Vrai si `error` dit « réessayez », non « votre requête est fautive ».
 
-        Le cas courant n'est pas la panne durable mais la connexion **périmée
-        dans le pool** : le serveur l'a fermée de son côté (``wait_timeout``,
-        redémarrage, bascule) et le pilote la remet en circulation sans le
-        savoir. Mesuré sur MariaDB, le pilote ne revalide qu'au delà d'une
-        demi-seconde d'inactivité ; en deçà il livre la connexion morte, et
-        l'exception du pilote traverse jusqu'à la page d'erreur.
+        La question porte sur une **famille**, pas sur une cause : le cœur fait
+        la même chose de toutes ses réponses, un `DatabaseUnavailableError`,
+        donc un **503 avec `Retry-After`**. La symétrie avec l'autre condition
+        qualifiable est voulue, une question du contrat pour une erreur du cœur
+        (`is_unique_violation` donne `UniqueViolationError`).
 
-        Signaux relevés sur les quatre backends, en tuant la connexion côté
-        serveur puis en rejouant une requête :
+        Deux causes, de même nature du point de vue de l'appelant.
+
+        **La connexion était morte.** Le serveur l'a fermée de son côté
+        (``wait_timeout``, redémarrage, bascule) et le pilote la remet en
+        circulation sans le savoir. Mesuré sur MariaDB, le pilote ne revalide
+        qu'au delà d'une demi-seconde d'inactivité ; en deçà il livre la
+        connexion morte, et l'exception du pilote traverse jusqu'à la page
+        d'erreur.
+
+        **La ressource était prise.** Sur un backend fichier, un seul écrivain
+        est admis à la fois : le verrou tenu par un autre processus fait
+        échouer l'écriture au bout du délai d'attente. C'est le jumeau exact de
+        la saturation du pool sur un backend serveur, que le cœur qualifie déjà
+        (`MARIADB-POOL-QUEUE-001`), et le remède est le même, attendre.
+
+        Signaux relevés backend par backend, en tuant la connexion côté serveur
+        ou en tenant le verrou depuis un second processus :
 
             MariaDB      mariadb.InterfaceError          errno 2006, 2013
             PostgreSQL   psycopg.OperationalError        sqlstate 57P01 puis aucun
             SQL Server   pyodbc.OperationalError         sqlstate 08S01
-            SQLite       sans objet (pas de serveur)
+            SQLite       sqlite3.OperationalError        SQLITE_BUSY, SQLITE_LOCKED
 
         Comme pour `is_unique_violation`, aucun signal n'est portable et la
-        méthode appartient au backend, seul à connaître son pilote.
+        méthode appartient au backend, seul à connaître son pilote. Un backend
+        n'est pas tenu de reconnaître les deux causes, seulement de dire
+        lesquelles il reconnaît : SQLite n'a pas de connexion à perdre, les
+        trois backends serveur n'ont pas de verrou de fichier.
 
-        Le cœur la traduit en `DatabaseUnavailableError`, donc en **503 avec
-        `Retry-After`** : la coupure est passagère et l'emprunt suivant
-        réussira, là où un 500 enverrait chercher un bug inexistant dans le
-        code applicatif. Forge ne rejoue **pas** la requête à la place de
-        l'appelant : réémettre en silence une écriture dont on ignore si le
-        serveur l'a reçue serait de la magie cachée (principe 3).
+        Forge ne rejoue **pas** la requête à la place de l'appelant : réémettre
+        en silence une écriture dont on ignore si le serveur l'a reçue serait
+        de la magie cachée (principe 3).
 
         Même exigence de stricte : dans le doute, renvoyer faux. Un faux
         positif masquerait une vraie panne derrière une invitation à réessayer.

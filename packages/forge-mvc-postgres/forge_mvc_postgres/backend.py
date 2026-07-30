@@ -204,8 +204,8 @@ class PostgreSQLBackend:
         """
         return getattr(error, "sqlstate", None) == "23505"
 
-    def is_connection_lost(self, error: Exception) -> bool:
-        """Connexion coupée PostgreSQL : classe SQLSTATE 08, arrêts 57Pxx.
+    def is_unavailable(self, error: Exception) -> bool:
+        """Indisponibilité PostgreSQL : classe SQLSTATE 08, arrêts 57Pxx.
 
         La classe `08` est celle des « connection exception » de la norme.
         S'y ajoutent les arrêts décidés par le serveur, mesurés : `57P01`

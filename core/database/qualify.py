@@ -39,13 +39,13 @@ def is_unique_violation(error: Exception) -> bool:
         return False
 
 
-def is_connection_lost(error: Exception) -> bool:
-    """Demande au backend actif si `error` est une connexion coupée.
+def is_unavailable(error: Exception) -> bool:
+    """Demande au backend actif si `error` invite à réessayer.
 
     Même enveloppe que `is_unique_violation`, pour la même raison.
     """
     try:
-        return bool(get_backend().is_connection_lost(error))
+        return bool(get_backend().is_unavailable(error))
     except Exception:  # noqa: BLE001 — un backend muet ne masque rien
         return False
 
@@ -59,7 +59,7 @@ def qualify(error: Exception) -> Exception:
     """
     if is_unique_violation(error):
         return UniqueViolationError(str(error))
-    if is_connection_lost(error):
+    if is_unavailable(error):
         return DatabaseUnavailableError(str(error))
     return error
 
