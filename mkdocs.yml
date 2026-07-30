@@ -244,6 +244,7 @@ nav:
         - Vue d'ensemble: release/release-and-compatibility.md
         - Politique de release: release/release-policy.md
         - Politique de dépréciation: release/deprecation-policy.md
+        - Retirer un paquet absorbé: release/orphan-packages.md
         - Matrice de compatibilité: release/compatibility.md
         - Guide de migration: features/migration-guide.md
         - Politique LTS: release/lts-policy.md

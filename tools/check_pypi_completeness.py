@@ -72,17 +72,31 @@ def built_distributions() -> "set[str]":
 
 
 def pypi_versions(nom: str, *, timeout: float = 10.0) -> "list[str] | None":
-    """Versions publiées, `[]` si le nom n'existe pas, `None` si PyPI est muet."""
+    """Versions **installables**, `[]` si aucune, `None` si PyPI est muet.
+
+    Une version retirée (« yank ») ne compte pas : elle reste servie à qui
+    l'épingle déjà, mais sort de toute résolution nouvelle. C'est exactement
+    l'état visé pour une distribution absorbée, et le garde doit donc cesser
+    d'avertir une fois le retrait fait, sans quoi il crierait pour toujours
+    (PKG-ORPHAN-YANK-001).
+    """
     url = f"https://pypi.org/pypi/{nom}/json"
     try:
         with urllib.request.urlopen(url, timeout=timeout) as reponse:
-            return sorted(json.load(reponse).get("releases", {}))
+            releases = json.load(reponse).get("releases", {})
     except urllib.error.HTTPError as erreur:
         if erreur.code == 404:
             return []
         return None
     except Exception:  # noqa: BLE001 — réseau absent, DNS, proxy : tous muets
         return None
+    vivantes: "list[str]" = []
+    for version, fichiers in releases.items():
+        # Une version sans fichier n'est pas installable ; une version dont
+        # tous les fichiers sont retirés ne l'est plus non plus.
+        if fichiers and not all(f.get("yanked", False) for f in fichiers):
+            vivantes.append(str(version))
+    return sorted(vivantes)
 
 
 def verifier(*, check_build: bool, offline_ok: bool) -> int:

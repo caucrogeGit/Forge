@@ -1,137 +1,64 @@
-"""Tests PIVOT-EXTRACT-001 : pivot advanced deplace dans forge-mvc-pivot (ADR-021)."""
+"""PIVOT-EXTRACT-001, devenu test d'absence : le pivot a été absorbé (ADR-070).
+
+Ce fichier éprouvait l'opt-in `forge-mvc-pivot`, extrait du cœur par l'ADR-021.
+L'ADR-070 a ensuite absorbé ce paquet dans `forge-mvc-entities`, et le dossier
+a disparu de `packages/`. Le fichier a survécu en l'état, ouvert par un
+`importorskip` sur un module qui n'existe plus : cent trente-sept lignes de test
+qui se sautaient à chaque exécution, donc ne prouvaient plus rien tout en
+donnant l'apparence d'une couverture.
+
+La convention du dépôt veut qu'une suppression laisse un test d'**absence**,
+pas un test endormi. C'est ce qu'il devient : le pivot ne doit plus exister
+comme paquet, ni comme module importable, et sa capacité doit vivre là où
+l'ADR-070 l'a mise.
+
+Le sort de la distribution restée sur PyPI est traité par
+`test_pkg_orphan_yank_001.py`.
+"""
 from __future__ import annotations
 
-import tomllib
+import importlib.util
 from pathlib import Path
 
 import pytest
 
-_CURRENT_VERSION = tomllib.loads(
-    (Path(__file__).parent.parent.parent / "pyproject.toml").read_text(encoding="utf-8")
-)["project"]["version"]
-pytest.importorskip("forge_mvc_pivot")
-
 pytestmark = pytest.mark.meta
 
-
-class TestPivotModuleAvailable:
-    def test_can_import_public_api(self):
-        from forge_mvc_pivot import (  # noqa: F401
-            PivotAdvancedService,
-            PivotConstraintError,
-            PivotFieldConstraint,
-            PivotFormError,
-            PivotRow,
-            pivot_error_to_form_error,
-        )
-        assert PivotAdvancedService is not None
-
-    def test_module_has_version(self):
-        import forge_mvc_pivot
-        assert hasattr(forge_mvc_pivot, "__version__")
-        assert forge_mvc_pivot.__version__ == _CURRENT_VERSION
-
-    def test_all_exports_complete(self):
-        import forge_mvc_pivot
-        expected = {
-            "PivotAdvancedService", "PivotConstraintError",
-            "PivotFieldConstraint", "PivotFormError", "PivotRow",
-            "pivot_error_to_form_error",
-        }
-        assert expected.issubset(set(forge_mvc_pivot.__all__))
-
-    def test_generator_importable(self):
-        from forge_mvc_pivot.make_pivot_crud import (  # noqa: F401
-            cmd_make_pivot_crud_main,
-            make_pivot_crud,
-        )
-        assert make_pivot_crud is not None
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
-class TestPivotRemovedFromCore:
-    def test_no_pivot_advanced_in_core(self):
-        assert not Path("core/pivot_advanced.py").exists(), (
-            "core/pivot_advanced.py aurait du etre supprime"
-        )
-
-    def test_no_make_pivot_crud_in_cli(self):
-        assert not Path("packages/forge-mvc-entities/forge_mvc_entities/make_pivot_crud.py").exists(), (
-            "packages/forge-mvc-entities/forge_mvc_entities/make_pivot_crud.py aurait du etre supprime"
-        )
-
-    def test_old_service_import_fails(self):
-        with pytest.raises(ImportError):
-            import core.pivot_advanced  # noqa: F401
-
-    def test_old_generator_import_fails(self):
-        with pytest.raises(ImportError):
-            import forge_mvc_entities.make_pivot_crud  # noqa: F401
+def test_le_paquet_pivot_n_est_plus_au_depot() -> None:
+    assert not (PROJECT_ROOT / "packages" / "forge-mvc-pivot").exists()
 
 
-class TestNoCorePivotImportsRemain:
-    @pytest.mark.parametrize("forbidden_import", [
-        "from core.pivot_advanced",
-        "import core.pivot_advanced",
-        "forge_mvc_entities.make_pivot_crud",
-    ])
-    def test_no_forbidden_imports(self, forbidden_import):
-        this_file = Path(__file__).resolve()
-        roots = [Path("core"), Path("mvc"), Path("cli"), Path("tests")]
-        offenders = []
-        for root in roots:
-            if not root.exists():
-                continue
-            for py_file in root.rglob("*.py"):
-                if py_file.resolve() == this_file:
-                    continue
-                if forbidden_import in py_file.read_text(encoding="utf-8"):
-                    offenders.append(str(py_file))
-        assert not offenders, (
-            f"References a l'ancien chemin pivot restantes dans : {offenders}"
-        )
+def test_le_module_pivot_n_est_plus_importable() -> None:
+    """Un `importorskip` sur ce nom rendrait tout un fichier silencieux."""
+    assert importlib.util.find_spec("forge_mvc_pivot") is None
 
 
-class TestPivotFunctional:
-    def test_attach_then_get(self):
-        from forge_mvc_pivot import PivotAdvancedService
+def test_la_capacite_pivot_vit_dans_le_moteur_d_entites() -> None:
+    """L'ADR-070 ne supprime pas la fonction, il la déplace."""
+    entities = PROJECT_ROOT / "packages" / "forge-mvc-entities"
 
-        rows: list[dict] = []
-
-        def fake_insert(sql, params):
-            rows.append(dict(zip(("article_id", "tag_id", "position"), params)))
-            return len(rows)
-
-        def fake_fetch_one(sql, params):
-            for r in rows:
-                if r["article_id"] == params[0] and r["tag_id"] == params[1]:
-                    return r
-            return None
-
-        svc = PivotAdvancedService(
-            "article_tag", "article_id", "tag_id", ["position"],
-            insert_fn=fake_insert, fetch_one=fake_fetch_one,
-        )
-        svc.attach(1, 2, {"position": 5})
-        row = svc.get(1, 2)
-        assert row is not None
-        assert row.pivot_data == {"position": 5}
-
-    def test_unknown_field_rejected(self):
-        from forge_mvc_pivot import PivotAdvancedService
-
-        svc = PivotAdvancedService(
-            "article_tag", "article_id", "tag_id", ["position"],
-            insert_fn=lambda s, p: 1,
-        )
-        with pytest.raises(ValueError):
-            svc.attach(1, 2, {"inconnu": "x"})
+    assert entities.is_dir()
+    sources = " ".join(p.name for p in entities.rglob("*.py"))
+    assert "pivot" in sources.lower(), (
+        "aucun module de pivot dans forge-mvc-entities : l'absorption n'a pas eu lieu"
+    )
 
 
-class TestPyprojectMetadata:
-    def test_pyproject_version(self):
-        content = Path("packages/forge-mvc-entities/pyproject.toml").read_text(encoding="utf-8")
-        assert f'version = "{_CURRENT_VERSION}"' in content
+def test_aucun_test_du_depot_ne_dort_sur_ce_nom() -> None:
+    """Le défaut à ne pas reproduire : un fichier entier sauté sans le dire."""
+    fautes: "list[str]" = []
+    motif = 'importorskip("forge_mvc' + '_pivot")'  # coupé : sinon l'audit se détecte
+    for fichier in PROJECT_ROOT.rglob("tests/**/test_*.py"):
+        if "build/" in fichier.as_posix() or fichier == Path(__file__):
+            continue
+        texte = fichier.read_text(encoding="utf-8")
+        if motif in texte:
+            fautes.append(str(fichier.relative_to(PROJECT_ROOT)))
 
-    def test_forge_mvc_dependency_declared(self):
-        content = Path("packages/forge-mvc-entities/pyproject.toml").read_text(encoding="utf-8")
-        assert "forge-mvc>=" in content
+    assert not fautes, (
+        "ces fichiers s'ouvrent sur un module absorbé, donc se sautent en "
+        "entier : " + ", ".join(fautes)
+    )
