@@ -448,10 +448,10 @@ def test_le_chapitre_d_installation_ne_reprend_pas_la_mise_en_service() -> None:
 def test_le_prerequis_precede_les_deux_canaux() -> None:
     """L'ordre qui compte : activer le venv avant de choisir un canal.
 
-    Le prérequis vaut pour les deux canaux, il vient donc avant eux. C'est le
-    seul invariant d'ordre à figer ; la façon d'introduire le choix, phrase
-    d'annonce ou titre « Installer le paquet », est un choix de rédaction en
-    cours d'essai sur la référence pilote (mariadb).
+    Le prérequis vaut pour les deux canaux, il vient donc avant eux. La façon
+    d'introduire le choix était longtemps restée un essai sur la référence
+    pilote (mariadb) ; elle est désormais tranchée et généralisée, et figée par
+    `test_le_titre_commun_annonce_les_deux_canaux`.
     """
     offenders: list[str] = []
     for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
@@ -462,3 +462,75 @@ def test_le_prerequis_precede_les_deux_canaux() -> None:
             offenders.append(f"{reference.parts[-3]} : prérequis après le canal A")
 
     assert offenders == [], offenders
+
+
+# ── La forme des deux canaux, généralisée depuis la référence pilote ─────────
+#
+# Ces quatre invariants ont été mis au point sur `forge-mvc-mariadb` puis
+# appliqués aux 26 autres (DOC-OPTIN-CANAUX-GENERALISATION-001). Les figer ici
+# évite qu'une référence écrite plus tard reparte de l'ancienne forme.
+
+
+def test_le_titre_commun_annonce_les_deux_canaux() -> None:
+    """Un titre plutôt qu'une phrase, pour que le sommaire latéral le porte.
+
+    Les `####` d'un bloc `???` alimentent le sommaire, là où une phrase
+    d'annonce disparaît. « Installer le paquet » y chapeaute donc A et B.
+    """
+    offenders: list[str] = []
+    for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        if "#### Installer le paquet" not in reference.read_text(encoding="utf-8"):
+            offenders.append(reference.parts[-3])
+
+    assert offenders == [], f"titre commun absent : {offenders}"
+
+
+def test_la_phrase_d_annonce_a_disparu() -> None:
+    """« Deux canaux, au choix. » faisait doublon avec le titre et les sous-titres."""
+    offenders: list[str] = []
+    for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        if "Deux canaux" in reference.read_text(encoding="utf-8"):
+            offenders.append(reference.parts[-3])
+
+    assert offenders == [], f"phrase d'annonce résiduelle : {offenders}"
+
+
+def test_chaque_canal_est_indente_par_son_conteneur() -> None:
+    """Deux `<div class="canal">` par référence, ouverts et refermés.
+
+    L'indentation passe par le CSS et non par une liste Markdown : une liste
+    ferait perdre aux titres A et B leur ancre et leur entrée de sommaire.
+    """
+    offenders: list[str] = []
+    for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        texte = reference.read_text(encoding="utf-8")
+        ouvrants = texte.count('<div class="canal">')
+        fermants = len(re.findall(r"^    </div>$", texte, re.M))
+        if (ouvrants, fermants) != (2, 2):
+            offenders.append(f"{reference.parts[-3]} : {ouvrants} ouvrants, {fermants} fermants")
+
+    assert offenders == [], offenders
+
+
+def test_la_regle_css_du_canal_existe() -> None:
+    """Sans elle, les `<div>` seraient du bruit dans la source sans effet visible."""
+    css = (PROJECT_ROOT / "docs" / "stylesheets" / "extra.css").read_text(encoding="utf-8")
+
+    assert ".md-typeset .canal {" in css
+
+
+def test_l_activation_du_venv_n_est_dite_qu_une_fois() -> None:
+    """Elle appartient au prérequis, pas au canal Git.
+
+    La répéter dans le bloc de code de l'option B laissait croire qu'elle ne
+    valait que pour ce canal, alors que le prérequis la pose pour les deux.
+    """
+    offenders: list[str] = []
+    for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        texte = reference.read_text(encoding="utf-8")
+        debut = texte.index("#### B. Depuis Git")
+        fin = texte.index('??? note "3', debut)
+        if "source .venv/bin/activate" in texte[debut:fin]:
+            offenders.append(reference.parts[-3])
+
+    assert offenders == [], f"activation répétée dans le canal Git : {offenders}"

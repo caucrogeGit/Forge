@@ -29,7 +29,9 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    Deux canaux, au choix.
+    #### Installer le paquet
+
+    <div class="canal">
 
     #### A. Depuis PyPI (stable)
 
@@ -39,15 +41,20 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     pip install --pre forge-mvc-audio
     ```
 
+    </div>
+
+    <div class="canal">
+
     #### B. Depuis Git (avant-garde)
 
     Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
     ```bash
-    source .venv/bin/activate
     pip install "git+https://github.com/caucrogeGit/Forge.git@main"
     pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-audio"
     ```
+
+    </div>
 
 ??? note "3. Mise en service"
 

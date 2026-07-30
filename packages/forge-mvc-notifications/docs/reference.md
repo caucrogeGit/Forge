@@ -30,7 +30,9 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    Deux canaux, au choix.
+    #### Installer le paquet
+
+    <div class="canal">
 
     #### A. Depuis PyPI (stable)
 
@@ -40,15 +42,20 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     pip install --pre forge-mvc-notifications
     ```
 
+    </div>
+
+    <div class="canal">
+
     #### B. Depuis Git (avant-garde)
 
     Cœur puis opt-in depuis git, dans le venv du projet (l'opt-in trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
     ```bash
-    source .venv/bin/activate
     pip install "git+https://github.com/caucrogeGit/Forge.git@main"
     pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-notifications"
     ```
+
+    </div>
 
 ??? note "3. Mise en service"
 

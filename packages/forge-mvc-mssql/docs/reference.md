@@ -37,7 +37,9 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
-    Deux canaux, au choix.
+    #### Installer le paquet
+
+    <div class="canal">
 
     #### A. Depuis PyPI (stable)
 
@@ -47,17 +49,23 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     pip install --pre forge-mvc-mssql
     ```
 
+    </div>
+
+    <div class="canal">
+
     #### B. Depuis Git (avant-garde)
 
     Cœur puis backend depuis git, dans le venv du projet, à la même version (le backend trouve le cœur git déjà en place, sans version publiée sur PyPI) :
 
     ```bash
-    source .venv/bin/activate
     pip install "git+https://github.com/caucrogeGit/Forge.git@main"
     pip install "git+https://github.com/caucrogeGit/Forge.git@main#subdirectory=packages/forge-mvc-mssql"
     ```
 
+    </div>
+
     Le cœur découvre le backend par son entry point `forge_mvc.db_backend` : aucune commande d'activation n'est nécessaire.
+
 ??? note "3. Mise en service"
 
     Installer le paquet ne suffit pas à le rendre opérationnel.
