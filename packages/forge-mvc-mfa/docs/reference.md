@@ -354,6 +354,22 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
         Ces protections sont actives par défaut.
 
+    !!! danger "L'anti-rejeu vaut par processus, pas par application"
+        Le registre des codes déjà utilisés vit en mémoire du processus.
+        Derrière un serveur à plusieurs workers, gunicorn typiquement, chaque worker a le sien.
+        Un même code TOTP peut donc être accepté une fois par worker, soit jusqu'à autant de fois qu'il y a de workers.
+
+        La fenêtre est courte, un code TOTP vivant trente secondes, et l'attaquant doit déjà détenir le code.
+        Le rate-limit du challenge borne par ailleurs le nombre de tentatives.
+        Le risque réel est donc le rejeu d'un code intercepté, pas la découverte d'un code.
+
+        Deux remèdes, au choix de l'exploitant.
+
+        - Servir l'authentification par un seul worker, ce qui suffit à beaucoup d'applications.
+        - Porter le registre dans un magasin partagé si votre modèle de menace l'exige, sur le modèle de `forge-mvc-sessions-db`.
+
+        Le registre n'est pas non plus persisté : un redémarrage l'oublie, avec la même fenêtre de moins de trente secondes.
+
     !!! note "Persistance applicative"
         Forge fournit les helpers et les contrats (`AuthMfaFactor`, codes) ; l'application choisit la persistance (table, schéma), cohérent avec ADR-008.
 
