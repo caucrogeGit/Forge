@@ -296,6 +296,17 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         Une base SQLite créée avant cette version peut contenir des lignes orphelines.
         Elles ne bloquent pas la lecture, mais toute écriture qui les toucherait sera désormais refusée.
 
+    !!! note "Base absente, refus plutôt que création"
+        La connexion d'exécution n'a pas le droit de créer le fichier.
+        Ouverte en création, elle fabriquait une base vide dès que `DB_NAME` désignait un fichier absent, une faute de frappe suffisant.
+        L'application démarrait, puis répondait « table inconnue » page après page, alors que la vérité était « base absente ».
+
+        Le message d'erreur nomme le chemin **absolu** réellement tenté.
+        C'est utile au delà de la faute de frappe, un `DB_NAME` relatif étant résolu depuis le répertoire d'où le serveur a été lancé.
+
+        La création appartient au provisionnement, `forge db:init`, qui prépare le fichier et la table `forge_migrations`.
+        `db:apply` et `migration:apply` la créent aussi au besoin, la DDL relevant du même rôle.
+
     !!! note "Fichier verrouillé, réponse 503"
         SQLite n'admet qu'un écrivain à la fois.
         Une sauvegarde, un `fixtures:load` ou un second processus qui tient une transaction fait attendre, puis échouer au delà du délai.

@@ -20,6 +20,9 @@ def _configure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     # ADR-060 : le backend SQLite lit le chemin du fichier dans DB_NAME (env).
     forge.configure(app_name="forge_sqlite_test")
     monkeypatch.setenv("DB_NAME", str(tmp_path / "app.db"))
+    # SQLITE-RUNTIME-NO-CREATE-001 : la connexion d'exécution ne crée plus le
+    # fichier. On provisionne d'abord, comme le ferait `forge db:init`.
+    SQLiteBackend().get_admin_connection().close()
 
 
 def test_adapter_roundtrip_dict_et_lastrowid(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

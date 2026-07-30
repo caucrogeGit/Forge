@@ -18,6 +18,7 @@ nativement supportés par SQLite.
 """
 import os
 import sqlite3
+from pathlib import Path
 from typing import Any
 
 from forge_mvc_sqlite.dialect import SQLiteDialect
@@ -132,23 +133,82 @@ class SQLiteBackend:
         accepte de patienter avant de rendre un 503, et une seule façon
         officielle vaut mieux que deux (principe 11). Sans elle, `sqlite3`
         applique cinq secondes en dur, que rien ne permettait d'ajuster.
+
+        La connexion d'exécution **n'a pas le droit de créer le fichier**
+        (SQLITE-RUNTIME-NO-CREATE-001). Ouverte en création, elle fabriquait une
+        base vide dès que `DB_NAME` désignait un fichier absent, une faute de
+        frappe suffisant : l'application démarrait, puis annonçait « table
+        inconnue » page après page, là où la vérité était « base absente ».
+        Créer une base à l'insu de l'exploitant est l'écriture invisible que la
+        charte refuse. La création appartient au provisionnement.
         """
-        database = os.environ.get("DB_NAME", "")
-        timeout = float(os.environ.get("DB_POOL_TIMEOUT", "5"))
-        raw = sqlite3.connect(database, timeout=timeout, check_same_thread=False)
-        raw.execute("PRAGMA foreign_keys = ON")
-        return _SQLiteConnection(raw)
+        return _SQLiteConnection(self._connect(create=False))
 
     def get_admin_connection(self, *, database: "str | None" = None) -> Any:
-        """SQLite est sans serveur : aucune connexion d'administration.
+        """Connexion de provisionnement : la seule autorisée à créer le fichier.
 
-        Ce chemin n'est jamais emprunté (`requires_provisioning=False` aiguille
-        la CLI vers la voie « serverless »).
+        SQLite n'a pas de compte d'administration, `requires_provisioning` reste
+        donc faux et la CLI ne lui demande ni base ni comptes à créer. Le
+        **rôle**, lui, existe bel et bien : le contrat le définit comme celui de
+        la DDL et du provisionnement (ADR-033), et pour un backend fichier cela
+        se traduit par un privilège précis, celui de créer le fichier.
+
+        C'est `forge db:init` qui l'emprunte, une fois, pour préparer la base et
+        la table `forge_migrations`. L'exécution passe par `get_connection`, qui
+        refuse de créer quoi que ce soit (SQLITE-RUNTIME-NO-CREATE-001).
+
+        `database` nomme un autre fichier que `DB_NAME` si besoin ; les
+        identifiants `DB_ADMIN_*` n'ont ici aucun sens et ne sont pas lus.
         """
-        raise RuntimeError(
-            "Le backend SQLite est sans serveur : pas de connexion "
-            "d'administration (requires_provisioning=False)."
-        )
+        return _SQLiteConnection(self._connect(create=True, database=database))
+
+    def _connect(self, *, create: bool, database: "str | None" = None) -> sqlite3.Connection:
+        """Ouvre le fichier, avec ou sans droit de création, et arme les FK.
+
+        Le refus de création passe par l'URI `mode=rw`, seule forme que
+        `sqlite3` accepte pour cela. Le chemin est résolu en absolu avant d'y
+        entrer, ce qui règle du même coup la question du répertoire de
+        lancement : un `DB_NAME` relatif dépend de l'endroit d'où le serveur a
+        été démarré, et le message d'erreur nomme désormais le chemin réellement
+        tenté plutôt que de laisser deviner.
+        """
+        name = database if database is not None else os.environ.get("DB_NAME", "")
+        timeout = float(os.environ.get("DB_POOL_TIMEOUT", "5"))
+        if not name:
+            raise RuntimeError(
+                "DB_NAME n'est pas défini : le backend SQLite ne sait pas quel "
+                "fichier ouvrir. Renseignez-le dans env/dev (voir `forge db:config`)."
+            )
+        if name == ":memory:":
+            # Base en mémoire, explicitement demandée : rien à créer ni à
+            # trouver sur disque, la question du droit de création ne se pose pas.
+            raw = sqlite3.connect(name, timeout=timeout, check_same_thread=False)
+            raw.execute("PRAGMA foreign_keys = ON")
+            return raw
+
+        path = Path(name).resolve()
+        if create:
+            raw = sqlite3.connect(str(path), timeout=timeout, check_same_thread=False)
+        else:
+            try:
+                raw = sqlite3.connect(f"{path.as_uri()}?mode=rw", uri=True,
+                                      timeout=timeout, check_same_thread=False)
+            except sqlite3.OperationalError as error:
+                if path.exists():
+                    # Le fichier est là mais illisible : droits, disque,
+                    # corruption. Panne durable, dont le message du pilote dit
+                    # déjà la nature ; l'envelopper la masquerait.
+                    raise
+                raise RuntimeError(
+                    f"Aucune base SQLite à l'emplacement « {path} » "
+                    f"(DB_NAME = {name!r}).\n"
+                    "Forge ne crée pas de base au vol : une base vide ferait "
+                    "répondre « table inconnue » à chaque page.\n"
+                    "Lancez `forge db:init` pour la créer, ou corrigez DB_NAME "
+                    "dans env/dev."
+                ) from error
+        raw.execute("PRAGMA foreign_keys = ON")
+        return raw
 
     def close_connection(self, connection: Any) -> None:
         """Ferme la connexion empruntée."""

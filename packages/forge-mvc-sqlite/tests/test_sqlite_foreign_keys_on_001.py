@@ -49,6 +49,9 @@ def base(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     from core.database import db
 
     backend_module.reset_backend()
+    # SQLITE-RUNTIME-NO-CREATE-001 : seule la porte de provisionnement crée le
+    # fichier, comme le ferait `forge db:init`.
+    SQLiteBackend().get_admin_connection().close()
     try:
         for statement in _SCHEMA:
             db.execute(statement)
@@ -170,6 +173,7 @@ def test_le_backend_arme_meme_hors_facade(tmp_path: Path,
     forge.configure(app_name="forge_sqlite_fk_test")
     monkeypatch.setenv("DB_NAME", str(tmp_path / "direct.db"))
     backend = SQLiteBackend()
+    backend.get_admin_connection().close()
     connection = backend.get_connection()
     try:
         cursor = connection.cursor(dictionary=True)

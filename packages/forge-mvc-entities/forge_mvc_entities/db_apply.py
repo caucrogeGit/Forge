@@ -135,12 +135,15 @@ def _connect_db():
 
     backend = get_backend()
     if not backend.requires_provisioning:
-        # Backend sans serveur (SQLite, ADR-054) : pas de comptes admin, on
-        # applique le SQL directement sur le fichier via le backend actif.
+        # Backend sans serveur (SQLite, ADR-054) : pas de comptes admin, mais le
+        # rôle d'administration existe et c'est bien le nôtre, la DDL. On prend
+        # donc la même porte que les backends serveur, celle qui a le droit de
+        # créer la base ; celle d'exécution le refuse depuis
+        # SQLITE-RUNTIME-NO-CREATE-001.
         from forge_mvc_entities.serverless_db import configure_serverless_db
 
         configure_serverless_db()
-        return backend.get_connection()
+        return backend.get_admin_connection()
 
     cfg = load_db_apply_config()
     try:

@@ -388,15 +388,18 @@ def generate_provisioning_sql_mssql(cfg: ProvisioningEnv, migrations_ddl: str) -
 def _init_serverless(backend: Any) -> list[str]:
     """Init d'un backend sans serveur (ex. SQLite, ADR-054).
 
-    Aucune base ni aucun compte à provisionner : on garantit la connexion
-    (fichier créé au besoin) et la table technique forge_migrations.
+    Aucun compte à provisionner, mais la base reste à créer, et c'est ici le
+    seul endroit qui en a le droit. On emprunte donc la connexion de
+    provisionnement : celle d'exécution refuse de créer un fichier absent, pour
+    ne pas fabriquer en silence une base vide sur un `DB_NAME` erroné
+    (SQLITE-RUNTIME-NO-CREATE-001).
     """
     from forge_mvc_entities.serverless_db import configure_serverless_db
 
     configure_serverless_db()
 
     actions: list[str] = []
-    connection = backend.get_connection()
+    connection = backend.get_admin_connection()
     try:
         cursor = connection.cursor()
         try:

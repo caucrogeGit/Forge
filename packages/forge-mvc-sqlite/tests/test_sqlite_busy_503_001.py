@@ -49,6 +49,9 @@ def base_verrouillee(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     from core.database import db
 
     backend_module.reset_backend()
+    # SQLITE-RUNTIME-NO-CREATE-001 : la base se crée par la porte de
+    # provisionnement, comme le ferait `forge db:init`.
+    SQLiteBackend().get_admin_connection().close()
     db.execute("CREATE TABLE compteur (id INTEGER PRIMARY KEY, v INTEGER)")
 
     bloqueur = sqlite3.connect(str(fichier), isolation_level=None)
@@ -104,6 +107,7 @@ def test_l_ecriture_repasse_une_fois_le_verrou_rendu(
     from core.database import db
 
     backend_module.reset_backend()
+    SQLiteBackend().get_admin_connection().close()
     try:
         db.execute("CREATE TABLE compteur (id INTEGER PRIMARY KEY, v INTEGER)")
         bloqueur = sqlite3.connect(str(fichier), isolation_level=None)

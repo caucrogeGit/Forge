@@ -1067,12 +1067,15 @@ def _connect_db():
 
     backend = get_backend()
     if not backend.requires_provisioning:
-        # Backend sans serveur (SQLite, ADR-054) : migrations appliquées
-        # directement sur le fichier via le backend actif.
+        # Backend sans serveur (SQLite, ADR-054) : pas de comptes admin, mais
+        # une migration est de la DDL, donc le rôle d'administration. On prend
+        # la même porte que les backends serveur, seule autorisée à créer la
+        # base ; celle d'exécution le refuse depuis
+        # SQLITE-RUNTIME-NO-CREATE-001.
         from forge_mvc_entities.serverless_db import configure_serverless_db
 
         configure_serverless_db()
-        return backend.get_connection()
+        return backend.get_admin_connection()
 
     cfg = load_migration_db_config()
     try:
