@@ -181,11 +181,11 @@ DB_BACKENDS: tuple[DbBackend, ...] = (
     ),
     DbBackend(
         "postgres", "forge-mvc-postgres", "forge_mvc_postgres",
-        "Backend PostgreSQL (psycopg). Statut Alpha (intégration serveur à valider).",
+        "Backend PostgreSQL (psycopg, pool de connexions). Niveau plein (ADR-084).",
     ),
     DbBackend(
         "mssql", "forge-mvc-mssql", "forge_mvc_mssql",
-        "Backend Microsoft SQL Server (pyodbc). Statut Alpha (intégration serveur à valider).",
+        "Backend Microsoft SQL Server (pyodbc). Niveau plein (ADR-084).",
     ),
 )
 
