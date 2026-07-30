@@ -17,7 +17,7 @@ from forge_mvc_i18n.translator import (
     trans,
 )
 
-__version__ = "1.0.0rc2"
+__version__ = "1.0.0rc3"
 
 __all__ = [
     "I18nError",

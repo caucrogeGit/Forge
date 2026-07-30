@@ -8,6 +8,6 @@ un vrai SQL Server. pyodbc utilise nativement les paramètres « ? » de Forge.
 """
 from forge_mvc_mssql.backend import MSSQLBackend
 
-__version__ = "1.0.0rc2"
+__version__ = "1.0.0rc3"
 
 __all__ = ["MSSQLBackend"]

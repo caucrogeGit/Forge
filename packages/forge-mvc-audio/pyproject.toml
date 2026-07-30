@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-audio"
-version = "1.0.0rc2"
+version = "1.0.0rc3"
 description = "Forge Audio — module opt-in pour l'upload, le sondage de métadonnées (ffprobe), le transcodage MP3 (ffmpeg) et la lecture audio en streaming (HTTP Range). Sans état : aucune base de données. Worker CLI forge audio:doctor."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "audio", "ffmpeg", "mp3", "streaming"]
 dependencies = [
-    "forge-mvc>=1.0.0rc2,<2",
+    "forge-mvc>=1.0.0rc3,<2",
 ]
 # NB : ffmpeg/ffprobe sont des binaires SYSTÈME, pas des dépendances pip.
 # Le module se branche sans eux (mode serveur de fichiers / probe indisponible),

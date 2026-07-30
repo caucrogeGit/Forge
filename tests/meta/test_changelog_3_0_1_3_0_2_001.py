@@ -129,18 +129,32 @@ class TestSectionOrder:
         assert pos_300 < pos_rc1, "[3.0.0] doit apparaître avant [3.0.0rc1]"
 
     def test_latest_at_top_after_header(self):
+        """La première section doit être la plus récente, par sa date.
+
+        Cette vérification s'appuyait sur une liste de sections acceptables
+        écrite en dur, qu'il fallait allonger à chaque release et qui a
+        justement fait échouer le passage en rc3.
+        L'ordre se lit maintenant dans le fichier lui-même, par comparaison des
+        dates : rien à maintenir, et la garantie est plus forte qu'avec une
+        liste, qui n'attrapait pas une section insérée au mauvais endroit
+        (RELEASE-VERSION-BUMP-RC3-001).
+        """
         text = _text()
-        # La section la plus récente doit être la première ## après # Changelog
-        sections = re.findall(r"^## \[", text, re.MULTILINE)
-        assert sections, "Aucune section ## trouvée"
-        first_section_pos = text.index("## [")
-        # Accepter 1.0.0-beta.12 (ou supérieur) comme première section
-        for candidate in ["## [Non publié]", "## [1.0.0-rc.2]", "## [1.0.0-rc.1]", "## [1.0.0-beta.17]", "## [1.0.0-beta.16]", "## [1.0.0-beta.15]", "## [1.0.0-beta.14]", "## [1.0.0-beta.13]", "## [1.0.0-beta.12]", "## [1.0.0-beta.11]", "## [1.0.0-beta.10]", "## [1.0.0-beta.9]", "## [1.0.0-beta.8]", "## [1.0.0-beta.7]", "## [1.0.0-beta.6]", "## [1.0.0-beta.5]", "## [1.0.0-beta.4]"]:
-            if candidate in text:
-                pos_candidate = text.index(candidate)
-                if first_section_pos == pos_candidate:
-                    return  # OK
-        raise AssertionError(
-            f"La première section du CHANGELOG doit être la plus récente. "
-            f"Première section trouvée à pos={first_section_pos}."
+        entetes = re.findall(
+            r"^## \[([^\]]+)\](?:\s*[\u2014\-:]\s*(\d{4}-\d{2}-\d{2}))?",
+            text, re.MULTILINE)
+        assert entetes, "Aucune section ## trouvée"
+
+        premiere, premiere_date = entetes[0]
+        if premiere == "Non publié":
+            return
+
+        assert premiere_date, (
+            f"La première section « {premiere} » n'a pas de date : impossible "
+            "de vérifier qu'elle est la plus récente."
+        )
+        plus_recente = max(date for _, date in entetes if date)
+        assert premiere_date == plus_recente, (
+            f"La première section est « {premiere} » du {premiere_date}, alors "
+            f"que le fichier contient une section du {plus_recente}."
         )

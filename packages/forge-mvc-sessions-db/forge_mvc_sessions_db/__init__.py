@@ -13,4 +13,4 @@ from forge_mvc_sessions_db.store import DbSessionStore
 
 __all__ = ["DbSessionStore"]
 
-__version__ = "1.0.0rc2"
+__version__ = "1.0.0rc3"

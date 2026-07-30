@@ -7,14 +7,14 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> Version courante : **Forge 1.0.0-rc.2** (release candidate, préparée le 2026-07-01).
+> Version courante : **Forge 1.0.0-rc.3** (release candidate, préparée le 2026-07-01).
 > Dernière version publiée sur PyPI : **Forge 1.0.0-beta.17**.
 
 ---
 
-## État actuel : Forge 1.0.0-rc.2
+## État actuel : Forge 1.0.0-rc.3
 
-**Tag courant : `v1.0.0-rc.2`**, deuxième release candidate avant la 1.0.0 stable.
+**Tag courant : `v1.0.0-rc.3`**, deuxième release candidate avant la 1.0.0 stable.
 Elle consolide la rc.1 : refonte de la navigation et de plusieurs pages de documentation, page d'accueil du squelette.
 Passe d'industrialisation : smoke d'installation vierge (`SMOKE-INSTALL-VIERGE-001`), budget de complexité du lanceur (`CLI-COMPLEXITY-BUDGET-001`), smoke des profils générés (`PROFILES-STARTER-SMOKE-001`) et carte des couches de test (`TEST-LAYERS-DOC-001`).
 Le dispatch CLI est refondu (ADR-059) : `forge.py` devient un lanceur mince et les commandes des opt-ins sont découvertes par entry points, le cœur ne les liste plus.
@@ -23,7 +23,7 @@ Acquis de la rc.1 conservés : nouvelles briques opt-in (ADR-052), déploiement 
 
 Précédent : v1.0.0-rc.1 (2026-06-26, première release candidate, briques opt-in ADR-052, déploiement extrait ADR-053), v1.0.0-beta.17 (2026-06-18, typage strict de bout en bout ADR-036), v1.0.0-beta.16 (2026-06-16, retrait de la génération de starters ADR-035), v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-rc.2, deuxième release candidate : API publique gelée, tous les opt-ins en Beta, nouvelles briques opt-in (ADR-052) et déploiement extrait (ADR-053).
+**Statut : v1.0.0-rc.3, deuxième release candidate : API publique gelée, tous les opt-ins en Beta, nouvelles briques opt-in (ADR-052) et déploiement extrait (ADR-053).
 Les acquis de beta.17 (typage strict de bout en bout ADR-036), beta.16 (parcours réalisés à la main ADR-035), beta.15 (i18n ADR-027, convention de route ADR-029, refonte `welcome-forge` ADR-025/028) et beta.14 (squelette dédié ADR-024) restent en place.**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).

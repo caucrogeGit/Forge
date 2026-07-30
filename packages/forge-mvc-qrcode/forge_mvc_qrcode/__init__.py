@@ -10,7 +10,7 @@ from forge_mvc_qrcode.errors import QrCodeError
 from forge_mvc_qrcode.generator import PNG_MIME, SVG_MIME, QrCode
 from forge_mvc_qrcode.response import QrCodeResponse
 
-__version__ = "1.0.0rc2"
+__version__ = "1.0.0rc3"
 
 __all__ = [
     "QrCode",

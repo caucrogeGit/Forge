@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-i18n"
-version = "1.0.0rc2"
+version = "1.0.0rc3"
 description = "Forge i18n — traduction par catalogues JSON, locale par défaut et fallback, helper trans() pour Jinja."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "i18n", "translation", "locale"]
 dependencies = [
-    "forge-mvc>=1.0.0rc2,<2",
+    "forge-mvc>=1.0.0rc3,<2",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

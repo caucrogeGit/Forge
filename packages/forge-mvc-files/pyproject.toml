@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-files"
-version = "1.0.0rc2"
+version = "1.0.0rc3"
 description = "Forge Files — module opt-in propriétaire de l'upload générique : écriture sécurisée, storage anti-traversal, service de fichiers, rate-limit. Extrait du core (ADR-019)."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "files", "upload", "storage"]
 dependencies = [
-    "forge-mvc>=1.0.0rc2,<2",
+    "forge-mvc>=1.0.0rc3,<2",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

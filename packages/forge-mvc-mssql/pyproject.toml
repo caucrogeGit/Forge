@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-mssql"
-version = "1.0.0rc2"
+version = "1.0.0rc3"
 description = "Forge SQL Server — backend BDD Microsoft SQL Server pour Forge (pyodbc), découvert par le cœur via entry point (ADR-054). Niveau plein : dialecte, provisioning db:init et intégration validés sur serveur réel en CI (ADR-084)."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "sqlserver", "mssql", "database", "backend"]
 dependencies = [
-    "forge-mvc>=1.0.0rc2,<2",
+    "forge-mvc>=1.0.0rc3,<2",
     "pyodbc>=5.0,<6",
 ]
 classifiers = [

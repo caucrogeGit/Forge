@@ -1,7 +1,11 @@
 # Changelog
 
 
-## [Non publié]
+## [1.0.0-rc.3] - 2026-07-30
+
+Troisième release candidate.
+Elle porte trois cycles de pré-mortem sur la couche d'accès aux données et sur les opt-ins, une chaîne de publication qui vérifie enfin ce qu'elle publie, et le dernier scénario connu où un projet restait bloqué sans outil.
+Les quatre backends de base de données sont éprouvés contre de vrais serveurs sous panne, saturation, concurrence et verrou, et la DML des opt-ins adossés à la base cesse de supposer MariaDB.
 
 ### Ajouté
 
