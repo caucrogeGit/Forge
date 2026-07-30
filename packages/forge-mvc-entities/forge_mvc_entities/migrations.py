@@ -32,6 +32,20 @@ INSERT_APPLIED_MIGRATION_SQL = (
     "(version, name, filename, checksum, applied_at, execution_ms) "
     "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?)"
 )
+# Journal de reprise (MIGRATION-RESUME-JOURNAL-001), tenu uniquement sur un
+# backend qui ne sait pas annuler la DDL : une ligne par instruction ayant pris
+# effet, effacée quand la migration entière aboutit.
+SELECT_MIGRATION_STEPS_SQL = (
+    "SELECT version, position, statement_checksum "
+    "FROM forge_migration_steps "
+    "ORDER BY version, position"
+)
+INSERT_MIGRATION_STEP_SQL = (
+    "INSERT INTO forge_migration_steps "
+    "(version, position, statement_checksum, applied_at) "
+    "VALUES (?, ?, ?, CURRENT_TIMESTAMP)"
+)
+DELETE_MIGRATION_STEPS_SQL = "DELETE FROM forge_migration_steps WHERE version = ?"
 SELECT_TABLE_COLUMNS_SQL = (
     "SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, EXTRA "
     "FROM information_schema.COLUMNS "
@@ -257,9 +271,14 @@ def apply_pending_migrations(
         if dry_run:
             return pending
 
+        # Le journal de reprise est lu une fois : vide sur un backend
+        # transactionnel ou sans échec antérieur (MIGRATION-RESUME-JOURNAL-001).
+        recorded_steps = (
+            {} if _ddl_is_transactional() else load_migration_steps(connection)
+        )
         applied: list[MigrationFile] = []
         for migration in pending:
-            _apply_one_migration(connection, migration)
+            _apply_one_migration(connection, migration, recorded_steps=recorded_steps)
             applied.append(migration)
         return applied
     finally:
@@ -501,6 +520,10 @@ def main(argv: list[str] | None = None) -> None:
             print("Usage : forge migration:apply")
             print()
             print("Applique les migrations PENDING dans mvc/migrations/.")
+            print()
+            print("Sur un backend qui ne sait pas annuler la DDL (MariaDB), une")
+            print("migration interrompue reprend à la première instruction non")
+            print("appliquée, grâce au journal de reprise (forge_migration_steps).")
         elif cmd == "migration:diff":
             print("Usage : forge migration:diff --entity <Entite>")
             print()
@@ -544,6 +567,28 @@ def _run_status_command() -> None:
         return
     print()
     _print_status_table(report.statuses)
+    # Une migration interrompue est PENDING au tableau (jamais enregistrée au
+    # journal des migrations), mais son état réel est ailleurs : le journal de
+    # reprise retient ce qui a déjà pris effet (MIGRATION-RESUME-JOURNAL-001).
+    # Sur un backend transactionnel, il n'existe pas : rien à lire. Et le
+    # statut reste un affichage : une base injoignable ne doit pas le casser.
+    try:
+        interrupted = {} if _ddl_is_transactional() else load_migration_steps()
+    except Exception:  # noqa: BLE001 — statut best-effort, le tableau est déjà là
+        interrupted = {}
+    filenames = {item.version: item.filename for item in report.statuses}
+    for version in sorted(interrupted):
+        pas = len(interrupted[version])
+        nom = filenames.get(version, version)
+        print()
+        print(
+            f"[ATTENTION] {nom} : interrompue, {pas} instruction(s) déjà en base "
+            "(journal de reprise)."
+        )
+        print(
+            "  Corrigez l'instruction fautive puis relancez `forge migration:apply` : "
+            f"la reprise continuera à l'instruction {pas + 1}."
+        )
 
 
 def _run_apply_command(args: list[str]) -> None:
@@ -649,18 +694,185 @@ def _ensure_migrations_can_be_applied(statuses: list[MigrationStatus]) -> None:
         )
 
 
-def _apply_one_migration(connection: Any, migration: MigrationFile) -> None:
+_DDL_KEYWORDS = frozenset({"CREATE", "ALTER", "DROP", "RENAME", "TRUNCATE"})
+
+
+def _contains_ddl(statements: "list[str]") -> bool:
+    """Vrai si la migration porte au moins une instruction de définition.
+
+    C'est la DDL, et elle seule, qui brise l'atomicité sur MariaDB : une
+    migration purement DML y est annulée normalement par le rollback. Le
+    journal de reprise ne s'active donc que lorsqu'il y a de la DDL, pour ne
+    pas sacrifier une atomicité qui existe vraiment.
+    """
+    for statement in statements:
+        mots = statement.split(None, 1)
+        if mots and mots[0].upper() in _DDL_KEYWORDS:
+            return True
+    return False
+
+
+def _statement_checksum(statement: str) -> str:
+    """Empreinte d'une instruction, blancs normalisés.
+
+    Le découpeur canonique a déjà ôté les commentaires : reformater ou
+    recommenter une instruction déjà appliquée ne doit pas faire refuser la
+    reprise, seul son SQL effectif compte.
+    """
+    return hashlib.sha256(" ".join(statement.split()).encode("utf-8")).hexdigest()
+
+
+def _steps_table_ddl(dialect: Any) -> str:
+    """DDL du journal de reprise, composée des primitives du dialecte actif.
+
+    Seul un backend non transactionnel en a besoin ; parmi les officiels c'est
+    MariaDB, mais un backend tiers dans le même cas la recevra dans ses types.
+    """
+    body = ",\n".join([
+        f"    version {dialect.string_type(64)} NOT NULL",
+        f"    position {dialect.simple_type('integer')} NOT NULL",
+        f"    statement_checksum {dialect.char_type(64)} NOT NULL",
+        f"    applied_at {dialect.simple_type('datetime')} NOT NULL "
+        f"{dialect.timestamp_default_clause(on_update=False)}",
+        "    PRIMARY KEY (version, position)",
+    ])
+    opening = dialect.create_table_opening("forge_migration_steps")
+    return f"{opening} (\n{body}\n){dialect.collated_table_suffix()}"
+
+
+def _steps_table_ddl_active() -> str:
+    """DDL du journal de reprise pour le dialecte du backend actif."""
+    from core.database.backend import get_backend
+
+    return _steps_table_ddl(get_backend().dialect)
+
+
+def load_migration_steps(db: Any = None) -> "dict[str, list[tuple[int, str]]]":
+    """Journal de reprise : par version interrompue, ses (position, empreinte).
+
+    Tolérant : table absente (backend transactionnel, ou aucun échec encore)
+    vaut journal vide. Les positions sont rendues triées.
+    """
+    connection = db or _connect_db()
+    should_close = db is None
+    steps: "dict[str, list[tuple[int, str]]]" = {}
+    try:
+        cursor = connection.cursor()
+        try:
+            cursor.execute(SELECT_MIGRATION_STEPS_SQL)
+            for version, position, checksum in cursor.fetchall():
+                steps.setdefault(str(version), []).append((int(position), str(checksum)))
+        finally:
+            cursor.close()
+    except Exception:  # noqa: BLE001 — table absente = aucun pas journalisé
+        _rollback_quietly(connection)
+        return {}
+    finally:
+        if should_close:
+            connection.close()
+    for positions in steps.values():
+        positions.sort()
+    return steps
+
+
+def _verify_recorded_prefix(
+    migration: MigrationFile,
+    statements: "list[str]",
+    steps: "list[tuple[int, str]]",
+) -> int:
+    """Vérifie que le préfixe journalisé correspond au fichier ; rend sa taille.
+
+    Les instructions déjà en base ne peuvent pas être réécrites depuis le
+    fichier : la base les a exécutées telles quelles, et les rejouer autrement
+    fabriquerait un état que personne n'a écrit. L'opérateur ne corrige que
+    l'instruction fautive et les suivantes.
+    """
+    for rank, (position, checksum) in enumerate(steps, start=1):
+        if position != rank or position > len(statements):
+            raise MigrationError(
+                f"{migration.filename}: reprise refusée, journal de reprise "
+                f"incohérent (position {position} pour {len(statements)} "
+                "instruction(s) au fichier). Si l'incohérence est assumée, videz "
+                "le journal après avoir défait les effets en base : "
+                f"DELETE FROM forge_migration_steps WHERE version = '{migration.version}'."
+            )
+        if _statement_checksum(statements[position - 1]) != checksum:
+            raise MigrationError(
+                f"{migration.filename}: reprise refusée, l'instruction {position} "
+                "a déjà pris effet en base mais ne correspond plus au fichier.\n"
+                "  Ne modifiez que l'instruction fautive et les suivantes ; "
+                "restaurez le texte d'origine des instructions déjà appliquées.\n"
+                "  Si la réécriture est assumée, défaites ses effets en base puis "
+                "videz le journal : DELETE FROM forge_migration_steps WHERE "
+                f"version = '{migration.version}'."
+            )
+    return len(steps)
+
+
+def _apply_one_migration(
+    connection: Any,
+    migration: MigrationFile,
+    *,
+    recorded_steps: "dict[str, list[tuple[int, str]]] | None" = None,
+) -> None:
     sql = migration.path.read_text(encoding="utf-8")
     statements = split_sql_statements(sql)
+    transactional = _ddl_is_transactional()
+
+    # Reprise (MIGRATION-RESUME-JOURNAL-001). Sur un backend qui ne sait pas
+    # annuler la DDL, une migration qui en contient est journalisée : chaque
+    # instruction est retenue et validée sitôt exécutée, et le journal dit
+    # alors EXACTEMENT ce qui a pris effet, y compris la DML de fin de fichier
+    # que l'annulation aurait silencieusement défaite. Une migration
+    # interrompue reprend à la première instruction non journalisée, après
+    # vérification que le préfixe déjà en base correspond toujours au fichier.
+    #
+    # Une migration purement DML n'est PAS journalisée, même sur ce backend :
+    # sans DDL, le rollback l'annule entièrement, et l'atomicité qui existe
+    # vraiment ne se sacrifie pas. Sur un backend transactionnel, l'annulation
+    # défait tout : aucun journal, la migration reste atomique.
+    skip = 0
+    journaled = False
+    if not transactional:
+        steps = (recorded_steps if recorded_steps is not None
+                 else load_migration_steps(connection)).get(migration.version, [])
+        journaled = bool(steps) or _contains_ddl(statements)
+        if steps:
+            skip = _verify_recorded_prefix(migration, statements, steps)
+            print(
+                f"[REPRISE] {migration.filename} : instructions 1 à {skip} déjà "
+                f"en base (journal de reprise), reprise à l'instruction {skip + 1}."
+            )
+
     start = time.perf_counter()
     cursor = connection.cursor()
-    executed = 0
+    executed = skip
     try:
         try:
-            for statement in statements:
-                cursor.execute(statement)
-                executed += 1
+            if not journaled:
+                for statement in statements:
+                    cursor.execute(statement)
+                    executed += 1
+            else:
+                cursor.execute(_steps_table_ddl_active())
+                for position in range(skip, len(statements)):
+                    cursor.execute(statements[position])
+                    cursor.execute(
+                        INSERT_MIGRATION_STEP_SQL,
+                        (
+                            migration.version,
+                            position + 1,
+                            _statement_checksum(statements[position]),
+                        ),
+                    )
+                    # Valider pas à pas : la DDL suivante validerait de toute
+                    # façon implicitement, mais entre les deux le journal doit
+                    # être aussi durable que l'instruction qu'il enregistre.
+                    connection.commit()
+                    executed = position + 1
             execution_ms = int((time.perf_counter() - start) * 1000)
+            if journaled:
+                cursor.execute(DELETE_MIGRATION_STEPS_SQL, (migration.version,))
             cursor.execute(
                 INSERT_APPLIED_MIGRATION_SQL,
                 (
@@ -717,18 +929,29 @@ def _failed_migration_report(
         f"  {error}",
     ]
 
-    if executed and not _ddl_is_transactional():
+    # L'avertissement de persistance ne vaut que si le journal pas à pas était
+    # actif : une migration purement DML est annulée entièrement, même sur un
+    # backend qui ne sait pas annuler la DDL.
+    if executed and not _ddl_is_transactional() and _contains_ddl(statements):
         lignes += [
             "",
             f"  Les {executed} instructions précédentes ont pris effet et "
             "PERSISTENT : ce backend valide implicitement chaque instruction de "
             "définition, l'annulation ne les a pas défaites.",
-            "  La migration n'est pas enregistrée au journal, donc "
-            "`migration:apply` la rejouera depuis le début et butera sur ce qui "
-            "existe déjà.",
-            "  Corrigez le fichier, puis défaites à la main en base les effets "
-            f"des instructions 1 à {executed} avant de relancer.",
+            "  Elles sont retenues au journal de reprise "
+            "(forge_migration_steps) et ne seront PAS rejouées.",
         ]
+        if fautive:
+            lignes += [
+                f"  Corrigez l'instruction {numero} puis relancez "
+                "`forge migration:apply` : la reprise continuera à "
+                f"l'instruction {numero}.",
+            ]
+        else:
+            lignes += [
+                "  Relancez `forge migration:apply` : rien ne sera rejoué, "
+                "seul l'enregistrement au journal des migrations sera retenté.",
+            ]
 
     return "\n".join(lignes)
 

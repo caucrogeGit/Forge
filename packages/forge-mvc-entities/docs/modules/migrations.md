@@ -161,6 +161,30 @@ forge migration:make ajout_champ_contact --from-diff Contact
 !!! tip "Prévisualiser une application"
     Utilisez `forge migration:apply --dry-run` pour voir ce qui serait appliqué avant l'exécution réelle.
 
+## 8. Migration interrompue et journal de reprise
+
+La plupart des serveurs annulent une migration entière si une instruction échoue.
+MariaDB ne le peut pas : il valide implicitement autour de chaque instruction de définition, et une migration qui casse à la troisième instruction laisse les deux premières en base.
+
+Sur un tel backend, Forge journalise chaque instruction sitôt exécutée, dans la table technique `forge_migration_steps`.
+Le journal dit alors exactement ce qui a pris effet, et le message d'échec nomme l'instruction fautive.
+
+La reprise est la relance :
+
+1. corrigez l'instruction fautive dans le fichier de migration ;
+2. relancez `forge migration:apply`.
+
+La reprise continue à la première instruction non appliquée, l'annonce (`[REPRISE]`), et n'exécute jamais deux fois ce qui est en base.
+Quand la migration aboutit, le journal de reprise s'efface et la migration rejoint `forge_migrations` normalement.
+`forge migration:status` signale une migration interrompue et l'instruction de reprise.
+
+!!! warning "Le préfixe appliqué ne se réécrit pas"
+    Les instructions déjà en base ont été exécutées telles quelles : les modifier dans le fichier fabriquerait un état que personne n'a écrit.
+    La reprise le refuse en nommant l'instruction en cause.
+    Ne corrigez que l'instruction fautive et les suivantes.
+
+Sur un backend transactionnel (PostgreSQL, SQL Server, SQLite), rien de tout cela n'existe : l'annulation défait la migration entière, qui reste atomique.
+
 ## Voir aussi
 
 - [La commande db:apply](db_apply.md) : application du schéma SQL du modèle.

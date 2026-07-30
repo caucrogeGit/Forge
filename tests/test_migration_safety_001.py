@@ -27,7 +27,10 @@ def _patched(monkeypatch, tmp_path):
     monkeypatch.setattr(M, "collect_migration_files", lambda d: ([mig], False))
     monkeypatch.setattr(M, "load_applied_migrations", lambda db=None: [])
     calls: list = []
-    monkeypatch.setattr(M, "_apply_one_migration", lambda conn, m: calls.append(m))
+    monkeypatch.setattr(
+        M, "_apply_one_migration",
+        lambda conn, m, recorded_steps=None: calls.append(m),
+    )
     return tmp_path, mig, calls
 
 

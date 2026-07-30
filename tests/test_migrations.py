@@ -298,7 +298,11 @@ def test_apply_with_no_migration_returns_empty_list(tmp_path):
     assert db.commits == 0
 
 
-def test_apply_one_pending_migration_executes_sql_and_records_row(tmp_path):
+def test_apply_one_pending_migration_executes_sql_and_records_row(tmp_path, monkeypatch):
+    # Ces tests modelisent le chemin transactionnel : sur un backend qui ne
+    # sait pas annuler la DDL, l'application journalise pas a pas et le compte
+    # de commits differe (MIGRATION-RESUME-JOURNAL-001, teste a part).
+    monkeypatch.setattr(migrations, "_ddl_is_transactional", lambda: True)
     path = _write_migration(tmp_path, "20260502193000_create_contacts.sql", "CREATE TABLE contact;")
     db = FakeConnection(rows=[])
 
@@ -321,7 +325,8 @@ def test_apply_one_pending_migration_executes_sql_and_records_row(tmp_path):
     assert db.commits == 1
 
 
-def test_apply_multiple_pending_migrations_in_version_order(tmp_path):
+def test_apply_multiple_pending_migrations_in_version_order(tmp_path, monkeypatch):
+    monkeypatch.setattr(migrations, "_ddl_is_transactional", lambda: True)
     _write_migration(tmp_path, "20260502194500_add_email.sql", "ALTER TABLE contact ADD Email VARCHAR(120);")
     _write_migration(tmp_path, "20260502193000_create_contacts.sql", "CREATE TABLE contact;")
     db = FakeConnection(rows=[])

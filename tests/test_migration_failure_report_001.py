@@ -181,26 +181,70 @@ def test_le_backend_non_transactionnel_declenche_l_avertissement(
     migration = _migration(tmp_path, SQL_TROIS)
 
     rapport = M._failed_migration_report(  # pyright: ignore[reportPrivateUsage]
-        migration, ["un", "deux", "trois"], 2, RuntimeError("boum"),
+        migration, ["CREATE TABLE a (id INT)", "CREATE TABLE b (id INT)",
+                    "CREATE TABLE c (id INT)"], 2, RuntimeError("boum"),
     )
 
     assert "PERSISTENT" in rapport
-    assert "instructions 1 à 2" in rapport
+    assert "2 instructions précédentes" in rapport
 
 
-def test_l_avertissement_explique_pourquoi_relancer_echouera(
+def test_une_migration_purement_dml_ne_menace_pas(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Le point qui débloque : sans lui, l'opérateur relance et ne comprend pas."""
+    """Sans DDL, le rollback annule tout, même sur MariaDB : rien ne persiste.
+
+    Annoncer une persistance qui n'a pas eu lieu ferait défaire à la main des
+    écritures déjà annulées.
+    """
     monkeypatch.setattr(M, "_ddl_is_transactional", lambda: False)
     migration = _migration(tmp_path, SQL_TROIS)
 
     rapport = M._failed_migration_report(  # pyright: ignore[reportPrivateUsage]
-        migration, ["un", "deux"], 1, RuntimeError("boum"),
+        migration, ["INSERT INTO t VALUES (1)", "INSERT INTO t VALUES (2)"],
+        1, RuntimeError("boum"),
     )
 
-    assert "n'est pas enregistrée au journal" in rapport
-    assert "existe déjà" in rapport
+    assert "PERSISTENT" not in rapport
+
+
+def test_l_avertissement_dit_comment_reprendre(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Le point qui débloque : relancer reprend, et le message le dit.
+
+    Avant `MIGRATION-RESUME-JOURNAL-001`, il expliquait pourquoi relancer
+    échouerait et demandait de défaire à la main. Le journal de reprise a
+    retiré la cause : le conseil est devenu la marche à suivre.
+    """
+    monkeypatch.setattr(M, "_ddl_is_transactional", lambda: False)
+    migration = _migration(tmp_path, SQL_TROIS)
+
+    rapport = M._failed_migration_report(  # pyright: ignore[reportPrivateUsage]
+        migration, ["CREATE TABLE a (id INT)", "CREATE TABLE b (id INT)"],
+        1, RuntimeError("boum"),
+    )
+
+    assert "journal de reprise" in rapport
+    assert "ne seront PAS rejouées" in rapport
+    assert "la reprise continuera à l'instruction 2" in rapport
+    assert "défaites à la main" not in rapport
+
+
+def test_l_echec_d_enregistrement_dit_que_rien_ne_sera_rejoue(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Toutes les instructions sont journalisées : la relance ne rejoue rien."""
+    monkeypatch.setattr(M, "_ddl_is_transactional", lambda: False)
+    migration = _migration(tmp_path, SQL_TROIS)
+
+    rapport = M._failed_migration_report(  # pyright: ignore[reportPrivateUsage]
+        migration, ["CREATE TABLE a (id INT)", "CREATE TABLE b (id INT)"],
+        2, RuntimeError("journal indisponible"),
+    )
+
+    assert "rien ne sera rejoué" in rapport
+    assert "Corrigez l'instruction" not in rapport
 
 
 def test_un_backend_transactionnel_reste_silencieux(
