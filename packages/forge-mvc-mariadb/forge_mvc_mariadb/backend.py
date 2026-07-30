@@ -58,6 +58,16 @@ class MariaDBBackend:
         # pool, elle porte autant de jetons que de connexions : un emprunteur
         # patiente au lieu d'échouer quand toutes sont prises.
         self._gate: "threading.BoundedSemaphore | None" = None
+        # Connexions réellement empruntées au pool, par identité d'objet
+        # (MARIADB-ADMIN-RESTITUTION-001). La restitution doit savoir d'où
+        # vient la connexion : rendre le jeton d'une connexion
+        # d'administration, ouverte en direct, gonflerait la file d'un jeton
+        # jamais pris. La file étant bornée, elle levait au lieu de gonfler,
+        # et `close_connection(admin)` échouait après avoir pourtant fermé.
+        # Le pilote ne permet pas de marquer ses objets connexion (extension C,
+        # pas de __dict__) : on retient donc leur id, retiré à la restitution.
+        self._borrowed: "set[int]" = set()
+        self._borrowed_lock = threading.Lock()
 
     def _get_pool(self) -> Any:
         if self._pool is None:
@@ -122,7 +132,7 @@ class MariaDBBackend:
             )
 
         try:
-            return pool.get_connection()
+            connection = pool.get_connection()
         except BaseException as error:
             # Le jeton doit repartir : sans cela, un échec d'emprunt réduirait
             # définitivement la capacité de la file.
@@ -131,6 +141,9 @@ class MariaDBBackend:
                 logger.exception("Emprunt impossible malgré un jeton libre : %s", error)
                 raise DatabaseUnavailableError(str(error)) from error
             raise
+        with self._borrowed_lock:
+            self._borrowed.add(id(connection))
+        return connection
 
     def get_admin_connection(self, *, database: "str | None" = None) -> Any:
         """Connexion d'administration directe, hors pool.
@@ -160,15 +173,25 @@ class MariaDBBackend:
         réellement disponible, sans quoi l'emprunteur suivant se présenterait
         devant un pool encore plein.
 
-        La file est **bornée** : une restitution sans emprunt lève, plutôt que
-        d'enfler silencieusement la capacité.
+        Le jeton ne repart que si la connexion en avait pris un
+        (MARIADB-ADMIN-RESTITUTION-001) : une connexion d'administration est
+        ouverte en direct, hors pool, et sa fermeture ne doit rien rendre à la
+        file. Mesuré, la file bornée levait « Semaphore released too many
+        times » après avoir pourtant fermé la connexion, faisant échouer une
+        restitution parfaitement légitime.
+
+        La file reste **bornée** : une sur-restitution qui échapperait à ce
+        registre lève, plutôt que d'enfler silencieusement la capacité.
         """
         if connection is None:
             return
+        with self._borrowed_lock:
+            emprunte = id(connection) in self._borrowed
+            self._borrowed.discard(id(connection))
         try:
             connection.close()
         finally:
-            if self._gate is not None:
+            if emprunte and self._gate is not None:
                 self._gate.release()
 
     def is_unique_violation(self, error: Exception) -> bool:
@@ -220,3 +243,5 @@ class MariaDBBackend:
             except Exception:  # noqa: BLE001 — fermeture best-effort
                 pass
             self._pool = None
+        with self._borrowed_lock:
+            self._borrowed.clear()

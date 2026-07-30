@@ -302,19 +302,29 @@ class MSSQLBackend:
         return "(2627)" in message or "(2601)" in message
 
     def is_unavailable(self, error: Exception) -> bool:
-        """Indisponibilité SQL Server : la connexion coupée, classe SQLSTATE 08.
+        """Indisponibilité SQL Server : connexion coupée, ou attente de verrou bornée.
 
-        Contrairement au doublon, le SQLSTATE discrimine ici parfaitement :
-        la classe `08` est celle des « connection exception » de la norme, que
-        le pilote ODBC respecte. Mesuré en tuant la session côté serveur, les
-        deux requêtes suivantes rendent `08S01` (« Communication link
-        failure »).
+        **La connexion coupée.** La classe SQLSTATE `08` est celle des
+        « connection exception » de la norme, que le pilote ODBC respecte.
+        Mesuré en tuant la session côté serveur, les deux requêtes suivantes
+        rendent `08S01` (« Communication link failure »). pyodbc place le
+        SQLSTATE en premier argument de l'exception ; c'est là qu'on le lit, la
+        classe d'exception (`OperationalError`) étant trop large à elle seule.
 
-        pyodbc place le SQLSTATE en premier argument de l'exception ; c'est là
-        qu'on le lit, la classe d'exception (`OperationalError`) étant trop
-        large à elle seule.
+        **Le verrou tenu trop longtemps.** L'erreur native 1222 (« Lock request
+        time out period exceeded ») signale le dépassement d'une attente de
+        verrou **bornée** (`SET LOCK_TIMEOUT`, posé par l'exploitant : SQL
+        Server attend indéfiniment par défaut). Jumeau de l'errno 1205 de
+        MariaDB, même critère, même famille : attendre suffit
+        (DB-LOCK-TIMEOUT-QUALIFY-001). Le SQLSTATE ne peut pas servir seul,
+        mesuré `42000`, la classe des erreurs de syntaxe : on exige donc le
+        numéro natif dans le message, comme `is_unique_violation` avec 2627.
+        L'interblocage (erreur native 1205 de SQL Server, victime désignée),
+        lui, reste dehors : attendre n'y change rien.
         """
         args = getattr(error, "args", ())
         if not args or not isinstance(args[0], str):
             return False
-        return args[0].startswith("08")
+        if args[0].startswith("08"):
+            return True
+        return args[0] == "42000" and "(1222)" in str(error)

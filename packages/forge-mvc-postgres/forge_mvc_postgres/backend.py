@@ -373,13 +373,21 @@ class PostgreSQLBackend:
         return getattr(error, "sqlstate", None) == "23505"
 
     def is_unavailable(self, error: Exception) -> bool:
-        """Indisponibilité PostgreSQL : classe SQLSTATE 08, arrêts 57Pxx.
+        """Indisponibilité PostgreSQL : classe SQLSTATE 08, arrêts 57Pxx, verrou 55P03.
 
         La classe `08` est celle des « connection exception » de la norme.
         S'y ajoutent les arrêts décidés par le serveur, mesurés : `57P01`
         (`admin_shutdown`, rendu quand le backend est terminé), `57P02`
         (`crash_shutdown`) et `57P03` (`cannot_connect_now`, redémarrage en
         cours).
+
+        `55P03` (`lock_not_available`) est le dépassement d'une attente de
+        verrou **bornée** (`lock_timeout`, posé par l'exploitant : PostgreSQL
+        attend indéfiniment par défaut). C'est le jumeau de l'errno 1205 de
+        MariaDB, et le même critère l'admet dans la famille : le verrou est
+        tenu par une autre transaction qui finira, attendre suffit
+        (DB-LOCK-TIMEOUT-QUALIFY-001). L'interblocage (`40P01`), lui, reste
+        dehors : attendre n'y change rien.
 
         Un troisième cas n'a pas de SQLSTATE du tout : une fois la connexion
         constatée morte, psycopg lève une `OperationalError` née côté client,
@@ -393,5 +401,7 @@ class PostgreSQLBackend:
 
         sqlstate = getattr(error, "sqlstate", None)
         if isinstance(sqlstate, str):
-            return sqlstate.startswith("08") or sqlstate in {"57P01", "57P02", "57P03"}
+            return sqlstate.startswith("08") or sqlstate in {
+                "57P01", "57P02", "57P03", "55P03",
+            }
         return isinstance(error, psycopg.OperationalError)

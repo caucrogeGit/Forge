@@ -62,8 +62,11 @@ Trois situations y répondent oui.
 |---|---|
 | MariaDB | errno `2006` et `2013` (coupure), `2002`, `2003`, `2055` (serveur hors d'atteinte), `1205` (attente de verrou) |
 | SQLite | codes `SQLITE_BUSY` et `SQLITE_LOCKED` |
-| PostgreSQL | classe SQLSTATE `08`, arrêts `57P01` à `57P03`, et `OperationalError` sans SQLSTATE |
-| SQL Server | classe SQLSTATE `08` |
+| PostgreSQL | classe SQLSTATE `08`, arrêts `57P01` à `57P03`, `55P03` (attente de verrou bornée), et `OperationalError` sans SQLSTATE |
+| SQL Server | classe SQLSTATE `08`, erreur native 1222 (attente de verrou bornée) |
+
+L'attente de verrou n'est bornée que là où quelqu'un l'a bornée.
+MariaDB plafonne à 50 secondes par défaut (`innodb_lock_wait_timeout`) ; PostgreSQL et SQL Server attendent indéfiniment tant que `lock_timeout` ou `SET LOCK_TIMEOUT` n'est pas posé ; SQLite suit `DB_POOL_TIMEOUT`.
 
 Le cœur en fait un `503` avec `Retry-After`, jamais un `500`.
 Un `500` annonce un bug du serveur et envoie chercher une erreur dans le code, là où le remède est d'élargir `DB_POOL_SIZE`, de raccourcir les requêtes, ou simplement d'attendre.
@@ -88,7 +91,7 @@ Le réessai appartient au client HTTP, que `Retry-After` renseigne.
 
 ### Ce qui n'entre pas dans la famille
 
-L'interblocage, errno `1213` en MariaDB, est transitoire mais reste un `500`.
+L'interblocage est transitoire mais reste un `500` : errno `1213` en MariaDB, `40P01` en PostgreSQL, erreur native 1205 en SQL Server, qui n'a rien à voir avec l'errno 1205 de MariaDB malgré le numéro.
 Le critère de la famille est « attendre suffit », or attendre n'y change rien.
 Deux transactions ont pris leurs verrous dans des ordres incompatibles, et le remède est de revoir cet ordre.
 Un `500` le laisse visible dans les journaux d'erreur, là où un `503` le rangerait parmi les conditions de routine.
