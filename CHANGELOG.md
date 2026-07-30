@@ -318,6 +318,32 @@
   dans ce fichier utilisateur). Cible le socle standard `users` (`forge auth:init`).
   Version 1 sans MFA / rate-limit / audit.
 
+- **Journal de reprise des migrations (`MIGRATION-RESUME-JOURNAL-001`).**
+  Sur MariaDB, seul backend qui ne sait pas annuler la DDL, une migration cassée en cours de route laissait les instructions déjà passées en base, hors journal, et la relance butait sur « already exists ».
+  L'état était révélé depuis le cycle précédent, mais aucune commande ne permettait d'en sortir : c'était le dernier scénario connu où un projet Forge restait bloqué sans outil.
+  Chaque instruction est désormais retenue dans `forge_migration_steps` et validée sitôt exécutée, et `migration:apply` **reprend** à la première instruction non appliquée, l'annonce, puis efface le journal quand la migration aboutit.
+  Le préfixe déjà en base ne se réécrit pas : la base l'a exécuté tel quel, et la reprise refuse toute divergence en nommant l'instruction.
+  Une migration purement DML n'est pas journalisée, même sur MariaDB : sans DDL le rollback l'annule entièrement, et l'atomicité qui existe vraiment ne se sacrifie pas.
+
+- **Un pool de connexions devant PostgreSQL (`POSTGRES-POOL-001`).**
+  Le backend ouvrait puis fermait une connexion à chaque requête : mesuré, 12,12 ms contre 0,16 ms sur une connexion tenue, soit une page à dix requêtes qui payait 120 ms de connexion pure.
+  MariaDB avait son pool et SQL Server bénéficie de celui du gestionnaire ODBC ; PostgreSQL était le seul à repartir de zéro, et `DB_POOL_SIZE` comme `DB_POOL_TIMEOUT` y étaient ignorés en silence.
+  Le pool est celui de `psycopg_pool`, écrit par les auteurs du pilote, né au premier emprunt pour appartenir au processus fils de gunicorn.
+  Après : 0,91 ms par requête, et 200 requêtes simultanées en 0,17 s contre 0,86 s.
+
+- **L'attente d'un verrou est bornée au runtime (`DB-LOCK-WAIT-BOUND-001`).**
+  Une transaction coincée, bug applicatif ou requête d'administration oubliée, faisait patienter les requêtes HTTP 50 secondes sur MariaDB et **indéfiniment** sur PostgreSQL et SQL Server.
+  Les workers s'épuisaient un à un et le site figeait sans un 503 ni une ligne de journal.
+  Les connexions du runtime reçoivent désormais `DB_POOL_TIMEOUT` comme borne, la variable qui nomme déjà le temps qu'on accepte de patienter, quelle que soit la ressource attendue.
+  Les connexions d'administration restent sans borne, une migration ayant le droit d'attendre.
+
+- **Garde de complétude de la publication (`RELEASE-PYPI-COMPLETENESS-GUARD-001`).**
+  La rc2 a été publiée avec vingt-quatre distributions sur vingt-sept, sans que rien ne le signale : les trois absentes étaient nées après la publication précédente.
+  Le garde croise le dépôt, la construction et PyPI, et refuse une release dont une distribution du dépôt n'a jamais été publiée.
+  Rien n'y est écrit en dur, le relevé venant des `pyproject.toml`.
+  Un PyPI injoignable fait échouer par défaut : un garde qui se tait quand il ne peut pas vérifier ne garde rien.
+
+
 ### Modifié
 
 - **Vues d'application sous un namespace `mvc/views/app/` (ADR-073, retour terrain 018 F41).**
@@ -387,6 +413,23 @@
   `forge-mvc-deploy` et la documentation. Rupture interne assumée en phase bêta : un
   projet existant remplace `DB_APP_HOST`/`DB_ADMIN_HOST` par `DB_HOST` et les ports
   correspondants par `DB_PORT`.
+
+- **La DML des opt-ins adossés à la base devient portable (`OPTIN-DML-DIALECT-001`).**
+  Un audit précédent avait rendu leur **DDL** dialectale et s'était arrêté là.
+  Mesuré sur serveurs réels, `jobs`, `notifications` et `settings` cassaient sur trois backends sur quatre, alors que la documentation de `settings` promettait les quatre : `NOW()` est inconnu de SQL Server et de SQLite, `NOW() + INTERVAL ? SECOND` et `ON DUPLICATE KEY UPDATE` sont propres à MariaDB.
+  Deux traits rejoignent le contrat `Dialect`, ceux qui n'ont aucune écriture commune : `now_expression()` et `interval_seconds_expression()`.
+  L'upsert et la réservation d'une ligne s'expriment sans lui, par des motifs portables bâtis sur l'existant, un noyau minimal ne gagnant pas à porter ce qu'on peut dire sans lui.
+
+- **Le contrat de backend demande la famille, plus une cause (`DB-UNAVAILABLE-FAMILY-001`).**
+  `is_connection_lost` nommait une cause alors que le cœur ne se sert que de la famille : quelle que soit la réponse, il lève `DatabaseUnavailableError`, donc un 503 avec `Retry-After`.
+  La question devient `is_unavailable`, ce qui rétablit la symétrie d'une question du contrat pour une erreur du cœur, et permet d'y ranger le verrou de fichier SQLite, jumeau exact de la saturation du pool.
+  Les interblocages restent dehors sur les trois serveurs : le critère est « attendre suffit », or attendre n'y change rien.
+
+- **SQLite applique enfin ses clés étrangères (`SQLITE-FOREIGN-KEYS-ON-001`).**
+  Le pragma restait inactif, réglage propre à la connexion que Forge n'armait nulle part : les contraintes écrites par `make:relation` ne contraignaient rien, un enfant orphelin entrait et `ON DELETE CASCADE` ne cascadait pas.
+  Le sens de la dérive commandait de corriger : SQLite sert en développement, les SGBD serveur en production, donc le défaut ne se voyait jamais chez le développeur et toujours chez l'utilisateur, sur des données déjà incohérentes.
+  Une base SQLite créée avant cette version peut porter des lignes orphelines ; toute écriture qui les toucherait sera désormais refusée.
+
 
 ### Corrigé
 
@@ -468,6 +511,47 @@
   le suffixe `_id` : « Annee scolaire » plutôt que « Annee scolaire id ») et le modèle persiste
   la valeur choisie (colonne présente dans `INSERT` et `UPDATE`), sans qu'il faille déclarer la
   FK comme champ d'entité.
+
+- **Un bloc `transaction()` ne rend plus l'exception du pilote (`CORE-TX-LOST-CONNECTION-001`).**
+  L'annulation du chemin d'erreur échoue elle aussi sur une connexion coupée, et remplaçait alors la cause par la sienne.
+  Mesuré en tuant la session pendant le bloc, les trois backends serveur rendaient chacun l'exception de leur pilote, c'est-à-dire exactement ce que l'ADR-054 promet de ne jamais laisser atteindre l'application, et un 500 là où la requête simple rendait un 503.
+  La qualification devient un service du cœur partagé par les deux chemins, et trois sorties qui pouvaient retenir la connexion, donc perdre son jeton de file d'attente, sont fermées.
+
+- **SQL Server perdait l'identité de quatre formes d'INSERT sur sept (`MSSQL-INSERT-IDENTITY-SCOPE-001`).**
+  La reconnaissance de l'INSERT était textuelle : la ligne était bien écrite, mais `db.insert()` rendait `None` dès qu'un commentaire précédait ou suivait l'instruction, ou que le mot « output » figurait dans un littéral.
+  Le CRUD généré redirige vers `/show/{id}` avec cette valeur, et le défaut pénalisait justement le SQL commenté que le principe 5 encourage.
+  La reconnaissance porte désormais sur un squelette de mots-clés bâti sur le découpeur canonique du cœur, qui connaît déjà littéraux et commentaires.
+
+- **Une base SQLite absente n'est plus créée en silence (`SQLITE-RUNTIME-NO-CREATE-001`).**
+  Un `DB_NAME` erroné, une faute de frappe suffisait, faisait fabriquer une base vide : l'application démarrait puis répondait « table inconnue » page après page, là où la vérité était « base absente ».
+  L'exécution ouvre désormais sans droit de création, et le refus nomme le chemin **absolu** réellement tenté, ce qui règle du même coup la dépendance au répertoire de lancement.
+  La création appartient au provisionnement.
+
+- **Le verrou de fichier SQLite rend 503 (`SQLITE-BUSY-503-001`).**
+  Un écrivain long, sauvegarde ou `fixtures:load`, faisait attendre cinq secondes puis échouer sur une erreur non qualifiée, donc une page 500.
+  En mode journal par défaut, le verrou exclusif tient aussi les lecteurs à distance : ce n'était pas une page sur deux qui tombait, c'était le site entier.
+
+- **L'export CSV ne produit plus de formule vive (`IMPORT-EXPORT-CSV-ESCAPE-001`).**
+  `to_csv` écrivait ses cellules telles quelles : une cellule commençant par `=`, `+`, `-` ou `@` redevenait une formule à l'ouverture dans un tableur, et la donnée vient le plus souvent d'un utilisateur.
+  Il se branche désormais sur la primitive du cœur, en-têtes compris, un nom de colonne pouvant venir d'une entité donc d'une saisie.
+
+- **Le smoke d'installation ne fumait plus rien (`RELEASE-SMOKE-INSTALL-PATH-001`).**
+  Il pointait un chemin de squelette disparu avec l'ADR-065 et échouait dès sa première vérification.
+  Réparé, il a révélé ce qu'il existait pour révéler : il installait la wheel par son nom, donc pouvait fumer la version déjà publiée au lieu de celle en préparation, et le projet généré naissait avec un backend BDD épinglé que l'ADR-060 interdit.
+
+- **Le cliquet de style rendait un verdict différent selon la machine (`META-RATCHET-TRACKED-FILES-001`).**
+  Il parcourait le disque, donc aussi les journaux d'erreur que Git ignore et qui n'existent que chez le développeur.
+  L'intégration continue est restée rouge deux jours pour cette seule raison.
+  Il ne lit plus que les fichiers suivis par Git.
+
+- **Les tests d'intégration ne déclaraient pas le serveur qu'ils exigent (`TEST-DB-BACKEND-MARKERS-001`).**
+  Trente et un tests visant PostgreSQL ou SQL Server ne portaient que le marqueur générique, et le job MariaDB échouait de les avoir sautés, par un message de fin de session qui ne produit aucune ligne d'échec.
+  Le lien entre la fixture et le marqueur est désormais figé par un garde-fou.
+
+- **Les distributions absorbées sont retirées de PyPI (`PKG-ORPHAN-YANK-001`).**
+  `forge-mvc-pivot` et `forge-mvc-media` restaient installables alors que le dépôt ne les porte plus, servant un code que personne ne maintient.
+  Toutes leurs versions sont remisées, ce qui les sort de toute résolution nouvelle sans casser les projets qui les épinglent.
+  La marche à suivre est documentée pour la prochaine absorption.
 
 ## [1.0.0-rc.2] - 2026-07-01
 
