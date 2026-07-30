@@ -32,6 +32,8 @@ import os
 import re
 from typing import Any
 
+from core.database.sql_script import split_sql_statements
+
 from forge_mvc_mssql.dialect import MSSQLDialect
 
 logger = logging.getLogger(__name__)
@@ -42,8 +44,55 @@ _DEFAULT_ODBC_DRIVER = "ODBC Driver 18 for SQL Server"
 # doit se faire dans le même lot (batch) que l'INSERT. On ne réécrit pas les
 # statements qui gèrent déjà leur identité (OUTPUT ... INSERTED, appel explicite
 # à SCOPE_IDENTITY()).
+#
+# Ces motifs ne s'appliquent JAMAIS au SQL brut, mais à son squelette de
+# mots-clés (voir `_keyword_skeleton`) : lus sur le texte tel quel, ils
+# répondaient faux quatre fois sur sept (MSSQL-INSERT-IDENTITY-SCOPE-001).
 _INSERT_STATEMENT = re.compile(r"^\s*insert\b", re.IGNORECASE)
 _HANDLES_IDENTITY = re.compile(r"\boutput\b|\bscope_identity\b", re.IGNORECASE)
+
+# Appliqués à un texte déjà débarrassé de ses commentaires par le découpeur
+# canonique : aucun `'` ni `]` égaré ne peut donc leur échapper.
+_STRING_LITERAL = re.compile(r"'(?:[^']|'')*'")
+_BRACKET_IDENTIFIER = re.compile(r"\[[^\]]*\]")
+_QUOTED_IDENTIFIER = re.compile(r'"[^"]*"')
+
+
+def _keyword_skeleton(sql: str) -> str:
+    """Rend le SQL réduit à ses mots-clés, pour y chercher sans se tromper.
+
+    Trois formes de texte y ressemblent à du code sans en être : les
+    commentaires, les littéraux de chaîne et les identifiants délimités. Le
+    découpeur canonique du cœur (ADR-079) ôte les premiers en respectant les
+    seconds, ce qui permet ensuite de vider littéraux et identifiants par
+    simple expression régulière : sans commentaire, plus aucune apostrophe ni
+    aucun crochet ne peut être orphelin.
+
+    Ce que cela corrige, mesuré sur serveur réel : quatre formes d'INSERT sur
+    sept perdaient leur identité en silence, la ligne étant pourtant écrite.
+    Un commentaire **avant** l'INSERT le déguisait en autre chose ; le mot
+    « output » dans un littéral ou un commentaire le faisait passer pour un
+    statement gérant déjà son identité, tout comme une colonne légitimement
+    nommée `[output]`.
+    """
+    skeleton = " ; ".join(split_sql_statements(sql))
+    skeleton = _STRING_LITERAL.sub("''", skeleton)
+    skeleton = _BRACKET_IDENTIFIER.sub("[]", skeleton)
+    return _QUOTED_IDENTIFIER.sub('""', skeleton)
+
+
+def _needs_identity_batch(sql: str) -> bool:
+    """Vrai si l'identité de cet INSERT doit être lue dans son propre lot.
+
+    Limite assumée : un INSERT précédé d'une expression de table commune
+    (`WITH ... INSERT`) n'est pas reconnu, la forme n'étant pas ancrée en tête.
+    `lastrowid` y reste None, comme avant, plutôt que de risquer un lot
+    invalide sur une reconnaissance approximative.
+    """
+    skeleton = _keyword_skeleton(sql)
+    if not _INSERT_STATEMENT.match(skeleton):
+        return False
+    return not _HANDLES_IDENTITY.search(skeleton)
 
 
 class _MsCursor:
@@ -58,7 +107,7 @@ class _MsCursor:
     def execute(self, sql: str, params: "Any" = ()) -> "_MsCursor":
         self._lastrowid = None
         self._insert_rowcount = None
-        if _INSERT_STATEMENT.match(sql) and not _HANDLES_IDENTITY.search(sql):
+        if _needs_identity_batch(sql):
             return self._execute_insert(sql, params)
         bound = tuple(params)
         if bound:
@@ -73,7 +122,13 @@ class _MsCursor:
         # exécute donc l'INSERT et la lecture d'identité dans le même lot, puis
         # on mémorise le rowcount de l'INSERT (avant de passer au résultat du
         # SELECT) et l'identité, servis par `rowcount` et `lastrowid`.
-        batch = sql.rstrip().rstrip(";") + "; SELECT SCOPE_IDENTITY()"
+        #
+        # La lecture commence sur une ligne neuve : collée à la suite, elle
+        # disparaissait dans un commentaire de fin de ligne, et le lot se
+        # réduisait au seul INSERT (MSSQL-INSERT-IDENTITY-SCOPE-001). Le texte
+        # d'origine est par ailleurs conservé tel quel, commentaires compris :
+        # c'est lui qui atteint le serveur, et donc le journal du DBA.
+        batch = sql.rstrip().rstrip(";") + "\n; SELECT SCOPE_IDENTITY()"
         bound = tuple(params)
         if bound:
             self._cursor.execute(batch, bound)

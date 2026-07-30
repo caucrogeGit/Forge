@@ -73,7 +73,10 @@ def test_insert_batche_avec_scope_identity_et_lastrowid() -> None:
     cur.execute("INSERT INTO contact (nom) VALUES (?)", ("Ada",))
 
     sql, params = fake.executed[0]
-    assert sql == "INSERT INTO contact (nom) VALUES (?); SELECT SCOPE_IDENTITY()"
+    # La lecture d'identité commence sur une ligne neuve depuis
+    # MSSQL-INSERT-IDENTITY-SCOPE-001 : collée à la suite, elle disparaissait
+    # dans un commentaire de fin de ligne.
+    assert sql == "INSERT INTO contact (nom) VALUES (?)\n; SELECT SCOPE_IDENTITY()"
     assert params == ("Ada",)
     assert cur.lastrowid == 7
     # rowcount = celui de l'INSERT, pas celui du SELECT SCOPE_IDENTITY() (-1).
@@ -86,7 +89,7 @@ def test_insert_point_virgule_final_normalise() -> None:
     cur.execute("INSERT INTO contact (nom) VALUES (?);  ", ("Ada",))
 
     sql, _ = fake.executed[0]
-    assert sql == "INSERT INTO contact (nom) VALUES (?); SELECT SCOPE_IDENTITY()"
+    assert sql == "INSERT INTO contact (nom) VALUES (?)\n; SELECT SCOPE_IDENTITY()"
 
 
 def test_identite_null_donne_lastrowid_none() -> None:
