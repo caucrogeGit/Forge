@@ -210,6 +210,21 @@ class MSSQLDialect:
 
     # ── Pagination (DML) ─────────────────────────────────────────────────────
 
+
+    # ── Horodatage serveur (DML, OPTIN-DML-DIALECT-001) ──────────────────────
+
+    def now_expression(self) -> str:
+        """`SYSUTCDATETIME()`, la même valeur que la clause DEFAULT.
+
+        `CURRENT_TIMESTAMP` existe aussi en T-SQL mais rend l'heure locale du
+        serveur, alors que les colonnes de Forge y sont posées en UTC : les
+        deux lignes ne seraient pas comparables.
+        """
+        return "SYSUTCDATETIME()"
+
+    def interval_seconds_expression(self, base: str) -> str:
+        return f"DATEADD(second, ?, {base})"
+
     def pagination_clause(self) -> str:
         # T-SQL n'a pas de LIMIT. Cette forme exige un ORDER BY dans la requête.
         return " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY"

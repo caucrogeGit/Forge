@@ -42,14 +42,16 @@ class FakeDb:
         return jid
 
     def execute(self, sql: str, params: Any = ()) -> int:
-        if "attempts=attempts+1" in sql:  # réservation
-            token, queue = params
-            for jid in sorted(self.jobs):
-                job = self.jobs[jid]
-                if job["queue"] == queue and job["status"] == "pending" and job["available_in"] <= 0:
-                    job.update(status="running", claim_token=token, attempts=job["attempts"] + 1)
-                    return 1
-            return 0
+        if "attempts=attempts+1" in sql:  # réservation, sous garde de statut
+            # OPTIN-DML-DIALECT-001 : la réservation se fait en deux temps,
+            # `UPDATE ... ORDER BY ... LIMIT 1` n'étant accepté que par MariaDB.
+            # La candidate est choisie par `fetch_one`, puis réservée ici.
+            token, jid = params
+            job = self.jobs.get(jid)
+            if job is None or job["status"] != "pending":
+                return 0
+            job.update(status="running", claim_token=token, attempts=job["attempts"] + 1)
+            return 1
         if "status='done'" in sql:
             self.jobs[params[0]]["status"] = "done"
             return 1
@@ -63,6 +65,14 @@ class FakeDb:
         return 0
 
     def fetch_one(self, sql: str, params: Any = ()) -> dict[str, Any] | None:
+        if sql.startswith("SELECT id FROM"):  # candidate à réserver
+            queue = params[0]
+            for jid in sorted(self.jobs):
+                job = self.jobs[jid]
+                if (job["queue"] == queue and job["status"] == "pending"
+                        and job["available_in"] <= 0):
+                    return {"id": jid}
+            return None
         if "claim_token=? AND status='running'" in sql:
             for jid in sorted(self.jobs):
                 job = self.jobs[jid]

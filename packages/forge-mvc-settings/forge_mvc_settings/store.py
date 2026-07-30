@@ -17,6 +17,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from core.database.errors import UniqueViolationError
 from forge_mvc_settings.errors import SettingsError
 
 #: Nom de la table de paramètres.
@@ -36,9 +37,11 @@ _KEY_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_.]{0,190}$")
 
 _SELECT_ONE_SQL = f"SELECT setting_value, value_type FROM {TABLE_NAME} WHERE setting_key = ?"
 _SELECT_ALL_SQL = f"SELECT setting_key, setting_value, value_type FROM {TABLE_NAME} ORDER BY setting_key"
-_UPSERT_SQL = (
-    f"INSERT INTO {TABLE_NAME} (setting_key, setting_value, value_type) VALUES (?, ?, ?) "
-    "ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), value_type = VALUES(value_type)"
+_UPDATE_SQL = (
+    f"UPDATE {TABLE_NAME} SET setting_value = ?, value_type = ? WHERE setting_key = ?"
+)
+_INSERT_SQL = (
+    f"INSERT INTO {TABLE_NAME} (setting_key, setting_value, value_type) VALUES (?, ?, ?)"
 )
 _DELETE_SQL = f"DELETE FROM {TABLE_NAME} WHERE setting_key = ?"
 
@@ -92,7 +95,23 @@ def set_setting(key: str, value: SettingValue, *, db: Any = None) -> None:
     """
     _validate_key(key)
     serialized, value_type = _serialize(value)
-    (db if db is not None else _db_module()).execute(_UPSERT_SQL, (key, serialized, value_type))
+    database = db if db is not None else _db_module()
+    # Écrire puis insérer si rien n'a été touché (OPTIN-DML-DIALECT-001).
+    # `ON DUPLICATE KEY UPDATE` était écrit en dur : mesuré, aucun des trois
+    # autres backends ne l'accepte, et chacun a sa propre forme d'upsert
+    # (`ON CONFLICT` ailleurs, `MERGE` en T-SQL). Ce motif en deux temps n'en
+    # exige aucune et n'ajoute rien au contrat.
+    #
+    # La course est fermée par la contrainte d'unicité de la clé : deux
+    # écrivains simultanés sur une clé absente ne peuvent pas insérer tous les
+    # deux, et le perdant reprend par la mise à jour. Le doublon est reconnu
+    # par le cœur (ADR-054), donc de la même façon sur les quatre backends.
+    if database.execute(_UPDATE_SQL, (serialized, value_type, key)):
+        return
+    try:
+        database.execute(_INSERT_SQL, (key, serialized, value_type))
+    except UniqueViolationError:
+        database.execute(_UPDATE_SQL, (serialized, value_type, key))
 
 
 def get_setting(

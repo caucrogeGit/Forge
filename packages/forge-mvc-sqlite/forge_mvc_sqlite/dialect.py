@@ -205,6 +205,18 @@ class SQLiteDialect:
 
     # ── Pagination (DML) ─────────────────────────────────────────────────────
 
+
+    # ── Horodatage serveur (DML, OPTIN-DML-DIALECT-001) ──────────────────────
+
+    def now_expression(self) -> str:
+        """`CURRENT_TIMESTAMP`, la même valeur que la clause DEFAULT."""
+        return "CURRENT_TIMESTAMP"
+
+    def interval_seconds_expression(self, base: str) -> str:
+        # `datetime()` veut un modificateur textuel : on le compose, le
+        # marqueur ne pouvant pas vivre dans un littéral.
+        return f"datetime({base}, '+' || ? || ' seconds')"
+
     def pagination_clause(self) -> str:
         return " LIMIT ? OFFSET ?"
 

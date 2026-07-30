@@ -37,26 +37,75 @@ TABLE_NAME = "jobs"
 JobHandler = Callable[[dict[str, Any]], object]
 
 
-_INSERT_SQL = (
-    f"INSERT INTO {TABLE_NAME} (queue, task, payload, max_attempts, available_at) "
-    "VALUES (?, ?, ?, ?, NOW() + INTERVAL ? SECOND)"
-)
-_CLAIM_SQL = (
-    f"UPDATE {TABLE_NAME} SET status='running', claim_token=?, started_at=NOW(), attempts=attempts+1 "
-    "WHERE queue=? AND status='pending' AND available_at <= NOW() "
-    "ORDER BY id LIMIT 1"
-)
+def _dialect() -> Any:
+    """Dialecte du backend actif, source des expressions non portables."""
+    from core.database.backend import get_backend
+
+    return get_backend().dialect
+
+
+def _now() -> str:
+    """Expression de l'instant courant, propre au backend (OPTIN-DML-DIALECT-001).
+
+    `NOW()` était écrit en dur : mesuré, SQL Server et SQLite ne le connaissent
+    pas, et la file de tâches y était inutilisable malgré une DDL déjà
+    dialectale.
+    """
+    return _dialect().now_expression()
+
+
+def _insert_sql() -> str:
+    maintenant = _now()
+    return (
+        f"INSERT INTO {TABLE_NAME} (queue, task, payload, max_attempts, available_at) "
+        f"VALUES (?, ?, ?, ?, {_dialect().interval_seconds_expression(maintenant)})"
+    )
+
+
+def _candidate_sql() -> str:
+    """Prochaine tâche prête de la file, la plus ancienne d'abord.
+
+    La réservation se fait ensuite en deux temps plutôt qu'en un
+    `UPDATE ... ORDER BY ... LIMIT 1`, extension que seul MariaDB accepte. On
+    choisit une candidate, puis on la réserve sous garde `status='pending'` :
+    deux ouvriers qui visent la même ligne ne peuvent pas gagner tous les deux,
+    le second voyant `rowcount` à zéro. Le motif n'ajoute rien au contrat, il
+    réemploie `limit_clause()`, déjà dialectale.
+    """
+    return (
+        f"SELECT id FROM {TABLE_NAME} "
+        f"WHERE queue=? AND status='pending' AND available_at <= {_now()} "
+        f"ORDER BY id {_dialect().limit_clause()}"
+    )
+
+
+def _claim_sql() -> str:
+    return (
+        f"UPDATE {TABLE_NAME} SET status='running', claim_token=?, "
+        f"started_at={_now()}, attempts=attempts+1 "
+        "WHERE id=? AND status='pending'"
+    )
+
+
 _SELECT_CLAIMED_SQL = (
     f"SELECT id, task, payload, attempts, max_attempts FROM {TABLE_NAME} "
-    "WHERE claim_token=? AND status='running' LIMIT 1"
+    "WHERE claim_token=? AND status='running'"
 )
-_DONE_SQL = f"UPDATE {TABLE_NAME} SET status='done', finished_at=NOW(), claim_token=NULL WHERE id=?"
-_FAIL_SQL = (
-    f"UPDATE {TABLE_NAME} SET status='failed', last_error=?, finished_at=NOW(), claim_token=NULL WHERE id=?"
-)
-_RETRY_SQL = (
-    f"UPDATE {TABLE_NAME} SET status='pending', claim_token=NULL, started_at=NULL, available_at=NOW() WHERE id=?"
-)
+
+
+def _done_sql() -> str:
+    return (f"UPDATE {TABLE_NAME} SET status='done', finished_at={_now()}, "
+            "claim_token=NULL WHERE id=?")
+
+
+def _fail_sql() -> str:
+    return (f"UPDATE {TABLE_NAME} SET status='failed', last_error=?, "
+            f"finished_at={_now()}, claim_token=NULL WHERE id=?")
+
+
+def _retry_sql() -> str:
+    return (f"UPDATE {TABLE_NAME} SET status='pending', claim_token=NULL, "
+            f"started_at=NULL, available_at={_now()} WHERE id=?")
 _PENDING_COUNT_SQL = f"SELECT COUNT(*) AS n FROM {TABLE_NAME} WHERE queue=? AND status='pending'"
 _SELECT_JOB_SQL = (
     f"SELECT id, queue, task, status, attempts, max_attempts, last_error FROM {TABLE_NAME} WHERE id=? LIMIT 1"
@@ -108,7 +157,7 @@ def enqueue(
     except (TypeError, ValueError) as exc:
         raise JobError(f"Charge utile non sérialisable en JSON : {exc}") from exc
     return (db if db is not None else _db_module()).insert(
-        _INSERT_SQL, (queue, task, payload_json, max_attempts, available_in)
+        _insert_sql(), (queue, task, payload_json, max_attempts, available_in)
     )
 
 
@@ -122,7 +171,12 @@ def process_one(handlers: Mapping[str, JobHandler], *, queue: str = "default", d
     """
     database = db if db is not None else _db_module()
     token = uuid4().hex
-    if not database.execute(_CLAIM_SQL, (token, queue)):
+    candidate = database.fetch_one(_candidate_sql(), (queue, 1))
+    if candidate is None:
+        return False
+    if not database.execute(_claim_sql(), (token, int(candidate["id"]))):
+        # Un autre ouvrier a réservé cette ligne entre-temps : ce n'est pas une
+        # file vide, mais on rend la main plutôt que de boucler ici.
         return False
     row = database.fetch_one(_SELECT_CLAIMED_SQL, (token,))
     if row is None:
@@ -136,19 +190,19 @@ def process_one(handlers: Mapping[str, JobHandler], *, queue: str = "default", d
 
     handler = handlers.get(task)
     if handler is None:
-        database.execute(_FAIL_SQL, (f"tâche inconnue : {task}", job_id))
+        database.execute(_fail_sql(), (f"tâche inconnue : {task}", job_id))
         return True
 
     try:
         handler(payload)
     except Exception as exc:  # noqa: BLE001 — toute erreur du gestionnaire est rapportée
         if attempts < max_attempts:
-            database.execute(_RETRY_SQL, (job_id,))
+            database.execute(_retry_sql(), (job_id,))
         else:
-            database.execute(_FAIL_SQL, (str(exc), job_id))
+            database.execute(_fail_sql(), (str(exc), job_id))
         return True
 
-    database.execute(_DONE_SQL, (job_id,))
+    database.execute(_done_sql(), (job_id,))
     return True
 
 

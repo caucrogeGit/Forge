@@ -355,6 +355,47 @@ class Dialect(Protocol):
         """
         ...
 
+    # ── Horodatage serveur (DML) ─────────────────────────────────────────────
+
+    def now_expression(self) -> str:
+        """Expression SQL de l'instant courant, à insérer dans une requête.
+
+        Les opt-ins adossés à la base écrivaient `NOW()`, qui n'existe ni en
+        SQL Server ni en SQLite : mesuré, `jobs`, `notifications` et `settings`
+        cassaient sur trois backends sur quatre alors que leur DDL, elle, était
+        déjà dialectale (OPTIN-DML-DIALECT-001).
+
+        La valeur rendue **coïncide avec celle de `timestamp_default_clause`**,
+        et c'est la seule contrainte qui compte : une ligne insérée avec le
+        défaut de la colonne et une ligne insérée avec cette expression doivent
+        être comparables. MariaDB, PostgreSQL et SQLite rendent donc
+        `CURRENT_TIMESTAMP`, SQL Server `SYSUTCDATETIME()`, exactement comme
+        leurs clauses `DEFAULT`.
+
+        Ce que cette méthode ne règle **pas** : une application qui a besoin
+        d'un instant en Python le calcule en Python et le passe en paramètre,
+        comme le fait `forge-mvc-sessions-db`. L'expression serveur ne sert que
+        lorsque l'horloge de référence doit être celle du serveur.
+        """
+        ...
+
+    def interval_seconds_expression(self, base: str) -> str:
+        """Expression décalant `base` d'un nombre de secondes passé en paramètre.
+
+        `base` est une expression SQL déjà rendue, typiquement
+        `now_expression()`. L'expression retournée porte **exactement un**
+        marqueur `?`, le nombre de secondes.
+
+            MariaDB      {base} + INTERVAL ? SECOND
+            PostgreSQL   {base} + (? * INTERVAL '1 second')
+            SQL Server   DATEADD(second, ?, {base})
+            SQLite       datetime({base}, '+' || ? || ' seconds')
+
+        Aucune de ces quatre formes n'est acceptée par les trois autres : c'est
+        la définition même d'un trait dialectal.
+        """
+        ...
+
     def pagination_param_order(self) -> "tuple[str, str]":
         """Ordre des deux paramètres de `pagination_clause()`.
 

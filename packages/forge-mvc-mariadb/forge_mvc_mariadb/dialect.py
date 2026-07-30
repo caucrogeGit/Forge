@@ -216,6 +216,16 @@ class MariaDBDialect:
 
     # ── Pagination (DML) ─────────────────────────────────────────────────────
 
+
+    # ── Horodatage serveur (DML, OPTIN-DML-DIALECT-001) ──────────────────────
+
+    def now_expression(self) -> str:
+        """`CURRENT_TIMESTAMP`, la même valeur que la clause DEFAULT."""
+        return "CURRENT_TIMESTAMP"
+
+    def interval_seconds_expression(self, base: str) -> str:
+        return f"{base} + INTERVAL ? SECOND"
+
     def pagination_clause(self) -> str:
         return " LIMIT ? OFFSET ?"
 

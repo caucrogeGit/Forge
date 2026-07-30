@@ -201,6 +201,18 @@ class PostgreSQLDialect:
 
     # ── Pagination (DML) ─────────────────────────────────────────────────────
 
+
+    # ── Horodatage serveur (DML, OPTIN-DML-DIALECT-001) ──────────────────────
+
+    def now_expression(self) -> str:
+        """`CURRENT_TIMESTAMP`, la même valeur que la clause DEFAULT."""
+        return "CURRENT_TIMESTAMP"
+
+    def interval_seconds_expression(self, base: str) -> str:
+        # `? * INTERVAL '1 second'` plutôt que `INTERVAL '? seconds'` : un
+        # marqueur ne peut pas vivre à l'intérieur d'un littéral d'intervalle.
+        return f"{base} + (? * INTERVAL '1 second')"
+
     def pagination_clause(self) -> str:
         return " LIMIT ? OFFSET ?"
 

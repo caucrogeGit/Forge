@@ -37,10 +37,27 @@ _SELECT_COLUMNS = "id, recipient, type, message, data, read_at, created_at"
 _UNREAD_COUNT_SQL = (
     f"SELECT COUNT(*) AS n FROM {TABLE_NAME} WHERE recipient = ? AND read_at IS NULL"
 )
-_MARK_READ_SQL = f"UPDATE {TABLE_NAME} SET read_at = NOW() WHERE id = ? AND read_at IS NULL"
-_MARK_ALL_READ_SQL = (
-    f"UPDATE {TABLE_NAME} SET read_at = NOW() WHERE recipient = ? AND read_at IS NULL"
-)
+
+
+def _now() -> str:
+    """Expression de l'instant courant, propre au backend (OPTIN-DML-DIALECT-001).
+
+    `NOW()` était écrit en dur : mesuré, SQL Server et SQLite ne le connaissent
+    pas, et marquer une notification comme lue y échouait malgré une DDL déjà
+    dialectale.
+    """
+    from core.database.backend import get_backend
+
+    return get_backend().dialect.now_expression()
+
+
+def _mark_read_sql() -> str:
+    return f"UPDATE {TABLE_NAME} SET read_at = {_now()} WHERE id = ? AND read_at IS NULL"
+
+
+def _mark_all_read_sql() -> str:
+    return (f"UPDATE {TABLE_NAME} SET read_at = {_now()} "
+            "WHERE recipient = ? AND read_at IS NULL")
 
 
 @dataclass(frozen=True)
@@ -141,9 +158,9 @@ def unread_count(recipient: str, *, db: Any = None) -> int:
 
 def mark_read(notification_id: int, *, db: Any = None) -> bool:
     """Marque une notification comme lue. Renvoie `True` si elle était non lue."""
-    return (db if db is not None else _db_module()).execute(_MARK_READ_SQL, (notification_id,)) > 0
+    return (db if db is not None else _db_module()).execute(_mark_read_sql(), (notification_id,)) > 0
 
 
 def mark_all_read(recipient: str, *, db: Any = None) -> int:
     """Marque toutes les notifications de `recipient` comme lues. Renvoie le nombre marqué."""
-    return (db if db is not None else _db_module()).execute(_MARK_ALL_READ_SQL, (recipient,))
+    return (db if db is not None else _db_module()).execute(_mark_all_read_sql(), (recipient,))
