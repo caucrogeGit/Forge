@@ -76,6 +76,7 @@ def test_mariadb_le_pool_reste_utilisable_apres(real_db: None) -> None:
 
 # ── PostgreSQL ───────────────────────────────────────────────────────────────
 
+@pytest.mark.db_pg
 def test_postgres_une_coupure_dans_un_bloc_reste_qualifiee(real_pg_db: None) -> None:
     from core.database import db
     from core.database.backend import get_backend
@@ -103,6 +104,7 @@ def test_postgres_une_coupure_dans_un_bloc_reste_qualifiee(real_pg_db: None) -> 
     _exiger_erreur_portable(erreur)
 
 
+@pytest.mark.db_pg
 def test_postgres_la_connexion_suivante_passe(real_pg_db: None) -> None:
     from core.database import db
 
@@ -111,6 +113,7 @@ def test_postgres_la_connexion_suivante_passe(real_pg_db: None) -> None:
 
 # ── SQL Server ───────────────────────────────────────────────────────────────
 
+@pytest.mark.db_mssql
 def test_mssql_une_coupure_dans_un_bloc_reste_qualifiee(real_mssql_db: None) -> None:
     from core.database import db
     from core.database.backend import get_backend
@@ -137,6 +140,7 @@ def test_mssql_une_coupure_dans_un_bloc_reste_qualifiee(real_mssql_db: None) -> 
     _exiger_erreur_portable(erreur)
 
 
+@pytest.mark.db_mssql
 def test_mssql_la_connexion_suivante_passe(real_mssql_db: None) -> None:
     from core.database import db
 

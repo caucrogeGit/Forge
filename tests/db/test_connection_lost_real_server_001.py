@@ -108,6 +108,7 @@ def test_mariadb_ne_confond_pas_avec_un_doublon(real_db: None) -> None:
 
 # ── PostgreSQL ───────────────────────────────────────────────────────────────
 
+@pytest.mark.db_pg
 def test_postgres_une_session_terminee_devient_une_indisponibilite(
     real_pg_db: None,
 ) -> None:
@@ -151,6 +152,7 @@ def test_postgres_une_session_terminee_devient_une_indisponibilite(
     assert issubclass(DatabaseUnavailableError, Exception)
 
 
+@pytest.mark.db_pg
 def test_postgres_ne_confond_pas_avec_une_erreur_de_requete(
     real_pg_db: None,
 ) -> None:
@@ -175,6 +177,7 @@ def test_postgres_ne_confond_pas_avec_une_erreur_de_requete(
 
 # ── SQL Server ───────────────────────────────────────────────────────────────
 
+@pytest.mark.db_mssql
 def test_mssql_une_session_tuee_devient_une_indisponibilite(
     real_mssql_db: None,
 ) -> None:
@@ -207,6 +210,7 @@ def test_mssql_une_session_tuee_devient_une_indisponibilite(
     )
 
 
+@pytest.mark.db_mssql
 def test_mssql_ne_confond_pas_avec_une_erreur_de_requete(
     real_mssql_db: None,
 ) -> None:

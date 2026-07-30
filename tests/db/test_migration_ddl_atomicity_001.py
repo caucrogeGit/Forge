@@ -114,6 +114,7 @@ def test_le_dialecte_mariadb_dit_la_verite(real_db: None) -> None:
 
 # ── PostgreSQL et SQL Server : atomiques ─────────────────────────────────────
 
+@pytest.mark.db_pg
 def test_postgres_annule_toute_la_migration(real_pg_db: None) -> None:
     from core.database.backend import get_backend
 
@@ -126,10 +127,12 @@ def test_postgres_annule_toute_la_migration(real_pg_db: None) -> None:
     assert survivantes == []
 
 
+@pytest.mark.db_pg
 def test_le_dialecte_postgres_dit_la_verite(real_pg_db: None) -> None:
     assert _capacite("forge_mvc_postgres.dialect", "PostgreSQLDialect") is True
 
 
+@pytest.mark.db_mssql
 def test_mssql_annule_toute_la_migration(real_mssql_db: None) -> None:
     from core.database.backend import get_backend
 
@@ -142,5 +145,6 @@ def test_mssql_annule_toute_la_migration(real_mssql_db: None) -> None:
     assert survivantes == []
 
 
+@pytest.mark.db_mssql
 def test_le_dialecte_mssql_dit_la_verite(real_mssql_db: None) -> None:
     assert _capacite("forge_mvc_mssql.dialect", "MSSQLDialect") is True

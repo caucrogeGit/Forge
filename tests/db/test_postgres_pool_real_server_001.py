@@ -18,7 +18,10 @@ import threading
 
 import pytest
 
-pytestmark = pytest.mark.db
+# TEST-DB-COLLECT-GUARD-001 : le job MariaDB sélectionne `-m db` mais
+# laisse sauter ce qui exige un autre serveur, à condition que le second
+# marqueur le dise.
+pytestmark = [pytest.mark.db, pytest.mark.db_pg]
 
 
 @pytest.fixture()
