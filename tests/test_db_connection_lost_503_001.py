@@ -26,7 +26,7 @@ from typing import Any
 
 import pytest
 
-from core.database import db
+from core.database import db, qualify
 from core.database.backend import DatabaseBackend
 from core.database.errors import DatabaseUnavailableError, UniqueViolationError
 
@@ -191,7 +191,10 @@ class _ConnexionQuiEchoue:
 
 def _brancher(monkeypatch: pytest.MonkeyPatch, backend: _BackendFactice,
               connexion: Any) -> None:
-    monkeypatch.setattr(db, "get_backend", lambda: backend)
+    # Depuis CORE-TX-LOST-CONNECTION-001, la traduction vit dans
+    # `core.database.qualify`, partagée par `db` et `transaction` : c'est là
+    # que le backend actif est interrogé.
+    monkeypatch.setattr(qualify, "get_backend", lambda: backend)
     monkeypatch.setattr(db, "get_connection", lambda: connexion)
     monkeypatch.setattr(db, "close_connection", lambda _c: None)
 
@@ -254,7 +257,7 @@ def test_un_backend_sans_la_methode_ne_masque_rien(
             return False
 
     ancien = _Ancien()
-    monkeypatch.setattr(db, "get_backend", lambda: ancien)
+    monkeypatch.setattr(qualify, "get_backend", lambda: ancien)
     monkeypatch.setattr(db, "get_connection",
                         lambda: _ConnexionQuiEchoue(_BackendFactice()))
     monkeypatch.setattr(db, "close_connection", lambda _c: None)

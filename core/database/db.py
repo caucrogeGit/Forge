@@ -2,9 +2,8 @@
 from collections.abc import Sequence
 from typing import Any
 
-from core.database.backend import get_backend
 from core.database.connection import get_connection, close_connection
-from core.database.errors import DatabaseUnavailableError, UniqueViolationError
+from core.database.qualify import raise_qualified
 from core.database.transaction import Transaction
 
 
@@ -28,29 +27,19 @@ def insert(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None" = N
     return _run_query(sql, params, tx=tx, dictionary=False, fetch="lastrowid")
 
 
-def _is_unique_violation(error: Exception) -> bool:
-    """Demande au backend actif si `error` est un doublon.
+def _close_quietly(closeable: Any) -> None:
+    """Ferme sans jamais lever : la sortie ne doit rien retenir.
 
-    Enveloppé : un backend tiers qui n'implémenterait pas la méthode ne doit
-    jamais masquer l'erreur d'origine, laquelle remonte alors telle quelle.
+    Sur connexion coupée, la fermeture du curseur peut échouer à son tour. Le
+    laisser lever depuis le `finally` remplacerait l'erreur d'origine par la
+    sienne **et** sauterait la restitution de la connexion qui suit : elle ne
+    repartirait pas au pool et son jeton de file d'attente serait perdu,
+    réduisant définitivement la capacité (MARIADB-POOL-QUEUE-001).
     """
     try:
-        return bool(get_backend().is_unique_violation(error))
-    except Exception:
-        return False
-
-
-def _is_connection_lost(error: Exception) -> bool:
-    """Demande au backend actif si `error` est une connexion coupée.
-
-    Même enveloppe que `_is_unique_violation` : un backend tiers qui
-    n'implémenterait pas la méthode laisse l'erreur d'origine remonter telle
-    quelle, plutôt que de la masquer derrière un `AttributeError`.
-    """
-    try:
-        return bool(get_backend().is_connection_lost(error))
-    except Exception:
-        return False
+        closeable.close()
+    except Exception:  # noqa: BLE001 — fermeture best-effort
+        pass
 
 
 def _run_query(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None" = None,
@@ -91,17 +80,12 @@ def _run_query(sql: str, params: Sequence[Any] = (), *, tx: "Transaction | None"
         # Deux conditions seulement sont qualifiées (ADR-054) : sans cela une
         # application devrait attraper l'exception de son pilote et ne serait
         # portable sur aucun autre backend. Tout le reste remonte inchangé.
-        if _is_unique_violation(error):
-            raise UniqueViolationError(str(error)) from error
-        # Connexion périmée dans le pool, serveur redémarré ou basculé : la
-        # requête n'a rien de fautif et l'emprunt suivant réussira. C'est la
-        # même famille que la saturation du pool, donc un 503 avec Retry-After
-        # et non un 500 qui enverrait chercher un bug dans le code applicatif.
-        if _is_connection_lost(error):
-            raise DatabaseUnavailableError(str(error)) from error
-        raise
+        # Le doublon s'affiche dans un formulaire ; la connexion périmée dans le
+        # pool, le serveur redémarré ou basculé font un 503 avec Retry-After,
+        # la requête n'ayant rien de fautif et l'emprunt suivant devant réussir.
+        raise_qualified(error)
     finally:
         if cursor is not None:
-            cursor.close()
+            _close_quietly(cursor)
         if owns_connection:
             close_connection(connection)
