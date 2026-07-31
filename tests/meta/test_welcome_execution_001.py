@@ -194,10 +194,13 @@ def test_les_motifs_ajoutes_sont_reconnus(script: str, raison: str) -> None:
 def test_un_script_que_le_lecteur_ecrit_n_est_pas_lance(tmp_path: Path) -> None:
     """Les parcours font écrire un fichier dans un bloc `python`, puis le
     lancent : le harnais n'en pose aucun, le lancer mesurerait son propre trou."""
-    assert harnais.raison_de_sauter("python worker.py", tmp_path) == "FICHIER_ABSENT"
+    # Pas `worker.py` : celui-la est declare bloquant, une boucle de worker
+    # ne rendant jamais la main meme une fois le fichier pose.
+    assert harnais.raison_de_sauter("python script_du_lecteur.py", tmp_path) == \
+        "FICHIER_ABSENT"
 
-    (tmp_path / "worker.py").write_text("", encoding="utf-8")
-    assert harnais.raison_de_sauter("python worker.py", tmp_path) is None
+    (tmp_path / "script_du_lecteur.py").write_text("", encoding="utf-8")
+    assert harnais.raison_de_sauter("python script_du_lecteur.py", tmp_path) is None
 
 
 # ── Les deux blocs corrigés ──────────────────────────────────────────────────
@@ -220,3 +223,62 @@ def test_la_verification_du_paquet_de_test_sort_en_zero_quand_tout_va_bien() -> 
 
     assert 'grep -r "forge_mvc_testing" mvc/   # ne doit rien retourner' not in page
     assert "if grep -rq" in page
+
+
+# ── Le harnais pose les fichiers que le parcours fait écrire ─────────────────
+
+def test_un_bloc_nommant_son_fichier_est_reconnu() -> None:
+    """Convention suivie par 187 des 279 blocs `python` des parcours."""
+    assert harnais.fichier_du_bloc("# mvc/controllers/x.py\nprint(1)\n") == \
+        "mvc/controllers/x.py"
+
+
+def test_le_nom_peut_etre_suivi_d_une_precision() -> None:
+    """« # worker.py, à la racine de l'application » : la précision est utile
+    au lecteur, et ne doit pas empêcher la pose."""
+    assert harnais.fichier_du_bloc("# worker.py, à la racine\nprint(1)\n") == "worker.py"
+
+
+def test_une_phrase_citant_un_fichier_n_est_pas_une_consigne_de_pose() -> None:
+    """Le nom doit venir en premier, sans quoi tout commentaire mentionnant un
+    module serait pris pour un ordre d'écriture."""
+    assert harnais.fichier_du_bloc("# on modifie mvc/x.py plus tard\n") is None
+
+
+def test_un_bloc_sans_nom_de_fichier_n_est_pas_pose() -> None:
+    assert harnais.fichier_du_bloc("from forge_mvc_import_export import to_csv\n") is None
+
+
+def test_un_fichier_existant_n_est_jamais_ecrase(tmp_path: "Path") -> None:
+    """`mvc/routes/__init__.py` est nommé 92 fois dans les parcours, toujours
+    pour un FRAGMENT à fusionner : l'écrire entier détruirait le câblage posé
+    par `forge new` (principe 9)."""
+    cible = tmp_path / "mvc" / "routes" / "__init__.py"
+    cible.parent.mkdir(parents=True)
+    cible.write_text("# câblage existant\n", encoding="utf-8")
+
+    verdict = harnais.poser_fichier("mvc/routes/__init__.py", "# fragment\n", tmp_path)
+
+    assert verdict == "FRAGMENT"
+    assert cible.read_text(encoding="utf-8") == "# câblage existant\n"
+
+
+def test_un_fichier_neuf_est_pose(tmp_path: "Path") -> None:
+    verdict = harnais.poser_fichier("mvc/controllers/x.py", "# mvc/controllers/x.py\n",
+                                    tmp_path)
+
+    assert verdict == "ÉCRIT"
+    assert (tmp_path / "mvc" / "controllers" / "x.py").is_file()
+
+
+def test_les_blocs_sont_lus_dans_l_ordre_du_document() -> None:
+    """Un parcours alterne « posez ce fichier » et « lancez cette commande » :
+    ne lire que le `bash` revenait à jouer la moitié d'un dialogue."""
+    page = (PROJECT_ROOT / "packages" / "forge-mvc-jobs" / "docs" / "welcome"
+            / "intermediaire" / "jobs-worker.md")
+    ordonnes = harnais.blocs_ordonnes(page)
+    langages = [langage for _l, langage, _c in ordonnes]
+
+    assert "python" in langages and "bash" in langages
+    lignes = [ligne for ligne, _lang, _c in ordonnes]
+    assert lignes == sorted(lignes)

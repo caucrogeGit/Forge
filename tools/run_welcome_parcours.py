@@ -35,6 +35,18 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 BLOC_BASH = re.compile(r"^```bash\s*$(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
+BLOC_QUELCONQUE = re.compile(r"^```(\w+)\s*$(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
+
+#: Première ligne d'un bloc nommant le fichier où le lecteur le pose.
+#: Convention déjà suivie par 187 des 279 blocs `python` des parcours.
+#: Le nom peut être suivi d'une précision, « # worker.py, à la racine de
+#: l'application ». Il doit venir EN PREMIER après le dièse, sans quoi une
+#: phrase citant un fichier serait prise pour une consigne de pose.
+CHEMIN_DU_BLOC = re.compile(
+    r"^\s*(?:#|<!--)\s*([\w./-]+\.(?:py|html|json))(?:[,:( ].*)?\s*(?:-->)?$")
+
+#: Langages dont un bloc est un FICHIER que le lecteur écrit.
+LANGAGES_FICHIER = ("python", "html", "json")
 
 #: Un `<nom>` que le lecteur remplace : la commande n'est pas exécutable telle quelle.
 PLACEHOLDER = re.compile(r"<[a-zA-Zà-ÿ][\w à-ÿ'-]*>")
@@ -43,7 +55,7 @@ PLACEHOLDER = re.compile(r"<[a-zA-Zà-ÿ][\w à-ÿ'-]*>")
 # `docker run` d'un serveur de base occupe le terminal tant qu'il tourne :
 # les parcours des backends l'emploient pour proposer une instance jetable.
 BLOQUANTES = ("forge run", "mkdocs serve", "npm run dev", "python -m http.server",
-              "docker run", "podman run")
+              "docker run", "podman run", "worker.py")
 
 #: Gestes qui sortent du terminal, donc hors de portée d'une exécution.
 #:
@@ -136,6 +148,60 @@ def blocs(page: Path) -> "list[tuple[int, str]]":
             for m in BLOC_BASH.finditer(texte)]
 
 
+def blocs_ordonnes(page: Path) -> "list[tuple[int, str, str]]":
+    """Tous les blocs de la page, dans l'ordre, avec leur langage.
+
+    Un parcours alterne « posez ce fichier » et « lancez cette commande ».
+    Ne lire que les blocs `bash` revenait à jouer la seconde moitié d'un
+    dialogue : la commande qui lance un fichier échouait, faute du fichier.
+    """
+    texte = page.read_text(encoding="utf-8")
+    return [(texte[: m.start()].count("\n") + 1, m.group(1), m.group(2))
+            for m in BLOC_QUELCONQUE.finditer(texte)]
+
+
+def fichier_du_bloc(contenu: str) -> "str | None":
+    """Chemin annoncé en première ligne du bloc, s'il y en a un."""
+    lignes = contenu.lstrip().splitlines()
+    if not lignes:
+        return None
+    trouve = CHEMIN_DU_BLOC.match(lignes[0])
+    return trouve.group(1) if trouve else None
+
+
+def compiler(fichiers: "list[Path]", projet: Path) -> "tuple[bool, str]":
+    """Le code posé par le parcours se parse-t-il vraiment.
+
+    Douze parcours sur vingt-sept n'ont aucun bloc `bash` : ils se vérifient
+    au navigateur. Leur code n'était donc soumis à rien, alors qu'il est ce
+    que le lecteur recopie. Le compiler ne prouve pas quil fonctionne, mais
+    prouve qu'il n'est pas périmé au point de ne plus se lire.
+    """
+    python = projet / ".venv" / "bin" / "python"
+    cibles = [str(f) for f in fichiers if f.suffix == ".py" and f.is_file()]
+    if not cibles or not python.exists():
+        return True, ""
+    fini = subprocess.run([str(python), "-m", "compileall", "-q", *cibles],
+                          capture_output=True, text=True, cwd=projet)
+    return fini.returncode == 0, (fini.stdout + fini.stderr)
+
+
+def poser_fichier(chemin: str, contenu: str, projet: Path) -> str:
+    """Écrit le bloc à sa place, sans jamais écraser (principe 9).
+
+    Le refus d'écraser n'est pas une prudence de harnais mais la seule
+    lecture correcte : `mvc/routes/__init__.py` est nommé 92 fois dans les
+    parcours, toujours pour un FRAGMENT à fusionner. L'écrire entier
+    détruirait le câblage que `forge new` a posé.
+    """
+    cible = projet / chemin
+    if cible.exists():
+        return "FRAGMENT"
+    cible.parent.mkdir(parents=True, exist_ok=True)
+    cible.write_text(contenu.lstrip("\n"), encoding="utf-8")
+    return "ÉCRIT"
+
+
 FICHIER_LANCE = re.compile(r"^\s*python3?\s+([\w./-]+\.py)", re.MULTILINE)
 
 
@@ -201,12 +267,27 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool) -> int:
 
     joues = 0
     substitutions = 0
+    poses: "dict[str, int]" = {}
+    ecrits_chemins: "list[Path]" = []
     sautes: "dict[str, int]" = {}
     print(f"=== Parcours {paquet} : {len(pages)} page(s), dans l'ordre du site ===")
 
     for page in pages:
         relatif = page.relative_to(PROJECT_ROOT)
-        for ligne, script in blocs(page):
+        for ligne, langage, contenu in blocs_ordonnes(page):
+            if langage in LANGAGES_FICHIER:
+                chemin = fichier_du_bloc(contenu)
+                if chemin is None or projet is None or lister:
+                    continue
+                verdict = poser_fichier(chemin, contenu, projet)
+                poses[verdict] = poses.get(verdict, 0) + 1
+                if verdict == "ÉCRIT":
+                    ecrits_chemins.append(projet / chemin)
+                print(f"  [{verdict}] {relatif}:{ligne} — {chemin}")
+                continue
+            if langage != "bash":
+                continue
+            script = contenu
             raison = raison_de_sauter(script, projet)
             premiere = script.strip().splitlines()[0] if script.strip() else ""
             if raison:
@@ -234,7 +315,21 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool) -> int:
             print(f"  [OK] {relatif}:{ligne} — {premiere}")
 
     detail = ", ".join(f"{n} {r.lower()}" for r, n in sorted(sautes.items())) or "aucun"
+    ecrits = poses.get("ÉCRIT", 0)
+    fragments = poses.get("FRAGMENT", 0)
     print(f"Blocs joués : {joues} ; sautés : {detail} ; substitués : {substitutions}")
+    if ecrits or fragments:
+        print(f"Fichiers posés : {ecrits} ; fragments laissés au lecteur : {fragments}")
+    if projet is not None and ecrits_chemins:
+        propre, sortie = compiler(ecrits_chemins, projet)
+        if not propre:
+            print("  [ÉCHEC] le code posé par le parcours ne compile pas :")
+            for l in sortie.strip().splitlines()[-10:]:
+                print(f"          | {l}")
+            return 1
+        py = sum(1 for f in ecrits_chemins if f.suffix == ".py")
+        if py:
+            print(f"Code posé : {py} fichier(s) Python, tous compilés.")
     if lister:
         print("Recensement seul : rien n'a été exécuté.")
         return 0

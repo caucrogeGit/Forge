@@ -30,6 +30,17 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Le harnais pose le code des parcours et le compile (`WELCOME-CODE-PLACEMENT-001`).**
+  Douze parcours sur vingt-sept n'ont **aucun** bloc `bash` : ils font écrire du code, puis se vérifient au navigateur.
+  Leur code n'était donc soumis à rien, alors qu'il est précisément ce que le lecteur recopie.
+  Le harnais lit désormais tous les blocs dans l'ordre du document, et non les seuls `bash`, ce qui revenait à jouer la moitié d'un dialogue, la commande lançant un fichier échouant faute de ce fichier.
+  Un bloc qui nomme sa destination en première ligne est posé à sa place, convention déjà suivie par **187 des 279 blocs `python`** des parcours.
+  Le nom peut être suivi d'une précision utile au lecteur, mais doit venir en premier, sans quoi toute phrase citant un module passerait pour un ordre d'écriture.
+  Un fichier existant n'est **jamais** écrasé, et pas seulement par prudence : `mvc/routes/__init__.py` est nommé 92 fois dans les parcours, toujours pour un fragment à fusionner, et l'écrire entier détruirait le câblage posé par `forge new` (principe 9).
+  Le code posé est ensuite compilé avec l'interpréteur du projet, ce qui ne prouve pas qu'il fonctionne mais prouve qu'il n'est pas périmé au point de ne plus se lire.
+  État mesuré : **dix des douze parcours** voient leur code posé et compilé, de 1 à 10 fichiers chacun.
+  Les deux autres restent sans couverture, `import-export` n'offrant que des extraits d'API sans fichier de destination, et `mail` aucun bloc de code dans son parcours.
+
 - **Dix parcours d'opt-in joués, deux blocs qui piégeaient leur lecteur (`WELCOME-OPTINS-STEPS-001`).**
   Le parcours de `sessions-db` étiquetait `bash` une ligne de **crontab**, que le shell lit comme un appel à une commande nommée `0`.
   Celui de `testing` proposait `grep -r "forge_mvc_testing" mvc/   # ne doit rien retourner`, dont le succès est un **code retour 1**, `grep` sortant ainsi quand il ne trouve rien.
