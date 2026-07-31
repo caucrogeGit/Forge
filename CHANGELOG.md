@@ -30,6 +30,15 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **`forge make:relation` déclare une relation sans terminal (`ENTITIES-NON-INTERACTIVE-002`).**
+  La commande était entièrement interactive, sans la moindre option.
+  Or la contrainte de clé étrangère vient de `relations.json` (ADR-069), si bien qu'un modèle relationnel complet restait hors d'atteinte d'un script, de l'intégration continue et d'un agent, même après l'ouverture de `make:entity`.
+  Donner `--from` et `--to` suffit à passer en mode non interactif, exiger un drapeau de plus ferait échouer la forme évidente sur un détail.
+  Les deux cardinalités sont couvertes, avec `--name`, `--inverse-name`, `--on-delete`, puis `--foreign-key`, `--not-null` et `--no-index` en `many_to_one`, `--pivot-table`, `--from-key` et `--to-key` en `many_to_many`.
+  Les défauts sont ceux du dialogue jusque dans leurs différences, `restrict` pour une clé étrangère et `cascade` sur un pivot.
+  La ligne de commande vaut confirmation, redemander sans terminal rendrait le mode inutilisable ; le dialogue reste intact pour qui l'emploie.
+  Vérifié de bout en bout sur un projet neuf, jusqu'aux contraintes réelles du pivot en base.
+
 - **`forge make:entity` décrit enfin une entité entière sans terminal (`ENTITIES-NON-INTERACTIVE-001`).**
   `--no-input` ne posait qu'une entité minimale, aux champs imposés.
   Décrire ses propres champs exigeait donc un humain devant un dialogue, ce qui mettait la modélisation hors d'atteinte d'un script, de l'intégration continue et d'un agent, alors que Forge écrit lui-même la guidance des agents (ADR-047).

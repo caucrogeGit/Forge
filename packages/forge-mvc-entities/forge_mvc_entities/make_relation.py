@@ -5,6 +5,28 @@ Ajoute une relation Forge dans mvc/entities/relations.json.
 
 Usage :
     forge make:relation
+    forge make:relation --type many_to_one --from Eleve --to Classe
+    forge make:relation --type many_to_many --from Article --to Tag
+
+Donner `--from` et `--to` suffit a passer en mode non interactif : la relation
+est alors decrite entierement par la ligne de commande, avec les memes defauts
+que le dialogue (ENTITIES-NON-INTERACTIVE-002).
+
+Options communes :
+    --type many_to_one|many_to_many   defaut many_to_one
+    --name <nom>                      defaut : cible en snake (+ « s » en m2m)
+    --inverse-name <nom>              cote cible, facultatif
+    --on-delete <action>              defaut restrict (m2o), cascade (m2m)
+
+many_to_one :
+    --foreign-key <colonne>           defaut <nom>_id
+    --not-null                        la FK devient obligatoire (defaut nullable)
+    --no-index                        pas d'index sur la FK (defaut : index)
+
+many_to_many :
+    --pivot-table <table>             defaut <source>_<cible>
+    --from-key <colonne>              defaut <source>_id
+    --to-key <colonne>                defaut <cible>_id
 """
 
 from __future__ import annotations
@@ -324,14 +346,119 @@ def _inject_fk_field_into_entity(
     return entity_path.as_posix()
 
 
+class _Options:
+    """Ce que la ligne de commande a demande, sans defaut applique."""
+
+    def __init__(self) -> None:
+        self.type: str = "many_to_one"
+        self.from_entity: str | None = None
+        self.to_entity: str | None = None
+        self.name: str | None = None
+        self.inverse_name: str | None = None
+        self.on_delete: str | None = None
+        self.foreign_key: str | None = None
+        self.nullable: bool = True
+        self.index: bool = True
+        self.pivot_table: str | None = None
+        self.from_key: str | None = None
+        self.to_key: str | None = None
+
+
+_AVEC_VALEUR = {
+    "--type": "type", "--from": "from_entity", "--to": "to_entity",
+    "--name": "name", "--inverse-name": "inverse_name", "--on-delete": "on_delete",
+    "--foreign-key": "foreign_key", "--pivot-table": "pivot_table",
+    "--from-key": "from_key", "--to-key": "to_key",
+}
+
+
+def parse_relation_args(args: list[str]) -> _Options:
+    options = _Options()
+    saute = False
+    for index, arg in enumerate(args):
+        if saute:
+            saute = False
+            continue
+        if arg in _AVEC_VALEUR:
+            if index + 1 >= len(args):
+                raise ValueError(f"L'option {arg} attend une valeur.")
+            setattr(options, _AVEC_VALEUR[arg], args[index + 1].strip())
+            saute = True
+            continue
+        if arg == "--not-null":
+            options.nullable = False
+            continue
+        if arg == "--no-index":
+            options.index = False
+            continue
+        raise ValueError(f"Option inconnue : {arg}.")
+    return options
+
+
+def build_relation_from_options(options: _Options) -> dict[str, Any]:
+    """Meme structure que le dialogue, memes defauts, sans terminal.
+
+    Les defauts comptent autant que les options : s'ils differaient, la meme
+    intention produirait deux relations selon le mode employe.
+    """
+    if options.type not in ALLOWED_RELATION_TYPES:
+        raise ValueError(
+            f"Type de relation invalide «{options.type}». "
+            f"Attendus : {', '.join(sorted(ALLOWED_RELATION_TYPES))}."
+        )
+    if not options.from_entity or not options.to_entity:
+        raise ValueError("--from et --to sont requis en mode non interactif.")
+
+    from_snake = to_snake(options.from_entity)
+    to_snake_name = to_snake(options.to_entity)
+
+    relation: dict[str, Any] = {
+        "type": options.type,
+        "from": options.from_entity,
+        "to": options.to_entity,
+    }
+
+    if options.type == "many_to_many":
+        relation["name"] = options.name or f"{to_snake_name}s"
+        if options.inverse_name:
+            relation["inverse_name"] = options.inverse_name
+        relation["pivot"] = {
+            "table": options.pivot_table or f"{from_snake}_{to_snake_name}",
+            "from_key": options.from_key or f"{from_snake}_id",
+            "to_key": options.to_key or f"{to_snake_name}_id",
+            "id": True,
+            "unique_pair": True,
+            "on_delete": options.on_delete or "cascade",
+            "fields": [],
+        }
+        return relation
+
+    relation["name"] = options.name or to_snake_name
+    if options.inverse_name:
+        relation["inverse_name"] = options.inverse_name
+    relation["foreign_key"] = options.foreign_key or f"{relation['name']}_id"
+    relation["nullable"] = options.nullable
+    relation["on_delete"] = options.on_delete or "restrict"
+    relation["index"] = options.index
+    return relation
+
+
 def main(argv: list[str] | None = None) -> None:
     args = list(sys.argv[1:] if argv is None else argv)
     if args and args[0] in {"-h", "--help"}:
         print((__doc__ or "").strip())
         raise SystemExit(0)
+
+    # Donner --from et --to suffit : exiger EN PLUS un drapeau ferait echouer la
+    # forme evidente sur un detail, comme pour make:entity --field.
+    options: _Options | None = None
     if args:
-        print("Usage : forge make:relation")
-        raise SystemExit(1)
+        try:
+            options = parse_relation_args(args)
+        except ValueError as exc:
+            print(f"[ERREUR] {exc}")
+            print((__doc__ or "").strip())
+            raise SystemExit(1) from None
 
     try:
         target_entities_dir = entities_dir()
@@ -347,7 +474,8 @@ def main(argv: list[str] | None = None) -> None:
     relations_path = target_entities_dir / "relations.json"
     try:
         document = _load_relations_document(relations_path)
-        relation = _build_relation_interactively(entity_map)
+        relation = (build_relation_from_options(options) if options is not None
+                    else _build_relation_interactively(entity_map))
         _ensure_no_obvious_duplicates(document["relations"], relation, source=relations_path.as_posix())
         candidate = {
             "schema_version": "1.0",
@@ -364,7 +492,11 @@ def main(argv: list[str] | None = None) -> None:
     print("Objet relation ajouté :")
     print(json.dumps(relation, indent=2, ensure_ascii=True))
     print("")
-    if not _prompt_yes_no("Confirmer l'écriture de mvc/entities/relations.json ?", default=True):
+    # La ligne de commande EST la confirmation : redemander sans terminal
+    # rendrait le mode non interactif inutilisable.
+    if options is None and not _prompt_yes_no(
+        "Confirmer l'écriture de mvc/entities/relations.json ?", default=True
+    ):
         print("Aucune écriture effectuée.")
         raise SystemExit(0)
 

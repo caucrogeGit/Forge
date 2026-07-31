@@ -60,11 +60,18 @@ EQUIVALENTS: "dict[str, str]" = {
 
 #: Commandes interactives SANS option documentée pour s'en passer.
 #:
-#: Constat, et non choix de conception du harnais : `make:entity` expose
-#: `--no-input`, `make:relation` n'expose rien d'équivalent. Une relation ne peut
-#: donc être créée ni par un script, ni en intégration continue, ni par un agent,
-#: alors que Forge écrit lui-même la guidance des agents (ADR-047).
-INTERACTIVES = ("forge make:relation",)
+#: Vide depuis `ENTITIES-NON-INTERACTIVE-001` et `-002`, qui ont ouvert
+#: `make:entity` et `make:relation`. La catégorie reste, car le constat se
+#: reproduira : elle nomme la limite au lieu de la laisser passer pour un échec.
+INTERACTIVES: "tuple[str, ...]" = ()
+
+#: Commandes dont le harnais ne peut pas DEVINER les arguments.
+#:
+#: `make:relation` est scriptable depuis `ENTITIES-NON-INTERACTIVE-002`, mais
+#: elle exige les deux entités que le parcours a en tête, et le harnais ne les
+#: connaît pas. Un remplacement figé produirait un faux échec sur un parcours
+#: sain, ce qui est pire qu'un saut annoncé.
+SANS_ARGUMENTS_INFERABLES = ("forge make:relation",)
 
 #: Délai au-delà duquel une commande est tenue pour bloquée.
 DELAI = 180
@@ -106,6 +113,8 @@ def raison_de_sauter(script: str) -> "str | None":
         return "MANUEL"
     if any(motif in script for motif in INTERACTIVES):
         return "INTERACTIF"
+    if any(motif in script for motif in SANS_ARGUMENTS_INFERABLES):
+        return "ARGUMENTS"
     return None
 
 
