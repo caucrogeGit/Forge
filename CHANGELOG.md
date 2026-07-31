@@ -19,6 +19,17 @@
   Deux péremptions trouvées à la première exécution. L'ADR-023 se déclarait « Accepté » alors que l'ADR-035 a retiré `forge starter:build`, si bien qu'un lecteur y trouvait la façon canonique de faire une chose impossible ; son statut annonce désormais son remplacement.
   Une page d'architecture conservait un nom d'époque en le disant dans son texte, mais sans que rien ne le rende lisible par la machine.
 
+- **Un harnais qui joue un parcours d'accueil au lieu de le relire (`WELCOME-EXECUTION-001`).**
+  Lire un parcours ne dit pas s'il marche.
+  `tools/run_welcome_parcours.py` suit les paliers dans l'ordre du `nav` de `mkdocs.yml`, celui que le lecteur voit dans le menu, et exécute les blocs `bash` dans un projet Forge réel jusqu'au premier qui refuse.
+  L'ordre ne pouvait pas venir de la convention « Palier suivant », qui ne couvre que 21 des 316 pages de parcours.
+  Trois raisons de ne pas exécuter un bloc, toutes déclarées et comptées, un `<nom>` à remplacer par le lecteur, une commande qui ne rend jamais la main, un geste hors du terminal.
+  Un bloc sauté est annoncé, jamais tu, un harnais silencieux se lisant comme une couverture complète (principe 3).
+  Éprouvé sur le plus simple des vingt-sept parcours, SQLite, il a trouvé **trois manques dans les deux premiers paliers**.
+  Le moteur d'entités n'était pas cité, alors que `db:init` en vient ; `db:config` manquait, si bien que le backend ignorait quel fichier ouvrir ; `make:crud` était donné seul, alors qu'il consomme une entité que seul `make:entity` crée.
+  Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
+  Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
+
 ### Corrigé
 
 - **Une erreur d'environnement sortait en trace Python, pas en message (`CLI-ERROR-BOUNDARY-001`).**
@@ -34,6 +45,8 @@
   Escamoter une trace sans recours serait de la magie cachée (principe 3), d'où `FORGE_TRACEBACK=1` qui la rend à qui la demande.
   Le contrat portable reçoit `DatabaseConfigurationError`, distincte de `DatabaseUnavailableError` puisque attendre résout l'une et jamais l'autre.
   Le backend SQLite levait un `RuntimeError` à deux endroits, indiscernable d'un bug ; le garde-fou écrit pour le premier a trouvé le second.
+  Le même parcours a livré un second constat, traité ici aussi. `forge make:entity` interroge l'utilisateur, et l'entrée standard fermée rendait une trace finissant sur `EOF when reading a line`, sans que rien n'annonce que la commande était interactive.
+  Elle dit désormais ce qu'elle attend, et oriente vers l'option non interactive que son aide expose.
 
 - **La reprise de publication ne servait qu'une release, et le garde de complétude posait une question trop large (`RELEASE-PUBLISH-RESUME-GENERALIZE-001`).**
   PyPI limite la création de nouveaux projets, si bien qu'une release qui en introduit plusieurs se heurte à un 429 en cours de route et doit être relancée toutes les demi-heures.

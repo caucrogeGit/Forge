@@ -138,6 +138,21 @@ def test_l_interruption_utilisateur_reste_traitee_a_part(
     assert "Interruption" in capsys.readouterr().err
 
 
+def test_une_commande_interactive_sans_terminal_dit_ce_qu_elle_attend(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Second constat, du même parcours : `forge make:entity` interroge
+    l'utilisateur, et l'entrée fermée rendait « EOF when reading a line »."""
+    with pytest.raises(SystemExit) as sortie:
+        _lancer(EOFError(), monkeypatch)
+
+    assert sortie.value.code == 1
+    erreur = capsys.readouterr().err
+    assert "interactive" in erreur
+    assert "--no-input" in erreur
+    assert "Traceback" not in erreur
+
+
 def test_la_trace_reste_accessible_sur_demande(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -732,6 +732,20 @@ def cli_entrypoint() -> None:
     except KeyboardInterrupt:
         print("\nInterruption utilisateur. Commande annulée.", file=sys.stderr)
         sys.exit(130)
+    except EOFError:
+        # Constaté en exécutant le parcours d'accueil SQLite sans terminal :
+        # `forge make:entity` interroge l'utilisateur, et l'entrée fermée
+        # produisait une trace de vingt lignes finissant sur « EOF when reading
+        # a line ». Rien n'y disait que la commande était interactive.
+        if os.environ.get("FORGE_TRACEBACK") == "1":
+            raise
+        cli_error(
+            "cette commande est interactive et attend des réponses au terminal, "
+            "or l'entrée standard est fermée.",
+            hint="Lancez-la depuis un terminal, ou cherchez une option non "
+                 "interactive dans son aide (souvent «--no-input»).",
+        )
+        sys.exit(1)
     except _erreurs_utilisateur() as exc:
         # Escamoter une trace serait de la magie cachée (principe 3) : elle
         # reste accessible sur demande explicite, ce que la référence du CLI
