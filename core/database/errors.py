@@ -20,6 +20,23 @@ class DatabaseError(Exception):
     """Racine des erreurs de base de données qualifiées par Forge."""
 
 
+class DatabaseConfigurationError(DatabaseError):
+    """La configuration ne permet pas d'atteindre la base.
+
+    Rien n'est en panne et aucune requête n'est fautive : il manque un
+    renseignement que seul l'utilisateur peut fournir, un `DB_NAME` absent, un
+    chemin qui ne désigne rien, un couple hôte et port introuvable dans l'env.
+
+    Elle se distingue de `DatabaseUnavailableError`, qui décrit une condition
+    passagère où réessayer suffit. Ici réessayer ne changera rien tant que
+    l'environnement n'est pas corrigé, ce qui appelle un message et non un 503.
+
+    Le message doit nommer **ce qui manque et où le poser**, la frontière CLI
+    l'affichant tel quel à l'utilisateur, sans trace d'exécution
+    (`CLI-ERROR-BOUNDARY-001`).
+    """
+
+
 class UniqueViolationError(DatabaseError):
     """Une contrainte d'unicité a été violée (doublon).
 

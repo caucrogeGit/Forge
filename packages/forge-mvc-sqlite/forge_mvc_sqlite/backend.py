@@ -21,6 +21,7 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
+from core.database.errors import DatabaseConfigurationError
 from forge_mvc_sqlite.dialect import SQLiteDialect
 
 
@@ -177,7 +178,7 @@ class SQLiteBackend:
         name = database if database is not None else os.environ.get("DB_NAME", "")
         timeout = float(os.environ.get("DB_POOL_TIMEOUT", "5"))
         if not name:
-            raise RuntimeError(
+            raise DatabaseConfigurationError(
                 "DB_NAME n'est pas défini : le backend SQLite ne sait pas quel "
                 "fichier ouvrir. Renseignez-le dans env/dev (voir `forge db:config`)."
             )
@@ -201,7 +202,7 @@ class SQLiteBackend:
                     # corruption. Panne durable, dont le message du pilote dit
                     # déjà la nature ; l'envelopper la masquerait.
                     raise
-                raise RuntimeError(
+                raise DatabaseConfigurationError(
                     f"Aucune base SQLite à l'emplacement « {path} » "
                     f"(DB_NAME = {name!r}).\n"
                     "Forge ne crée pas de base au vol : une base vide ferait "

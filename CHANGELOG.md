@@ -5,6 +5,20 @@
 
 ### Corrigé
 
+- **Une erreur d'environnement sortait en trace Python, pas en message (`CLI-ERROR-BOUNDARY-001`).**
+  Mesuré en exécutant le parcours d'accueil SQLite dans un projet neuf, tel qu'un débutant le suit.
+  `forge db:init` sans `DB_NAME` déroulait vingt lignes de trace avant d'arriver à la phrase utile, qui disait pourtant exactement quoi faire.
+  Le message était juste, et `forge doctor` affichait déjà le même diagnostic proprement en `[WARN]`.
+  Seule la frontière du CLI manquait, celle-ci ne rattrapant que `KeyboardInterrupt`.
+  Une trace répond à « où Forge s'est-il trompé », et n'a rien à dire à qui a oublié un renseignement dans son env.
+  Elle enterre au passage la seule ligne qui compte.
+  La règle retenue tient en deux phrases.
+  Les erreurs qui décrivent l'environnement de l'utilisateur sortent en message, sans trace ; tout le reste garde la sienne, parce qu'un `AttributeError` est un bug de Forge et que la trace en est le diagnostic.
+  Deux familles seulement sont triées, les erreurs de base de données et de configuration de projet, et cette liste ne s'élargira que sur constat (règle B).
+  Escamoter une trace sans recours serait de la magie cachée (principe 3), d'où `FORGE_TRACEBACK=1` qui la rend à qui la demande.
+  Le contrat portable reçoit `DatabaseConfigurationError`, distincte de `DatabaseUnavailableError` puisque attendre résout l'une et jamais l'autre.
+  Le backend SQLite levait un `RuntimeError` à deux endroits, indiscernable d'un bug ; le garde-fou écrit pour le premier a trouvé le second.
+
 - **La reprise de publication ne servait qu'une release, et le garde de complétude posait une question trop large (`RELEASE-PUBLISH-RESUME-GENERALIZE-001`).**
   PyPI limite la création de nouveaux projets, si bien qu'une release qui en introduit plusieurs se heurte à un 429 en cours de route et doit être relancée toutes les demi-heures.
   Un script posé en cron faisait ce guet, mais il portait `rc2` dans son nom, son journal, ses messages et sa ligne d'auto-retrait.

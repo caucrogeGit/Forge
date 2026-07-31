@@ -19,6 +19,8 @@ from pathlib import Path
 
 import pytest
 
+from core.database.errors import DatabaseConfigurationError
+
 pytest.importorskip("forge_mvc_sqlite")
 from forge_mvc_sqlite.backend import SQLiteBackend  # noqa: E402
 
@@ -47,7 +49,9 @@ def test_la_connexion_d_execution_ne_le_cree_pas(
     fichier = tmp_path / "absente.db"
     monkeypatch.setenv("DB_NAME", str(fichier))
 
-    with pytest.raises(RuntimeError, match="Aucune base SQLite"):
+    # Type qualifié depuis CLI-ERROR-BOUNDARY-001 : un `RuntimeError` ne se
+    # distingue pas d'un bug, et traversait donc la frontière du CLI en trace.
+    with pytest.raises(DatabaseConfigurationError, match="Aucune base SQLite"):
         SQLiteBackend().get_connection()
 
     assert not fichier.exists(), "rien ne doit être créé au passage"

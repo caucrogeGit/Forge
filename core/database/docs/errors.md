@@ -7,15 +7,20 @@ Ce document décrit `core/database/errors.py`, qui expose les erreurs de base de
 Chaque pilote signale un doublon ou une coupure à sa façon.
 Une application qui attrape l'exception de son pilote n'est portable sur aucun autre backend, ce qui contredit le principe d'un cœur agnostique (ADR-054).
 
-## Deux conditions qualifiées, pas une de plus
+## Trois conditions qualifiées, pas une de plus
 
-Forge ne traduit que ce qui a un usage évident pour l'appelant.
+Forge ne nomme que ce qui a un usage évident pour l'appelant.
 
 | Exception | Ce qu'elle dit | Réponse HTTP du cœur |
 |---|---|---|
 | `DatabaseError` | racine des erreurs qualifiées par Forge | sans objet |
 | `UniqueViolationError` | une contrainte d'unicité a été violée | à l'application, typiquement une erreur de formulaire |
 | `DatabaseUnavailableError` | aucune connexion utilisable, condition passagère | `503` avec `Retry-After` |
+| `DatabaseConfigurationError` | l'environnement ne permet pas d'atteindre la base | `500`, la configuration du serveur est en cause |
+
+Les deux premières sont des **traductions** : le cœur interroge le backend sur une exception du pilote, puis produit l'erreur portable correspondante.
+La troisième est levée **directement** par le backend, aucun pilote n'étant encore entré en jeu.
+C'est la différence qui explique pourquoi elle n'apparaît pas dans `core.database.qualify`.
 
 Toute autre exception remonte **inchangée** : le cœur n'enveloppe pas ce qu'il ne sait pas nommer.
 Les violations de clé étrangère, de `NOT NULL` et de `CHECK` restent donc celles du pilote.
@@ -98,6 +103,25 @@ Deux transactions ont pris leurs verrous dans des ordres incompatibles, et le re
 Un `500` le laisse visible dans les journaux d'erreur, là où un `503` le rangerait parmi les conditions de routine.
 
 Une panne de disque, de permission ou de corruption reste également un `500` : elle est durable.
+
+## La configuration qui ne mène nulle part
+
+Rien n'est en panne et aucune requête n'est fautive.
+Il manque un renseignement que seul l'utilisateur peut fournir, un `DB_NAME` absent, un chemin qui ne désigne rien, un couple hôte et port introuvable dans l'env.
+
+La distinction avec l'indisponibilité tient au remède.
+Attendre résout l'une et ne résout jamais l'autre, si bien qu'un `503` avec `Retry-After` inviterait ici à réessayer une opération qui échouera identiquement.
+
+Le message doit nommer **ce qui manque et où le poser**.
+
+```
+DB_NAME n'est pas défini : le backend SQLite ne sait pas quel fichier ouvrir.
+Renseignez-le dans env/dev (voir `forge db:config`).
+```
+
+C'est la frontière du CLI qui l'affiche tel quel, sans trace d'exécution (`CLI-ERROR-BOUNDARY-001`).
+Mesuré avant ce ticket, un `RuntimeError` traversait cette frontière et déroulait vingt lignes de trace avant la phrase utile.
+Un backend qui lève une exception générique pour une erreur de configuration prive donc son utilisateur du message qu'il a pourtant pris soin d'écrire.
 
 ## La traduction, et où elle a lieu
 

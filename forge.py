@@ -36,7 +36,7 @@ from cli.project.project_profiles import (
     SUPPORTED_PROJECT_PROFILES,
     DEFAULT_PROJECT_PROFILE,
 )
-from cli._support.errors import cli_fail
+from cli._support.errors import cli_error, cli_fail
 from cli._support.help_dispatch import format_command_help, wants_help
 from cli.commands.optin_dispatch import dispatch_optin
 
@@ -707,12 +707,39 @@ def main() -> None:
     cli_fail(f"commande inconnue : «{command}».", hint=hint)
 
 
+# CLI-ERROR-BOUNDARY-001 — familles d'erreurs destinées à l'UTILISATEUR.
+#
+# Une trace d'exécution répond à « où Forge s'est-il trompé ». Elle n'a rien à
+# dire à qui a simplement oublié un renseignement dans son env, et elle enterre
+# le message qui, lui, dit quoi faire. Mesuré sur le parcours SQLite : `forge
+# db:init` sans `DB_NAME` déroulait vingt lignes de trace avant la phrase utile,
+# alors que `forge doctor` affichait le même diagnostic proprement.
+#
+# Tout ce qui n'est pas listé ici GARDE sa trace : un `AttributeError` est un
+# bug de Forge, et la trace en est le diagnostic. Cette liste ne s'élargit que
+# sur constat, jamais par anticipation (règle B, révéler avant de corriger).
+def _erreurs_utilisateur() -> "tuple[type[Exception], ...]":
+    """Résolues à l'appel, pour ne pas alourdir le démarrage du CLI."""
+    from core.database.errors import DatabaseError  # env, pas code
+    from cli.project.project_config import ProjectConfigError  # projet mal configuré
+
+    return (DatabaseError, ProjectConfigError)
+
+
 def cli_entrypoint() -> None:
     try:
         main()
     except KeyboardInterrupt:
         print("\nInterruption utilisateur. Commande annulée.", file=sys.stderr)
         sys.exit(130)
+    except _erreurs_utilisateur() as exc:
+        # Escamoter une trace serait de la magie cachée (principe 3) : elle
+        # reste accessible sur demande explicite, ce que la référence du CLI
+        # documente.
+        if os.environ.get("FORGE_TRACEBACK") == "1":
+            raise
+        cli_error(str(exc))
+        sys.exit(1)
 
 
 if __name__ == "__main__":
