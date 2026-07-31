@@ -23,8 +23,11 @@ Vous voyez donc ce qui va être fait avant que ce soit fait.
 Après avoir déclaré ou modifié des entités (niveau débutant), générez la migration correspondante :
 
 ```bash
-forge migration:make
+forge migration:make ajout_colonne_resume
 ```
+
+Le nom est obligatoire : il devient celui du fichier produit, et c'est lui que vous lirez dans l'historique des migrations.
+Choisissez-le descriptif, à la façon d'un message de commit.
 
 Forge produit un fichier de migration à partir de l'écart entre vos contrats et l'état connu du schéma.
 Ouvrez-le : c'est du SQL lisible, que vous pouvez relire et versionner.

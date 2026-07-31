@@ -617,6 +617,16 @@ def _run_apply_command(args: list[str]) -> None:
 
 
 def _run_make_command(args: list[str]) -> None:
+    # Le nom est obligatoire, et son absence rendait `IndexError: list index out
+    # of range` en trace brute (WELCOME-EXECUTION-001, constaté en jouant le
+    # parcours du moteur d'entités). Un argument manquant est une erreur
+    # d'usage : elle appelle le rappel de l'usage, pas une trace.
+    if len(args) < 2 or args[1].startswith("-"):
+        print("[ERREUR] Nom de migration manquant.")
+        print("Usage : forge migration:make <nom> [--from-entity <Entité>] "
+              "[--from-entities] [--from-diff <Entité>] [--with-relations]")
+        print("Exemple : forge migration:make ajout_colonne_resume")
+        raise SystemExit(1)
     name = args[1]
     from_entity = None
     from_entities = False

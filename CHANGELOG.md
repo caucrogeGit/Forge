@@ -32,6 +32,12 @@
 
 ### Corrigé
 
+- **`forge migration:make` sans nom rendait un `IndexError` (`ENTITIES-MIGRATION-MAKE-USAGE-001`).**
+  Constaté en jouant le parcours du moteur d'entités, dont la page écrivait `forge migration:make` sans argument alors que le nom est obligatoire.
+  Le code lisait `args[1]` sans vérifier, si bien qu'un argument oublié produisait `IndexError: list index out of range` en trace brute.
+  Un argument manquant est une erreur d'usage, et appelle donc le rappel de l'usage avec un exemple.
+  La page du parcours donne désormais un nom réel, et explique que ce nom devient celui du fichier de migration, à choisir comme un message de commit.
+
 - **Une erreur d'environnement sortait en trace Python, pas en message (`CLI-ERROR-BOUNDARY-001`).**
   Mesuré en exécutant le parcours d'accueil SQLite dans un projet neuf, tel qu'un débutant le suit.
   `forge db:init` sans `DB_NAME` déroulait vingt lignes de trace avant d'arriver à la phrase utile, qui disait pourtant exactement quoi faire.

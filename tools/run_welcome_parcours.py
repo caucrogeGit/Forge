@@ -45,6 +45,27 @@ BLOQUANTES = ("forge run", "mkdocs serve", "npm run dev", "python -m http.server
 #: Gestes qui sortent du terminal, donc hors de portée d'une exécution.
 MANUELLES = ("$EDITOR", "nano ", "vim ", "code ")
 
+#: Commandes qui interrogent le lecteur, et l'option documentée qui s'en passe.
+#:
+#: Le parcours a raison de montrer la forme interactive, celle qu'un humain
+#: emploie. Le harnais, lui, n'a pas de terminal : sans cette table il
+#: s'arrêterait au premier `make:entity` et laisserait le reste du parcours,
+#: quatorze blocs pour le moteur d'entités, sans aucune vérification.
+#: La substitution est **annoncée** à chaque fois, car elle change ce qui est
+#: éprouvé : `--no-input` pose une entité minimale là où le lecteur aurait
+#: décrit ses champs.
+EQUIVALENTS: "dict[str, str]" = {
+    "forge make:entity": "--no-input",
+}
+
+#: Commandes interactives SANS option documentée pour s'en passer.
+#:
+#: Constat, et non choix de conception du harnais : `make:entity` expose
+#: `--no-input`, `make:relation` n'expose rien d'équivalent. Une relation ne peut
+#: donc être créée ni par un script, ni en intégration continue, ni par un agent,
+#: alors que Forge écrit lui-même la guidance des agents (ADR-047).
+INTERACTIVES = ("forge make:relation",)
+
 #: Délai au-delà duquel une commande est tenue pour bloquée.
 DELAI = 180
 
@@ -83,7 +104,20 @@ def raison_de_sauter(script: str) -> "str | None":
         return "BLOQUANT"
     if any(motif in script for motif in MANUELLES):
         return "MANUEL"
+    if any(motif in script for motif in INTERACTIVES):
+        return "INTERACTIF"
     return None
+
+
+def substituer(script: str) -> "tuple[str, str | None]":
+    """Rend le script à jouer et, le cas échéant, la substitution opérée."""
+    for commande, option in EQUIVALENTS.items():
+        lignes = script.splitlines()
+        for index, ligne in enumerate(lignes):
+            if commande in ligne and option not in ligne:
+                lignes[index] = f"{ligne.rstrip()} {option}"
+                return "\n".join(lignes), f"{commande} + {option}"
+    return script, None
 
 
 def executer(script: str, projet: Path) -> "tuple[int, str]":
@@ -108,6 +142,7 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool) -> int:
         raise SystemExit(f"Erreur : aucun parcours dans le nav de forge-mvc-{paquet}.")
 
     joues = 0
+    substitutions = 0
     sautes: "dict[str, int]" = {}
     print(f"=== Parcours {paquet} : {len(pages)} page(s), dans l'ordre du site ===")
 
@@ -125,6 +160,10 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool) -> int:
                 joues += 1
                 continue
             assert projet is not None
+            script, substitution = substituer(script)
+            if substitution:
+                substitutions += 1
+                print(f"  [SUBSTITUÉ] {relatif}:{ligne} — {substitution}")
             code, sortie = executer(script, projet)
             joues += 1
             if code != 0:
@@ -137,7 +176,7 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool) -> int:
             print(f"  [OK] {relatif}:{ligne} — {premiere}")
 
     detail = ", ".join(f"{n} {r.lower()}" for r, n in sorted(sautes.items())) or "aucun"
-    print(f"Blocs joués : {joues} ; sautés : {detail}")
+    print(f"Blocs joués : {joues} ; sautés : {detail} ; substitués : {substitutions}")
     if lister:
         print("Recensement seul : rien n'a été exécuté.")
         return 0
