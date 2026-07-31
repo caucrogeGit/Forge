@@ -54,10 +54,17 @@ server {{
 
 
 def _systemd_service(project_dir: Path) -> str:
+    # L'unite attendait `mariadb.service` quel que soit le backend : sur les
+    # trois autres, elle nommait un service inexistant, et sur SQLite elle en
+    # attendait un la ou il n'y a pas de serveur du tout
+    # (DEPLOY-BACKEND-AGNOSTIC-001).
+    backend = _backend_installe()
+    service = SERVICES_SYSTEMD.get(backend or "", "")
+    apres = f"network.target {service}".strip() if service else "network.target"
     return f"""\
 [Unit]
 Description=Forge Application
-After=network.target mariadb.service
+After={apres}
 
 [Service]
 Type=simple
@@ -220,6 +227,46 @@ def cmd_deploy_init(root: Path | None = None) -> None:
 
 # ── deploy:check ──────────────────────────────────────────────────────────────
 
+#: Service systeme conventionnel de chaque backend a serveur.
+#:
+#: Nommer ces unites est le metier de l'opt-in de deploiement, pas celui des
+#: backends : c'est ici qu'on ecrit du systemd. SQLite n'y figure pas, n'ayant
+#: aucun service a attendre.
+SERVICES_SYSTEMD: "dict[str, str]" = {
+    "mariadb": "mariadb.service",
+    "postgres": "postgresql.service",
+    "mssql": "mssql-server.service",
+}
+
+
+def _backend_installe() -> "str | None":
+    """Nom du backend BDD resolu, ou `None` s'il n'y en a pas exactement un."""
+    from importlib.metadata import entry_points
+
+    noms = sorted(ep.name for ep in entry_points(group="forge_mvc.db_backend"))
+    return noms[0] if len(noms) == 1 else None
+
+
+def _verifier_backend_bdd() -> _Result:
+    from importlib.metadata import entry_points
+
+    points = sorted(entry_points(group="forge_mvc.db_backend"), key=lambda ep: ep.name)
+    if not points:
+        return _Result("error", "Backend BDD",
+                       "aucun backend installé — pip install forge-mvc-<sgbd> (ADR-054)")
+    if len(points) > 1:
+        noms = ", ".join(ep.name for ep in points)
+        return _Result("error", "Backend BDD",
+                       f"plusieurs backends installés ({noms}) — un seul par projet (ADR-054)")
+    point = points[0]
+    try:
+        point.load()
+    except Exception as exc:  # noqa: BLE001 — pilote absent, ABI, dependance
+        return _Result("error", f"Backend BDD {point.name}",
+                       f"installé mais non chargeable — {type(exc).__name__} : {exc}")
+    return _Result("ok", f"Backend BDD {point.name}", "installé et chargeable")
+
+
 def _check_results(root: Path) -> list[_Result]:
     results: list[_Result] = []
 
@@ -324,11 +371,13 @@ def _check_results(root: Path) -> list[_Result]:
             "APP_SSL_ENABLED=false — backend HTTP local cohérent avec Nginx",
         ))
 
-    # module mariadb
-    if importlib.util.find_spec("mariadb") is not None:
-        results.append(_Result("ok", "Module mariadb", "importable"))
-    else:
-        results.append(_Result("error", "Module mariadb", "non installé — pip install mariadb"))
+    # Backend BDD : la question est « un backend est-il installé et chargeable »,
+    # pas « le pilote MariaDB est-il là ». Le contrôle nommait ce pilote en dur,
+    # si bien qu'un projet sur SQLite, PostgreSQL ou SQL Server recevait une
+    # ERREUR fausse lui demandant d'installer MariaDB (DEPLOY-BACKEND-AGNOSTIC-001).
+    # Le coeur est agnostique et resout son backend par entry point (ADR-054) :
+    # cette verification pose donc la meme question que lui.
+    results.append(_verifier_backend_bdd())
 
     # module jinja2
     if importlib.util.find_spec("jinja2") is not None:

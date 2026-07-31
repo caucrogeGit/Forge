@@ -30,6 +30,15 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Le déploiement supposait MariaDB sur les quatre backends (`DEPLOY-BACKEND-AGNOSTIC-001`).**
+  Constaté en jouant le parcours de l'opt-in sur un projet SQLite.
+  `forge deploy:check` cherchait le module `mariadb` et rendait une **erreur** quand il manquait, en conseillant de l'installer.
+  Sur trois des quatre backends officiels, ce refus était donc faux, et il envoyait installer le pilote d'un SGBD que le projet n'emploie pas.
+  L'unité systemd générée portait le même défaut avec `After=network.target mariadb.service`, soit un service inexistant sur PostgreSQL et SQL Server, et un service attendu là où SQLite n'a aucun serveur.
+  Le cœur est agnostique et résout son backend par entry point (ADR-054) : la vérification pose désormais la même question que lui, ce qui la rend juste pour les quatre backends et pour tout backend tiers à venir.
+  Elle distingue trois refus utiles, aucun backend, plusieurs backends, et un backend installé dont le pilote ne se charge pas, ce dernier étant le vrai cas que l'ancien contrôle visait sans savoir le nommer.
+  L'unité systemd attend le service du backend résolu, et n'en attend aucun quand il n'y en a pas.
+
 - **Les quatre parcours de backend supposaient trois états jamais établis (`WELCOME-BACKENDS-STEPS-001`).**
   Le même défaut, aux mêmes endroits, sur SQLite, MariaDB, PostgreSQL et SQL Server.
   Le moteur d'entités n'était cité nulle part, alors que `db:init`, `db:apply` et `migration:*` en viennent depuis l'ADR-070.
