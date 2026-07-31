@@ -40,10 +40,18 @@ BLOC_BASH = re.compile(r"^```bash\s*$(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
 PLACEHOLDER = re.compile(r"<[a-zA-Zà-ÿ][\w à-ÿ'-]*>")
 
 #: Commandes qui ne rendent jamais la main. Les lancer figerait le harnais.
-BLOQUANTES = ("forge run", "mkdocs serve", "npm run dev", "python -m http.server")
+# `docker run` d'un serveur de base occupe le terminal tant qu'il tourne :
+# les parcours des backends l'emploient pour proposer une instance jetable.
+BLOQUANTES = ("forge run", "mkdocs serve", "npm run dev", "python -m http.server",
+              "docker run", "podman run")
 
 #: Gestes qui sortent du terminal, donc hors de portée d'une exécution.
-MANUELLES = ("$EDITOR", "nano ", "vim ", "code ")
+#:
+#: `sudo` en fait partie : les parcours des backends serveur font ouvrir une
+#: session d'administration pour y coller le SQL de provisioning que `db:init`
+#: affiche (ADR-067). C'est un geste d'administrateur, distinct du projet, et
+#: la session ainsi ouverte attend une saisie humaine.
+MANUELLES = ("$EDITOR", "nano ", "vim ", "code ", "sudo ")
 
 #: Commandes qui interrogent le lecteur, et l'option documentée qui s'en passe.
 #:

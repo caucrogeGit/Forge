@@ -1,7 +1,14 @@
 # Provisionner la base
 
-!!! note "Prérequis : installer l'opt-in"
-    Installez `forge-mvc-mariadb` avant de commencer : voir sa [référence](../../reference.md).
+!!! note "Prérequis : deux paquets"
+    ```bash
+    pip install --pre forge-mvc-mariadb forge-mvc-entities
+    ```
+
+    Le backend seul ne suffit pas.
+    Les commandes de base de données (`db:init`, `db:apply`, `migration:*`) sont fournies par le moteur d'entités, extrait du cœur par l'[ADR-070](/docs/forge/adr/070-entities-engine-extraction/).
+
+    Voir la [référence](../../reference.md) pour la mise en service complète.
 
 Objectif : premier contact avec le backend **opt-in** `forge-mvc-mariadb`.
 
@@ -17,6 +24,7 @@ Premier palier du **niveau débutant** de la progression MariaDB.
 ## Ce que ce palier montre
 
 - vérifier le backend et la connexion ;
+- renseigner l'accès au serveur ;
 - provisionner la base avec `forge db:init`.
 
 ## 1. Vérifier le backend et la connexion
@@ -27,7 +35,20 @@ forge doctor
 
 `doctor` indique le backend résolu (`mariadb`) et teste l'accès au serveur.
 
-## 2. Provisionner
+Sur un projet neuf, il signale que la configuration est incomplète, ce que le palier suivant corrige.
+
+## 2. Renseigner l'accès au serveur
+
+```bash
+forge db:config
+```
+
+Cette commande amorce dans `env/example`, `env/dev` et `env/prod` les clés attendues par le backend, sans jamais écraser une valeur déjà renseignée (ADR-064).
+
+Ouvrez ensuite `env/dev` et renseignez les valeurs vides, en particulier les mots de passe des deux comptes.
+Forge n'invente aucun secret et n'en écrit aucun dans les gabarits.
+
+## 3. Provisionner
 
 `forge db:init` lit `env/` et affiche le script SQL de provisioning (base + comptes scellés à `DB_NAME`) :
 

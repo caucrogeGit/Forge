@@ -1,7 +1,14 @@
 # Préparer la base
 
-!!! note "Prérequis : installer l'opt-in"
-    Installez `forge-mvc-mssql` avant de commencer : voir sa [référence](../../reference.md).
+!!! note "Prérequis : deux paquets"
+    ```bash
+    pip install --pre forge-mvc-mssql forge-mvc-entities
+    ```
+
+    Le backend seul ne suffit pas.
+    Les commandes de base de données (`db:init`, `db:apply`, `migration:*`) sont fournies par le moteur d'entités, extrait du cœur par l'[ADR-070](/docs/forge/adr/070-entities-engine-extraction/).
+
+    Voir la [référence](../../reference.md) pour la mise en service complète.
 
 Objectif : premier contact avec le backend **opt-in** `forge-mvc-mssql`.
 
@@ -19,7 +26,19 @@ Premier palier du **niveau débutant** de la progression SQL Server.
 - provisionner la base et le compte applicatif avec `db:init` ;
 - vérifier que le cœur résout le backend.
 
-## 1. Provisionner la base
+## 1. Renseigner l'accès au serveur
+
+```bash
+forge db:config
+```
+
+Cette commande amorce dans `env/example`, `env/dev` et `env/prod` les clés attendues par le backend, sans jamais écraser une valeur déjà renseignée (ADR-064).
+
+Ouvrez ensuite `env/dev` et renseignez les valeurs vides, en particulier les mots de passe des deux comptes.
+Forge n'invente aucun secret et n'en écrit aucun dans les gabarits.
+Sans cette étape, `db:init` refuse et nomme les variables manquantes.
+
+## 2. Provisionner la base
 
 ```bash
 forge db:init
@@ -33,7 +52,7 @@ forge db:init --run
 
 `--run` exécute ce provisioning avec le compte `DB_ADMIN_*`.
 
-## 2. Vérifier le backend
+## 3. Vérifier le backend
 
 ```bash
 forge doctor

@@ -1,7 +1,14 @@
 # Préparer la base
 
-!!! note "Prérequis : installer l'opt-in"
-    Installez `forge-mvc-postgres` avant de commencer : voir sa [référence](../../reference.md).
+!!! note "Prérequis : deux paquets"
+    ```bash
+    pip install --pre forge-mvc-postgres forge-mvc-entities
+    ```
+
+    Le backend seul ne suffit pas.
+    Les commandes de base de données (`db:init`, `db:apply`, `migration:*`) sont fournies par le moteur d'entités, extrait du cœur par l'[ADR-070](/docs/forge/adr/070-entities-engine-extraction/).
+
+    Voir la [référence](../../reference.md) pour la mise en service complète.
 
 Objectif : premier contact avec le backend **opt-in** `forge-mvc-postgres`.
 
@@ -16,10 +23,23 @@ Premier palier du **niveau débutant** de la progression PostgreSQL.
 
 ## Ce que ce palier montre
 
+- renseigner l'accès au serveur ;
 - provisionner la base et le rôle PostgreSQL avec `db:init` ;
 - vérifier que le cœur résout le backend.
 
-## 1. Provisionner base et rôle
+## 1. Renseigner l'accès au serveur
+
+```bash
+forge db:config
+```
+
+Cette commande amorce dans `env/example`, `env/dev` et `env/prod` les clés attendues par le backend, sans jamais écraser une valeur déjà renseignée (ADR-064).
+
+Ouvrez ensuite `env/dev` et renseignez les valeurs vides, en particulier les mots de passe des deux comptes.
+Forge n'invente aucun secret et n'en écrit aucun dans les gabarits.
+Sans cette étape, `db:init` refuse et nomme les variables manquantes.
+
+## 2. Provisionner base et rôle
 
 ```bash
 forge db:init        # affiche le SQL de provisioning
@@ -29,7 +49,7 @@ forge db:init --run  # crée la base, le rôle applicatif et le registre de migr
 Le compte `DB_ADMIN_*` renseigné dans `env/dev` doit exister côté serveur.
 (En conteneur Docker, exécutez ces commandes depuis le projet, le serveur restant joignable via `DB_HOST`/`DB_PORT`.)
 
-## 2. Vérifier le backend
+## 3. Vérifier le backend
 
 ```bash
 forge doctor

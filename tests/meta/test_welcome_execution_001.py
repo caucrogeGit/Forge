@@ -124,3 +124,36 @@ def test_le_parcours_sqlite_declare_l_entite_avant_son_crud() -> None:
             / "debutant" / "sqlite-apply.md").read_text(encoding="utf-8")
 
     assert page.index("make:entity") < page.index("make:crud")
+
+
+# ── Les quatre backends portaient le même défaut ─────────────────────────────
+
+@pytest.mark.parametrize("backend", ["sqlite", "mariadb", "postgres", "mssql"])
+def test_chaque_backend_cite_le_moteur_d_entites(backend: str) -> None:
+    """`db:init`, `db:apply` et `migration:*` viennent de l'opt-in entities
+    (ADR-070) : les quatre parcours l'omettaient de leurs prérequis."""
+    dossier = PROJECT_ROOT / "packages" / f"forge-mvc-{backend}" / "docs" / "welcome"
+    textes = "\n".join(p.read_text(encoding="utf-8") for p in dossier.rglob("*.md"))
+
+    assert "forge-mvc-entities" in textes
+
+
+@pytest.mark.parametrize("backend", ["sqlite", "mariadb", "postgres", "mssql"])
+def test_chaque_backend_configure_avant_de_provisionner(backend: str) -> None:
+    """Sans `db:config`, le backend ignore où se connecter et `db:init` refuse."""
+    dossier = PROJECT_ROOT / "packages" / f"forge-mvc-{backend}" / "docs" / "welcome"
+    textes = "\n".join(p.read_text(encoding="utf-8") for p in dossier.rglob("*.md"))
+
+    assert "forge db:config" in textes
+
+
+@pytest.mark.parametrize("backend", ["sqlite", "mariadb", "postgres", "mssql"])
+def test_chaque_backend_declare_l_entite_avant_son_crud(backend: str) -> None:
+    """`make:crud` consomme un contrat que seul `make:entity` crée."""
+    dossier = PROJECT_ROOT / "packages" / f"forge-mvc-{backend}" / "docs" / "welcome"
+    page = next(p for p in dossier.rglob("*.md")
+                if "make:crud" in p.read_text(encoding="utf-8"))
+    texte = page.read_text(encoding="utf-8")
+
+    assert "make:entity" in texte, f"{page.name} appelle make:crud sans make:entity"
+    assert texte.index("make:entity") < texte.index("make:crud")

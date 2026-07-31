@@ -30,6 +30,16 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Les quatre parcours de backend supposaient trois états jamais établis (`WELCOME-BACKENDS-STEPS-001`).**
+  Le même défaut, aux mêmes endroits, sur SQLite, MariaDB, PostgreSQL et SQL Server.
+  Le moteur d'entités n'était cité nulle part, alors que `db:init`, `db:apply` et `migration:*` en viennent depuis l'ADR-070.
+  `forge db:config` manquait, si bien que le backend ignorait où se connecter et que `db:init` refusait, à juste titre et avec un message excellent.
+  Enfin `make:crud` était donné seul, alors qu'il consomme un contrat que seul `make:entity` crée.
+  Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles, ce qu'aucune relecture ne pouvait montrer.
+  Les quatre parcours se déroulent désormais de bout en bout, **vérifiés contre des serveurs réels**, MariaDB 11.8, PostgreSQL 17.10 et SQL Server 2022.
+  Un garde-fou fige les trois points sur les quatre backends à la fois, la répétition du défaut valant avertissement.
+  Le harnais gagne au passage deux motifs de saut déclarés, `sudo` pour la session d'administration où le lecteur colle le SQL affiché par `db:init` (ADR-067), et `docker run` pour l'instance jetable que proposent les paliers avancés.
+
 - **`forge make:relation` déclare une relation sans terminal (`ENTITIES-NON-INTERACTIVE-002`).**
   La commande était entièrement interactive, sans la moindre option.
   Or la contrainte de clé étrangère vient de `relations.json` (ADR-069), si bien qu'un modèle relationnel complet restait hors d'atteinte d'un script, de l'intégration continue et d'un agent, même après l'ouverture de `make:entity`.
