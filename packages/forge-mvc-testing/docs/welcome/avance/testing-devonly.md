@@ -23,10 +23,18 @@ Le code de test (fixtures, fausses requêtes, faux exécuteurs) n'a rien à fair
 ## Vérifier
 
 ```bash
-grep -r "forge_mvc_testing" mvc/   # ne doit rien retourner
+if grep -rq "forge_mvc_testing" mvc/; then
+    echo "FUITE : l'application importe le paquet de test"
+    exit 1
+fi
+echo "OK : aucune fuite"
 ```
 
 Aucun fichier de l'application ne doit importer le paquet de test.
+
+La forme est un peu plus longue qu'un `grep` nu, et c'est délibéré.
+`grep` sort en **code 1** quand il ne trouve rien, c'est-à-dire dans le cas qui nous convient : posé tel quel dans un script ou une intégration continue, il signalerait un échec au moment même où tout va bien.
+Ce bloc se colle donc sans surprise dans une vérification automatisée.
 
 !!! warning "Ne pas fuiter en production"
     Si `forge-mvc-testing` apparaît dans les dépendances runtime, retirez-le : il appartient au développement.

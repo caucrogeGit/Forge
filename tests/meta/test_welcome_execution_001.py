@@ -29,11 +29,11 @@ import pytest
 
 from tools import run_welcome_parcours as harnais
 
-# Boucle documentaire : ce garde lit des parcours et un `nav`, et la dérive
-# qu'il attrape naît d'une édition de la documentation. Contrairement au garde
-# d'adéquation (DOC-CODE-ADEQUATION-001), qui part d'un symbole renommé et
-# appartient donc à la boucle code.
-pytestmark = [pytest.mark.meta, pytest.mark.docs]
+# Boucle code, et non documentaire. Ce fichier a d'abord porté le marqueur
+# `docs`, tant qu'il ne lisait que des parcours et un `nav`. Il éprouve désormais
+# aussi la logique du harnais, sur un projet temporaire, ce qui en fait un test
+# d'outillage : le garde des marqueurs l'a signalé, et il avait raison.
+pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -157,3 +157,66 @@ def test_chaque_backend_declare_l_entite_avant_son_crud(backend: str) -> None:
 
     assert "make:entity" in texte, f"{page.name} appelle make:crud sans make:entity"
     assert texte.index("make:entity") < texte.index("make:crud")
+
+
+# ── Un harnais ne prétend pas avoir vérifié ce qu'il n'a pas joué ────────────
+
+def test_un_parcours_sans_bloc_joue_le_dit(capsys: pytest.CaptureFixture[str],
+                                           tmp_path: Path) -> None:
+    """« De bout en bout » sur zéro bloc se lirait comme une couverture.
+
+    Même leçon que le verdict pytest lu dans le texte plutôt que dans le code
+    retour : un contrôle qui n'a rien contrôlé doit le dire.
+    """
+    harnais.parcourir("iot", tmp_path, lister=False)
+
+    assert "RIEN JOUÉ" in capsys.readouterr().out
+
+
+def test_forge_doctor_reste_verifie() -> None:
+    """Une règle large sur « tout ce qui ressemble à un diagnostic » sautait
+    `forge doctor`, qui sort en 0 et se vérifie très bien."""
+    assert harnais.raison_de_sauter("forge doctor") is None
+
+
+@pytest.mark.parametrize(("script", "raison"), [
+    ("forge deploy:check", "DIAGNOSTIC"),
+    ("forge iot:doctor", "DIAGNOSTIC"),
+    ("forge iot:listen", "SERVICE_EXTERNE"),
+    ("curl -k https://localhost:8000/api/iot/events", "SERVEUR"),
+    ("docker run --rm postgres", "BLOQUANT"),
+    ("sudo mariadb", "MANUEL"),
+])
+def test_les_motifs_ajoutes_sont_reconnus(script: str, raison: str) -> None:
+    assert harnais.raison_de_sauter(script) == raison
+
+
+def test_un_script_que_le_lecteur_ecrit_n_est_pas_lance(tmp_path: Path) -> None:
+    """Les parcours font écrire un fichier dans un bloc `python`, puis le
+    lancent : le harnais n'en pose aucun, le lancer mesurerait son propre trou."""
+    assert harnais.raison_de_sauter("python worker.py", tmp_path) == "FICHIER_ABSENT"
+
+    (tmp_path / "worker.py").write_text("", encoding="utf-8")
+    assert harnais.raison_de_sauter("python worker.py", tmp_path) is None
+
+
+# ── Les deux blocs corrigés ──────────────────────────────────────────────────
+
+def test_la_ligne_de_crontab_n_est_pas_etiquetee_bash() -> None:
+    """`0 3 * * * ...` n'est pas une commande : bash y lit « 0 » comme un binaire."""
+    page = (PROJECT_ROOT / "packages" / "forge-mvc-sessions-db" / "docs" / "welcome"
+            / "intermediaire" / "sessions-db-cleanup.md").read_text(encoding="utf-8")
+    bloc = page[page.index("crontab de l'application") - 200:
+                page.index("crontab de l'application")]
+
+    assert "```bash" not in bloc
+
+
+def test_la_verification_du_paquet_de_test_sort_en_zero_quand_tout_va_bien() -> None:
+    """`grep` sort en 1 quand il ne trouve rien, soit le cas qui convient :
+    posé tel quel dans une CI, il signalerait un échec au meilleur moment."""
+    page = (PROJECT_ROOT / "packages" / "forge-mvc-testing" / "docs" / "welcome"
+            / "avance" / "testing-devonly.md").read_text(encoding="utf-8")
+
+    assert 'grep -r "forge_mvc_testing" mvc/   # ne doit rien retourner' not in page
+    assert "if grep -rq" in page

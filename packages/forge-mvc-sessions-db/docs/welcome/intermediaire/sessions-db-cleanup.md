@@ -66,10 +66,12 @@ if __name__ == "__main__":
     print(f"{n} sessions expirées supprimées")
 ```
 
-```bash
+```text
 # crontab de l'application : tous les jours à 3 h du matin
 0 3 * * * /chemin/vers/venv/bin/python /chemin/vers/scripts/cleanup_sessions.py
 ```
+
+Cette ligne se pose dans une crontab, avec `crontab -e` ; ce n'est pas une commande à taper dans un terminal.
 
 ### Comprendre ce code
 

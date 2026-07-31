@@ -81,6 +81,30 @@ INTERACTIVES: "tuple[str, ...]" = ()
 #: sain, ce qui est pire qu'un saut annoncé.
 SANS_ARGUMENTS_INFERABLES = ("forge make:relation",)
 
+#: Adresses qui désignent le serveur du projet, lancé par un bloc bloquant.
+#:
+#: Les parcours démarrent l'application avec `forge run`, que le harnais saute,
+#: puis interrogent ses routes au `curl`. Ces appels dépendent donc d'un serveur
+#: que le harnais n'a pas démarré : les jouer mesurerait son propre saut.
+SERVEUR_LOCAL = ("localhost", "127.0.0.1")
+
+#: Commandes exigeant un service externe que le harnais ne monte pas.
+#:
+#: `iot:listen` s'abonne à un broker MQTT. Son absence n'est pas un défaut du
+#: parcours, et le refus qu'elle produit est d'ailleurs clair et juste.
+SERVICES_EXTERNES = ("forge iot:listen", "forge iot:publish")
+
+#: Commandes dont le code retour EST le rapport, pas un verdict.
+#:
+#: `deploy:check` documente lui-même que « la sortie vaut code 1 si au moins
+#: une erreur bloquante est détectée ». Sur un projet non préparé pour la
+#: production, ce 1 est le comportement annoncé, non un parcours cassé. Les
+#: confondre ferait tenir une commande honnête pour un défaut.
+#: Liste explicite et courte, non une règle sur « tout ce qui ressemble à un
+#: diagnostic » : `forge doctor` sort en 0 et se vérifie très bien, une règle
+#: large le sautait et retirait de la couverture un bloc qui marchait.
+DIAGNOSTICS = ("forge deploy:check", "forge iot:doctor")
+
 #: Délai au-delà duquel une commande est tenue pour bloquée.
 DELAI = 180
 
@@ -112,7 +136,10 @@ def blocs(page: Path) -> "list[tuple[int, str]]":
             for m in BLOC_BASH.finditer(texte)]
 
 
-def raison_de_sauter(script: str) -> "str | None":
+FICHIER_LANCE = re.compile(r"^\s*python3?\s+([\w./-]+\.py)", re.MULTILINE)
+
+
+def raison_de_sauter(script: str, projet: "Path | None" = None) -> "str | None":
     if PLACEHOLDER.search(script):
         return "PLACEHOLDER"
     if any(motif in script for motif in BLOQUANTES):
@@ -123,6 +150,20 @@ def raison_de_sauter(script: str) -> "str | None":
         return "INTERACTIF"
     if any(motif in script for motif in SANS_ARGUMENTS_INFERABLES):
         return "ARGUMENTS"
+    if any(hote in script for hote in SERVEUR_LOCAL):
+        return "SERVEUR"
+    if any(motif in script for motif in SERVICES_EXTERNES):
+        return "SERVICE_EXTERNE"
+    if any(motif in script for motif in DIAGNOSTICS):
+        return "DIAGNOSTIC"
+    if projet is not None:
+        # Les parcours font écrire un script au lecteur dans un bloc `python`,
+        # puis le lancent. Le harnais ne pose aucun fichier : le lancer
+        # mesurerait ce qu'il n'a pas fait. Règle générale plutôt que liste
+        # de noms de scripts à tenir à jour.
+        for chemin in FICHIER_LANCE.findall(script):
+            if not (projet / chemin).exists():
+                return "FICHIER_ABSENT"
     return None
 
 
@@ -166,7 +207,7 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool) -> int:
     for page in pages:
         relatif = page.relative_to(PROJECT_ROOT)
         for ligne, script in blocs(page):
-            raison = raison_de_sauter(script)
+            raison = raison_de_sauter(script, projet)
             premiere = script.strip().splitlines()[0] if script.strip() else ""
             if raison:
                 sautes[raison] = sautes.get(raison, 0) + 1
@@ -197,7 +238,16 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool) -> int:
     if lister:
         print("Recensement seul : rien n'a été exécuté.")
         return 0
-    print(f"OK : le parcours {paquet} se déroule de bout en bout.")
+    if joues == 0:
+        # Annoncer « de bout en bout » sans avoir rien joué se lirait comme
+        # une couverture, alors que c'est l'inverse. Même leçon que le
+        # verdict pytest lu dans le texte plutôt que dans le code retour
+        # (RELEASE-AUDIT-SHIPPED-SURFACE-001).
+        print(f"RIEN JOUÉ : le parcours {paquet} n'a aucun bloc exécutable ; "
+              "sa vérification reste entièrement manuelle.")
+        return 0
+    print(f"OK : le parcours {paquet} se déroule de bout en bout "
+          f"({joues} bloc(s) joué(s)).")
     return 0
 
 

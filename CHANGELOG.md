@@ -30,6 +30,15 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Dix parcours d'opt-in joués, deux blocs qui piégeaient leur lecteur (`WELCOME-OPTINS-STEPS-001`).**
+  Le parcours de `sessions-db` étiquetait `bash` une ligne de **crontab**, que le shell lit comme un appel à une commande nommée `0`.
+  Celui de `testing` proposait `grep -r "forge_mvc_testing" mvc/   # ne doit rien retourner`, dont le succès est un **code retour 1**, `grep` sortant ainsi quand il ne trouve rien.
+  Posé tel quel dans une intégration continue, ce bloc signalait un échec au moment précis où tout allait bien ; il prend désormais une forme qui sort en zéro quand la vérification passe.
+  Neuf parcours sur dix se déroulent de bout en bout, le dixième, `iot`, n'ayant **aucun** bloc exécutable sans broker MQTT ni serveur lancé.
+  Le harnais gagne quatre motifs de saut, tous constatés et non anticipés : un serveur local que le harnais n'a pas démarré, un service externe, un fichier que le lecteur écrit lui-même depuis un bloc `python`, et un diagnostic dont le code retour **est** le rapport.
+  Ce dernier vise `deploy:check`, qui documente lui-même sortir en 1 dès qu'il trouve une erreur bloquante, comportement juste qu'il ne fallait pas prendre pour un parcours cassé.
+  Le harnais annonce enfin **« rien joué »** au lieu de « de bout en bout » quand aucun bloc n'a tourné, un contrôle qui n'a rien contrôlé devant le dire.
+
 - **Le déploiement supposait MariaDB sur les quatre backends (`DEPLOY-BACKEND-AGNOSTIC-001`).**
   Constaté en jouant le parcours de l'opt-in sur un projet SQLite.
   `forge deploy:check` cherchait le module `mariadb` et rendait une **erreur** quand il manquait, en conseillant de l'installer.
