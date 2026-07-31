@@ -98,4 +98,29 @@ elif [ -n "$FAILED" ]; then
     exit 2
 else
     echo "Publication terminée : $i distributions traitées, aucune en échec."
+    # « twine n'a pas protesté » n'est pas « PyPI sert la version ». Le garde
+    # de complétude tranche en interrogeant PyPI, distribution par distribution.
+    # Sans cet appel, la vérification dépendait de la mémoire de qui publie :
+    # aucune documentation ne porte la séquence
+    # (RELEASE-PUBLISH-RESUME-GENERALIZE-001).
+    echo ""
+    echo "-- Vérification : PyPI sert-il bien $VERSION partout ? --"
+    _VERIFIE=false
+    for _essai in 1 2 3; do
+        if python3 "$ROOT/tools/check_pypi_completeness.py" --version "$VERSION"; then
+            _VERIFIE=true
+            break
+        fi
+        # L'index met parfois quelques secondes à refléter un envoi : conclure
+        # au premier refus ferait douter de son propre travail celui qui vient
+        # de publier.
+        [ "$_essai" -lt 3 ] && { echo "   (nouvel essai dans 15 s)"; sleep 15; }
+    done
+    if ! $_VERIFIE; then
+        echo ""
+        echo "PUBLICATION INCOMPLÈTE : PyPI ne sert pas $VERSION pour toutes les distributions."
+        echo "Relancez 'bash tools/publish.sh --upload' (--skip-existing saute les publiés),"
+        echo "ou posez la reprise automatique : bash tools/publish-resume.sh en cron."
+        exit 3
+    fi
 fi

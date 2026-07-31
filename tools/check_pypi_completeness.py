@@ -21,6 +21,14 @@ Trois ensembles, trois questions.
 - Une distribution sur PyPI absente du dépôt est **orpheline** : plus
   maintenue, toujours installable, elle continue de servir du code mort.
 
+`--version` pose une quatrième question, plus fine, **après** publication : la
+version qu'on vient de publier est-elle servie par **toutes** les distributions.
+Sans elle, le garde se contente de « publié un jour » : une distribution restée
+en rc2 pendant que les vingt-sept autres passent en rc3 le satisfait, alors que
+la release est partielle et qu'un projet épinglant la nouvelle version ne
+l'obtiendrait pas. Ce trou a été vu en généralisant le script de reprise, qui
+posait cette question dans son coin (`RELEASE-PUBLISH-RESUME-GENERALIZE-001`).
+
 Le réseau peut manquer. Dans ce cas le script le **dit** et échoue si on le lui
 demande, plutôt que de passer en silence : un garde qui se tait quand il ne
 peut pas vérifier ne garde rien.
@@ -107,12 +115,31 @@ def pypi_versions(nom: str, *, timeout: float = 10.0) -> "list[str] | None":
     return sorted(vivantes)
 
 
-def verifier(*, check_build: bool, offline_ok: bool) -> int:
+def meme_version(demandee: str, publiee: str) -> bool:
+    """Compare deux versions sans se laisser piéger par leur écriture.
+
+    Forge nomme ses tags en SemVer (`1.0.0-rc.3`) et ses distributions en
+    PEP 440 (`1.0.0rc3`). Ce sont les deux écritures de la même version, et
+    `release-validate.sh` affiche déjà l'équivalence. Comparer les chaînes
+    telles quelles ferait échouer le garde sur la seule forme du texte.
+    """
+    try:
+        from packaging.version import Version
+
+        return Version(demandee) == Version(publiee)
+    except Exception:  # noqa: BLE001 — packaging absent ou version illisible
+        return demandee == publiee
+
+
+def verifier(*, check_build: bool, offline_ok: bool,
+             version: "str | None" = None) -> int:
     depot = repo_distributions()
     erreurs: "list[str]" = []
     avertissements: "list[str]" = []
 
     print(f"Dépôt : {len(depot)} distribution(s)")
+    if version is not None:
+        print(f"Version exigée sur PyPI : {version}")
 
     if check_build:
         construites = built_distributions()
@@ -136,6 +163,12 @@ def verifier(*, check_build: bool, offline_ok: bool) -> int:
             erreurs.append(
                 f"{nom} : présent au dépôt, JAMAIS PUBLIÉ sur PyPI. Publier une "
                 "release sans lui la rendrait régressive pour qui l'utilise."
+            )
+        elif version is not None and not any(meme_version(version, v) for v in versions):
+            erreurs.append(
+                f"{nom} : publié, mais la version {version} n'y est pas "
+                f"({len(versions)} version(s) installable(s)). La release est "
+                "partielle : qui épingle cette version ne l'obtiendra pas."
             )
 
     for nom, raison in sorted(ABSORBED.items()):
@@ -186,8 +219,12 @@ def main(argv: "list[str] | None" = None) -> int:
                         help="croise aussi avec les artefacts de dist/")
     parser.add_argument("--offline-ok", action="store_true",
                         help="tolère un PyPI injoignable (avertissement au lieu d'échec)")
+    parser.add_argument("--version", metavar="VERSION", default=None,
+                        help="exige cette version sur PyPI pour chaque distribution "
+                             "(à poser APRÈS publication ; SemVer ou PEP 440)")
     args = parser.parse_args(argv)
-    return verifier(check_build=args.check_build, offline_ok=args.offline_ok)
+    return verifier(check_build=args.check_build, offline_ok=args.offline_ok,
+                    version=args.version)
 
 
 if __name__ == "__main__":

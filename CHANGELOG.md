@@ -1,6 +1,26 @@
 # Changelog
 
 
+## [Non publié]
+
+### Corrigé
+
+- **La reprise de publication ne servait qu'une release, et le garde de complétude posait une question trop large (`RELEASE-PUBLISH-RESUME-GENERALIZE-001`).**
+  PyPI limite la création de nouveaux projets, si bien qu'une release qui en introduit plusieurs se heurte à un 429 en cours de route et doit être relancée toutes les demi-heures.
+  Un script posé en cron faisait ce guet, mais il portait `rc2` dans son nom, son journal, ses messages et sa ligne d'auto-retrait.
+  Il aurait donc fallu le réécrire au moment précis où le 429 frappe, c'est-à-dire au plus mauvais moment pour écrire un script.
+  La version se lit désormais dans `pyproject.toml`, seule source de vérité, et `tools/publish-resume.sh` sert toutes les releases à venir sans édition.
+  Généraliser a révélé un trou dans `tools/check_pypi_completeness.py`.
+  Celui-ci demandait « cette distribution a-t-elle été publiée un jour », alors que la question d'une release est « la version qu'on publie est-elle servie partout ».
+  Une distribution restée en rc2 pendant que les vingt-sept autres passent en rc3 le satisfaisait donc, alors que la release est partielle et que personne ne peut épingler la nouvelle version.
+  Le script de reprise posait bien cette question, mais dans son coin, avec sa propre lecture de PyPI, forcément divergente.
+  Mesuré : elle comptait une version retirée comme installable, et déduisait les noms de distribution des noms de dossier.
+  La question rejoint le garde sous `--version`, qui accepte les deux écritures d'une même version, SemVer pour les tags et PEP 440 pour les distributions.
+  Le script de reprise l'appelle au lieu de relire PyPI (principe 11).
+  Enfin, `tools/publish.sh` vérifie lui-même, après avoir publié, que PyPI sert bien la version pour les 28 distributions.
+  Sans cet appel, la vérification dépendait de la mémoire de qui publie, aucune documentation ne portant la séquence.
+  Un délai de réindexation ne doit pas faire crier le garde sur un envoi réussi, d'où trois tentatives espacées.
+
 ## [1.0.0-rc.3] - 2026-07-30
 
 Troisième release candidate.
