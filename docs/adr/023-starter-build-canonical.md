@@ -4,6 +4,10 @@
 
 Accepté, Forge 1.0.0-beta.13 (ticket `CLI-NEW-DROP-STARTER-001`).
 
+**Remplacé** par l'[ADR-035](035-starters-manual-not-generated.md), Forge 1.0.0-beta.16.
+La commande `forge starter:build` décrite ici n'existe plus, les parcours étant désormais réalisés à la main.
+Ce document reste consultable pour la décision qu'il enregistre, non comme instruction.
+
 ---
 
 ## Date

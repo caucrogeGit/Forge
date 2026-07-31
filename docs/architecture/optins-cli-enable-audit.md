@@ -1,3 +1,7 @@
+<!-- check-docs-symbols: ignore -->
+<!-- Document de conception : conserve à dessein le nom d'époque `optin:enable`,
+     renommé `opt-in:enable` par l'ADR-016. Voir l'encart ci-dessous. -->
+
 # Audit `forge optin:enable`
 
 !!! note "Renommage CLI (ADR-016)"

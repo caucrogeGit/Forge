@@ -3,6 +3,22 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **Un garde qui vérifie que la documentation nomme du code existant (`DOC-CODE-ADEQUATION-001`).**
+  Une page qui montre `from forge_mvc_x import Y` promet que `Y` s'importe, et une qui écrit `forge machin:truc` promet que la commande existe.
+  Rien ne le vérifiait, et le seul retour possible était celui d'un lecteur qui essaie.
+  Forge a pourtant beaucoup renommé, extrait et supprimé depuis la 0.x, et la documentation suit à la main.
+  `tools/check_docs_symbols.py` lit les blocs de code de toute la documentation embarquée, en extrait les imports visant Forge et les appels au CLI, puis demande à l'interpréteur et au CLI eux-mêmes si cela existe.
+  Il ne juge pas le sens, seulement l'existence, seule chose vérifiable sans ambiguïté.
+  État mesuré du dépôt : **1192 imports et 619 appels de commande, tous valides**, dont 635 imports et 180 commandes dans les seuls parcours d'accueil.
+  Trois exclusions, toutes motivées. Les archives de `docs/history/` conservent à dessein du code supprimé.
+  Un ADR qui déclare son remplacement décrit un état passé et doit continuer de montrer ce qu'il a fait adopter, sans quoi on réécrirait la décision qu'il enregistre.
+  Une page peut enfin se déclarer hors contrôle par un marqueur explicite, ce qui vaut mieux qu'une liste de répertoires exclus se remplissant en silence (principe 3).
+  Le garde appartient à la boucle **code** et non à la boucle documentaire, la dérive naissant le plus souvent d'un symbole renommé ou d'une commande retirée.
+  Deux péremptions trouvées à la première exécution. L'ADR-023 se déclarait « Accepté » alors que l'ADR-035 a retiré `forge starter:build`, si bien qu'un lecteur y trouvait la façon canonique de faire une chose impossible ; son statut annonce désormais son remplacement.
+  Une page d'architecture conservait un nom d'époque en le disant dans son texte, mais sans que rien ne le rende lisible par la machine.
+
 ### Corrigé
 
 - **Une erreur d'environnement sortait en trace Python, pas en message (`CLI-ERROR-BOUNDARY-001`).**
