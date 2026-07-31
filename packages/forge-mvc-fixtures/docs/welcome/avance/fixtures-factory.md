@@ -57,8 +57,11 @@ Vous pouvez écrire les données à la main, les calculer, ou piocher dans une l
 Lancez la génération et lisez le `.sql` produit :
 
 ```bash
-forge fixtures:generate ville --rows 3 --seed 1
+forge fixtures:generate ville --rows 3 --seed 1 --force
 ```
+
+`--force` est nécessaire ici : `ville.sql` existe déjà, produit au niveau intermédiaire, et Forge n'écrase jamais un fichier sans un geste explicite (charte, principe 9).
+C'est justement la boucle de travail de ce palier, où l'on régénère encore et encore le même fichier.
 
 Vous voyez immédiatement le SQL que votre code a fabriqué, chaque valeur rendue correctement pour votre backend.
 Modifiez la factory, régénérez, comparez : la rétroaction est directe.

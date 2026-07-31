@@ -9,9 +9,19 @@ Objectif : produire un fichier de fixtures depuis une factory, au lieu de taper 
 Écrire cinquante villes à la main est fastidieux et peu réaliste.
 Une **factory** décrit comment produire des lignes ; Forge génère ensuite le `.sql` à partir d'elle.
 
-## Échafauder la factory
+## Déclarer l'entité visée
 
-En supposant une entité `ville` déjà déclarée (`forge make:entity ville`) :
+Une factory se déduit d'un contrat d'entité, il en faut donc un.
+
+```bash
+forge make:entity ville --no-input
+forge db:apply
+```
+
+Sans le contrat, `fixtures:make-factory` refuse, faute de quoi lire.
+Sans `db:apply`, la table n'existe pas encore et le chargement des fixtures échouera sur un `no such table`.
+
+## Échafauder la factory
 
 ```bash
 forge fixtures:make-factory ville
