@@ -30,6 +30,18 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **`forge make:entity` décrit enfin une entité entière sans terminal (`ENTITIES-NON-INTERACTIVE-001`).**
+  `--no-input` ne posait qu'une entité minimale, aux champs imposés.
+  Décrire ses propres champs exigeait donc un humain devant un dialogue, ce qui mettait la modélisation hors d'atteinte d'un script, de l'intégration continue et d'un agent, alors que Forge écrit lui-même la guidance des agents (ADR-047).
+  Constaté en jouant le parcours des fixtures, dont le palier des fixtures reliées suppose une entité portant une clé étrangère.
+  `--field "nom:type:attributs"` décrit les champs un à un, avec `--table`, `--timestamps` et `--soft-delete` pour le reste.
+  Les attributs sont ceux du dialogue, `required` ou `optional`, `nullable`, `unique`, `max_length=N`, `precision=N` et `scale=N`, et **les défauts aussi**, sans quoi les deux modes produiraient des entités différentes pour la même intention.
+  Ce que le dialogue exige, la ligne de commande l'exige de même, un `decimal` sans précision étant refusé des deux côtés.
+  Deux types manquaient au générateur, tous deux adossés à un ADR. `slug` est canonique depuis l'ADR-017, `foreign_key` est un champ de première classe depuis l'ADR-069.
+  La liste des types vivait en dur dans le générateur et avait dérivé, douze contre quatorze au schéma, si bien qu'aucun générateur ne savait produire ces deux types.
+  Elle est désormais **lue du schéma canonique** (ADR-058), seule façon de ne plus diverger.
+  Le champ déclare la colonne, au type de la clé primaire visée ; la contrainte reste portée par `relations.json`, conformément à l'ADR-069.
+
 ### Corrigé
 
 - **`forge migration:make` sans nom rendait un `IndexError` (`ENTITIES-MIGRATION-MAKE-USAGE-001`).**

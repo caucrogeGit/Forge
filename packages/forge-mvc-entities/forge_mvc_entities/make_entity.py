@@ -8,6 +8,23 @@ Usage :
     forge make:entity
     forge make:entity Contact
     forge make:entity Contact --no-input
+    forge make:entity Contact --table contacts \
+        --field "nom:string:max_length=120,unique" \
+        --field "age:integer:optional,nullable" \
+        --timestamps --soft-delete
+
+`--no-input` seul pose une entite minimale. `--field` decrit les champs un a un
+et rend le mode non interactif l'egal exact du dialogue : meme surface, memes
+defauts, meme validation (ENTITIES-NON-INTERACTIVE-001).
+
+Grammaire d'un champ :
+
+    nom:type[:attribut,attribut,...]
+
+    type          string, text, integer, big_integer, float, decimal,
+                  boolean, date, datetime, email, password, json
+    attributs     required (defaut), optional, nullable, unique,
+                  max_length=N (string), precision=N et scale=N (decimal)
 """
 
 from __future__ import annotations
@@ -25,20 +42,29 @@ from forge_mvc_entities.validation import (
     validate_entity_definition,
 )
 
-FORGE_TYPES = (
-    "string",
-    "text",
-    "integer",
-    "big_integer",
-    "float",
-    "decimal",
-    "boolean",
-    "date",
-    "datetime",
-    "email",
-    "password",
-    "json",
-)
+def _types_canoniques() -> tuple[str, ...]:
+    """Les types du schema canonique, lus et non recopies (ADR-058).
+
+    La liste vivait ici en dur et avait derive : elle en comptait douze quand le
+    schema en declarait quatorze. Manquaient `slug`, type canonique depuis
+    l'ADR-017, et `foreign_key`, champ d'entite de premiere classe depuis
+    l'ADR-069. Deux types adosses a un ADR qu'aucun generateur ne savait donc
+    produire (ENTITIES-NON-INTERACTIVE-001).
+    """
+    import json as _json
+
+    import cli.schemas
+
+    chemin = cli.schemas.__file__
+    assert chemin is not None
+    schema = _json.loads(
+        (Path(chemin).resolve().parent / "field.schema.json").read_text(encoding="utf-8")
+    )
+    types = schema["properties"]["type"]["enum"]
+    return tuple(str(t) for t in types)
+
+
+FORGE_TYPES = _types_canoniques()
 
 
 def project_root() -> Path:
@@ -214,6 +240,100 @@ def _build_canonical_field(*, input_fn: Callable[[str], str] | None = None) -> d
     return field
 
 
+def parse_field_spec(spec: str) -> dict[str, Any]:
+    """Traduit « nom:type:attributs » en champ canonique.
+
+    Les defauts sont ceux du dialogue, sans quoi les deux modes produiraient des
+    entites differentes pour la meme intention : requis, non nul, non unique.
+    """
+    parts = spec.split(":")
+    if len(parts) < 2 or len(parts) > 3:
+        raise ValueError(
+            f"Champ mal forme : «{spec}». Attendu «nom:type» ou «nom:type:attributs»."
+        )
+    name = parts[0].strip()
+    forge_type = parts[1].strip().lower()
+    if not name:
+        raise ValueError(f"Champ sans nom : «{spec}».")
+    if forge_type not in FORGE_TYPES:
+        raise ValueError(
+            f"Type invalide «{forge_type}» pour le champ «{name}». "
+            f"Valeurs attendues : {', '.join(FORGE_TYPES)}."
+        )
+
+    field: dict[str, Any] = {"name": name, "type": forge_type,
+                             "required": True, "nullable": False, "unique": False}
+
+    attributs = [a.strip() for a in parts[2].split(",")] if len(parts) == 3 else []
+    for attribut in attributs:
+        if not attribut:
+            continue
+        if attribut == "required":
+            field["required"] = True
+        elif attribut == "optional":
+            field["required"] = False
+        elif attribut == "nullable":
+            field["nullable"] = True
+        elif attribut == "unique":
+            field["unique"] = True
+        elif "=" in attribut:
+            cle, _, valeur = attribut.partition("=")
+            cle = cle.strip()
+            if cle == "references":
+                # Cible d'une cle etrangere, en PascalCase : la colonne adopte
+                # le type de la cle primaire de l'entite visee (ADR-069).
+                field["references"] = valeur.strip()
+                continue
+            if cle not in {"max_length", "precision", "scale"}:
+                raise ValueError(
+                    f"Attribut inconnu «{cle}» sur le champ «{name}». "
+                    "Attendus : max_length, precision, scale, references."
+                )
+            try:
+                field[cle] = int(valeur)
+            except ValueError:
+                raise ValueError(
+                    f"L'attribut «{cle}» du champ «{name}» attend un entier, "
+                    f"reçu «{valeur}»."
+                ) from None
+        else:
+            raise ValueError(
+                f"Attribut inconnu «{attribut}» sur le champ «{name}». "
+                "Attendus : required, optional, nullable, unique, "
+                "max_length=N, precision=N, scale=N."
+            )
+
+    if forge_type == "decimal" and ("precision" not in field or "scale" not in field):
+        raise ValueError(
+            f"Le champ decimal «{name}» exige precision=N et scale=N, "
+            "comme le dialogue les demande."
+        )
+    if forge_type == "foreign_key" and "references" not in field:
+        raise ValueError(
+            f"Le champ foreign_key «{name}» exige references=Entite, "
+            "l'entite visee en PascalCase (ADR-069)."
+        )
+    return field
+
+
+def build_entity_json_from_specs(
+    entity_name: str,
+    *,
+    table: str | None,
+    field_specs: list[str],
+    timestamps: bool,
+    soft_delete: bool,
+) -> dict[str, Any]:
+    """Meme structure que le dialogue, sans terminal."""
+    return {
+        "schema_version": "1.0",
+        "name": entity_name,
+        "table": table or to_snake(entity_name),
+        "fields": [parse_field_spec(spec) for spec in field_specs],
+        "options": {"timestamps": timestamps, "soft_delete": soft_delete},
+    }
+
+
 def build_entity_json_interactively(
     entity_name: str | None = None,
     *,
@@ -283,27 +403,70 @@ def _render_entity_summary(entity_definition: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def _parse_args(args: list[str]) -> tuple[str | None, bool]:
-    entity_name: str | None = None
-    interactive = True
+class _Options:
+    """Ce que la ligne de commande a demande."""
 
-    for arg in args:
+    def __init__(self) -> None:
+        self.entity_name: str | None = None
+        self.interactive: bool = True
+        self.table: str | None = None
+        self.fields: list[str] = []
+        self.timestamps: bool = False
+        self.soft_delete: bool = False
+
+
+def _valeur_suivante(args: list[str], index: int, option: str) -> str:
+    if index + 1 >= len(args):
+        print(out.error(f"L'option {option} attend une valeur."))
+        raise SystemExit(1)
+    return args[index + 1]
+
+
+def _parse_args(args: list[str]) -> _Options:
+    options = _Options()
+    saute = False
+
+    for index, arg in enumerate(args):
+        if saute:
+            saute = False
+            continue
         if arg in {"-h", "--help"}:
             print((__doc__ or "").strip())
             raise SystemExit(0)
         if arg == "--no-input":
-            interactive = False
+            options.interactive = False
             continue
         if arg == "--interactive":
-            interactive = True
+            options.interactive = True
             continue
-        if entity_name is None:
-            entity_name = arg.strip()
+        if arg == "--table":
+            options.table = _valeur_suivante(args, index, "--table").strip()
+            saute = True
+            continue
+        if arg == "--field":
+            options.fields.append(_valeur_suivante(args, index, "--field"))
+            # Decrire des champs, c'est repondre au dialogue : l'exiger EN PLUS
+            # de --no-input ferait echouer la forme evidente sur un detail.
+            options.interactive = False
+            saute = True
+            continue
+        if arg == "--timestamps":
+            options.timestamps = True
+            continue
+        if arg == "--soft-delete":
+            options.soft_delete = True
+            continue
+        if arg.startswith("-"):
+            print(out.error(f"Option inconnue : {arg}."))
+            print((__doc__ or "").strip())
+            raise SystemExit(1)
+        if options.entity_name is None:
+            options.entity_name = arg.strip()
             continue
         print((__doc__ or "").strip())
         raise SystemExit(1)
 
-    return entity_name, interactive
+    return options
 
 
 def _write_entity_files(
@@ -687,7 +850,8 @@ def ensure_file(path: Path, content: str, created: list[Path], skipped: list[Pat
 
 def main(argv: list[str] | None = None) -> None:
     args = list(sys.argv[1:] if argv is None else argv)
-    entity_name_arg, interactive = _parse_args(args)
+    options = _parse_args(args)
+    entity_name_arg, interactive = options.entity_name, options.interactive
 
     if not interactive and entity_name_arg is None:
         print("Usage : forge make:entity Contact --no-input")
@@ -699,8 +863,20 @@ def main(argv: list[str] | None = None) -> None:
             if entity_name_arg is not None:
                 validated_name = validate_entity_name(entity_name_arg)
             entity_definition = build_entity_json_interactively(validated_name)
+        elif options.fields:
+            entity_definition = build_entity_json_from_specs(
+                validate_entity_name(entity_name_arg or ""),
+                table=options.table,
+                field_specs=options.fields,
+                timestamps=options.timestamps,
+                soft_delete=options.soft_delete,
+            )
         else:
             entity_definition = build_entity_json_canonical(validate_entity_name(entity_name_arg or ""))
+            if options.table:
+                entity_definition["table"] = options.table
+            entity_definition["options"] = {"timestamps": options.timestamps,
+                                            "soft_delete": options.soft_delete}
     except ValueError as exc:
         print(out.error(str(exc)))
         raise SystemExit(1)
