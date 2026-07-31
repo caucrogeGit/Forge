@@ -27,6 +27,17 @@ Troisième release candidate.
 Elle porte trois cycles de pré-mortem sur la couche d'accès aux données et sur les opt-ins, une chaîne de publication qui vérifie enfin ce qu'elle publie, et le dernier scénario connu où un projet restait bloqué sans outil.
 Les quatre backends de base de données sont éprouvés contre de vrais serveurs sous panne, saturation, concurrence et verrou, et la DML des opt-ins adossés à la base cesse de supposer MariaDB.
 
+### Sécurité
+
+- **Un saut de ligne dans un en-tête de réponse découpait la réponse (`CORE-HEADER-CRLF-001`).**
+  Les valeurs d'en-tête partaient telles quelles vers le client.
+  Or un `CR` ou un `LF` termine la ligne pour lui, qui lit la suite comme un nouvel en-tête, voire comme le début du corps.
+  Il suffisait qu'une application reprenne une donnée utilisateur dans un en-tête, un nom de fichier en `Content-Disposition` ou une cible en `Location`, pour qu'un attaquant pose l'en-tête de son choix, `Set-Cookie` compris, ou fasse servir son propre corps de réponse.
+  Mesuré sur la pile WSGI réelle, quatre charges sur quatre sortaient avec leur saut intact, sur les deux chemins de sortie.
+  Forge **refuse** désormais la réponse plutôt que de retirer le caractère en silence, car retirer modifierait une donnée applicative sans le dire, et la norme HTTP n'admet aucun saut de ligne dans une valeur.
+  La règle vit dans `core.security.headers`, source unique partagée par les deux émetteurs, et s'exécute avant la première ligne envoyée.
+  Le serveur de développement émet ses en-têtes un par un, si bien que refuser après coup n'aurait servi à rien ; les cookies accumulés hors du dictionnaire d'en-têtes sont couverts aussi.
+
 ### Ajouté
 
 - **Un ADR canonique pour le style rédactionnel de la documentation (`ADR-087`).**
@@ -38,6 +49,15 @@ Les quatre backends de base de données sont éprouvés contre de vrais serveurs
   Les cinq autres règles relèvent du jugement : un contrôle approximatif produirait des faux positifs qui feraient désactiver l'ensemble.
 
 ### Corrigé
+
+- **La validation de release portait sur le mauvais interpréteur (`RELEASE-VALIDATE-INTERPRETER-001`).**
+  `tools/release-validate.sh` résolvait `python3` depuis le `PATH` et se contentait de vérifier qu'il existe.
+  Or il en existe un sur toute machine, si bien que le script lancé sans venv actif validait l'interpréteur du système, où ni Forge ni l'outillage ne sont installés.
+  Mesuré sur une validation réelle de la rc3, deux échecs sur trois étaient des faux positifs de cette nature.
+  Le sens inverse est plus grave et n'avait pas encore été rencontré, un interpréteur portant une version ancienne de Forge donnant un feu vert sur autre chose que ce qu'on s'apprête à publier.
+  Le script vérifie désormais que la **distribution** `forge-mvc` est installée, et non qu'un `import core` réussit, ce dernier passant depuis la racine du dépôt avec n'importe quel interpréteur.
+  Il compare ensuite la version installée à celle du `pyproject.toml`, puis contrôle la présence de l'outillage qu'il appelle.
+  Le garde s'exécute avant les étapes coûteuses, découvrir l'erreur après vingt minutes de tests étant sans intérêt.
 
 - **La documentation d'installation des opt-ins donnait une commande qui ne fait rien (`DOC-OPTIN-INSTALL-PROCEDURE-001`).**
   Les pages de référence écrivaient `forge opt-in:enable <nom>`, or cette commande est en **dry-run par défaut** : sans `--apply`, rien n'est écrit. **19 références sur 22** donnaient donc une instruction qui laisse croire l'opt-in activé alors que `optins/registry.py` reste inchangé. Corrigé partout.
