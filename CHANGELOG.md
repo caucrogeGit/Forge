@@ -30,6 +30,17 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Un projet neuf échouait à son propre `make check` (`SKELETON-PYTEST-PYTHONPATH-001`).**
+  Constaté en jouant les chapitres « Mise en service » des références, dont 22 sur 26 font lancer `make check`.
+  Sur un projet à peine créé par `forge new`, sans que rien n'y soit fait, la collecte s'arrêtait sur `ModuleNotFoundError: No module named 'mvc'`.
+  La cause tenait à une différence que rien n'annonçait. `python -m pytest` insère le répertoire courant dans `sys.path`, le script console `pytest` ne le fait pas, et c'est ce dernier que le `Makefile` lance.
+  Les tests passaient donc sous une forme et échouaient sous l'autre, ce qui rendait le défaut difficile à voir et facile à croire résolu.
+  `pythonpath = .` dans le `pytest.ini` du squelette fait tenir les deux formes.
+  Le motif est écrit à côté de la ligne, sans quoi elle passerait pour superflue au prochain nettoyage.
+  Un garde-fou existait pourtant, mais il vérifiait que le `Makefile` **contient** ses cibles, sans jamais rien lancer.
+  Le nouveau **exécute** pytest sur un projet reconstitué, dans les deux modes d'invocation, et vérifie en outre que le défaut revient si la ligne est retirée : un garde qui passerait aussi sans le correctif ne garderait rien.
+  `lint`, `typage` et `docs` passaient déjà ; seule `test` échouait, c'est-à-dire la cible qui donne son sens à l'apparat qualité que l'ADR-063 fait livrer.
+
 - **Un garde de fraîcheur pour les diagrammes UML des références (`DOC-UML-FRESHNESS-001`).**
   Chaque page de référence porte un chapitre « Schémas UML », soit 27 diagrammes de classe et 27 de séquence.
   Dessinés à la main, ils vieillissent en silence, et un schéma périmé garde l'autorité que donne un dessin.
