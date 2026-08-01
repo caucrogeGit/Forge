@@ -30,6 +30,14 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Le câblage généré par `opt-in:enable` ne passait pas la porte qualité du projet (`OPTINS-GENERATED-TYPING-001`).**
+  Second défaut de la même famille, révélé en débloquant le premier.
+  `opt-in:enable` écrivait `optins/<nom>/routes.py` avec `def register(router) -> None:`, paramètre non annoté.
+  Le squelette livrant un pyright strict (ADR-063), `make typage` refusait donc le code que Forge venait d'écrire.
+  La forme retenue n'est pas inventée : c'est celle que le `optins/registry.py` du squelette emploie déjà, un import gardé par `TYPE_CHECKING`.
+  Deux générateurs de la même couche écrivaient deux conventions différentes.
+  Les trois parcours de `audio`, `video` et `iot` se déroulent désormais de bout en bout, ce qui achève de les débloquer.
+
 - **`optins/__init__.py` vivait en double, et les trois opt-ins routiers en pâtissaient (`OPTINS-INIT-SOURCE-UNIQUE-001`).**
   Le squelette en livrait une version, `cli/optins/enable.py` en portait une autre dans une constante.
   Les deux disaient la même chose, écrite différemment, 319 caractères contre 349, et elles avaient dérivé.

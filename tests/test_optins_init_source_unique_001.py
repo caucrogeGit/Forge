@@ -84,3 +84,42 @@ def test_le_fichier_partage_est_traite_comme_partage() -> None:
     partages = source[source.index("_SHARED_FILES"):source.index("REGISTRY_REL")]
 
     assert '"optins/__init__.py"' in partages
+
+
+# ── Le code généré doit passer la porte qualité que Forge installe ───────────
+
+@pytest.mark.parametrize("optin", ["iot", "video", "audio"])
+def test_le_cablage_genere_annote_son_parametre(optin: str) -> None:
+    """Le squelette livre un pyright strict : un paramètre non annoté faisait
+    échouer `make typage` sur le code que Forge venait d'écrire.
+
+    Second défaut de la même famille que `pytest.ini`, révélé en débloquant le
+    premier : Forge produisait du code refusé par la porte qualité qu'il
+    installe lui-même (OPTINS-GENERATED-TYPING-001).
+    """
+    from cli.optins import enable
+
+    gabarit = getattr(enable, f"_{optin.upper()}_ROUTES")
+
+    assert "def register(router: Router) -> None:" in gabarit
+    assert "if TYPE_CHECKING:" in gabarit
+    assert "from core.http.router import Router" in gabarit
+
+
+def test_aucun_cablage_genere_ne_laisse_un_parametre_nu() -> None:
+    """Un nouveau gabarit copié sur un ancien reprendrait le défaut."""
+    source = (PROJECT_ROOT / "cli" / "optins" / "enable.py").read_text(
+        encoding="utf-8")
+
+    assert "def register(router) -> None:" not in source
+
+
+def test_le_squelette_annote_deja_ainsi() -> None:
+    """La forme retenue n'est pas inventée : c'est celle que `optins/registry.py`
+    du squelette emploie déjà. Deux générateurs de la même couche doivent
+    écrire la même chose."""
+    registry = (PROJECT_ROOT / "skeleton" / "data" / "optins"
+                / "registry.py").read_text(encoding="utf-8")
+
+    assert "if TYPE_CHECKING:" in registry
+    assert "from core.http.router import Router" in registry

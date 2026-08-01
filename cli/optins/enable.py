@@ -114,10 +114,15 @@ que le câblage. Appelé par `optins/registry.py`.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from forge_mvc_iot import register_iot_routes
 
+if TYPE_CHECKING:  # pragma: no cover - annotation seulement
+    from core.http.router import Router
 
-def register(router) -> None:
+
+def register(router: Router) -> None:
     """Expose l'API HTTP IoT officielle (lecture seule) :
 
     - GET /api/iot/events
@@ -219,10 +224,15 @@ que le câblage. Appelé par `optins/registry.py`.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from forge_mvc_video import register_video_routes
 
+if TYPE_CHECKING:  # pragma: no cover - annotation seulement
+    from core.http.router import Router
 
-def register(router) -> None:
+
+def register(router: Router) -> None:
     """Expose les routes vidéo (lecture en streaming, etc.)."""
     register_video_routes(router)
 '''
@@ -279,10 +289,15 @@ que le câblage. Appelé par `optins/registry.py`.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from forge_mvc_audio import register_audio_routes
 
+if TYPE_CHECKING:  # pragma: no cover - annotation seulement
+    from core.http.router import Router
 
-def register(router) -> None:
+
+def register(router: Router) -> None:
     """Expose les routes audio (lecture en streaming, etc.)."""
     register_audio_routes(router)
 '''
