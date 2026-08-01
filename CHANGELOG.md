@@ -30,6 +30,14 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Le palier des fixtures reliées se déroule enfin (`WELCOME-FIXTURES-RELIEES-001`).**
+  Il relie un `eleve` à un compte `users` sans coder d'`Id` en dur, mais ne préparait aucune des deux tables.
+  Il était le dernier arrêt du parcours des fixtures, et il l'est resté tant que déclarer une entité avec ses champs exigeait un terminal ; les modes non interactifs livrés juste avant l'ont débloqué.
+  La page pose désormais `make:auth`, `auth:init`, l'entité `Eleve` et `db:apply` avant d'échafauder sa factory.
+  Elle précise aussi que `user_id` est ici un **entier ordinaire** et non un champ `foreign_key`, distinction dont dépend le nom de colonne que la factory doit employer, `UserId` contre `user_id`.
+  Le parcours des fixtures passe de bout en bout, **dix-sept blocs, aucun saut, aucune substitution**.
+  Vérifié au passage, exact au mot près : `self.reference()` produit bien la sous-requête que la page montre.
+
 - **Le harnais pose le code des parcours et le compile (`WELCOME-CODE-PLACEMENT-001`).**
   Douze parcours sur vingt-sept n'ont **aucun** bloc `bash` : ils font écrire du code, puis se vérifient au navigateur.
   Leur code n'était donc soumis à rien, alors qu'il est précisément ce que le lecteur recopie.

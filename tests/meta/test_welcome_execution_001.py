@@ -282,3 +282,39 @@ def test_les_blocs_sont_lus_dans_l_ordre_du_document() -> None:
     assert "python" in langages and "bash" in langages
     lignes = [ligne for ligne, _lang, _c in ordonnes]
     assert lignes == sorted(lignes)
+
+
+# ── Le palier des fixtures reliées, débloqué ─────────────────────────────────
+
+def test_les_fixtures_reliees_preparent_leurs_deux_tables() -> None:
+    """Ce palier relie `eleve` à `users` : il lui faut les deux.
+
+    Il était le dernier arrêt du parcours des fixtures, faute de pouvoir
+    déclarer une entité avec ses champs sans terminal. Les modes non interactifs
+    de `make:entity` l'ont débloqué (ENTITIES-NON-INTERACTIVE-001).
+    """
+    page = (PROJECT_ROOT / "packages" / "forge-mvc-fixtures" / "docs" / "welcome"
+            / "avance" / "fixtures-reliees.md").read_text(encoding="utf-8")
+
+    for commande in ("forge make:auth", "forge auth:init", "forge db:apply"):
+        assert commande in page, f"{commande} manque aux prérequis du palier"
+    assert page.index("forge make:auth") < page.index("fixtures:make-factory eleve")
+
+
+def test_le_champ_user_id_est_annonce_comme_entier() -> None:
+    """La page enseigne la différence de nommage entre un entier (`UserId`) et
+    un champ `foreign_key` (`user_id`) : la confondre égarerait sa factory."""
+    page = (PROJECT_ROOT / "packages" / "forge-mvc-fixtures" / "docs" / "welcome"
+            / "avance" / "fixtures-reliees.md").read_text(encoding="utf-8")
+
+    assert 'user_id:integer' in page
+    assert "entier ordinaire" in page
+
+
+def test_une_commande_deja_non_interactive_n_est_pas_substituee() -> None:
+    """Annoncer un geste qu'on ne fait pas trompe autant que taire celui
+    qu'on fait."""
+    script = 'forge make:entity Eleve --field "nom:string"'
+    _joue, substitution = harnais.substituer(script)
+
+    assert substitution is None

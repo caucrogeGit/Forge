@@ -78,6 +78,14 @@ EQUIVALENTS: "dict[str, str]" = {
     "forge make:entity": "--no-input",
 }
 
+#: Options qui rendent DÉJÀ la commande non interactive.
+#:
+#: Sans elles, le harnais ajoutait `--no-input` à un `make:entity --field …`
+#: qui décrivait pourtant ses champs, et annonçait une substitution là où il
+#: n'y avait rien à substituer. Annoncer un geste qu'on ne fait pas est aussi
+#: trompeur que taire celui qu'on fait.
+DEJA_NON_INTERACTIF = ("--field", "--no-input")
+
 #: Commandes interactives SANS option documentée pour s'en passer.
 #:
 #: Vide depuis `ENTITIES-NON-INTERACTIVE-001` et `-002`, qui ont ouvert
@@ -238,7 +246,7 @@ def substituer(script: str) -> "tuple[str, str | None]":
     for commande, option in EQUIVALENTS.items():
         lignes = script.splitlines()
         for index, ligne in enumerate(lignes):
-            if commande in ligne and option not in ligne:
+            if commande in ligne and not any(o in ligne for o in DEJA_NON_INTERACTIF):
                 lignes[index] = f"{ligne.rstrip()} {option}"
                 return "\n".join(lignes), f"{commande} + {option}"
     return script, None

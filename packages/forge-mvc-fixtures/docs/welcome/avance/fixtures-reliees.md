@@ -4,6 +4,23 @@ Objectif : produire un jeu de données réaliste où les tables se référencent
 
 **Ce que vous allez apprendre :** les colonnes réelles de vos factories, la référence à une autre table par une clé naturelle, et l'ordre de chargement qui respecte les clés étrangères.
 
+## Préparer les deux tables
+
+Ce palier relie deux tables, il faut donc que les deux existent.
+
+```bash
+forge make:auth
+forge auth:init
+forge make:entity Eleve --field "nom:string:max_length=80" --field "prenom:string:max_length=80" --field "user_id:integer"
+forge db:apply
+```
+
+`make:auth` puis `auth:init` posent la table `users` de l'authentification, celle que l'élève va référencer.
+`make:entity` déclare l'entité `Eleve` avec sa colonne `user_id`, et `db:apply` crée les tables en base.
+
+Le champ `user_id` est ici un **entier ordinaire**, pas un champ `foreign_key`.
+La distinction se voit dans le nom de colonne, et la section suivante l'explique.
+
 ## Les colonnes sont celles de la table
 
 Une factory produit un dict dont les clés sont les **colonnes réelles** de la table, pas les noms de champs du contrat.
