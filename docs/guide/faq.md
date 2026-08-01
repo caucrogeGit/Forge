@@ -6,6 +6,25 @@ Cette page regroupe les questions fréquentes retirées de la landing page. La l
 
 ---
 
+## Mon `make check` échoue sur `No module named 'mvc'`
+
+Votre projet a été créé avec une version de Forge antérieure au correctif `SKELETON-PYTEST-PYTHONPATH-001`.
+Le `pytest.ini` livré alors ne rendait pas la racine du projet importable, si bien que les tests ne trouvaient pas le paquet `mvc`.
+
+Ajoutez cette ligne dans le `pytest.ini` de votre projet, sous `testpaths` :
+
+```ini
+pythonpath = .
+```
+
+Une montée de version de Forge ne le fera **pas** à votre place.
+`forge skeleton:upgrade` ajoute les fichiers manquants mais ne réécrit jamais les vôtres (principe 9), et `pytest.ini` vous appartient dès qu'il existe.
+
+Le symptôme ne se voyait que sous une forme d'invocation : `python -m pytest` insère le répertoire courant dans `sys.path`, le script `pytest` ne le fait pas, et c'est ce dernier que le `Makefile` lance.
+Si vos tests passaient d'un côté et échouaient de l'autre, c'était cela.
+
+---
+
 ## Que génère `forge make:crud` ?
 
 `forge make:crud` génère le squelette MVC nécessaire pour administrer une entité :

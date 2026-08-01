@@ -40,6 +40,8 @@
   Un garde-fou existait pourtant, mais il vérifiait que le `Makefile` **contient** ses cibles, sans jamais rien lancer.
   Le nouveau **exécute** pytest sur un projet reconstitué, dans les deux modes d'invocation, et vérifie en outre que le défaut revient si la ligne est retirée : un garde qui passerait aussi sans le correctif ne garderait rien.
   `lint`, `typage` et `docs` passaient déjà ; seule `test` échouait, c'est-à-dire la cible qui donne son sens à l'apparat qualité que l'ADR-063 fait livrer.
+  **Les projets déjà créés ne sont pas rattrapés.** `forge skeleton:upgrade` ajoute les fichiers manquants mais ne réécrit jamais les vôtres (principe 9), et `pytest.ini` vous appartient dès qu'il existe.
+  Il faut donc y ajouter `pythonpath = .` à la main ; la [FAQ](guide/faq.md) le rappelle avec le symptôme qui met sur la piste.
 
 - **Un garde de fraîcheur pour les diagrammes UML des références (`DOC-UML-FRESHNESS-001`).**
   Chaque page de référence porte un chapitre « Schémas UML », soit 27 diagrammes de classe et 27 de séquence.
