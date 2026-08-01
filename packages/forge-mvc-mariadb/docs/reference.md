@@ -153,14 +153,17 @@ Forge n'impose aucun backend de référence.
 
     #### 5. Vérifier et appliquer
 
-    La base et les comptes créés, vérifiez la connexion puis créez le schéma des entités :
+    La base et les comptes créés, vérifiez la connexion :
 
     ```bash
     forge doctor
-    forge db:apply
     ```
 
     `forge doctor` indique le backend résolu et l'état de la connexion (la ligne `Base de données` doit passer `[OK]`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=mariadb`.
+    C'est ce qui atteste que la mise en service est terminée.
+
+    Le schéma des entités vient ensuite, avec `forge db:apply`, une fois que vous en aurez déclaré.
+    Le lancer maintenant échouerait sur `mvc/entities/relations.sql` introuvable, un projet neuf n'ayant aucune entité.
 
 
 ??? note "4. Désinstallation"

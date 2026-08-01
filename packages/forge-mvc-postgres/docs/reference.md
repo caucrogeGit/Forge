@@ -119,6 +119,21 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
     `forge doctor` confirme le backend résolu (`postgres`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=postgres`.
 
+    Exécutez ce SQL, soit en le collant dans une session d'administration, soit en laissant Forge le faire :
+
+    ```bash
+    forge db:init --run
+    ```
+
+    Vérifiez enfin que le cœur atteint la base :
+
+    ```bash
+    forge doctor
+    ```
+
+    La ligne `Base de données` doit passer `[OK]` ; si plusieurs backends sont installés, fixez `DB_BACKEND=postgres`.
+    C'est ce qui atteste que la mise en service est terminée.
+
     La progression guidée, pas à pas : [Installation de forge-mvc-postgres](welcome/debutant/postgres-welcome.md).
 
 ??? note "4. Désinstallation"

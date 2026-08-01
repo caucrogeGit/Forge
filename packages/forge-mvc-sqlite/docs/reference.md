@@ -96,8 +96,16 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     DB_NAME=storage/mon_projet.db
     ```
 
-    `forge doctor` confirme le backend résolu (`sqlite`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=sqlite`.
-    `forge db:init` crée alors le fichier et la table technique `forge_migrations` : aucun serveur n'est contacté.
+    `forge db:init` crée ensuite le fichier et la table technique `forge_migrations` ; aucun serveur n'est contacté.
+    `forge doctor` confirme enfin le backend résolu (`sqlite`) et l'accès au fichier.
+
+    ```bash
+    forge db:init
+    forge doctor
+    ```
+
+    Si plusieurs backends sont installés, fixez `DB_BACKEND=sqlite`.
+    La ligne `Base de données` de `doctor` doit passer `[OK]` : c'est ce qui atteste que la mise en service est terminée.
 
     La progression guidée, pas à pas : [Installation de forge-mvc-sqlite](welcome/debutant/sqlite-welcome.md).
 

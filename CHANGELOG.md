@@ -30,6 +30,16 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Les quatre chapitres « Mise en service » des backends divergeaient (`REFERENCE-BACKENDS-SETUP-001`).**
+  Constaté en jouant les 26 chapitres des pages de référence, ceux que 22 opt-ins font suivre à leur lecteur.
+  `sqlite` s'arrêtait à `db:config` et ne créait jamais sa base : ses commandes `db:init` et `doctor` vivaient dans la prose, jamais dans un bloc, si bien qu'un lecteur qui copie les blocs repartait sans base de données.
+  `postgres` et `mssql` mentionnaient `doctor` de la même façon, en prose seulement, et n'exécutaient jamais le SQL de provisioning que `db:init` se contente d'afficher (ADR-067).
+  `mariadb`, le plus complet, allait jusqu'à `forge db:apply`, qui échoue sur `mvc/entities/relations.sql` introuvable tant qu'aucune entité n'est déclarée, ce qui est toujours le cas à ce stade.
+  Les quatre suivent désormais la même séquence, amorcer, provisionner, vérifier, et se terminent sur `forge doctor` dont la ligne `Base de données` atteste que la mise en service est faite.
+  Aucun n'applique de schéma, cette étape venant avec les entités.
+  Un garde-fou fige les trois points sur les quatre backends à la fois.
+  **Les 26 chapitres se déroulent désormais de bout en bout**, les trois backends serveur vérifiés contre MariaDB 11.8, PostgreSQL 17.10 et SQL Server 2022.
+
 - **Le câblage généré par `opt-in:enable` ne passait pas la porte qualité du projet (`OPTINS-GENERATED-TYPING-001`).**
   Second défaut de la même famille, révélé en débloquant le premier.
   `opt-in:enable` écrivait `optins/<nom>/routes.py` avec `def register(router) -> None:`, paramètre non annoté.

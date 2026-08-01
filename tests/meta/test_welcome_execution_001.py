@@ -373,3 +373,53 @@ def test_chaque_opt_in_porte_un_chapitre_de_mise_en_service() -> None:
             sans.append(court)
 
     assert sans == ["testing"], f"chapitre manquant pour : {', '.join(sans)}"
+
+
+# ── Les quatre chapitres « Mise en service » des backends ────────────────────
+
+def _sequence_mise_en_service(backend: str) -> "list[str]":
+    from tools.run_welcome_parcours import BLOC_BASH, _sans_retrait, decouper_section
+
+    page = (PROJECT_ROOT / "packages" / f"forge-mvc-{backend}" / "docs"
+            / "reference.md").read_text(encoding="utf-8")
+    section = decouper_section(page, "Mise en service")
+    lignes: "list[str]" = []
+    for m in BLOC_BASH.finditer(section):
+        lignes += [l.strip() for l in
+                   _sans_retrait(m.group(2), m.group(1)).strip().splitlines() if l.strip()]
+    return lignes
+
+
+@pytest.mark.parametrize("backend", ["sqlite", "mariadb", "postgres", "mssql"])
+def test_la_mise_en_service_se_termine_par_une_verification(backend: str) -> None:
+    """Les quatre divergeaient : `sqlite` s'arrêtait à `db:config` sans jamais
+    créer sa base, `postgres` et `mssql` mentionnaient `doctor` en prose sans
+    jamais le mettre dans un bloc, et seul `mariadb` l'exécutait.
+
+    Un lecteur qui copie les blocs doit finir sur une preuve que la base est
+    atteinte, sans quoi il croit avoir terminé sans l'avoir vérifié.
+    """
+    sequence = _sequence_mise_en_service(backend)
+
+    assert sequence, f"aucun bloc dans le chapitre de {backend}"
+    assert sequence[-1] == "forge doctor", (
+        f"{backend} ne finit pas sur une vérification : {sequence}")
+
+
+@pytest.mark.parametrize("backend", ["sqlite", "mariadb", "postgres", "mssql"])
+def test_la_mise_en_service_amorce_puis_provisionne(backend: str) -> None:
+    """`db:config` pose les clés, `db:init` crée la base : dans cet ordre."""
+    sequence = _sequence_mise_en_service(backend)
+
+    assert "forge db:config" in sequence
+    init = [c for c in sequence if c.startswith("forge db:init")]
+    assert init, f"{backend} ne provisionne jamais sa base"
+    assert sequence.index("forge db:config") < sequence.index(init[0])
+
+
+def test_aucune_mise_en_service_n_applique_de_schema() -> None:
+    """`db:apply` échoue tant qu'aucune entité n'existe, et un projet neuf n'en
+    a aucune : le chapitre de `mariadb` le lançait pourtant."""
+    for backend in ("sqlite", "mariadb", "postgres", "mssql"):
+        assert "forge db:apply" not in _sequence_mise_en_service(backend), (
+            f"{backend} applique un schéma avant qu'il existe des entités")
