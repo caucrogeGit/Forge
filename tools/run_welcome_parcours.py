@@ -34,8 +34,15 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-BLOC_BASH = re.compile(r"^```bash\s*$(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
-BLOC_QUELCONQUE = re.compile(r"^```(\w+)\s*$(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
+# Les fences peuvent être INDENTÉES : dans un encart `!!! note` ou un bloc à
+# onglets, le contenu est décalé de quatre espaces. Mesuré sur les pages de
+# référence : 181 blocs `bash` indentés contre 85 en marge, soit plus des deux
+# tiers invisibles à un motif ancré en colonne zéro. La fermeture doit être au
+# MÊME retrait, sans quoi un bloc imbriqué avalerait la suite de la page.
+BLOC_BASH = re.compile(r"^([ \t]*)```bash[ \t]*$(.*?)^\1```[ \t]*$",
+                       re.MULTILINE | re.DOTALL)
+BLOC_QUELCONQUE = re.compile(r"^([ \t]*)```(\w+)[ \t]*$(.*?)^\1```[ \t]*$",
+                             re.MULTILINE | re.DOTALL)
 
 #: Première ligne d'un bloc nommant le fichier où le lecteur le pose.
 #: Convention déjà suivie par 187 des 279 blocs `python` des parcours.
@@ -129,8 +136,12 @@ DIAGNOSTICS = ("forge deploy:check", "forge iot:doctor")
 DELAI = 180
 
 
-def nav_welcome(paquet: str) -> "list[Path]":
-    """Pages de parcours du paquet, dans l'ordre du menu du site.
+def nav_pages(paquet: str, *, welcome_seul: bool = True) -> "list[Path]":
+    """Pages du paquet, dans l'ordre du menu du site.
+
+    `welcome_seul=False` ajoute la présentation et la référence, jamais
+    jouées jusqu'ici alors qu'elles portent 113 blocs `bash` et qu'on les
+    consulte pour une commande précise, souvent sans lire le parcours.
 
     Le `nav` est lu comme du texte plutôt que comme du YAML : seul l'ordre des
     chemins `welcome/...` importe, et une dépendance à PyYAML pour cela serait
@@ -141,8 +152,10 @@ def nav_welcome(paquet: str) -> "list[Path]":
         raise SystemExit(f"Erreur : {config} est introuvable.")
     docs = config.parent / "docs"
     pages: "list[Path]" = []
+    motif = (r"(welcome/[\w/-]+\.md)\s*$" if welcome_seul
+             else r"([\w/-]*\.md)\s*$")
     for ligne in config.read_text(encoding="utf-8").splitlines():
-        trouve = re.search(r"(welcome/[\w/-]+\.md)\s*$", ligne)
+        trouve = re.search(motif, ligne)
         if trouve:
             page = docs / trouve.group(1)
             if page.is_file():
@@ -150,9 +163,40 @@ def nav_welcome(paquet: str) -> "list[Path]":
     return pages
 
 
+def _sans_retrait(contenu: str, retrait: str) -> str:
+    """Rend le bloc tel que le lecteur le colle, sans le décalage de l'encart."""
+    if not retrait:
+        return contenu
+    lignes = [l[len(retrait):] if l.startswith(retrait) else l
+              for l in contenu.splitlines()]
+    return "\n".join(lignes)
+
+
+SECTION = re.compile(r'^\?\?\? note "(?:\d+\.\s*)?([^"]+)"', re.MULTILINE)
+
+
+def decouper_section(texte: str, titre: str) -> str:
+    """Rend la seule section nommée, ou une chaîne vide.
+
+    Une page de référence n'est **pas** une séquence : elle catalogue des
+    alternatives. Mesuré sur la référence SQLite, la jouer de haut en bas
+    installerait depuis PyPI **puis** depuis Git, puis défairait la
+    configuration avec `db:config --remove`. Seul « Mise en service » est un
+    ordre à suivre, et 26 paquets sur 27 en portent un.
+    """
+    debuts = [(m.start(), m.group(1).strip()) for m in SECTION.finditer(texte)]
+    for index, (position, nom) in enumerate(debuts):
+        if nom.lower() != titre.lower():
+            continue
+        fin = debuts[index + 1][0] if index + 1 < len(debuts) else len(texte)
+        return texte[position:fin]
+    return ""
+
+
 def blocs(page: Path) -> "list[tuple[int, str]]":
     texte = page.read_text(encoding="utf-8")
-    return [(texte[: m.start()].count("\n") + 1, m.group(1))
+    return [(texte[: m.start()].count("\n") + 1,
+             _sans_retrait(m.group(2), m.group(1)))
             for m in BLOC_BASH.finditer(texte)]
 
 
@@ -164,7 +208,8 @@ def blocs_ordonnes(page: Path) -> "list[tuple[int, str, str]]":
     dialogue : la commande qui lance un fichier échouait, faute du fichier.
     """
     texte = page.read_text(encoding="utf-8")
-    return [(texte[: m.start()].count("\n") + 1, m.group(1), m.group(2))
+    return [(texte[: m.start()].count("\n") + 1, m.group(2),
+             _sans_retrait(m.group(3), m.group(1)))
             for m in BLOC_QUELCONQUE.finditer(texte)]
 
 
@@ -268,10 +313,29 @@ def executer(script: str, projet: Path) -> "tuple[int, str]":
     return fini.returncode, (fini.stdout + fini.stderr)
 
 
-def parcourir(paquet: str, projet: "Path | None", *, lister: bool) -> int:
-    pages = nav_welcome(paquet)
+def blocs_de_section(page: Path, titre: str) -> "list[tuple[int, str]]":
+    """Blocs `bash` de la seule section nommée, aux lignes de la page."""
+    texte = page.read_text(encoding="utf-8")
+    section = decouper_section(texte, titre)
+    if not section:
+        return []
+    decalage = texte[: texte.index(section)].count("\n")
+    return [(decalage + section[: m.start()].count("\n") + 1,
+             _sans_retrait(m.group(2), m.group(1)))
+            for m in BLOC_BASH.finditer(section)]
+
+
+def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
+              welcome_seul: bool = True, section: "str | None" = None) -> int:
+    if section is not None:
+        reference = PROJECT_ROOT / "packages" / f"forge-mvc-{paquet}" / "docs" / "reference.md"
+        if not reference.is_file():
+            raise SystemExit(f"Erreur : {reference} est introuvable.")
+        pages = [reference]
+    else:
+        pages = nav_pages(paquet, welcome_seul=welcome_seul)
     if not pages:
-        raise SystemExit(f"Erreur : aucun parcours dans le nav de forge-mvc-{paquet}.")
+        raise SystemExit(f"Erreur : aucune page dans le nav de forge-mvc-{paquet}.")
 
     joues = 0
     substitutions = 0
@@ -282,7 +346,9 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool) -> int:
 
     for page in pages:
         relatif = page.relative_to(PROJECT_ROOT)
-        for ligne, langage, contenu in blocs_ordonnes(page):
+        contenus = ([(l, "bash", sc) for l, sc in blocs_de_section(page, section)]
+                    if section is not None else blocs_ordonnes(page))
+        for ligne, langage, contenu in contenus:
             if langage in LANGAGES_FICHIER:
                 chemin = fichier_du_bloc(contenu)
                 if chemin is None or projet is None or lister:
@@ -360,13 +426,23 @@ def main(argv: "list[str] | None" = None) -> int:
                         help="nom court de l'opt-in (ex. « sqlite »)")
     parser.add_argument("--project", metavar="CHEMIN", default=None, type=Path,
                         help="projet Forge où jouer le parcours")
+    parser.add_argument("--toutes-pages", action="store_true",
+                        help="ajoute présentation et référence au parcours")
+    parser.add_argument("--section", metavar="TITRE", default=None,
+                        help="ne jouer que cette section de reference.md "
+                             "(ex. « Mise en service », seule séquence de la page)")
     parser.add_argument("--list", action="store_true", dest="lister",
                         help="recenser les blocs sans rien exécuter")
     args = parser.parse_args(argv)
     if not args.lister and args.project is None:
         parser.error("--project est requis pour exécuter (ou utilisez --list)")
-    return parcourir(args.package, args.project, lister=args.lister)
+    return parcourir(args.package, args.project, lister=args.lister,
+                     welcome_seul=not args.toutes_pages, section=args.section)
 
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+#: Ancien nom, conservé : les garde-fous et l'habitude s'y appuient.
+nav_welcome = nav_pages

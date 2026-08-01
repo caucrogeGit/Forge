@@ -104,7 +104,8 @@ def test_le_numero_de_ligne_designe_le_bloc() -> None:
     lignes = page.read_text(encoding="utf-8").splitlines()
 
     for numero, _script in harnais.blocs(page):
-        assert lignes[numero - 1].startswith("```bash")
+        # `lstrip` : les fences des encarts sont indentées de quatre espaces.
+        assert lignes[numero - 1].lstrip().startswith("```bash")
 
 
 # ── Le parcours pilote, corrigé ──────────────────────────────────────────────
@@ -318,3 +319,57 @@ def test_une_commande_deja_non_interactive_n_est_pas_substituee() -> None:
     _joue, substitution = harnais.substituer(script)
 
     assert substitution is None
+
+
+# ── Les blocs des encarts étaient invisibles ─────────────────────────────────
+
+def test_un_bloc_indente_dans_un_encart_est_vu(tmp_path: Path) -> None:
+    """Mesuré sur les pages de référence : 181 blocs `bash` indentés contre 85
+    en marge, soit plus des deux tiers invisibles à un motif ancré en colonne
+    zéro."""
+    page = tmp_path / "p.md"
+    page.write_text('!!! note "Prérequis"\n\n    ```bash\n    forge doctor\n    ```\n',
+                    encoding="utf-8")
+
+    trouves = harnais.blocs(page)
+
+    assert len(trouves) == 1
+    assert trouves[0][1].strip() == "forge doctor"
+
+
+def test_le_bloc_est_rendu_sans_son_retrait(tmp_path: Path) -> None:
+    """Le lecteur colle la commande sans les quatre espaces de l'encart."""
+    page = tmp_path / "p.md"
+    page.write_text('!!! note "x"\n\n    ```bash\n    cd projet\n    forge run\n    ```\n',
+                    encoding="utf-8")
+
+    # `strip` : le contenu commence par le saut de ligne qui suit la fence.
+    assert harnais.blocs(page)[0][1].strip().splitlines()[0] == "cd projet"
+
+
+# ── Une page de référence n'est pas une séquence ─────────────────────────────
+
+def test_seule_la_mise_en_service_est_un_ordre_a_suivre() -> None:
+    """La jouer de haut en bout installerait depuis PyPI **puis** depuis Git,
+    puis défairait la configuration avec `db:config --remove`."""
+    reference = (PROJECT_ROOT / "packages" / "forge-mvc-sqlite" / "docs"
+                 / "reference.md").read_text(encoding="utf-8")
+
+    section = harnais.decouper_section(reference, "Mise en service")
+
+    assert section, "le chapitre « Mise en service » est introuvable"
+    assert "--remove" not in section
+    assert "git+https" not in section
+
+
+def test_chaque_opt_in_porte_un_chapitre_de_mise_en_service() -> None:
+    """26 sur 27 : seul `testing` n'a rien à mettre en service, une
+    infrastructure de développement ne se branchant à rien."""
+    sans: "list[str]" = []
+    for reference in sorted(PROJECT_ROOT.glob("packages/*/docs/reference.md")):
+        court = reference.parent.parent.name.removeprefix("forge-mvc-")
+        if not harnais.decouper_section(reference.read_text(encoding="utf-8"),
+                                        "Mise en service"):
+            sans.append(court)
+
+    assert sans == ["testing"], f"chapitre manquant pour : {', '.join(sans)}"
