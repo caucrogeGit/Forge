@@ -30,6 +30,17 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Un garde de fraîcheur pour les diagrammes UML des références (`DOC-UML-FRESHNESS-001`).**
+  Chaque page de référence porte un chapitre « Schémas UML », soit 27 diagrammes de classe et 27 de séquence.
+  Dessinés à la main, ils vieillissent en silence, et un schéma périmé garde l'autorité que donne un dessin.
+  `tools/check_uml_diagrams.py` lit les diagrammes de classe et confronte au code, lu par AST et jamais importé, les classes et les méthodes qu'ils déclarent.
+  Une périmption trouvée à la première exécution : le diagramme de `forge-mvc-sessions-db` attribuait `cleanup_expired()` au **protocole** `SessionStore` du cœur, qui ne le déclare pas.
+  La méthode existe, mais sur `DbSessionStore` seulement, et c'est cohérent, purger des sessions périmées n'ayant de sens que pour un store persistant.
+  Le diagramme montre désormais le contrat réel, et la page dit pourquoi la méthode le déborde.
+  Le garde est **silencieux plutôt que criard**, et c'est un choix mesuré. Sa première version refusait douze acteurs conceptuels que les diagrammes ont le droit de dessiner, l'exécuteur injecté, la bibliothèque externe, le contrôleur du lecteur, la factory d'exemple.
+  Un garde qui crie à tort finit désactivé, et ne garde alors plus rien.
+  La limite est écrite dans l'outil : une classe **renommée** sort du contrôle au lieu d'être signalée, faute de pouvoir la distinguer d'un acteur conceptuel.
+
 - **Le palier des fixtures reliées se déroule enfin (`WELCOME-FIXTURES-RELIEES-001`).**
   Il relie un `eleve` à un compte `users` sans coder d'`Id` en dur, mais ne préparait aucune des deux tables.
   Il était le dernier arrêt du parcours des fixtures, et il l'est resté tant que déclarer une entité avec ses champs exigeait un terminal ; les modes non interactifs livrés juste avant l'ont débloqué.

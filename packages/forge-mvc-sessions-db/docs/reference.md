@@ -156,6 +156,8 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
     `DbSessionStore` implémente l'intégralité du contrat `SessionStore` du cœur et délègue tout son SQL à un exécuteur injecté.
 
+    Il ajoute `cleanup_expired()`, qui ne figure **pas** au contrat : purger les sessions périmées n'a de sens que pour un store persistant, un store en mémoire disparaissant avec le processus.
+
     ```mermaid
     classDiagram
         class SessionStore {
@@ -163,9 +165,11 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
             +create(data) str
             +get(session_id) dict
             +set(session_id, data) None
+            +replace(session_id, data) None
             +delete(session_id) None
             +regenerate(session_id) str
-            +cleanup_expired() int
+            +authenticate(session_id, user_data, ttl) str
+            +touch_expiry(session_id, ttl) bool
         }
         class DbSessionStore {
             -_fetch_one
