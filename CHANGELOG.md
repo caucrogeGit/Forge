@@ -30,6 +30,16 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **`optins/__init__.py` vivait en double, et les trois opt-ins routiers en pâtissaient (`OPTINS-INIT-SOURCE-UNIQUE-001`).**
+  Le squelette en livrait une version, `cli/optins/enable.py` en portait une autre dans une constante.
+  Les deux disaient la même chose, écrite différemment, 319 caractères contre 349, et elles avaient dérivé.
+  La conséquence se voyait au premier geste sur un projet neuf. `forge new` posait sa version, puis `forge opt-in:enable <route> --apply` trouvait un fichier « existant avec un contenu différent », refusait d'écraser et sortait en erreur.
+  `audio`, `video` et `iot`, les seuls opt-ins à recevoir la couche `optins/`, étaient donc inutilisables sur un projet neuf.
+  Le refus d'écraser était **juste**, Forge ne réécrivant pas un fichier applicatif (principe 9) ; c'est la duplication qui était fautive.
+  Une règle écrite deux fois finit écrite de deux façons, exactement comme la primitive CSV recopiée dans chaque contrôleur généré.
+  La commande lit désormais le fichier du squelette au lieu de le redéfinir (principe 11), et le garde-fou interdit à la constante littérale de revenir.
+  Constaté en jouant les chapitres « Mise en service » des références, qui échouaient tous les trois au même endroit.
+
 - **Un projet neuf échouait à son propre `make check` (`SKELETON-PYTEST-PYTHONPATH-001`).**
   Constaté en jouant les chapitres « Mise en service » des références, dont 22 sur 26 font lancer `make check`.
   Sur un projet à peine créé par `forge new`, sans que rien n'y soit fait, la collecte s'arrêtait sur `ModuleNotFoundError: No module named 'mvc'`.

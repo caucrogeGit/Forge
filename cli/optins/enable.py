@@ -63,15 +63,30 @@ STATUS_DRYRUN = "[DRY-RUN]"
 # (OPTINS-IOT-PROJECT-BRIDGE-001) : même branchement explicite, mêmes
 # fichiers. Le code métier reste dans le paquet `forge-mvc-iot`.
 
-OPTINS_INIT = '''\
-"""Couche de branchement local des opt-ins de ce projet Forge.
+def _optins_init_du_squelette() -> str:
+    """Contenu de `optins/__init__.py`, lu du squelette et non redéfini ici.
 
-Les paquets opt-in restent distribués (`forge-mvc-*`) ; ce dossier ne
-contient que le **câblage local** (routes, README, repères de migration).
-Branchement explicite via `optins/registry.py` — aucune découverte
-automatique. Contrat : docs/architecture/optins-project-structure.md.
-"""
-'''
+    Ce contenu vivait en double : le squelette en livrait une version, cette
+    constante en portait une autre. Les deux disaient la même chose, écrite
+    différemment, 319 caractères contre 349, et elles avaient dérivé.
+
+    La conséquence se voyait au premier geste. `forge new` pose sa version,
+    puis `forge opt-in:enable <route> --apply` trouve un fichier « existant avec
+    un contenu différent », refuse d'écraser (principe 9) et sort en erreur.
+    Les trois opt-ins routiers, `audio`, `video` et `iot`, étaient donc
+    inutilisables sur un projet neuf (OPTINS-INIT-SOURCE-UNIQUE-001).
+
+    Le refus d'écraser était juste ; c'est la duplication qui était fautive,
+    exactement comme la primitive CSV recopiée dans chaque contrôleur généré.
+    Une source, un lecteur (principe 11).
+    """
+    import skeleton
+
+    racine = Path(skeleton.__file__ or "").resolve().parent
+    return (racine / "data" / "optins" / "__init__.py").read_text(encoding="utf-8")
+
+
+OPTINS_INIT = _optins_init_du_squelette()
 
 # Ancres d'insertion dans optins/registry.py (ADR-061, source unique dans
 # cli.optins.registry_format). `forge opt-in:enable <name>` insère une ligne
