@@ -355,6 +355,34 @@ class Dialect(Protocol):
         """
         ...
 
+    def single_row_subquery(self, column: str, table: str, where: str) -> str:
+        """Sous-requête scalaire bornée à **une** ligne, en SQL littéral.
+
+        Distincte de `limit_clause()`, et pour deux raisons qui empêchent de la
+        réutiliser. Celle-là est **paramétrée** (`LIMIT ?`), alors qu'on écrit
+        ici du SQL destiné à un fichier, sans paramètre à lier. Et sa forme
+        T-SQL, `OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY`, exige un `ORDER BY` et
+        se place en suffixe, là où l'équivalent littéral naturel de SQL Server
+        est `SELECT TOP 1`, en **tête** du `SELECT`.
+
+        Aucun suffixe commun n'existe donc, et c'est pourquoi le dialecte rend
+        la sous-requête entière plutôt qu'un morceau à recoller. Deux primitives
+        à lire en paire auraient reproduit le piège de `pagination_clause()` et
+        `pagination_param_order()`, dont l'ordre des marqueurs s'inverse en
+        T-SQL.
+
+            MariaDB, SQLite, PostgreSQL
+                (SELECT Id FROM users WHERE Email = 'a@b.c' LIMIT 1)
+            SQL Server
+                (SELECT TOP 1 Id FROM users WHERE Email = 'a@b.c')
+
+        `where` est une condition déjà rendue, littéraux compris : le dialecte
+        n'en compose que l'enveloppe. Le premier appelant est `fixtures:generate`,
+        dont les références écrivaient `LIMIT 1` en dur et ne chargeaient donc
+        pas sur SQL Server (`FIXTURES-REFERENCE-DIALECT-001`).
+        """
+        ...
+
     # ── Horodatage serveur (DML) ─────────────────────────────────────────────
 
     def now_expression(self) -> str:

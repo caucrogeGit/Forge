@@ -226,6 +226,10 @@ class SQLiteDialect:
     def pagination_param_order(self) -> tuple[str, str]:
         return ("limit", "offset")
 
+    def single_row_subquery(self, column: str, table: str, where: str) -> str:
+        """Sous-requête scalaire bornée à une ligne (FIXTURES-REFERENCE-DIALECT-001)."""
+        return f"(SELECT {column} FROM {table} WHERE {where} LIMIT 1)"
+
     # ── DDL des relations many_to_one (ADR-084) ──────────────────────────────
 
     def add_foreign_key_sql(

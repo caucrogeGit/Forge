@@ -237,6 +237,15 @@ class MSSQLDialect:
         # Le décalage est annoncé avant le nombre de lignes, contrairement à LIMIT.
         return ("offset", "limit")
 
+    def single_row_subquery(self, column: str, table: str, where: str) -> str:
+        """Sous-requête scalaire bornée à une ligne (FIXTURES-REFERENCE-DIALECT-001).
+
+        T-SQL n'a pas de `LIMIT` : la borne s'écrit `TOP 1` en tête du `SELECT`,
+        et non en suffixe. C'est cette asymétrie qui rendait `limit_clause()`
+        inutilisable ici.
+        """
+        return f"(SELECT TOP 1 {column} FROM {table} WHERE {where})"
+
     # ── DDL des relations many_to_one (ADR-084) ──────────────────────────────
 
     def add_foreign_key_sql(

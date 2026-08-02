@@ -30,6 +30,17 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Les fixtures reliées ne chargeaient pas sur SQL Server (`FIXTURES-REFERENCE-DIALECT-001`).**
+  `fixtures:generate` traduit `self.reference(table, colonne, valeur)` en sous-requête, écrite telle quelle dans un `.sql`.
+  Le littéral passait bien par `dialect.render_literal()`, mais la borne était écrite en dur, `LIMIT 1`.
+  Mesuré contre un serveur réel, SQL Server refuse ce fichier avec `Incorrect syntax near '1'`, alors qu'il est au niveau plein depuis l'ADR-084.
+  Le chantier de portabilité de la DML avait manqué ce cas parce qu'il balayait la **couche de requêtes** : ici le SQL n'est pas exécuté, il est écrit comme texte dans un fichier, et n'a donc jamais traversé cette couche.
+  Un audit qui suit les chemins d'exécution ne voit pas le SQL qu'on imprime.
+  `limit_clause()` ne pouvait pas servir, étant paramétrée là où l'on écrit du SQL sans paramètre, et sa forme T-SQL exigeant un `ORDER BY` en suffixe quand l'équivalent littéral de SQL Server est `TOP 1`, en tête du `SELECT`.
+  Le contrat `Dialect` reçoit donc `single_row_subquery()`, qui rend la **sous-requête entière** plutôt que deux morceaux à recoller.
+  Deux primitives à lire en paire auraient reproduit le piège de `pagination_clause()` et `pagination_param_order()`, dont l'ordre des marqueurs s'inverse en T-SQL.
+  Les quatre backends l'implémentent, et un test joue la sous-requête de chacun **contre son serveur**, par le chemin de requêtes de Forge : c'est ce pendant qui manquait pour que le défaut se voie.
+
 - **Les quatre chapitres « Mise en service » des backends divergeaient (`REFERENCE-BACKENDS-SETUP-001`).**
   Constaté en jouant les 26 chapitres des pages de référence, ceux que 22 opt-ins font suivre à leur lecteur.
   `sqlite` s'arrêtait à `db:config` et ne créait jamais sa base : ses commandes `db:init` et `doctor` vivaient dans la prose, jamais dans un bloc, si bien qu'un lecteur qui copie les blocs repartait sans base de données.

@@ -94,15 +94,22 @@ def load_factory(root: Path, entity: str) -> Factory:
 def render_value(value: Any, dialect: Any) -> str:
     """Rend une valeur de colonne en SQL pour le dialecte donné.
 
-    Un ``FixtureReference`` (ADR-077) devient une sous-requête résolue à la charge
-    ``(SELECT Id FROM <table> WHERE <key_column> = <valeur> LIMIT 1)`` ; toute autre
-    valeur passe par ``dialect.render_literal`` (littéral correct par backend, ADR-075).
+    Un ``FixtureReference`` (ADR-077) devient une sous-requête résolue à la charge,
+    dont le dialecte rend la forme complète : les trois backends à ``LIMIT`` la
+    bornent en suffixe, SQL Server par un ``TOP 1`` en tête du ``SELECT``.
+    Toute autre valeur passe par ``dialect.render_literal`` (littéral correct par
+    backend, ADR-075).
     """
     if isinstance(value, FixtureReference):
         literal = dialect.render_literal(value.value)
-        return (
-            f"(SELECT Id FROM {value.table} "
-            f"WHERE {value.key_column} = {literal} LIMIT 1)"
+        # La borne passe par le dialecte, comme le littéral juste au-dessus.
+        # Elle s'écrivait « LIMIT 1 » en dur : SQL Server refusait le fichier
+        # produit (`Incorrect syntax near '1'`), alors qu'il est au niveau plein
+        # depuis l'ADR-084. Un SQL écrit comme TEXTE dans un fichier échappe à la
+        # couche de requêtes, et c'est ce qui l'avait fait manquer par le
+        # chantier de portabilité de la DML (FIXTURES-REFERENCE-DIALECT-001).
+        return dialect.single_row_subquery(
+            "Id", value.table, f"{value.key_column} = {literal}"
         )
     return dialect.render_literal(value)
 
