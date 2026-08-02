@@ -86,7 +86,7 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
     Rien à faire : cet opt-in n'apporte aucune table.
 

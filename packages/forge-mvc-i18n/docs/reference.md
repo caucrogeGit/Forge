@@ -83,7 +83,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
     Rien à faire : cet opt-in n'apporte aucune table.
 

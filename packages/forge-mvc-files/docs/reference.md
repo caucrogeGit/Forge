@@ -83,9 +83,16 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
-    Rien à faire : cet opt-in n'apporte aucune table.
+    Cet opt-in n'apporte aucune table, mais il a tout de même une initialisation :
+
+    ```bash
+    forge upload:init
+    ```
+
+    Elle crée `storage/uploads/` et ses sous-dossiers `images/`, `documents/` et `tmp/`.
+    Ne pas avoir de tables ne veut pas dire n'avoir rien à faire.
 
     #### 4. Le brancher là où il agit
 

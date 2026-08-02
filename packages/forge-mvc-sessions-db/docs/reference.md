@@ -90,7 +90,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
     ```bash
     forge sessions:init

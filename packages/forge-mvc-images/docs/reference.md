@@ -84,7 +84,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
     ```bash
     forge images:init

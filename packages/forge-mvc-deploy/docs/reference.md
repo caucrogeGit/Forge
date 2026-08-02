@@ -83,9 +83,16 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
-    Rien à faire : cet opt-in n'apporte aucune table.
+    Cet opt-in n'apporte aucune table, mais il a tout de même une initialisation :
+
+    ```bash
+    forge deploy:init
+    ```
+
+    Elle génère les fichiers Nginx et systemd dans `deploy/`.
+    Ne pas avoir de tables ne veut pas dire n'avoir rien à faire.
 
     #### 4. Le brancher là où il agit
 

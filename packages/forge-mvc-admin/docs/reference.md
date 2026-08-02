@@ -83,9 +83,16 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
-    Rien à faire : cet opt-in n'apporte aucune table.
+    Cet opt-in n'apporte aucune table, mais il a tout de même une initialisation :
+
+    ```bash
+    forge admin:init
+    ```
+
+    Elle génère `mvc/admin/`, où l'application déclare ses ressources administrables.
+    Ne pas avoir de tables ne veut pas dire n'avoir rien à faire.
 
     #### 4. Le brancher là où il agit
 

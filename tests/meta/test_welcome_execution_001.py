@@ -450,3 +450,52 @@ def test_aucune_mise_en_service_n_applique_de_schema() -> None:
     for backend in ("sqlite", "mariadb", "postgres", "mssql"):
         assert "forge db:apply" not in _sequence_mise_en_service(backend), (
             f"{backend} applique un schéma avant qu'il existe des entités")
+
+
+# ── Tout `:init` documenté doit figurer dans la mise en service ──────────────
+
+def test_chaque_optin_a_init_le_dit_dans_sa_mise_en_service() -> None:
+    """« Poser sa base » ne parlait que de tables, et quatre opt-ins sont tombés.
+
+    `upload:init` crée `storage/uploads/`, `mail:init` `storage/mail/`,
+    `admin:init` la structure du back-office, `deploy:init` les fichiers Nginx
+    et systemd. Aucun n'apporte de table, tous sont indispensables : leurs
+    références disaient pourtant « Rien à faire : cet opt-in n'apporte aucune
+    table ». La procédure canonique portait l'angle mort, ses vingt-sept
+    dérivations en héritaient.
+    """
+    import importlib.metadata
+
+    from tools.run_welcome_parcours import decouper_section
+
+    manquants: "list[str]" = []
+    for point in importlib.metadata.entry_points(group="forge_mvc.commands"):
+        try:
+            table = point.load()
+        except Exception:  # noqa: BLE001 — opt-in absent de l'environnement
+            continue
+        if not isinstance(table, dict):
+            continue
+        inits = [str(n) for n in table if str(n).endswith(":init")]
+        if not inits:
+            continue
+        court = point.name.removeprefix("forge_mvc_").replace("_", "-")
+        reference = PROJECT_ROOT / "packages" / f"forge-mvc-{court}" / "docs" / "reference.md"
+        if not reference.is_file():
+            continue
+        section = decouper_section(reference.read_text(encoding="utf-8"), "Mise en service")
+        if section and not any(commande in section for commande in inits):
+            manquants.append(f"{court} ({', '.join(inits)})")
+
+    assert not manquants, (
+        "opt-ins dont la mise en service omet leur commande d'initialisation : "
+        + ", ".join(sorted(manquants)))
+
+
+def test_la_procedure_canonique_ne_parle_plus_des_seules_tables() -> None:
+    """C'est elle la cause : ses dérivations reprennent son cadrage."""
+    page = (PROJECT_ROOT / "docs" / "install" / "opt-ins.md").read_text(encoding="utf-8")
+
+    assert "### 3. Poser ce dont il a besoin" in page
+    # Ancré sur une phrase sans apostrophe : la page emploie U+2019.
+    assert "Ne pas avoir de tables" in page

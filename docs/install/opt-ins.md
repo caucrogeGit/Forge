@@ -132,19 +132,25 @@ Pour un opt-in de type `route`, c’est aussi ce qui monte ses routes.
 
 `--apply` est **obligatoire** : sans lui, la commande travaille en simulation et n’écrit rien.
 
-### 3. Poser sa base
+### 3. Poser ce dont il a besoin
 
-Si l’opt-in apporte des tables :
+Si l’opt-in expose une commande `:init`, elle prépare ce qu’il lui faut dans le projet.
 
 ```bash
 forge <nom>:init
+```
+
+Ce que cette commande pose dépend de l’opt-in, et sa page de référence le dit.
+Pour ceux qui apportent des **tables**, elle copie la migration embarquée dans `mvc/migrations/`, qu’il faut ensuite exécuter (ADR-071) :
+
+```bash
 forge migration:apply
 ```
 
-`<nom>:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l’exécute (ADR-071).
+Pour les autres, elle pose ce dont ils ont besoin sans toucher à la base : des dossiers de stockage pour `files` et `mail`, la structure du back-office pour `admin`, les fichiers Nginx et systemd pour `deploy`.
+**Ne pas avoir de tables ne veut donc pas dire n’avoir rien à faire.**
 
-Cette étape est celle qu’on oublie le plus souvent, et son oubli ne se voit qu’au premier appel, sous la forme d’une erreur SQL sur une table absente.
-La page de référence de l’opt-in indique s’il a une commande `:init`.
+Cette étape est celle qu’on oublie le plus souvent, et son oubli ne se voit qu’au premier usage : une erreur SQL sur une table absente, ou un dossier de stockage introuvable.
 
 ### 4. Le brancher là où il agit
 

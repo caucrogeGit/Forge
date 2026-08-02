@@ -83,7 +83,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
     Rien à faire : cet opt-in n'apporte aucune table.
 

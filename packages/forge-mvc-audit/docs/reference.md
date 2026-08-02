@@ -83,7 +83,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
     ```bash
     forge audit:init

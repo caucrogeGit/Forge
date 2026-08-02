@@ -83,7 +83,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
     ```bash
     forge settings:init

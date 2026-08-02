@@ -100,7 +100,9 @@ def test_la_procedure_canonique_existe() -> None:
     [
         ("### 1. L’épingler", "sans épinglage, l'opt-in n'existe que sur une machine"),
         ("### 2. L’inscrire", "le registre rend l'opt-in visible du projet"),
-        ("### 3. Poser sa base", "l'oubli ne se voit qu'au premier appel"),
+        # Élargi par WELCOME-OPTIN-INIT-001 : le point ne parlait que de tables,
+        # et quatre opt-ins dont le `:init` pose des dossiers y échappaient.
+        ("### 3. Poser ce dont il a besoin", "l'oubli ne se voit qu'au premier usage"),
         ("### 4. Le brancher là où il agit", "le branchement dépend du type d'opt-in"),
         ("### 5. Le prouver", "présent n'est pas opérationnel"),
     ],
@@ -159,7 +161,7 @@ def test_chaque_reference_a_son_chapitre_de_mise_en_service() -> None:
 @pytest.mark.parametrize("titre", [
     "#### 1. L'épingler",
     "#### 2. L'inscrire",
-    "#### 3. Poser sa base",
+    "#### 3. Poser ce dont il a besoin",
     "#### 4. Le brancher là où il agit",
     "#### 5. Le prouver",
 ])

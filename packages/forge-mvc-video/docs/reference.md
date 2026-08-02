@@ -83,7 +83,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
     ```bash
     forge video:init

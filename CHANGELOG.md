@@ -30,6 +30,20 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **« Poser sa base » ne parlait que de tables, et quatre opt-ins sont tombés dans le trou (`WELCOME-OPTIN-INIT-001`).**
+  Le troisième point de la procédure canonique d'installation cadrait l'étape sur les migrations seules.
+  Ses vingt-sept dérivations en ont hérité, et quatre références concluaient donc « Rien à faire : cet opt-in n'apporte aucune table ».
+  C'est vrai des tables et faux de l'opt-in. `upload:init` crée `storage/uploads/` et ses sous-dossiers, `mail:init` crée `storage/mail/`, `admin:init` génère la structure du back-office, `deploy:init` produit les fichiers Nginx et systemd.
+  Sans eux, l'opt-in est installé, inscrit, et ne fonctionne pas.
+  La cause était en amont, pas dans les quatre pages : le point canonique devient « Poser ce dont il a besoin », dit ce que la commande pose selon l'opt-in, et écrit noir sur blanc que **ne pas avoir de tables ne veut pas dire n'avoir rien à faire**.
+  Les vingt-deux références qui portaient l'ancien intitulé suivent, et les quatre incomplètes reçoivent leur commande.
+  Un garde-fou confronte désormais les commandes `:init` publiées en entry points au chapitre de mise en service de chaque opt-in.
+  Trouvé en balayant les 508 blocs `bash` de `docs/`, en partant de la procédure dont les 27 références déclarent dériver.
+
+- **Deux vérifications de plus sur les 508 blocs, sans défaut (`DOC-BASH-SWEEP-001`).**
+  La validité shell de chaque bloc, par `bash -n` : **484 sur 493 se collent tels quels**, les 9 autres étant des gabarits à trous que `<VERSION>` ou `<nom>` rendent volontairement non exécutables.
+  Et les paquets que la documentation fait installer : les 10 distributions Forge citées existent, les 15 paquets système aussi.
+
 - **Une page du cœur échappait au contrôle documentaire (`DOC-SWEEP-PERIMETER-001`).**
   Le motif de balayage était `core/*/docs`, à une seule étoile : il attrapait les treize `core/<module>/docs` et manquait `core/docs`, situé un niveau au-dessus.
   `core/docs/forge_config.md` n'a donc jamais été confrontée au code, sans que rien ne le signale.

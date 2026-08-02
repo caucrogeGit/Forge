@@ -84,7 +84,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
     ```bash
     forge notifications:init

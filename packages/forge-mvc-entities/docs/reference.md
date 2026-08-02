@@ -86,7 +86,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     Rien à faire : ses commandes sont découvertes par l'entry point
     `forge_mvc.commands` dès l'installation (ADR-070).
 
-    #### 3. Poser sa base
+    #### 3. Poser ce dont il a besoin
 
     Rien à faire : cet opt-in n'apporte aucune table.
 
