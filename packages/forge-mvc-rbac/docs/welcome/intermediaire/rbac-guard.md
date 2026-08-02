@@ -100,6 +100,7 @@ Si vous démarrez ici, créez-le :
 Créez la vue `mvc/views/rbac_guard/index.html` :
 
 ```html
+{# mvc/views/rbac_guard/index.html #}
 <!DOCTYPE html>
 <html lang="fr">
 <head>

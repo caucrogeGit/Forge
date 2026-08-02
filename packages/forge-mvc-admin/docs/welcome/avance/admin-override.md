@@ -13,6 +13,7 @@ L'ordre des loaders donne la priorité au projet : votre fichier l'emporte.
 Pour personnaliser le gabarit de base, créez `mvc/views/admin/layout.html` :
 
 ```html
+{# mvc/views/admin/layout.html #}
 <!DOCTYPE html>
 <html lang="fr">
 <head>

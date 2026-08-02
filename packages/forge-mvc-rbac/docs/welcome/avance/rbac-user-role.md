@@ -73,6 +73,7 @@ class RbacUserRoleController(BaseController):
 Créez la vue `mvc/views/rbac_user_role/index.html` :
 
 ```html
+{# mvc/views/rbac_user_role/index.html #}
 <!DOCTYPE html>
 <html lang="fr">
 <head>

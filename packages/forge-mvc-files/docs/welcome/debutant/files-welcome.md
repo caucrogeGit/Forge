@@ -41,6 +41,8 @@ Ouvrez `https://localhost:8000/files-welcome` (« Welcome Files »), puis `/file
 
 ```python
 # mvc/controllers/files_welcome_controller.py
+import os
+
 from core.forge import get as get_config
 from core.http.request import Request
 from core.http.response import Response
@@ -53,8 +55,11 @@ def _capabilities() -> dict:
     """Décrit où et quoi forge-mvc-files accepte de stocker."""
     return {
         "upload_root": str(upload_root()),
-        "allowed_extensions": sorted(get_config("upload_allowed_extensions")),
-        "allowed_mime_types": sorted(get_config("upload_allowed_mime_types")),
+        # Extensions et types MIME viennent de l'ENVIRONNEMENT, pas du cœur :
+        # l'ADR-032 n'y a laissé que `upload_max_size`. Vides ici, l'opt-in
+        # applique ses propres valeurs par défaut.
+        "allowed_extensions": os.environ.get("UPLOAD_ALLOWED_EXTENSIONS", ""),
+        "allowed_mime_types": os.environ.get("UPLOAD_ALLOWED_MIME_TYPES", ""),
         "max_size_bytes": int(get_config("upload_max_size")),
     }
 

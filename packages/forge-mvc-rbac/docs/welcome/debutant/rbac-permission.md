@@ -77,6 +77,7 @@ class RbacPermissionController(BaseController):
 Créez la vue `mvc/views/rbac_permission/index.html` :
 
 ```html
+{# mvc/views/rbac_permission/index.html #}
 <!DOCTYPE html>
 <html lang="fr">
 <head>

@@ -50,6 +50,7 @@ Le mot de passe n'est jamais affiché, seule sa présence est indiquée.
     Créez le fichier `mvc/views/mail_config/index.html` :
 
     ```html
+    {# mvc/views/mail_config/index.html #}
     {% extends "layouts/base.html" %}
     {% block content %}
     <h1>Configurer l'envoi</h1>

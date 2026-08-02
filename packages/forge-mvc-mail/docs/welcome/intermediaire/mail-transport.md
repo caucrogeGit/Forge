@@ -51,6 +51,7 @@ En production, on choisit `ConsoleTransport`, `LogTransport`, `NullTransport` ou
     Créez le fichier `mvc/views/mail_transport/index.html` :
 
     ```html
+    {# mvc/views/mail_transport/index.html #}
     {% extends "layouts/base.html" %}
     {% block content %}
     <h1>Choisir un transport</h1>

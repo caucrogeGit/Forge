@@ -419,9 +419,15 @@ def appeler_routes(routes: "list[tuple[str, str]]", projet: Path) -> "tuple[bool
     lignes: "list[str]" = []
     propre = True
     for methode, chemin, statut, taille in json.loads(fini.stdout):
+        # Un 4xx prouve que la route est câblée et que le contrôleur tourne :
+        # il refuse une requête incomplète, ce qui est son travail. Seul un
+        # 5xx est un plantage. Les confondre ferait tenir pour cassée une
+        # route qui se défend correctement (`/file-serve/download` sans son
+        # paramètre `path`, par exemple).
         ok = isinstance(statut, str) and statut[:1] in "23"
-        propre = propre and ok
-        marque = "OK" if ok else "ÉCHEC"
+        refus = isinstance(statut, str) and statut[:1] == "4"
+        propre = propre and (ok or refus)
+        marque = "OK" if ok else ("REFUS" if refus else "ÉCHEC")
         lignes.append(f"  [{marque}] {methode} {chemin} -> {statut} ({taille} o)")
     return propre, lignes
 

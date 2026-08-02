@@ -63,6 +63,7 @@ class RbacTemplateController(BaseController):
 Créez la vue `mvc/views/rbac_template/index.html` :
 
 ```html
+{# mvc/views/rbac_template/index.html #}
 <!DOCTYPE html>
 <html lang="fr">
 <head>

@@ -30,6 +30,20 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Douze gabarits ne disaient qu'en prose où les poser (`WELCOME-TEMPLATE-DESTINATION-001`).**
+  Les parcours nomment la destination d'un bloc en première ligne, `# chemin.py` ou `{# chemin.html #}`, convention suivie par 49 blocs `html` sur 62.
+  Les treize autres, dans `rbac`, `mail`, `admin` et `entities`, ne l'indiquaient que dans la phrase précédente, « Créez la vue `mvc/views/rbac_permission/index.html` ».
+  Un lecteur s'en sort ; rien d'automatique ne le peut, et surtout la destination se perd dès qu'on copie le bloc seul.
+  Douze reçoivent la destination que leur prose nommait déjà, reprise telle quelle et non devinée.
+  Le treizième est un **extrait** que sa page annonce comme tel, et n'a donc pas de destination.
+  Trouvé en faisant répondre les routes : les pages de `rbac` rendaient `TemplateNotFound` faute de gabarit posé.
+
+- **Une configuration d'upload retirée du cœur était encore lue par un parcours (`WELCOME-FILES-CONFIG-001`).**
+  Le parcours `files` appelait `get_config("upload_allowed_extensions")`, clé que l'ADR-032 a sortie du registre du cœur, où seul `upload_max_size` demeure.
+  Sa page `/files-welcome/inspect` rendait donc 500 sur `Clé de configuration inconnue`.
+  L'exemple lit désormais l'environnement, comme `forge-mvc-files` lui-même, et le dit.
+  La sonde HTTP distingue par ailleurs un `4xx` d'un `5xx` : un refus prouve que la route est câblée et que le contrôleur fait son travail, un plantage non.
+
 - **Les parcours qui se vérifiaient au navigateur répondent enfin (`WELCOME-HTTP-ROUTES-001`).**
   Douze parcours n'ont aucun bloc `bash` : ils font écrire du code, puis se vérifient en ouvrant une page.
   Leur code était posé et compilé depuis `WELCOME-CODE-PLACEMENT-001`, mais rien ne disait s'il **fonctionnait**.

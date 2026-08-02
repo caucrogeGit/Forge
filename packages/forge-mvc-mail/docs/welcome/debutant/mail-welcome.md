@@ -68,6 +68,7 @@ L'email s'affiche alors dans la console du serveur, aucun serveur SMTP n'est req
     Créez le fichier `mvc/views/mail_welcome/index.html` :
 
     ```html
+    {# mvc/views/mail_welcome/index.html #}
     <!DOCTYPE html>
     <html lang="fr">
     <head>
