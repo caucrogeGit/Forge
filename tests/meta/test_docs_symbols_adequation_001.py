@@ -202,3 +202,34 @@ def test_un_appel_a_arguments_etoiles_est_marque() -> None:
             "start_mfa_challenge(*args)\n")
 
     assert garde.appels_forge(code)[0][3] is True
+
+
+# ── Le périmètre du garde, mesuré et non supposé ─────────────────────────────
+
+@pytest.mark.parametrize(("racine", "motif"), [
+    ("core", "core/**/docs/**/*.md"),
+    ("cli", "cli/**/docs/**/*.md"),
+    ("packages", "packages/*/docs/**/*.md"),
+])
+def test_aucune_page_embarquee_n_echappe_au_controle(racine: str, motif: str) -> None:
+    """Un garde n'est fiable que sur le périmètre qu'on lui a donné.
+
+    Le motif était `core/*/docs`, à une seule étoile : il attrapait les treize
+    `core/<module>/docs` et manquait `core/docs`, situé un niveau au-dessus.
+    `core/docs/forge_config.md` échappait donc au contrôle, sans que rien ne le
+    signale. Ce test mesure le périmètre au lieu de le supposer.
+    """
+    balayees = {p.relative_to(PROJECT_ROOT) for p in garde.pages(None)}
+    toutes = {p for p in PROJECT_ROOT.glob(motif) if "history" not in p.parts}
+    manquantes = sorted(p.relative_to(PROJECT_ROOT) for p in toutes
+                        if p.relative_to(PROJECT_ROOT) not in balayees)
+
+    assert not manquantes, (
+        f"pages {racine} hors du balayage : {', '.join(str(p) for p in manquantes)}")
+
+
+def test_la_page_qui_manquait_est_desormais_lue() -> None:
+    """Le cas mesuré, nommé pour qu'un motif rétréci le fasse échouer."""
+    balayees = {p.relative_to(PROJECT_ROOT) for p in garde.pages(None)}
+
+    assert Path("core/docs/forge_config.md") in balayees

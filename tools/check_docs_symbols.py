@@ -232,7 +232,11 @@ def pages(cible: "str | None") -> "list[Path]":
     else:
         racines = [
             *sorted(PROJECT_ROOT.glob("packages/*/docs")),
-            *sorted(PROJECT_ROOT.glob("core/*/docs")),
+            # `core/**/docs` et non `core/*/docs` : le motif à une étoile
+            # attrapait les treize `core/<module>/docs` mais manquait
+            # `core/docs`, situé un niveau au-dessus. Une page y échappait
+            # au contrôle sans que rien ne le signale.
+            *sorted(PROJECT_ROOT.glob("core/**/docs")),
             # La doc embarquée du CLI (ADR-043) manquait à ce balayage : ses
             # 60 blocs `bash` sont pourtant des commandes qu'un lecteur tape,
             # et aucune n'avait jamais été confrontée au CLI.

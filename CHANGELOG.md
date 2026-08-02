@@ -30,6 +30,13 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Une page du cœur échappait au contrôle documentaire (`DOC-SWEEP-PERIMETER-001`).**
+  Le motif de balayage était `core/*/docs`, à une seule étoile : il attrapait les treize `core/<module>/docs` et manquait `core/docs`, situé un niveau au-dessus.
+  `core/docs/forge_config.md` n'a donc jamais été confrontée au code, sans que rien ne le signale.
+  Un garde n'est fiable que sur le périmètre qu'on lui a donné, et ce périmètre doit se mesurer comme le reste : un test compare désormais les pages balayées à toutes celles qui existent, sous `core/`, `cli/` et `packages/`.
+  Couverture vérifiée : 66 pages du cœur, 35 du CLI, 475 des opt-ins, aucune manquante.
+  C'est le quatrième angle mort trouvé dans mes propres outils, après les fences indentées, l'oubli de `cli/*/docs` et la règle trop large sur les diagnostics.
+
 - **Douze gabarits ne disaient qu'en prose où les poser (`WELCOME-TEMPLATE-DESTINATION-001`).**
   Les parcours nomment la destination d'un bloc en première ligne, `# chemin.py` ou `{# chemin.html #}`, convention suivie par 49 blocs `html` sur 62.
   Les treize autres, dans `rbac`, `mail`, `admin` et `entities`, ne l'indiquaient que dans la phrase précédente, « Créez la vue `mvc/views/rbac_permission/index.html` ».
