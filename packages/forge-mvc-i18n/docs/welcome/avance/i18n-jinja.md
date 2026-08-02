@@ -21,7 +21,7 @@ Premier palier du **niveau avancé**.
 
 ```html
 {# mvc/views/i18n_page/index.html #}
-{% extends "layouts/app.html" %}
+{% extends "layouts/base.html" %}
 {% block content %}
 <h1>{{ trans("welcome.title", locale) }}</h1>
 <p>{{ trans("welcome.greeting", locale) }}</p>

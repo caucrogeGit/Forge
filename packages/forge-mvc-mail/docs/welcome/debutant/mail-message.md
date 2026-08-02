@@ -50,7 +50,7 @@ On inspecte les champs du message composé, sans l'envoyer.
     Créez le fichier `mvc/views/mail_message/index.html` :
 
     ```html
-    {% extends "layouts/app.html" %}
+    {% extends "layouts/base.html" %}
     {% block content %}
     <h1>Composer un message</h1>
     <p>Un <code>MailMessage</code> a été composé (sans envoi) :</p>

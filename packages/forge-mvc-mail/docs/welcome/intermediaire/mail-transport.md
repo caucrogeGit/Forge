@@ -51,7 +51,7 @@ En production, on choisit `ConsoleTransport`, `LogTransport`, `NullTransport` ou
     Créez le fichier `mvc/views/mail_transport/index.html` :
 
     ```html
-    {% extends "layouts/app.html" %}
+    {% extends "layouts/base.html" %}
     {% block content %}
     <h1>Choisir un transport</h1>
     <p>Message envoyé via <code>{{ transport_name }}</code> (transport de test) :</p>

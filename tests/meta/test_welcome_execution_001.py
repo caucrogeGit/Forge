@@ -169,7 +169,11 @@ def test_un_parcours_sans_bloc_joue_le_dit(capsys: pytest.CaptureFixture[str],
     Même leçon que le verdict pytest lu dans le texte plutôt que dans le code
     retour : un contrôle qui n'a rien contrôlé doit le dire.
     """
-    harnais.parcourir("iot", tmp_path, lister=False)
+    # `import-export` n'a ni bloc `bash`, ni bloc nommant un fichier, ni route
+    # déclarée : rien n'y est mécaniquement vérifiable, et c'est le seul cas.
+    # `iot` et `mail` ne conviennent plus, leurs routes répondant depuis que le
+    # harnais les appelle.
+    harnais.parcourir("import-export", tmp_path, lister=False)
 
     assert "RIEN JOUÉ" in capsys.readouterr().out
 
@@ -254,14 +258,37 @@ def test_un_fichier_existant_n_est_jamais_ecrase(tmp_path: "Path") -> None:
     """`mvc/routes/__init__.py` est nommé 92 fois dans les parcours, toujours
     pour un FRAGMENT à fusionner : l'écrire entier détruirait le câblage posé
     par `forge new` (principe 9)."""
-    cible = tmp_path / "mvc" / "routes" / "__init__.py"
+    cible = tmp_path / "mvc" / "controllers" / "x.py"
     cible.parent.mkdir(parents=True)
-    cible.write_text("# câblage existant\n", encoding="utf-8")
+    cible.write_text("# le mien\n", encoding="utf-8")
 
-    verdict = harnais.poser_fichier("mvc/routes/__init__.py", "# fragment\n", tmp_path)
+    verdict = harnais.poser_fichier("mvc/controllers/x.py", "# fragment\n", tmp_path)
 
     assert verdict == "FRAGMENT"
-    assert cible.read_text(encoding="utf-8") == "# câblage existant\n"
+    assert cible.read_text(encoding="utf-8") == "# le mien\n"
+
+
+def test_le_cablage_de_routes_est_fusionne_et_non_ecrase(tmp_path: "Path") -> None:
+    """`mvc/routes/__init__.py` fait exception, et une seule.
+
+    Ses 92 occurrences sont des fragments de câblage que le lecteur recopie à la
+    main, Forge n'injectant jamais de route (ADR-085). Le harnais joue son rôle
+    et les ajoute **en fin de fichier**, sans toucher à ce qui existe : sans
+    cela, aucune route du parcours ne répondrait.
+    """
+    cible = tmp_path / "mvc" / "routes" / "__init__.py"
+    cible.parent.mkdir(parents=True)
+    cible.write_text("router = Router()\n", encoding="utf-8")
+
+    verdict = harnais.poser_fichier(
+        "mvc/routes/__init__.py",
+        '# mvc/routes/__init__.py\npublic.add("GET", "/x", C.show)\n', tmp_path)
+    contenu = cible.read_text(encoding="utf-8")
+
+    assert verdict == "FUSIONNÉ"
+    assert contenu.startswith("router = Router()")
+    assert 'public.add("GET", "/x", C.show)' in contenu
+    assert "# mvc/routes/__init__.py" not in contenu.split("router = Router()")[1]
 
 
 def test_un_fichier_neuf_est_pose(tmp_path: "Path") -> None:

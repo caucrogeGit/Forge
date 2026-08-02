@@ -198,7 +198,7 @@ Fichiers créés s'ils sont absents :
 mvc/controllers/contact_controller.py
 mvc/models/contact_model.py
 mvc/forms/contact_form.py
-mvc/views/layouts/app.html
+mvc/views/layouts/base.html
 mvc/views/contact/index.html
 mvc/views/contact/_table.html
 mvc/views/contact/_pagination.html

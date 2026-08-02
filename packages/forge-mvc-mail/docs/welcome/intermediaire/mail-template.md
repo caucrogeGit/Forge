@@ -58,7 +58,7 @@ La page dégrade proprement si le template est absent.
     Créez le fichier `mvc/views/mail_template/index.html` :
 
     ```html
-    {% extends "layouts/app.html" %}
+    {% extends "layouts/base.html" %}
     {% block content %}
     <h1>Rendre un template</h1>
     {% if error %}

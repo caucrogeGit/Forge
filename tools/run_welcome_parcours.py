@@ -49,8 +49,15 @@ BLOC_QUELCONQUE = re.compile(r"^([ \t]*)```(\w+)[ \t]*$(.*?)^\1```[ \t]*$",
 #: Le nom peut être suivi d'une précision, « # worker.py, à la racine de
 #: l'application ». Il doit venir EN PREMIER après le dièse, sans quoi une
 #: phrase citant un fichier serait prise pour une consigne de pose.
+#: Trois façons de nommer la destination, toutes légitimes : le dièse
+#: Python, le commentaire HTML, et le commentaire **Jinja** `{# … #}`.
+#: Ce dernier est le bon choix pour un gabarit : un commentaire HTML
+#: serait envoyé au client, un commentaire Jinja est retiré au rendu.
+#: L'ignorer laissait les gabarits non posés, et les pages du parcours
+#: échouaient alors sur `TemplateNotFound`.
 CHEMIN_DU_BLOC = re.compile(
-    r"^\s*(?:#|<!--)\s*([\w./-]+\.(?:py|html|json))(?:[,:( ].*)?\s*(?:-->)?$")
+    r"^\s*(?:\{#|#|<!--)\s*([\w./-]+\.(?:py|html|json))"
+    r"(?:[,:( ].*?)?\s*(?:#\}|-->)?$")
 
 #: Langages dont un bloc est un FICHIER que le lecteur écrit.
 LANGAGES_FICHIER = ("python", "html", "json")
@@ -239,6 +246,29 @@ def compiler(fichiers: "list[Path]", projet: Path) -> "tuple[bool, str]":
     return fini.returncode == 0, (fini.stdout + fini.stderr)
 
 
+#: Fichiers dont un bloc est un FRAGMENT à ajouter, non un contenu complet.
+#:
+#: `mvc/routes/__init__.py` est nommé 92 fois dans les parcours, toujours pour
+#: quelques lignes de câblage. Le lecteur les recopie à la main : Forge
+#: n'injecte jamais de route (ADR-085). Le harnais joue son rôle et les ajoute
+#: en fin de fichier, `router` y étant déjà construit et l'ordre
+#: d'enregistrement étant sans effet sur des chemins distincts.
+FICHIERS_A_FUSIONNER = ("mvc/routes/__init__.py",)
+
+
+def fusionner_fragment(chemin: str, contenu: str, projet: Path) -> str:
+    """Ajoute le fragment en fin de fichier, sans toucher à ce qui existe."""
+    cible = projet / chemin
+    lignes = contenu.strip().splitlines()
+    # La première ligne nomme le fichier : elle n'est pas du code.
+    corps = "\n".join(lignes[1:]).strip()
+    if not corps or corps in cible.read_text(encoding="utf-8"):
+        return "DÉJÀ FUSIONNÉ"
+    with cible.open("a", encoding="utf-8") as fichier:
+        fichier.write(f"\n\n{corps}\n")
+    return "FUSIONNÉ"
+
+
 def poser_fichier(chemin: str, contenu: str, projet: Path) -> str:
     """Écrit le bloc à sa place, sans jamais écraser (principe 9).
 
@@ -248,6 +278,8 @@ def poser_fichier(chemin: str, contenu: str, projet: Path) -> str:
     détruirait le câblage que `forge new` a posé.
     """
     cible = projet / chemin
+    if chemin in FICHIERS_A_FUSIONNER and cible.exists():
+        return fusionner_fragment(chemin, contenu, projet)
     if cible.exists():
         return "FRAGMENT"
     cible.parent.mkdir(parents=True, exist_ok=True)
@@ -325,6 +357,75 @@ def blocs_de_section(page: Path, titre: str) -> "list[tuple[int, str]]":
             for m in BLOC_BASH.finditer(section)]
 
 
+ROUTE_DECLAREE = re.compile(
+    r"""\.add\(\s*["']([A-Z]+)["']\s*,\s*["']([^"']+)["']""")
+
+#: Sonde exécutée DANS le venv du projet : elle appelle l'application par son
+#: point d'entrée WSGI de production, celui que Gunicorn utilise. Pas de
+#: serveur à démarrer, pas de port à réserver, pas d'attente de disponibilité.
+SONDE_HTTP = """\
+import json, sys
+from io import BytesIO
+from core.app.wsgi import create_configured_wsgi_app
+app = create_configured_wsgi_app()
+capture = {}
+def start_response(statut, entetes, exc_info=None):
+    capture["statut"] = statut
+resultats = []
+for methode, chemin in json.loads(sys.argv[1]):
+    environ = {"REQUEST_METHOD": methode, "PATH_INFO": chemin, "QUERY_STRING": "",
+               "wsgi.input": BytesIO(b""), "CONTENT_LENGTH": "0",
+               "SERVER_NAME": "t", "SERVER_PORT": "80", "wsgi.url_scheme": "http"}
+    try:
+        corps = b"".join(app(environ, start_response))
+        resultats.append([methode, chemin, capture.get("statut", "?"), len(corps)])
+    except Exception as exc:
+        resultats.append([methode, chemin, type(exc).__name__ + ": " + str(exc)[:80], 0])
+print(json.dumps(resultats))
+"""
+
+
+def routes_declarees(fragments: "list[str]") -> "list[tuple[str, str]]":
+    """Routes que le parcours déclare lui-même, dans ses fragments de câblage.
+
+    Plus sûr que de deviner des URL dans la prose : ce sont exactement les
+    routes que le lecteur vient d'ajouter, donc exactement celles qui doivent
+    répondre. Les chemins paramétrés sont écartés, faute de valeur à donner.
+    """
+    trouvees: "list[tuple[str, str]]" = []
+    for fragment in fragments:
+        for methode, chemin in ROUTE_DECLAREE.findall(fragment):
+            # Seuls les GET : un POST sans jeton CSRF est refusé en 403, et
+            # c'est le comportement voulu (principe 7). Forger un jeton pour
+            # le contourner ferait mesurer autre chose que la page.
+            if methode != "GET" or "{" in chemin or (methode, chemin) in trouvees:
+                continue
+            trouvees.append((str(methode), str(chemin)))
+    return trouvees
+
+
+def appeler_routes(routes: "list[tuple[str, str]]", projet: Path) -> "tuple[bool, list[str]]":
+    """Appelle chaque route et rend (tout va bien, lignes de rapport)."""
+    import json
+
+    python = projet / ".venv" / "bin" / "python"
+    if not python.exists() or not routes:
+        return True, []
+    fini = subprocess.run([str(python), "-c", SONDE_HTTP, json.dumps(routes)],
+                          cwd=projet, capture_output=True, text=True, timeout=DELAI)
+    if fini.returncode != 0:
+        return False, ["l'application ne se charge pas :",
+                       *fini.stderr.strip().splitlines()[-8:]]
+    lignes: "list[str]" = []
+    propre = True
+    for methode, chemin, statut, taille in json.loads(fini.stdout):
+        ok = isinstance(statut, str) and statut[:1] in "23"
+        propre = propre and ok
+        marque = "OK" if ok else "ÉCHEC"
+        lignes.append(f"  [{marque}] {methode} {chemin} -> {statut} ({taille} o)")
+    return propre, lignes
+
+
 def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
               welcome_seul: bool = True, section: "str | None" = None) -> int:
     if section is not None:
@@ -341,6 +442,7 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
     substitutions = 0
     poses: "dict[str, int]" = {}
     ecrits_chemins: "list[Path]" = []
+    fragments_routes: "list[str]" = []
     sautes: "dict[str, int]" = {}
     print(f"=== Parcours {paquet} : {len(pages)} page(s), dans l'ordre du site ===")
 
@@ -357,6 +459,8 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
                 poses[verdict] = poses.get(verdict, 0) + 1
                 if verdict == "ÉCRIT":
                     ecrits_chemins.append(projet / chemin)
+                if verdict in ("FUSIONNÉ", "DÉJÀ FUSIONNÉ"):
+                    fragments_routes.append(contenu)
                 print(f"  [{verdict}] {relatif}:{ligne} — {chemin}")
                 continue
             if langage != "bash":
@@ -404,8 +508,28 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
         py = sum(1 for f in ecrits_chemins if f.suffix == ".py")
         if py:
             print(f"Code posé : {py} fichier(s) Python, tous compilés.")
+
+    # Dernière marche : le code compile, mais la page répond-elle ? Les douze
+    # parcours sans bloc `bash` se vérifiaient jusqu'ici au navigateur, donc
+    # jamais. Les routes appelées sont celles que le parcours vient de déclarer.
+    routes_appelees = 0
+    if projet is not None and fragments_routes:
+        routes = routes_declarees(fragments_routes)
+        if routes:
+            routes_appelees = len(routes)
+            print(f"Routes déclarées par le parcours : {len(routes)}")
+            propre, lignes = appeler_routes(routes, projet)
+            for ligne in lignes:
+                print(ligne)
+            if not propre:
+                print(f"ÉCHEC : le parcours {paquet} déclare des routes qui ne répondent pas.")
+                return 1
     if lister:
         print("Recensement seul : rien n'a été exécuté.")
+        return 0
+    if joues == 0 and routes_appelees:
+        print(f"OK : le parcours {paquet} n'a aucune commande, mais ses "
+              f"{routes_appelees} route(s) répondent.")
         return 0
     if joues == 0:
         # Annoncer « de bout en bout » sans avoir rien joué se lirait comme

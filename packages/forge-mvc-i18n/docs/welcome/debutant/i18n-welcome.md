@@ -1,7 +1,15 @@
 # Welcome i18n
 
-!!! note "Prérequis : installer l'opt-in"
-    Installez `forge-mvc-i18n` avant de commencer : voir sa [référence](../../reference.md).
+!!! note "Prérequis : installer, puis créer le catalogue"
+    ```bash
+    pip install --pre forge-mvc-i18n
+    forge i18n:init
+    ```
+
+    `i18n:init` crée `translations/` et le catalogue `fr.json`.
+    Sans lui, toute page qui appelle `trans()` échoue sur `Catalogue introuvable : translations/fr.json`, et non par un repli silencieux.
+
+    Voir la [référence](../../reference.md) pour la mise en service complète.
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-i18n`.
 

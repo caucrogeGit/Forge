@@ -30,6 +30,20 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Les parcours qui se vérifiaient au navigateur répondent enfin (`WELCOME-HTTP-ROUTES-001`).**
+  Douze parcours n'ont aucun bloc `bash` : ils font écrire du code, puis se vérifient en ouvrant une page.
+  Leur code était posé et compilé depuis `WELCOME-CODE-PLACEMENT-001`, mais rien ne disait s'il **fonctionnait**.
+  Le harnais fusionne désormais les fragments de câblage dans `mvc/routes/__init__.py`, ce que le lecteur fait à la main puisque Forge n'injecte jamais de route (ADR-085), puis appelle les routes que le parcours vient de déclarer.
+  L'appel passe par `create_configured_wsgi_app()`, le point d'entrée WSGI **de production**, celui que Gunicorn utilise : pas de serveur à démarrer, pas de port à réserver, et l'on éprouve la même pile que le lecteur.
+  Les routes visées sont celles que le parcours déclare lui-même, plus sûr que de deviner des URL dans la prose. Seuls les `GET` sont appelés, un `POST` sans jeton CSRF étant refusé à juste titre (principe 7).
+  Deux défauts trouvés du premier coup, invisibles à tout ce qui précédait.
+  Le parcours i18n ne citait **nulle part** `forge i18n:init`, si bien que ses neuf pages rendaient 500 sur `Catalogue introuvable : translations/fr.json`.
+  Et **cinq gabarits** de `i18n` et `mail` étendaient `layouts/app.html`, que le squelette ne livre pas : il livre `layouts/base.html`. Copiés tels quels, ils rendaient `TemplateNotFound`.
+  Le guide portait la même référence.
+  Une troisième convention de nommage de destination est reconnue, le commentaire **Jinja** `{# … #}`, seul correct pour un gabarit puisqu'un commentaire HTML serait envoyé au client.
+  L'ignorer laissait les gabarits non posés.
+  État mesuré : `i18n` répond sur ses 8 routes, `iot` sur 6, `mail` sur 5. `import-export` reste le seul parcours dont rien n'est mécaniquement vérifiable.
+
 - **Quatre exemples de documentation levaient `TypeError` si on les copiait (`DOC-CODE-SIGNATURES-001`).**
   Le contrôle d'adéquation vérifiait que le symbole documenté **existe**. Un symbole peut exister et sa **signature** avoir changé : l'exemple passait alors le contrôle et échouait chez le lecteur.
   La vérification descend d'un cran et lie chaque appel documenté à la signature réelle, par `inspect.signature`.
