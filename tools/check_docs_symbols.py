@@ -165,6 +165,10 @@ def pages(cible: "str | None") -> "list[Path]":
         racines = [
             *sorted(PROJECT_ROOT.glob("packages/*/docs")),
             *sorted(PROJECT_ROOT.glob("core/*/docs")),
+            # La doc embarquée du CLI (ADR-043) manquait à ce balayage : ses
+            # 60 blocs `bash` sont pourtant des commandes qu'un lecteur tape,
+            # et aucune n'avait jamais été confrontée au CLI.
+            *sorted(PROJECT_ROOT.glob("cli/*/docs")),
             PROJECT_ROOT / "docs",
         ]
     fichiers: "list[Path]" = []

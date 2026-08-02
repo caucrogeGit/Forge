@@ -142,7 +142,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "i18n:check":       "Vérifie la complétude des traductions.",
     # Médias et JavaScript
     "upload:init":      "Configure les uploads de fichiers (dossiers storage/uploads).",
-    "media:init":       "Configure les médias (alias de upload:init).",
+    "media:init":       "Configure les médias : upload:init plus les variantes d'image.",
     "images:init":      "Copie la migration Images vers mvc/migrations/ (idempotent, sans appliquer).",
     "js:init":          "Installe htmx, alpine ou les deux.",
     # Déploiement

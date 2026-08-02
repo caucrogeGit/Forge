@@ -30,6 +30,15 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **La doc embarquée du CLI échappait au contrôle d'adéquation, et `forge --help` s'y contredisait (`CLI-HELP-SUMMARY-COHERENCE-001`).**
+  `tools/check_docs_symbols.py` balayait `packages/*/docs`, `core/*/docs` et `docs/`, mais pas `cli/*/docs` (ADR-043), qui porte pourtant 60 blocs de commandes qu'un lecteur tape.
+  Balayage élargi : **1220 imports et 700 appels de commande**, tous valides.
+  Le premier passage y a trouvé une contradiction. `forge --help` annonçait `media:init` comme un « alias de upload:init », quand son aide détaillée, dans le même fichier, disait justement « surensemble de upload:init pour le sous-système média ».
+  La conséquence n'est pas cosmétique : `init_media_storage()` appelle `init_upload_storage()` **puis** crée les sous-dossiers de variantes d'image.
+  Un lecteur qui croit les deux commandes équivalentes lance `upload:init`, n'obtient ni `thumbnail` ni `medium`, et le découvre au premier traitement d'image.
+  Le sommaire dit désormais ce que fait la commande, et un garde-fou refuse toute description courte annonçant un alias que l'aide longue ne confirme pas.
+  Une sur quatre-vingts le faisait.
+
 - **Les fixtures reliées ne chargeaient pas sur SQL Server (`FIXTURES-REFERENCE-DIALECT-001`).**
   `fixtures:generate` traduit `self.reference(table, colonne, valeur)` en sous-requête, écrite telle quelle dans un `.sql`.
   Le littéral passait bien par `dialect.render_literal()`, mais la borne était écrite en dur, `LIMIT 1`.
