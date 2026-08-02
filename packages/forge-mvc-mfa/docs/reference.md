@@ -313,22 +313,25 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     )
 
-    # Après vérification du mot de passe :
-    if is_mfa_enabled(user):
-        start_mfa_challenge(request, user_id=user["id"])
+    # Après vérification du mot de passe. `factors` vient de votre stockage :
+    # c'est la liste des facteurs MFA de cet utilisateur.
+    if is_mfa_enabled(factors):
+        start_mfa_challenge(request, user)
         return redirect("/login/mfa")     # demander le code TOTP
 
     else:
         open_session(request, user)       # pas de MFA : session directe
 
     # Sur la page de saisie du code :
-    if verify_mfa_challenge(request, code=request.form("code")):
+    if verify_mfa_challenge(request, request.form("code"), factors):
         open_session(request, user)
 
     else:
         return Response.text("Code invalide", status=401)
 
     ```
+
+    `factors` est demandé partout où la décision en dépend, plutôt que rechargé en interne : Forge ne va pas chercher vos données à votre place, et le SQL de leur lecture reste chez vous (principe 5).
 
     !!! tip "Aide-mémoire"
         Quatre temps, une clé de chiffrement :

@@ -30,6 +30,16 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Quatre exemples de documentation levaient `TypeError` si on les copiait (`DOC-CODE-SIGNATURES-001`).**
+  Le contrôle d'adéquation vérifiait que le symbole documenté **existe**. Un symbole peut exister et sa **signature** avoir changé : l'exemple passait alors le contrôle et échouait chez le lecteur.
+  La vérification descend d'un cran et lie chaque appel documenté à la signature réelle, par `inspect.signature`.
+  Mesuré sur **770 appels**, quatre étaient fautifs, dans trois paquets.
+  `forge-mvc-rbac` employait `require_contract_permission` **en décorateur**, alors que c'est une fonction de garde rendant `None` ou une `Response` 403 ; l'exemple enseignait donc un usage qui n'existe pas.
+  `forge-mvc-mfa` passait `user_id=` à `start_mfa_challenge`, un mot-clé absent de la signature, et omettait `factors` dans `verify_mfa_challenge` et `is_mfa_enabled`.
+  `forge-mvc-images` appelait `attach_media_to_entity` avec trois positionnels, alors que `entity_name` et `entity_id` sont réservés aux mots-clés.
+  Le garde ne juge que ce qui est sans ambiguïté, un mot-clé inconnu, un argument requis manquant, trop de positionnels, et se tait sur les appels à `*args` ou `**kwargs` qui ne se lient pas.
+  Chaque cas mesuré a son test, avec la contre-épreuve : un garde qui passerait aussi sans le correctif ne garderait rien.
+
 - **La doc embarquée du CLI échappait au contrôle d'adéquation, et `forge --help` s'y contredisait (`CLI-HELP-SUMMARY-COHERENCE-001`).**
   `tools/check_docs_symbols.py` balayait `packages/*/docs`, `core/*/docs` et `docs/`, mais pas `cli/*/docs` (ADR-043), qui porte pourtant 60 blocs de commandes qu'un lecteur tape.
   Balayage élargi : **1220 imports et 700 appels de commande**, tous valides.

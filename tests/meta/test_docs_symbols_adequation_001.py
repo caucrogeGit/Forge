@@ -140,3 +140,65 @@ def test_les_parcours_d_accueil_en_particulier(
     sortie = capsys.readouterr().out
 
     assert code == 0, f"un parcours d'accueil cite du code absent :\n{sortie}"
+
+
+# ── La signature, et non le seul nom ─────────────────────────────────────────
+
+def test_un_appel_conforme_passe() -> None:
+    """Le symbole existe et l'appel se lie : rien à signaler."""
+    modules = {"require_contract_permission": "forge_mvc_rbac"}
+
+    assert garde.verdict_appel(modules, "require_contract_permission", 3, []) is None
+
+
+def test_un_argument_manquant_est_refuse() -> None:
+    """Cas mesuré : `verify_mfa_challenge(request, code=…)` sans `factors`."""
+    modules = {"verify_mfa_challenge": "forge_mvc_mfa"}
+
+    souci = garde.verdict_appel(modules, "verify_mfa_challenge", 1, ["code"])
+
+    assert souci is not None
+    assert "factors" in souci
+
+
+def test_un_mot_cle_inexistant_est_refuse() -> None:
+    """Cas mesuré : `start_mfa_challenge(request, user_id=…)`."""
+    modules = {"start_mfa_challenge": "forge_mvc_mfa"}
+
+    souci = garde.verdict_appel(modules, "start_mfa_challenge", 1, ["user_id"])
+
+    assert souci is not None
+
+
+def test_trop_de_positionnels_est_refuse() -> None:
+    """Cas mesuré : `attach_media_to_entity(saved, "article", 7, …)`, dont les
+    deux derniers paramètres sont réservés aux mots-clés."""
+    modules = {"attach_media_to_entity": "forge_mvc_images"}
+
+    souci = garde.verdict_appel(modules, "attach_media_to_entity", 3, ["role"])
+
+    assert souci is not None
+    assert "positional" in souci or "positionnel" in souci
+
+
+def test_un_symbole_non_importe_dans_le_bloc_est_ignore() -> None:
+    """Sans import dans le bloc, on ne sait pas de quoi parle le nom."""
+    assert garde.verdict_appel({}, "peu_importe", 3, []) is None
+
+
+def test_les_appels_du_bloc_sont_releves() -> None:
+    code = ("from forge_mvc_mfa import start_mfa_challenge\n"
+            "start_mfa_challenge(request, user)\n")
+
+    releves = garde.appels_forge(code)
+
+    assert [(nom, mots, etoile) for _l, nom, mots, etoile in releves] == \
+        [("start_mfa_challenge", [], False)]
+
+
+def test_un_appel_a_arguments_etoiles_est_marque() -> None:
+    """`f(*args)` ne se lie pas : le marquer évite un refus arbitraire."""
+    code = ("from forge_mvc_mfa import start_mfa_challenge\n"
+            "start_mfa_challenge(*args)\n")
+
+    assert garde.appels_forge(code)[0][3] is True

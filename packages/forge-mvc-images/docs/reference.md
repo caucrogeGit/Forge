@@ -288,7 +288,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
 
     def add_photo(request):
         saved = save_image_upload(request.file("photo"))
-        attach_media_to_entity(saved, "article", 7, role="gallery")
+        attach_media_to_entity(saved, entity_name="article", entity_id=7, role="gallery")
         return Response.text("Photo ajoutée.")
 
     ```

@@ -283,11 +283,16 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     from forge_mvc_rbac import require_contract_permission
 
 
-    @require_contract_permission("article.update")
     def update(request):
+        refus = require_contract_permission(contract, user_roles, "article.update")
+        if refus is not None:
+            return refus
         ...
 
     ```
+
+    Ce n'est pas un décorateur : la fonction rend `None` si la permission est accordée, et une `Response` 403 si elle est refusée ou si le contrat est absent.
+    Le contrôleur la teste et retourne le refus tel quel, ce qui garde le contrôle de flux visible (principe 3).
 
     Les droits sont décrits dans `mvc/security/rbac.json`, pas codés en dur.
 

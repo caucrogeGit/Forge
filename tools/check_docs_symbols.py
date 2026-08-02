@@ -126,6 +126,74 @@ def imports_forge(code: str) -> "list[tuple[str, str]]":
     return couples
 
 
+def appels_forge(code: str) -> "list[tuple[int, str, list[str], bool]]":
+    """Appels de symboles Forge importés dans CE bloc, prêts à être liés.
+
+    Rend (ligne, nom, mots-clés, argument étoilé) pour chaque appel dont le
+    callee est un nom simple importé plus haut. Les appels à `*args` ou
+    `**kwargs` sont marqués : les lier n'aurait aucun sens.
+    """
+    try:
+        arbre = ast.parse(code)
+    except SyntaxError:
+        return []
+    importes: "set[str]" = set()
+    for noeud in ast.walk(arbre):
+        if isinstance(noeud, ast.ImportFrom) and noeud.module \
+                and any(noeud.module.startswith(p) for p in PREFIXES_FORGE):
+            importes.update(a.asname or a.name for a in noeud.names)
+    trouves: "list[tuple[int, str, list[str], bool]]" = []
+    for noeud in ast.walk(arbre):
+        if not isinstance(noeud, ast.Call) or not isinstance(noeud.func, ast.Name):
+            continue
+        if noeud.func.id not in importes:
+            continue
+        etoile = (any(isinstance(a, ast.Starred) for a in noeud.args)
+                  or any(k.arg is None for k in noeud.keywords))
+        trouves.append((noeud.lineno, noeud.func.id,
+                        [str(k.arg) for k in noeud.keywords if k.arg], etoile))
+    return trouves
+
+
+def _positionnels(code: str, ligne: int, nom: str) -> int:
+    """Nombre d'arguments positionnels de cet appel, relu de l'AST."""
+    try:
+        arbre = ast.parse(code)
+    except SyntaxError:
+        return 0
+    for noeud in ast.walk(arbre):
+        if (isinstance(noeud, ast.Call) and isinstance(noeud.func, ast.Name)
+                and noeud.func.id == nom and noeud.lineno == ligne):
+            return len(noeud.args)
+    return 0
+
+
+def verdict_appel(module_par_nom: "dict[str, str]", nom: str,
+                  positionnels: int, mots_cles: "list[str]") -> "str | None":
+    """L'appel documenté se lie-t-il à la signature réelle.
+
+    Un symbole peut exister et sa signature avoir changé : le contrôle
+    d'existence passait alors, et l'exemple levait quand même `TypeError`
+    chez le lecteur. Mesuré sur 960 appels, quatre étaient dans ce cas, dont
+    un qui employait en décorateur une fonction qui n'en est pas une.
+    """
+    import inspect
+
+    module = module_par_nom.get(nom)
+    if module is None:
+        return None
+    try:
+        cible = getattr(importlib.import_module(module), nom)
+        signature = inspect.signature(cible)  # pyright: ignore[reportAny]
+    except Exception:  # noqa: BLE001 — non introspectable : on se tait
+        return None
+    try:
+        signature.bind(*[None] * positionnels, **dict.fromkeys(mots_cles))
+    except TypeError as erreur:
+        return f"appel invalide : {erreur}"
+    return None
+
+
 def verdict(module: str, symbole: str) -> "str | None":
     """Rend le problème constaté, ou `None` si l'import tient."""
     try:
@@ -196,6 +264,7 @@ def verifier(cible: "str | None", *, welcome_seul: bool) -> int:
     problemes: "list[str]" = []
     total_imports = 0
     total_commandes = 0
+    total_appels = 0
     connues = commandes_connues()
 
     for page in pages(cible):
@@ -205,12 +274,24 @@ def verifier(cible: "str | None", *, welcome_seul: bool) -> int:
         relatif = page.relative_to(PROJECT_ROOT)
 
         for ligne, code in blocs_python(texte):
+            module_par_nom: "dict[str, str]" = {}
             for module, symbole in imports_forge(code):
                 total_imports += 1
+                module_par_nom[symbole] = module
                 souci = verdict(module, symbole)
                 if souci:
                     problemes.append(
                         f"{relatif}:{ligne} — from {module} import {symbole} : {souci}"
+                    )
+            for decalage, nom, mots_cles, etoile in appels_forge(code):
+                if etoile:
+                    continue
+                total_appels += 1
+                positionnels = _positionnels(code, decalage, nom)
+                souci = verdict_appel(module_par_nom, nom, positionnels, mots_cles)
+                if souci:
+                    problemes.append(
+                        f"{relatif}:{ligne + decalage - 1} — {nom}(...) : {souci}"
                     )
 
         for ligne, script in blocs_bash(texte):
@@ -222,6 +303,7 @@ def verifier(cible: "str | None", *, welcome_seul: bool) -> int:
                     )
 
     print(f"Imports Forge vérifiés : {total_imports}")
+    print(f"Appels de symboles vérifiés : {total_appels}")
     print(f"Commandes `forge` vérifiées : {total_commandes} "
           f"(le CLI en déclare {len(connues)})")
     for ligne in problemes:
