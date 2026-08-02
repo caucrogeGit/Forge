@@ -160,6 +160,10 @@ EnvironmentFile=/chemin/vers/projet/env/prod
 [Install]
 WantedBy=multi-user.target
 ```
+La ligne `After=` suit le **backend BDD résolu** : `mariadb.service`, `postgresql.service` ou `mssql-server.service`.
+Avec SQLite, sans serveur à attendre, elle se réduit à `After=network.target` (`DEPLOY-BACKEND-AGNOSTIC-001`).
+Préférez le fichier que `forge deploy:init` produit à une recopie de cet exemple : lui connaît votre backend.
+
 
 **Adapter avant installation :**
 

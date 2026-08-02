@@ -478,7 +478,11 @@ FLUSH PRIVILEGES;
 **Règle stricte** : aucun mot de passe root/admin MariaDB réel ne doit être stocké dans `env/prod` (ou tout fichier commité).
 
 Le **runtime applicatif Forge** (WSGI, dispatcher) n'utilise, pour les identifiants, **que** `DB_APP_*` : il se connecte au serveur partagé (`DB_HOST`/`DB_PORT`) avec `DB_APP_LOGIN`/`DB_APP_PWD`, jamais avec les identifiants d'administration `DB_ADMIN_*` (ADR-066).
-Le backend runtime lit `DB_HOST, DB_PORT, DB_NAME, DB_APP_LOGIN, DB_APP_PWD, DB_POOL_SIZE` ; `DB_ADMIN_LOGIN`/`DB_ADMIN_PWD` n'y apparaissent pas.
+Le backend runtime lit `DB_HOST, DB_PORT, DB_NAME, DB_APP_LOGIN, DB_APP_PWD, DB_POOL_SIZE, DB_POOL_TIMEOUT` ; `DB_ADMIN_LOGIN`/`DB_ADMIN_PWD` n'y apparaissent pas.
+
+`DB_POOL_TIMEOUT` mérite d'être renseignée en production, et pas seulement `DB_POOL_SIZE`.
+C'est elle qui borne l'attente d'une connexion : au-delà, Forge rend un `503` avec `Retry-After` plutôt que de laisser la requête pendre.
+Sans borne, mesuré, une transaction coincée fait patienter les requêtes cinquante secondes sur MariaDB et indéfiniment sur PostgreSQL et SQL Server, les workers s'épuisant un à un sans qu'aucune ligne de journal ne le dise.
 
 | Variable | Utilisée par | Stockée où en production ? |
 |---|---|---|

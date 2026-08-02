@@ -30,6 +30,19 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **La documentation de déploiement figeait encore l'unité systemd sur MariaDB (`DOC-DEPLOYMENT-BACKEND-001`).**
+  Deux pages montraient `After=network.target mariadb.service` comme unité de service, alors que `deploy:init` la fait suivre le backend résolu depuis `DEPLOY-BACKEND-AGNOSTIC-001`.
+  C'est mon propre correctif qui avait créé l'écart : le code a changé, la documentation qui le décrit non.
+  Un lecteur sur PostgreSQL, SQL Server ou SQLite qui recopiait l'exemple obtenait une unité attendant un service inexistant.
+  Les deux pages disent désormais que la ligne suit le backend, et invitent à préférer le fichier produit par `deploy:init` à une recopie, lui seul connaissant le backend du projet.
+
+- **`DB_POOL_TIMEOUT` manquait à la documentation de production (`DOC-DEPLOYMENT-POOL-TIMEOUT-001`).**
+  Les quatre backends la déclarent dans leur gabarit d'environnement, et la page de sécurité en production ne citait que `DB_POOL_SIZE`.
+  C'est pourtant elle qui borne l'attente d'une connexion, donc qui fait rendre un `503` avec `Retry-After` au lieu de laisser la requête pendre.
+  Sans borne, mesuré lors du chantier des pools, une transaction coincée fait patienter les requêtes cinquante secondes sur MariaDB et indéfiniment sur PostgreSQL et SQL Server.
+
+  Vérifié sans défaut dans la même zone : les variables citées correspondent toutes au contrat réel des backends, et la configuration Nginx documentée est identique, ligne à ligne, à celle que `deploy:init` produit.
+
 - **« Poser sa base » ne parlait que de tables, et quatre opt-ins sont tombés dans le trou (`WELCOME-OPTIN-INIT-001`).**
   Le troisième point de la procédure canonique d'installation cadrait l'étape sur les migrations seules.
   Ses vingt-sept dérivations en ont hérité, et quatre références concluaient donc « Rien à faire : cet opt-in n'apporte aucune table ».
