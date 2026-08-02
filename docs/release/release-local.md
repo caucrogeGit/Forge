@@ -73,7 +73,7 @@ bash scripts/release_check.sh --help   # aide
 Le script valide localement, ne publie rien et ne crée aucun tag.
 La publication reste le ticket **2.3 BETA-2-RELEASE-001**.
 
-`tools/check_version_sync.py` n'existe pas encore, la synchronisation des versions entre core et opt-ins est assurée par `tools/release-validate.sh`.
+`tools/check_version_sync.py` vérifie la cohérence des versions entre le cœur et les opt-ins ; `tools/release-validate.sh` l'appelle.
 
 ### Résultats attendus
 
@@ -452,19 +452,19 @@ Dans le navigateur, vérifier les deux routes :
 ```bash
 cd /chemin/vers/Forge
 
-# Tests de packaging (sans MariaDB)
-PYENV_VERSION=3.12.13 python -m pytest tests/test_packaging.py -v
+# Garde-fous de structure et de packaging (sans base de données)
+PYENV_VERSION=3.12.13 python -m pytest -m meta -q
 
 # Vérification des ancres et liens de documentation
 PYENV_VERSION=3.12.13 python -m mkdocs build --strict
 ```
 
-Les tests de packaging vérifient :
+Les garde-fous `meta` vérifient notamment :
 
-- que `pyproject.toml` utilise bien `find_packages` avec les bons patterns ;
-- que tous les sous-packages `core`, `cli` et `integrations` sont couverts ;
-- que les fichiers représentatifs de chaque starter existent sur disque ;
-- que le glob `starters/data/**/*` couvre tous les types (`.py`, `.json`, `.html`, `.snippet`).
+- que chaque distribution du dépôt est construite et publiée (complétude, `RELEASE-PYPI-COMPLETENESS-GUARD-001`) ;
+- que les versions sont cohérentes entre le cœur et les vingt-sept opt-ins ;
+- que la documentation ne nomme que du code existant, imports, commandes et signatures ;
+- que les conventions de structure du squelette et des paquets tiennent.
 
 Le build MkDocs `--strict` détecte les ancres cassées et les liens internes invalides.
 
@@ -484,13 +484,13 @@ Le build MkDocs `--strict` détecte les ancres cassées et les liens internes in
 | `forge db:init` + parcours « communes & séjours » à la main | pages publiques + formulaire séjour |
 | `forge db:init` + parcours « auth MFA » à la main | auth + MFA TOTP (nécessite forge-mvc-mfa) |
 | parcours « welcome-forge » à la main | pages éducatives HTTP sans BDD |
-| `pytest tests/test_packaging.py` | 14/14 passants |
+| `pytest -m meta -q` | tous passants |
 | `mkdocs build --strict` | 0 avertissement d'ancre |
 
 ---
 
 ## 8. Limites connues
 
-- Les tests `test_packaging.py` ne valident pas le contenu des fichiers, uniquement leur présence.
+- Les garde-fous `meta` valident la structure et les conventions, pas le comportement applicatif.
 - `--dry-run` ne valide pas la connexion MariaDB ni l'exécution de `db:apply`.
 - `seed_suivi.py` requiert que les entités du starter 4 aient été créées (`db:apply` passé).
