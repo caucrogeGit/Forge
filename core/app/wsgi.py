@@ -10,6 +10,10 @@ Tickets :
 - WSGI-PROD-WARNINGS-001 : `create_configured_wsgi_app()` émet aussi
   les warnings production (`MemorySessionStore` en `APP_ENV=prod`) — une
   seule fois à la construction de l'application, jamais par requête ;
+- CORE-WSGI-HEALTH-PARITY-001 : `GET /health` répond `200 {"status": "ok"}`
+  ici comme sur le serveur de développement. La sonde figure au contrat de
+  stabilité, mais n'était servie que par ce dernier et répondait 404 derrière
+  Gunicorn ; la réponse vient désormais de `core.http.health`, source unique ;
 - CORE-WSGI-BODY-LIMIT-001 : le corps de requête est contrôlé contre
   `request_size_limit(...)` AVANT d'être lu (aucune allocation pour un
   `Content-Length` au-delà de la limite), il n'est lu que pour les méthodes
@@ -40,6 +44,7 @@ from collections.abc import Callable
 from io import BytesIO
 from typing import Any, Iterable
 
+from core.http.health import health_response, is_health_request
 from core.http.request import (
     BODY_METHODS,
     Request,
@@ -234,6 +239,12 @@ def create_wsgi_app(application: Any) -> Callable[[dict[str, Any], Callable[...,
                 content_type="text/plain; charset=utf-8",
             )
             return _response_to_wsgi(bad_request, start_response, is_https=is_https)
+        # CORE-WSGI-HEALTH-PARITY-001 : la sonde du contrat de stabilité, servie
+        # avant le routage comme sur le serveur de dev. Elle n'était traitée que
+        # par ce dernier, et répondait 404 derrière Gunicorn.
+        if is_health_request(request.path):
+            return _response_to_wsgi(
+                health_response(), start_response, is_https=is_https)
         response = application.dispatch(request)
         return _response_to_wsgi(response, start_response, is_https=is_https)
 

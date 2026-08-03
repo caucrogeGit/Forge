@@ -279,6 +279,18 @@
 
 ### Corrigé
 
+- **La sonde `GET /health` répondait 404 en production (`CORE-WSGI-HEALTH-PARITY-001`).**
+  `GET /health` → `200 {"status": "ok"}` figure au contrat de stabilité comme surface publique garantie.
+  Elle n'était pourtant servie que par le serveur de développement, qui la traitait par un littéral inscrit dans son `do_GET`.
+  Le chemin WSGI, seul chemin de production supporté, ne la connaissait pas.
+  Un opérateur qui branchait la sonde de son superviseur sur `/health` derrière Gunicorn obtenait une application déclarée morte alors qu'elle servait, et un redémarrage en boucle du seul composant qui allait bien.
+  Trouvé en vérifiant par exécution le `curl` que la page de mise en production donne comme étape de validation, laquelle échouait donc depuis toujours.
+  Le défaut a tenu parce que ses deux tests exercent le même serveur, l'un en appelant `do_GET`, l'autre en lançant `python app.py` en sous-processus.
+  Aucun ne traversait le callable WSGI, si bien qu'une surface du contrat de stabilité était absente de la production sans qu'aucun garde ne puisse le voir.
+  La réponse vit désormais dans `core/http/health.py`, source unique que les deux serveurs consomment (règle A) : il n'y a plus deux contenus, donc plus d'écart possible entre eux.
+  Sept tests passent par le callable WSGI et par lui seul, dont un qui refuse qu'un littéral `{"status": "ok"}` revienne dans le squelette.
+  La sonde reste sans effet de bord, ne touchant ni la base ni les sessions : une sonde qui interroge la base transforme une base lente en application déclarée morte.
+
 - **`forge migration:make` sans nom rendait un `IndexError` (`ENTITIES-MIGRATION-MAKE-USAGE-001`).**
   Constaté en jouant le parcours du moteur d'entités, dont la page écrivait `forge migration:make` sans argument alors que le nom est obligatoire.
   Le code lisait `args[1]` sans vérifier, si bien qu'un argument oublié produisait `IndexError: list index out of range` en trace brute.
