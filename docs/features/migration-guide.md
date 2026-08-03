@@ -147,7 +147,7 @@ forge --version
 
 Un PATCH corrige des bugs ou des problèmes de sécurité sans modifier les interfaces.
 
-**Exemple :** `2.2.0 → 2.2.1`
+**Exemple :** `1.2.0 → 1.2.1`
 
 ### Ce qui peut changer
 
@@ -375,9 +375,10 @@ Les migrations SQL Forge concernent les projets applicatifs, pas le framework lu
 ### Commandes concernées
 
 ```bash
-forge db:init          # crée la base et applique les entités
-forge db:apply         # applique les migrations
-forge sync:entity      # régénère _base.py et .sql depuis entity.json
+forge db:init          # AFFICHE le SQL de provisioning ; --run l'exécute (ADR-067)
+forge db:apply         # applique le schéma SQL des entités
+forge migration:apply  # applique les migrations en attente
+forge sync:entity      # régénère les artefacts d'une entité depuis son JSON canonique
 ```
 
 **Forge ne fournit pas encore de système de migrations versionnées au sens strict** (type Alembic). Les fichiers SQL générés reflètent l'état courant des entités. Toute modification de schéma doit être gérée manuellement ou via des scripts SQL dédiés.
@@ -443,7 +444,7 @@ git revert HEAD
 ### Rollback de Forge
 
 ```bash
-pipx install forge-mvc==2.2.0 --force   # version précise
+pipx install forge-mvc==1.0.0rc2 --force  # une version précédente, réellement publiée
 forge --version                          # vérifier
 ```
 

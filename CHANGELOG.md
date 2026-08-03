@@ -30,6 +30,15 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Le guide de migration décrivait trois commandes de travers et une version inexistante (`DOC-MIGRATION-GUIDE-STALE-001`).**
+  Son bloc « commandes concernées » annonçait que `forge db:init` « crée la base et applique les entités », alors que depuis l'ADR-067 il **affiche** le SQL de provisioning et n'exécute qu'avec `--run`, et qu'il n'applique aucune entité.
+  `forge db:apply` y « appliquait les migrations », rôle de `migration:apply` ; le bloc citait le premier et omettait le second.
+  Un lecteur qui suivait ce guide pour migrer croyait donc sa base provisionnée alors que rien n'avait été exécuté.
+  La procédure de retour arrière proposait par ailleurs `pipx install forge-mvc==2.2.0`, version qui **n'a jamais été publiée** : PyPI ne porte que des `1.0.0b*` et `1.0.0rc*`, la trajectoire publique ayant été renumérotée vers 1.0.
+  Elle cite désormais une version réellement publiée, et l'exemple de numérotation PATCH passe de `2.2.0` à `1.2.0`, comme les exemples MINOR et MAJEUR : illustrer avec une série 2 laissait croire à une version 2 de Forge.
+
+  Vérifié sans défaut dans la même zone : la page sur les événements documente correctement une **absence assumée** (ADR-052) et non un paquet disparu, et les seules mentions d'une version 3.x vivent dans `docs/history/`, qui décrit son époque.
+
 - **La documentation de déploiement figeait encore l'unité systemd sur MariaDB (`DOC-DEPLOYMENT-BACKEND-001`).**
   Deux pages montraient `After=network.target mariadb.service` comme unité de service, alors que `deploy:init` la fait suivre le backend résolu depuis `DEPLOY-BACKEND-AGNOSTIC-001`.
   C'est mon propre correctif qui avait créé l'écart : le code a changé, la documentation qui le décrit non.

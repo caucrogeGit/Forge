@@ -170,7 +170,9 @@ class TestNiveauxMigration:
 
     def test_exemple_patch(self):
         text = _text()
-        assert "2.2.0" in text and "2.2.1" in text
+        # Harmonisé sur la série 1.x, comme les exemples MINOR et MAJEUR :
+        # illustrer un PATCH avec 2.2.0 laissait croire à une version 2 de Forge.
+        assert "1.2.0" in text and "1.2.1" in text
 
     def test_exemple_minor(self):
         text = _text()
