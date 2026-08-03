@@ -186,14 +186,26 @@ Forge distingue plusieurs types :
 
 ### Tests MariaDB opt-in
 
-Les tests E2E avec une vraie base MariaDB ne s'exécutent que si la variable d'environnement `FORGE_E2E_MARIADB=1` est définie.
-La base doit avoir un nom préfixé `forge_e2e_` pour éviter tout écrasement accidentel d'une base de développement ou de production.
+Deux variables distinctes gouvernent les tests adossés à une base réelle. Les confondre fait croire qu'on a testé.
+
+`tests/test_e2e_mariadb.py` n'attend aucune variable pour tourner : il lui faut une base joignable.
+Si elle ne l'est pas, il **se saute en silence**.
+`FORGE_REQUIRE_DB=1` transforme ce saut en échec, ce qui est le mode de la CI.
 
 ```bash
-FORGE_E2E_MARIADB=1 pytest tests/test_e2e_mariadb.py
+FORGE_TEST_DB_NAME=forge_e2e_test FORGE_REQUIRE_DB=1 pytest tests/test_e2e_mariadb.py
 ```
 
-Ces tests ne sont pas requis dans la suite standard.
+La base doit s'appeler `forge_test` ou commencer par `forge_e2e_`.
+Le test refuse tout autre nom, pour ne pas écraser une base de développement ou de production.
+
+`FORGE_E2E_MARIADB=1` est autre chose : elle ajoute le store de session BDD aux backends éprouvés par `tests/test_auth_login_persist_001.py`.
+
+```bash
+FORGE_E2E_MARIADB=1 pytest tests/test_auth_login_persist_001.py
+```
+
+Sans `FORGE_REQUIRE_DB=1`, un lancement local avec la base arrêtée affiche des `skipped`, pas des échecs.
 Ils sont optionnels et documentés dans la [Matrice de compatibilité](../release/compatibility.md).
 
 ### Règles pour les tests
@@ -411,14 +423,17 @@ git diff --check
 | `mkdocs build --strict` | Build doc sans erreur ni lien brisé |
 | `git diff --check` | Absence d'espaces de fin de ligne ou de marqueurs de conflit |
 
-### Validation optionnelle MariaDB
+### Validation avec une base réelle
 
 ```bash
-FORGE_E2E_MARIADB=1 pytest tests/test_e2e_mariadb.py
+FORGE_TEST_DB_NAME=forge_e2e_test FORGE_REQUIRE_DB=1 pytest tests/test_e2e_mariadb.py
 ```
 
-Uniquement si une instance MariaDB réelle est configurée avec une base dont le nom commence par `forge_e2e_`.
-Non requis dans la suite standard.
+Uniquement si une instance MariaDB réelle est configurée avec une base nommée `forge_test` ou préfixée `forge_e2e_`.
+
+`FORGE_REQUIRE_DB=1` compte ici plus que le reste. Sans elle, une base arrêtée donne des tests sautés, indiscernables d'une validation réussie dans un `-q`.
+
+Voir [Tests bout en bout](../reference/tests-e2e.md) pour les trois backends et leurs variables.
 
 ---
 
@@ -535,8 +550,7 @@ Voici le déroulé typique d'une contribution à Forge.
 
 **Ticket** : `DOC-MODULE-AUTHOR-001`, guide de création d'un module Forge
 
-**1.
-Auditer l'existant**
+**1. Auditer l'existant**
 
 ```bash
 # Lire le code du système de modules
@@ -548,35 +562,31 @@ cat core/modules/remove.py
 # Lire les tests E2E existants
 cat tests/test_e2e_module.py
 # Lire la référence
-grep -n "module" docs/reference.md | head -20
+grep -rn "module" docs/reference/ | head -20
 ```
 
-**2.
-Créer la documentation**
+**2. Créer la documentation**
 
 ```bash
 # Créer docs/module-author-guide.md
 # Ajouter dans mkdocs.yml (Modules et starters)
 ```
 
-**3.
-Créer les tests documentaires**
+**3. Créer les tests documentaires**
 
 ```bash
 # Créer tests/meta/test_doc_module_author.py
 # Tester que les sections existent, les commandes sont mentionnées, etc.
 ```
 
-**4.
-Mettre à jour la roadmap**
+**4. Mettre à jour la roadmap**
 
 ```bash
 # Dans docs/roadmap/forge-roadmap.md : marquer DOC-MODULE-AUTHOR-001 livré
 # Dans CHANGELOG.md : ajouter l'entrée complète du ticket
 ```
 
-**5.
-Valider**
+**5. Valider**
 
 ```bash
 pytest tests/meta/test_doc_module_author.py --tb=short -q
@@ -586,8 +596,7 @@ mkdocs build --strict
 git diff --check
 ```
 
-**6.
-Committer**
+**6. Committer**
 
 ```bash
 git add docs/module-author-guide.md tests/meta/test_doc_module_author.py \
@@ -602,8 +611,7 @@ git commit -m "feat: ajouter le guide de création de modules Forge"
 
 | Limite | État |
 |---|---|
-| Pas de CI automatique publique | Les validations sont manuelles en local |
-| Tests MariaDB non automatisés en CI | `FORGE_E2E_MARIADB=1` requis, base séparée nécessaire |
+| Tests base de données à lancer soi-même en local | La CI les couvre sur trois serveurs réels, mais un poste sans base les saute en silence |
 | Pas de contribution externe formalisée | Forge est maintenu par Roger Lequette, toute contribution suit la cession de droits documentée dans `CONTRIBUTING.md` |
 | Pas de bot de review automatique | La review est humaine |
 | Pas de guide de contribution graphique | Forge Design est un projet séparé |

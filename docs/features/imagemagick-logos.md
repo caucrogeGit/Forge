@@ -69,7 +69,10 @@ Version: ImageMagick 6.9.12-98 Q16 x86_64
 ```
 
 **Convention de ce guide** : toutes les commandes utilisent `magick` (version 7, recommandée).
-Si vous êtes en version 6, remplacez simplement `magick` par `convert` dans chaque exemple.
+Si vous êtes en version 6, remplacez `magick` par `convert` dans chaque exemple.
+
+Deux exceptions : la version 6 n'a pas de sous-commandes, mais des outils séparés.
+`magick montage` s'y écrit `montage`, et `magick identify` s'y écrit `identify`.
 
 Le `Q16` indique la profondeur de calcul (16 bits par canal), ce qui garantit une bonne qualité sur les dégradés et la transparence.
 

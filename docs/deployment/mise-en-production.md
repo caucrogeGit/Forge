@@ -3,7 +3,10 @@
 Ce parcours déroule **le** chemin officiel de mise en production de Forge, de zéro à une solution fiable.
 Il enchaîne des étapes précises ; chacune renvoie à la page de référence correspondante pour le détail.
 
-Le chemin canonique unique est : **reverse proxy HTTPS → Gunicorn (WSGI) → Forge → MariaDB**.
+Le chemin canonique unique est : **reverse proxy HTTPS → Gunicorn (WSGI) → Forge → base de données**.
+
+Ce parcours l'illustre avec MariaDB, parce qu'un pas à pas a besoin d'un backend concret.
+Les quatre backends sont au même niveau de support (ADR-084) : pour PostgreSQL, SQLite ou SQL Server, seules changent les étapes 1 et 4, décrites dans [Bases de données (backends)](../guide/bases-de-donnees.md).
 Le serveur de développement (`forge run`, `python app.py`) n'est pas destiné à l'exposition publique.
 Voir [Limites de production](production-limits.md) pour le pourquoi.
 
@@ -99,24 +102,41 @@ La politique de stockage des secrets admin est détaillée dans [Sécurité en p
 
 ---
 
-## 4. Créer la base MariaDB
+## 4. Provisionner la base
 
-Créez la base et un compte applicatif au privilège minimal.
+Le provisionnement se fait en deux temps, et Forge ne demande jamais le compte root du serveur (ADR-067).
 
-```sql
--- Connecté en root MariaDB
-CREATE DATABASE mon_app_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'mon_app_user'@'localhost' IDENTIFIED BY 'mot_de_passe_applicatif';
-GRANT SELECT, INSERT, UPDATE, DELETE ON mon_app_db.* TO 'mon_app_user'@'localhost';
-FLUSH PRIVILEGES;
+**Premier temps, obtenir le SQL.**
+`forge db:init` lit `env/` et **affiche** le script de provisionnement, sans se connecter.
+
+```bash
+.venv/bin/forge db:init
 ```
 
-Le provisioning (`db:init`) a besoin des identifiants admin, qui vivent dans `env/db-admin.local`.
-Chargez-les le temps de la commande, puis créez les tables :
+Il produit le `CREATE DATABASE` et les deux comptes, l'administrateur des migrations et l'applicatif au privilège minimal.
+Relisez-le : c'est du SQL visible, destiné à être lu avant d'être exécuté (principe 5).
+
+**Deuxième temps, l'exécuter.**
+La commande n'écrit aucun fichier, elle écrit sur la sortie standard.
+Redirigez-la, relisez le fichier obtenu, puis passez-le à une session d'administration.
+
+```bash
+.venv/bin/forge db:init > provisioning.sql
+sudo mariadb < provisioning.sql
+```
+
+`forge db:init --run` fait la même chose depuis Forge, en lisant les identifiants administrateur dans `env/db-admin.local`.
 
 ```bash
 export $(grep -v '^#' env/db-admin.local | xargs)
-.venv/bin/forge db:init
+.venv/bin/forge db:init --run
+```
+
+À ce stade la base et les comptes existent, mais **aucune table**.
+Les tables viennent des migrations.
+
+```bash
+.venv/bin/forge db:apply
 ```
 
 Les migrations ultérieures et les sauvegardes sont décrites dans [Déploiement avancé](deploy-advanced.md).
@@ -153,7 +173,10 @@ Installez Gunicorn dans l'environnement virtuel, puis testez le service à la ma
 
 Ajustez `--workers` selon le nombre de cœurs (règle simple : 2 × cœurs + 1).
 
-En multi-processus, les sessions doivent être **partagées** entre workers : utilisez le store MariaDB.
+En multi-processus, les sessions doivent être **partagées** entre workers.
+Le store par défaut du cœur garde les sessions en mémoire du processus, donc un visiteur perdrait la sienne à chaque worker changé.
+Installez `forge-mvc-sessions-db`, qui fournit `DbSessionStore`, adossé à la base configurée du projet.
+Ce store est agnostique du backend et fonctionne à l'identique sur les quatre (ADR-054).
 Créez la table `forge_sessions` (`forge sessions:init` puis `forge migration:apply`), puis éditez `wsgi.py` :
 
 ```python

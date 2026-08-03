@@ -310,7 +310,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
     git log --oneline -5
     ```
 
-    Selon la version de Forge et le starter utilisé, le dépôt Git peut déjà être initialisé.
+    Selon la version de Forge, le dépôt Git peut déjà être initialisé.
     Vérifiez d'abord avec `git status`.
 
     Si aucun dépôt n'est initialisé, ou si aucun commit n'a été créé, faites-le vous-même :
@@ -802,7 +802,7 @@ Elle part du principe que le poste Linux est déjà prêt : Forge, Git, `pipx` e
 
 Votre projet Forge est maintenant installé, configuré et lancé.
 
-La suite logique est de suivre le parcours du starter **Welcome Forge**.
+La suite logique est de suivre le parcours **Welcome Forge**.
 Il sert à prendre en main un projet Forge réel, étape par étape, sans partir directement dans les sujets avancés.
 
 Vous y verrez notamment :
