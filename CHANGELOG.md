@@ -30,6 +30,16 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Le tutoriel de première application ne fonctionnait pas (`DOC-TUTORIAL-PREREQUIS-001`).**
+  C'est le guide qu'un débutant suit pour construire son premier CRUD, et il échouait à sa **première commande de génération**.
+  Il ne mentionnait ni `forge-mvc-entities`, dont viennent `make:entity`, `make:relation`, `build:model` et `make:crud` depuis l'ADR-070, ni aucun backend de base de données, le squelette étant livré sans depuis l'ADR-060.
+  Le mot `pip install` n'apparaissait nulle part dans ses 426 lignes.
+  Sa section base de données était périmée de la même façon : elle annonçait que `forge db:init` « crée la base, l'utilisateur applicatif et les tables », alors qu'il **affiche** le SQL de provisioning depuis l'ADR-067, et que ce sont les tables que `db:apply` crée — commande absente du tutoriel.
+  Un lecteur arrivait donc au bout avec des fichiers générés, aucune table, et une application incapable de démarrer.
+  Les prérequis sont posés au premier chapitre, la section base distingue provisionner de créer les tables, et le récapitulatif final suit.
+
+  Vérifié sans défaut dans la même zone : `getting-started` s'arrête à `forge run` et renvoie aux parcours, sans promettre de génération ; `bases-de-donnees` présente correctement les quatre backends.
+
 - **Le guide de migration décrivait trois commandes de travers et une version inexistante (`DOC-MIGRATION-GUIDE-STALE-001`).**
   Son bloc « commandes concernées » annonçait que `forge db:init` « crée la base et applique les entités », alors que depuis l'ADR-067 il **affiche** le SQL de provisioning et n'exécute qu'avec `--run`, et qu'il n'applique aucune entité.
   `forge db:apply` y « appliquait les migrations », rôle de `migration:apply` ; le bloc citait le premier et omettait le second.

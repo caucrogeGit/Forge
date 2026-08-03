@@ -69,6 +69,18 @@ source .venv/bin/activate
 
 `forge new` crée la structure du projet, installe les dépendances Python, génère les certificats SSL de développement, compile le CSS Tailwind si npm est disponible, et initialise un dépôt Git propre.
 
+### Installer les deux opt-ins nécessaires
+
+Le squelette est livré **sans backend de base de données** ([ADR-060](../adr/060-backend-free-skeleton.md)), et le moteur d'entités est un opt-in depuis l'[ADR-070](../adr/070-entities-engine-extraction.md).
+
+```bash
+pip install --pre forge-mvc-mariadb forge-mvc-entities
+```
+
+Sans le moteur d'entités, `forge make:entity` n'existe pas.
+Sans backend, `forge db:init` répond qu'aucun n'est installé.
+Un autre backend convient tout aussi bien : `forge-mvc-sqlite`, `forge-mvc-postgres` ou `forge-mvc-mssql`, un seul par projet ([ADR-054](../adr/054-database-backend-optins.md)).
+
 Structure créée :
 
 ```text
@@ -312,16 +324,26 @@ DB_APP_PWD=<mot_de_passe_app>
 DB_NAME=carnet_contacts
 ```
 
-### Initialiser la base
+### Provisionner la base
 
 ```bash
 forge db:init
 ```
 
-`forge db:init` crée la base, l'utilisateur applicatif et les tables issues des fichiers SQL générés (`ville.sql`, `contact.sql`) puis applique `relations.sql`.
+`forge db:init` **affiche** le SQL de provisioning dérivé de `env/` : la base et les deux comptes ([ADR-067](../adr/067-db-init-provisioning-sql.md)).
+Forge ne demande jamais le root du serveur : collez ce script dans une session d'administration, ou laissez Forge l'exécuter avec `forge db:init --run` si le compte `DB_ADMIN_*` existe déjà côté serveur.
+
+### Créer les tables
+
+```bash
+forge db:apply
+```
+
+`forge db:apply` applique les fichiers SQL générés (`ville.sql`, `contact.sql`) puis `relations.sql`.
+C'est cette commande qui crée les tables, pas `db:init`.
 
 !!! warning "Ordre des tables"
-    `forge db:init` applique d'abord les fichiers SQL des entités, puis `relations.sql`.
+    `forge db:apply` applique d'abord les fichiers SQL des entités, puis `relations.sql`.
     La table `villes` doit exister avant que la contrainte de clé étrangère sur `contacts` soit ajoutée.
     Cet ordre est géré automatiquement.
 
@@ -380,7 +402,7 @@ Il ne couvre pas :
 `forge make:relation` est interactif.
 Pour les projets sans terminal interactif, éditez directement `mvc/entities/relations.json` selon le format documenté dans [Relations entre entités](../features/relations.md).
 
-`forge db:init` nécessite un MariaDB local configuré.
+`forge db:init` et `forge db:apply` nécessitent un MariaDB local configuré.
 Sans MariaDB, les fichiers JSON, SQL, modèles et vues sont générés mais l'application ne peut pas démarrer.
 
 ---
@@ -391,6 +413,8 @@ Sans MariaDB, les fichiers JSON, SQL, modèles et vues sont générés mais l'ap
 forge new carnet_contacts          # créer le projet
 cd carnet_contacts
 source .venv/bin/activate
+
+pip install --pre forge-mvc-mariadb forge-mvc-entities   # backend + moteur d'entités
 
 forge doctor                       # vérifier l'environnement
 forge project:check                # cohérence structurelle
@@ -408,7 +432,8 @@ forge make:crud Contact            # générer le CRUD Contact
 forge project:check                # vérifier après génération
 forge project:audit                # rapport détaillé
 
-forge db:init                      # initialiser la base (MariaDB requis)
+forge db:init                      # AFFICHE le SQL de provisioning ; --run l'exécute
+forge db:apply                     # crée les tables des entités
 forge run                          # lancer l'application
 ```
 
