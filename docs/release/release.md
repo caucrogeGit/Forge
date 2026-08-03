@@ -32,6 +32,17 @@ Si des tickets du sprint suivant sont déjà ouverts, ils restent en branche ou 
 
 ## Checklist avant release
 
+Les points 1 à 7 sont automatisés par un seul script :
+
+```bash
+bash tools/release-validate.sh <VERSION>
+```
+
+Il accepte la version en SemVer (`1.0.0-rc.4`) comme en PEP 440 (`1.0.0rc4`), et enchaîne la cohérence de version, les tests, Ruff, `compileall`, MkDocs strict et `pip-audit`.
+Il se termine par `RÉSULTAT : OK - prêt à releaser.`
+
+Les points ci-dessous détaillent ce qu'il contrôle, et servent à diagnostiquer un échec.
+
 ### 1. Working tree propre
 
 ```bash
@@ -91,15 +102,23 @@ pip-audit -r requirements-dev.txt
 Aucune vulnérabilité critique connue dans les dépendances.
 Si `pip-audit` signale un problème, créer un ticket `DEPENDENCY-FIX-XXX` avant de publier.
 
-### 8. Construction de la wheel
+### 8. Construction des distributions
+
+Forge n'est pas une distribution mais un jeu de distributions.
+Le cœur `forge-mvc` et chaque opt-in de `packages/` ont leur propre `pyproject.toml`.
+Un `python -m build` lancé à la racine ne construit que le cœur, et laisse les opt-ins à leur version précédente sur PyPI.
+
+Construire l'ensemble avec le script dédié :
 
 ```bash
-rm -rf dist build *.egg-info
-python -m build
-ls dist/
+bash tools/release-build.sh
 ```
 
-La wheel et le sdist doivent être générés sans erreur.
+Il construit toutes les distributions dans `dist/`, puis passe `twine check`.
+Il ne publie rien.
+
+Le compte attendu n'est pas écrit ici : il a valu 13, puis 25, puis 28.
+C'est `tools/release-build.sh` qui l'établit à chaque passage, et le garde-fou `RELEASE-PYPI-COMPLETENESS-GUARD-001` qui refuse qu'un paquet neuf soit oublié.
 
 ---
 
@@ -206,25 +225,49 @@ git diff --check
 
 ---
 
-## Création du tag
-
-```bash
-git tag -a vx.y.z -m "Forge x.y.z"
-```
-
-Vérifier que le tag pointe bien sur le bon commit :
-
-```bash
-git status
-git tag --points-at HEAD
-```
-
----
-
 ## Push GitHub
 
 ```bash
 git push origin main
+```
+
+Le tag n'est pas poussé ici. Il vient en dernier, une fois la publication faite.
+
+Laisser la CI confirmer sur `main` avant de publier.
+
+---
+
+## Publication PyPI
+
+```bash
+bash tools/publish.sh
+```
+
+Sans option, le script est en simulation. Il construit, vérifie et affiche l'ordre de publication, sans rien envoyer.
+
+Quand la séquence affichée est la bonne :
+
+```bash
+bash tools/publish.sh --upload
+```
+
+Le cœur `forge-mvc` part en premier, les opt-ins en dépendent.
+Chaque envoi passe `--skip-existing`, ce qui rend le script reprenable.
+PyPI limite la création de projets neufs et répond parfois 429 : dans ce cas, attendre puis relancer la même commande, elle saute les distributions déjà publiées.
+
+---
+
+## Création du tag
+
+Le tag vient **après** la publication, et il se pose sur le commit publié.
+
+C'est l'ordre qui a manqué à la `v1.0.0-rc.3`.
+Le tag avait été posé avant la fin du travail, puis un correctif de sécurité est parti sur `main` : le tag désignait un code que personne n'avait publié, et il a fallu le déplacer.
+Un tag déplacé est un tag que d'autres ont déjà pu récupérer.
+
+```bash
+git tag -a vx.y.z -m "Forge x.y.z"
+git tag --points-at HEAD
 git push origin vx.y.z
 ```
 
