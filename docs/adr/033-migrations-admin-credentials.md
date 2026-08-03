@@ -41,6 +41,11 @@ Conséquences :
    Pour que `db:apply` marche, il faut élargir `forge_app` au DDL (le commentaire `DB_APP_PRIVILEGES=...,CREATE,ALTER,DROP,...` de `env/example`), ce qui contredit « `forge_app` = runtime à privilèges minimaux » et affaiblit la sécurité (le compte runtime peut modifier la structure et supprimer des tables).
 
 `forge db:init` se connecte déjà correctement en `DB_ADMIN_*` (création base, utilisateur applicatif, grants).
+
+!!! note "Comportement changé depuis"
+    L'[ADR-067](067-db-init-provisioning-sql.md) a modifié `forge db:init` :
+    il **affiche** désormais le SQL de provisioning et ne se connecte qu'avec `--run`.
+    La décision de cet ADR, employer `DB_ADMIN_*` pour les migrations, reste en vigueur.
 L'incohérence est isolée à la chaîne migrations.
 
 ---

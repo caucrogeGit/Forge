@@ -22,7 +22,9 @@ Nous abordons un nouveau domaine, la base de données : selon le principe « nou
     forge db:init
     ```
 
-    `forge db:init` crée la base, l'utilisateur applicatif et la table `forge_migrations` qui enregistre les migrations déjà appliquées.
+    `forge db:init` prépare la base et la table `forge_migrations`, qui enregistre les migrations déjà appliquées.
+    Sur un backend **sans serveur** comme SQLite, il crée directement le fichier.
+    Sur un backend **serveur**, il affiche le SQL de provisioning, base et comptes, à exécuter dans une session d'administration, ou l'exécute avec `--run` ([ADR-067](../../../adr/067-db-init-provisioning-sql.md)).
     Sans cette étape, `forge migration:apply` n'a ni base ni table de suivi et échoue.
 
     Générez ensuite le fichier de migration ; Forge l'horodate pour vous :

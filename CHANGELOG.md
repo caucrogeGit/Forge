@@ -30,6 +30,15 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **Un garde interdit à la documentation d'affirmer ce que l'aide contredit (`DOC-COMMAND-BEHAVIOUR-001`).**
+  Trois ADR récents ont changé le comportement de commandes centrales, et la documentation a décrit l'ancien pendant des mois : le tutoriel de première application, le guide de migration, la page d'installation MariaDB, les chapitres des quatre backends, le parcours welcome-forge.
+  Le garde compare la documentation à **l'aide de la commande**, pas à une liste écrite dans le test : si l'aide dit que `db:init` affiche par défaut et n'exécute qu'avec `--run`, aucune page ne peut affirmer qu'il crée sans nommer `--run`.
+  Il est volontairement **étroit**. Sa première version relevait dix phrases dont la moitié étaient justes, une négation, une comparaison, et le cas SQLite où `db:init` crée réellement le fichier faute de serveur.
+  Les exemptions sont explicites et motivées, et un test vérifie qu'elles le restent : une exemption sans motif écrit devient un trou silencieux.
+  Les ADR sont hors de portée, comme les archives : ils énoncent ce qui était vrai à leur date, et les corriger réécrirait la décision qu'ils enregistrent.
+  L'ADR-033, qui décrivait un `db:init` se connectant, reçoit à la place un renvoi vers l'ADR-067 qui a changé ce comportement, sa propre décision restant en vigueur.
+  Trois pages de `welcome-forge` affirmaient enfin que `db:init` « crée la base, l'utilisateur applicatif » : c'est vrai sur SQLite, sans serveur ni comptes, et faux sur les trois autres backends. Elles distinguent désormais les deux cas.
+
 - **La page d'installation de MariaDB décrivait un `db:init` d'avant l'ADR-067 (`DOC-INSTALL-MARIADB-STALE-001`).**
   Elle affirmait que `forge db:init` « se connecte en tant que `forge_admin` », et citait un message d'erreur, `Connexion MariaDB admin impossible`, qui **n'existe plus dans le code**.
   Depuis l'ADR-067, `db:init` ne se connecte pas : il affiche le SQL de provisioning, et seul `--run` l'exécute.
