@@ -102,6 +102,7 @@ forge.configure(
     upload_max_size = UPLOAD_MAX_SIZE,
     trusted_proxies = APP_TRUSTED_PROXIES,
 )
+from core.http.health import health_response, is_health_request
 from core.http.request import Request, RequestEntityTooLarge
 from core.http.response import Response
 from core.http.helpers import html as _html
@@ -191,8 +192,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         with _csp.request_nonce(_csp.generate_nonce() if APP_CSP_NONCE_ENABLED else None):
             try:
                 request = Request(self)
-                if request.path == "/health":
-                    self._send_response(Response(200, b'{"status": "ok"}', "application/json"))
+                if is_health_request(request.path):
+                    self._send_response(health_response())
                     return
                 if request.path == "/favicon.ico":
                     self._serve_static("/static/favicon.ico")

@@ -315,7 +315,8 @@
   Trouvé en vérifiant par exécution le `curl` que la page de mise en production donne comme étape de validation, laquelle échouait donc depuis toujours.
   Le défaut a tenu parce que ses deux tests exercent le même serveur, l'un en appelant `do_GET`, l'autre en lançant `python app.py` en sous-processus.
   Aucun ne traversait le callable WSGI, si bien qu'une surface du contrat de stabilité était absente de la production sans qu'aucun garde ne puisse le voir.
-  La réponse vit désormais dans `core/http/health.py`, source unique que les deux serveurs consomment (règle A) : il n'y a plus deux contenus, donc plus d'écart possible entre eux.
+  La réponse vit désormais dans `core/http/health.py`, source unique que tous les serveurs consomment (règle A) : il n'y a plus qu'un contenu, donc plus d'écart possible.
+  Ils étaient trois, et non deux comme annoncé d'abord. L'application de dogfooding servie par les tests E2E gardait sa propre copie du littéral, restée invisible tant que ces tests étaient inertes. Réveillés par `E2E-LAUNCHER-APP-PATH-001`, ils valident ce fichier, si bien qu'une divergence y aurait fait passer au vert une sonde différente de celle qui est expédiée.
   Sept tests passent par le callable WSGI et par lui seul, dont un qui refuse qu'un littéral `{"status": "ok"}` revienne dans le squelette.
   La sonde reste sans effet de bord, ne touchant ni la base ni les sessions : une sonde qui interroge la base transforme une base lente en application déclarée morte.
 

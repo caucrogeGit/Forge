@@ -143,17 +143,42 @@ def test_les_deux_serveurs_lisent_la_meme_reponse() -> None:
     assert reponse.content_type == "application/json"
 
 
-def test_le_squelette_ne_reecrit_pas_la_reponse() -> None:
-    """Le serveur de développement doit consommer `core.http.health`.
+#: Les `app.py` qui servent la sonde par le chemin du serveur de développement.
+#:
+#: - `skeleton/data/app.py` : le gabarit copié dans chaque projet neuf ;
+#: - `tests/fixtures/app/app.py` : l'application de dogfooding servie par les
+#:   tests E2E depuis l'ADR-044. Elle avait gardé sa propre copie du littéral,
+#:   restée invisible tant que ces tests étaient inertes
+#:   (`E2E-LAUNCHER-APP-PATH-001`). Réveillés, ils valident ce fichier : une
+#:   divergence y ferait passer au vert une sonde différente de celle qui est
+#:   expédiée.
+SERVEURS_DE_DEV = (
+    "skeleton/data/app.py",
+    "tests/fixtures/app/app.py",
+)
 
-    Un littéral `{"status": "ok"}` réintroduit dans `app.py` recréerait
+
+@pytest.mark.parametrize("fichier", SERVEURS_DE_DEV)
+def test_aucun_serveur_de_dev_ne_reecrit_la_reponse(fichier: str) -> None:
+    """Chaque serveur de développement doit consommer `core.http.health`.
+
+    Un littéral `{"status": "ok"}` réintroduit dans l'un d'eux recréerait
     exactement le défaut corrigé ici, sans que rien ne le signale.
     """
     from pathlib import Path
 
-    source = (Path(__file__).resolve().parent.parent
-              / "skeleton" / "data" / "app.py").read_text(encoding="utf-8")
+    source = (Path(__file__).resolve().parent.parent / fichier).read_text(encoding="utf-8")
 
-    assert "is_health_request" in source
-    assert "health_response()" in source
-    assert '{"status": "ok"}' not in source
+    assert "is_health_request" in source, f"{fichier} n'utilise pas la source unique"
+    assert "health_response()" in source, f"{fichier} n'utilise pas la source unique"
+    assert '{"status": "ok"}' not in source, f"{fichier} garde une copie du littéral"
+
+
+def test_les_serveurs_de_dev_listes_existent() -> None:
+    """Une entrée périmée ferait passer le garde sans rien vérifier."""
+    from pathlib import Path
+
+    racine = Path(__file__).resolve().parent.parent
+
+    for fichier in SERVEURS_DE_DEV:
+        assert (racine / fichier).is_file(), fichier
