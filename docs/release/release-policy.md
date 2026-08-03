@@ -108,7 +108,7 @@ Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la
 
 ### Stable : garantie 1.x
 
-- Commandes CLI documentées dans `docs/reference.md`.
+- Commandes CLI documentées dans [Commandes CLI](../reference/cli-commands.md).
 - Structure projet générée par `forge new`.
 - Format JSON canonique des entités (v1).
 - Clés `.env` documentées.

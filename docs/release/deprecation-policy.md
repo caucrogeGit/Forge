@@ -57,7 +57,7 @@ Une dépréciation doit être :
 
 Les éléments suivants ne peuvent pas être supprimés sans cycle de dépréciation :
 
-- Commandes CLI documentées dans `docs/reference.md` et `docs/stability-contract.md`.
+- Commandes CLI documentées dans [Commandes CLI](../reference/cli-commands.md) et [Contrat de stabilité](stability-contract.md).
 - Imports publics de `core.http`, `core.auth`, `core.security` documentés.
 - Clés `.env` documentées.
 - Structure de projet générée par `forge new`.
@@ -151,7 +151,7 @@ def ancienne_fonction():
     return nouvelle_fonction()
 ```
 
-Ajouter dans `CHANGELOG.md` et dans `docs/auth.md` ou `docs/reference.md` la mention de la dépréciation.
+Ajouter dans `CHANGELOG.md` et dans [Authentification](../features/auth.md) ou [Commandes CLI](../reference/cli-commands.md) la mention de la dépréciation.
 
 ### Maintien pendant la série 1.x
 
@@ -175,7 +175,7 @@ Documenter la migration dans le guide de migration (`RELEASE-MIGRATION-GUIDE-001
 
 ### Annonce
 
-Documenter dans `docs/reference.md` que l'option est dépréciée, quelle option utiliser à la place, et depuis quelle version.
+Documenter dans [Commandes CLI](../reference/cli-commands.md) que l'option est dépréciée, quelle option utiliser à la place, et depuis quelle version.
 
 ### Avertissement runtime
 
@@ -278,7 +278,7 @@ Avant le retrait :
 1. Vérifier que la dépréciation a bien été annoncée dans la série précédente.
 2. Documenter le retrait dans le CHANGELOG sous `### Supprimé`.
 3. Documenter la migration dans `docs/` si nécessaire.
-4. Mettre à jour `docs/reference.md` et `docs/stability-contract.md`.
+4. Mettre à jour [Commandes CLI](../reference/cli-commands.md) et [Contrat de stabilité](stability-contract.md).
 5. Supprimer les tests de la fonctionnalité retirée ou les adapter à la nouvelle.
 
 ---
@@ -324,7 +324,7 @@ Dans ce cas :
 - **Déprécié pendant** : le développement pré-1.0.
 - **Alternative** : `core.auth.session.login_required`.
 - **Retrait prévu** : Forge 1.x stable.
-- **Référence** : `docs/auth.md`, section "Modules core.security dépréciés".
+- **Référence** : [Authentification](../features/auth.md), section "Modules core.security dépréciés".
 
 ---
 

@@ -177,7 +177,6 @@ Forge distingue plusieurs types :
 | **Tests unitaires** | `tests/test_<module>.py` | Vérifient une fonction ou une classe isolée |
 | **Tests comportementaux** | `tests/test_<module>.py` | Vérifient un flux runtime, une CLI, un générateur ou une intégration |
 | **Tests E2E CLI** | `tests/test_e2e_cli.py` | Vérifient les commandes Forge dans un projet temporaire |
-| **Tests E2E starters** | `tests/test_e2e_starter.py` | Vérifient le build complet d'un starter |
 | **Tests E2E modules** | `tests/test_e2e_module.py` | Vérifient le cycle install → files → routes → remove d'un module |
 | **Tests sécurité** | `tests/test_security_*.py` | Vérifient CSRF, cookies, headers, uploads, RBAC |
 | **Tests MariaDB opt-in** | `tests/test_e2e_mariadb.py` | Nécessitent une base `forge_e2e_*` réelle |
@@ -256,7 +255,7 @@ Suppression possible uniquement si l'invariant disparaît de l'architecture :
 
 - frontières d'import entre `core/` et les opt-ins (`ADR-004`, `ADR-011`) ;
 - contrat de packaging (packages déclarés dans `pyproject.toml`) ;
-- politique de sécurité documentée (`docs/production-security.md`, `docs/security.md`) ;
+- politique de sécurité documentée ([Sécurité en production](../deployment/production-security.md), [Sécurité](security.md)) ;
 - politique de dépréciation documentée ;
 - stabilité de l'API publique (`test_stability_contract_3_x_001.py`) ;
 - isolation des tests méta (`test_tests_meta_isolate_001.py`) ;
@@ -366,7 +365,7 @@ Elle n'est pas « le projet de référence »
 
 Une fonctionnalité non documentée est incomplète.
 
-### Quand modifier `docs/reference.md`
+### Quand modifier la référence
 
 Toute nouvelle commande CLI, tout nouveau paramètre ou tout changement de comportement observable doit être reflété dans [Référence API et CLI](../reference/api.md).
 

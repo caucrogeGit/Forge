@@ -279,6 +279,15 @@
 
 ### Corrigé
 
+- **Le contrat de stabilité garantissait deux classes qui n'existent pas (`DOC-CITED-PATHS-001`).**
+  `docs/release/stability-contract.md` engageait Forge sur des « backends de session FileStore / MariaDbStore ». Aucun des deux noms n'existe dans le code, où les stores s'appellent `FileSessionStore` et `DbSessionStore`.
+  Le même document se contredisait sur leur statut. Il les déclarait « Disponible, API stable » dans son tableau du public, puis les rangeait plus bas parmi ce qui n'est **pas** garanti, comme « expérimentaux ». `release-policy.md`, que le contrat désigne lui-même comme source unique de la maturité, les classe en expérimental. Le contrat suit désormais sa propre source.
+  Découvert en balayant le contrat plutôt qu'en corrigeant les deux lignes déjà repérées.
+  Dans la même famille, dix-huit autres chemins cités en prose ne désignaient plus rien, dont sept dans les trois documents les plus engageants du projet, tous hérités de la refonte de l'ADR-039 et du découpage de `docs/reference.md` en onze fichiers. Un lecteur cherchant où sont documentées les clés d'environnement ou les commandes CLI garanties tombait sur un fichier absent.
+  Ces mentions survivaient parce que `mkdocs build --strict` vérifie les liens Markdown et ne voit pas un chemin écrit entre dos-de-chat.
+  Un garde-fou vérifie maintenant que tout chemin cité en prose désigne un fichier réel, hors archives : un ADR, une entrée de roadmap ou un ticket de campagne enregistrent ce qui était vrai à leur date, et corriger leurs chemins réécrirait le compte rendu qu'ils conservent.
+  Il a aussitôt révélé qu'un garde plus ancien passait grâce au chemin mort lui-même. Il exigeait la sous-chaîne `reference.md` dans la page d'authentification, que seule satisfaisait la mention obsolète ; le vrai lien de « Voir aussi » ne la contient pas, si bien que le garde serait resté vert si ce lien avait disparu.
+
 - **Soixante-cinq tests, dont les trente-trois d'en-têtes de sécurité, ne s'exécutaient plus depuis six versions (`E2E-LAUNCHER-APP-PATH-001`).**
   L'ADR-044 a relocalisé l'application de dogfooding hors de la racine du dépôt le 2026-06-23. `tests/_e2e_launcher.py` a continué de la chercher à la racine.
   Trois causes se sont additionnées pour rendre la panne muette. Le lanceur visait un fichier disparu. Son `stderr` partait dans `subprocess.DEVNULL`, si bien que le `FileNotFoundError` n'atteignait personne. Et l'absence du signal `READY:` se traduisait en `pytest.skip("Serveur Forge non disponible")`, formule qui décrit un poste local mal équipé plutôt qu'un défaut.

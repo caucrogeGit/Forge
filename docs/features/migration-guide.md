@@ -466,8 +466,8 @@ Avant de migrer :
 
 - [ ] Identifier la version actuelle (`forge --version`).
 - [ ] Lire le `CHANGELOG.md` de la version cible.
-- [ ] Lire les dépréciations actives dans `docs/deprecation-policy.md`.
-- [ ] Vérifier la compatibilité dans `docs/compatibility.md`.
+- [ ] Lire les dépréciations actives dans [Politique de dépréciation](../release/deprecation-policy.md).
+- [ ] Vérifier la compatibilité dans [Matrice de compatibilité](../release/compatibility.md).
 - [ ] Sauvegarder le code (`git commit`, `git push`).
 - [ ] Sauvegarder la base de données (`mysqldump`).
 - [ ] Vérifier l'état du projet (`forge doctor`, `forge project:check`, `pytest`).

@@ -37,7 +37,7 @@ logging.getLogger("forge.auth.audit").setLevel(logging.INFO)
 
 ### Tests
 
-`tests/test_auth_audit_controller.py` couvre 33 cas : niveaux INFO/WARNING, absence de données sensibles dans les logs, présence de `user_id` et `ip`, comportement des contrôleurs préservé, silence en cas d'erreur interne.
+`tests/test_auth_audit.py` et ses compléments couvrent : niveaux INFO/WARNING, absence de données sensibles dans les logs, présence de `user_id` et `ip`, comportement des contrôleurs préservé, silence en cas d'erreur interne.
 
 ## Cookies de session : Attributs de sécurité
 
@@ -81,7 +81,7 @@ Forge suppose un accès HTTPS ou proxy TLS dans tous les environnements.
 
 ### Tests
 
-`tests/test_security_cookies.py` couvre 39 cas : attributs de tous les points d'émission, contenu du cookie, données de session côté serveur, fixation de session, durée d'expiration, comportement `Secure` en dev et prod, absence de cookie CSRF séparé.
+`tests/test_auth_session_hardening.py` et `tests/test_security_session_cookie_helper_001.py` couvrent : attributs de tous les points d'émission, contenu du cookie, données de session côté serveur, fixation de session, durée d'expiration, comportement `Secure` en dev et prod, absence de cookie CSRF séparé.
 
 ## Headers HTTP de sécurité
 
@@ -232,4 +232,4 @@ Le path traversal via l'URL est bloqué avant toute lecture de fichier.
 ### Tests
 
 `tests/test_security_uploads_audit.py` : 65 tests sécurité ciblés.
-`tests/test_uploads.py` + `tests/test_media_route.py` : couverture fonctionnelle existante.
+`tests/test_uploads.py` et `tests/test_e2e_upload_http.py` : couverture fonctionnelle existante.

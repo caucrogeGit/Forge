@@ -204,7 +204,13 @@ class TestLiensCroises:
         assert "production-security.md" in a or "production" in a.lower()
 
     def test_auth_md_lien_vers_reference(self):
-        assert "reference.md" in _auth()
+        # DOC-CITED-PATHS-001 : cette assertion cherchait la sous-chaîne
+        # `reference.md`, que seule satisfaisait une mention en prose de
+        # `docs/reference.md`, monolithe découpé par DOCS-REFERENCE-SPLIT-001.
+        # Le vrai lien de « Voir aussi » pointe vers `../reference/api.md` et ne
+        # la contient pas : le garde passait donc sur un chemin mort, et serait
+        # resté vert si le lien réel avait disparu.
+        assert "../reference/api.md" in _auth()
 
     def test_auth_md_section_voir_aussi(self):
         a = _auth()

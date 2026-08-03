@@ -31,7 +31,7 @@ Les éléments suivants sont garantis pour toute la série 1.x :
 - Les commandes CLI listées dans la section [Commandes CLI stables](#commandes-cli-stables).
 - La structure de projet générée par `forge new` (dossiers `mvc/`, `env/`, `static/`, `app.py`, `forge_profile.txt`).
 - Le format JSON canonique des entités (`mvc/entities/<entite>/<entite>.json`, v1).
-- Les clés de configuration `.env` documentées dans `docs/reference.md`.
+- Les clés de configuration `.env` documentées dans [Sécurité en production](../deployment/production-security.md).
 - Le comportement des fichiers générés et préservés décrit plus bas.
 - Les imports publics documentés de `core.http`, `core.auth`, `core.security` (session, CSRF, décorateurs RBAC).
 - L'endpoint `GET /health` → `200 {"status": "ok"}`.
@@ -46,7 +46,7 @@ Les éléments suivants sont garantis pour toute la série 1.x :
 
 | Domaine | Éléments publics garantis |
 |---|---|
-| CLI | Commandes et options listées dans `docs/reference.md` |
+| CLI | Commandes et options listées dans [Commandes CLI](../reference/cli-commands.md) |
 | Structure projet | `mvc/`, `env/`, `static/`, `app.py`, `forge_profile.txt` |
 | Entités | Format JSON v1 (`entity`, `table`, `primary_key`, `fields`, `constraints`) |
 | Modèles | `*_base.py` (interface), `*.py` manuel (classe métier) |
@@ -55,7 +55,7 @@ Les éléments suivants sont garantis pour toute la série 1.x :
 | Auth | `core.auth.login`, `core.auth.logout`, `core.auth.current_user`, `core.auth.is_authenticated`, `@login_required` |
 | RBAC | `@require_role`, `@require_auth`, `@require_csrf` |
 | Session | `core.security.session` (API documentée) |
-| Config | Clés `APP_*`, `DB_*`, `MAIL_*` documentées dans `docs/reference.md` |
+| Config | Clés `APP_*`, `DB_*`, `MAIL_*` documentées dans [Sécurité en production](../deployment/production-security.md) |
 | Santé | `GET /health` → `200 {"status": "ok"}` |
 
 ---
@@ -67,7 +67,7 @@ Les éléments suivants peuvent changer sans notice entre versions mineures de F
 - Fonctions et modules internes de `cli/` (générateurs, parseurs, builders).
 - Fonctions préfixées `_` dans tout le code source Forge.
 - Structure interne des générateurs (`cli/entities/crud/`, `cli/entities/model/`, etc.).
-- Helpers non référencés dans `docs/reference.md`.
+- Helpers non référencés dans [Référence API et CLI](../reference/api.md).
 - Contenu interne des tests Forge (fichiers `tests/`).
 - Modules internes non exposés dans la documentation (`core/templating/` internals, `core/forge.py` registry).
 - Format interne des fichiers de session stockés côté serveur.
@@ -85,7 +85,7 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 | `forge check:model` | Expérimental |
 | `forge deploy:init`, `forge deploy:check` | Expérimental |
 | Pages publiques (`make:public-*`) | Disponible, interface stable, comportement peut s'affiner |
-| Backends de session FileStore / MariaDbStore | Disponible, API stable, options de configuration susceptibles d'évoluer |
+| Backends de session `FileSessionStore` (cœur) et `DbSessionStore` (`forge-mvc-sessions-db`) | Expérimental, stable en usage, interface susceptible d'évoluer |
 | `forge-mvc-mfa` (Beta) | Secret TOTP chiffré au repos via Fernet (`FORGE_MFA_SECRET_KEY`). Publié sur PyPI depuis `1.0.0-beta.9`. |
 | `forge-mvc-iot` (Beta) | Subscriber MQTT, stockage `iot_events`, API HTTP en lecture seule. Publié sur PyPI depuis `1.0.0-beta.12`. API en stabilisation. |
 | `forge-mvc-video` (Beta) | Chaîne complète `video:upload` → `video:process` → lecture HTTP Range, + `video:cleanup`. Transcodage MP4 (H.264/AAC). Publié sur PyPI depuis `1.0.0-beta.13`. |
@@ -304,7 +304,7 @@ Les points suivants seront traités dans des tickets dédiés :
 - Promesse sur l'API JSON future (`API-JSON-001` et suivants).
 - Garantie sur les modules internes non documentés.
 - Garantie sur les starters (code généré, non versionnés dans les projets utilisateur).
-- Garantie sur les backends de session expérimentaux (FileStore, MariaDbStore).
+- Garantie sur les backends de session expérimentaux (`FileSessionStore`, `DbSessionStore`).
 - La rétrocompatibilité fine des API des opt-ins en Bêta : elles peuvent encore évoluer avant le statut Stable.
 - Les API privées préfixées par `_` peuvent changer entre versions mineures sans notice.
 

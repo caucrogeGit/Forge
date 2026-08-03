@@ -245,7 +245,7 @@ Modèle (skeleton), aligné sur `welcome` / `first-crud` :
 }
 ```
 
-- **`number` contiguë** : l'ensemble des starters est numéroté `1..N` sans trou (invariant vérifié par `tests/test_starter_cli.py`).
+- **`number` contiguë** : l'ensemble des starters est numéroté `1..N` sans trou (invariant vérifié par `tests/meta/test_starter_progression_001.py`).
   Ajouter un starter = prendre le numéro suivant.
 - `doc_url` pointe vers le slug réel : `/starters/<starter>/<niveau>/<id>/` pour un palier d'une progression par niveau (ex. `/starters/welcome-forge/debutant/welcome/`), `/starters/<id>/` pour un starter autonome.
 
@@ -306,7 +306,7 @@ Tout nouveau palier/starter doit livrer un test `tests/test_starter_<id>_001.py`
 - doc présente, **sans** motif interdit (`Starter N`, `forge starter:build`, `forge new mon-projet`, `cd mon-projet`, `source .venv/...`) ;
 - progression : le palier est marqué « livré » au bon rang dans `docs/starters/index.md`.
 
-Tests transverses à mettre à jour quand on touche la progression : `tests/meta/test_starter_progression_001.py` (liste + numéros), `tests/meta/test_starter_sequential_nav_001.py` (chaînage), `tests/test_starter_cli.py` (numérotation contiguë).
+Tests transverses à mettre à jour quand on touche la progression : `tests/meta/test_starter_progression_001.py` (liste + numéros) et `tests/meta/test_starter_sequential_nav_001.py` (chaînage).
 
 **Charte règle D** : les tests testent le **code**, pas cette page.
 Ce document est un guide, pas un contrat verrouillé par test.
