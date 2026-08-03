@@ -113,11 +113,12 @@ forge_app    → accès applicatif en lecture/écriture
 
 Cette séparation évite d’utiliser `root` comme compte applicatif et limite les droits utilisés par l’application au quotidien.
 
-!!! warning "Étape indispensable avant `forge db:init`"
-    `forge db:init` se connecte en tant que `forge_admin` : ce compte doit déjà exister dans MariaDB.
-    Il n’est **pas** créé automatiquement par Forge.
-    Sans lui, `forge db:init` s’arrête sur :
-    `[ERREUR] Connexion MariaDB admin impossible. Vérifiez DB_ADMIN_* dans env/dev.`
+!!! warning "Le compte d’administration doit exister avant `forge db:init --run`"
+    Par défaut, `forge db:init` **ne se connecte pas** : il affiche le SQL de provisioning, que vous collez dans une session d’administration ([ADR-067](../adr/067-db-init-provisioning-sql.md)).
+    Forge ne demande jamais le root du serveur.
+
+    C’est `forge db:init --run` qui se connecte, en tant que `DB_ADMIN_LOGIN`.
+    Ce compte doit alors déjà exister dans MariaDB : Forge ne le crée pas.
 
 Créez donc les comptes **maintenant**, avant de configurer le projet et d’initialiser la base.
 
@@ -180,18 +181,22 @@ Initialiser la base :
 forge db:init
 ```
 
-!!! warning "Si `forge db:init` échoue sur « Connexion MariaDB admin impossible »"
-    Forge n’a pas pu se connecter avec `forge_admin`. Causes fréquentes :
+!!! warning "Si `forge db:init --run` ne parvient pas à se connecter"
+    C’est le compte `DB_ADMIN_LOGIN` que Forge emploie pour ce provisioning. Causes fréquentes :
 
-    * le compte `forge_admin` n’existe pas encore dans MariaDB (voir « Créer les comptes du projet » plus haut) ;
-    * le mot de passe `DB_ADMIN_PWD` de `env/dev` ne correspond pas à celui du `CREATE USER 'forge_admin'` ;
+    * ce compte n’existe pas encore dans MariaDB (voir « Créer les comptes du projet » plus haut) ;
+    * le mot de passe `DB_ADMIN_PWD` de `env/dev` ne correspond pas à celui du `CREATE USER` ;
     * `DB_HOST` ou `DB_PORT` ne pointent pas vers le serveur MariaDB local.
 
-Appliquer les migrations disponibles :
+    Sans `--run`, `forge db:init` ne se connecte pas : il affiche le SQL, et cette erreur ne peut pas se produire.
+
+Créer les tables des entités :
 
 ```bash
 forge db:apply
 ```
+
+Les migrations en attente, elles, s’appliquent avec `forge migration:apply`.
 
 Vérifier l’état des migrations :
 
@@ -205,9 +210,10 @@ forge migration:status
 
 ### `forge db:init`
 
-Prépare la base du projet.
+Prépare la base du projet, sans s’y connecter par défaut.
+Elle **affiche** le SQL de provisioning dérivé de `env/` ([ADR-067](../adr/067-db-init-provisioning-sql.md)) ; `forge db:init --run` l’exécute.
 
-Cette commande initialise la structure attendue par Forge et crée notamment la table technique :
+Le script produit crée la base, les deux comptes, et la table technique :
 
 ```text
 forge_migrations
@@ -217,9 +223,10 @@ Cette table permet à Forge de savoir quelles migrations SQL ont déjà été ap
 
 ### `forge db:apply`
 
-Applique les migrations SQL du projet.
+Applique le schéma SQL des entités du projet (`ville.sql`, `contact.sql`, puis `relations.sql`).
+Les migrations versionnées relèvent de `forge migration:apply`.
 
-Comme `db:init`, cette commande modifie la structure : elle se connecte en `forge_admin` (`DB_ADMIN_*`), pas avec le compte applicatif.
+Cette commande modifie la structure : elle se connecte avec `DB_ADMIN_*`, pas avec le compte applicatif.
 Le compte `forge_app` reste donc en lecture/écriture de données uniquement (`SELECT/INSERT/UPDATE/DELETE`).
 
 Les fichiers de migration sont lus dans :

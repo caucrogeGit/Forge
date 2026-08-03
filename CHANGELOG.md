@@ -30,6 +30,13 @@
   Chaque commande était juste prise isolément, et le manque n'existait qu'entre elles.
   Le parcours corrigé se déroule désormais de bout en bout, dix blocs sur dix, sur un projet neuf.
 
+- **La page d'installation de MariaDB décrivait un `db:init` d'avant l'ADR-067 (`DOC-INSTALL-MARIADB-STALE-001`).**
+  Elle affirmait que `forge db:init` « se connecte en tant que `forge_admin` », et citait un message d'erreur, `Connexion MariaDB admin impossible`, qui **n'existe plus dans le code**.
+  Depuis l'ADR-067, `db:init` ne se connecte pas : il affiche le SQL de provisioning, et seul `--run` l'exécute.
+  Un lecteur y cherchait donc la cause d'une erreur que la commande ne peut plus produire.
+  Elle employait par ailleurs `db:apply` pour « appliquer les migrations », rôle de `migration:apply` : `db:apply` applique le schéma des entités, et la page confondait les deux à trois endroits.
+  Enfin, elle faisait lancer neuf fois `db:init` et quatre fois `db:apply` **sans jamais nommer les deux opt-ins d'où ces commandes viennent**, `forge-mvc-mariadb` (ADR-060) et `forge-mvc-entities` (ADR-070).
+
 - **Le tutoriel de première application ne fonctionnait pas (`DOC-TUTORIAL-PREREQUIS-001`).**
   C'est le guide qu'un débutant suit pour construire son premier CRUD, et il échouait à sa **première commande de génération**.
   Il ne mentionnait ni `forge-mvc-entities`, dont viennent `make:entity`, `make:relation`, `build:model` et `make:crud` depuis l'ADR-070, ni aucun backend de base de données, le squelette étant livré sans depuis l'ADR-060.
