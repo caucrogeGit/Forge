@@ -134,6 +134,7 @@ def forge_server():
     import os
     import socket
     import subprocess
+    import tempfile
 
     def _free_port():
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -143,23 +144,34 @@ def forge_server():
     port = _free_port()
     env = {**os.environ, "APP_ENV": "prod", "TEST_PORT": str(port)}
     launcher = ROOT / "tests" / "_e2e_launcher.py"
+    # E2E-LAUNCHER-APP-PATH-001 : `stderr` capturé et non plus jeté, échec et
+    # non plus `skip`. Ces onze tests étaient inertes depuis l'ADR-044, ce qui a
+    # laissé passer l'absence de `/health` sur le chemin WSGI.
+    journal = tempfile.TemporaryFile()
     proc = subprocess.Popen(
         [sys.executable, str(launcher)],
         cwd=str(ROOT),
         env=env,
         stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
+        stderr=journal,
     )
+
+    def _echouer():
+        proc.terminate()
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+        journal.seek(0)
+        erreur = journal.read().decode("utf-8", "replace").strip()
+        pytest.fail("Serveur Forge E2E non démarré.\n" + (erreur or "(aucun stderr)"))
+
     try:
         line = proc.stdout.readline()
         if not line.startswith(b"READY:"):
-            proc.terminate()
-            proc.wait(timeout=5)
-            pytest.skip("Serveur Forge non disponible")
+            _echouer()
     except Exception:
-        proc.terminate()
-        proc.wait(timeout=5)
-        pytest.skip("Serveur Forge non disponible")
+        _echouer()
     proc.stdout.close()
     yield f"http://127.0.0.1:{port}"
     proc.terminate()

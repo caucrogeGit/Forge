@@ -26,6 +26,7 @@ from __future__ import annotations
 import os
 import socket
 import subprocess
+import tempfile
 import sys
 import urllib.error
 import urllib.request
@@ -64,37 +65,50 @@ def _free_port() -> int:
         return s.getsockname()[1]
 
 
-def _start_server() -> tuple[subprocess.Popen, str]:
+def _start_server() -> "tuple[subprocess.Popen, str, str]":
+    """Retourne (proc, base_url, erreur) ; `erreur` porte le stderr du lanceur.
+
+    E2E-LAUNCHER-APP-PATH-001 : ce `stderr` partait dans DEVNULL, si bien que
+    les trente-trois tests d'en-têtes de sécurité de ce fichier se sautaient
+    sans dire pourquoi.
+    """
     port = _free_port()
     env = {**os.environ, "APP_ENV": "prod", "TEST_PORT": str(port)}
     launcher = ROOT / "tests" / "_e2e_launcher.py"
+    journal = tempfile.TemporaryFile()
     proc = subprocess.Popen(
         [sys.executable, str(launcher)],
         cwd=str(ROOT),
         env=env,
         stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
+        stderr=journal,
     )
+
+    def _abandon() -> "tuple[subprocess.Popen, str, str]":
+        proc.terminate()
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+        journal.seek(0)
+        return proc, "", journal.read().decode("utf-8", "replace").strip()
+
     try:
         line = proc.stdout.readline()
         if not line.startswith(b"READY:"):
-            proc.terminate()
-            proc.wait(timeout=5)
-            return proc, ""
+            return _abandon()
     except Exception:
-        proc.terminate()
-        proc.wait(timeout=5)
-        return proc, ""
+        return _abandon()
     proc.stdout.close()
-    return proc, f"http://127.0.0.1:{port}"
+    return proc, f"http://127.0.0.1:{port}", ""
 
 
 @pytest.fixture(scope="module")
 def srv():
     """Serveur Forge réel sur port libre — partagé pour tout le module."""
-    proc, base = _start_server()
+    proc, base, erreur = _start_server()
     if not base:
-        pytest.skip("Serveur Forge non disponible")
+        pytest.fail("Serveur Forge E2E non démarré.\n" + (erreur or "(aucun stderr)"))
     yield base
     proc.terminate()
     try:

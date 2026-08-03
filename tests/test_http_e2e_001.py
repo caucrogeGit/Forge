@@ -19,6 +19,7 @@ from __future__ import annotations
 import os
 import socket
 import subprocess
+import tempfile
 import sys
 import time
 import urllib.error
@@ -82,12 +83,13 @@ def _get(url: str, timeout: float = 5.0) -> _Response:
 # ── Fixture serveur ───────────────────────────────────────────────────────────
 
 
-def _start_server(extra_env: dict | None = None) -> tuple[subprocess.Popen, str]:
+def _start_server(extra_env: dict | None = None) -> "tuple[subprocess.Popen, str, str]":
     """
     Démarre le serveur Forge via _e2e_launcher.py sur un port libre.
 
     TEST_PORT contourne le override de APP_PORT par load_dotenv(env/prod).
-    Retourne (proc, base_url).
+    Retourne (proc, base_url, erreur) ; `base_url` est vide en cas d'échec, et
+    `erreur` porte alors le `stderr` du lanceur.
     """
     port = _free_port()
     env = {
@@ -97,26 +99,38 @@ def _start_server(extra_env: dict | None = None) -> tuple[subprocess.Popen, str]
         **(extra_env or {}),
     }
     launcher = ROOT / "tests" / "_e2e_launcher.py"
+    # E2E-LAUNCHER-APP-PATH-001 : le `stderr` du lanceur partait dans DEVNULL.
+    # Quand il mourait sur `FileNotFoundError`, l'appelant ne voyait qu'une
+    # absence de `READY:`, indiscernable d'un démarrage lent. Il est désormais
+    # capturé dans un fichier temporaire — pas un tube, qu'un serveur bavard
+    # remplirait jusqu'au blocage — et rendu à l'appelant en cas d'échec.
+    journal = tempfile.TemporaryFile()
     proc = subprocess.Popen(
         [sys.executable, str(launcher)],
         cwd=str(ROOT),
         env=env,
         stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
+        stderr=journal,
     )
+
+    def _abandon() -> "tuple[subprocess.Popen, str, str]":
+        proc.terminate()
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+        journal.seek(0)
+        return proc, "", journal.read().decode("utf-8", "replace").strip()
+
     # Attend le signal READY:{port} sur stdout
     try:
         line = proc.stdout.readline()
         if not line.startswith(b"READY:"):
-            proc.terminate()
-            proc.wait(timeout=5)
-            return proc, ""
+            return _abandon()
     except Exception:
-        proc.terminate()
-        proc.wait(timeout=5)
-        return proc, ""
+        return _abandon()
     proc.stdout.close()
-    return proc, f"http://127.0.0.1:{port}"
+    return proc, f"http://127.0.0.1:{port}", ""
 
 
 @pytest.fixture(scope="module")
@@ -128,9 +142,12 @@ def forge_server():
     Aucune connexion MariaDB n'est établie : le pool est lazy, les routes
     utilisées dans les tests (404, static) n'interrogent pas la base.
     """
-    proc, base = _start_server()
+    proc, base, erreur = _start_server()
     if not base:
-        pytest.skip("Serveur Forge non disponible — démarrage échoué dans les délais")
+        # Un `skip` ici a masqué la panne six semaines : l'application servie
+        # vit dans le dépôt, son absence est un bug du harnais, jamais une
+        # condition de poste.
+        pytest.fail("Serveur Forge E2E non démarré.\n" + (erreur or "(aucun stderr)"))
     yield base
     proc.terminate()
     try:
@@ -281,9 +298,9 @@ def test_static_path_traversal_refuse(forge_server):
 @pytest.fixture(scope="module")
 def forge_server_nonce():
     """Serveur démarré avec APP_CSP_NONCE_ENABLED=true."""
-    proc, base = _start_server({"APP_CSP_NONCE_ENABLED": "true"})
+    proc, base, erreur = _start_server({"APP_CSP_NONCE_ENABLED": "true"})
     if not base:
-        pytest.skip("Serveur Forge (nonce) non disponible")
+        pytest.fail("Serveur Forge E2E (nonce) non démarré.\n" + (erreur or "(aucun stderr)"))
     yield base
     proc.terminate()
     try:

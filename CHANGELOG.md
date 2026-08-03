@@ -279,6 +279,16 @@
 
 ### Corrigé
 
+- **Soixante-cinq tests, dont les trente-trois d'en-têtes de sécurité, ne s'exécutaient plus depuis six versions (`E2E-LAUNCHER-APP-PATH-001`).**
+  L'ADR-044 a relocalisé l'application de dogfooding hors de la racine du dépôt le 2026-06-23. `tests/_e2e_launcher.py` a continué de la chercher à la racine.
+  Trois causes se sont additionnées pour rendre la panne muette. Le lanceur visait un fichier disparu. Son `stderr` partait dans `subprocess.DEVNULL`, si bien que le `FileNotFoundError` n'atteignait personne. Et l'absence du signal `READY:` se traduisait en `pytest.skip("Serveur Forge non disponible")`, formule qui décrit un poste local mal équipé plutôt qu'un défaut.
+  Les trois fichiers concernés sautaient donc intégralement, en local comme en CI, sans que rien ne distingue leur silence d'une suite verte.
+  Découvert en inspectant les motifs de saut lors du pré-mortem précédant la rc4, et non par un test rouge.
+  Un `skip` est légitime quand l'environnement manque vraiment de quelque chose, une base par exemple. Ici l'application servie est dans le dépôt, donc son absence est toujours un défaut du harnais.
+  Le chemin est résolu en un seul endroit, le `stderr` du lanceur est capturé et rendu, et les quatre fixtures échouent au lieu de se sauter.
+  Les soixante-cinq tests passent tous, sans qu'aucun code de production n'ait eu à changer : ils étaient corrects, seulement inertes.
+  Un garde-fou tient les trois causes et prouve par exécution que le harnais sert. Sa contre-épreuve a été mesurée en cassant volontairement le chemin, ce qui le fait bien rougir.
+
 - **La sonde `GET /health` répondait 404 en production (`CORE-WSGI-HEALTH-PARITY-001`).**
   `GET /health` → `200 {"status": "ok"}` figure au contrat de stabilité comme surface publique garantie.
   Elle n'était pourtant servie que par le serveur de développement, qui la traitait par un littéral inscrit dans son `do_GET`.
