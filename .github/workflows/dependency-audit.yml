@@ -32,6 +32,15 @@ jobs:
         with:
           python-version: "3.12"
 
+      # CI-DEPAUDIT-SYSTEM-DEPS-001 : `requirements-audit.txt` couvre la surface
+      # expédiée, dont `mariadb`, distribué en source seule. Sans
+      # `mariadb_config`, pip échoue à en lire les métadonnées et pip-audit
+      # s'arrête avant d'auditer quoi que ce soit. Même pas que `tests.yml`.
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libmariadb-dev pkg-config
+
       - name: Install pip-audit
         run: python -m pip install pip-audit>=2.0
 
