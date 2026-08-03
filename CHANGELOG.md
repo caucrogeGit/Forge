@@ -279,6 +279,15 @@
 
 ### Corrigé
 
+- **Un projet mis à jour gardait une unité systemd figée sur MariaDB, sans le savoir (`DEPLOY-SYSTEMD-STALE-AFTER-001`).**
+  `DEPLOY-BACKEND-AGNOSTIC-001` a rendu l'unité systemd dialectale, mais `deploy:init` écrit en write-if-new, et c'est juste : Forge ne réécrit pas un fichier du projet (principe 9).
+  Un projet provisionné avant ce correctif garde donc son `After=network.target mariadb.service`, quel que soit son backend, et rien ne le lui disait.
+  La panne qui en découle est discrète. Sous PostgreSQL, cet `After=` désigne un service inexistant, donc systemd ne retarde rien : au démarrage de la machine, l'application part avant sa base et rate ses premières connexions. Cela ne se produit qu'au boot, jamais en test, et ressemble à un défaut de Forge.
+  `deploy:check` compare désormais la ligne `After=` de l'unité déjà écrite au service du backend résolu, et dit quoi éditer.
+  C'est un avertissement, jamais une erreur, et Forge ne touche pas au fichier : l'unité appartient au projet.
+  Il n'affirme rien quand aucun backend n'est résolu, la commande signalant déjà cette cause ailleurs. Deux messages pour une seule anomalie brouilleraient le diagnostic, et le second serait faux.
+  SQLite est traité à part, n'ayant aucun service à attendre : une unité qui en nomme un y retarde le démarrage pour rien.
+
 - **Le contrat de stabilité garantissait deux classes qui n'existent pas (`DOC-CITED-PATHS-001`).**
   `docs/release/stability-contract.md` engageait Forge sur des « backends de session FileStore / MariaDbStore ». Aucun des deux noms n'existe dans le code, où les stores s'appellent `FileSessionStore` et `DbSessionStore`.
   Le même document se contredisait sur leur statut. Il les déclarait « Disponible, API stable » dans son tableau du public, puis les rangeait plus bas parmi ce qui n'est **pas** garanti, comme « expérimentaux ». `release-policy.md`, que le contrat désigne lui-même comme source unique de la maturité, les classe en expérimental. Le contrat suit désormais sa propre source.

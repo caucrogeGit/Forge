@@ -259,6 +259,16 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
         - `deploy:init` génère, `deploy:check` vérifie ;
         - en production, Nginx devant Gunicorn servant `wsgi:application`.
 
+    !!! warning "Projet créé avant la 1.0.0-rc.4"
+
+        L'unité systemd attend le service du backend résolu, `postgresql.service` sous PostgreSQL, aucun sous SQLite.
+        Avant la `1.0.0-rc.4`, elle nommait toujours `mariadb.service`.
+
+        `deploy:init` ne réécrit jamais un fichier existant (principe 9), donc un projet plus ancien garde son unité d'origine.
+        Sous un autre backend, cet `After=` désigne un service inexistant et ne retarde donc rien : au démarrage de la machine, l'application part avant sa base et rate ses premières connexions.
+
+        `deploy:check` le signale désormais. La correction reste manuelle, dans `deploy/systemd/forge-app.service`.
+
 ??? note "10. CLI-only et adaptation"
 
     `forge-mvc-deploy` n'a pas d'API runtime : il sert uniquement à préparer le déploiement.

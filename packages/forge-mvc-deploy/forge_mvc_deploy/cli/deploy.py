@@ -10,6 +10,7 @@ n'importe jamais ce module à l'exécution.
 from __future__ import annotations
 
 import importlib.util
+import re
 import sys
 from pathlib import Path
 from typing import NamedTuple
@@ -267,6 +268,67 @@ def _verifier_backend_bdd() -> _Result:
     return _Result("ok", f"Backend BDD {point.name}", "installé et chargeable")
 
 
+#: Repere la ligne `After=` d'une unite systemd deja ecrite.
+_APRES_SYSTEMD = re.compile(r"^After=(.*)$", re.MULTILINE)
+
+
+def _verifier_unite_systemd(root: Path) -> _Result:
+    """L'unite deja ecrite attend-elle le service du backend resolu ?
+
+    DEPLOY-SYSTEMD-STALE-AFTER-001. `DEPLOY-BACKEND-AGNOSTIC-001` a rendu
+    l'unite dialectale, mais `deploy:init` ecrit en write-if-new (principe 9) :
+    un projet provisionne avant ce correctif garde son `After=network.target
+    mariadb.service`, quel que soit son backend.
+
+    Rien ne le lui disait. Sous PostgreSQL, ce `After=` designe un service
+    inexistant, donc ne retarde rien : au demarrage de la machine,
+    l'application part avant sa base et rate ses premieres connexions. La panne
+    ne se produit qu'au boot, et ressemble a un defaut de Forge.
+
+    Un avertissement, jamais une erreur : l'unite appartient au projet, Forge ne
+    la reecrit pas (principe 9). Il dit quoi corriger, la main reste a
+    l'exploitant.
+    """
+    unite = root / "deploy" / "systemd" / "forge-app.service"
+    if not unite.is_file():
+        return _Result("ok", "Unité systemd", "absente — sera écrite par forge deploy:init")
+
+    trouve = _APRES_SYSTEMD.search(unite.read_text(encoding="utf-8"))
+    if trouve is None:
+        return _Result("warn", "Unité systemd", "sans ligne After= — ordre de démarrage non garanti")
+
+    declare = trouve.group(1).strip()
+    backend = _backend_installe()
+
+    if backend is None:
+        # Sans backend resolu on ne sait pas quel service attendre, donc on
+        # n'affirme rien. `_verifier_backend_bdd` a deja signale l'anomalie ;
+        # deux erreurs pour une seule cause brouilleraient le diagnostic.
+        return _Result("warn", "Unité systemd",
+                       f"After={declare} — non vérifiable sans backend BDD résolu")
+
+    attendu = SERVICES_SYSTEMD.get(backend)
+
+    if attendu is None:
+        # SQLite : pas de serveur, donc aucun service a attendre.
+        cites = [s for s in SERVICES_SYSTEMD.values() if s in declare]
+        if cites:
+            return _Result(
+                "warn", "Unité systemd",
+                f"After= attend {', '.join(cites)}, alors que {backend} n'a aucun service — "
+                f"éditer deploy/systemd/forge-app.service")
+        return _Result("ok", "Unité systemd", f"After={declare}")
+
+    if attendu in declare:
+        return _Result("ok", "Unité systemd", f"After={declare}")
+
+    return _Result(
+        "warn", "Unité systemd",
+        f"After={declare} ne nomme pas {attendu} du backend {backend} — "
+        f"l'application peut démarrer avant sa base ; "
+        f"éditer deploy/systemd/forge-app.service")
+
+
 def _check_results(root: Path) -> list[_Result]:
     results: list[_Result] = []
 
@@ -378,6 +440,7 @@ def _check_results(root: Path) -> list[_Result]:
     # Le coeur est agnostique et resout son backend par entry point (ADR-054) :
     # cette verification pose donc la meme question que lui.
     results.append(_verifier_backend_bdd())
+    results.append(_verifier_unite_systemd(root))
 
     # module jinja2
     if importlib.util.find_spec("jinja2") is not None:
