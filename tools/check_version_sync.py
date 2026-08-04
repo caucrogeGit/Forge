@@ -7,12 +7,21 @@ Ticket PKG-VERSION-SYNC-CHECK-001.
 Dérive la version canonique depuis le pyproject racine (`[project].version`, en
 PEP 440, ex. `1.0.0rc1`) et vérifie que TOUS les emplacements la reprennent :
 
-- `version =` des 14 sous-paquets ;
+- `version =` des sous-paquets ;
 - les pins `forge-mvc>=` (et `forge-mvc-files>=` pour images) des sous-paquets ;
 - les pins des extras du pyproject racine (`rbac`, `workflow`, `stats`, `all`) ;
 - `core/__init__.py` (`__version__`) et `forge.py` (`_FORGE_VERSION`) ;
+- le `__version__` du module de chaque sous-paquet (`VERSION-SYNC-OPTIN-MODULE-001`) ;
 - le pin `forge-mvc==` du squelette (`skeleton/data/requirements.txt`) ;
 - `package.json`, en forme SemVer publique (ex. `1.0.0-beta.17`).
+
+`VERSION-SYNC-OPTIN-MODULE-001` : les vingt-sept `__init__.py` d'opt-in portent
+chacun un `__version__`, et rien ne le comparait au canonique. Seul le
+`pyproject.toml` du paquet était vérifié. Un bump qui en oublie un publie donc
+un paquet en rc4 dont `forge_mvc_x.__version__` répond encore `rc3`, sans qu'un
+seul contrôle proteste. Mesuré à la veille de la rc4 : les vingt-sept étaient
+alignés, mais par chance, aucune contrainte ne le garantissant. Un bump touche
+soixante et un fichiers ; la moitié n'était pas couverte.
 
 Sortie : 0 si tout est cohérent, 1 avec le détail des écarts sinon.
 Autonome (aucun argument) : utilisable en test méta et dans les scripts release.
@@ -66,6 +75,15 @@ def collect_mismatches() -> tuple[str, list[str]]:
             pin = re.match(r"(forge-mvc(?:-[a-z0-9]+)?)\s*>=\s*([0-9][^,\s]*)", dep)
             if pin and pin.group(1) in ("forge-mvc", "forge-mvc-files"):
                 check(f"{name} pin {pin.group(1)}", pin.group(2), canonical)
+
+    # VERSION-SYNC-OPTIN-MODULE-001 : le `__version__` du module, distinct du
+    # `version` de son pyproject. C'est celui qu'une application lit à
+    # l'exécution, et il n'était comparé à rien.
+    for init in sorted((ROOT / "packages").glob("forge-mvc-*/forge_mvc_*/__init__.py")):
+        paquet = init.parent.parent.name
+        declare = _first_match(init, r'__version__\s*=\s*"([^"]+)"')
+        if declare is not None:
+            check(f"{paquet} module __version__", declare, canonical)
 
     # Extras du pyproject racine (rbac / workflow / stats / all).
     for extra, deps in root["project"].get("optional-dependencies", {}).items():
