@@ -7,24 +7,33 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> Version courante : **Forge 1.0.0-rc.3** (release candidate, préparée le 2026-07-01).
-> Dernière version publiée sur PyPI : **Forge 1.0.0-beta.17**.
+> Version courante : **Forge 1.0.0-rc.4** (release candidate, préparée le 2026-08-04).
+> Dernière version publiée sur PyPI : **Forge 1.0.0-rc.3** (2026-07-31).
 
 ---
 
-## État actuel : Forge 1.0.0-rc.3
+## État actuel : Forge 1.0.0-rc.4
 
-**Tag courant : `v1.0.0-rc.3`**, deuxième release candidate avant la 1.0.0 stable.
-Elle consolide la rc.1 : refonte de la navigation et de plusieurs pages de documentation, page d'accueil du squelette.
-Passe d'industrialisation : smoke d'installation vierge (`SMOKE-INSTALL-VIERGE-001`), budget de complexité du lanceur (`CLI-COMPLEXITY-BUDGET-001`), smoke des profils générés (`PROFILES-STARTER-SMOKE-001`) et carte des couches de test (`TEST-LAYERS-DOC-001`).
-Le dispatch CLI est refondu (ADR-059) : `forge.py` devient un lanceur mince et les commandes des opt-ins sont découvertes par entry points, le cœur ne les liste plus.
+**Tag courant : `v1.0.0-rc.4`**, quatrième release candidate avant la 1.0.0 stable.
+
+Elle est née d'un chantier de vérification par exécution plutôt que par relecture. Les parcours d'accueil sont joués dans de vrais projets, les blocs de commande de la documentation sont exécutés, et chaque import ou commande cité est confronté à l'interpréteur et au CLI.
+
+Ce chantier a surtout servi à trouver des défauts que la relecture ne voyait pas.
+La sonde `GET /health`, au contrat de stabilité, répondait 404 sous WSGI, seul chemin de production supporté.
+Soixante-cinq tests, dont les trente-trois d'en-têtes de sécurité, ne s'exécutaient plus depuis l'ADR-044, en se sautant avec le vocabulaire d'un poste mal équipé.
+Le contrat de stabilité garantissait deux classes absentes du code et se contredisait sur leur statut.
+Un projet mis à jour gardait une unité systemd figée sur MariaDB sans que rien ne le lui dise.
+
+Côté dépendances, `cryptography` passe à `>=50.0.0` et perd sa borne haute (`DEPS-CRYPTOGRAPHY-NO-CEILING-001`) : cette bibliothèque livre ses correctifs de sécurité dans une nouvelle majeure, si bien qu'un plafond les excluait au moment même de leur parution.
+
+Le moteur d'entités devient utilisable sans terminal (`ENTITIES-NON-INTERACTIVE-001` et `002`), ce qui rend les parcours rejouables.
+
 L'API publique reste gelée pour la 1.0 et tous les opt-ins restent en Beta (`Development Status :: 4 - Beta`).
-Acquis de la rc.1 conservés : nouvelles briques opt-in (ADR-052), déploiement extrait (ADR-053) et typage strict de bout en bout (ADR-036).
 
-Précédent : v1.0.0-rc.1 (2026-06-26, première release candidate, briques opt-in ADR-052, déploiement extrait ADR-053), v1.0.0-beta.17 (2026-06-18, typage strict de bout en bout ADR-036), v1.0.0-beta.16 (2026-06-16, retrait de la génération de starters ADR-035), v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-rc.3 (2026-07-31, correctif CRLF des en-têtes, DDL dialectale des opt-ins), v1.0.0-rc.2 (2026-07-01, refonte de la navigation documentaire, dispatch CLI par entry points ADR-059), v1.0.0-rc.1 (2026-06-26, première release candidate, briques opt-in ADR-052, déploiement extrait ADR-053), v1.0.0-beta.17 (2026-06-18, typage strict de bout en bout ADR-036), v1.0.0-beta.16 (2026-06-16, retrait de la génération de starters ADR-035), v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-rc.3, deuxième release candidate : API publique gelée, tous les opt-ins en Beta, nouvelles briques opt-in (ADR-052) et déploiement extrait (ADR-053).
-Les acquis de beta.17 (typage strict de bout en bout ADR-036), beta.16 (parcours réalisés à la main ADR-035), beta.15 (i18n ADR-027, convention de route ADR-029, refonte `welcome-forge` ADR-025/028) et beta.14 (squelette dédié ADR-024) restent en place.**
+**Statut : v1.0.0-rc.4, quatrième release candidate : API publique gelée, tous les opt-ins en Beta, documentation vérifiée par exécution et non par relecture.
+Les acquis des rc précédentes restent en place, comme ceux de beta.17 (typage strict ADR-036), beta.16 (parcours réalisés à la main ADR-035), beta.15 (i18n ADR-027, convention de route ADR-029) et beta.14 (squelette dédié ADR-024).**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques) et Forge 2.0.2 (cohérence documentaire).

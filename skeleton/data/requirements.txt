@@ -1,7 +1,7 @@
 # Dependances du projet Forge.
 # Le framework et ses dependances runtime (python-dotenv, Jinja2, Argon2,
 # jsonschema) sont fournis par le paquet forge-mvc.
-forge-mvc==1.0.0rc3
+forge-mvc==1.0.0rc4
 # Couche de donnees (ADR-070) : le squelette est livre SANS moteur d'entites.
 # Pour modeliser des donnees (make:entity, make:relation, make:crud, build:model,
 # migrations, provisioning db:*), installez l'opt-in moteur d'entites :

@@ -38,7 +38,7 @@ Les points 1 à 7 sont automatisés par un seul script :
 bash tools/release-validate.sh <VERSION>
 ```
 
-Il accepte la version en SemVer (`1.0.0-rc.4`) comme en PEP 440 (`1.0.0rc4`), et enchaîne la cohérence de version, les tests, Ruff, `compileall`, MkDocs strict et `pip-audit`.
+Il accepte la version en SemVer (`{{forge_tag}}` sans le `v`) comme en PEP 440 (`{{forge_version}}`), et enchaîne la cohérence de version, les tests, Ruff, `compileall`, MkDocs strict et `pip-audit`.
 Il se termine par `RÉSULTAT : OK - prêt à releaser.`
 
 Les points ci-dessous détaillent ce qu'il contrôle, et servent à diagnostiquer un échec.

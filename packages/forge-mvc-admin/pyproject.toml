@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-admin"
-version = "1.0.0rc3"
+version = "1.0.0rc4"
 description = "Forge Admin — back-office applicatif opt-in : CRUD générique sur les entités déclarées, sécurité par défaut (auth + CSRF), RBAC optionnel, commandes admin:init / admin:doctor."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "admin", "back-office"]
 dependencies = [
-    "forge-mvc>=1.0.0rc3,<2",
+    "forge-mvc>=1.0.0rc4,<2",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

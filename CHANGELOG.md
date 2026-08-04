@@ -3,6 +3,8 @@
 
 ## [Non publié]
 
+## [1.0.0-rc.4] - 2026-08-04
+
 ### Ajouté
 
 - **Un garde qui vérifie que la documentation nomme du code existant (`DOC-CODE-ADEQUATION-001`).**

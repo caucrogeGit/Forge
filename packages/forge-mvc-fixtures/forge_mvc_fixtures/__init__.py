@@ -24,6 +24,6 @@ from forge_mvc_fixtures.factory import (
     FixtureReference,
 )
 
-__version__ = "1.0.0rc3"
+__version__ = "1.0.0rc4"
 
 __all__ = ["Factory", "FactoryError", "Fixture", "FixtureReference"]

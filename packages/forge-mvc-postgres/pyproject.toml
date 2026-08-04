@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-postgres"
-version = "1.0.0rc3"
+version = "1.0.0rc4"
 description = "Forge PostgreSQL — backend BDD PostgreSQL pour Forge (psycopg), découvert par le cœur via entry point (ADR-054). Niveau plein : dialecte, provisioning db:init et intégration validés sur serveur réel en CI (ADR-084)."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "postgresql", "postgres", "database", "backend"]
 dependencies = [
-    "forge-mvc>=1.0.0rc3,<2",
+    "forge-mvc>=1.0.0rc4,<2",
     "psycopg[binary,pool]>=3.1,<4",
 ]
 classifiers = [

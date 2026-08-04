@@ -21,7 +21,7 @@ applicative** (``media_repository``, ``media_gallery``) y est rapatriée :
 Voir ``docs/adr/018-image-module-extraction.md``.
 """
 
-__version__ = "1.0.0rc3"
+__version__ = "1.0.0rc4"
 
 from forge_mvc_images.processing import (
     ALLOWED_IMAGE_EXTENSIONS,

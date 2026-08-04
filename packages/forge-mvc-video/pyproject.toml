@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc-video"
-version = "1.0.0rc3"
+version = "1.0.0rc4"
 description = "Forge Video — module opt-in pour l'upload, le transcodage MP4 (H.264/AAC) et la lecture vidéo en streaming (HTTP Range). Worker CLI forge video:*."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -14,7 +14,7 @@ authors = [
 license = "LicenseRef-Forge-Proprietary"
 keywords = ["python", "mvc", "forge", "video", "ffmpeg", "mp4"]
 dependencies = [
-    "forge-mvc>=1.0.0rc3,<2",
+    "forge-mvc>=1.0.0rc4,<2",
 ]
 # NB : FFmpeg/ffprobe sont des binaires SYSTÈME, pas des dépendances pip.
 # Le module se branche quand même sans eux (mode serveur de médias), mais

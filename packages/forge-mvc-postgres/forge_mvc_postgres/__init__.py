@@ -8,6 +8,6 @@ validés en CI contre un vrai PostgreSQL.
 """
 from forge_mvc_postgres.backend import PostgreSQLBackend
 
-__version__ = "1.0.0rc3"
+__version__ = "1.0.0rc4"
 
 __all__ = ["PostgreSQLBackend"]
