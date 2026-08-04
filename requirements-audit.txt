@@ -15,7 +15,7 @@
 # jinja2 est déjà couvert par le cœur (requirements.txt). jsonschema a quitté le
 # cœur avec le moteur d'entités (CORE-DROP-JSONSCHEMA-001) : il est désormais listé
 # ici, apporté par forge-mvc-entities et forge-mvc-rbac.
-cryptography>=48.0.1,<49
+cryptography>=50.0.0,<51
 faker>=30,<40
 jsonschema>=4.18,<5
 mariadb>=1.1.14,<1.2

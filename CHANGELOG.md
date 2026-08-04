@@ -279,6 +279,14 @@
 
 ### Corrigé
 
+- **Trois avis de sécurité sur `cryptography` 48.0.1 (`DEPS-CRYPTOGRAPHY-50-001`).**
+  Publiés le 2026-08-04, ils ont fait passer la CI de `main` au rouge en quelques heures, sans qu'aucun changement du dépôt en soit la cause.
+  `CVE-2026-69248` permet de contourner les contraintes de noms X.509 : une autorité intermédiaire limitée à `foo.example.com` accepte une feuille portant le joker `*.example.com`.
+  `CVE-2026-69249` provoque une explosion exponentielle sur une chaîne invalide contenant des copies d'un même certificat auto-signé.
+  `CVE-2026-69247` est un oracle de déchiffrement PKCS#7 : l'issue du déchiffrement d'un `encryptedKey` était distinguable et révélait la longueur récupérée de l'opération RSA. C'est le seul des trois à exiger la 50.0.0, les deux autres étant corrigés en 49.0.0.
+  Aucun ne touche le chemin de Forge, qui n'utilise que `cryptography.fernet.Fernet`, du chiffrement symétrique, sans X.509 ni PKCS#7.
+  La borne monte quand même, de `>=48.0.1,<49` à `>=50.0.0,<51` : la dépendance est **expédiée** avec `forge-mvc-mfa`, et une application peut s'en servir pour tout autre chose que ce que Forge en fait.
+
 - **Un projet mis à jour gardait une unité systemd figée sur MariaDB, sans le savoir (`DEPLOY-SYSTEMD-STALE-AFTER-001`).**
   `DEPLOY-BACKEND-AGNOSTIC-001` a rendu l'unité systemd dialectale, mais `deploy:init` écrit en write-if-new, et c'est juste : Forge ne réécrit pas un fichier du projet (principe 9).
   Un projet provisionné avant ce correctif garde donc son `After=network.target mariadb.service`, quel que soit son backend, et rien ne le lui disait.
