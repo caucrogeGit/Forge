@@ -29,7 +29,18 @@ import pytest
 
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
-_STARTERS_ROOT = _REPO_ROOT / "cli" / "starters" / "data"
+#: Contrôleurs réellement livrés à un projet neuf.
+#:
+#: STARTERS-TESTS-REPOINT-001 : ce pointeur visait `cli/starters/data`,
+#: supprimé par l'ADR-035. Le `rglob` ne trouvait donc plus rien, et les
+#: trois garanties ci-dessous se sautaient sur un jeu de paramètres vide,
+#: en affichant « got empty parameter set » plutôt qu'un échec. Elles ont
+#: cessé de protéger quoi que ce soit sans que rien ne le dise.
+#:
+#: Le squelette a remplacé les starters comme source du code livré
+#: (ADR-024, ADR-065) : les garanties le suivent, plutôt que de disparaître
+#: avec leur ancien sujet.
+_LIVRE_ROOT = _REPO_ROOT / "skeleton" / "data"
 
 
 _PUBLIC_ACTION_NAMES = {
@@ -281,20 +292,20 @@ class TestPublicFormGenerator:
         assert "def create(request: Request) -> Response:" in build_public_form_controller(self._spec())
 
 
-# ── Couverture des starters livrés ───────────────────────────────────────────
+# ── Couverture du code livré à un projet neuf ────────────────────────────────
 
 
-def _starter_controller_files() -> list[Path]:
-    """Liste tous les contrôleurs livrés par les starters (hors __pycache__)."""
+def _controleurs_livres() -> list[Path]:
+    """Liste les contrôleurs livrés à un projet neuf (hors __pycache__)."""
     return [
-        p for p in _STARTERS_ROOT.rglob("mvc/controllers/*.py")
+        p for p in _LIVRE_ROOT.rglob("mvc/controllers/*.py")
         if "__pycache__" not in p.parts and p.name != "__init__.py"
     ]
 
 
-@pytest.mark.parametrize("path", _starter_controller_files(), ids=lambda p: p.relative_to(_STARTERS_ROOT).as_posix())
-class TestStarterControllersAreTyped:
-    """Chaque contrôleur de starter livré expose des actions typées.
+@pytest.mark.parametrize("path", _controleurs_livres(), ids=lambda p: p.relative_to(_LIVRE_ROOT).as_posix())
+class TestControleursLivresSontTypes:
+    """Chaque contrôleur livré expose des actions typées.
 
     Règle vérifiée :
       - si le fichier déclare au moins une action publique connue (cf.
@@ -306,30 +317,46 @@ class TestStarterControllersAreTyped:
     sont pas concernés.
     """
 
-    def test_starter_controller_est_type(self, path: Path):
+    def test_controleur_livre_est_type(self, path: Path):
         source = path.read_text(encoding="utf-8")
         actions = list(_iter_action_methods(source))
         if not actions:
             pytest.skip(f"{path.name} ne déclare aucune action publique connue.")
 
         assert _has_request_import(source), (
-            f"{path.relative_to(_STARTERS_ROOT)} : `from core.http.request "
+            f"{path.relative_to(_LIVRE_ROOT)} : `from core.http.request "
             f"import Request` manquant."
         )
         assert _has_response_import(source), (
-            f"{path.relative_to(_STARTERS_ROOT)} : `from core.http.response "
+            f"{path.relative_to(_LIVRE_ROOT)} : `from core.http.response "
             f"import Response` manquant."
         )
 
         for cls_name, node in actions:
             assert _request_param_annotation(node) == "Request", (
-                f"{path.relative_to(_STARTERS_ROOT)} : "
+                f"{path.relative_to(_LIVRE_ROOT)} : "
                 f"{cls_name}.{node.name} doit annoter `request: Request`."
             )
             assert _return_annotation(node) == "Response", (
-                f"{path.relative_to(_STARTERS_ROOT)} : "
+                f"{path.relative_to(_LIVRE_ROOT)} : "
                 f"{cls_name}.{node.name} doit retourner `-> Response`."
             )
+
+
+def test_il_y_a_bien_des_controleurs_a_verifier() -> None:
+    """Sans ce contrôle, un chemin faux rend les garanties ci-dessus invisibles.
+
+    C'est exactement ce qui s'est produit : le pointeur visait un répertoire
+    supprimé, le `parametrize` recevait une liste vide, et pytest affichait
+    « got empty parameter set » — un saut, pas un échec. Trois garanties sur le
+    code livré ont ainsi cessé d'exister sans que rien ne le signale.
+    """
+    trouves = _controleurs_livres()
+
+    assert trouves, (
+        f"aucun contrôleur trouvé sous {_LIVRE_ROOT} : le chemin est faux, et "
+        f"les garanties de typage, d'imports et de compilation ne s'appliquent "
+        f"donc à rien")
 
 
 # ── Anti-régression : pas d'imports inutiles ajoutés en cascade ──────────────
@@ -339,21 +366,21 @@ class TestImportsRemainTargeted:
     """Les imports ajoutés (Request, Response) ne sont pas dilués par des
     imports en gros (`from core.http import *`, `from core import *`)."""
 
-    @pytest.mark.parametrize("path", _starter_controller_files(),
-                              ids=lambda p: p.relative_to(_STARTERS_ROOT).as_posix())
-    def test_starter_pas_d_import_etoile(self, path):
+    @pytest.mark.parametrize("path", _controleurs_livres(),
+                              ids=lambda p: p.relative_to(_LIVRE_ROOT).as_posix())
+    def test_controleur_livre_sans_import_etoile(self, path):
         source = path.read_text(encoding="utf-8")
         assert "import *" not in source, (
-            f"{path.relative_to(_STARTERS_ROOT)} : import étoile interdit."
+            f"{path.relative_to(_LIVRE_ROOT)} : import étoile interdit."
         )
 
 
 # ── Compilabilité ────────────────────────────────────────────────────────────
 
 
-@pytest.mark.parametrize("path", _starter_controller_files(),
-                          ids=lambda p: p.relative_to(_STARTERS_ROOT).as_posix())
-def test_starter_controller_compile(path):
+@pytest.mark.parametrize("path", _controleurs_livres(),
+                          ids=lambda p: p.relative_to(_LIVRE_ROOT).as_posix())
+def test_controleur_livre_compile(path):
     """Chaque contrôleur livré doit parser en Python valide."""
     ast.parse(path.read_text(encoding="utf-8"))
 

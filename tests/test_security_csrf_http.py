@@ -25,7 +25,6 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-import pytest
 
 from core.app.application import Application
 from core.http.response import Response
@@ -651,14 +650,57 @@ class TestCsrfFormulairesGeneres:
                          r'|name="csrf_token"[^>]*type="hidden"'
                          r'|input type="hidden" name="csrf_token"', text)
 
-    def test_starter_communes_sejours_vues_csrf(self):
-        """Le starter Communes & Séjours contient des champs csrf_token dans ses vues."""
-        starter_dir = ROOT / "cli" / "starters" / "data" / "communes-sejours" / "files"
-        if not starter_dir.exists():
-            pytest.skip("Starter Communes & Séjours absent")
-        views = list(starter_dir.rglob("*.html"))
-        csrf_in_views = [v for v in views if 'name="csrf_token"' in v.read_text(encoding="utf-8")]
-        assert csrf_in_views, "Aucune vue du starter Communes & Séjours ne contient csrf_token"
+    def test_le_squelette_livre_le_champ_csrf(self):
+        """Le partiel inclus par tous les formulaires générés porte le jeton.
+
+        STARTERS-TESTS-REPOINT-001 : ce test visait les vues du starter
+        « Communes & Séjours », supprimé par l'ADR-035. Il se sautait donc
+        toujours, en annonçant un starter absent comme s'il s'agissait d'une
+        condition d'environnement.
+
+        Son intention reste valable, et son nouveau sujet n'était couvert par
+        rien : `partials/csrf.html` est le fichier que chaque formulaire du
+        squelette inclut. S'il perdait son champ caché, tous les formulaires
+        d'un projet neuf posteraient sans jeton.
+        """
+        partiel = ROOT / "skeleton" / "data" / "mvc" / "views" / "partials" / "csrf.html"
+
+        assert partiel.is_file(), f"{partiel} absent du squelette"
+
+        contenu = partiel.read_text(encoding="utf-8")
+
+        assert 'name="csrf_token"' in contenu
+        assert 'type="hidden"' in contenu
+        assert "{{ csrf_token }}" in contenu, (
+            "le champ doit interpoler la variable de contexte, pas une valeur figée")
+
+    def test_tout_formulaire_post_du_squelette_porte_le_jeton(self):
+        """Un partiel juste qu'aucun formulaire n'inclut ne protège rien.
+
+        Le squelette ne livre aujourd'hui aucun formulaire POST : ses trois
+        occurrences de `<form` sont un commentaire d'usage, une modale native
+        `method="dialog"` et une démonstration `onsubmit="return false"`. La
+        règle est donc vraie à vide.
+
+        Ce constat est **affirmé** plutôt que sauté. Un `pytest.skip` ici
+        rendrait la règle invisible le jour où quelqu'un ajoute un formulaire
+        POST, et c'est exactement le mode de panne que ce fichier vient de
+        corriger. Le jour venu, ce test bascule tout seul sur la vérification
+        du jeton.
+        """
+        vues = ROOT / "skeleton" / "data" / "mvc" / "views"
+        # `method` peut être en toute casse et avec n'importe quel guillemet.
+        poste = re.compile(r"<form[^>]*\bmethod\s*=\s*[\"']?post\b", re.IGNORECASE)
+
+        formulaires = [(v, v.read_text(encoding="utf-8")) for v in sorted(vues.rglob("*.html"))]
+        postants = [(v, texte) for v, texte in formulaires if poste.search(texte)]
+
+        sans_jeton = [
+            v.relative_to(vues).as_posix() for v, texte in postants
+            if "partials/csrf.html" not in texte and 'name="csrf_token"' not in texte
+        ]
+
+        assert not sans_jeton, f"formulaires POST sans jeton CSRF : {sans_jeton}"
 
 
 # ── Vérification du contrat CsrfMiddleware ────────────────────────────────────
