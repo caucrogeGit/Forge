@@ -133,9 +133,18 @@ def test_mariadb_est_une_plage_et_non_une_version_figee() -> None:
 
 
 def test_les_bornes_hautes_restent_posees() -> None:
-    """Une borne basse relevée ne doit pas faire sauter la borne haute."""
+    """Une borne basse relevée ne doit pas faire sauter la borne haute.
+
+    `cryptography` est écarté depuis `DEPS-CRYPTOGRAPHY-NO-CEILING-001`, et
+    c'est la seule exception. Cette bibliothèque livre ses correctifs de
+    sécurité dans une nouvelle majeure : un plafond les exclut au moment même de
+    leur parution, et `forge-mvc-mfa` étant une bibliothèque, il casse la
+    résolution des applications qui en dépendent. Motifs complets dans
+    `tests/meta/test_security_cryptography_mfa_001.py`, qui exige en retour
+    l'ABSENCE de plafond, si bien que les deux gardes ne peuvent plus diverger.
+    """
     audit = REQUIREMENTS_AUDIT.read_text(encoding="utf-8")
-    for package in ("Pillow", "mariadb", "cryptography", "jsonschema"):
+    for package in ("Pillow", "mariadb", "jsonschema"):
         spec = _requirement(audit, package)
         assert "<" in spec, f"{package} n'a plus de borne haute : {package}{spec}"
 

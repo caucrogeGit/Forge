@@ -15,7 +15,15 @@
 # jinja2 est déjà couvert par le cœur (requirements.txt). jsonschema a quitté le
 # cœur avec le moteur d'entités (CORE-DROP-JSONSCHEMA-001) : il est désormais listé
 # ici, apporté par forge-mvc-entities et forge-mvc-rbac.
-cryptography>=50.0.0,<51
+
+# cryptography est la SEULE dépendance sans borne haute, et c'est délibéré
+# (DEPS-CRYPTOGRAPHY-NO-CEILING-001). Le motif complet est dans
+# tests/meta/test_security_cryptography_mfa_001.py ; en deux phrases : la
+# bibliothèque livre ses correctifs de sécurité dans une nouvelle majeure, donc
+# un plafond interdit le correctif au moment même où il paraît, et
+# forge-mvc-mfa est une bibliothèque, dont le plafond contamine la résolution
+# de toute application qui en dépend.
+cryptography>=50.0.0
 faker>=30,<40
 jsonschema>=4.18,<5
 mariadb>=1.1.14,<1.2

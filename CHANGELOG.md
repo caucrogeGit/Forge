@@ -279,6 +279,14 @@
 
 ### Corrigé
 
+- **`cryptography` n'est plus plafonné (`DEPS-CRYPTOGRAPHY-NO-CEILING-001`).**
+  Quatre changements de borne depuis la bêta, aucun motivé par une rupture d'API : tous venaient d'un avis de sécurité, sur les majeures 42 à 50. Le plafond n'a jamais servi à ce pour quoi il existait.
+  Il nuisait en revanche. Cette bibliothèque livre ses correctifs de sécurité dans une **nouvelle majeure**, jamais dans un correctif de la précédente, si bien qu'un plafond `<majeure+1` exclut le correctif au moment même de sa parution. Le plafond `<49` a été posé le 2026-06-24, alors que la 49.0.0 était sortie douze jours plus tôt : la borne naissait périmée.
+  Tant qu'un plafond tient, un utilisateur de `forge-mvc-mfa` ne peut pas prendre le correctif amont même en le voulant, et attend une release de Forge. La fenêtre de vulnérabilité passe de l'amont à Forge, ce qui est le contraire du but recherché sur une bibliothèque de sécurité.
+  `forge-mvc-mfa` étant une bibliothèque, son plafond cassait de surcroît la résolution de toute application ayant besoin d'une majeure plus récente pour une autre dépendance, sans recours possible.
+  Ce que le plafond protégeait est tenu autrement. Une rupture d'API dans Fernet, seul usage de Forge, fait rougir l'aller-retour de `tests/test_mfa_secret_crypto.py` ; l'abandon d'un vieux Python par une majeure relève de `requires-python`, que pip respecte sans plafond ; et l'audit hebdomadaire a relevé les trois derniers avis en moins de vingt-quatre heures.
+  La décision ne vise que cette dépendance, seule sans borne haute de `requirements-audit.txt`. L'étendre aux autres serait une décision distincte.
+
 - **Trois avis de sécurité sur `cryptography` 48.0.1 (`DEPS-CRYPTOGRAPHY-50-001`).**
   Publiés le 2026-08-04, ils ont fait passer la CI de `main` au rouge en quelques heures, sans qu'aucun changement du dépôt en soit la cause.
   `CVE-2026-69248` permet de contourner les contraintes de noms X.509 : une autorité intermédiaire limitée à `foo.example.com` accepte une feuille portant le joker `*.example.com`.
