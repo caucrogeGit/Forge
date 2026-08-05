@@ -106,8 +106,8 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-rc.4 : release candidate (API publique gelée, tous les opt-ins en Beta, nouvelles briques opt-in ADR-052, déploiement extrait ADR-053). -->
-<section id="beta17" class="py-24 px-6 sec-light">
+<!-- Nouveautés 1.0.0-rc.4 : documentation vérifiée par exécution, défauts trouvés par cette vérification, entités sans terminal, dépendances surveillées. -->
+<section id="nouveautes" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
       <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-rc.4</div>
@@ -116,23 +116,23 @@
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">API publique gelée</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Forge entre en release candidate : l'API publique du cœur est gelée pour la 1.0. Le code que vous écrivez aujourd'hui contre la RC reste valide en 1.0.0 stable, sans rupture d'API.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Documentation jouée, pas relue</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Les parcours d'accueil sont exécutés dans de vrais projets, les blocs de commande de la documentation sont lancés, et chaque import ou commande cité est confronté à l'interpréteur et au CLI. Une page qui montre du code promet qu'il fonctionne : cette promesse est désormais vérifiée à chaque intégration, pas relue.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Tous les opt-ins en Beta</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Toutes les briques opt-in officielles passent en statut Beta. Chacune s'installe séparément et le cœur ne dépend d'aucune : votre application n'embarque que ce qu'elle utilise vraiment.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Ce que la vérification a trouvé</h3>
+        <p class="text-white/60 text-sm leading-relaxed">La sonde de disponibilité /health, pourtant au contrat de stabilité, répondait 404 en production. Soixante-cinq tests, dont les trente-trois d'en-têtes de sécurité, ne s'exécutaient plus. Corrigés, et tenus par des garde-fous qui empêchent le retour.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Nouvelles briques applicatives</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Cinq nouveaux opt-ins couvrent des besoins courants, adossés à votre base de données et sans magie : settings (paramètres), audit (journal applicatif), jobs (file de tâches de fond), notifications in-app et import/export CSV.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Entités sans terminal</h3>
+        <p class="text-white/60 text-sm leading-relaxed">forge make:entity et forge make:relation acceptent la description complète en arguments, champs et relations compris. Un parcours devient rejouable, un projet reproductible, et l'outillage scriptable sans dialogue interactif.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Déploiement en opt-in</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Le déploiement quitte le cœur pour l'opt-in CLI forge-mvc-deploy : forge deploy:init génère une configuration Nginx, systemd et Gunicorn à adapter, forge deploy:check valide l'environnement de production.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Dépendances surveillées</h3>
+        <p class="text-white/60 text-sm leading-relaxed">L'audit hebdomadaire des dépendances expédiées a été remis en état, et il a relevé trois avis en moins de vingt-quatre heures. La borne haute de cryptography est levée : cette bibliothèque livre ses correctifs de sécurité dans une nouvelle version majeure, qu'un plafond interdisait au moment même de leur parution.</p>
       </div>
 
     </div>

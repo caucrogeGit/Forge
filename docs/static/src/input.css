@@ -1,8 +1,25 @@
 @import "tailwindcss";
 
-@source "../../mvc/views/landing/index.html";
-@source "../../docs/index.html";
-@source "../../mvc/views/errors";
+/* TAILWIND-SOURCES-DEAD-PATHS-001 : ces trois chemins visaient
+   `docs/mvc/views/landing/index.html`, `docs/docs/index.html` et
+   `docs/mvc/views/errors`, tous inexistants depuis l'ADR-044 (application
+   relocalisée hors du dépôt) et la refonte de `docs/` (ADR-039). Tailwind ne
+   balayait donc plus aucune des sources déclarées, et `npm run build:css`
+   élaguait 4 Ko de classes que la landing utilise encore : le prochain rebuild
+   aurait publié une landing sans styles.
+   Les chemins sont relatifs à CE fichier, `docs/static/src/`. */
+@source "../../index.html";
+@source "../../../skeleton/data/mvc/views/errors";
+
+/* LANDING-ACCENT-TEXT-VARIANTS-001 : déclarée en `@utility` et non dans
+   `@layer components`. Tailwind v4 ne génère pas de variante pour une classe
+   de `@layer components` : `group-hover:landing-accent-text`, présent sur les
+   72 titres de cartes cliquables et exigé par le garde-fou
+   LANDING-ARTICLES-CLICKABLE-001, n'existait donc dans aucun CSS compilé.
+   Le survol des cartes ne teintait rien depuis toujours. */
+@utility landing-accent-text {
+  color: var(--forge-accent);
+}
 
 @layer components {
   /* Barre de navigation : valeurs partagées avec la doc via forge-tokens.css
@@ -30,10 +47,6 @@
 
   .landing-accent-bg {
     background: var(--forge-accent);
-  }
-
-  .landing-accent-text {
-    color: var(--forge-accent);
   }
 
   .landing-version-strip {
