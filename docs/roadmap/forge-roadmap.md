@@ -74,6 +74,21 @@ Pour l'état détaillé du Scénario C, voir [Scénario C, Consolidation 3.0.2](
 
 ---
 
+## Chantiers issus de la publication 1.0.0-rc.4 (2026-08-05)
+
+Relevés en publiant la rc.4, sur mesure et non sur impression.
+Statut « à faire ».
+
+| Chantier | Ticket | Responsabilité unique | Sévérité |
+|---|---|---|---|
+| Publication du site | `CI-FORGE-WEB-DEPLOY-PATH-001` | Réconcilier le chemin de publication **déclaré** et le chemin **réel** de `forgemvc.com`. Le workflow `deploy-forge-web.yml` décrit une publication depuis GitHub Actions, exige un runner `[self-hosted, forge-web]` et n'a **jamais été exécuté** : l'API du dépôt déclare zéro runner (`total_count: 0`). La publication réelle est `official-site/scripts/sync-forge-docs-and-deploy.sh`, lancé à la main depuis le poste du mainteneur. Deux façons officielles coexistent donc, dont une fictive, ce que le principe 11 refuse. Trancher : soit enregistrer le runner sur la VM et faire du workflow le chemin unique, soit retirer le workflow et documenter le script comme la façon officielle, avec sa place dans la procédure de release | Moyenne |
+
+Mesure à l'appui : le site public est resté sur « Nouveautés 1.0.0-rc.2 » pendant que la rc.3 puis la rc.4 étaient publiées sur PyPI.
+Personne ne l'a vu, parce que rien ne relie la publication des paquets à celle du site.
+Le ticket devra donc dire, quelle que soit l'option retenue, **à quel moment de la release** le site se republie.
+
+---
+
 ## Chantiers issus de l'audit complet (2026-06-24)
 
 Audit transversal en six axes (architecture, sécurité, tests, packaging, qualité de code, documentation), avec preuves `file:line`.
