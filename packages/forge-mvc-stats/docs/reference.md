@@ -89,7 +89,19 @@ Aucun cookie visiteur, aucune IP.
 
     #### 3. Poser ce dont il a besoin
 
-    Rien à faire : cet opt-in n'apporte aucune table.
+    Cet opt-in apporte une table, `forge_stats_events`, où atterrissent les événements.
+
+    ```bash
+    forge stats:init        # écrit la migration dans mvc/migrations/, sans l'exécuter
+    forge migration:apply   # après relecture
+    ```
+
+    La déclaration de cette table vit dans `tables.py`, rendue pour le backend installé.
+
+    !!! warning "Projets antérieurs à cette commande"
+        `stats:init` n'a pas toujours existé, et cette page affirmait auparavant que l'opt-in n'apportait aucune table.
+        Les projets d'alors ont donc créé `forge_stats_events` à la main.
+        Si c'est votre cas, ignorez la migration neuve plutôt que de l'appliquer, sans quoi `migration:apply` butera sur une table déjà présente.
 
     #### 4. Le brancher là où il agit
 

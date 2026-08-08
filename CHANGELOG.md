@@ -5,6 +5,16 @@
 
 ### Ajouté
 
+- **`forge-mvc-stats` rejoint la convention de provisioning des opt-ins BDD (`STATS-OPTIN-CONFORM-001`).**
+  Le paquet était en retrait des neuf autres opt-ins adossés à la base.
+  Il décrivait bien sa table en `TableDefinition`, mais il n'avait ni `MIGRATIONS`, ni entry point `forge_mvc.commands`, ni dossier `cli/`, ni commande d'amorçage.
+  `forge_stats_events` n'était donc créée par aucune commande Forge, alors que l'ADR-071 fixe une convention unique de provisioning, et sa page de référence affirmait « cet opt-in n'apporte aucune table », ce qui était faux.
+  L'écart n'a été trouvé qu'en vérifiant un avis extérieur qui, lui, pointait autre chose.
+  `forge stats:init` rend désormais la migration pour le backend installé et l'écrit dans `mvc/migrations/`, sans exécuter de SQL.
+  La déclaration de la table déménage dans `tables.py`, emplacement conventionnel où le provisioning partagé va la chercher ; `schema.py` la réexporte, ces noms appartenant à l'API publique du paquet depuis son origine.
+  Un test vérifie que les deux modules désignent le même objet, deux `TableDefinition` pour une même table divergeant en silence.
+  Un projet antérieur qui avait créé la table à la main doit ignorer la migration neuve plutôt que de l'appliquer ; la page de référence le dit.
+
 - **Les tâches de fond orphelines sont reprises au lieu de rester bloquées (`JOBS-STALE-RECLAIM-001`).**
   Un worker réserve une tâche en la passant à `running`, puis rend son verdict.
   Tué entre les deux, il ne rendait aucun verdict et personne ne le rendait à sa place : la tâche restait `running` indéfiniment, et la file se remplissait de lignes mortes que rien ne signalait.

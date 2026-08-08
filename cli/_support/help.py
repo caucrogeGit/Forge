@@ -132,6 +132,7 @@ Déploiement
 
 Opt-ins applicatifs
   settings:init       Prépare la table des paramètres applicatifs (forge-mvc-settings).
+  stats:init          Prépare la table des événements statistiques (forge-mvc-stats).
   audit:init          Prépare le journal d'audit applicatif (forge-mvc-audit).
   audit:gc            Purge le journal d'audit par âge (affiche ; --run exécute).
   jobs:init           Prépare la file de tâches de fond (forge-mvc-jobs).

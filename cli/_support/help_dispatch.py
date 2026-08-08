@@ -150,6 +150,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "deploy:check":     "Vérifie la configuration de déploiement.",
     # Opt-ins applicatifs (ADR-052)
     "settings:init":      "Prépare la table des paramètres applicatifs (forge-mvc-settings).",
+    "stats:init":         "Prépare la table des événements statistiques (forge-mvc-stats).",
     "audit:init":         "Prépare le journal d'audit applicatif (forge-mvc-audit).",
     "audit:gc":           "Purge le journal d'audit par âge (affiche ; --run exécute).",
     "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
@@ -210,6 +211,34 @@ Prérequis:
 Limites:
   - n'exécute aucun SQL et ne contacte pas MariaDB ;
   - lancer ensuite forge migration:apply pour appliquer la migration.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "stats:init": """\
+Usage:
+  forge stats:init
+
+Description:
+  Prépare la migration SQL de l'opt-in forge-mvc-stats (table
+  forge_stats_events) dans mvc/migrations/, sans exécuter de SQL.
+
+  Ce paquet était en retrait des autres opt-ins adossés à la base : il
+  décrivait bien sa table, mais aucune commande Forge ne la créait, et sa
+  documentation affirmait à tort qu'il n'apportait aucune table.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - rend la migration pour le backend installé, puis l'écrit dans mvc/migrations/.
+
+Prérequis:
+  - forge-mvc-stats installé (pip install --pre forge-mvc-stats) ;
+  - un backend BDD installé (le SQL rendu en dépend) ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - n'exécute aucun SQL et n'ouvre aucune connexion ;
+  - lancer ensuite forge migration:apply pour appliquer la migration ;
+  - un projet qui avait créé la table à la main doit ignorer cette
+    migration plutôt que de l'appliquer deux fois.
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.""",
