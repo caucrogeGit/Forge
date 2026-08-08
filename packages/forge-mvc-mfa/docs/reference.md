@@ -103,7 +103,19 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     #### 3. Poser ce dont il a besoin
 
-    Rien à faire : cet opt-in n'apporte aucune table.
+    Rien à faire dans le cas courant.
+    Cet opt-in n'apporte aucune table, la persistance des facteurs appartenant à l'application.
+
+    Une seule exception, si vous servez l'authentification par **plusieurs workers** et voulez
+    un anti-rejeu TOTP commun à tous.
+    Le registre partagé, décrit plus bas, s'appuie alors sur une table.
+
+    ```bash
+    forge mfa:init          # écrit la migration dans mvc/migrations/, sans l'exécuter
+    forge migration:apply   # après relecture
+    ```
+
+    La déclaration de cette table vit dans `tables.py`, rendue pour le backend installé.
 
     #### 4. Le brancher là où il agit
 
@@ -357,7 +369,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
         Ces protections sont actives par défaut.
 
-    !!! danger "L'anti-rejeu vaut par processus, pas par application"
+    !!! danger "Par défaut, l'anti-rejeu vaut par processus, pas par application"
         Le registre des codes déjà utilisés vit en mémoire du processus.
         Derrière un serveur à plusieurs workers, gunicorn typiquement, chaque worker a le sien.
         Un même code TOTP peut donc être accepté une fois par worker, soit jusqu'à autant de fois qu'il y a de workers.
@@ -366,12 +378,37 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         Le rate-limit du challenge borne par ailleurs le nombre de tentatives.
         Le risque réel est donc le rejeu d'un code intercepté, pas la découverte d'un code.
 
-        Deux remèdes, au choix de l'exploitant.
+        Trois remèdes, au choix de l'exploitant.
 
         - Servir l'authentification par un seul worker, ce qui suffit à beaucoup d'applications.
-        - Porter le registre dans un magasin partagé si votre modèle de menace l'exige, sur le modèle de `forge-mvc-sessions-db`.
+        - Installer le registre partagé livré par Forge, voir le paragraphe suivant.
+        - Porter le registre dans un magasin partagé de votre cru, en écrivant une classe conforme au protocole `TotpReplayStore`.
 
         Le registre n'est pas non plus persisté : un redémarrage l'oublie, avec la même fenêtre de moins de trente secondes.
+
+    !!! tip "Partager le registre entre tous les processus"
+        Forge livre `DbTotpReplayStore`, adossé au backend BDD du projet, donc commun à tous les workers.
+        Il ne s'active pas tout seul, l'application le pose au démarrage en une ligne visible.
+
+        ```python
+        from forge_mvc_mfa import set_replay_store
+        from forge_mvc_mfa.replay_store_db import DbTotpReplayStore
+
+        set_replay_store(DbTotpReplayStore())
+        ```
+
+        La table se provisionne comme celle de tout opt-in adossé à la base.
+
+        ```bash
+        forge mfa:init          # écrit la migration dans mvc/migrations/, sans l'exécuter
+        forge migration:apply   # après relecture
+        ```
+
+        Cette table n'est requise que si vous installez ce registre.
+        Un projet qui garde le défaut n'a aucune table à créer, `forge-mvc-mfa` restant une bibliothèque sans persistance.
+
+        Le coût est d'une écriture par validation de code.
+        En contrepartie la garantie devient exacte, y compris entre processus, et elle n'exige ni Redis ni aucune dépendance nouvelle.
 
     !!! note "Persistance applicative"
         Forge fournit les helpers et les contrats (`AuthMfaFactor`, codes) ; l'application choisit la persistance (table, schéma), cohérent avec ADR-008.

@@ -5,6 +5,23 @@
 
 ### Sécurité
 
+- **L'anti-rejeu TOTP peut désormais être partagé par tous les processus (`MFA-TOTP-REPLAY-SHARED-001`).**
+  Le registre des codes déjà consommés vivait dans la mémoire d'un processus, donc chaque worker gunicorn avait le sien.
+  Or `deploy:init` génère précisément du gunicorn multi-worker, si bien que le chemin de déploiement officiel de Forge affaiblissait sa propre protection.
+  Un code intercepté pouvait être présenté à chaque worker tour à tour, et accepté autant de fois qu'il y a de workers.
+  La limite était connue, écrite et gardée par un test (`MFA-REPLAY-SCOPE-DOC-001`), qui laissait le remède au choix de l'exploitant ; ce ticket lui en donne un qui fonctionne, sans lui retirer le choix.
+  Le registre passe derrière un contrat, `TotpReplayStore`, et Forge en livre deux mises en œuvre.
+  Le **défaut ne change pas**, c'est toujours le registre en mémoire, si bien qu'aucun projet existant ne voit son comportement bouger.
+  `DbTotpReplayStore` s'adosse au backend BDD du projet et vaut alors pour tous les processus ; l'application le pose au démarrage par `set_replay_store()`, en une ligne visible (principe 3).
+  Aucune dépendance nouvelle, ni Redis ni broker, `core.database` venant de `forge-mvc` que le paquet exigeait déjà, et l'import restant paresseux pour que `forge-mvc-mfa` demeure utilisable sans backend.
+  Le contrat est reproduit **exactement**, y compris sa partie la moins visible.
+  Il refuse toute fenêtre antérieure ou égale à la dernière vue, et pas seulement le doublon exact, sans quoi un code plus ancien resterait rejouable tant que la tolérance de `verify_totp_code` l'accepte.
+  D'où une ligne par facteur portant sa dernière fenêtre, et non une ligne par code consommé, ce qui borne aussi la table au nombre de facteurs actifs.
+  L'atomicité est obtenue sans transaction applicative, par un `INSERT` dont l'échec en doublon bascule vers un `UPDATE` gardé par `last_step < ?`, le doublon étant reconnu par `is_unique_violation()` du contrat `DatabaseBackend`.
+  La purge compare des numéros de fenêtre et jamais des dates, ce qui la rend portable sans effort sur les quatre backends.
+  La table est **optionnelle**, `forge mfa:init` ne servant qu'aux projets qui installent le registre partagé ; le paquet reste une bibliothèque sans persistance pour tous les autres.
+  Le test central ouvre deux connexions distinctes et vérifie qu'un code accepté par la première est refusé par la seconde, propriété que le registre en mémoire ne peut pas offrir.
+
 - **Les listes blanches ancrées acceptaient la valeur suffixée d'un saut de ligne (`VALIDATION-ANCHOR-FULLMATCH-001`).**
   En Python, `$` n'ancre pas tout à fait la fin de la chaîne, il accepte aussi la position qui précède un saut de ligne final.
   Un validateur écrit `^...$` puis consulté par `match()` laissait donc passer ce qu'il prétendait interdire.

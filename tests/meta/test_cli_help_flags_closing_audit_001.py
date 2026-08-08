@@ -93,6 +93,9 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Opt-ins applicatifs (ADR-052)
     "settings:init", "audit:init", "jobs:init", "notifications:init",
     "sessions:init", "sessions:gc",
+    # MFA : table du registre anti-rejeu partagé, optionnelle
+    # (MFA-TOTP-REPLAY-SHARED-001). Le magasin par défaut n'a besoin d'aucune table.
+    "mfa:init",
     # RBAC : provisionnement de roles/permissions/role_permissions
     # (OPTIN-DDL-RBAC-INIT-001). La table pivot user_roles reste à auth:init.
     "rbac:init",

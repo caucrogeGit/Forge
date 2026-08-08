@@ -67,10 +67,16 @@ from forge_mvc_mfa.recovery import (
     verify_recovery_code,
 )
 from forge_mvc_mfa.totp_replay import (
+    InMemoryTotpReplayStore,
+    TotpReplayStore,
+    check_and_record,
+    get_replay_store,
     is_replay,
     purge_all as purge_all_totp_replay,
     purge_old,
     record_used,
+    reset_replay_store,
+    set_replay_store,
     step_for_time,
 )
 
@@ -143,7 +149,14 @@ __all__ = [
     # totp_replay
     "is_replay",
     "record_used",
+    "check_and_record",
     "purge_old",
     "purge_all_totp_replay",
     "step_for_time",
+    # totp_replay — magasin enfichable (MFA-TOTP-REPLAY-SHARED-001)
+    "TotpReplayStore",
+    "InMemoryTotpReplayStore",
+    "set_replay_store",
+    "get_replay_store",
+    "reset_replay_store",
 ]

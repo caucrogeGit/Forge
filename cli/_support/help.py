@@ -134,6 +134,7 @@ Opt-ins applicatifs
   settings:init       Prépare la table des paramètres applicatifs (forge-mvc-settings).
   audit:init          Prépare le journal d'audit applicatif (forge-mvc-audit).
   jobs:init           Prépare la file de tâches de fond (forge-mvc-jobs).
+  mfa:init            Prépare le registre anti-rejeu TOTP partagé (forge-mvc-mfa, optionnel).
   notifications:init  Prépare les notifications in-app (forge-mvc-notifications).
   rbac:init           Génère les migrations RBAC (roles, permissions, role_permissions) vers mvc/migrations/.
   sessions:init       Génère la migration Sessions vers mvc/migrations/ (idempotent, sans appliquer).

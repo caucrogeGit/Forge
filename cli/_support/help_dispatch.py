@@ -152,6 +152,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "settings:init":      "Prépare la table des paramètres applicatifs (forge-mvc-settings).",
     "audit:init":         "Prépare le journal d'audit applicatif (forge-mvc-audit).",
     "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
+    "mfa:init":           "Prépare le registre anti-rejeu TOTP partagé (forge-mvc-mfa, optionnel).",
     "notifications:init": "Prépare les notifications in-app (forge-mvc-notifications).",
     "rbac:init":          "Génère les migrations RBAC (roles, permissions, role_permissions) vers mvc/migrations/.",
     "sessions:init":      "Génère la migration Sessions vers mvc/migrations/ (idempotent, sans appliquer).",
@@ -228,6 +229,33 @@ Prérequis:
 Limites:
   - n'exécute aucun SQL et ne contacte pas MariaDB ;
   - lancer ensuite forge migration:apply pour appliquer la migration.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "mfa:init": """\
+Usage:
+  forge mfa:init
+
+Description:
+  Prépare la migration SQL du registre anti-rejeu TOTP partagé
+  (table mfa_totp_replay) dans mvc/migrations/, sans exécuter de SQL.
+
+  Cette table est OPTIONNELLE. Elle ne sert qu'aux projets qui installent
+  DbTotpReplayStore pour partager le registre entre plusieurs workers.
+  Le registre par défaut vit en mémoire et n'a besoin d'aucune table.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - rend la migration pour le backend installé, puis l'écrit dans mvc/migrations/.
+
+Prérequis:
+  - forge-mvc-mfa installé (pip install --pre forge-mvc-mfa) ;
+  - un backend BDD installé (le SQL rendu en dépend) ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - n'exécute aucun SQL et n'ouvre aucune connexion ;
+  - lancer ensuite forge migration:apply pour appliquer la migration ;
+  - poser le magasin reste explicite : set_replay_store(DbTotpReplayStore()).
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.""",

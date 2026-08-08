@@ -101,6 +101,10 @@ OPT_IN_CLI_NAMESPACES = (
     "settings:", "audit:", "jobs:", "notifications:",
     # Opt-ins médias et sessions : doc embarquée du paquet (ADR-038).
     "images:", "sessions:",
+    # MFA : `mfa:init` provisionne la table du registre anti-rejeu partagé,
+    # optionnelle (MFA-TOTP-REPLAY-SHARED-001). Documentée dans la doc
+    # embarquée du paquet, section « Mise en service ».
+    "mfa:",
 )
 
 # Commandes dans forge --help intentionnellement non documentées (rare)
