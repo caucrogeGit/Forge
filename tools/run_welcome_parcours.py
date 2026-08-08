@@ -225,7 +225,7 @@ def fichier_du_bloc(contenu: str) -> "str | None":
     lignes = contenu.lstrip().splitlines()
     if not lignes:
         return None
-    trouve = CHEMIN_DU_BLOC.match(lignes[0])
+    trouve = CHEMIN_DU_BLOC.fullmatch(lignes[0])
     return trouve.group(1) if trouve else None
 
 

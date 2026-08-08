@@ -107,7 +107,7 @@ def parse_topic(topic: str) -> tuple[str, str]:
     Lève ``ContractError(CODE_TOPIC_PATTERN, ...)`` si le topic ne
     respecte pas ``forge/{site}/{device_id}/telemetry``.
     """
-    match = _TOPIC_RE.match(topic)
+    match = _TOPIC_RE.fullmatch(topic)
     if not match:
         raise ContractError(
             CODE_TOPIC_PATTERN,
@@ -218,14 +218,14 @@ def _validate_types(data: dict[str, Any]) -> None:
 
 def _validate_formats(data: dict[str, Any]) -> None:
     kind = data["kind"]
-    if not _KIND_RE.match(kind):
+    if not _KIND_RE.fullmatch(kind):
         raise ContractError(
             CODE_PAYLOAD_VALUE_FORMAT,
             f"kind n'est pas un slug [a-z0-9_-]+ : {kind!r}",
         )
 
     timestamp = data["timestamp"]
-    if not _TIMESTAMP_RE.match(timestamp):
+    if not _TIMESTAMP_RE.fullmatch(timestamp):
         raise ContractError(
             CODE_PAYLOAD_VALUE_FORMAT,
             f"timestamp doit être ISO 8601 UTC avec suffixe Z : "

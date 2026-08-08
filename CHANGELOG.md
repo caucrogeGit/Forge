@@ -3,6 +3,22 @@
 
 ## [Non publié]
 
+### Sécurité
+
+- **Les listes blanches ancrées acceptaient la valeur suffixée d'un saut de ligne (`VALIDATION-ANCHOR-FULLMATCH-001`).**
+  En Python, `$` n'ancre pas tout à fait la fin de la chaîne, il accepte aussi la position qui précède un saut de ligne final.
+  Un validateur écrit `^...$` puis consulté par `match()` laissait donc passer ce qu'il prétendait interdire.
+  Mesuré, `_ident("titre\n")` rendait la chaîne intacte, et cette valeur est ensuite interpolée dans le `SELECT` de `forge-mvc-admin`.
+  Aucun cas exploitable n'a été trouvé, rien ne peut suivre ce saut de ligne, `"titre\nDROP TABLE x"` étant bien rejeté.
+  Mais plusieurs de ces valeurs composent ensuite un chemin de fichier, l'identifiant de session devenant `<dossier>/<identifiant>.json` et la locale `<dossier>/<locale>.json`, or un saut de ligne est un caractère légal dans un nom de fichier POSIX.
+  Une défense en profondeur ne se juge pas à son exploitabilité du jour.
+  Le critère de tri n'est pas la forme de l'expression mais la méthode d'appel, `fullmatch()` immunisant déjà même en gardant les ancres.
+  Le dépôt employait les deux formes, `core/forms/fields.py`, `forge_mvc_files` et `forge_mvc_entities` appelant déjà `fullmatch()`.
+  Le ticket retient `fullmatch()` partout, forme unique (principe 11), sur **29 sites répartis dans 18 fichiers**.
+  Quatre sites étaient couverts par accident, un `.strip()` en amont retirant le saut avant la validation ; **six laissaient réellement passer**.
+  Le garde-fou ne porte aucune liste de sites et détecte l'idiome par analyse syntaxique, si bien qu'un site futur le fera échouer sans que personne ait à l'y inscrire.
+  Il a d'ailleurs trouvé cinq sites qu'une recherche textuelle avait manqués, leurs variables ne suivant pas la convention de nommage attendue.
+
 ## [1.0.0-rc.4] - 2026-08-04
 
 ### Ajouté

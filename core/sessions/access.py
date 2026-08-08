@@ -41,7 +41,7 @@ def get_session_id(request: Request) -> str | None:
         part = part.strip()
         if part.startswith(prefix):
             sid = part[len(prefix):]
-            if _SESSION_ID_RE.match(sid):
+            if _SESSION_ID_RE.fullmatch(sid):
                 return sid
             return None
     return None

@@ -114,7 +114,7 @@ def verifier(cible: "str | None") -> int:
         relatif = page.relative_to(PROJECT_ROOT)
         for ligne, diagramme in diagrammes_de_classe(page):
             for nom, membres in lire_classes(diagramme).items():
-                if not IDENTIFIANT_CLASSE.match(nom):
+                if not IDENTIFIANT_CLASSE.fullmatch(nom):
                     ignorees += 1
                     continue
                 if nom not in code:

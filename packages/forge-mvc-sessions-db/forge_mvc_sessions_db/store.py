@@ -124,7 +124,7 @@ class DbSessionStore:
     # ── helpers ─────────────────────────────────────────────────────────────
 
     def _valid(self, session_id: str) -> bool:
-        return bool(_SESSION_ID_RE.match(session_id))
+        return bool(_SESSION_ID_RE.fullmatch(session_id))
 
     def _load(self, session_id: str) -> tuple[dict[str, Any], int] | None:
         """Charge une session non expirée : `(data, version)`.

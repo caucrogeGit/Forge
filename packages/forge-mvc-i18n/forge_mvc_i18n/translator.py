@@ -38,7 +38,7 @@ def set_fallback_locale(locale: str | None) -> None:
 
 @lru_cache(maxsize=None)
 def _load_catalog_cached(locale: str, translations_dir: str) -> dict[str, str]:
-    if not _LOCALE_RE.match(locale):
+    if not _LOCALE_RE.fullmatch(locale):
         raise TranslationCatalogError(
             f"Locale invalide : {locale!r} (caractères de chemin interdits)"
         )

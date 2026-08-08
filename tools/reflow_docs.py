@@ -132,7 +132,7 @@ def reflow(src: str) -> str:
             continue
 
         # Item de liste : marqueur + continuation indentée.
-        match = _LIST.match(line)
+        match = _LIST.fullmatch(line)
         if match is not None:
             marker_indent, marker, first = match.group(1), match.group(2), match.group(3)
             content_indent = len(marker_indent) + len(marker) + 1
@@ -142,7 +142,7 @@ def reflow(src: str) -> str:
                 nxt = lines[i]
                 if not nxt.strip() or nxt.lstrip().startswith("```"):
                     break
-                if _verbatim(nxt, in_code) or _LIST.match(nxt) or nxt.lstrip().startswith(">"):
+                if _verbatim(nxt, in_code) or _LIST.fullmatch(nxt) or nxt.lstrip().startswith(">"):
                     break
                 if _indent(nxt) < content_indent:
                     break
@@ -164,7 +164,7 @@ def reflow(src: str) -> str:
             nxt = lines[i]
             if not nxt.strip() or nxt.lstrip().startswith("```"):
                 break
-            if _verbatim(nxt, in_code) or _LIST.match(nxt) or nxt.lstrip().startswith(">"):
+            if _verbatim(nxt, in_code) or _LIST.fullmatch(nxt) or nxt.lstrip().startswith(">"):
                 break
             if _indent(nxt) != indent:
                 break

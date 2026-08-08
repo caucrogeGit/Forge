@@ -53,7 +53,7 @@ class FileSessionStore:
     # ── helpers ─────────────────────────────────────────────────────────────
 
     def _valid(self, session_id: str) -> bool:
-        return bool(_SESSION_ID_RE.match(session_id))
+        return bool(_SESSION_ID_RE.fullmatch(session_id))
 
     def _path(self, session_id: str) -> Path:
         return self._dir / f"{session_id}.json"
@@ -220,7 +220,7 @@ class FileSessionStore:
         count = 0
         with self._lock:
             for path in self._dir.glob("*.json"):
-                if not _SESSION_ID_RE.match(path.stem):
+                if not _SESSION_ID_RE.fullmatch(path.stem):
                     continue
                 try:
                     raw = json.loads(path.read_text(encoding="utf-8"))

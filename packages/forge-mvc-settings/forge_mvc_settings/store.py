@@ -53,7 +53,7 @@ def _db_module() -> Any:
 
 
 def _validate_key(key: object) -> None:
-    if not isinstance(key, str) or not _KEY_RE.match(key):
+    if not isinstance(key, str) or not _KEY_RE.fullmatch(key):
         raise SettingsError(
             f"Clé de paramètre invalide : {key!r}. Attendu : une lettre suivie de "
             "lettres, chiffres, '_' ou '.' (191 caractères au plus)."

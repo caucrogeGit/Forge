@@ -316,7 +316,7 @@ def audit_project_migrations(root: Path) -> list[AuditResult]:
 
     results.append(AuditResult("ok", family, f"{len(sql_files)} fichier(s) SQL trouvé(s)"))
 
-    invalid_names = [f.name for f in sql_files if not _MIGRATION_RE.match(f.name)]
+    invalid_names = [f.name for f in sql_files if not _MIGRATION_RE.fullmatch(f.name)]
     if invalid_names:
         results.append(AuditResult("warn", family,
                                    f"{len(invalid_names)} nom(s) non conforme(s) : "
@@ -328,7 +328,7 @@ def audit_project_migrations(root: Path) -> list[AuditResult]:
                                    f"{len(empty_files)} fichier(s) vide(s) : "
                                    f"{', '.join(empty_files)}"))
 
-    valid_files = [f for f in sql_files if _MIGRATION_RE.match(f.name)]
+    valid_files = [f for f in sql_files if _MIGRATION_RE.fullmatch(f.name)]
     timestamps = [f.name[:14] for f in valid_files]
     dup_timestamps = sorted(ts for ts, count in Counter(timestamps).items() if count > 1)
     if dup_timestamps:

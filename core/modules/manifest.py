@@ -47,7 +47,7 @@ def validate_module_name(value: Any) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ModuleManifestError("name: doit etre une chaine non vide")
     name = value.strip()
-    if not _VALID_NAME_RE.match(name):
+    if not _VALID_NAME_RE.fullmatch(name):
         raise ModuleManifestError(
             f"name: format invalide {name!r} — snake_case minuscule requis, "
             "ne doit pas commencer par un chiffre"
@@ -60,7 +60,7 @@ def validate_module_version(value: Any) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ModuleManifestError("version: doit etre une chaine non vide")
     version = value.strip()
-    if not _VALID_VERSION_RE.match(version):
+    if not _VALID_VERSION_RE.fullmatch(version):
         raise ModuleManifestError(
             f"version: format invalide {version!r} — format attendu : MAJOR.MINOR.PATCH"
         )

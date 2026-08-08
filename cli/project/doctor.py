@@ -264,7 +264,7 @@ def check_migrations(root: Path) -> CheckResult:
     if not sql_files:
         return CheckResult("ok", "Migrations", "mvc/migrations/ présent et vide")
 
-    invalid_names = [f.name for f in sql_files if not _MIGRATION_RE.match(f.name)]
+    invalid_names = [f.name for f in sql_files if not _MIGRATION_RE.fullmatch(f.name)]
     empty_files = [f.name for f in sql_files if f.stat().st_size == 0]
 
     issues: list[str] = []

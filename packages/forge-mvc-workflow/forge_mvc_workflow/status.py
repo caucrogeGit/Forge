@@ -60,7 +60,7 @@ def validate_status_name(value: str) -> str:
         raise WorkflowStatusError(
             f"Le nom de statut '{value}' est invalide après normalisation."
         )
-    if not _VALID_NAME_RE.match(normalized):
+    if not _VALID_NAME_RE.fullmatch(normalized):
         raise WorkflowStatusError(
             f"Le nom de statut '{value}' contient des caractères non autorisés. "
             "Utilisez uniquement des lettres minuscules, des chiffres et des tirets bas."

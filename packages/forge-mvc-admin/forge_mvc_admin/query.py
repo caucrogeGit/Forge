@@ -31,7 +31,7 @@ def _ident(name: str) -> str:
     Les valeurs viennent d'un `AdminResource` déjà validé ; cette revalidation
     rend le SQL interpolé sûr même lu isolément (défense en profondeur).
     """
-    if not _IDENT_RE.match(name):
+    if not _IDENT_RE.fullmatch(name):
         raise AdminResourceError(f"identifiant SQL invalide : {name!r}")
     return name
 

@@ -74,7 +74,7 @@ def validate_event_name(value: str) -> str:
         raise StatsEventError(
             f"Le nom d'événement '{value}' est invalide après normalisation."
         )
-    if not _VALID_NAME_RE.match(normalized):
+    if not _VALID_NAME_RE.fullmatch(normalized):
         raise StatsEventError(
             f"Le nom d'événement '{value}' est invalide. "
             "Format attendu : lettres minuscules, chiffres et tirets bas, "

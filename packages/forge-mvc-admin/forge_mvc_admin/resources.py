@@ -62,11 +62,11 @@ class AdminResource:
     pk: str = "id"
 
     def __post_init__(self) -> None:
-        if not _ENTITY_RE.match(self.entity):
+        if not _ENTITY_RE.fullmatch(self.entity):
             raise AdminResourceError(
                 f"entity invalide : {self.entity!r} (PascalCase attendu, ex. 'Article')."
             )
-        if not _SLUG_RE.match(self.slug):
+        if not _SLUG_RE.fullmatch(self.slug):
             raise AdminResourceError(
                 f"slug invalide : {self.slug!r} (minuscules, chiffres et tirets, "
                 "commençant par une lettre, ex. 'articles')."
@@ -77,15 +77,15 @@ class AdminResource:
             raise AdminResourceError("plural_label vide.")
         _validate_fields("list_fields", self.list_fields)
         _validate_fields("form_fields", self.form_fields)
-        if not _FIELD_RE.match(self.table):
+        if not _FIELD_RE.fullmatch(self.table):
             raise AdminResourceError(
                 f"table invalide : {self.table!r} (snake_case attendu, ex. 'articles')."
             )
-        if self.order_by and not _FIELD_RE.match(self.order_by):
+        if self.order_by and not _FIELD_RE.fullmatch(self.order_by):
             raise AdminResourceError(
                 f"order_by invalide : {self.order_by!r} (snake_case attendu)."
             )
-        if not _FIELD_RE.match(self.pk):
+        if not _FIELD_RE.fullmatch(self.pk):
             raise AdminResourceError(
                 f"pk invalide : {self.pk!r} (snake_case attendu, ex. 'id')."
             )
@@ -97,7 +97,7 @@ def _validate_fields(kind: str, names: tuple[str, ...]) -> None:
         raise AdminResourceError(f"{kind} : au moins un champ est requis.")
     seen: set[str] = set()
     for name in names:
-        if not _FIELD_RE.match(name):
+        if not _FIELD_RE.fullmatch(name):
             raise AdminResourceError(
                 f"{kind} : nom de champ invalide {name!r} (snake_case attendu)."
             )

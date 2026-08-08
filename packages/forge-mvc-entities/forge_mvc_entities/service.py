@@ -30,7 +30,7 @@ _Execute = Callable[[str, _Params], int]
 
 def _safe_identifier(name: str, label: str) -> str:
     """Valide qu'un nom de table ou de colonne ne contient pas de caractères dangereux."""
-    if not _IDENTIFIER_RE.match(name):
+    if not _IDENTIFIER_RE.fullmatch(name):
         raise ValueError(
             f"{label} invalide : {name!r}. "
             "Seuls les caractères [A-Za-z0-9_] sont autorisés, le premier doit être une lettre ou _."
