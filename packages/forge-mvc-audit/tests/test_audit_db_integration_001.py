@@ -18,6 +18,8 @@ forge_mvc_audit = pytest.importorskip("forge_mvc_audit")
 
 from forge_mvc_audit import get_audit_log, record_audit
 
+from forge_mvc_testing.db_probe import connection_failure_message
+
 _REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
 
 
@@ -96,7 +98,9 @@ def audit_db() -> Any:
     try:
         admin = mariadb.connect(**params)
     except Exception as error:  # noqa: BLE001
-        message = f"MariaDB de test injoignable : {error}"
+        message = connection_failure_message(
+            "MariaDB", error, env_prefix="FORGE_TEST_DB"
+        )
         if _REQUIRE_DB:
             pytest.fail(message + " (FORGE_REQUIRE_DB=1)")
         pytest.skip(message + " (test d'intégration sauté en local)")

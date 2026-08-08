@@ -17,6 +17,8 @@ import os
 
 import pytest
 
+from forge_mvc_testing.db_probe import connection_failure_message
+
 _REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
 _REQUIRE_DB_PG = os.environ.get("FORGE_REQUIRE_DB_PG") == "1"
 _REQUIRE_DB_MSSQL = os.environ.get("FORGE_REQUIRE_DB_MSSQL") == "1"
@@ -79,9 +81,9 @@ def real_db():
     try:
         probe = connection.get_connection()  # crée le pool nommé une fois
         connection.close_connection(probe)
-    except Exception as error:  # noqa: BLE001 — toute erreur de connexion = base indisponible
+    except Exception as error:  # noqa: BLE001 — la cause est classée, pas supposée
         _restore()
-        message = f"MariaDB de test injoignable : {error}"
+        message = connection_failure_message("MariaDB", error, env_prefix="FORGE_TEST_DB")
         if _REQUIRE_DB:
             pytest.fail(message + " (FORGE_REQUIRE_DB=1)")
         pytest.skip(message + " (test d'intégration sauté en local)")
@@ -120,9 +122,9 @@ def real_pg_db(monkeypatch: pytest.MonkeyPatch):
     try:
         probe = connection.get_connection()
         connection.close_connection(probe)
-    except Exception as error:  # noqa: BLE001 — toute erreur de connexion = base indisponible
+    except Exception as error:  # noqa: BLE001 — la cause est classée, pas supposée
         reset_backend()
-        message = f"PostgreSQL de test injoignable : {error}"
+        message = connection_failure_message("PostgreSQL", error, env_prefix="FORGE_TEST_PG")
         if _REQUIRE_DB_PG:
             pytest.fail(message + " (FORGE_REQUIRE_DB_PG=1)")
         pytest.skip(message + " (test d'intégration sauté en local)")
@@ -173,9 +175,9 @@ def real_mssql_db(monkeypatch: pytest.MonkeyPatch):
             backend.close_connection(admin)
         probe = connection.get_connection()
         connection.close_connection(probe)
-    except Exception as error:  # noqa: BLE001 — toute erreur de connexion = base indisponible
+    except Exception as error:  # noqa: BLE001 — la cause est classée, pas supposée
         reset_backend()
-        message = f"SQL Server de test injoignable : {error}"
+        message = connection_failure_message("SQL Server", error, env_prefix="FORGE_TEST_MSSQL")
         if _REQUIRE_DB_MSSQL:
             pytest.fail(message + " (FORGE_REQUIRE_DB_MSSQL=1)")
         pytest.skip(message + " (test d'intégration sauté en local)")

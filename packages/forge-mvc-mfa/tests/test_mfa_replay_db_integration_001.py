@@ -23,6 +23,8 @@ pytest.importorskip("forge_mvc_mfa")
 
 from forge_mvc_mfa.replay_store_db import DbTotpReplayStore
 
+from forge_mvc_testing.db_probe import connection_failure_message
+
 _REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
 
 
@@ -87,7 +89,9 @@ def deux_workers() -> Iterator[tuple[DbTotpReplayStore, DbTotpReplayStore]]:
     try:
         admin = mariadb.connect(**params)
     except Exception as error:  # noqa: BLE001
-        message = f"MariaDB de test injoignable : {error}"
+        message = connection_failure_message(
+            "MariaDB", error, env_prefix="FORGE_TEST_DB"
+        )
         if _REQUIRE_DB:
             pytest.fail(message + " (FORGE_REQUIRE_DB=1)")
         pytest.skip(message + " (test d'intégration sauté en local)")

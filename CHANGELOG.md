@@ -3,6 +3,19 @@
 
 ## [Non publié]
 
+### Corrigé
+
+- **Le motif de saut des tests d'intégration désignait la mauvaise cause (`TEST-DB-SKIP-REASON-001`).**
+  Les douze fixtures d'intégration rangeaient toute erreur de connexion sous un mot unique, « injoignable », et le commentaire de `tests/db/conftest.py` assumait la confusion en toutes lettres.
+  Or « pas de serveur » et « serveur qui refuse mes identifiants » appellent des gestes opposés, démarrer un service dans un cas, corriger une variable d'environnement dans l'autre.
+  Le coût n'est pas théorique : un serveur MariaDB actif, à l'écoute, qui refusait seulement le mot de passe, a été lu comme un serveur arrêté, et le diagnostic s'est fourvoyé jusqu'à ce que l'erreur réelle soit relue.
+  En CI le point était masqué, `FORGE_REQUIRE_DB=1` transformant le saut en échec ; en local il produisait un faux diagnostic sans le moindre signal.
+  Un classificateur partagé vit désormais dans `forge-mvc-testing` (ADR-041), et les douze sites l'appellent au lieu de recopier le message.
+  Le motif nomme le geste attendu, « le serveur tourne, inutile de le démarrer, posez `FORGE_TEST_DB_PASSWORD` », ou « démarrez le serveur, ou vérifiez `FORGE_TEST_DB_HOST` et `FORGE_TEST_DB_PORT` ».
+  Une cause non reconnue n'est jamais rangée d'office dans l'une des deux autres : mieux vaut ne rien affirmer que d'affirmer faux avec l'aplomb du vrai.
+  Le classificateur est éprouvé sur des messages **réels** des trois pilotes, relevés en condition, et non sur des chaînes inventées.
+  Les deux scénarios ont été rejoués de bout en bout, mauvais mot de passe puis port sans serveur, pour vérifier que chacun produit bien son motif.
+
 ### Ajouté
 
 - **La table d'événements statistiques gagne une politique de rétention (`STATS-RETENTION-001`).**

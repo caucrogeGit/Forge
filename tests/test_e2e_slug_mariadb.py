@@ -59,6 +59,8 @@ except ImportError as _exc:
         raise RuntimeError(_msg + " (FORGE_REQUIRE_DB=1)") from _exc
     pytest.skip(_msg, allow_module_level=True)
 
+from forge_mvc_testing.db_probe import connection_failure_message
+
 _DB_HOST     = os.environ.get("FORGE_TEST_DB_HOST", "127.0.0.1")
 _DB_PORT     = int(os.environ.get("FORGE_TEST_DB_PORT", "3306"))
 _DB_NAME     = os.environ.get("FORGE_TEST_DB_NAME", "forge_test")
@@ -82,11 +84,12 @@ try:
         password=_DB_PASSWORD, database=_DB_NAME,
     )
     _probe.close()
-except Exception as _conn_err:  # noqa: BLE001 — toute erreur = base indisponible
+except Exception as _conn_err:  # noqa: BLE001 — la cause est classée, pas supposée
     if _REQUIRE_DB:
         raise
     pytest.skip(
-        f"MariaDB de test injoignable : {_conn_err} (E2E sauté en local)",
+        connection_failure_message("MariaDB", _conn_err, env_prefix="FORGE_TEST_DB")
+        + " (E2E sauté en local)",
         allow_module_level=True,
     )
 

@@ -179,6 +179,30 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
 
     Le plugin s'active par le point d'entrée `pytest11` : aucune configuration `conftest` n'est requise.
 
+    ### Motifs de saut des tests d'intégration (`db_probe.py`)
+
+    Une fixture d'intégration qui ne peut pas se connecter doit dire **pourquoi**, car les deux causes possibles appellent des gestes opposés.
+    Un serveur absent se démarre, un serveur qui refuse les identifiants se configure.
+
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `classify_connection_error` | `classify_connection_error(error) -> str` | rend `CAUSE_AUTH`, `CAUSE_UNREACHABLE` ou `CAUSE_UNKNOWN` |
+    | `connection_failure_message` | `connection_failure_message(server_label, error, *, env_prefix) -> str` | motif de saut nommant le geste attendu |
+    | `CAUSE_AUTH`, `CAUSE_UNREACHABLE`, `CAUSE_UNKNOWN` | constantes | les trois causes distinguées |
+
+    ```python
+    try:
+        connexion = mariadb.connect(**params)
+    except Exception as erreur:
+        motif = connection_failure_message("MariaDB", erreur, env_prefix="FORGE_TEST_DB")
+        if REQUIRE_DB:
+            pytest.fail(motif)
+        pytest.skip(motif)
+    ```
+
+    Une cause non reconnue n'est jamais rangée d'office dans l'une des deux autres.
+    Affirmer la mauvaise cause avec aplomb est précisément ce que ce module corrige.
+
 ??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |

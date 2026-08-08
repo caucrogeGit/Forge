@@ -33,6 +33,8 @@ from forge_mvc_entities.db_init import forge_migrations_table_sql
 
 pytestmark = pytest.mark.db
 
+from forge_mvc_testing.db_probe import connection_failure_message
+
 _REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
 
 WIDGETS_SQL = (
@@ -105,7 +107,9 @@ def harness() -> Any:
         probe = h.connect()
         probe.close()
     except Exception as error:  # noqa: BLE001 — toute erreur = base indisponible
-        message = f"MariaDB de test injoignable : {error}"
+        message = connection_failure_message(
+            "MariaDB", error, env_prefix="FORGE_TEST_DB"
+        )
         if _REQUIRE_DB:
             pytest.fail(message + " (FORGE_REQUIRE_DB=1)")
         pytest.skip(message + " (test d'intégration sauté en local)")
