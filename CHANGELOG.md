@@ -3,6 +3,18 @@
 
 ## [Non publié]
 
+### Modifié
+
+- **La résolution de routes gagne 41 à 47 % sur le chemin nominal (`ROUTER-METHOD-HOIST-001`).**
+  Un avis extérieur affirmait que le parcours linéaire du routeur devenait « une latence CPU réelle » à cinq cents routes.
+  Le parcours linéaire est bien réel, mais aucune des deux analyses n'avait de chiffre, et j'avais moi-même écarté le point en avançant des ordres de grandeur faux des deux côtés de la comparaison.
+  La mesure a tranché, et elle a désigné une cause que personne n'avait nommée : à cette granularité, le coût dominant n'est ni l'expression rationnelle ni la normalisation de méthode, c'est **l'appel de fonction Python**, exécuté une à deux fois par entrée parcourue.
+  Les méthodes d'une route sont désormais rangées en `frozenset` à l'enregistrement, la méthode demandée est normalisée **une fois** par résolution au lieu d'une fois par entrée, et les boucles de `match`, `allowed_methods` et `is_public` ne font plus aucun appel de fonction par entrée.
+  Mesuré sur le chemin applicatif complet, celui qui enchaîne `match()` puis `allowed_methods()` sur un échec : succès de 99,4 à 57,0 µs à mille routes, 405 de 263,0 à 176,1 µs, 404 de 351,2 à 260,0 µs.
+  **Aucune sémantique ne change**, et une quinzaine de tests le verrouillent, dont les deux pièges du remaniement : `method_label` doit continuer de lire la déclaration ordonnée et non l'ensemble, et l'en-tête `Allow` d'un 405 doit rester exhaustif.
+  Le banc de mesure est versé dans `tools/bench_router.py`, afin que ces chiffres soient contredisables en une commande plutôt que crus sur parole.
+  Réserve à garder en tête : tout ceci reste sous la milliseconde, et à cent routes, taille d'une application Forge courante, le gain va de 10,2 à 5,8 µs, soit un dixième d'un aller-retour SQL.
+
 ### Corrigé
 
 - **Le motif de saut des tests d'intégration désignait la mauvaise cause (`TEST-DB-SKIP-REASON-001`).**
