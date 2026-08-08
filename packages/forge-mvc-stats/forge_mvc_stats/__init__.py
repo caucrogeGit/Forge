@@ -25,6 +25,14 @@ from forge_mvc_stats.events import (
     validate_event,
     validate_event_name,
 )
+from forge_mvc_stats.retention import (
+    StatsRetentionError,
+    count_stats_events_before,
+    cutoff_for_days,
+    get_stats_count_before_sql,
+    get_stats_purge_sql,
+    purge_stats_events_before,
+)
 from forge_mvc_stats.schema import (
     STATS_EVENTS_COLUMNS,
     STATS_EVENTS_TABLE,
@@ -57,6 +65,13 @@ __all__ = [
     "normalize_stats_event_row",
     "list_stats_events",
     "StatsAggregateError",
+    # Rétention (STATS-RETENTION-001)
+    "StatsRetentionError",
+    "cutoff_for_days",
+    "get_stats_count_before_sql",
+    "get_stats_purge_sql",
+    "count_stats_events_before",
+    "purge_stats_events_before",
     "get_stats_counts_sql",
     "prepare_stats_counts_params",
     "normalize_stats_count_row",

@@ -151,6 +151,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # Opt-ins applicatifs (ADR-052)
     "settings:init":      "Prépare la table des paramètres applicatifs (forge-mvc-settings).",
     "stats:init":         "Prépare la table des événements statistiques (forge-mvc-stats).",
+    "stats:gc":           "Purge les événements statistiques par âge (affiche ; --run exécute).",
     "audit:init":         "Prépare le journal d'audit applicatif (forge-mvc-audit).",
     "audit:gc":           "Purge le journal d'audit par âge (affiche ; --run exécute).",
     "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
@@ -241,6 +242,40 @@ Limites:
     migration plutôt que de l'appliquer deux fois.
 
 Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "stats:gc": """\
+Usage:
+  forge stats:gc --days N [--run]
+
+Description:
+  Purge la table d'événements statistiques (forge_stats_events) de ses
+  entrées antérieures à N jours. AFFICHE le nombre de lignes visées par
+  défaut ; --run supprime.
+
+  La rétention doit être dite : aucune valeur par défaut n'est supposée.
+  Elle vient de --days N, ou à défaut de la variable STATS_KEEP_DAYS.
+  L'option l'emporte sur la variable.
+
+Exemples:
+  forge stats:gc --days 365          # affiche ce qui serait supprimé
+  forge stats:gc --days 365 --run    # supprime
+
+Prérequis:
+  - forge-mvc-stats installé et sa migration appliquée ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - purger des événements DÉTRUIT de l'information : aucun agrégat de
+    remplacement n'est calculé, calculez vos totaux en amont si vous
+    voulez les garder ;
+  - suppression en une instruction : sur une très grosse table, le verrou
+    peut être long ;
+  - Forge ne fournit pas d'ordonnanceur, branchez la commande sur cron
+    ou un minuteur systemd.
+
+Options:
+  --days N      Rétention en jours (>= 1). À défaut : STATS_KEEP_DAYS.
+  --run         Exécute la suppression au lieu de l'afficher.
   -h, --help    Affiche cette aide sans exécuter la commande.""",
     "audit:gc": """\
 Usage:

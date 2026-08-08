@@ -91,6 +91,23 @@ Aucun cookie visiteur, aucune IP.
 
     Cet opt-in apporte une table, `forge_stats_events`, où atterrissent les événements.
 
+    !!! warning "Prévoyez la purge dès le premier jour"
+        La table reçoit une ligne par événement suivi et rien ne la borne d'elle-même.
+        Une application qui trace consciencieusement y accumule des millions de lignes, et les agrégats ralentissent d'autant sans que rien ne prévienne.
+
+        `forge stats:gc --days N` compte les événements antérieurs à la borne et les affiche ; `--run` supprime.
+        La rétention doit être **dite**, par l'option ou par la variable `STATS_KEEP_DAYS` ; l'option l'emporte.
+
+        ```bash
+        forge stats:gc --days 365          # affiche le nombre d'événements visés
+        forge stats:gc --days 365 --run    # supprime
+        ```
+
+        Purger **détruit de l'information** : aucun agrégat de remplacement n'est calculé.
+        Si vous voulez conserver des totaux, calculez-les en amont avec `count_stats_events`, puis purgez.
+
+        Forge ne fournit pas d'ordonnanceur, cette commande est le point d'entrée à brancher sur cron ou un minuteur systemd.
+
     ```bash
     forge stats:init        # écrit la migration dans mvc/migrations/, sans l'exécuter
     forge migration:apply   # après relecture
@@ -132,7 +149,13 @@ Aucun cookie visiteur, aucune IP.
 
 ??? note "5. Commandes"
 
-    Cet opt-in n'expose aucune commande CLI : il s'utilise **par import** dans le code applicatif (voir l'API publique ci-dessous).
+    Le suivi lui-même s'utilise **par import** dans le code applicatif, jamais par le terminal (voir l'API publique ci-dessous).
+    Deux commandes couvrent en revanche le cycle de vie de la table.
+
+    | Commande | Rôle | Exemple |
+    |---|---|---|
+    | `stats:init` | Écrit la migration de `forge_stats_events` dans `mvc/migrations/`. | `forge stats:init` |
+    | `stats:gc` | Purge les événements par âge. Affiche par défaut, `--run` exécute. | `forge stats:gc --days 365 --run` |
 
 ??? note "6. Vue d'ensemble rapide"
 
@@ -255,6 +278,22 @@ Aucun cookie visiteur, aucune IP.
     | `StatsEventError`, `StatsAdminError`, `StatsAggregateError` | exceptions | nom invalide, lecture invalide, agrégation invalide |
 
     `execute` et `fetch_all` sont des callables fournis par l'application (par exemple `db.execute`, `db.fetch_all`).
+
+    ### Rétention (`retention.py`)
+
+    Ces fonctions suivent la même convention que le reste du paquet : elles ne touchent jamais la base d'elles-mêmes, l'appelant fournit l'exécuteur.
+    La commande `forge stats:gc` en est le point d'entrée en ligne de commande.
+
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `cutoff_for_days` | `cutoff_for_days(keep_days, *, now=None) -> str` | borne UTC, `keep_days` jours dans le passé |
+    | `count_stats_events_before` | `count_stats_events_before(fetch_one, cutoff) -> int` | compte les événements antérieurs, sans rien supprimer |
+    | `purge_stats_events_before` | `purge_stats_events_before(execute, cutoff) -> int` | supprime les événements antérieurs |
+    | `get_stats_count_before_sql` | fonction | SQL du comptage |
+    | `get_stats_purge_sql` | fonction | SQL de la suppression |
+    | `StatsRetentionError` | exception | rétention nulle, négative, ou borne vide |
+
+    La borne part toujours en **paramètre lié**, jamais en expression SQL de date, ce qui rend la purge portable sur les quatre backends sans rendu dialectal.
 
 ??? note "9. Contextes d'utilisation"
 

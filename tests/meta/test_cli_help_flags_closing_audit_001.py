@@ -91,7 +91,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Déploiement
     "deploy:init", "deploy:check",
     # Opt-ins applicatifs (ADR-052)
-    "settings:init", "stats:init", "audit:init", "audit:gc",
+    "settings:init", "stats:init", "stats:gc", "audit:init", "audit:gc",
     "jobs:init", "jobs:reclaim", "notifications:init",
     "sessions:init", "sessions:gc",
     # MFA : table du registre anti-rejeu partagé, optionnelle

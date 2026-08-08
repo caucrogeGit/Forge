@@ -5,6 +5,17 @@
 
 ### Ajouté
 
+- **La table d'événements statistiques gagne une politique de rétention (`STATS-RETENTION-001`).**
+  `forge_stats_events` reçoit une ligne par événement suivi et rien ne la bornait.
+  Une application qui trace consciencieusement y accumule des millions de lignes, et les agrégats ralentissent d'autant sans que rien ne prévienne.
+  `forge stats:gc --days N` compte les événements antérieurs à la borne et les affiche ; `--run` supprime.
+  Même forme que `audit:gc`, rétention à dire explicitement par l'option ou par `STATS_KEEP_DAYS`, refus d'une valeur nulle ou négative.
+  Le module de rétention suit la convention **du paquet** et non celle de `forge-mvc-audit` : il n'accède jamais à la base de lui-même, l'appelant fournit l'exécuteur, exactement comme `track_event` et `count_stats_events`.
+  La commande fait seule la jonction avec `core.database`.
+  La borne part en paramètre lié, aucune expression de date n'entrant dans le SQL, et `idx_forge_stats_events_created_at` rend la suppression indexée sans migration.
+  Purger détruit de l'information et aucun agrégat de remplacement n'est calculé, ce que la page de référence dit sans détour.
+  Le paquet reçoit au passage son **premier test d'intégration** : il rendait jusqu'ici un DDL que rien n'exécutait jamais, si bien qu'une erreur de rendu ne se serait vue qu'en production.
+
 - **`forge-mvc-stats` rejoint la convention de provisioning des opt-ins BDD (`STATS-OPTIN-CONFORM-001`).**
   Le paquet était en retrait des neuf autres opt-ins adossés à la base.
   Il décrivait bien sa table en `TableDefinition`, mais il n'avait ni `MIGRATIONS`, ni entry point `forge_mvc.commands`, ni dossier `cli/`, ni commande d'amorçage.
