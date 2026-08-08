@@ -16,6 +16,7 @@ doit avoir été appliquée (voir `forge audit:init` puis `forge migration:apply
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from forge_mvc_audit.errors import AuditError
@@ -25,6 +26,15 @@ TABLE_NAME = "audit_log"
 
 #: Plafond strict du nombre de lignes lues d'un coup.
 MAX_LIMIT = 1000
+
+#: Format d'horodatage des bornes de purge.
+#: Identique à celui de `forge-mvc-sessions-db` : la borne part en **paramètre
+#: lié**, jamais en expression SQL de date. Aucun dialecte n'entre alors dans la
+#: requête, ce qui la rend portable sans effort sur les quatre backends.
+_DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
+
+_COUNT_BEFORE_SQL = f"SELECT COUNT(*) AS n FROM {TABLE_NAME} WHERE created_at < ?"
+_PURGE_BEFORE_SQL = f"DELETE FROM {TABLE_NAME} WHERE created_at < ?"
 
 
 _INSERT_SQL = (
@@ -139,3 +149,48 @@ def get_audit_log(
         )
         for row in rows
     ]
+
+
+def cutoff_for_days(keep_days: int, *, now: datetime | None = None) -> str:
+    """Borne de rétention : l'instant, en UTC, `keep_days` jours dans le passé.
+
+    Le calcul se fait en Python et le résultat part en paramètre lié. La requête
+    de purge ne contient donc aucune expression de date, ce qui lui évite le
+    piège mesuré par `OPTIN-DML-DIALECT-001` où un `NOW()` écrit en dur rendait
+    la DML inutilisable ailleurs que sur MariaDB.
+
+    Lève :class:`AuditError` si `keep_days` est inférieur à 1 : une rétention
+    nulle ou négative viderait la table entière, ce qui ne peut pas être le
+    résultat d'une étourderie de frappe.
+    """
+    if not isinstance(keep_days, int) or isinstance(keep_days, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
+        raise AuditError(f"keep_days doit être un entier. Reçu : {keep_days!r}.")
+    if keep_days < 1:
+        raise AuditError(
+            f"keep_days doit être >= 1. Reçu : {keep_days}. "
+            "Une rétention nulle ou négative viderait tout le journal."
+        )
+    instant = now if now is not None else datetime.now(timezone.utc)
+    return (instant - timedelta(days=keep_days)).strftime(_DATETIME_FMT)
+
+
+def count_audit_before(cutoff: str, *, db: Any = None) -> int:
+    """Nombre d'entrées d'audit antérieures à `cutoff`, sans rien supprimer.
+
+    Sert à montrer l'effet avant de l'appliquer : `forge audit:gc` affiche ce
+    compte par défaut et n'efface qu'avec `--run` (charte §7).
+    """
+    row = (db if db is not None else _db_module()).fetch_one(_COUNT_BEFORE_SQL, (cutoff,))
+    return int(row["n"]) if row else 0
+
+
+def purge_audit_before(cutoff: str, *, db: Any = None) -> int:
+    """Supprime les entrées antérieures à `cutoff`. Retourne le nombre supprimé.
+
+    La suppression est indexée : `idx_audit_created` porte déjà sur
+    `created_at`. Aucune migration n'est requise par la rétention.
+
+    Aucune archive n'est produite avant suppression : un exploitant tenu de
+    conserver son journal doit l'exporter lui-même, en amont.
+    """
+    return int((db if db is not None else _db_module()).execute(_PURGE_BEFORE_SQL, (cutoff,)))

@@ -3,6 +3,20 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **Le journal d'audit gagne une politique de rétention (`AUDIT-RETENTION-001`).**
+  `audit_log` grossissait à chaque action tracée et rien ne la bornait.
+  C'était la seule table d'opt-in adossé à la base sans purge, alors que `sessions:gc` avait posé le précédent, si bien que l'exploitant devait écrire lui-même son ménage en SQL.
+  `forge audit:gc --days N` compte les entrées antérieures à la borne et les affiche ; `--run` supprime.
+  La rétention doit être **dite**, par l'option ou par la variable `AUDIT_KEEP_DAYS`, l'option l'emportant sur la variable.
+  Aucune valeur par défaut n'est supposée, et une rétention nulle ou négative est refusée, car elle viderait le journal entier sans que rien ne distingue l'intention de l'étourderie.
+  Contrairement à `sessions:gc` qui supprime directement, la commande affiche d'abord (charte §7, motif déjà suivi par `fixtures:purge` et `db:init`).
+  La raison de cette asymétrie est écrite dans le module : une session expirée n'est plus rien pour personne, son expiration étant portée par la ligne elle-même, tandis qu'une entrée d'audit est un enregistrement délibéré dont aucune date ne dit qu'il a cessé de valoir.
+  La borne est calculée en Python et part en **paramètre lié**, sur le modèle de `forge-mvc-sessions-db` : aucune expression de date n'entre dans le SQL, ce qui évite d'emblée le piège mesuré par `OPTIN-DML-DIALECT-001`.
+  Aucune migration n'est requise, `idx_audit_created` portant déjà sur `created_at`, donc la suppression est indexée.
+  Deux limites écrites noir sur blanc : aucune archive n'est produite avant suppression, et la suppression tient en une instruction, donc sur une très grosse table le verrou peut être long.
+
 ### Sécurité
 
 - **L'anti-rejeu TOTP peut désormais être partagé par tous les processus (`MFA-TOTP-REPLAY-SHARED-001`).**

@@ -133,6 +133,7 @@ Déploiement
 Opt-ins applicatifs
   settings:init       Prépare la table des paramètres applicatifs (forge-mvc-settings).
   audit:init          Prépare le journal d'audit applicatif (forge-mvc-audit).
+  audit:gc            Purge le journal d'audit par âge (affiche ; --run exécute).
   jobs:init           Prépare la file de tâches de fond (forge-mvc-jobs).
   mfa:init            Prépare le registre anti-rejeu TOTP partagé (forge-mvc-mfa, optionnel).
   notifications:init  Prépare les notifications in-app (forge-mvc-notifications).

@@ -123,11 +123,34 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
 
 ??? note "5. Commandes"
 
-    `forge-mvc-audit` ajoute une commande :
+    `forge-mvc-audit` ajoute deux commandes :
 
     | Commande | Rôle | Exemple |
     |---|---|---|
     | `audit:init` | Crée la table `audit_log` (DDL fournie). | `forge audit:init` |
+    | `audit:gc` | Purge le journal par âge. Affiche par défaut, `--run` exécute. | `forge audit:gc --days 90 --run` |
+
+    !!! warning "Rétention du journal"
+        `audit_log` grossit à chaque action tracée et rien ne la borne d'elle-même.
+        Sans purge, la table finit par peser sur les lectures, et rien ne vous préviendra.
+
+        La rétention doit être **dite**, Forge ne suppose aucune valeur à votre place.
+        Elle vient de `--days N`, ou à défaut de la variable d'environnement `AUDIT_KEEP_DAYS` ; l'option l'emporte sur la variable.
+
+        ```bash
+        forge audit:gc --days 90          # affiche le nombre d'entrées visées
+        forge audit:gc --days 90 --run    # supprime
+        ```
+
+        Contrairement à `sessions:gc`, qui supprime directement, la commande affiche d'abord.
+        Une session expirée n'est plus rien pour personne, son expiration est portée par la ligne elle-même.
+        Une entrée d'audit est un enregistrement délibéré, et aucune date ne dit d'elle-même qu'elle a cessé de valoir.
+
+        Forge ne fournit pas d'ordonnanceur, cette commande est le point d'entrée à brancher sur cron ou un minuteur systemd.
+
+        Deux limites à connaître.
+        Aucune archive n'est produite avant suppression, donc exportez en amont si votre obligation de conservation l'exige.
+        Et la suppression tient en une instruction, si bien que sur une très grosse table le verrou peut être long.
 
 ??? note "6. Vue d'ensemble rapide"
 

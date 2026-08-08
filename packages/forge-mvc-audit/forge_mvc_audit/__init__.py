@@ -14,7 +14,10 @@ from forge_mvc_audit.store import (
     MAX_LIMIT,
     TABLE_NAME,
     AuditEntry,
+    count_audit_before,
+    cutoff_for_days,
     get_audit_log,
+    purge_audit_before,
     record_audit,
 )
 
@@ -27,4 +30,8 @@ __all__ = [
     "MAX_LIMIT",
     "record_audit",
     "get_audit_log",
+    # Rétention (AUDIT-RETENTION-001)
+    "cutoff_for_days",
+    "count_audit_before",
+    "purge_audit_before",
 ]

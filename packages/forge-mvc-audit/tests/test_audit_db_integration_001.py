@@ -66,6 +66,23 @@ class _ConnAdapter:
         cur.close()
         return rows
 
+    def fetch_one(self, sql: str, params: Any = ()) -> "dict[str, Any] | None":
+        cur = self._conn.cursor(dictionary=True)
+        cur.execute(f"USE `{self._database}`")
+        cur.execute(sql, tuple(params))
+        row = cur.fetchone()
+        cur.close()
+        return row
+
+    def execute(self, sql: str, params: Any = ()) -> int:
+        cur = self._conn.cursor()
+        cur.execute(f"USE `{self._database}`")
+        cur.execute(sql, tuple(params))
+        self._conn.commit()
+        compte = cur.rowcount
+        cur.close()
+        return int(compte)
+
 
 @pytest.fixture
 def audit_db() -> Any:
@@ -126,3 +143,74 @@ def test_created_at_is_populated(audit_db: _ConnAdapter) -> None:
     record_audit("connexion", actor="prof", db=audit_db)
     entry = get_audit_log(limit=1, db=audit_db)[0]
     assert entry.created_at and entry.action == "connexion"
+
+
+# ── Rétention (AUDIT-RETENTION-001) ──────────────────────────────────────────
+#
+# `record_audit` laisse `created_at` au DEFAULT CURRENT_TIMESTAMP, donc toute
+# ligne écrite par lui date de maintenant. Vieillir une entrée demande un INSERT
+# qui pose la colonne explicitement, ce que fait `_inserer_datee`.
+
+
+def _inserer_datee(db: _ConnAdapter, action: str, created_at: str) -> None:
+    db.execute(
+        "INSERT INTO audit_log (actor, action, created_at) VALUES (?, ?, ?)",
+        ("systeme", action, created_at),
+    )
+
+
+def test_la_purge_ne_retire_que_les_entrees_anterieures(audit_db: _ConnAdapter) -> None:
+    """LE test du ticket : la borne discrimine, elle ne vide pas la table."""
+    from forge_mvc_audit.store import count_audit_before, purge_audit_before
+
+    _inserer_datee(audit_db, "vieille", "2020-01-01 00:00:00")
+    _inserer_datee(audit_db, "recente", "2026-08-01 00:00:00")
+    borne = "2026-01-01 00:00:00"
+
+    assert count_audit_before(borne, db=audit_db) == 1
+    assert purge_audit_before(borne, db=audit_db) == 1
+
+    restantes = [e.action for e in get_audit_log(db=audit_db)]
+    assert restantes == ["recente"]
+
+
+def test_le_comptage_ne_supprime_rien(audit_db: _ConnAdapter) -> None:
+    """`audit:gc` affiche avant d'effacer : le comptage doit être inoffensif."""
+    from forge_mvc_audit.store import count_audit_before
+
+    _inserer_datee(audit_db, "vieille", "2020-01-01 00:00:00")
+    borne = "2026-01-01 00:00:00"
+
+    assert count_audit_before(borne, db=audit_db) == 1
+    assert count_audit_before(borne, db=audit_db) == 1
+    assert len(get_audit_log(db=audit_db)) == 1
+
+
+def test_une_purge_sans_cible_ne_supprime_rien(audit_db: _ConnAdapter) -> None:
+    from forge_mvc_audit.store import purge_audit_before
+
+    _inserer_datee(audit_db, "recente", "2026-08-01 00:00:00")
+
+    assert purge_audit_before("2020-01-01 00:00:00", db=audit_db) == 0
+    assert len(get_audit_log(db=audit_db)) == 1
+
+
+def test_la_borne_calculee_en_jours_s_applique_reellement(audit_db: _ConnAdapter) -> None:
+    """Bout en bout : `cutoff_for_days` produit une borne que le SQL sait comparer.
+
+    C'est le point de jonction entre le calcul Python et la colonne SQL. Un
+    format d'horodatage divergent passerait les tests unitaires et échouerait
+    seulement ici.
+    """
+    from datetime import datetime, timedelta, timezone
+
+    from forge_mvc_audit.store import cutoff_for_days, purge_audit_before
+
+    maintenant = datetime.now(timezone.utc)
+    vieille = (maintenant - timedelta(days=120)).strftime("%Y-%m-%d %H:%M:%S")
+    recente = (maintenant - timedelta(days=10)).strftime("%Y-%m-%d %H:%M:%S")
+    _inserer_datee(audit_db, "vieille", vieille)
+    _inserer_datee(audit_db, "recente", recente)
+
+    assert purge_audit_before(cutoff_for_days(90), db=audit_db) == 1
+    assert [e.action for e in get_audit_log(db=audit_db)] == ["recente"]

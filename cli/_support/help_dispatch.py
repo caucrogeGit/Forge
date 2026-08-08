@@ -151,6 +151,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # Opt-ins applicatifs (ADR-052)
     "settings:init":      "Prépare la table des paramètres applicatifs (forge-mvc-settings).",
     "audit:init":         "Prépare le journal d'audit applicatif (forge-mvc-audit).",
+    "audit:gc":           "Purge le journal d'audit par âge (affiche ; --run exécute).",
     "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
     "mfa:init":           "Prépare le registre anti-rejeu TOTP partagé (forge-mvc-mfa, optionnel).",
     "notifications:init": "Prépare les notifications in-app (forge-mvc-notifications).",
@@ -210,6 +211,42 @@ Limites:
   - lancer ensuite forge migration:apply pour appliquer la migration.
 
 Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "audit:gc": """\
+Usage:
+  forge audit:gc --days N [--run]
+
+Description:
+  Purge le journal d'audit (table audit_log) de ses entrées antérieures
+  à N jours. AFFICHE le nombre de lignes visées par défaut ; --run supprime.
+
+  La rétention doit être dite : aucune valeur par défaut n'est supposée.
+  Elle vient de --days N, ou à défaut de la variable AUDIT_KEEP_DAYS.
+  L'option l'emporte sur la variable.
+
+  Contrairement à sessions:gc qui supprime directement, une entrée d'audit
+  est un enregistrement délibéré : rien dans la ligne ne dit qu'elle a
+  cessé de valoir. D'où l'affichage préalable (charte §7).
+
+Exemples:
+  forge audit:gc --days 90          # affiche ce qui serait supprimé
+  forge audit:gc --days 90 --run    # supprime
+
+Prérequis:
+  - forge-mvc-audit installé et sa migration appliquée ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - aucune archive n'est produite avant suppression, exportez en amont
+    si votre obligation de conservation l'exige ;
+  - suppression en une instruction : sur une très grosse table, le verrou
+    peut être long ;
+  - Forge ne fournit pas d'ordonnanceur, branchez la commande sur cron
+    ou un minuteur systemd.
+
+Options:
+  --days N      Rétention en jours (>= 1). À défaut : AUDIT_KEEP_DAYS.
+  --run         Exécute la suppression au lieu de l'afficher.
   -h, --help    Affiche cette aide sans exécuter la commande.""",
     "jobs:init": """\
 Usage:
