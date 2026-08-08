@@ -50,7 +50,7 @@ class RouteEntry:
         self.public   = public
         self.csrf     = csrf
         self.api      = api
-        self.regex    = self._compile(pattern)
+        self.regex, self.is_static = self._compile(pattern)
         # ROUTER-METHOD-HOIST-001 : les méthodes en ensemble, calculées une fois
         # à l'enregistrement. Les boucles de résolution testaient auparavant
         # `isinstance` puis `method.upper()` sur CHAQUE entrée parcourue ; à
@@ -62,15 +62,26 @@ class RouteEntry:
         )
 
     @classmethod
-    def _compile(cls, pattern: str) -> re.Pattern[str]:
+    def _compile(cls, pattern: str) -> tuple[re.Pattern[str], bool]:
+        """Compile le motif et dit s'il est **statique**.
+
+        La nature est décidée ici, et nulle part ailleurs, parce que c'est ici
+        que le critère existe : un segment est dynamique s'il correspond **en
+        entier** à `{mot}`. Un test extérieur du genre « le motif contient une
+        accolade » serait faux, `/a/{id-x}` n'étant pas un paramètre (le tiret
+        n'appartient pas à `\\w`) mais un segment littéral, donc une route
+        statique. Mal classée, elle deviendrait introuvable.
+        """
         parts: list[str] = []
+        statique = True
         for segment in pattern.split('/'):
             m = re.fullmatch(r'\{(\w+)\}', segment)
             if m:
                 parts.append(f'(?P<{m.group(1)}>[^/]+)')
+                statique = False
             else:
                 parts.append(re.escape(segment))
-        return re.compile('^' + '/'.join(parts) + '$')
+        return re.compile('^' + '/'.join(parts) + '$'), statique
 
     def matches_method(self, method: str) -> bool:
         """Cette route répond-elle à `method` ?
@@ -159,6 +170,14 @@ class Router:
     def __init__(self):
         self._entries: list[RouteEntry] = []
         self._named:   dict[str, RouteEntry] = {}
+        # ROUTER-STATIC-INDEX-001 : partition du tableau de routes.
+        # `_entries` reste la source d'ordre, seule lue par `iter_routes()`
+        # (`routes:list` en dépend). Les deux structures ci-dessous en sont une
+        # vue dénormalisée, tenue à jour par `add()` et jamais autrement.
+        # Un chemin statique peut porter plusieurs entrées, différant par la
+        # méthode, d'où une liste en valeur.
+        self._static:  dict[str, list[RouteEntry]] = {}
+        self._dynamic: list[RouteEntry] = []
 
     def add(self, method: str | list[str], pattern: str, handler: Handler, *,
             name: str | None = None, public: bool = False, csrf: bool = True,
@@ -167,6 +186,10 @@ class Router:
         entry = RouteEntry(method, pattern, handler, name=name,
                            public=public, csrf=csrf, api=api)
         self._entries.append(entry)
+        if entry.is_static:
+            self._static.setdefault(entry.pattern, []).append(entry)
+        else:
+            self._dynamic.append(entry)
         if name:
             if name in self._named:
                 raise ValueError(f"Route déjà nommée : {name!r}")
@@ -186,14 +209,27 @@ class Router:
             (RouteEntry, params_dict) si trouvé, None sinon.
             params_dict est vide pour les routes statiques.
 
-        Boucle volontairement dégraissée (ROUTER-METHOD-HOIST-001). La méthode
+        **Règle de résolution** (ROUTER-STATIC-INDEX-001) : une route statique
+        l'emporte sur une route dynamique qui viserait le même chemin, quel que
+        soit l'ordre de déclaration. Entre deux routes de même nature, la
+        première déclarée gagne.
+
+        Cette règle est écrite depuis ce ticket. Auparavant elle n'existait
+        pas : le résultat découlait de l'ordre d'itération d'une liste, si bien
+        que déclarer `/client/{id}` avant `/client/index` faisait résoudre
+        `/client/index` vers `show(id="index")`, et le contrôleur recevait un
+        identifiant nommé « index ». Le développeur y lisait une erreur de base
+        de données, jamais une erreur de routage.
+
+        Boucle volontairement dégraissée (ROUTER-METHOD-HOIST-001) : la méthode
         est normalisée **une fois**, et le corps évite tout appel de fonction
-        Python par entrée : mesuré à mille routes, ces appels coûtaient plus
-        que les expressions rationnelles qu'ils encadraient. La résolution y
-        gagne 55 %, sans qu'aucune sémantique ne change.
+        Python par entrée.
         """
         methode = method.upper()
-        for entry in self._entries:
+        for entry in self._static.get(path, ()):
+            if methode in entry.methods:
+                return entry, {}
+        for entry in self._dynamic:
             if methode not in entry.methods:
                 continue
             capture = entry.regex.match(path)
@@ -209,7 +245,9 @@ class Router:
         CORE-HTTP-405-ALLOW-001). Retourne la liste triée, sans doublon.
         """
         methods: set[str] = set()
-        for entry in self._entries:
+        for entry in self._static.get(path, ()):
+            methods.update(entry.methods)
+        for entry in self._dynamic:
             if entry.regex.match(path) is None:
                 continue
             methods.update(entry.methods)
@@ -237,7 +275,12 @@ class Router:
         sélectif des deux et de loin le moins cher.
         """
         methode = None if method is None else method.upper()
-        for entry in self._entries:
+        for entry in self._static.get(path, ()):
+            if not entry.public:
+                continue
+            if methode is None or methode in entry.methods:
+                return True
+        for entry in self._dynamic:
             if not entry.public:
                 continue
             if methode is not None and methode not in entry.methods:

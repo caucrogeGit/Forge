@@ -5,6 +5,18 @@
 
 ### Modifié
 
+- **Le routeur énonce enfin sa règle de résolution, et indexe ses routes statiques (`ROUTER-STATIC-INDEX-001`).**
+  Forge n'avait **aucune règle de résolution écrite**. Le résultat découlait de l'ordre d'itération d'une liste, si bien que déclarer `/client/{id}` avant `/client/index` faisait résoudre `/client/index` vers `show(id="index")`.
+  Le contrôleur recevait un identifiant nommé « index », et le développeur y lisait une erreur de base de données, jamais une erreur de routage.
+  Une règle qui dépend de l'ordre des lignes d'un fichier et que personne n'a énoncée est de la magie cachée (principe 3), et c'est **le motif principal de ce ticket** ; la vitesse n'en est que l'effet secondaire.
+  La règle est désormais écrite, documentée et gardée : une route **statique** l'emporte sur une route **dynamique**, quel que soit l'ordre de déclaration ; entre deux routes de même nature, la première déclarée gagne.
+  **C'est une rupture de contrat**, assumée avant le tag 1.0.0 stable. Les générateurs de Forge ne produisent pas la situation, le paramètre occupant le troisième segment sous l'ADR-029 tandis que les formes statiques en ont deux ; seule une route écrite à la main peut la déclencher.
+  Le test qui figeait l'ancien comportement a fait ce pour quoi il avait été écrit : il a échoué **seul**, obligeant ce ticket à énoncer la rupture au lieu de la glisser.
+  Techniquement, les routes sont partitionnées à l'enregistrement, un dictionnaire pour les chemins statiques et une liste pour les dynamiques, `_entries` restant la seule source d'ordre pour `iter_routes()` dont `routes:list` dépend.
+  Le classement est décidé par le compilateur de motif lui-même, seul endroit où le critère existe : `/a/{id-x}` n'est **pas** une route dynamique, le tiret n'appartenant pas aux caractères de mot, et un classement naïf par présence d'accolade l'aurait rendue introuvable. Un test paramétré fixe ce piège.
+  Mesuré sur le chemin applicatif complet à mille routes : succès statique de 57,0 à **0,3 µs**, succès dynamique de 56,5 à 26,5 µs, 405 de 176,1 à 84,7 µs, 404 de 260,0 à 115,8 µs.
+  Cumulé avec le ticket précédent depuis l'état d'origine : une route statique passe de 99,4 à 0,3 µs.
+
 - **La résolution de routes gagne 41 à 47 % sur le chemin nominal (`ROUTER-METHOD-HOIST-001`).**
   Un avis extérieur affirmait que le parcours linéaire du routeur devenait « une latence CPU réelle » à cinq cents routes.
   Le parcours linéaire est bien réel, mais aucune des deux analyses n'avait de chiffre, et j'avais moi-même écarté le point en avançant des ordres de grandeur faux des deux côtés de la comparaison.

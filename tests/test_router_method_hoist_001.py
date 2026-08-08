@@ -107,22 +107,23 @@ def test_une_route_statique_ne_capture_rien() -> None:
     assert resultat[1] == {}
 
 
-def test_la_premiere_route_declaree_gagne_toujours() -> None:
-    """Contrat d'ordre inchangé par ce ticket.
+def test_entre_deux_routes_de_meme_nature_la_premiere_declaree_gagne() -> None:
+    """Ce que ce ticket ne change pas, et que le suivant n'a pas changé non plus.
 
-    Il n'est ni écrit ni voulu, il découle de l'ordre d'itération. Le fixer ici
-    garantit qu'il ne bougera pas **par accident** : le ticket qui le changera
-    devra faire échouer ce test, donc le dire.
+    La version d'origine de ce test figeait un contrat plus large, « la
+    première déclarée gagne, toujours ». Il a rempli son office : il a échoué
+    seul quand `ROUTER-STATIC-INDEX-001` a fait primer le statique, obligeant
+    ce ticket à énoncer la rupture au lieu de la glisser. Il porte désormais ce
+    qui reste vrai, l'arbitrage entre routes de **même** nature.
     """
     routeur = Router()
-    routeur.add("GET", "/client/{id}", _handler, name="dynamique")
-    routeur.add("GET", "/client/index", _handler, name="statique")
+    routeur.add("GET", "/client/show/{id}", _handler, name="premiere")
+    routeur.add("GET", "/client/show/{ref}", _handler, name="seconde")
 
-    resultat = routeur.match("GET", "/client/index")
+    resultat = routeur.match("GET", "/client/show/42")
 
     assert resultat is not None
-    assert resultat[0].name == "dynamique"
-    assert resultat[1] == {"id": "index"}
+    assert resultat[0].name == "premiere"
 
 
 # ── Les méthodes autorisées restent agrégées, toutes routes confondues ───────

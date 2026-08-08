@@ -11,6 +11,31 @@ Il permet aussi de regrouper des routes partageant des réglages communs (préfi
 
 La convention de route (ADR-029) est : chemin `/<contrôleur>/<méthode>` (l'index est le chemin nu), nom `<contrôleur>-<méthode>`.
 
+### Règle de résolution
+
+Quand plusieurs routes pourraient répondre au même chemin, Forge tranche ainsi.
+
+1. Une route **statique** l'emporte sur une route **dynamique**, quel que soit l'ordre de déclaration.
+2. Entre deux routes de même nature, la **première déclarée** gagne.
+
+Une route est statique quand aucun de ses segments n'est un paramètre, c'est-à-dire un segment valant exactement `{mot}`.
+Attention, `{id-x}` n'est **pas** un paramètre, le tiret n'appartenant pas aux caractères de mot : ce segment est littéral, donc la route reste statique.
+
+!!! warning "Cette règle a changé"
+    Jusqu'au ticket `ROUTER-STATIC-INDEX-001`, aucune règle n'était écrite et le résultat découlait de l'ordre de déclaration seul.
+
+    ```python
+    router.add("GET", "/client/{id}",  ClientController.show)
+    router.add("GET", "/client/index", ClientController.index)
+    ```
+
+    L'ancien comportement résolvait `/client/index` vers `show`, avec `id="index"`.
+    Le contrôleur recevait un identifiant nommé « index » et le développeur y lisait une erreur de base de données, jamais une erreur de routage.
+    Le nouveau résout vers `index`, ce qui est presque toujours l'intention.
+
+    Les générateurs de Forge ne produisent pas cette situation : sous l'ADR-029 le paramètre occupe le troisième segment (`/client/show/{id}`) tandis que les formes statiques en ont deux.
+    Seule une route écrite à la main peut la déclencher.
+
 ## 2. Vue d'ensemble rapide
 
 | Élément | Valeur |
@@ -130,7 +155,9 @@ Un réglage laissé à `None` dans `RouteGroup.add` hérite de la valeur du grou
 | `matches_method` | `matches_method(method: str) -> bool` | vrai si la route accepte cette méthode |
 | `match` | `match(path: str) -> dict[str, Any] | None` | paramètres capturés, ou `None` si le chemin ne correspond pas |
 | `requires_csrf` | `requires_csrf(method: str) -> bool` | vrai si la protection CSRF s'applique pour cette méthode |
-| `method_label` | propriété | libellé lisible de la ou des méthodes |
+| `method_label` | propriété | libellé lisible de la ou des méthodes, dans l'ordre de déclaration |
+| `methods` | `frozenset[str]` | les méthodes acceptées, en majuscules, sans ordre |
+| `is_static` | `bool` | vrai si aucun segment n'est un paramètre, ce qui décide de la règle de résolution |
 
 Signification des indicateurs d'une route :
 
