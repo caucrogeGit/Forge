@@ -124,11 +124,43 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
 
 ??? note "5. Commandes"
 
-    `forge-mvc-jobs` ajoute une commande :
+    `forge-mvc-jobs` ajoute deux commandes :
 
     | Commande | Rôle | Exemple |
     |---|---|---|
     | `jobs:init` | Crée la table `jobs` (DDL fournie). | `forge jobs:init` |
+    | `jobs:reclaim` | Reprend les tâches orphelines d'un worker planté. | `forge jobs:reclaim --lease 1800` |
+
+    !!! danger "Un worker qui meurt laisse sa tâche bloquée"
+        Le worker réserve une tâche en la passant à `running`, puis rend son verdict.
+        S'il est tué entre les deux, personne ne rend ce verdict à sa place, et la tâche reste `running` indéfiniment.
+        La file se remplit alors de lignes mortes que rien ne signale.
+
+        `forge jobs:reclaim` remet en file les tâches dont le **bail** de réservation a expiré.
+        Celles qui ont épuisé leurs tentatives sont marquées `failed`, avec un message qui les distingue d'une exception du gestionnaire.
+        La distinction compte pour le diagnostic, un worker tué n'ayant rendu aucun verdict.
+
+        ```bash
+        forge jobs:reclaim                # bail par défaut, 900 secondes
+        forge jobs:reclaim --lease 1800   # bail de 30 minutes
+        ```
+
+        Forge ne fournit pas d'ordonnanceur, cette commande est le point d'entrée à brancher sur cron ou un minuteur systemd.
+
+    !!! warning "Le bail est une durée fixe"
+        Une tâche légitimement plus longue que le bail sera reprise **alors qu'elle tourne encore**, donc exécutée deux fois.
+
+        Deux conséquences pratiques.
+        Réglez le bail au-dessus de votre tâche la plus longue.
+        Écrivez des gestionnaires **idempotents**, car la reprise ne promet pas l'exécution unique, elle promet qu'aucune tâche ne reste bloquée.
+
+        Le worker ne prolonge pas son bail pendant qu'il travaille, ce qui lèverait cette limite. C'est hors périmètre pour l'instant.
+
+    !!! note "Le réessai attend, désormais"
+        Une tâche dont le gestionnaire lève une exception repart en file après un délai croissant, et non plus immédiatement.
+        Le délai double à chaque tentative et se plafonne, soit 10, 20, 40, 80, 160, 320, puis 600 secondes.
+
+        Sans lui, une tâche qui échoue vite consommait toutes ses tentatives en une fraction de seconde, ce qui ne laissait aucune chance à une panne passagère de se résorber.
 
 ??? note "6. Vue d'ensemble rapide"
 

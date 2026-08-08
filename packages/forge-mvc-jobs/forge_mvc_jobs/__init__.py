@@ -11,14 +11,19 @@ synchrone. La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 """
 from forge_mvc_jobs.errors import JobError
 from forge_mvc_jobs.queue import (
+    DEFAULT_LEASE_SECONDS,
+    RECLAIM_FAILURE_MESSAGE,
     TABLE_NAME,
     Job,
     JobHandler,
+    ReclaimResult,
+    backoff_seconds,
     drain,
     enqueue,
     get_job,
     pending_count,
     process_one,
+    reclaim_stale,
     run_worker,
 )
 
@@ -35,4 +40,10 @@ __all__ = [
     "run_worker",
     "pending_count",
     "get_job",
+    # Reprise après plantage d'un worker (JOBS-STALE-RECLAIM-001)
+    "reclaim_stale",
+    "ReclaimResult",
+    "backoff_seconds",
+    "DEFAULT_LEASE_SECONDS",
+    "RECLAIM_FAILURE_MESSAGE",
 ]

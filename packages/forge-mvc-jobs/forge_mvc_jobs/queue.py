@@ -15,9 +15,26 @@ serveur web reste synchrone (WSGI). La réservation d'une tâche est atomique vi
 un `UPDATE ... ORDER BY id LIMIT 1` avec jeton de réservation, donc plusieurs
 workers peuvent tourner sans se marcher dessus.
 
-Limite assumée V1 : pas de reprise automatique d'une tâche restée `running`
-après un crash worker (pas de délai de visibilité). La dépendance va de l'opt-in
-vers le cœur, jamais l'inverse.
+## Reprise après plantage d'un worker
+
+Un worker qui meurt en cours de traitement laisse sa tâche au statut `running`,
+jeton posé, et personne ne la reprendrait jamais. :func:`reclaim_stale` remet en
+file les tâches dont la réservation a dépassé un **bail**, et marque en échec
+celles qui ont épuisé leurs tentatives. `forge jobs:reclaim` est le point
+d'entrée à brancher sur un ordonnanceur externe, Forge n'en fournissant pas.
+
+Deux limites à connaître, écrites plutôt que découvertes.
+
+Le bail est une durée fixe. Une tâche légitimement plus longue que lui sera
+reprise alors qu'elle tourne encore, donc exécutée deux fois. Réglez le bail
+au-dessus de votre tâche la plus longue, et écrivez des gestionnaires
+**idempotents** : la reprise ne garantit pas l'exécution unique, elle garantit
+qu'aucune tâche ne reste bloquée.
+
+Le worker ne prolonge pas son bail pendant qu'il travaille, ce qui lèverait la
+limite précédente. C'est hors périmètre pour l'instant.
+
+La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 """
 from __future__ import annotations
 
@@ -104,8 +121,83 @@ def _fail_sql() -> str:
 
 
 def _retry_sql() -> str:
+    """Remise en file d'une tâche qui a échoué, après un délai croissant.
+
+    Le délai part en secondes **positives** dans
+    `interval_seconds_expression()`, seul régime que les quatre backends
+    acceptent. Mesuré, le dialecte SQLite compose son modificateur par
+    concaténation (`'+' || ? || ' seconds'`) et rend `NULL` pour une valeur
+    négative, ce qui ferait taire toute comparaison l'employant.
+    """
     return (f"UPDATE {TABLE_NAME} SET status='pending', claim_token=NULL, "
-            f"started_at=NULL, available_at={_now()} WHERE id=?")
+            f"started_at=NULL, available_at={_dialect().interval_seconds_expression(_now())} "
+            "WHERE id=?")
+
+
+#: Délai de base du réessai, en secondes.
+BACKOFF_BASE_SECONDS = 10
+#: Plafond du délai de réessai, en secondes.
+BACKOFF_CAP_SECONDS = 600
+
+
+def backoff_seconds(attempts: int) -> int:
+    """Délai avant le réessai suivant, après `attempts` tentatives consommées.
+
+    Doublement à chaque tentative, plafonné : 10, 20, 40, 80, 160, 320, puis
+    600 secondes. Formule écrite et bornée plutôt que devinée (principe 3).
+    Sans elle, une tâche qui échoue vite était remise en file aussitôt et
+    consommait toutes ses tentatives en une fraction de seconde, ce qui ne
+    laissait aucune chance à une panne passagère de se résorber.
+    """
+    if attempts < 1:
+        return 0
+    return min(BACKOFF_BASE_SECONDS * (2 ** (attempts - 1)), BACKOFF_CAP_SECONDS)
+
+
+#: Bail par défaut d'une réservation, en secondes.
+DEFAULT_LEASE_SECONDS = 900
+
+
+def _stale_predicate() -> str:
+    """Tâches réservées dont le bail a expiré.
+
+    L'inégalité est écrite `started_at + bail < maintenant` et non
+    `started_at < maintenant - bail`. Les deux sont équivalentes en
+    mathématiques, pas en SQL portable : la seconde forme exigerait un
+    intervalle **négatif**, que le dialecte SQLite rend `NULL`. La comparaison
+    serait alors fausse partout, et la reprise ne ferait rien du tout sans
+    lever la moindre erreur.
+
+    Les deux bornes restent côté serveur, donc aucune horloge applicative
+    n'entre dans la décision.
+    """
+    return (
+        f"queue=? AND status='running' AND started_at IS NOT NULL "
+        f"AND {_dialect().interval_seconds_expression('started_at')} < {_now()}"
+    )
+
+
+def _reclaim_requeue_sql() -> str:
+    return (
+        f"UPDATE {TABLE_NAME} SET status='pending', claim_token=NULL, started_at=NULL, "
+        f"available_at={_dialect().interval_seconds_expression(_now())} "
+        f"WHERE {_stale_predicate()} AND attempts < max_attempts"
+    )
+
+
+def _reclaim_fail_sql() -> str:
+    return (
+        f"UPDATE {TABLE_NAME} SET status='failed', last_error=?, finished_at={_now()}, "
+        f"claim_token=NULL WHERE {_stale_predicate()} AND attempts >= max_attempts"
+    )
+
+
+#: Message porté par une tâche abandonnée faute de tentatives restantes.
+#: Distinct d'une exception du gestionnaire : le diagnostic n'est pas le même.
+RECLAIM_FAILURE_MESSAGE = (
+    "tâche reprise après expiration du bail de réservation, "
+    "tentatives épuisées (le worker n'a jamais rendu de verdict)"
+)
 _PENDING_COUNT_SQL = f"SELECT COUNT(*) AS n FROM {TABLE_NAME} WHERE queue=? AND status='pending'"
 _SELECT_JOB_SQL = (
     f"SELECT id, queue, task, status, attempts, max_attempts, last_error FROM {TABLE_NAME} WHERE id=? LIMIT 1"
@@ -197,7 +289,7 @@ def process_one(handlers: Mapping[str, JobHandler], *, queue: str = "default", d
         handler(payload)
     except Exception as exc:  # noqa: BLE001 — toute erreur du gestionnaire est rapportée
         if attempts < max_attempts:
-            database.execute(_retry_sql(), (job_id,))
+            database.execute(_retry_sql(), (backoff_seconds(attempts), job_id))
         else:
             database.execute(_fail_sql(), (str(exc), job_id))
         return True
@@ -246,6 +338,62 @@ def run_worker(
         processed = drain(handlers, queue=queue, db=db)
         if processed == 0:
             time.sleep(poll_interval)
+
+
+@dataclass(frozen=True)
+class ReclaimResult:
+    """Effet d'une passe de reprise.
+
+    `requeued` compte les tâches remises en file, `failed` celles abandonnées
+    faute de tentatives restantes. Les deux ensembles sont disjoints.
+    """
+
+    requeued: int
+    failed: int
+
+    @property
+    def total(self) -> int:
+        return self.requeued + self.failed
+
+
+def reclaim_stale(
+    *,
+    queue: str = "default",
+    lease_seconds: int = DEFAULT_LEASE_SECONDS,
+    db: Any = None,
+) -> ReclaimResult:
+    """Reprend les tâches dont la réservation a dépassé `lease_seconds`.
+
+    Une tâche qui a encore des tentatives repart en file, après le délai
+    croissant habituel. Une tâche qui les a épuisées est marquée `failed` avec
+    :data:`RECLAIM_FAILURE_MESSAGE`, distinct du message d'une exception : un
+    worker tué n'a pas rendu de verdict, et confondre les deux ferait chercher
+    un bogue applicatif là où il y a eu une panne de processus.
+
+    Ne fait rien tant que le bail n'est pas dépassé, donc peut être appelée
+    aussi souvent que voulu. Lève :class:`JobError` si `lease_seconds` est
+    inférieur à 1 : un bail nul reprendrait des tâches en cours d'exécution.
+    """
+    if lease_seconds < 1:
+        raise JobError(
+            f"lease_seconds doit être >= 1. Reçu : {lease_seconds}. "
+            "Un bail nul reprendrait des tâches en cours d'exécution."
+        )
+    database = db if db is not None else _db_module()
+
+    requeued = int(
+        database.execute(
+            _reclaim_requeue_sql(),
+            (backoff_seconds(1), queue, lease_seconds),
+        )
+    )
+    failed = int(
+        database.execute(
+            _reclaim_fail_sql(),
+            (RECLAIM_FAILURE_MESSAGE, queue, lease_seconds),
+        )
+    )
+    return ReclaimResult(requeued=requeued, failed=failed)
 
 
 def pending_count(*, queue: str = "default", db: Any = None) -> int:

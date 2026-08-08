@@ -153,6 +153,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "audit:init":         "Prépare le journal d'audit applicatif (forge-mvc-audit).",
     "audit:gc":           "Purge le journal d'audit par âge (affiche ; --run exécute).",
     "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
+    "jobs:reclaim":       "Reprend les tâches orphelines d'un worker planté.",
     "mfa:init":           "Prépare le registre anti-rejeu TOTP partagé (forge-mvc-mfa, optionnel).",
     "notifications:init": "Prépare les notifications in-app (forge-mvc-notifications).",
     "rbac:init":          "Génère les migrations RBAC (roles, permissions, role_permissions) vers mvc/migrations/.",
@@ -247,6 +248,44 @@ Limites:
 Options:
   --days N      Rétention en jours (>= 1). À défaut : AUDIT_KEEP_DAYS.
   --run         Exécute la suppression au lieu de l'afficher.
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "jobs:reclaim": """\
+Usage:
+  forge jobs:reclaim [--lease N] [--queue NOM]
+
+Description:
+  Reprend les tâches restées au statut 'running' au-delà du bail de
+  réservation, c'est-à-dire celles qu'un worker tué n'a jamais terminées.
+
+  Une tâche qui a encore des tentatives repart en file, après le délai
+  croissant habituel. Une tâche qui les a épuisées est marquée 'failed',
+  avec un message qui la distingue d'une exception du gestionnaire :
+  un worker tué n'a pas rendu de verdict.
+
+  Sans reprise, une tâche orpheline restait bloquée indéfiniment et
+  la file se remplissait de lignes mortes que rien ne signalait.
+
+Exemples:
+  forge jobs:reclaim                    # bail par défaut (900 s)
+  forge jobs:reclaim --lease 1800       # bail de 30 minutes
+  forge jobs:reclaim --queue emails     # une autre file
+
+Prérequis:
+  - forge-mvc-jobs installé et sa migration appliquée ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - le bail est une durée FIXE : une tâche légitimement plus longue que
+    lui sera reprise alors qu'elle tourne encore, donc exécutée deux fois.
+    Réglez le bail au-dessus de votre tâche la plus longue et écrivez des
+    gestionnaires idempotents ;
+  - le worker ne prolonge pas son bail pendant qu'il travaille ;
+  - Forge ne fournit pas d'ordonnanceur, branchez la commande sur cron
+    ou un minuteur systemd.
+
+Options:
+  --lease N     Bail en secondes (>= 1, défaut 900). À défaut : JOBS_LEASE_SECONDS.
+  --queue NOM   File visée (défaut : default).
   -h, --help    Affiche cette aide sans exécuter la commande.""",
     "jobs:init": """\
 Usage:

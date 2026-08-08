@@ -5,6 +5,22 @@
 
 ### Ajouté
 
+- **Les tâches de fond orphelines sont reprises au lieu de rester bloquées (`JOBS-STALE-RECLAIM-001`).**
+  Un worker réserve une tâche en la passant à `running`, puis rend son verdict.
+  Tué entre les deux, il ne rendait aucun verdict et personne ne le rendait à sa place : la tâche restait `running` indéfiniment, et la file se remplissait de lignes mortes que rien ne signalait.
+  La limite était assumée en toutes lettres dans le module, ce qui la rendait visible sans la rendre supportable.
+  `forge jobs:reclaim` remet en file les tâches dont le **bail** de réservation a expiré, et marque en échec celles qui ont épuisé leurs tentatives.
+  Aucune migration n'était nécessaire, `started_at` et `claim_token` existaient déjà dans la table.
+  L'échec de reprise porte un message distinct de celui d'une exception du gestionnaire : confondre les deux ferait chercher un bogue applicatif là où il y a eu une panne de processus.
+  Le réessai après échec attend désormais un **délai croissant**, 10, 20, 40, 80, 160, 320 puis 600 secondes, au lieu de repartir aussitôt.
+  Sans lui, une tâche qui échouait vite consommait toutes ses tentatives en une fraction de seconde et ne laissait aucune chance à une panne passagère de se résorber.
+  C'est un changement de comportement pour les files réglées à plus d'une tentative, et les tests qui encodaient le réessai immédiat disent maintenant le délai.
+  Détail de portabilité qui valait le détour : l'inégalité du bail est écrite `started_at + bail < maintenant` et non `started_at < maintenant - bail`.
+  Les deux sont équivalentes en mathématiques, pas en SQL portable.
+  Mesuré, le dialecte SQLite compose son modificateur par concaténation et rend **`NULL`** pour un intervalle négatif, si bien que la seconde forme n'aurait rien repris du tout sur SQLite, sans lever la moindre erreur.
+  Un garde-fou relit le SQL engendré pour empêcher la forme négative de revenir.
+  Deux limites écrites plutôt que découvertes : le bail est une durée fixe, donc une tâche légitimement plus longue que lui sera reprise alors qu'elle tourne encore et exécutée deux fois, ce qui impose des gestionnaires idempotents ; et le worker ne prolonge pas son bail pendant qu'il travaille.
+
 - **Le journal d'audit gagne une politique de rétention (`AUDIT-RETENTION-001`).**
   `audit_log` grossissait à chaque action tracée et rien ne la bornait.
   C'était la seule table d'opt-in adossé à la base sans purge, alors que `sessions:gc` avait posé le précédent, si bien que l'exploitant devait écrire lui-même son ménage en SQL.

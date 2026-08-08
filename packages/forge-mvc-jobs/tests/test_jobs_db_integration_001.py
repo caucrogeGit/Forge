@@ -139,6 +139,13 @@ def test_failure_retries_then_fails(jobs_db: _ConnAdapter) -> None:
     jid = enqueue("boom", max_attempts=2, db=jobs_db)
     assert process_one({"boom": boom}, db=jobs_db) is True
     assert get_job(jid, db=jobs_db).status == "pending"  # re-mise en file
+
+    # JOBS-STALE-RECLAIM-001 : la remise en file porte un délai croissant, donc
+    # la tâche n'est pas immédiatement reprise. On avance l'horloge de la file
+    # plutôt que d'attendre, puis on vérifie la seconde tentative.
+    assert process_one({"boom": boom}, db=jobs_db) is False, "le délai doit être respecté"
+    jobs_db.execute("UPDATE jobs SET available_at = NOW() WHERE id = ?", (jid,))
+
     assert process_one({"boom": boom}, db=jobs_db) is True
     failed = get_job(jid, db=jobs_db)
     assert failed.status == "failed" and "oups" in failed.last_error
@@ -159,3 +166,126 @@ def test_available_in_delays_the_job(jobs_db: _ConnAdapter) -> None:
 
 def test_empty_queue_process_one_false(jobs_db: _ConnAdapter) -> None:
     assert process_one({}, db=jobs_db) is False
+
+
+# ── Reprise des tâches orphelines (JOBS-STALE-RECLAIM-001) ───────────────────
+#
+# Simuler un worker tué demande de réserver une tâche puis de n'y plus toucher,
+# et de vieillir sa réservation. `_vieillir` recule `started_at` du nombre de
+# secondes voulu, ce qui revient à laisser le temps passer sans l'attendre.
+
+
+def _vieillir(db: _ConnAdapter, job_id: int, secondes: int) -> None:
+    db.execute(
+        "UPDATE jobs SET started_at = started_at - INTERVAL ? SECOND WHERE id = ?",
+        (secondes, job_id),
+    )
+
+
+def _reserver_sans_finir(db: _ConnAdapter, job_id: int) -> None:
+    """Reproduit un worker qui meurt entre la réservation et le verdict."""
+    db.execute(
+        "UPDATE jobs SET status='running', claim_token='jeton-mort', "
+        "started_at=NOW(), attempts=attempts+1 WHERE id=?",
+        (job_id,),
+    )
+
+
+def test_une_tache_orpheline_repart_en_file(jobs_db: _ConnAdapter) -> None:
+    """LE test du ticket : sans reprise, elle restait 'running' pour toujours."""
+    from forge_mvc_jobs.queue import get_job, reclaim_stale
+
+    job_id = enqueue("lent", {"x": 1}, max_attempts=3, db=jobs_db)
+    _reserver_sans_finir(jobs_db, job_id)
+    _vieillir(jobs_db, job_id, 1000)
+
+    effet = reclaim_stale(lease_seconds=900, db=jobs_db)
+
+    assert (effet.requeued, effet.failed) == (1, 0)
+    reprise = get_job(job_id, db=jobs_db)
+    assert reprise is not None
+    assert reprise.status == "pending"
+
+
+def test_une_tache_orpheline_sans_tentative_restante_part_en_echec(
+    jobs_db: _ConnAdapter,
+) -> None:
+    from forge_mvc_jobs.queue import RECLAIM_FAILURE_MESSAGE, get_job, reclaim_stale
+
+    job_id = enqueue("lent", {}, max_attempts=1, db=jobs_db)
+    _reserver_sans_finir(jobs_db, job_id)
+    _vieillir(jobs_db, job_id, 1000)
+
+    effet = reclaim_stale(lease_seconds=900, db=jobs_db)
+
+    assert (effet.requeued, effet.failed) == (0, 1)
+    echouee = get_job(job_id, db=jobs_db)
+    assert echouee is not None
+    assert echouee.status == "failed"
+    assert echouee.last_error == RECLAIM_FAILURE_MESSAGE
+
+
+def test_une_tache_dans_son_bail_n_est_pas_reprise(jobs_db: _ConnAdapter) -> None:
+    """Le point qui fait la différence entre une reprise et un doublon."""
+    from forge_mvc_jobs.queue import get_job, reclaim_stale
+
+    job_id = enqueue("lent", {}, max_attempts=3, db=jobs_db)
+    _reserver_sans_finir(jobs_db, job_id)
+    _vieillir(jobs_db, job_id, 60)
+
+    effet = reclaim_stale(lease_seconds=900, db=jobs_db)
+
+    assert effet.total == 0
+    intacte = get_job(job_id, db=jobs_db)
+    assert intacte is not None
+    assert intacte.status == "running"
+
+
+def test_une_tache_en_attente_n_est_jamais_reprise(jobs_db: _ConnAdapter) -> None:
+    """`started_at IS NULL` désigne une tâche jamais réservée, pas une orpheline."""
+    from forge_mvc_jobs.queue import get_job, reclaim_stale
+
+    job_id = enqueue("jamais_prise", {}, db=jobs_db)
+
+    assert reclaim_stale(lease_seconds=1, db=jobs_db).total == 0
+    attente = get_job(job_id, db=jobs_db)
+    assert attente is not None
+    assert attente.status == "pending"
+
+
+def test_la_reprise_ne_touche_pas_les_autres_files(jobs_db: _ConnAdapter) -> None:
+    from forge_mvc_jobs.queue import get_job, reclaim_stale
+
+    job_id = enqueue("lent", {}, queue="emails", max_attempts=3, db=jobs_db)
+    _reserver_sans_finir(jobs_db, job_id)
+    _vieillir(jobs_db, job_id, 1000)
+
+    assert reclaim_stale(queue="default", lease_seconds=900, db=jobs_db).total == 0
+    assert reclaim_stale(queue="emails", lease_seconds=900, db=jobs_db).requeued == 1
+    reprise = get_job(job_id, db=jobs_db)
+    assert reprise is not None
+    assert reprise.status == "pending"
+
+
+def test_une_tache_reprise_redevient_traitable(jobs_db: _ConnAdapter) -> None:
+    """La reprise doit rendre la tâche au circuit normal, pas seulement au statut.
+
+    Elle repart avec un délai croissant : on l'annule pour vérifier que le
+    worker la reprend bien ensuite.
+    """
+    from forge_mvc_jobs.queue import get_job, reclaim_stale
+
+    vues: list[dict[str, Any]] = []
+    job_id = enqueue("lent", {"x": 7}, max_attempts=3, db=jobs_db)
+    _reserver_sans_finir(jobs_db, job_id)
+    _vieillir(jobs_db, job_id, 1000)
+    reclaim_stale(lease_seconds=900, db=jobs_db)
+
+    jobs_db.execute("UPDATE jobs SET available_at = NOW() WHERE id = ?", (job_id,))
+    traitees = drain({"lent": lambda p: vues.append(p)}, db=jobs_db)
+
+    assert traitees == 1
+    assert vues == [{"x": 7}]
+    finie = get_job(job_id, db=jobs_db)
+    assert finie is not None
+    assert finie.status == "done"

@@ -60,7 +60,13 @@ class FakeDb:
             self.jobs[jid].update(status="failed", last_error=err)
             return 1
         if "status='pending', claim_token=NULL" in sql:  # reprise
-            self.jobs[params[0]].update(status="pending", claim_token=None)
+            # JOBS-STALE-RECLAIM-001 : la remise en file porte désormais un
+            # délai croissant, annoncé AVANT l'identifiant dans les paramètres
+            # (le marqueur du SET précède celui du WHERE).
+            delai, jid = params
+            self.jobs[jid].update(
+                status="pending", claim_token=None, available_in=delai
+            )
             return 1
         return 0
 
@@ -143,6 +149,14 @@ def test_handler_failure_retries_then_fails(db: FakeDb) -> None:
     enqueue("boom", max_attempts=2, db=db)
     process_one({"boom": boom}, db=db)        # tentative 1 -> reprise
     assert db.jobs[1]["status"] == "pending" and db.jobs[1]["attempts"] == 1
+
+    # JOBS-STALE-RECLAIM-001 : la reprise n'est plus immédiate. Sans délai, une
+    # tâche qui échoue vite consommait toutes ses tentatives en une fraction de
+    # seconde, ce qui ne laissait aucune chance à une panne passagère.
+    assert db.jobs[1]["available_in"] == 10
+    assert process_one({"boom": boom}, db=db) is False, "le délai doit être respecté"
+
+    db.jobs[1]["available_in"] = 0            # le temps passe
     process_one({"boom": boom}, db=db)        # tentative 2 -> failed
     assert db.jobs[1]["status"] == "failed" and "oups" in db.jobs[1]["last_error"]
 
