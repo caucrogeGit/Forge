@@ -20,7 +20,7 @@ Passer un dictionnaire en deuxième position lève une `TypeError` claire, au li
 | Couche | HTTP |
 | Rôle | construire les réponses HTTP courantes |
 | Objet produit | `Response` |
-| API publique | `html`, `json_response`, `api_success`, `api_error` |
+| API publique | `html`, `json_response`, `json_error` |
 | Exception liée | `TypeError` si le 2e argument de `html()` n'est pas un entier ; `ValueError` si les données JSON ne sont pas sérialisables |
 | Dépend de | `core.templating` (rendu des gabarits), `core.forge` (lecture de `app_env` et `views_dir`) |
 
@@ -38,8 +38,7 @@ classDiagram
         <<module>>
         +html(template, status, context, raw) Response
         +json_response(data, status) Response
-        +api_success(data, status, meta) Response
-        +api_error(message, status, code, details) Response
+        +json_error(code, status, message) Response
     }
 
     class Response {
@@ -49,14 +48,13 @@ classDiagram
     }
 
     helpers --> Response : construit et retourne
-    api_success ..> json_response : délègue
-    api_error ..> json_response : délègue
+    json_error ..> json_response : délègue
 ```
 
 À retenir :
 
 - les quatre helpers retournent tous un `Response` ;
-- `api_success` et `api_error` délèguent à `json_response` ;
+- `json_error` délègue à `json_response` ;
 - `html(...)` rend un gabarit, `json_response(...)` sérialise des données brutes.
 
 ## 4. API publique
@@ -65,17 +63,16 @@ classDiagram
 |---|---|---|
 | `html` | `html(template: str, status: int = 200, context: dict[str, Any] | None = None, *, raw: bool = False) -> Response` | rend un gabarit en `Response` HTML |
 | `json_response` | `json_response(data: Any, status: int = 200) -> Response` | renvoie `data` sérialisé en JSON |
-| `api_success` | `api_success(data: Any = None, status: int = 200, meta: dict[str, Any] | None = None) -> Response` | enveloppe d'API de succès |
-| `api_error` | `api_error(message: str, status: int = 400, code: str = "error", details: Any = None) -> Response` | enveloppe d'API d'erreur |
+| `json_error` | `json_error(code: str, status: int, *, message: str | None = None) -> Response` | réponse d'erreur d'API, forme unique (ADR-088) |
 
 Forme des enveloppes d'API :
 
 | Helper | Corps JSON produit |
 |---|---|
-| `api_success` | `{"success": true, "data": ..., "meta": ...}` (`meta` ajouté si fourni) |
-| `api_error` | `{"success": false, "error": {"code": ..., "message": ..., "details": ...}}` (`details` ajouté si fourni) |
+| `json_error` | `{"error": "<code>"}`, plus `"message"` s'il est fourni |
 
-`api_success` et `api_error` produisent une enveloppe JSON cohérente.
+`json_error` est la **seule** fabrique de réponse d'erreur JSON du dépôt, et un garde-fou l'exige (ADR-088).
+Une réponse de succès n'a pas d'enveloppe en regard : elle rend la ressource, le code HTTP portant déjà l'information de succès.
 Les clients d'API trouvent ainsi toujours la même forme : un drapeau `success`, des données ou un bloc d'erreur structuré.
 
 ## 5. Contextes d'utilisation
@@ -84,13 +81,13 @@ Les clients d'API trouvent ainsi toujours la même forme : un drapeau `success`,
 |---|---|
 | Rendre une vue HTML | `html(template, context=...)` |
 | Renvoyer du JSON brut | `json_response(...)` |
-| Répondre une API structurée (succès) | `api_success(...)` |
-| Répondre une API structurée (erreur) | `api_error(...)` |
+| Répondre un succès d'API | `json_response(...)`, qui rend la ressource |
+| Répondre une erreur d'API | `json_error(code, status)` |
 
 ## 6. Exemples d'utilisation
 
 ```python
-from core.http.helpers import html, json_response, api_success, api_error
+from core.http.helpers import html, json_error, json_response
 
 
 def page(request):
@@ -102,11 +99,11 @@ def feed(request):
 
 
 def api(request):
-    return api_success(data=rows, meta={"total": len(rows)})
+    return json_response({"rows": rows, "total": len(rows)})
 
 
 def api_invalid(request):
-    return api_error("Champ manquant", status=422, code="validation")
+    return json_error("validation_error", 422, message="Champ manquant")
 ```
 
 !!! warning "Le 2e argument de html() est le statut"

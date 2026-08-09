@@ -104,34 +104,6 @@ def json_response(data: Any, status: int = 200) -> Response:
     return Response.json(data, status)
 
 
-def api_success(data: Any = None, status: int = 200, meta: "dict[str, Any] | None" = None) -> Response:
-    """Enveloppe de succès historique. **Retirée par l'ADR-088**, ticket à venir.
-
-    Conservée le temps que la référence utilisateur soit réécrite et que les
-    trois fichiers de tests qui ne portent qu'elle soient repris. Aucun code de
-    production ne l'appelle : une réponse de succès rend la ressource.
-    """
-    payload: "dict[str, Any]" = {"success": True, "data": data}
-    if meta is not None:
-        payload["meta"] = meta
-    return json_response(payload, status)
-
-
-def api_error(message: str, status: int = 400, code: str = "error", details: Any = None) -> Response:
-    """Enveloppe d'erreur historique. **Retirée par l'ADR-088**, ticket à venir.
-
-    La forme unique est :func:`json_error`. Celle-ci n'a **plus aucun appelant
-    de production** depuis le retrait de `core/security/api_auth.py`, ses trois
-    seuls sites y vivant. Elle reste exportée le temps que la référence
-    utilisateur soit réécrite et que les tests qui ne portent qu'elle soient
-    repris.
-    """
-    error: "dict[str, Any]" = {"code": code, "message": message}
-    if details is not None:
-        error["details"] = details
-    return json_response({"success": False, "error": error}, status)
-
-
 def json_error(code: str, status: int, *, message: "str | None" = None) -> Response:
     """Réponse d'erreur JSON, forme unique de Forge (ADR-088).
 

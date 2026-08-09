@@ -150,3 +150,59 @@ def test_les_trois_opt_ins_json_passent_par_la_fabrique() -> None:
             continue
         source = chemin.read_text(encoding="utf-8")
         assert "json_error" in source, f"{paquet} n'emploie pas la fabrique canonique"
+
+
+# ── Conventions de contrôleur, sous la forme retenue ─────────────────────────
+#
+# `tests/test_api_controller_conventions.py` portait ces conventions sous
+# l'enveloppe retirée par l'ADR-088. Les conventions n'ont pas disparu avec
+# elle, elles ont changé de forme : elles sont reprises ici.
+
+
+def test_convention_lecture() -> None:
+    """Une lecture réussie rend la ressource, en 200."""
+    from core.http import json_response
+
+    reponse = json_response({"id": 1, "nom": "Contact"})
+
+    assert reponse.status == 200
+    assert json.loads(reponse.body.decode("utf-8")) == {"id": 1, "nom": "Contact"}
+
+
+def test_convention_creation() -> None:
+    """Une création rend la ressource créée, en 201."""
+    from core.http import json_response
+
+    reponse = json_response({"id": 42}, status=201)
+
+    assert reponse.status == 201
+    assert json.loads(reponse.body.decode("utf-8")) == {"id": 42}
+
+
+def test_convention_liste() -> None:
+    """Un comptage se place dans la ressource, il n'a pas d'enveloppe dédiée."""
+    from core.http import json_response
+
+    items = [{"id": 1}, {"id": 2}]
+    corps = json.loads(
+        json_response({"items": items, "count": len(items)}).body.decode("utf-8")
+    )
+
+    assert corps["count"] == 2
+    assert len(corps["items"]) == 2
+
+
+def test_convention_introuvable() -> None:
+    reponse = json_error("not_found", 404)
+
+    assert reponse.status == 404
+    assert json.loads(reponse.body.decode("utf-8")) == {"error": "not_found"}
+
+
+def test_le_corps_est_du_json_utf8_valide() -> None:
+    """Propriété générique, héritée de `json_response` et vérifiée ici aussi."""
+    reponse = json_error("erreur_héros", 400, message="caractère accentué")
+
+    assert isinstance(reponse.body, bytes)
+    assert "héros" in reponse.body.decode("utf-8")
+    assert json.loads(reponse.body.decode("utf-8"))["message"] == "caractère accentué"

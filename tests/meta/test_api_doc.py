@@ -49,11 +49,13 @@ class TestHelpersMentionnes:
     def test_json_response(self):
         assert "json_response" in _doc()
 
-    def test_api_success(self):
-        assert "api_success" in _doc()
+    def test_json_error(self):
+        """ADR-088 : la page enseigne `json_error`, fabrique unique des erreurs."""
+        assert "json_error" in _doc()
 
-    def test_api_error(self):
-        assert "api_error" in _doc()
+    def test_la_forme_plate_est_montree(self):
+        """La forme du contrat doit apparaître, pas seulement le nom de la fabrique."""
+        assert '{"error": "not_found"}' in _doc()
 
 
 # ---------------------------------------------------------------------------
@@ -98,16 +100,25 @@ class TestAuthApi:
 
 
 class TestConventionJson:
-    def test_success_data(self):
-        assert '"success"' in _doc() or "success" in _doc()
+    """ADR-088 : la page enseigne la forme plate, plus l'enveloppe.
+
+    Ces trois contrôles exigeaient auparavant `"success": true` et
+    `"success": false` dans la page. L'enveloppe ayant été retirée, ils
+    vérifient désormais la forme retenue, et **l'absence** de l'ancienne dans
+    les exemples, sans quoi la page enseignerait deux contrats à la fois.
+    """
 
     def test_structure_succes(self):
         doc = _doc()
-        assert '"success": true' in doc or "success: true" in doc or "success" in doc
+        assert "rend **la ressource**" in doc or "rend la ressource" in doc
 
     def test_structure_erreur(self):
+        assert '{"error": "not_found"}' in _doc()
+
+    def test_l_enveloppe_n_est_plus_enseignee(self):
         doc = _doc()
-        assert '"success": false' in doc or "success: false" in doc
+        assert '"success": true' not in doc
+        assert '"success": false' not in doc
 
     def test_content_type_json(self):
         assert "application/json" in _doc()

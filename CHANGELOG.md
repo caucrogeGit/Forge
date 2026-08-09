@@ -29,6 +29,16 @@
 
 ### Retiré
 
+- **L'enveloppe `api_success` et `api_error` (`CORE-API-ENVELOPE-REMOVE-001`, ADR-088).**
+  Ces deux fonctions enveloppaient toute réponse dans `{"success": ..., "data": ...}` ou `{"success": false, "error": {"code", "message"}}`.
+  Elles étaient exportées par `core.http`, documentées dans deux pages de référence, couvertes par un fichier de tests de trois cent soixante-cinq lignes, et **appelées par aucun code de production** : leurs seuls sites vivaient dans `core/security/api_auth.py`, retiré par le ticket précédent, et l'unique occurrence d'`api_success` hors tests était dans une docstring.
+  Le code HTTP porte déjà l'information de succès, et Forge le traite comme tel avec soin, 405 accompagné de son en-tête `Allow`, 503 distinct du 500, 401 distinct d'une redirection ; un champ `success` la redoublait.
+  **Remplacement** : une réponse de succès rend la ressource par `json_response(data, status)`, une erreur passe par `json_error(code, status, message=...)`.
+  Les trois pages qui enseignaient l'enveloppe sont réécrites, et elles disent désormais **pourquoi** la forme est plate plutôt que de la présenter comme allant de soi.
+  La contradiction laissée par `CORE-ROUTE-API-FLAG-001` est corrigée au passage : `docs/reference/api-json.md` affirmait encore que le drapeau `api=True` « est déclaratif, sans modifier leur comportement », ce que ce ticket avait rendu faux deux jours plus tôt.
+  Le fichier de tests de l'enveloppe est supprimé, ses propriétés génériques étant déjà couvertes par `test_core_json_response_unify_001.py` ; ses **conventions de contrôleur** sont en revanche reprises sous la forme retenue, car elles n'ont pas disparu avec l'enveloppe, elles ont changé de forme.
+  Trois garde-fous documentaires exigeaient l'enveloppe dans la page de référence. Ils ont échoué, comme prévu, et vérifient désormais la forme plate **et l'absence** de l'ancienne, sans quoi la page enseignerait deux contrats à la fois.
+
 - **`core.security.api_auth`, seconde implémentation Bearer du cœur (`CORE-API-AUTH-REMOVE-001`, ADR-088).**
   Le cœur portait **deux** implémentations de l'authentification par jeton Bearer, divergentes jusque dans la lecture du préfixe, `"Bearer "` avec espace contre `"bearer"` comparé en minuscules.
   Le ticket `CORE-HTTP-BEARER-PRIMITIVE-001` avait extrait `core/http/bearer.py` au motif qu'« un correctif de sécurité appliqué à une seule copie laisse les autres vulnérables » ; il a consolidé les trois opt-ins et laissé ce module de côté.

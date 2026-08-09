@@ -25,8 +25,7 @@ C'est une couche minimale, explicite et testable.
 | Brique | Module | Description |
 |---|---|---|
 | `json_response(data, status=200)` | `core.http` | Réponse JSON brute |
-| `api_success(data, status=200, meta=None)` | `core.http` | Réponse JSON structurée, succès |
-| `api_error(message, status=400, code, details)` | `core.http` | Réponse JSON structurée, erreur |
+| `json_error(code, status, message=None)` | `core.http` | Réponse d'erreur, forme unique (ADR-088) |
 | `mvc/api_routes.py` | convention projet | Fichier optionnel de routes API |
 | `register_api_routes(router)` | convention projet | Fonction d'enregistrement des routes |
 | `is_bearer_authorized(request, token)` | `core.http.bearer` | Vérification d'un jeton Bearer, en temps constant |
@@ -74,105 +73,96 @@ Lève `ValueError` si les données ne sont pas sérialisables.
 
 ---
 
-## Réponse de succès structurée
+## Réponse de succès
 
-Pour une réponse structurée avec `success/data` :
+Une réponse de succès rend **la ressource**, sans enveloppe.
 
 ```python
-from core.http import api_success
+from core.http import json_response
 
 def status(request):
-    return api_success({
-        "status": "ok",
-        "service": "forge"
-    })
+    return json_response({"status": "ok", "service": "forge"})
 ```
 
 Réponse :
 
 ```json
-{
-  "success": true,
-  "data": {
-    "status": "ok",
-    "service": "forge"
-  }
-}
+{"status": "ok", "service": "forge"}
 ```
 
-Avec statut HTTP personnalisé (création) :
+Avec un statut personnalisé, à la création :
 
 ```python
-return api_success({"id": 42}, status=201)
+return json_response({"id": 42}, status=201)
 ```
 
-Avec liste et métadonnées :
+Une liste se rend telle quelle, et une métadonnée de comptage se place dans la
+ressource quand elle en fait partie :
 
 ```python
 items = [{"id": 1, "nom": "Alice"}, {"id": 2, "nom": "Bob"}]
-return api_success(items, meta={"count": len(items)})
+return json_response({"items": items, "count": len(items)})
 ```
 
-Résultat :
+!!! info "Pourquoi pas d'enveloppe `success` / `data`"
+    Forge a longtemps proposé `api_success` et `api_error`, qui enveloppaient
+    la réponse dans `{"success": ..., "data": ...}`.
+    L'ADR-088 les a retirés, pour deux raisons.
 
-```json
-{
-  "success": true,
-  "data": [{"id": 1, "nom": "Alice"}, {"id": 2, "nom": "Bob"}],
-  "meta": {"count": 2}
-}
-```
+    Le code HTTP porte déjà l'information de succès, et Forge le traite comme
+    tel avec soin, 405 accompagné de son en-tête `Allow`, 503 distinct du 500,
+    401 distinct d'une redirection. Un champ `success` la redoublait.
+
+    Et l'enveloppe n'avait **aucun adoptant** : quand les trois opt-ins de
+    Forge exposant du JSON ont eu ce besoin, les trois ont rendu la ressource
+    directement.
 
 ---
 
-## Réponse d'erreur structurée
+## Réponse d'erreur
+
+Une réponse d'erreur rend un objet plat, produit par `json_error`.
 
 ```python
-from core.http import api_error
+from core.http import json_error
 
 def show(request):
-    return api_error(
-        "Ressource introuvable",
-        status=404,
-        code="not_found"
-    )
+    return json_error("not_found", 404)
 ```
 
 Réponse :
 
 ```json
-{
-  "success": false,
-  "error": {
-    "code": "not_found",
-    "message": "Ressource introuvable"
-  }
-}
+{"error": "not_found"}
 ```
 
-Avec détails de validation :
+Le `code` est un identifiant **stable et lisible par une machine**, jamais une
+phrase destinée à un humain. Un client teste `error == "not_found"`, il ne lit
+pas un message.
+
+### Le champ `message`, réservé à la validation
 
 ```python
-return api_error(
-    "Données invalides",
-    status=422,
-    code="validation_error",
-    details={"email": "Champ obligatoire"}
-)
+return json_error("validation_error", 422, message="email est obligatoire")
 ```
-
-Résultat :
 
 ```json
-{
-  "success": false,
-  "error": {
-    "code": "validation_error",
-    "message": "Données invalides",
-    "details": {"email": "Champ obligatoire"}
-  }
-}
+{"error": "validation_error", "message": "email est obligatoire"}
 ```
+
+C'est le **seul** cas prévu, celui où le client a besoin de savoir quoi
+corriger.
+
+!!! warning "Ne pas expliquer un refus"
+    Une erreur d'authentification ou d'autorisation ne porte pas de message.
+
+    Distinguer « en-tête absent », « schéma invalide » et « jeton invalide »
+    renseigne un attaquant sur l'étape qu'il a franchie, et lui indique où
+    porter son effort suivant.
+
+    C'est la raison pour laquelle l'ADR-088 a retiré l'implémentation qui
+    faisait cette distinction, au profit de celle des opt-ins, qui rend un
+    refus opaque.
 
 ### Statuts HTTP recommandés
 
@@ -196,22 +186,25 @@ Un contrôleur JSON Forge est un contrôleur normal qui retourne une réponse JS
 ```python
 # mvc/controllers/api_contacts_controller.py
 
-from core.http import api_success, api_error
+from core.http import json_error, json_response
+
 
 def index(request):
     contacts = [{"id": 1, "nom": "Alice"}, {"id": 2, "nom": "Bob"}]
-    return api_success(contacts, meta={"count": len(contacts)})
+    return json_response({"contacts": contacts, "count": len(contacts)})
+
 
 def show(request):
     contact_id = int(request.route_params.get("id", 0))
     contact = None  # remplacer par une vraie requête DB
     if contact is None:
-        return api_error("Contact introuvable", status=404, code="not_found")
-    return api_success(contact)
+        return json_error("not_found", 404)
+    return json_response(contact)
+
 
 def create(request):
     # créer le contact...
-    return api_success({"id": 42}, status=201)
+    return json_response({"id": 42}, status=201)
 ```
 
 Pas d'héritage spécifique requis, un contrôleur API est une fonction Python ordinaire.
@@ -240,8 +233,10 @@ def register_api_routes(router):
 Les routes HTML restent dans `mvc/routes/__init__.py`.
 Les deux fichiers partagent le même routeur mais sont séparés organisationnellement.
 
-Le flag `api=True` est déclaratif, il identifie les routes API sans modifier leur comportement.
-Le flag `csrf=False` est recommandé pour les routes API qui reçoivent du JSON, car elles utilisent le token Bearer plutôt que le CSRF.
+Le drapeau `api=True` **modifie le comportement** de la route depuis le ticket `CORE-ROUTE-API-FLAG-001` : les refus et erreurs que le framework produit après avoir trouvé la route sont rendus en JSON, jamais en redirection ni en page HTML.
+Le détail figure dans [la documentation du routeur](../core-http/router.md).
+
+Le drapeau `csrf=False` est recommandé pour les routes d'API, qui s'authentifient par jeton Bearer et non par session, donc n'ont pas de jeton CSRF à présenter.
 
 ---
 

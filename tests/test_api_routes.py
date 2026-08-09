@@ -7,7 +7,7 @@ import types
 import pytest
 
 from core.app.api_routes_loader import load_api_routes
-from core.http import api_success, api_error
+from core.http import json_error, json_response
 from core.http.router import Router
 from core.http.response import Response
 
@@ -129,7 +129,7 @@ class TestApplicationApiRoutes:
 
         def register(r):
             r.add("GET", "/api/ping",
-                  lambda req: api_success({"ping": "pong"}),
+                  lambda req: json_response({"ping": "pong"}),
                   public=True)
 
         mod = _make_api_module(register)
@@ -140,8 +140,7 @@ class TestApplicationApiRoutes:
         assert resp.status == 200
         assert "application/json" in resp.content_type
         body = json.loads(resp.body)
-        assert body["success"] is True
-        assert body["data"]["ping"] == "pong"
+        assert body["ping"] == "pong"
 
     def test_application_defaut_tente_mvc_api_routes(self):
         from core.app.application import Application
@@ -164,7 +163,7 @@ class TestRouteApiConvention:
 
         def register(r):
             r.add("GET", "/api/status",
-                  lambda req: api_success({"status": "ok"}),
+                  lambda req: json_response({"status": "ok"}),
                   public=True)
 
         mod = _make_api_module(register)
@@ -174,10 +173,10 @@ class TestRouteApiConvention:
         resp = app.dispatch(FakeRequest("GET", "/api/status"))
         assert resp.status == 200
         assert resp.content_type == "application/json; charset=utf-8"
-        body = json.loads(resp.body)
-        assert body["success"] is True
+        # ADR-088 : un succès rend la ressource, sans enveloppe `success`/`data`.
+        assert json.loads(resp.body) == {"status": "ok"}
 
-    def test_route_api_retourne_api_error(self, monkeypatch):
+    def test_route_api_retourne_json_error(self, monkeypatch):
         from core.app.application import Application
         from forge_mvc_testing import FakeRequest
 
@@ -185,7 +184,7 @@ class TestRouteApiConvention:
 
         def register(r):
             r.add("GET", "/api/missing",
-                  lambda req: api_error("Introuvable", status=404, code="not_found"),
+                  lambda req: json_error("not_found", 404),
                   public=True)
 
         mod = _make_api_module(register)
@@ -195,8 +194,7 @@ class TestRouteApiConvention:
         resp = app.dispatch(FakeRequest("GET", "/api/missing"))
         assert resp.status == 404
         body = json.loads(resp.body)
-        assert body["success"] is False
-        assert body["error"]["code"] == "not_found"
+        assert body["error"] == "not_found"
 
     def test_statut_201_creation(self, monkeypatch):
         from core.app.application import Application
@@ -206,7 +204,7 @@ class TestRouteApiConvention:
 
         def register(r):
             r.add("POST", "/api/items",
-                  lambda req: api_success({"id": 1}, status=201),
+                  lambda req: json_response({"id": 1}, status=201),
                   public=True, csrf=False)
 
         mod = _make_api_module(register)
@@ -225,7 +223,7 @@ class TestRouteApiConvention:
 
         def register(r):
             r.add("GET", "/api/status",
-                  lambda req: api_success({"ok": True}),
+                  lambda req: json_response({"ok": True}),
                   public=True)
 
         mod = _make_api_module(register)
@@ -287,8 +285,8 @@ class TestConventionRegisterApiRoutes:
 
         def register(r):
             with r.group("/api", public=True, api=True) as g:
-                g.add("GET", "/items", lambda req: api_success([]), name="api_items")
-                g.add("GET", "/items/{id}", lambda req: api_success({}), name="api_item_show")
+                g.add("GET", "/items", lambda req: json_response([]), name="api_items")
+                g.add("GET", "/items/{id}", lambda req: json_response({}), name="api_item_show")
 
         mod = _make_api_module(register)
         monkeypatch.setitem(sys.modules, "mvc.api_group", mod)
