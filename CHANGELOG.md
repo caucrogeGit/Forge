@@ -120,7 +120,9 @@
   `forge stats:init` rend désormais la migration pour le backend installé et l'écrit dans `mvc/migrations/`, sans exécuter de SQL.
   La déclaration de la table déménage dans `tables.py`, emplacement conventionnel où le provisioning partagé va la chercher ; `schema.py` la réexporte, ces noms appartenant à l'API publique du paquet depuis son origine.
   Un test vérifie que les deux modules désignent le même objet, deux `TableDefinition` pour une même table divergeant en silence.
-  Un projet antérieur qui avait créé la table à la main doit ignorer la migration neuve plutôt que de l'appliquer ; la page de référence le dit.
+  Un projet antérieur avait créé `forge_stats_events` à la main, faute de commande. Vérifié en conditions réelles, les deux cas se passent bien.
+  Si sa table est conforme, la migration ne fait rien et s'enregistre, le DDL étant rendu en `CREATE TABLE IF NOT EXISTS` sur les quatre backends.
+  Si elle diverge, la migration **échoue franchement** en nommant la colonne absente, et **n'est pas enregistrée comme appliquée**, ce qui laisse le projet réparer puis rejouer.
 
 - **Les tâches de fond orphelines sont reprises au lieu de rester bloquées (`JOBS-STALE-RECLAIM-001`).**
   Un worker réserve une tâche en la passant à `running`, puis rend son verdict.

@@ -115,10 +115,17 @@ Aucun cookie visiteur, aucune IP.
 
     La déclaration de cette table vit dans `tables.py`, rendue pour le backend installé.
 
-    !!! warning "Projets antérieurs à cette commande"
+    !!! info "Projets antérieurs à cette commande"
         `stats:init` n'a pas toujours existé, et cette page affirmait auparavant que l'opt-in n'apportait aucune table.
         Les projets d'alors ont donc créé `forge_stats_events` à la main.
-        Si c'est votre cas, ignorez la migration neuve plutôt que de l'appliquer, sans quoi `migration:apply` butera sur une table déjà présente.
+        Si c'est votre cas, appliquez la migration sans crainte, les deux issues sont sûres.
+
+        Si votre table est conforme à la déclaration, la migration ne fait rien et s'enregistre.
+        Le DDL est rendu en `CREATE TABLE IF NOT EXISTS` sur les quatre backends, donc l'opération est idempotente.
+
+        Si elle diverge, la migration échoue en nommant la colonne manquante, et **n'est pas enregistrée comme appliquée**.
+        Vous corrigez votre table, puis vous rejouez `forge migration:apply`.
+        À aucun moment une table divergente n'est acceptée en silence.
 
     #### 4. Le brancher là où il agit
 
