@@ -29,6 +29,15 @@
 
 ### Corrigé (pré-mortem rc5)
 
+- **Les fixtures de serveur réel n'étaient visibles que d'un seul dossier (`TESTING-REAL-DB-FIXTURES-001`).**
+  `real_db`, `real_pg_db` et `real_mssql_db` vivaient dans `tests/db/conftest.py`, donc n'existaient que pour ce dossier.
+  Les tests des paquets opt-in sont sous `packages/*/tests/` : ils n'y avaient pas accès, et six d'entre eux avaient répondu en réécrivant chacun son propre adaptateur de connexion à la main.
+  Deux façons officielles de monter une base de test contredisaient le principe 11, et la seconde court-circuitait la vraie couche d'accès, donc la qualification d'erreur de Forge. C'est ce qui a caché les deux défauts du magasin anti-rejeu MFA pendant tout un cycle.
+  Les quatre fixtures vivent désormais dans `forge-mvc-testing`, l'emplacement prévu pour l'infrastructure de test partagée (ADR-041), et son plugin pytest les expose à toute la suite. `tests/db/conftest.py` ne définit plus rien, il réutilise.
+  Nouveauté : `real_backend_db` est **paramétrée sur les trois serveurs**, et chaque paramètre porte ses propres marqueurs. Un test d'intégration écrit **une seule fois** produit donc trois cas, que les trois jobs de CI sélectionnent chacun le sien. C'est ce qui rend abordable la couverture des trois backends, jusqu'ici payée en triplant le code.
+  Le garde-fou a immédiatement révélé un piège que personne n'avait encore rencontré : les trois fixtures directes n'apportent **aucun** marqueur, si bien qu'un test qui les demande sans déclarer `db` est collecté dans le job sans serveur, où la fixture le saute en silence, et où il compte comme vert sans rien avoir vérifié. Un relevé sur analyse syntaxique refuse désormais ce cas.
+  Les deux propriétés qui comptent sont vérifiées par **collecte réelle** dans un pytest lancé sur un fichier sonde écrit hors du dépôt, plutôt que par introspection : l'attribut privé de pytest qui porte les paramètres d'une fixture a déjà changé de nom d'une version à l'autre.
+
 - **Le back-office ne savait ni modifier ni supprimer un enregistrement sur PostgreSQL et SQL Server (`ADMIN-JOBS-LIMIT-PORTABLE-001`).**
   Quatre `LIMIT` écrits en dur, trois dans `forge-mvc-admin` et un dans `forge-mvc-jobs`.
   `UPDATE ... LIMIT` et `DELETE ... LIMIT` sont des **extensions MySQL et MariaDB** que PostgreSQL et SQL Server refusent tous les deux : les deux actions les plus visibles d'un back-office étaient donc inutilisables sur la moitié des backends, alors que l'ADR-084 les donne au niveau plein.

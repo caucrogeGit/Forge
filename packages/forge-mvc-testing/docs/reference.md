@@ -203,11 +203,49 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     Une cause non reconnue n'est jamais rangée d'office dans l'une des deux autres.
     Affirmer la mauvaise cause avec aplomb est précisément ce que ce module corrige.
 
+    ### Fixtures serveur réel (`real_db.py`)
+
+    Ces quatre fixtures montent Forge sur un serveur de base de test, puis rendent la main.
+    Le test passe ensuite par la **vraie couche d'accès**, `core.database.db`, celle que l'application utilise en production.
+
+    | Fixture | Portée | Serveur |
+    |---|---|---|
+    | `real_db` | session | MariaDB, variables `FORGE_TEST_DB_*` |
+    | `real_pg_db` | fonction | PostgreSQL, variables `FORGE_TEST_PG_*` |
+    | `real_mssql_db` | fonction | SQL Server, variables `FORGE_TEST_MSSQL_*` |
+    | `real_backend_db` | fonction | les trois, un cas par serveur |
+
+    `real_backend_db` est paramétrée, et **chaque paramètre porte ses propres marqueurs**.
+    Un test qui la demande est donc exécuté trois fois, et chaque job de la CI sélectionne le sien avec `-m db`, `-m db_pg` ou `-m db_mssql`.
+    Écrire un test d'intégration une seule fois suffit à couvrir les trois serveurs.
+
+    ```python
+    def test_le_compteur_est_portable(real_backend_db):
+        from core.database import db
+
+        db.execute("INSERT INTO app_settings (cle, valeur) VALUES (?, ?)", ("x", "1"))
+        assert db.fetch_one("SELECT valeur FROM app_settings WHERE cle = ?", ("x",))
+    ```
+
+    !!! warning "Les trois fixtures directes n'apportent aucun marqueur"
+
+        `real_db`, `real_pg_db` et `real_mssql_db` ne marquent pas le test qui les demande.
+        Un fichier qui les emploie déclare donc son propre `pytestmark = pytest.mark.db`.
+
+        Sans ce marqueur, le test est collecté dans le job de CI qui n'a aucun serveur.
+        La fixture l'y **saute**, en silence, et il compte comme vert alors qu'il n'a rien vérifié.
+        Un garde-fou refuse ce cas (`tests/test_testing_real_db_fixtures_001.py`).
+
+    En l'absence de serveur, le test est **sauté** en local avec le motif réel de l'échec.
+    En CI, `FORGE_REQUIRE_DB=1` et ses variantes par backend transforment le saut en **échec** : la couche base n'est jamais verte par défaut.
+
 ??? note "8. Contextes d'utilisation"
 
     | Besoin | Élément |
     |---|---|
     | Tester un contrôleur sans serveur | `FakeRequest(...)` puis appeler l'action |
+    | Éprouver du SQL sur les trois serveurs | fixture `real_backend_db` |
+    | Éprouver du SQL sur un seul serveur | `real_db`, `real_pg_db` ou `real_mssql_db` |
     | Simuler un POST de formulaire | `FakeRequest("POST", "/x", body={...})` |
     | Simuler un corps JSON | `FakeRequest("POST", "/api", json_body={...})` |
     | Partir d'un état propre | fixtures autouse (automatiques) |

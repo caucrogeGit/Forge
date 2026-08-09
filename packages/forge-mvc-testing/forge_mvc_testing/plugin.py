@@ -17,6 +17,17 @@ import core.forge as forge
 
 from forge_mvc_testing.fake_request import FakeRequest
 
+# Fixtures d'intégration serveur réel (TESTING-REAL-DB-FIXTURES-001). Importées
+# ici pour que le plugin les expose à toute la suite, y compris aux tests des
+# paquets opt-in sous `packages/*/tests/`, qui n'avaient pas accès à celles de
+# `tests/db/conftest.py` et réécrivaient donc chacun son adaptateur à la main.
+from forge_mvc_testing.real_db import (  # noqa: F401 — exposées comme fixtures
+    real_backend_db,
+    real_db,
+    real_mssql_db,
+    real_pg_db,
+)
+
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_forge_kernel(tmp_path_factory):
