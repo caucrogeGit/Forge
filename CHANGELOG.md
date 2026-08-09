@@ -29,6 +29,18 @@
 
 ### Corrigé
 
+- **Le drapeau `api` d'une route ne faisait rien, alors que la documentation lui prêtait un comportement (`CORE-ROUTE-API-FLAG-001`).**
+  Il était déclaré dans `RouteEntry`, propagé par `RouteGroup`, affiché par `routes:list`, et **lu par aucun code applicatif**.
+  Ses seules lectures dans tout le dépôt étaient celle de `forge.py`, pour l'afficher, et des tests vérifiant qu'il valait ce qu'on lui avait passé.
+  La documentation du routeur en promettait pourtant « réponses JSON, pas de redirection login » : une route marquée `api=True` recevant une requête non authentifiée renvoyait une redirection 302 vers une page HTML de connexion, et son client JSON échouait loin de la cause en tentant de désérialiser du HTML.
+  C'est le troisième cas de ce cycle où une documentation affirme un comportement que le code n'a pas, après la mise en service de `forge-mvc-stats` et le motif de saut des tests d'intégration.
+  Le drapeau tient désormais sa promesse pour tout ce que le framework rend **après** avoir trouvé la route : 401 sur défaut d'authentification, 403 sur jeton CSRF invalide, 503 sur base indisponible, 500 sur erreur non gérée, tous en JSON.
+  Un refus déjà explicite garde son statut, seule sa forme change : un middleware applicatif qui rend 403 continue de rendre 403.
+  Les en-têtes du refus sont conservés, **cookies compris**, et c'est le point délicat : `AuthMiddleware` ferme la session quand il détecte une session orpheline (ADR-080), et reconstruire la réponse sans ce cookie aurait laissé la session ouverte, transformant une correction de forme en régression de sécurité.
+  La cause d'une erreur non gérée n'est **jamais** exposée, même en `APP_ENV=dev`, contrairement à la page HTML : celle-ci est lue par un humain devant son navigateur, tandis qu'une réponse d'API part vers un client qui la journalise, la stocke ou la réexpose. La cause reste dans les journaux du serveur.
+  La forme `{"error": "<code>"}` n'est pas inventée ici : `forge-mvc-iot`, `forge-mvc-video`, `forge-mvc-audio` et `forge-mvc-admin` avaient déjà convergé seuls dessus, `video` et `audio` portant même la ligne à l'identique. Ce ticket la reprend, il ne la décrète pas, et ne touche pas encore aux quatre paquets.
+  **Limite assumée et écrite** : les 404 et 405 restent en HTML. Le drapeau appartient à une route, et dans ces deux cas aucune route n'a été trouvée, donc rien ne dit que le chemin visait une API.
+
 - **Le motif de saut des tests d'intégration désignait la mauvaise cause (`TEST-DB-SKIP-REASON-001`).**
   Les douze fixtures d'intégration rangeaient toute erreur de connexion sous un mot unique, « injoignable », et le commentaire de `tests/db/conftest.py` assumait la confusion en toutes lettres.
   Or « pas de serveur » et « serveur qui refuse mes identifiants » appellent des gestes opposés, démarrer un service dans un cas, corriger une variable d'environnement dans l'autre.

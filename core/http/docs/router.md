@@ -165,7 +165,29 @@ Signification des indicateurs d'une route :
 |---|---|---|
 | `public` | `False` | route accessible sans authentification |
 | `csrf` | `True` | protection CSRF exigée sur les méthodes non sûres |
-| `api` | `False` | route d'API (réponses JSON, pas de redirection login) |
+| `api` | `False` | route d'API : les refus et erreurs du framework sont rendus en JSON, jamais en redirection ni en page HTML |
+
+!!! info "Ce que fait exactement `api=True`"
+    Le drapeau gouverne les réponses que **le framework** produit une fois la route trouvée.
+
+    | Situation | Route ordinaire | Route `api=True` |
+    |---|---|---|
+    | Non authentifié | 302 vers `/login` | 401 `{"error": "unauthenticated"}` |
+    | Refus explicite d'un middleware | statut conservé, page HTML | statut conservé, JSON |
+    | Jeton CSRF invalide | 403 HTML | 403 `{"error": "forbidden"}` |
+    | Base indisponible | 503 HTML | 503 `{"error": "service_unavailable"}` |
+    | Erreur non gérée | 500 HTML, cause affichée en dev | 500 `{"error": "internal_error"}`, sans détail |
+
+    Les en-têtes du refus sont conservés, cookies compris.
+    C'est nécessaire : `AuthMiddleware` ferme la session quand il détecte une session orpheline (ADR-080), et perdre ce cookie laisserait la session ouverte.
+
+    La cause d'une erreur non gérée n'est **jamais** exposée, même en `APP_ENV=dev`.
+    Une page HTML est lue par un humain devant son navigateur, une réponse d'API part vers un client qui la journalise, la stocke ou la réexpose.
+    La cause reste dans les journaux du serveur.
+
+    **Limite assumée** : les 404 et 405 restent en HTML.
+    Le drapeau appartient à une route, et sur ces deux cas aucune route n'a été trouvée : rien ne dit que le chemin visait une API.
+    Servir une API sous un préfixe dédié n'y change rien, Forge ne devine pas l'intention d'un chemin inconnu.
 | `name` | `None` | nom stable de la route (convention `contrôleur-méthode`) |
 
 Motifs de chemin reconnus :

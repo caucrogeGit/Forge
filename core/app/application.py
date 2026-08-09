@@ -55,6 +55,59 @@ def _service_unavailable() -> Response:
         )
 
 
+#: Codes d'erreur des réponses d'API, stables et lisibles côté client.
+#: La forme `{"error": "<code>"}` n'est pas inventée ici : `forge-mvc-iot`,
+#: `forge-mvc-video`, `forge-mvc-audio` et `forge-mvc-admin` avaient déjà
+#: convergé seuls dessus. Ce ticket la reprend, il ne la décrète pas.
+API_ERROR_UNAUTHENTICATED = "unauthenticated"
+API_ERROR_FORBIDDEN = "forbidden"
+API_ERROR_DENIED = "denied"
+API_ERROR_UNAVAILABLE = "service_unavailable"
+API_ERROR_INTERNAL = "internal_error"
+
+
+def _api_error(status: int, code: str, source: "Response | None" = None) -> Response:
+    """Réponse JSON d'erreur pour une route d'API.
+
+    `source` est la réponse HTML ou la redirection que l'on remplace. Ses
+    en-têtes sont repris, **cookies compris**, et c'est le point délicat :
+    `AuthMiddleware` efface le cookie de session quand il détecte une session
+    orpheline (ADR-080). Reconstruire la réponse sans les reprendre laisserait
+    cette session ouverte, donc transformerait une correction de forme en
+    régression de sécurité.
+
+    `Location` est écarté, une réponse d'API ne redirigeant pas, et les en-têtes
+    de corps le sont aussi puisque le corps change.
+    """
+    from core.http.response import Response
+
+    response = Response.json({"error": code}, status=status)
+    if source is not None:
+        for cle, valeur in source.headers.items():
+            if cle.lower() in ("location", "content-type", "content-length"):
+                continue
+            response.headers[cle] = valeur
+        response.set_cookies.extend(source.set_cookies)
+    return response
+
+
+def _api_denial(denied: Response) -> Response:
+    """Traduit en JSON le refus d'un middleware sur une route d'API.
+
+    Une redirection devient un 401 : c'est le cœur de la promesse du drapeau
+    `api`, un client JSON ne suit pas une redirection vers une page de
+    connexion, il reçoit du HTML là où il attend des données et échoue loin de
+    la cause.
+
+    Un refus déjà explicite garde son statut, seule sa forme change. Un
+    middleware applicatif qui rend 403 doit continuer de rendre 403.
+    """
+    if 300 <= denied.status < 400:
+        return _api_error(401, API_ERROR_UNAUTHENTICATED, denied)
+    code = API_ERROR_FORBIDDEN if denied.status == 403 else API_ERROR_DENIED
+    return _api_error(denied.status, code, denied)
+
+
 class Application:
     """
     Orchestre le routage, les middlewares et le contrôle d'accès.
@@ -86,6 +139,16 @@ class Application:
             _load_api_routes(router, api_routes_module)
 
     def dispatch(self, request: Request) -> Response:
+        # CORE-ROUTE-API-FLAG-001 : le drapeau `api` d'une route était déclaré,
+        # propagé, affiché par `routes:list`, et **lu par aucun code**. La
+        # documentation en promettait pourtant un comportement, « réponses
+        # JSON, pas de redirection login ». Il le tient désormais, pour tout ce
+        # que le framework rend APRÈS avoir trouvé la route.
+        #
+        # Le drapeau ne peut rien gouverner avant : sur un 404 aucune route
+        # n'est trouvée, donc rien ne dit que le chemin visait une API. Les 404
+        # et 405 restent en HTML, limite écrite dans la doc du routeur.
+        est_api = False
         try:
             result = self._router.match(request.method, request.path)
             if result is None:
@@ -101,17 +164,18 @@ class Application:
 
             route, params = result
             request.route_params = params
+            est_api = route.api
 
             if route.requires_csrf(request.method):
                 denied = self._csrf.check(request)
                 if denied:
-                    return denied
+                    return _api_error(denied.status, API_ERROR_FORBIDDEN, denied) if est_api else denied
 
             if not route.public:
                 for middleware in self._middlewares:
                     denied = middleware.check(request)
                     if denied:
-                        return denied
+                        return _api_denial(denied) if est_api else denied
 
             return route.handler(request)
 
@@ -129,12 +193,23 @@ class Application:
                 "Base indisponible — %s %s : %s",
                 request.method, request.path, _indispo,
             )
-            response = _service_unavailable()
+            response = (
+                _api_error(503, API_ERROR_UNAVAILABLE) if est_api
+                else _service_unavailable()
+            )
             response.headers["Retry-After"] = "2"
             return response
 
         except Exception as _exc:
             logger.exception("Erreur non gérée — %s %s", request.method, request.path)
             _log_runtime_error(_exc, request)
+            if est_api:
+                # Aucun détail sur l'erreur, même en dev. La page HTML peut se
+                # permettre d'afficher la cause, elle est lue par un humain
+                # devant son navigateur ; une réponse d'API part vers un client
+                # qui la journalise, la stocke ou la réexpose. La cause reste
+                # dans les journaux du serveur, où `_log_runtime_error` vient
+                # de l'écrire.
+                return _api_error(500, API_ERROR_INTERNAL)
             # En APP_ENV=dev, la page 500 affiche la cause ; None en prod.
             return _html("errors/500.html", 500, _dev_error_context(_exc))
