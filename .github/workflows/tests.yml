@@ -135,7 +135,13 @@ jobs:
           FORGE_TEST_DB_USER: root
           FORGE_TEST_DB_PASSWORD: forge_test_root
           FORGE_TEST_DB_NAME: forge_test
-        run: python -m pytest -m db -v
+        # `db and not db_pg and not db_mssql` et non `db` seul
+        # (`CI-DB-JOB-SELECTOR-001`). Un cas PostgreSQL ou SQL Server porte
+        # AUSSI `db`, donc `-m db` le sélectionnait ici, où sa fixture tentait
+        # une connexion vers un serveur absent avant de le sauter. Mesuré : 15 s
+        # par cas quand l'hôte ne répond pas, 2,5 s quand il refuse. Ce job
+        # payait ainsi 4 minutes pour 94 cas qu'il ne pouvait pas exécuter.
+        run: python -m pytest -m "db and not db_pg and not db_mssql" -v
 
   # CI-DB-POSTGRES-001 (ADR-084) : la suite `db_pg` s'exécute contre un vrai
   # PostgreSQL — premier critère CI de la promotion du backend Alpha.

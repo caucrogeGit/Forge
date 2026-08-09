@@ -29,6 +29,15 @@
 
 ### Corrigé (pré-mortem rc5)
 
+- **Le job d'intégration MariaDB payait quatre minutes pour des tests qu'il ne pouvait pas exécuter (`CI-DB-JOB-SELECTOR-001`).**
+  Il sélectionnait `-m db`. Or un cas PostgreSQL ou SQL Server porte **aussi** `db`, si bien qu'il les collectait tous, et que leur fixture tentait une connexion vers un serveur absent avant de les sauter.
+  Mesuré, fixture `real_pg_db` avec un hôte injoignable : **quinze secondes par cas**, contre deux et demie quand l'hôte refuse, ce qui est le cas d'un runner. Le job sélectionnait 312 tests pour 116 exécutables.
+  Le défaut préexistait, mais restait discret. Il est devenu voyant avec la paramétrisation des tests de paquet sur les trois serveurs (`TEST-PACKAGE-INTEGRATION-REAL-LAYER-001`), qui a fait passer ce job de 4 min 47 à 8 min 45.
+  Le correctif porte sur la **sélection**, pas sur les marqueurs : `-m "db and not db_pg and not db_mssql"`.
+  La combinaison `db` + `db_pg` reste en place, et c'est délibéré. Elle est **porteuse** : elle dit au garde de collecte qu'un cas PostgreSQL n'est pas exigé du job MariaDB, et elle permet au job sans base d'exclure les trois serveurs d'un seul terme, `-m "not db"`. La retirer aurait cassé le premier et obligé le second à énumérer chaque backend, donc à en oublier un au prochain ajout.
+  Aucune couverture n'est perdue : 116 sur MariaDB, 98 sur PostgreSQL, 98 sur SQL Server, soit les 312 d'avant.
+  Un garde-fou fige la sélection de chacun des trois jobs, et vérifie que le job sans base garde son terme unique. Éprouvé en remettant `-m db` : il échoue.
+
 - **Le dépôt de `forge-mvc-video` était inutilisable sur PostgreSQL et SQL Server (`VIDEO-DML-PORTABLE-001`).**
   Il écrivait ses marqueurs de paramètre en `%s`, le format natif du connecteur MariaDB, quand Forge écrit `?`.
   Le cœur traduit `?` vers le format de chaque pilote et **double tout `%` littéral** au passage, si bien qu'un `%s` déjà écrit devenait `%%s`, un texte et non un marqueur.

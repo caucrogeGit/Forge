@@ -157,7 +157,9 @@ Le mécanisme existe déjà (marqueurs `pytest` en mode `--strict-markers`, doss
 | Unitaire | cœur, CLI, générateurs (le gros de `tests/`) | `pytest tests -m "not db" --ignore=tests/meta --ignore=tests/release` |
 | Contrats (meta) | cohérence doc, version, charte, contrats d'API | `pytest tests/meta` |
 | Prose (docs) | tests de prose pure : ne cassent que par édition de la documentation (marqueur `docs`) | `pytest -m docs` |
-| Intégration BDD | tests nécessitant une vraie base (marqueur `db`) | `FORGE_REQUIRE_DB=1 pytest -m db` |
+| Intégration BDD, MariaDB | tests nécessitant une vraie base | `FORGE_REQUIRE_DB=1 pytest -m "db and not db_pg and not db_mssql"` |
+| Intégration BDD, PostgreSQL | idem, contre un vrai PostgreSQL | `FORGE_REQUIRE_DB_PG=1 pytest -m db_pg` |
+| Intégration BDD, SQL Server | idem, contre un vrai SQL Server | `FORGE_REQUIRE_DB_MSSQL=1 pytest -m db_mssql` |
 | Release | garde-fous de publication | `pytest tests/release` |
 | Opt-ins | smoke et tests unitaires des paquets `packages/` | `pytest packages` |
 | Tout | validation complète de release | `pytest` |
@@ -169,6 +171,13 @@ Marqueurs canoniques (déclarés dans `pytest.ini`, `--strict-markers` actif, do
 - `db` : test d'intégration nécessitant une vraie base (sauté en local sans base ; MariaDB par défaut, requis en CI via `FORGE_REQUIRE_DB=1`) ;
 - `db_pg` : test d'intégration nécessitant un vrai PostgreSQL ; se combine à `db` (forme liste), requis en CI via `FORGE_REQUIRE_DB_PG=1` (ADR-084) ;
 - `db_mssql` : test d'intégration nécessitant un vrai SQL Server ; se combine à `db` (forme liste), requis en CI via `FORGE_REQUIRE_DB_MSSQL=1` (ADR-084) ;
+
+La combinaison avec `db` est **porteuse**, elle ne relève pas du confort d'écriture.
+C'est elle qui dit au garde de collecte du `conftest.py` racine qu'un cas PostgreSQL n'est pas exigé du job MariaDB, et qui permet au job sans base d'exclure les trois serveurs d'un seul terme, `-m "not db"`.
+
+En revanche le job MariaDB ne les **sélectionne** plus (`CI-DB-JOB-SELECTOR-001`).
+Il employait `-m db`, donc les collectait puis les sautait, mais leur fixture tentait d'abord une connexion vers un serveur absent : quinze secondes par cas quand l'hôte ne répond pas, deux et demie quand il refuse.
+Aucune couverture n'est perdue, ces cas s'exécutant dans le job de leur propre backend.
 - `docs` : test de prose pure, ne casse que par édition de la documentation du dépôt (`TESTS-DOCS-MARKER-001`).
 
 #### Écrire un test d'intégration base

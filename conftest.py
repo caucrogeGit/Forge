@@ -28,7 +28,15 @@ os.environ.setdefault("DB_BACKEND", "mariadb")
 # façon normale de sauter les tests d'intégration sans base.
 # Backends (ADR-084) : `db` seul = MariaDB (FORGE_REQUIRE_DB=1) ; `db` combiné
 # à `db_pg`/`db_mssql` = requis par FORGE_REQUIRE_DB_PG/FORGE_REQUIRE_DB_MSSQL
-# uniquement — le job MariaDB les sélectionne (-m db) mais les laisse sauter.
+# uniquement. La combinaison reste porteuse : c'est elle qui dit à `_db_test_required`
+# qu'un cas PostgreSQL n'est pas exigé du job MariaDB.
+#
+# Le job MariaDB ne les sélectionne plus pour autant (`CI-DB-JOB-SELECTOR-001`).
+# Il employait `-m db`, donc les collectait puis les sautait, mais leur fixture
+# tentait d'abord une connexion vers un serveur absent : 15 s par cas quand
+# l'hôte ne répond pas, 2,5 s quand il refuse. Il emploie désormais
+# `-m "db and not db_pg and not db_mssql"`. Aucune couverture n'est perdue, ces
+# cas s'exécutant dans le job de leur propre backend.
 
 _REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
 _REQUIRE_DB_PG = os.environ.get("FORGE_REQUIRE_DB_PG") == "1"
