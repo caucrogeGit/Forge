@@ -13,6 +13,7 @@ minimal ne gagne pas à porter ce qu'on peut exprimer sans lui (principe 8).
 """
 from __future__ import annotations
 
+import ast
 import re
 from pathlib import Path
 
@@ -78,8 +79,26 @@ def test_l_horodatage_coincide_avec_la_clause_default(module: str, classe: str) 
 # ── L'absence, dans les opt-ins ──────────────────────────────────────────────
 
 _NON_PORTABLE = re.compile(
-    r"\bNOW\(\)|ON DUPLICATE KEY|INTERVAL \?|ORDER BY \w+ LIMIT \d", re.IGNORECASE
+    r"\bNOW\(\)|ON DUPLICATE KEY|INTERVAL \?|\bLIMIT\b", re.IGNORECASE
 )
+
+#: Mots qui font d'une chaîne une instruction SQL, `DELETE` compris.
+#: Il manquait, et `DELETE FROM ... LIMIT 1` échappait donc au relevé.
+_MOTS_SQL = ("SELECT", "UPDATE", "INSERT", "VALUES", "DELETE")
+
+#: Dette connue, à payer, et **listée plutôt que cachée**.
+#:
+#: Même principe que le cliquet DDL : une exclusion muette rendrait le relevé
+#: rassurant et faux. Chaque entrée porte son motif et son ticket, et le test
+#: `test_le_cliquet_dml_se_resserre` échoue dès qu'une entrée devient propre,
+#: ce qui oblige à la retirer au lieu de la laisser dormir.
+_DETTE_CONNUE: "dict[str, str]" = {
+    "forge-mvc-video/forge_mvc_video/storage/repository.py":
+        "12 marqueurs `%s` au lieu de `?`, plus deux `LIMIT` en dur. MariaDB et "
+        "PostgreSQL acceptent `%s` nativement, SQLite et SQL Server exigent `?` : "
+        "le dépôt vidéo n'est donc pas portable, et le corriger dépasse le "
+        "périmètre de ADMIN-JOBS-LIMIT-PORTABLE-001. Ticket dédié à ouvrir.",
+}
 
 
 def _fichiers_sql_des_optins() -> "list[Path]":
@@ -98,30 +117,82 @@ def _fichiers_sql_des_optins() -> "list[Path]":
     return fichiers
 
 
+def _lignes_de_docstring(arbre: ast.Module) -> "set[int]":
+    """Lignes occupées par les docstrings, à ne pas juger.
+
+    Une docstring cite volontiers la forme qu'elle bannit, pour expliquer
+    pourquoi. La reconnaître par « la ligne commence par trois guillemets » est
+    faux dès la deuxième ligne, ce qui obligeait le relevé à garder un motif
+    étroit pour éviter les faux positifs (`OPTIN-DML-PORTABILITY-WIDEN-001`).
+    """
+    occupees: "set[int]" = set()
+    porteurs = (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)
+    for noeud in ast.walk(arbre):
+        if not isinstance(noeud, porteurs):
+            continue
+        corps = getattr(noeud, "body", None)
+        if not corps:
+            continue
+        premier = corps[0]
+        if (isinstance(premier, ast.Expr)
+                and isinstance(premier.value, ast.Constant)
+                and isinstance(premier.value.value, str)):
+            occupees.update(range(premier.lineno, (premier.end_lineno or premier.lineno) + 1))
+    return occupees
+
+
+def _chaines_sql(module: "Path") -> "list[tuple[int, str]]":
+    """Chaînes littérales du module qui ressemblent à du SQL.
+
+    L'analyse syntaxique remplace le balayage ligne à ligne : elle ne voit que
+    de vraies chaînes, jamais un commentaire ni une docstring, et elle lit les
+    fragments littéraux d'une f-string comme le reste.
+    """
+    try:
+        arbre = ast.parse(module.read_text(encoding="utf-8"))
+    except (SyntaxError, UnicodeDecodeError):  # pragma: no cover — défensif
+        return []
+    docs = _lignes_de_docstring(arbre)
+    trouvees: "list[tuple[int, str]]" = []
+    for noeud in ast.walk(arbre):
+        if not isinstance(noeud, ast.Constant) or not isinstance(noeud.value, str):
+            continue
+        if noeud.lineno in docs:
+            continue
+        texte = noeud.value
+        if any(mot in texte.upper() for mot in _MOTS_SQL):
+            trouvees.append((noeud.lineno, texte))
+    return trouvees
+
+
 def test_aucune_construction_mariadb_en_dur_dans_la_dml() -> None:
     """Les chaînes SQL des opt-ins ne doivent nommer aucune forme propriétaire.
 
     Les commentaires et docstrings y ont droit : ils expliquent justement
-    pourquoi la forme est bannie. Seules les chaînes de code comptent.
+    pourquoi la forme est bannie. Seules les chaînes de code comptent, et
+    l'analyse syntaxique le garantit au lieu de l'approcher.
+
+    `LIMIT` est banni en entier, plus seulement sous la forme
+    `ORDER BY <col> LIMIT <chiffre>`. Ce motif étroit laissait passer
+    `WHERE id = ? LIMIT 1`, `DELETE ... LIMIT 1` et `... LIMIT ?`, qui cassaient
+    respectivement `jobs.get_job`, le back-office et la liste de `stats` sur les
+    backends sans `LIMIT` (`ADMIN-JOBS-LIMIT-PORTABLE-001`). La borne appartient
+    au dialecte, par `limit_clause()` ou `pagination_clause()`.
     """
     fautes: "list[str]" = []
     for module in _fichiers_sql_des_optins():
-        for numero, ligne in enumerate(module.read_text(encoding="utf-8").splitlines(), 1):
-            nue = ligne.strip()
-            if nue.startswith("#") or nue.startswith('"""') or nue.startswith("`"):
-                continue
-            if '"' not in ligne and "'" not in ligne:
-                continue
-            if _NON_PORTABLE.search(ligne) and ("SELECT" in ligne.upper()
-                                                or "UPDATE" in ligne.upper()
-                                                or "INSERT" in ligne.upper()
-                                                or "VALUES" in ligne.upper()):
-                fautes.append(f"{module.relative_to(PROJECT_ROOT)}:{numero} : {nue[:80]}")
+        relatif = module.relative_to(PACKAGES).as_posix()
+        if relatif in _DETTE_CONNUE:
+            continue
+        for numero, texte in _chaines_sql(module):
+            if _NON_PORTABLE.search(texte):
+                extrait = " ".join(texte.split())[:80]
+                fautes.append(f"{module.relative_to(PROJECT_ROOT)}:{numero} : {extrait}")
 
     assert not fautes, (
         "SQL non portable dans un opt-in (OPTIN-DML-DIALECT-001) : passez par "
-        "`dialect.now_expression()` / `interval_seconds_expression()`, ou par un "
-        "motif portable.\n  " + "\n  ".join(fautes)
+        "`dialect.now_expression()`, `interval_seconds_expression()` ou "
+        "`limit_clause()`, ou par un motif portable.\n  " + "\n  ".join(fautes)
     )
 
 
@@ -139,3 +210,21 @@ def test_sessions_db_reste_le_modele_du_sans_fonction_serveur() -> None:
     garde = (PACKAGES / "forge-mvc-sessions-db" / "tests" / "test_db_store_001.py")
 
     assert 'assert "NOW()" not in sql' in garde.read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("relatif", sorted(_DETTE_CONNUE))
+def test_le_cliquet_dml_se_resserre(relatif: str) -> None:
+    """Une entrée corrigée, ou disparue, doit être retirée de la dette.
+
+    Sans ce contrôle, la liste ne ferait que grandir et le relevé se viderait
+    de son sens. Un fichier qui n'a plus de construction non portable n'a plus
+    rien à faire ici.
+    """
+    module = PACKAGES / relatif
+    if not module.exists():
+        pytest.fail(f"{relatif} n'existe plus : retirez-le de _DETTE_CONNUE.")
+    reste = [t for _, t in _chaines_sql(module) if _NON_PORTABLE.search(t)]
+    assert reste, (
+        f"{relatif} n'a plus de SQL non portable : retirez-le de _DETTE_CONNUE "
+        "pour que le relevé le surveille de nouveau."
+    )

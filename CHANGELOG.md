@@ -43,6 +43,16 @@
   Deux autres décrivaient la réservation de `jobs` comme un `UPDATE ... ORDER BY id LIMIT 1`, forme abandonnée au cycle précédent, et le README d'`admin` annonçait encore « pas de reprise automatique » comme limite V1, alors que `reclaim_stale()` la lève depuis ce cycle.
   Deux pages enfin présentaient la borne de pagination comme fixe : elles disent maintenant qu'elle vient du backend actif, et le rendu annoncé pour chacun des quatre a été lu sur les dialectes réels, non supposé.
   C'est la sixième fois de ce cycle qu'une documentation affirme un comportement que le code n'a pas ou n'a plus.
+
+- **Le relevé de portabilité DML ne couvrait qu'un tiers des paquets, et un échantillon d'opérations (`OPTIN-DML-PORTABILITY-WIDEN-001`).**
+  `OPTIN-DML-DIALECT-001` avait rendu la DML de trois opt-ins portable, et s'était arrêté là.
+  Deux restrictions se cumulaient. Il couvrait `jobs`, `notifications` et `settings`, donc ni `admin`, ni `audit`, ni `stats`, ni `mfa`. Et pour `jobs`, il exerçait treize opérations choisies, parmi lesquelles `get_job` ne figurait pas, c'est-à-dire précisément la fautive.
+  Le garde-fou statique, lui, cherchait `ORDER BY <col> LIMIT <chiffre>`, motif trop étroit sur trois points à la fois : il exigeait un `ORDER BY`, une seule colonne de tri, et un chiffre. Aucun des cinq défauts ne lui correspondait.
+  Le relevé porte désormais sur la **surface publique** de sept paquets, et non sur un échantillon jugé représentatif.
+  Le garde-fou statique est refait sur **analyse syntaxique** : il ne juge que de vraies chaînes littérales, docstrings exclues, ce qui permet de bannir `LIMIT` en entier sans les faux positifs qui obligeaient à garder un motif étroit. `DELETE` rejoint les mots-clés reconnus, il manquait.
+  Le relevé élargi a immédiatement trouvé le défaut de `stats`, puis un sixième cas dans `forge-mvc-video`, dont le dépôt emploie douze marqueurs `%s` au lieu de `?`.
+  Ce dernier dépasse le périmètre du ticket : il est **inscrit en dette listée**, avec son motif, et un cliquet échoue dès qu'il devient propre, sur le modèle du cliquet DDL. Une exclusion muette aurait rendu le relevé rassurant et faux.
+  Vérifié : le relevé élargi échoue sur le code d'avant, sur PostgreSQL comme sur SQL Server, et passe après correctif.
 - **L'anti-rejeu TOTP partagé s'effondrait sous concurrence, exactement le cas qu'il vise (`PREMORTEM-RC5-003`).**
   `MFA-TOTP-REPLAY-SHARED-001` promettait que deux requêtes concurrentes portant le même code ne pouvaient pas être acceptées toutes les deux.
   Ses tests vérifiaient la propriété **en séquence**, et par un adaptateur de connexion écrit à la main. Mis en concurrence réelle par le pré-mortem, le magasin a révélé deux défauts que cette approche ne pouvait pas voir.
