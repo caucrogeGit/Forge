@@ -2,7 +2,7 @@
 
 ## Statut
 
-Proposée.
+Acceptée.
 Décision de périmètre et de contrat public ; relève du mainteneur.
 Révise sur un point la classification de l'ADR-052, qui rangeait l'API JSON en catégorie 4 sans trancher la forme de ses réponses.
 
