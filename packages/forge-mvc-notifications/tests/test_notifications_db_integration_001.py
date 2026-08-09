@@ -1,19 +1,23 @@
-"""Intégration MariaDB du store de notifications (NOTIFICATIONS-DB-INTEGRATION-001).
+"""Intégration du store de notifications sur les trois serveurs (NOTIFICATIONS-DB-INTEGRATION-001).
 
-Vérifie le contrat SQL réel : `CREATE_TABLE_SQL`, insertion, lecture filtrée,
-décompte des non lues, marquage. Marqué `db` : sauté en local, requis en CI.
+Vérifie le contrat SQL réel face au moteur : la DDL dialectale, l'envoi, l'ordre
+décroissant, le comptage des non lues et le marquage.
+
+## Ce qui a changé (`TEST-PACKAGE-INTEGRATION-REAL-LAYER-001`)
+
+Ce fichier montait sa propre connexion MariaDB dans un adaptateur écrit à la
+main. Il ne tournait donc que sur MariaDB, et court-circuitait la vraie couche
+d'accès `core.database.db`, celle que l'application utilise en production.
+Les tests passent désormais par `real_backend_db` : chacun s'exécute trois
+fois, une par serveur, à travers la couche réelle.
 """
 from __future__ import annotations
 
-import os
-import uuid
-from typing import Any
+from collections.abc import Iterator
 
 import pytest
 
-pytestmark = pytest.mark.db
-
-forge_mvc_notifications = pytest.importorskip("forge_mvc_notifications")
+pytest.importorskip("forge_mvc_notifications")
 
 from forge_mvc_notifications import (
     get_notifications,
@@ -23,137 +27,50 @@ from forge_mvc_notifications import (
     unread_count,
 )
 
-from forge_mvc_testing.db_probe import connection_failure_message
-
-_REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
-
-
-def _rendered_ddl() -> str:
-    """DDL de la table, rendu pour le backend actif.
-
-    La constante de schéma du module est supprimée
-    (`OPTIN-DDL-CONSTANTS-001`) : deux façons officielles de créer la même
-    table contredisaient le principe 11. La source unique est la déclaration
-    `forge_mvc_notifications.tables`, rendue par le dialecte.
-    """
-    from core.database.backend import get_backend
-    from core.database.table_ddl import render_create_table
-    from forge_mvc_notifications.tables import NOTIFICATIONS
-
-    return chr(10).join(render_create_table(NOTIFICATIONS, get_backend().dialect))
-
-def _params() -> dict[str, Any]:
-    return {
-        "host": os.environ.get("FORGE_TEST_DB_HOST", "127.0.0.1"),
-        "port": int(os.environ.get("FORGE_TEST_DB_PORT", "3306")),
-        "user": os.environ.get("FORGE_TEST_DB_USER", "root"),
-        "password": os.environ.get("FORGE_TEST_DB_PASSWORD", ""),
-    }
-
-
-class _ConnAdapter:
-    def __init__(self, conn: Any, database: str) -> None:
-        self._conn = conn
-        self._database = database
-
-    def execute(self, sql: str, params: Any = ()) -> int:
-        cur = self._conn.cursor()
-        cur.execute(f"USE `{self._database}`")
-        cur.execute(sql, tuple(params))
-        self._conn.commit()
-        rc = cur.rowcount
-        cur.close()
-        return rc
-
-    def insert(self, sql: str, params: Any = ()) -> int:
-        cur = self._conn.cursor()
-        cur.execute(f"USE `{self._database}`")
-        cur.execute(sql, tuple(params))
-        self._conn.commit()
-        rid = cur.lastrowid
-        cur.close()
-        return int(rid)
-
-    def fetch_one(self, sql: str, params: Any = ()) -> dict[str, Any] | None:
-        cur = self._conn.cursor(dictionary=True)
-        cur.execute(f"USE `{self._database}`")
-        cur.execute(sql, tuple(params))
-        row = cur.fetchone()
-        cur.close()
-        return row
-
-    def fetch_all(self, sql: str, params: Any = ()) -> list[dict[str, Any]]:
-        cur = self._conn.cursor(dictionary=True)
-        cur.execute(f"USE `{self._database}`")
-        cur.execute(sql, tuple(params))
-        rows = cur.fetchall()
-        cur.close()
-        return rows
+from forge_mvc_testing.real_db import tables_temporaires
 
 
 @pytest.fixture
-def notif_db() -> Any:
-    try:
-        import mariadb
-    except ImportError:  # pragma: no cover
-        pytest.skip("paquet python 'mariadb' non installé")
+def notif_db(real_backend_db: str) -> Iterator[None]:
+    """Table des notifications créée par sa DDL dialectale, sur le serveur du cas."""
+    from forge_mvc_notifications.tables import NOTIFICATIONS
 
-    params = _params()
-    db_name = f"forge_it_notif_{uuid.uuid4().hex[:10]}"
-    try:
-        admin = mariadb.connect(**params)
-    except Exception as error:  # noqa: BLE001
-        message = connection_failure_message(
-            "MariaDB", error, env_prefix="FORGE_TEST_DB"
-        )
-        if _REQUIRE_DB:
-            pytest.fail(message + " (FORGE_REQUIRE_DB=1)")
-        pytest.skip(message + " (test d'intégration sauté en local)")
-
-    cur = admin.cursor()
-    cur.execute(f"CREATE DATABASE `{db_name}`")
-    cur.execute(f"USE `{db_name}`")
-    cur.execute(_rendered_ddl())
-    admin.commit()
-    cur.close()
-    try:
-        yield _ConnAdapter(admin, db_name)
-    finally:
-        cur = admin.cursor()
-        cur.execute(f"DROP DATABASE IF EXISTS `{db_name}`")
-        admin.commit()
-        cur.close()
-        admin.close()
+    with tables_temporaires(NOTIFICATIONS):
+        yield
 
 
-def test_notify_then_read_most_recent_first(notif_db: _ConnAdapter) -> None:
-    notify("eleve.42", "Première", data={"k": 1}, db=notif_db)
-    notify("eleve.42", "Seconde", db=notif_db)
-    notify("autre", "x", db=notif_db)
-    entries = get_notifications("eleve.42", db=notif_db)
+@pytest.mark.usefixtures("notif_db")
+def test_notify_then_read_most_recent_first() -> None:
+    notify("eleve.42", "Première", data={"k": 1})
+    notify("eleve.42", "Seconde")
+    notify("autre", "x")
+    entries = get_notifications("eleve.42")
     assert [n.message for n in entries] == ["Seconde", "Première"]
     assert entries[1].data == {"k": 1}
 
 
-def test_unread_count_and_mark_read(notif_db: _ConnAdapter) -> None:
-    nid = notify("eleve.42", "m", db=notif_db)
-    notify("eleve.42", "m2", db=notif_db)
-    assert unread_count("eleve.42", db=notif_db) == 2
-    assert mark_read(nid, db=notif_db) is True
-    assert mark_read(nid, db=notif_db) is False  # déjà lue
-    assert unread_count("eleve.42", db=notif_db) == 1
+@pytest.mark.usefixtures("notif_db")
+def test_unread_count_and_mark_read() -> None:
+    nid = notify("eleve.42", "m")
+    notify("eleve.42", "m2")
+    assert unread_count("eleve.42") == 2
+    assert mark_read(nid) is True
+    assert mark_read(nid) is False  # déjà lue
+    assert unread_count("eleve.42") == 1
 
 
-def test_unread_only_filter(notif_db: _ConnAdapter) -> None:
-    a = notify("r", "lu", db=notif_db)
-    notify("r", "non lu", db=notif_db)
-    mark_read(a, db=notif_db)
-    msgs = [n.message for n in get_notifications("r", unread_only=True, db=notif_db)]
+@pytest.mark.usefixtures("notif_db")
+def test_unread_only_filter() -> None:
+    a = notify("r", "lu")
+    notify("r", "non lu")
+    mark_read(a)
+    msgs = [n.message for n in get_notifications("r", unread_only=True)]
     assert msgs == ["non lu"]
 
 
-def test_mark_all_read(notif_db: _ConnAdapter) -> None:
-    notify("r", "1", db=notif_db)
-    notify("r", "2", db=notif_db)
-    assert mark_all_read("r", db=notif_db) == 2
-    assert unread_count("r", db=notif_db) == 0
+@pytest.mark.usefixtures("notif_db")
+def test_mark_all_read() -> None:
+    notify("r", "1")
+    notify("r", "2")
+    assert mark_all_read("r") == 2
+    assert unread_count("r") == 0

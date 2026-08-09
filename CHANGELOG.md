@@ -29,6 +29,15 @@
 
 ### Corrigé (pré-mortem rc5)
 
+- **Six tests d'intégration de paquet passaient à côté de la couche qu'ils prétendaient éprouver (`TEST-PACKAGE-INTEGRATION-REAL-LAYER-001`).**
+  `audit`, `jobs`, `mfa`, `notifications`, `settings` et `stats` ouvraient chacun sa propre connexion MariaDB et l'enveloppaient dans un petit objet exposant `execute`, `fetch_one` et `fetch_all`.
+  Deux conséquences, aucune voulue. Ils ne tournaient que sur **MariaDB**, alors que l'ADR-084 donne les quatre backends au niveau plein. Et ils court-circuitaient `core.database.db`, donc la **qualification d'erreur** de Forge : une violation d'unicité y remontait sous sa forme pilote, jamais sous la forme portable `UniqueViolationError`.
+  C'est cet écart qui a caché les deux défauts du magasin anti-rejeu MFA, dont un interblocage InnoDB, pendant tout un cycle. Le pré-mortem les a trouvés seulement en mettant le magasin en course réelle, hors de ces tests.
+  Les six passent désormais par `real_backend_db`, donc par la couche réelle, et chacun s'exécute **trois fois**, une par serveur. La suite gagne 103 cas d'exécution sans qu'une seule assertion soit dupliquée.
+  Les helpers de `jobs` écrivaient eux-mêmes `NOW()` et `INTERVAL ? SECOND`, les constructions que le relevé de portabilité bannit : ils auraient fait échouer le fichier dès son premier passage sur un autre moteur. Le vieillissement d'une réservation lit maintenant l'heure **au serveur** et soustrait en Python, ce qui évite l'arithmétique dialectale et le piège de l'intervalle négatif, que SQLite rend en `NULL` sans rien signaler.
+  Deux lectures entrent au relevé au passage, `jobs.get_job` et la liste d'administration de `stats`, toutes deux fautives et toutes deux jamais exercées ici.
+  Le garde-fou a d'abord été écrit trop étroit, de deux façons : il jugeait la prose des docstrings comme du SQL, et il ne visait que les fichiers employant une fixture serveur, donc **aucun des six fichiers d'origine**. Corrigé sur les deux points, puis vérifié en le relançant sur les versions d'avant : six sur six.
+
 - **Les fixtures de serveur réel n'étaient visibles que d'un seul dossier (`TESTING-REAL-DB-FIXTURES-001`).**
   `real_db`, `real_pg_db` et `real_mssql_db` vivaient dans `tests/db/conftest.py`, donc n'existaient que pour ce dossier.
   Les tests des paquets opt-in sont sous `packages/*/tests/` : ils n'y avaient pas accès, et six d'entre eux avaient répondu en réécrivant chacun son propre adaptateur de connexion à la main.

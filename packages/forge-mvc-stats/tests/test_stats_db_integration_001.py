@@ -1,23 +1,30 @@
-"""Intégration MariaDB de forge-mvc-stats (STATS-RETENTION-001).
+"""Intégration de forge-mvc-stats sur les trois serveurs (STATS-RETENTION-001).
 
 Le paquet n'avait aucun test d'intégration : il rendait du SQL que personne
 n'exécutait jamais. Rendre un DDL et l'appliquer sont deux choses, et le second
 est le seul qui prouve quoi que ce soit à l'exploitant.
 
 Ce fichier applique réellement la migration déclarée par `tables.py`, écrit des
-événements, puis vérifie la purge par âge. Marqué `db` : sauté en local sans
-base, requis en CI.
+événements, puis vérifie la purge par âge et la liste d'administration.
+
+## Ce qui a changé (`TEST-PACKAGE-INTEGRATION-REAL-LAYER-001`)
+
+Ce fichier montait sa propre connexion MariaDB dans un adaptateur écrit à la
+main. Il ne tournait donc que sur MariaDB, et court-circuitait la vraie couche
+d'accès `core.database.db`, celle que l'application utilise en production.
+Les tests passent désormais par `real_backend_db` : chacun s'exécute trois
+fois, une par serveur, à travers la couche réelle.
+
+La liste d'administration entre dans le relevé au passage. Sa borne était écrite
+en `LIMIT ?` en dur, donc rejetée par SQL Server, et rien ici ne l'exerçait
+(`ADMIN-JOBS-LIMIT-PORTABLE-001`).
 """
 from __future__ import annotations
 
-import os
-import uuid
 from collections.abc import Iterator
 from typing import Any
 
 import pytest
-
-pytestmark = pytest.mark.db
 
 pytest.importorskip("forge_mvc_stats")
 
@@ -28,90 +35,19 @@ from forge_mvc_stats.retention import (
 )
 from forge_mvc_stats.tracking import track_event
 
-from forge_mvc_testing.db_probe import connection_failure_message
-
-_REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
-
-
-def _rendered_ddl() -> str:
-    """DDL de la table, rendu pour le backend actif (source unique, ADR-071)."""
-    from core.database.backend import get_backend
-    from core.database.table_ddl import render_create_table
-    from forge_mvc_stats.tables import STATS_EVENTS
-
-    return chr(10).join(render_create_table(STATS_EVENTS, get_backend().dialect))
-
-
-def _params() -> dict[str, Any]:
-    return {
-        "host": os.environ.get("FORGE_TEST_DB_HOST", "127.0.0.1"),
-        "port": int(os.environ.get("FORGE_TEST_DB_PORT", "3306")),
-        "user": os.environ.get("FORGE_TEST_DB_USER", "root"),
-        "password": os.environ.get("FORGE_TEST_DB_PASSWORD", ""),
-    }
-
-
-class _ConnAdapter:
-    def __init__(self, conn: Any, database: str) -> None:
-        self._conn = conn
-        self._database = database
-
-    def execute(self, sql: str, params: Any = ()) -> int:
-        cur = self._conn.cursor()
-        cur.execute(f"USE `{self._database}`")
-        cur.execute(sql, tuple(params))
-        self._conn.commit()
-        compte = cur.rowcount
-        cur.close()
-        return int(compte)
-
-    def fetch_one(self, sql: str, params: Any = ()) -> "dict[str, Any] | None":
-        cur = self._conn.cursor(dictionary=True)
-        cur.execute(f"USE `{self._database}`")
-        cur.execute(sql, tuple(params))
-        row = cur.fetchone()
-        cur.close()
-        return row
+from forge_mvc_testing.real_db import tables_temporaires
 
 
 @pytest.fixture
-def stats_db() -> Iterator[_ConnAdapter]:
-    try:
-        import mariadb
-    except ImportError:  # pragma: no cover
-        pytest.skip("paquet python 'mariadb' non installé")
+def stats_db(real_backend_db: str) -> Iterator[Any]:
+    """Table des événements créée par sa DDL dialectale, sur le serveur du cas."""
+    from forge_mvc_stats.tables import STATS_EVENTS
 
-    params = _params()
-    db_name = f"forge_it_stats_{uuid.uuid4().hex[:10]}"
-    try:
-        admin = mariadb.connect(**params)
-    except Exception as error:  # noqa: BLE001
-        message = connection_failure_message(
-            "MariaDB", error, env_prefix="FORGE_TEST_DB"
-        )
-        if _REQUIRE_DB:
-            pytest.fail(message + " (FORGE_REQUIRE_DB=1)")
-        pytest.skip(message + " (test d'intégration sauté en local)")
-
-    cur = admin.cursor()
-    cur.execute(f"CREATE DATABASE `{db_name}`")
-    cur.execute(f"USE `{db_name}`")
-    for instruction in _rendered_ddl().split(";"):
-        if instruction.strip():
-            cur.execute(instruction)
-    admin.commit()
-    cur.close()
-    try:
-        yield _ConnAdapter(admin, db_name)
-    finally:
-        cur = admin.cursor()
-        cur.execute(f"DROP DATABASE IF EXISTS `{db_name}`")
-        admin.commit()
-        cur.close()
-        admin.close()
+    with tables_temporaires(STATS_EVENTS) as db:
+        yield db
 
 
-def _inserer_date(db: _ConnAdapter, nom: str, created_at: str) -> None:
+def _inserer_date(db: Any, nom: str, created_at: str) -> None:
     db.execute(
         "INSERT INTO forge_stats_events (name, label, category, created_at) "
         "VALUES (?, ?, ?, ?)",
@@ -119,12 +55,12 @@ def _inserer_date(db: _ConnAdapter, nom: str, created_at: str) -> None:
     )
 
 
-def test_la_migration_declaree_s_applique_vraiment(stats_db: _ConnAdapter) -> None:
+def test_la_migration_declaree_s_applique_vraiment(stats_db: Any) -> None:
     """La fixture a appliqué le DDL : si elle a tenu, la table existe.
 
     C'est le test qui manquait le plus. Le paquet rendait un DDL que rien
     n'exécutait jamais, donc une erreur de rendu ne se serait vue qu'en
-    production.
+    production, et seulement sur le moteur concerné.
     """
     row = stats_db.fetch_one("SELECT COUNT(*) AS total FROM forge_stats_events", ())
 
@@ -132,7 +68,7 @@ def test_la_migration_declaree_s_applique_vraiment(stats_db: _ConnAdapter) -> No
     assert row["total"] == 0
 
 
-def test_un_evenement_suivi_atterrit_dans_la_table(stats_db: _ConnAdapter) -> None:
+def test_un_evenement_suivi_atterrit_dans_la_table(stats_db: Any) -> None:
     track_event(stats_db.execute, "page_vue", label="Page vue")
 
     row = stats_db.fetch_one("SELECT COUNT(*) AS total FROM forge_stats_events", ())
@@ -140,7 +76,25 @@ def test_un_evenement_suivi_atterrit_dans_la_table(stats_db: _ConnAdapter) -> No
     assert row["total"] == 1
 
 
-def test_la_purge_ne_retire_que_les_evenements_anterieurs(stats_db: _ConnAdapter) -> None:
+def test_la_liste_d_administration_traverse_le_moteur(stats_db: Any) -> None:
+    """La borne de la liste vient du dialecte : `LIMIT ?` en dur cassait SQL Server.
+
+    Le défaut a été trouvé en élargissant le relevé de portabilité DML, et non
+    ici : ce fichier n'exerçait pas la liste. Il l'exerce maintenant, sur les
+    trois serveurs.
+    """
+    from forge_mvc_stats.admin import list_stats_events
+
+    for index in range(4):
+        track_event(stats_db.execute, f"vue_{index}", label=f"Vue {index}")
+
+    lignes = list_stats_events(stats_db.fetch_all, limit=2)
+    assert len(lignes) == 2
+    assert lignes[0]["name"] == "vue_3"  # created_at DESC, id DESC
+    assert lignes[0]["metadata"] == {}
+
+
+def test_la_purge_ne_retire_que_les_evenements_anterieurs(stats_db: Any) -> None:
     """LE test du ticket : la borne discrimine, elle ne vide pas la table."""
     _inserer_date(stats_db, "vieux", "2020-01-01 00:00:00")
     _inserer_date(stats_db, "recent", "2026-08-01 00:00:00")
@@ -154,7 +108,7 @@ def test_la_purge_ne_retire_que_les_evenements_anterieurs(stats_db: _ConnAdapter
     assert restant["name"] == "recent"
 
 
-def test_le_comptage_ne_supprime_rien(stats_db: _ConnAdapter) -> None:
+def test_le_comptage_ne_supprime_rien(stats_db: Any) -> None:
     _inserer_date(stats_db, "vieux", "2020-01-01 00:00:00")
     borne = "2026-01-01 00:00:00"
 
@@ -162,11 +116,11 @@ def test_le_comptage_ne_supprime_rien(stats_db: _ConnAdapter) -> None:
     assert count_stats_events_before(stats_db.fetch_one, borne) == 1
 
 
-def test_la_borne_calculee_en_jours_s_applique_reellement(stats_db: _ConnAdapter) -> None:
+def test_la_borne_calculee_en_jours_s_applique_reellement(stats_db: Any) -> None:
     """Point de jonction entre le calcul Python et la colonne SQL.
 
     Un format d'horodatage divergent passerait les tests unitaires et
-    n'échouerait qu'ici.
+    n'échouerait qu'ici, et il peut diverger par moteur.
     """
     from datetime import datetime, timedelta, timezone
 

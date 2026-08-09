@@ -32,8 +32,9 @@ CI, `FORGE_REQUIRE_DB=1` (et ses variantes par backend) transforme le saut en
 """
 from __future__ import annotations
 
+import contextlib
 import os
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from typing import Any
 
 import pytest
@@ -213,6 +214,51 @@ def real_mssql_db(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     yield
 
     reset_backend()
+
+
+def _jeter(db: Any, noms: Sequence[str], backend_name: str) -> None:
+    """Supprime les tables, y compris avant création : une exécution tuée en laisse."""
+    for nom in noms:
+        if backend_name == "mssql":
+            # T-SQL n'a pas de `DROP TABLE IF EXISTS` avant SQL Server 2016, et
+            # la forme conditionnelle reste la seule portable sur les images en
+            # service dans la CI.
+            db.execute(f"IF OBJECT_ID('{nom}') IS NOT NULL DROP TABLE {nom}")
+        else:
+            db.execute(f"DROP TABLE IF EXISTS {nom}")
+
+
+@contextlib.contextmanager
+def tables_temporaires(*definitions: Any) -> Iterator[Any]:
+    """Crée les tables données par leur DDL dialectale, rend `core.database.db`, puis les jette.
+
+    Les `definitions` sont des `TableDefinition` du socle
+    `core.database.table_ddl` : la DDL est rendue par le dialecte du backend
+    actif, donc ce geste vaut pour les quatre backends sans une ligne de SQL
+    écrite à la main.
+
+    Le module rendu est **la vraie couche d'accès**. C'est le point de tout :
+    un test qui écrit son propre adaptateur de connexion court-circuite la
+    traduction des marqueurs de paramètre et la qualification d'erreur, et
+    reste vert sur du code qui ne l'est pas.
+
+    À utiliser derrière `real_db` ou `real_backend_db`, qui configurent le
+    backend. Sans backend configuré, l'appel échoue à la première requête.
+    """
+    from core.database import db
+    from core.database.backend import get_backend
+    from core.database.table_ddl import render_create_table
+
+    backend = get_backend()
+    noms = [definition.name for definition in definitions]
+    _jeter(db, noms, backend.name)
+    for definition in definitions:
+        for sql in render_create_table(definition, backend.dialect):
+            db.execute(sql)
+    try:
+        yield db
+    finally:
+        _jeter(db, noms, backend.name)
 
 
 @pytest.fixture(

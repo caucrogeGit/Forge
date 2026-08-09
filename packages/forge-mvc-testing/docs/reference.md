@@ -77,9 +77,9 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     | Catégorie | Exploitation et outillage (ADR-055), **dev-only** |
     | Couche | infrastructure de test partagée |
     | Dépend de | `forge-mvc`, `pytest` (en développement) |
-    | API publique | `FakeRequest` |
+    | API publique | `FakeRequest`, `tables_temporaires` |
     | Plugin pytest | point d'entrée `pytest11` (`forge_mvc_testing.plugin`) |
-    | Fixtures | `fake_request`, configuration du noyau, nettoyages autouse |
+    | Fixtures | `fake_request`, `real_backend_db` et les trois fixtures serveur, configuration du noyau, nettoyages autouse |
     | Portée | **jamais** une dépendance runtime (ADR-041) |
     | Installation | `pip install --pre forge-mvc-testing` (dev) |
 
@@ -238,6 +238,31 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
 
     En l'absence de serveur, le test est **sauté** en local avec le motif réel de l'échec.
     En CI, `FORGE_REQUIRE_DB=1` et ses variantes par backend transforment le saut en **échec** : la couche base n'est jamais verte par défaut.
+
+    ### Tables jetables (`tables_temporaires`)
+
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `tables_temporaires` | `tables_temporaires(*definitions) -> ContextManager` | crée les tables par leur DDL dialectale, rend `core.database.db`, puis les jette |
+
+    Les `definitions` sont des `TableDefinition` du socle `core.database.table_ddl`.
+    La DDL est rendue par le dialecte du backend actif, donc ce geste vaut pour les quatre backends sans une ligne de SQL écrite à la main.
+    Les tables sont aussi supprimées **avant** création, pour rattraper une exécution précédente tuée en cours de route.
+
+    ```python
+    from forge_mvc_testing.real_db import tables_temporaires
+
+
+    @pytest.fixture
+    def ma_table(real_backend_db):
+        from forge_mvc_settings.tables import APP_SETTINGS
+
+        with tables_temporaires(APP_SETTINGS) as db:
+            yield db
+    ```
+
+    Le module rendu est la vraie couche d'accès, et c'est le point de tout.
+    Un test qui écrit son propre objet `execute`/`fetch_one` par-dessus une connexion pilote court-circuite la traduction des marqueurs de paramètre et la qualification d'erreur, et reste vert sur du code qui ne l'est pas.
 
 ??? note "8. Contextes d'utilisation"
 

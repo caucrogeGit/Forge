@@ -1,123 +1,49 @@
-"""MFA-TOTP-REPLAY-SHARED-001 : le registre adossé à la base est bien partagé.
+"""Le registre anti-rejeu adossé à la base est partagé (MFA-TOTP-REPLAY-SHARED-001).
 
-Le test central ouvre **deux connexions distinctes** et pose un
-`DbTotpReplayStore` sur chacune, ce qui reproduit deux workers gunicorn. Un code
-accepté par le premier doit être refusé par le second. C'est la propriété que le
-registre en mémoire ne peut pas offrir, et le seul motif de ce ticket.
+Le test central pose **deux magasins distincts** sur la même base, ce qui
+reproduit deux workers gunicorn. Un code accepté par le premier doit être refusé
+par le second. C'est la propriété que le registre en mémoire ne peut pas offrir,
+et le seul motif de ce ticket.
 
-Marqué `db` : sauté en local sans base, requis en CI. Connexion auto-suffisante
-via `FORGE_TEST_DB_*`, sur le gabarit des autres tests d'intégration de paquet.
+## Ce qui a changé (`TEST-PACKAGE-INTEGRATION-REAL-LAYER-001`)
+
+Ce fichier ouvrait deux connexions MariaDB à la main et posait un adaptateur sur
+chacune. Il ne tournait donc que sur MariaDB, et surtout il court-circuitait la
+**qualification d'erreur** de Forge : une violation d'unicité y remontait sous
+sa forme pilote, jamais sous la forme portable `UniqueViolationError`. C'est
+exactement cet écart qui a caché deux défauts du magasin pendant tout un cycle,
+un interblocage InnoDB et un doublon non reconnu, tous deux trouvés seulement en
+mettant le magasin en course réelle.
+
+Les deux magasins passent maintenant par `core.database.db`. La preuve du
+partage en est renforcée, pas affaiblie : chaque opération emprunte une
+connexion au pool, donc deux appels successifs du même magasin peuvent déjà
+tomber sur deux connexions différentes.
+
+Le pendant sous concurrence est `tests/db/test_mfa_replay_concurrency_real_server_001.py`.
 """
 from __future__ import annotations
 
-import os
-import uuid
 from collections.abc import Iterator
-from typing import Any
 
 import pytest
-
-pytestmark = pytest.mark.db
 
 pytest.importorskip("forge_mvc_mfa")
 
 from forge_mvc_mfa.replay_store_db import DbTotpReplayStore
 
-from forge_mvc_testing.db_probe import connection_failure_message
-
-_REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
-
-
-def _rendered_ddl() -> str:
-    """DDL de la table, rendu pour le backend actif (source unique, ADR-071)."""
-    from core.database.backend import get_backend
-    from core.database.table_ddl import render_create_table
-    from forge_mvc_mfa.tables import TOTP_REPLAY
-
-    return chr(10).join(render_create_table(TOTP_REPLAY, get_backend().dialect))
-
-
-def _params() -> dict[str, Any]:
-    return {
-        "host": os.environ.get("FORGE_TEST_DB_HOST", "127.0.0.1"),
-        "port": int(os.environ.get("FORGE_TEST_DB_PORT", "3306")),
-        "user": os.environ.get("FORGE_TEST_DB_USER", "root"),
-        "password": os.environ.get("FORGE_TEST_DB_PASSWORD", ""),
-    }
-
-
-class _ConnAdapter:
-    """Surface minimale attendue par `DbTotpReplayStore` : `execute`, `fetch_one`."""
-
-    def __init__(self, conn: Any, database: str) -> None:
-        self._conn = conn
-        self._database = database
-
-    def execute(self, sql: str, params: Any = ()) -> int:
-        cur = self._conn.cursor()
-        cur.execute(f"USE `{self._database}`")
-        cur.execute(sql, tuple(params))
-        self._conn.commit()
-        compte = cur.rowcount
-        cur.close()
-        return int(compte)
-
-    def fetch_one(self, sql: str, params: Any = ()) -> "dict[str, Any] | None":
-        cur = self._conn.cursor(dictionary=True)
-        cur.execute(f"USE `{self._database}`")
-        cur.execute(sql, tuple(params))
-        row = cur.fetchone()
-        cur.close()
-        return row
+from forge_mvc_testing.real_db import tables_temporaires
 
 
 @pytest.fixture
-def deux_workers() -> Iterator[tuple[DbTotpReplayStore, DbTotpReplayStore]]:
-    """Deux magasins sur deux connexions distinctes, une seule base.
+def deux_workers(
+    real_backend_db: str,
+) -> Iterator[tuple[DbTotpReplayStore, DbTotpReplayStore]]:
+    """Deux magasins distincts sur la même base, sur le serveur du cas."""
+    from forge_mvc_mfa.tables import TOTP_REPLAY
 
-    Deux connexions et non une seule : partager la connexion prouverait
-    seulement que deux objets Python voient la même session, pas que deux
-    processus voient le même registre.
-    """
-    try:
-        import mariadb
-    except ImportError:  # pragma: no cover
-        pytest.skip("paquet python 'mariadb' non installé")
-
-    params = _params()
-    db_name = f"forge_it_mfa_replay_{uuid.uuid4().hex[:10]}"
-    try:
-        admin = mariadb.connect(**params)
-    except Exception as error:  # noqa: BLE001
-        message = connection_failure_message(
-            "MariaDB", error, env_prefix="FORGE_TEST_DB"
-        )
-        if _REQUIRE_DB:
-            pytest.fail(message + " (FORGE_REQUIRE_DB=1)")
-        pytest.skip(message + " (test d'intégration sauté en local)")
-
-    cur = admin.cursor()
-    cur.execute(f"CREATE DATABASE `{db_name}`")
-    cur.execute(f"USE `{db_name}`")
-    for instruction in _rendered_ddl().split(";"):
-        if instruction.strip():
-            cur.execute(instruction)
-    admin.commit()
-    cur.close()
-
-    second = mariadb.connect(**params)
-    try:
-        yield (
-            DbTotpReplayStore(db=_ConnAdapter(admin, db_name)),
-            DbTotpReplayStore(db=_ConnAdapter(second, db_name)),
-        )
-    finally:
-        second.close()
-        cur = admin.cursor()
-        cur.execute(f"DROP DATABASE IF EXISTS `{db_name}`")
-        admin.commit()
-        cur.close()
-        admin.close()
+    with tables_temporaires(TOTP_REPLAY):
+        yield (DbTotpReplayStore(), DbTotpReplayStore())
 
 
 def test_un_code_accepte_par_un_worker_est_refuse_par_l_autre(
@@ -191,7 +117,8 @@ def test_la_purge_retire_les_fenetres_anciennes(
     """La purge compare des numéros de fenêtre, jamais des dates.
 
     Aucune arithmétique de date n'entre dans le SQL, ce qui la rend portable
-    sans effort sur les quatre backends.
+    sans effort sur les quatre backends. Ce fichier le vérifie maintenant sur
+    trois d'entre eux, au lieu de l'affirmer depuis un seul.
     """
     worker_1, _ = deux_workers
     from forge_mvc_mfa.totp_replay import step_for_time

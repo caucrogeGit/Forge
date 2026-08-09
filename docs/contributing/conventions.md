@@ -171,6 +171,35 @@ Marqueurs canoniques (déclarés dans `pytest.ini`, `--strict-markers` actif, do
 - `db_mssql` : test d'intégration nécessitant un vrai SQL Server ; se combine à `db` (forme liste), requis en CI via `FORGE_REQUIRE_DB_MSSQL=1` (ADR-084) ;
 - `docs` : test de prose pure, ne casse que par édition de la documentation du dépôt (`TESTS-DOCS-MARKER-001`).
 
+#### Écrire un test d'intégration base
+
+Un test d'intégration passe par la **vraie couche d'accès**, `core.database.db`, celle que l'application utilise en production.
+Il ne monte jamais sa propre connexion pilote, et n'écrit jamais son propre objet exposant `execute` et `fetch_one`.
+Un tel adaptateur ne traduit pas les marqueurs de paramètre et ne qualifie pas les erreurs : il rend le test vert sur du code que la vraie couche ferait échouer, ce qui est pire qu'un test absent.
+Six tests de paquet en étaient là, et c'est ce qui a caché deux défauts du magasin anti-rejeu MFA pendant tout un cycle (`TEST-PACKAGE-INTEGRATION-REAL-LAYER-001`).
+
+Les fixtures sont fournies par `forge-mvc-testing` et disponibles partout, y compris sous `packages/*/tests/`.
+
+```python
+from forge_mvc_testing.real_db import tables_temporaires
+
+
+@pytest.fixture
+def ma_table(real_backend_db):
+    from forge_mvc_settings.tables import APP_SETTINGS
+
+    with tables_temporaires(APP_SETTINGS) as db:
+        yield db
+```
+
+`real_backend_db` est paramétrée sur MariaDB, PostgreSQL et SQL Server, et chaque paramètre porte ses marqueurs.
+Le test est donc écrit **une seule fois** et exécuté sur les trois serveurs, chaque job de CI sélectionnant le sien.
+`tables_temporaires` crée les tables par leur DDL dialectale, puis les jette, y compris avant création pour rattraper une exécution tuée.
+
+Pour viser un seul moteur, demander `real_db`, `real_pg_db` ou `real_mssql_db` directement.
+Attention : ces trois-là n'apportent **aucun** marqueur, le fichier déclare donc son `pytestmark = pytest.mark.db`.
+Sans ce marqueur, le test est collecté dans le job qui n'a aucun serveur, où la fixture le saute en silence, et où il compte comme vert sans rien avoir vérifié.
+
 Règle : tout test appartient à exactement une couche.
 Un nouveau test de contrat doc va sous `tests/meta/` (avec `pytestmark = pytest.mark.meta`) ; un test d'intégration base porte `@pytest.mark.db` ; le reste est unitaire dans `tests/` à plat.
 Le marqueur `docs` se combine à `meta` (forme liste : `pytestmark = [pytest.mark.meta, pytest.mark.docs]`) ; il est réservé à la prose pure, jamais à un test qui peut casser par édition de code.
