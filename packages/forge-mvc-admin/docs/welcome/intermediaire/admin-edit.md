@@ -15,7 +15,7 @@ Comme la création, il est protégé par un jeton CSRF.
 À la soumission (`POST /admin/articles/<id>/edit`), la ligne est mise à jour :
 
 ```sql
-UPDATE articles SET title = ?, body = ? WHERE id = ? LIMIT 1
+UPDATE articles SET title = ?, body = ? WHERE id = ?
 ```
 
 Mêmes garanties que la création : seules les colonnes de `form_fields` sont écrites, les valeurs passent par des paramètres, et la clé primaire cible la bonne ligne.

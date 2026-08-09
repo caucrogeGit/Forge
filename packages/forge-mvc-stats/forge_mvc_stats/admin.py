@@ -33,7 +33,17 @@ def get_stats_events_admin_sql(
     category: str | None = None,
     limit: int = _DEFAULT_LIMIT,
 ) -> str:
-    """Return the SELECT SQL for listing stats events with optional filters."""
+    """Return the SELECT SQL for listing stats events with optional filters.
+
+    La borne appartient au **dialecte** : T-SQL ne connaît pas `LIMIT` et
+    exige `OFFSET ... FETCH NEXT`. Écrite en dur, elle rendait cette lecture
+    inutilisable sur SQL Server, défaut trouvé en élargissant le relevé de
+    portabilité DML aux paquets qu'il ne couvrait pas
+    (`OPTIN-DML-PORTABILITY-WIDEN-001`). `forge-mvc-audit` employait déjà
+    `limit_clause()` au même endroit.
+    """
+    from core.database.backend import get_backend
+
     parts = [
         f"SELECT id, name, label, category, metadata, created_at"
         f" FROM {STATS_EVENTS_TABLE}"
@@ -44,7 +54,7 @@ def get_stats_events_admin_sql(
     if category is not None:
         parts.append(" AND category = ?")
     parts.append(" ORDER BY created_at DESC, id DESC")
-    parts.append(" LIMIT ?")
+    parts.append(get_backend().dialect.limit_clause())
     return "".join(parts)
 
 

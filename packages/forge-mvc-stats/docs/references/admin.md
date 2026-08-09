@@ -32,7 +32,7 @@ Chaque entrée est un `dict` normalisé (`id`, `name`, `label`, `category`, `met
 
 | Fonction | Comportement |
 |---|---|
-| `get_stats_events_admin_sql(name, category, limit)` | le `SELECT ... FROM forge_stats_events WHERE 1 = 1 [AND name = ?] [AND category = ?] ORDER BY created_at DESC, id DESC LIMIT ?` |
+| `get_stats_events_admin_sql(name, category, limit)` | le `SELECT ... FROM forge_stats_events WHERE 1 = 1 [AND name = ?] [AND category = ?] ORDER BY created_at DESC, id DESC` suivi de la clause de borne du backend actif, `LIMIT ?` sur MariaDB, SQLite et PostgreSQL, `OFFSET 0 ROWS FETCH NEXT ? ROWS ONLY` sur SQL Server |
 | `prepare_stats_events_admin_params(name, category, limit)` | valide et retourne le tuple de paramètres ; `name` normalisé, `limit` borné à 500 |
 | `normalize_stats_event_row(row)` | désérialise `metadata`, `None`/`""` vers `{}` ; lève `StatsAdminError` si colonne manquante ou JSON invalide |
 | `list_stats_events(fetch_all, name, category, limit)` | orchestre la requête et retourne une liste de dicts normalisés |

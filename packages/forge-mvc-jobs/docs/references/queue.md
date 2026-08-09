@@ -9,7 +9,9 @@ Le fichier de code correspondant est `forge_mvc_jobs/queue.py`.
 La file est une table `jobs`.
 On enfile une tâche depuis le code web, un process worker séparé la traite.
 Pas de broker, pas de runtime async : le serveur reste synchrone (WSGI).
-La réservation d'une tâche est atomique (`UPDATE ... ORDER BY id LIMIT 1` avec un jeton de réservation), donc plusieurs workers peuvent tourner en parallèle.
+La réservation d'une tâche est atomique : le worker choisit une candidate, puis la réserve sous garde `status='pending'`.
+Deux workers qui visent la même ligne ne peuvent pas gagner tous les deux, le second voyant zéro ligne affectée.
+Plusieurs workers peuvent donc tourner en parallèle.
 
 ## 2. Enfiler (`enqueue`)
 

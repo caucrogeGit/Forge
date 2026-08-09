@@ -82,11 +82,16 @@ def detail_columns(resource: AdminResource) -> tuple[str, ...]:
 
 
 def build_get_sql(resource: AdminResource) -> str:
-    """`SELECT <colonnes> FROM <table> WHERE <pk> = ? LIMIT 1`."""
+    """`SELECT <colonnes> FROM <table> WHERE <pk> = ?`.
+
+    Sans `LIMIT 1` : la clause porte sur la **clé primaire**, donc au plus une
+    ligne peut correspondre. Le `LIMIT` n'apportait rien et coûtait la
+    portabilité, T-SQL ne le connaissant pas (`ADMIN-JOBS-LIMIT-PORTABLE-001`).
+    """
     columns = ", ".join(_ident(col) for col in detail_columns(resource))
     table = _ident(resource.table)
     pk = _ident(resource.pk)
-    return f"SELECT {columns} FROM {table} WHERE {pk} = ? LIMIT 1"
+    return f"SELECT {columns} FROM {table} WHERE {pk} = ?"
 
 
 def get_row(
@@ -118,11 +123,20 @@ def insert_row(
 
 
 def build_update_sql(resource: AdminResource) -> str:
-    """`UPDATE <table> SET <form_fields = ?> WHERE <pk> = ? LIMIT 1`."""
+    """`UPDATE <table> SET <form_fields = ?> WHERE <pk> = ?`.
+
+    Sans `LIMIT 1`, et c'est ici plus qu'une simplification : `UPDATE ... LIMIT`
+    est une **extension MySQL et MariaDB** que PostgreSQL et SQL Server refusent
+    tous les deux. Le back-office ne savait donc pas modifier un enregistrement
+    sur la moitié des backends, alors que l'ADR-084 les donne au niveau plein
+    (`ADMIN-JOBS-LIMIT-PORTABLE-001`).
+
+    La clause portant sur la clé primaire, au plus une ligne est touchée.
+    """
     assignments = ", ".join(f"{_ident(col)} = ?" for col in resource.form_fields)
     table = _ident(resource.table)
     pk = _ident(resource.pk)
-    return f"UPDATE {table} SET {assignments} WHERE {pk} = ? LIMIT 1"
+    return f"UPDATE {table} SET {assignments} WHERE {pk} = ?"
 
 
 def update_row(
@@ -140,10 +154,15 @@ def update_row(
 
 
 def build_delete_sql(resource: AdminResource) -> str:
-    """`DELETE FROM <table> WHERE <pk> = ? LIMIT 1`."""
+    """`DELETE FROM <table> WHERE <pk> = ?`.
+
+    Sans `LIMIT 1`, pour la même raison que l'`UPDATE` : `DELETE ... LIMIT` est
+    une extension MySQL et MariaDB, refusée par PostgreSQL et SQL Server.
+    La clause portant sur la clé primaire, au plus une ligne est supprimée.
+    """
     table = _ident(resource.table)
     pk = _ident(resource.pk)
-    return f"DELETE FROM {table} WHERE {pk} = ? LIMIT 1"
+    return f"DELETE FROM {table} WHERE {pk} = ?"
 
 
 def delete_row(

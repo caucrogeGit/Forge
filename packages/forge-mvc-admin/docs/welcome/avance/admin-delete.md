@@ -18,7 +18,7 @@ C'est la garantie « suppression contrôlée ».
 La requête exécutée est ciblée :
 
 ```sql
-DELETE FROM articles WHERE id = ? LIMIT 1
+DELETE FROM articles WHERE id = ?
 ```
 
 En cas de succès, le back-office redirige vers la liste avec un message de confirmation.

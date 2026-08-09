@@ -23,6 +23,7 @@ SELECT title, published_at FROM articles ORDER BY title ASC LIMIT ? OFFSET ?
 
 Seules les colonnes déclarées entrent dans la requête.
 Les bornes de pagination passent par des paramètres.
+La clause finale est celle du backend actif : l'exemple ci-dessus est son rendu sur MariaDB, SQLite et PostgreSQL, tandis que SQL Server écrit `OFFSET ? ROWS FETCH NEXT ? ROWS ONLY` et annonce le décalage en premier.
 Il n'y a pas d'ORM ni d'introspection : le SQL reste lisible et prévisible.
 
 ## Choisir le tri

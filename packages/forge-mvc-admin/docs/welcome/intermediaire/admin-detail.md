@@ -13,7 +13,7 @@ La fiche affiche les champs de la ligne : la clé primaire, puis les champs de `
 La fiche lit une seule ligne par sa clé primaire :
 
 ```sql
-SELECT id, title, published_at, body FROM articles WHERE id = ? LIMIT 1
+SELECT id, title, published_at, body FROM articles WHERE id = ?
 ```
 
 La valeur de la clé passe par un paramètre.

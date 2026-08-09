@@ -92,10 +92,11 @@ def test_detail_columns_unique_pk_puis_list_puis_form():
 
 
 def test_build_get_sql():
+    """Sans `LIMIT 1` : la clause porte sur la clé primaire (ADMIN-JOBS-LIMIT-PORTABLE-001)."""
     sql = build_get_sql(_resource())
     assert sql == (
         "SELECT id, title, published_at, body FROM articles "
-        "WHERE id = ? LIMIT 1"
+        "WHERE id = ?"
     )
 
 
@@ -138,8 +139,9 @@ def test_insert_row_passe_les_valeurs_et_retourne_lastrowid():
 
 
 def test_build_update_sql():
+    """`UPDATE ... LIMIT` est une extension MySQL, refusée par PostgreSQL et T-SQL."""
     sql = build_update_sql(_resource())
-    assert sql == "UPDATE articles SET title = ?, body = ? WHERE id = ? LIMIT 1"
+    assert sql == "UPDATE articles SET title = ?, body = ? WHERE id = ?"
 
 
 def test_update_row_valeurs_puis_cle():
@@ -156,7 +158,8 @@ def test_update_row_valeurs_puis_cle():
 
 
 def test_build_delete_sql():
-    assert build_delete_sql(_resource()) == "DELETE FROM articles WHERE id = ? LIMIT 1"
+    """`DELETE ... LIMIT` est une extension MySQL, refusée par PostgreSQL et T-SQL."""
+    assert build_delete_sql(_resource()) == "DELETE FROM articles WHERE id = ?"
 
 
 def test_delete_row_passe_la_cle():

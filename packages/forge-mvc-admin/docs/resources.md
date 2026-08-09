@@ -64,7 +64,7 @@ En cas de succès, redirection vers la fiche créée.
 L'édition (`GET`/`POST /admin/<slug>/<id>/edit`) pré-remplit le formulaire depuis la ligne existante puis fait un `UPDATE … WHERE <pk> = ?` (mêmes garanties que la création : colonnes en liste blanche, valeurs paramétrées, CSRF).
 La fiche détail propose un lien « Modifier ».
 
-La suppression est **contrôlée** : `GET /admin/<slug>/<id>/delete` affiche une page de confirmation (lecture seule), et seule la soumission `POST /admin/<slug>/<id>/delete` exécute `DELETE … WHERE <pk> = ? LIMIT 1` (jamais en GET, CSRF vérifié), puis redirige vers la liste.
+La suppression est **contrôlée** : `GET /admin/<slug>/<id>/delete` affiche une page de confirmation (lecture seule), et seule la soumission `POST /admin/<slug>/<id>/delete` exécute `DELETE … WHERE <pk> = ?` (jamais en GET, CSRF vérifié), puis redirige vers la liste.
 La fiche détail propose un lien « Supprimer »
 vers la page de confirmation.
 

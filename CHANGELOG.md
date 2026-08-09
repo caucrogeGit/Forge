@@ -29,6 +29,20 @@
 
 ### Corrigé (pré-mortem rc5)
 
+- **Le back-office ne savait ni modifier ni supprimer un enregistrement sur PostgreSQL et SQL Server (`ADMIN-JOBS-LIMIT-PORTABLE-001`).**
+  Quatre `LIMIT` écrits en dur, trois dans `forge-mvc-admin` et un dans `forge-mvc-jobs`.
+  `UPDATE ... LIMIT` et `DELETE ... LIMIT` sont des **extensions MySQL et MariaDB** que PostgreSQL et SQL Server refusent tous les deux : les deux actions les plus visibles d'un back-office étaient donc inutilisables sur la moitié des backends, alors que l'ADR-084 les donne au niveau plein.
+  `jobs.get_job` portait le même défaut sur un `SELECT`, ce qui le cassait sur SQL Server.
+  Un cinquième cas est apparu en élargissant le relevé : `forge-mvc-stats` engendrait un `LIMIT ?` en dur pour sa liste, là où `forge-mvc-audit` employait déjà `limit_clause()` au même endroit.
+  Le correctif est un **retrait**, pas un rendu dialectal : les quatre clauses portent sur une clé primaire, donc au plus une ligne, et le `LIMIT` n'apportait rien. Seul celui de `stats` passe par le dialecte, sa borne étant réelle.
+  Trois tests d'`admin` figeaient le SQL fautif, donc verrouillaient le bug ; ils affirment désormais la forme portable et disent pourquoi.
+  Vérifié pour de vrai sur MariaDB, PostgreSQL et SQL Server : les quatre opérations passent partout.
+  Ces défauts existaient à l'identique dans la rc4, aucun n'est introduit par ce cycle.
+
+  **Huit emplacements de documentation affichaient le SQL fautif**, dont trois pages du parcours welcome d'`admin` qui donnaient à lire, mot pour mot, une requête que PostgreSQL et SQL Server rejettent.
+  Deux autres décrivaient la réservation de `jobs` comme un `UPDATE ... ORDER BY id LIMIT 1`, forme abandonnée au cycle précédent, et le README d'`admin` annonçait encore « pas de reprise automatique » comme limite V1, alors que `reclaim_stale()` la lève depuis ce cycle.
+  Deux pages enfin présentaient la borne de pagination comme fixe : elles disent maintenant qu'elle vient du backend actif, et le rendu annoncé pour chacun des quatre a été lu sur les dialectes réels, non supposé.
+  C'est la sixième fois de ce cycle qu'une documentation affirme un comportement que le code n'a pas ou n'a plus.
 - **L'anti-rejeu TOTP partagé s'effondrait sous concurrence, exactement le cas qu'il vise (`PREMORTEM-RC5-003`).**
   `MFA-TOTP-REPLAY-SHARED-001` promettait que deux requêtes concurrentes portant le même code ne pouvaient pas être acceptées toutes les deux.
   Ses tests vérifiaient la propriété **en séquence**, et par un adaptateur de connexion écrit à la main. Mis en concurrence réelle par le pré-mortem, le magasin a révélé deux défauts que cette approche ne pouvait pas voir.

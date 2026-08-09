@@ -11,9 +11,9 @@ Le modèle est volontairement simple et fidèle à Forge :
   en appelant un gestionnaire que l'application a explicitement enregistré.
 
 Aucune dépendance lourde (pas de Celery ni de Redis), aucune boucle async : le
-serveur web reste synchrone (WSGI). La réservation d'une tâche est atomique via
-un `UPDATE ... ORDER BY id LIMIT 1` avec jeton de réservation, donc plusieurs
-workers peuvent tourner sans se marcher dessus.
+serveur web reste synchrone (WSGI). La réservation d'une tâche est atomique : on
+choisit une candidate, puis on la réserve sous garde `status='pending'`, donc
+plusieurs workers peuvent tourner sans se marcher dessus.
 
 ## Reprise après plantage d'un worker
 
@@ -199,8 +199,13 @@ RECLAIM_FAILURE_MESSAGE = (
     "tentatives épuisées (le worker n'a jamais rendu de verdict)"
 )
 _PENDING_COUNT_SQL = f"SELECT COUNT(*) AS n FROM {TABLE_NAME} WHERE queue=? AND status='pending'"
+#: Lecture d'une tâche par son identifiant.
+#: Sans `LIMIT 1` : la clause porte sur la **clé primaire**, donc au plus une
+#: ligne correspond. Le `LIMIT` n'apportait rien et rendait `get_job()`
+#: inutilisable sur SQL Server, qui ne le connaît pas
+#: (`ADMIN-JOBS-LIMIT-PORTABLE-001`).
 _SELECT_JOB_SQL = (
-    f"SELECT id, queue, task, status, attempts, max_attempts, last_error FROM {TABLE_NAME} WHERE id=? LIMIT 1"
+    f"SELECT id, queue, task, status, attempts, max_attempts, last_error FROM {TABLE_NAME} WHERE id=?"
 )
 
 

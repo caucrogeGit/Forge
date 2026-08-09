@@ -53,10 +53,10 @@ planifiée) ; `run_worker(handlers)` boucle. `enqueue` accepte `queue`,
 
 ## Périmètre
 
-- File MariaDB, réservation atomique (`UPDATE ... ORDER BY id LIMIT 1` + jeton).
+- File en base, réservation atomique (candidate choisie, puis réservée sous garde `status='pending'`).
 - Worker explicite lancé par l'application, jamais par la requête.
-- Limite V1 : pas de reprise automatique d'une tâche restée `running` après un
-  crash worker.
+- Reprise après plantage d'un worker : `reclaim_stale()` et `forge jobs:reclaim`
+  rendent à la file les tâches `running` dont le bail a expiré.
 - Hors périmètre : ordonnancement cron, priorités fines, broker distribué.
 
 Documentation complète : <https://forgemvc.com/docs/forge/>.
