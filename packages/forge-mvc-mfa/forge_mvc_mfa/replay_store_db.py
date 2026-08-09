@@ -19,13 +19,19 @@ table au nombre de facteurs actifs plutôt qu'au nombre d'authentifications.
 
 ## Comment l'atomicité est obtenue, sans transaction
 
-`check_and_record` tente d'abord l'`INSERT`. S'il échoue sur un doublon de clé
-primaire, la ligne existe, et un `UPDATE` gardé par `last_step < ?` tranche :
-`rowcount` à 1 vaut acceptation, 0 vaut rejeu. Deux ouvriers qui présentent la
-même fenêtre ne peuvent pas gagner tous les deux, le second voyant sa garde
-fausse. Le doublon est reconnu par `is_unique_violation()`, porté par le contrat
-`DatabaseBackend` : aucun code d'erreur n'est portable, et le SQLSTATE 23000 ne
-discrimine ni sur MariaDB ni sur SQL Server (`UNIQUE-VIOLATION-PORTABLE-001`).
+`check_and_record` tente d'abord l'`UPDATE`, gardé par `last_step < ?` :
+`rowcount` à 1 vaut acceptation. À zéro ligne touchée, soit le facteur est
+inconnu, soit la fenêtre est déjà consommée, et l'`INSERT` tranche, son échec en
+doublon valant rejeu. Deux ouvriers qui présentent la même fenêtre ne peuvent
+pas gagner tous les deux.
+
+Cet ordre n'est pas indifférent, et le pré-mortem de la rc5 l'a montré
+(`PREMORTEM-RC5-003`). L'ordre inverse, `INSERT` puis `UPDATE`, provoquait un
+interblocage InnoDB sous concurrence : un `INSERT` qui échoue prend un verrou
+partagé sur la ligne, et l'`UPDATE` suivant en réclame un exclusif. Les deux
+défauts trouvés alors sont couverts par
+`tests/db/test_mfa_replay_concurrency_real_server_001.py`, qui passe par la
+vraie couche de données et non par un adaptateur.
 """
 from __future__ import annotations
 
@@ -54,9 +60,29 @@ def _db_module() -> Any:
 
 
 def _is_duplicate(error: Exception) -> bool:
+    """Cette erreur est-elle un doublon de clé ?
+
+    Deux formes possibles, et confondre les deux coûte cher.
+
+    `core.database.db` **qualifie déjà** ses erreurs et lève
+    :class:`UniqueViolationError`, forme portable du doublon. C'est le cas en
+    production, et c'est celui à tester en premier.
+
+    `is_unique_violation()`, elle, interroge le backend sur une erreur **de
+    pilote**. Appliquée à l'exception déjà qualifiée, elle rend `False`, le
+    wrapper n'étant plus un objet du pilote. Ce module ne testait que celle-là,
+    si bien que chaque rejeu remontait une erreur au lieu d'un refus propre :
+    défaut trouvé en mettant le magasin en concurrence réelle
+    (`PREMORTEM-RC5-003`). Le CRUD engendré et `forge-mvc-settings` attrapaient
+    déjà `UniqueViolationError`, ce module était le seul à s'en écarter.
+
+    Le second test reste utile pour un exécuteur injecté qui laisserait passer
+    l'erreur brute du pilote, ce que font les adaptateurs de test.
+    """
+    from core.database.errors import UniqueViolationError  # noqa: PLC0415
     from core.database.qualify import is_unique_violation  # noqa: PLC0415
 
-    return is_unique_violation(error)
+    return isinstance(error, UniqueViolationError) or is_unique_violation(error)
 
 
 class DbTotpReplayStore:
@@ -111,16 +137,36 @@ class DbTotpReplayStore:
     def _claim(self, factor_id: int, step: int) -> bool:
         """Consomme la fenêtre. Vrai si elle était neuve, faux si rejeu.
 
-        La première authentification d'un facteur pose la ligne ; les suivantes
-        avancent `last_step` sous garde. Les deux chemins sont atomiques du
-        point de vue du serveur, aucun n'ouvre de transaction applicative.
+        L'`UPDATE` passe **en premier**, et l'`INSERT` ne sert que de repli
+        quand aucune ligne n'existe encore. L'ordre inverse paraît plus naturel,
+        il est pourtant faux sous concurrence, et c'est un pré-mortem qui l'a
+        montré : douze requêtes simultanées sur le même facteur provoquaient un
+        `Deadlock found when trying to get lock` et remontaient une erreur au
+        client (`PREMORTEM-RC5-003`).
+
+        La raison tient à InnoDB. Un `INSERT` qui échoue sur doublon prend un
+        verrou **partagé** sur la ligne existante ; l'`UPDATE` qui suivait
+        réclamait alors un verrou **exclusif** sur cette même ligne. N requêtes
+        détenant chacune le partagé et voulant l'exclusif se bloquent
+        mutuellement, et le moteur en tue une partie.
+
+        Dans l'ordre retenu, l'`UPDATE` prend directement le verrou exclusif et
+        l'`INSERT` est terminal, donc aucune montée en puissance de verrou ne
+        peut se croiser. C'est aussi le plus rapide : passé la première
+        authentification d'un facteur, la ligne existe toujours, donc le premier
+        ordre suffit.
         """
         database = self._database()
+        if int(database.execute(_ADVANCE_SQL, (step, factor_id, step))) == 1:
+            return True
+
+        # Zéro ligne touchée : soit le facteur est inconnu, soit la fenêtre est
+        # déjà consommée. L'`INSERT` tranche, son échec en doublon signifiant
+        # qu'une autre requête a posé la ligne entre-temps, donc rejeu.
         try:
             database.execute(_INSERT_SQL, (factor_id, step))
         except Exception as error:  # noqa: BLE001 — seul le doublon est rattrapé
             if not _is_duplicate(error):
                 raise
-        else:
-            return True
-        return int(database.execute(_ADVANCE_SQL, (step, factor_id, step))) == 1
+            return False
+        return True

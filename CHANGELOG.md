@@ -27,6 +27,17 @@
   Le banc de mesure est versé dans `tools/bench_router.py`, afin que ces chiffres soient contredisables en une commande plutôt que crus sur parole.
   Réserve à garder en tête : tout ceci reste sous la milliseconde, et à cent routes, taille d'une application Forge courante, le gain va de 10,2 à 5,8 µs, soit un dixième d'un aller-retour SQL.
 
+### Corrigé (pré-mortem rc5)
+
+- **L'anti-rejeu TOTP partagé s'effondrait sous concurrence, exactement le cas qu'il vise (`PREMORTEM-RC5-003`).**
+  `MFA-TOTP-REPLAY-SHARED-001` promettait que deux requêtes concurrentes portant le même code ne pouvaient pas être acceptées toutes les deux.
+  Ses tests vérifiaient la propriété **en séquence**, et par un adaptateur de connexion écrit à la main. Mis en concurrence réelle par le pré-mortem, le magasin a révélé deux défauts que cette approche ne pouvait pas voir.
+  **Un interblocage InnoDB.** L'ordre d'origine tentait l'`INSERT` puis, sur doublon, l'`UPDATE`. Or un `INSERT` qui échoue prend un verrou partagé sur la ligne, et l'`UPDATE` suivant en réclame un exclusif : sur douze requêtes simultanées, **dix mouraient** sur un `Deadlock found when trying to get lock`. L'ordre est inversé, l'`UPDATE` d'abord et l'`INSERT` en repli terminal, ce qui est aussi le plus rapide passé la première authentification.
+  **Un doublon non reconnu.** `core.database.db` qualifie déjà ses erreurs et lève `UniqueViolationError` ; le module ne testait que `is_unique_violation()`, qui interroge le backend sur une erreur **de pilote** et rend donc `False` face à la forme portable. Chaque rejeu remontait une erreur au client au lieu d'un refus propre. Le CRUD engendré et `forge-mvc-settings` attrapaient déjà `UniqueViolationError` : ce module était le seul du dépôt à s'en écarter.
+  La propriété de sécurité n'avait jamais cédé, une seule acceptation dans tous les cas, mais **par accident** : les requêtes tuées n'avaient pas l'occasion d'accepter.
+  Le test de non-régression passe par **`core.database.db`**, la couche de production, et non par un adaptateur. Vérifié : il échoue sur le code d'avant, il passe sur le code corrigé.
+  Mesuré après correctif, jusqu'à vingt requêtes simultanées, sur facteur neuf comme sur ligne préexistante : exactement une acceptation, aucune erreur.
+
 ### Retiré
 
 - **L'enveloppe `api_success` et `api_error` (`CORE-API-ENVELOPE-REMOVE-001`, ADR-088).**
