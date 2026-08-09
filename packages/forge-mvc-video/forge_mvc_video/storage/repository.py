@@ -40,32 +40,56 @@ VALID_STATUSES = frozenset({
     STATUS_UPLOADED, STATUS_PROCESSING, STATUS_READY, STATUS_FAILED,
 })
 
+# Marqueur de paramètre : `?`, le format de Forge (`VIDEO-DML-PORTABLE-001`).
+#
+# Ce fichier écrivait `%s`, le format natif du connecteur MariaDB. Le cœur
+# traduit `?` vers le format de chaque pilote, et **double tout `%` littéral**
+# au passage : sur PostgreSQL, un `%s` déjà écrit devenait donc `%%s`, un texte
+# et non un marqueur. Le dépôt vidéo était par là inutilisable sur PostgreSQL
+# comme sur SQL Server, tous deux au niveau plein depuis l'ADR-084, avec
+# l'erreur « 0 marqueurs pour 8 paramètres ».
 _INSERT_SQL = (
     "INSERT INTO videos "
     "(uuid, title, original_path, size_bytes, mime_type, status, "
     "created_at, updated_at) "
-    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 )
-_SELECT_BY_UUID_SQL = "SELECT * FROM videos WHERE uuid = %s"
-_SELECT_BY_ID_SQL = "SELECT * FROM videos WHERE id = %s"
+_SELECT_BY_UUID_SQL = "SELECT * FROM videos WHERE uuid = ?"
+_SELECT_BY_ID_SQL = "SELECT * FROM videos WHERE id = ?"
 _UPDATE_STATUS_SQL = (
-    "UPDATE videos SET status = %s, error_message = %s, updated_at = %s "
-    "WHERE id = %s"
+    "UPDATE videos SET status = ?, error_message = ?, updated_at = ? "
+    "WHERE id = ?"
 )
 _UPDATE_METADATA_SQL = (
-    "UPDATE videos SET duration_seconds = %s, width = %s, height = %s, "
-    "updated_at = %s WHERE id = %s"
+    "UPDATE videos SET duration_seconds = ?, width = ?, height = ?, "
+    "updated_at = ? WHERE id = ?"
 )
 _MARK_READY_SQL = (
-    "UPDATE videos SET status = %s, mp4_path = %s, poster_path = %s, "
-    "error_message = NULL, updated_at = %s WHERE id = %s"
+    "UPDATE videos SET status = ?, mp4_path = ?, poster_path = ?, "
+    "error_message = NULL, updated_at = ? WHERE id = ?"
 )
-_SELECT_RECENT_SQL = "SELECT * FROM videos ORDER BY id DESC LIMIT %s"
-_SELECT_BY_STATUS_SQL = (
-    "SELECT * FROM videos WHERE status = %s ORDER BY id ASC LIMIT %s"
-)
-_DELETE_SQL = "DELETE FROM videos WHERE id = %s"
+_DELETE_SQL = "DELETE FROM videos WHERE id = ?"
 _SELECT_ALL_PATHS_SQL = "SELECT original_path, mp4_path, poster_path FROM videos"
+
+
+def _limit_clause() -> str:
+    """Borne du backend actif : T-SQL ne connaît pas `LIMIT`.
+
+    Les deux listes l'écrivaient en dur, ce qui les cassait sur SQL Server même
+    une fois les marqueurs corrigés. La clause exige un `ORDER BY`, que les deux
+    requêtes portent déjà.
+    """
+    from core.database.backend import get_backend
+
+    return get_backend().dialect.limit_clause()
+
+
+def _select_recent_sql() -> str:
+    return f"SELECT * FROM videos ORDER BY id DESC{_limit_clause()}"
+
+
+def _select_by_status_sql() -> str:
+    return f"SELECT * FROM videos WHERE status = ? ORDER BY id ASC{_limit_clause()}"
 
 
 class DbAdapter(Protocol):
@@ -171,10 +195,10 @@ class VideoRepository:
         )
 
     def list_recent(self, limit: int = 50) -> list[dict[str, Any]]:
-        return self._db.fetch_all(_SELECT_RECENT_SQL, (int(limit),))
+        return self._db.fetch_all(_select_recent_sql(), (int(limit),))
 
     def list_by_status(self, status: str, limit: int = 100) -> list[dict[str, Any]]:
-        return self._db.fetch_all(_SELECT_BY_STATUS_SQL, (status, int(limit)))
+        return self._db.fetch_all(_select_by_status_sql(), (status, int(limit)))
 
     def delete(self, video_id: int) -> None:
         """Supprime une ligne ``videos`` (utilisé par ``video:cleanup``)."""

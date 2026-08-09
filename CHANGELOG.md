@@ -29,6 +29,16 @@
 
 ### Corrigé (pré-mortem rc5)
 
+- **Le dépôt de `forge-mvc-video` était inutilisable sur PostgreSQL et SQL Server (`VIDEO-DML-PORTABLE-001`).**
+  Il écrivait ses marqueurs de paramètre en `%s`, le format natif du connecteur MariaDB, quand Forge écrit `?`.
+  Le cœur traduit `?` vers le format de chaque pilote et **double tout `%` littéral** au passage, si bien qu'un `%s` déjà écrit devenait `%%s`, un texte et non un marqueur.
+  Douze marqueurs, plus deux `LIMIT` écrits en dur qui auraient de toute façon cassé SQL Server.
+  Mesuré avant correctif, sur les deux moteurs promus au niveau plein par l'ADR-084 : `psycopg` répond « the query has 0 placeholders but 8 parameters were passed », `pyodbc` répond « The SQL contains 0 parameter markers, but 8 parameters were supplied ».
+  Le paquet avait pourtant un test d'intégration, mais marqué `db` seul, donc exécuté contre MariaDB uniquement, où `%s` passe par coïncidence. Il porte maintenant sur les trois serveurs, et deux tests s'y ajoutent, l'un pour les métadonnées `ffprobe`, l'autre pour vérifier que la borne des listes s'applique réellement.
+  Un test unitaire figeait `WHERE status = %s`, donc verrouillait le bug ; il affirme la forme portable et dit pourquoi.
+  **La dette listée du cliquet DML est vidée**, et elle décrivait le défaut de travers : elle affirmait que PostgreSQL accepte `%s` nativement. C'est faux à cause du doublement des `%`, et je ne l'ai su qu'en interrogeant les serveurs plutôt que le pilote.
+  Le cliquet lui-même passait d'ailleurs en test **sauté** une fois la liste vide, donc invisible : il est réécrit en boucle. Un saut n'est pas un succès, y compris pour le garde-fou qui surveille les sauts des autres.
+
 - **Six tests d'intégration de paquet passaient à côté de la couche qu'ils prétendaient éprouver (`TEST-PACKAGE-INTEGRATION-REAL-LAYER-001`).**
   `audit`, `jobs`, `mfa`, `notifications`, `settings` et `stats` ouvraient chacun sa propre connexion MariaDB et l'enveloppaient dans un petit objet exposant `execute`, `fetch_one` et `fetch_all`.
   Deux conséquences, aucune voulue. Ils ne tournaient que sur **MariaDB**, alors que l'ADR-084 donne les quatre backends au niveau plein. Et ils court-circuitaient `core.database.db`, donc la **qualification d'erreur** de Forge : une violation d'unicité y remontait sous sa forme pilote, jamais sous la forme portable `UniqueViolationError`.

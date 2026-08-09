@@ -112,5 +112,7 @@ def test_list_by_status_sql():
     fake = _FakeDb()
     VideoRepository(fake).list_by_status("uploaded")
     sql, params = fake.fetch_calls[-1]
-    assert "WHERE status = %s" in sql
+    # `?` est le marqueur de Forge ; `%s` cassait PostgreSQL et
+    # SQL Server (`VIDEO-DML-PORTABLE-001`).
+    assert "WHERE status = ?" in sql
     assert params[0] == "uploaded"

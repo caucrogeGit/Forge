@@ -92,13 +92,16 @@ _MOTS_SQL = ("SELECT", "UPDATE", "INSERT", "VALUES", "DELETE")
 #: rassurant et faux. Chaque entrée porte son motif et son ticket, et le test
 #: `test_le_cliquet_dml_se_resserre` échoue dès qu'une entrée devient propre,
 #: ce qui oblige à la retirer au lieu de la laisser dormir.
-_DETTE_CONNUE: "dict[str, str]" = {
-    "forge-mvc-video/forge_mvc_video/storage/repository.py":
-        "12 marqueurs `%s` au lieu de `?`, plus deux `LIMIT` en dur. MariaDB et "
-        "PostgreSQL acceptent `%s` nativement, SQLite et SQL Server exigent `?` : "
-        "le dépôt vidéo n'est donc pas portable, et le corriger dépasse le "
-        "périmètre de ADMIN-JOBS-LIMIT-PORTABLE-001. Ticket dédié à ouvrir.",
-}
+#: Dette listée : fichiers dont le SQL non portable est connu et assumé, le
+#: temps d'un ticket dédié. Une exclusion muette rendrait le relevé rassurant
+#: et faux ; le cliquet ci-dessous échoue dès qu'une entrée devient propre.
+#:
+#: Vide depuis `VIDEO-DML-PORTABLE-001`. La seule entrée qu'elle ait portée
+#: décrivait d'ailleurs le défaut de travers : elle affirmait que PostgreSQL
+#: accepte `%s` nativement, alors que le cœur y **double** tout `%` littéral,
+#: si bien que `%s` y devenait `%%s`, un texte et non un marqueur. Vérifié
+#: contre les serveurs plutôt que déduit du pilote.
+_DETTE_CONNUE: "dict[str, str]" = {}
 
 
 def _fichiers_sql_des_optins() -> "list[Path]":
@@ -212,19 +215,27 @@ def test_sessions_db_reste_le_modele_du_sans_fonction_serveur() -> None:
     assert 'assert "NOW()" not in sql' in garde.read_text(encoding="utf-8")
 
 
-@pytest.mark.parametrize("relatif", sorted(_DETTE_CONNUE))
-def test_le_cliquet_dml_se_resserre(relatif: str) -> None:
+def test_le_cliquet_dml_se_resserre() -> None:
     """Une entrée corrigée, ou disparue, doit être retirée de la dette.
 
     Sans ce contrôle, la liste ne ferait que grandir et le relevé se viderait
     de son sens. Un fichier qui n'a plus de construction non portable n'a plus
     rien à faire ici.
+
+    Écrit en boucle et non en `parametrize` : une paramétrisation vide rend un
+    test **sauté**, donc invisible, alors que la dette vide est justement l'état
+    qu'on veut voir tenir. Un saut n'est pas un succès.
     """
-    module = PACKAGES / relatif
-    if not module.exists():
-        pytest.fail(f"{relatif} n'existe plus : retirez-le de _DETTE_CONNUE.")
-    reste = [t for _, t in _chaines_sql(module) if _NON_PORTABLE.search(t)]
-    assert reste, (
-        f"{relatif} n'a plus de SQL non portable : retirez-le de _DETTE_CONNUE "
-        "pour que le relevé le surveille de nouveau."
+    a_retirer: "list[str]" = []
+    for relatif in sorted(_DETTE_CONNUE):
+        module = PACKAGES / relatif
+        if not module.exists():
+            a_retirer.append(f"{relatif} n'existe plus")
+            continue
+        if not [t for _, t in _chaines_sql(module) if _NON_PORTABLE.search(t)]:
+            a_retirer.append(f"{relatif} n'a plus de SQL non portable")
+
+    assert not a_retirer, (
+        "Retirez ces entrées de _DETTE_CONNUE pour que le relevé les surveille "
+        "de nouveau :\n  " + "\n  ".join(a_retirer)
     )
