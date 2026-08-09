@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Any
 
 from core.http.bearer import is_bearer_authorized
+from core.http.helpers import json_error
 from core.http.response import Response
 
 from forge_mvc_audio.config import AudioConfig, load_audio_config
@@ -36,8 +37,6 @@ logger = logging.getLogger(__name__)
 
 ROUTE_PLAYBACK = "/audio/{uuid}"
 
-def _error(code: str, status: int) -> Response:
-    return Response.json({"error": code}, status=status)
 
 
 class AudioHttpController:
@@ -49,19 +48,19 @@ class AudioHttpController:
 
     def stream(self, request: Any) -> Response:
         if not is_bearer_authorized(request, self._api_token):
-            return _error("unauthorized", 401)
+            return json_error("unauthorized", 401)
 
         uuid = request.route("uuid")
         # Chemin retrouvé sur le disque (jamais depuis l'URL) ; uuid validé en
         # interne par resolve_playable_relpath → pas de path traversal.
         rel = resolve_playable_relpath(uuid, storage_root=self._config.storage_root)
         if not rel:
-            return _error("not_found", 404)
+            return json_error("not_found", 404)
 
         path = Path(self._config.storage_root) / rel
         if not path.is_file():
             logger.warning("Forge Audio — fichier absent pour %s : %s", uuid, path)
-            return _error("file_missing", 404)
+            return json_error("file_missing", 404)
 
         # Streaming + Range délégués à la primitive core.
         return Response.file(path, request)

@@ -56,9 +56,8 @@ def _service_unavailable() -> Response:
 
 
 #: Codes d'erreur des réponses d'API, stables et lisibles côté client.
-#: La forme `{"error": "<code>"}` n'est pas inventée ici : `forge-mvc-iot`,
-#: `forge-mvc-video`, `forge-mvc-audio` et `forge-mvc-admin` avaient déjà
-#: convergé seuls dessus. Ce ticket la reprend, il ne la décrète pas.
+#: La forme est celle de l'ADR-088, rendue par `core.http.json_error`, seule
+#: fabrique de réponse d'erreur JSON du dépôt.
 API_ERROR_UNAUTHENTICATED = "unauthenticated"
 API_ERROR_FORBIDDEN = "forbidden"
 API_ERROR_DENIED = "denied"
@@ -79,9 +78,9 @@ def _api_error(status: int, code: str, source: "Response | None" = None) -> Resp
     `Location` est écarté, une réponse d'API ne redirigeant pas, et les en-têtes
     de corps le sont aussi puisque le corps change.
     """
-    from core.http.response import Response
+    from core.http.helpers import json_error
 
-    response = Response.json({"error": code}, status=status)
+    response = json_error(code, status)
     if source is not None:
         for cle, valeur in source.headers.items():
             if cle.lower() in ("location", "content-type", "content-length"):

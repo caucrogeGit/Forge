@@ -105,6 +105,12 @@ def json_response(data: Any, status: int = 200) -> Response:
 
 
 def api_success(data: Any = None, status: int = 200, meta: "dict[str, Any] | None" = None) -> Response:
+    """Enveloppe de succès historique. **Retirée par l'ADR-088**, ticket à venir.
+
+    Conservée le temps que la référence utilisateur soit réécrite et que les
+    trois fichiers de tests qui ne portent qu'elle soient repris. Aucun code de
+    production ne l'appelle : une réponse de succès rend la ressource.
+    """
     payload: "dict[str, Any]" = {"success": True, "data": data}
     if meta is not None:
         payload["meta"] = meta
@@ -112,7 +118,41 @@ def api_success(data: Any = None, status: int = 200, meta: "dict[str, Any] | Non
 
 
 def api_error(message: str, status: int = 400, code: str = "error", details: Any = None) -> Response:
+    """Enveloppe d'erreur historique. **Retirée par l'ADR-088**, ticket à venir.
+
+    La forme unique est :func:`json_error`. Celle-ci reste le temps du retrait,
+    ses seuls appelants vivant dans `core/security/api_auth.py`, lui-même
+    supprimé par l'ADR-088.
+    """
     error: "dict[str, Any]" = {"code": code, "message": message}
     if details is not None:
         error["details"] = details
     return json_response({"success": False, "error": error}, status)
+
+
+def json_error(code: str, status: int, *, message: "str | None" = None) -> Response:
+    """Réponse d'erreur JSON, forme unique de Forge (ADR-088).
+
+    ```json
+    {"error": "not_found"}
+    ```
+
+    `code` est un identifiant stable, lisible par une machine, jamais une
+    phrase. `message` reste **facultatif et réservé aux erreurs de
+    validation**, seul cas où le client a besoin de savoir quoi corriger. Les
+    autres erreurs n'en portent pas, et c'est délibéré : un refus qui explique
+    à quelle étape il a eu lieu renseigne l'attaquant.
+
+    Il n'y a pas d'enveloppe de succès en regard. Une réponse de succès rend la
+    ressource, le code HTTP portant déjà l'information que `{"success": true}`
+    redoublait. C'est la décision de l'ADR-088, prise après avoir constaté que
+    l'enveloppe déclarée n'avait aucun adoptant, pas même dans Forge.
+
+    Toute réponse d'erreur JSON du cœur et des opt-ins passe par ici. Un
+    garde-fou l'exige, parce que la divergence précédente est née exactement
+    de l'absence d'un endroit unique où la forme soit écrite.
+    """
+    corps: "dict[str, Any]" = {"error": code}
+    if message is not None:
+        corps["message"] = message
+    return json_response(corps, status)

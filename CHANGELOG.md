@@ -27,6 +27,18 @@
   Le banc de mesure est versé dans `tools/bench_router.py`, afin que ces chiffres soient contredisables en une commande plutôt que crus sur parole.
   Réserve à garder en tête : tout ceci reste sous la milliseconde, et à cent routes, taille d'une application Forge courante, le gain va de 10,2 à 5,8 µs, soit un dixième d'un aller-retour SQL.
 
+### Ajouté
+
+- **Une seule fabrique de réponse d'erreur JSON (`CORE-API-ERROR-CANONICAL-001`, ADR-088).**
+  Forge portait deux formes d'erreur JSON qui s'étaient développées séparément, et un client recevait l'une ou l'autre selon la route touchée.
+  D'un côté une enveloppe déclarée dans `core/http/helpers.py`, documentée sur quatre cent onze lignes dans `docs/reference/api-json.md` et câblée dans le cœur ; de l'autre une forme plate qu'aucun document ne décrivait, mais que les trois opt-ins exposant réellement du JSON avaient adoptée seuls.
+  Mesuré : l'enveloppe comptait trois sites d'appel, tous dans un module qu'aucun opt-in n'emploie, et son pendant `api_success` n'en comptait aucun.
+  L'ADR-088 a tranché pour la forme pratiquée, et ce ticket l'établit : `core.http.json_error(code, status, message=...)` devient la seule fabrique, et `application.py` comme `forge-mvc-iot`, `forge-mvc-video` et `forge-mvc-audio` y convergent.
+  Le format en sortie ne bouge pas, les tests d'API des trois opt-ins passent sans modification, ce qui était le critère de validation du ticket.
+  Le champ `message` reste **facultatif et réservé aux erreurs de validation**, seul cas où le client a besoin de savoir quoi corriger ; un refus qui explique à quelle étape il a eu lieu renseigne l'attaquant.
+  Un garde-fou par analyse syntaxique refuse désormais tout corps d'erreur JSON composé hors de cette fabrique. Sans lui la divergence recommencerait, puisqu'elle est née exactement de l'absence d'un endroit unique où la forme soit écrite.
+  L'enveloppe `api_success` et `api_error` est marquée sortante mais **encore exportée** : son retrait, celui de `core/security/api_auth.py` et la réécriture de la référence forment des tickets distincts, pour ne pas laisser le dépôt cassé entre deux commits.
+
 ### Corrigé
 
 - **Le drapeau `api` d'une route ne faisait rien, alors que la documentation lui prêtait un comportement (`CORE-ROUTE-API-FLAG-001`).**

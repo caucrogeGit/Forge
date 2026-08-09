@@ -42,6 +42,7 @@ from typing import Any
 
 from core.forge import get as _forge_get
 from core.http.bearer import is_bearer_authorized
+from core.http.helpers import json_error
 from core.http.response import Response
 
 from forge_mvc_iot.config import IotConfig, load_iot_config
@@ -159,27 +160,20 @@ def _parse_limit(request: Any) -> int:
 
 
 def _bad_limit_response(exc: _BadLimit) -> Response:
-    return Response.json(
-        {"error": ERROR_INVALID_LIMIT, "message": exc.message},
-        status=400,
-    )
+    # Seul cas où un `message` accompagne le code : une erreur de validation,
+    # où le client a besoin de savoir quoi corriger (ADR-088).
+    return json_error(ERROR_INVALID_LIMIT, 400, message=exc.message)
 
 
 def _internal_error_response() -> Response:
     # Réponse sobre — aucune fuite SQL/stacktrace côté client.
-    return Response.json(
-        {"error": ERROR_INTERNAL},
-        status=500,
-    )
+    return json_error(ERROR_INTERNAL, 500)
 
 
 def _unauthorized_response() -> Response:
     # Réponse sobre : on n'indique jamais si c'est le header, le schéma ou
     # le token qui est en cause, et on ne renvoie évidemment pas le token.
-    return Response.json(
-        {"error": ERROR_UNAUTHORIZED},
-        status=401,
-    )
+    return json_error(ERROR_UNAUTHORIZED, 401)
 
 
 # ── Contrôleur ──────────────────────────────────────────────────────────────
