@@ -45,7 +45,7 @@ Accès SQL explicite, sans ORM.
 
 Les briques de sécurité par défaut.
 
-- [Hachage de mots de passe](../core-security/hashing.md) (Argon2id) et [Auth API par jeton](../core-security/api_auth.md).
+- [Hachage de mots de passe](../core-security/hashing.md) (Argon2id) et [jeton Bearer d'API](../core-http/bearer.md).
 - [CSRF](../core-security/csrf.md), [CSP](../core-security/csp.md), [En-têtes de sécurité](../core-security/headers.md), [Cookies](../core-security/cookies.md).
 - [Décorateurs](../core-security/decorators.md) et [middleware](../core-security/middleware.md).
 

@@ -120,9 +120,11 @@ def api_success(data: Any = None, status: int = 200, meta: "dict[str, Any] | Non
 def api_error(message: str, status: int = 400, code: str = "error", details: Any = None) -> Response:
     """Enveloppe d'erreur historique. **Retirée par l'ADR-088**, ticket à venir.
 
-    La forme unique est :func:`json_error`. Celle-ci reste le temps du retrait,
-    ses seuls appelants vivant dans `core/security/api_auth.py`, lui-même
-    supprimé par l'ADR-088.
+    La forme unique est :func:`json_error`. Celle-ci n'a **plus aucun appelant
+    de production** depuis le retrait de `core/security/api_auth.py`, ses trois
+    seuls sites y vivant. Elle reste exportée le temps que la référence
+    utilisateur soit réécrite et que les tests qui ne portent qu'elle soient
+    repris.
     """
     error: "dict[str, Any]" = {"code": code, "message": message}
     if details is not None:

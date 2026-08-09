@@ -29,8 +29,8 @@ C'est une couche minimale, explicite et testable.
 | `api_error(message, status=400, code, details)` | `core.http` | Réponse JSON structurée, erreur |
 | `mvc/api_routes.py` | convention projet | Fichier optionnel de routes API |
 | `register_api_routes(router)` | convention projet | Fonction d'enregistrement des routes |
-| `@require_api_token` | `core.security.api_auth` | Protection par token Bearer |
-| `API_TOKEN` | variable d'environnement | Token attendu côté serveur |
+| `is_bearer_authorized(request, token)` | `core.http.bearer` | Vérification d'un jeton Bearer, en temps constant |
+| `API_TOKEN` | variable d'environnement | Jeton attendu côté serveur, lu par l'application |
 
 ## Ce que Forge ne fournit pas encore
 
@@ -262,16 +262,43 @@ API_TOKEN=votre-token-secret
 
 ### Protéger une route
 
+La vérification est **explicite**, dans le contrôleur, par `is_bearer_authorized`.
+
 ```python
 # mvc/controllers/api_status_controller.py
 
-from core.http import api_success
-from core.security.api_auth import require_api_token
+import os
 
-@require_api_token
+from core.http import json_error, json_response
+from core.http.bearer import is_bearer_authorized
+
+
 def status(request):
-    return api_success({"status": "ok", "service": "forge"})
+    if not is_bearer_authorized(request, os.getenv("API_TOKEN") or None):
+        return json_error("unauthorized", 401)
+    return json_response({"status": "ok", "service": "forge"})
 ```
+
+`is_bearer_authorized` compare le jeton en temps constant, avec
+`secrets.compare_digest`, ce qui écarte les attaques par mesure du temps de
+réponse.
+
+!!! danger "Jeton absent égale API ouverte"
+    Quand le second argument vaut `None`, `is_bearer_authorized` **autorise
+    tout le monde**. C'est le mode local et pédagogique, et c'est un piège en
+    production.
+
+    Refusez de démarrer plutôt que de servir une API ouverte sans le savoir.
+    C'est ce que fait `forge-mvc-iot`, dont vous pouvez reprendre le geste.
+
+    ```python
+    def register_api_routes(router):
+        if os.getenv("APP_ENV") == "prod" and not os.getenv("API_TOKEN"):
+            raise RuntimeError(
+                "API ouverte interdite en production : définir API_TOKEN."
+            )
+        ...
+    ```
 
 ### Requête authentifiée
 
@@ -286,34 +313,33 @@ Avec `curl` :
 curl -H "Authorization: Bearer <token>" https://example.com/api/status
 ```
 
-Réponse si token valide :
+Réponse si le jeton est valide :
 
 ```json
-{"success": true, "data": {"status": "ok", "service": "forge"}}
+{"status": "ok", "service": "forge"}
 ```
 
 ---
 
 ## Réponses d'erreur d'authentification
 
-| Situation | Statut | `error.code` |
+Un seul code, et c'est délibéré.
+
+| Situation | Statut | Corps |
 |---|---|---|
-| Header `Authorization` absent | 401 | `unauthorized` |
-| Format invalide (`Token …`, `Basic …`) | 401 | `invalid_authorization_header` |
-| Token invalide | 401 | `invalid_token` |
-| `API_TOKEN` non configuré côté serveur | 401 | `invalid_token` |
+| En-tête `Authorization` absent | 401 | `{"error": "unauthorized"}` |
+| Format invalide (`Token …`, `Basic …`) | 401 | `{"error": "unauthorized"}` |
+| Jeton invalide | 401 | `{"error": "unauthorized"}` |
 
-Exemple :
+!!! info "Pourquoi un seul code"
+    Distinguer « en-tête absent », « schéma invalide » et « jeton invalide »
+    renseigne un attaquant sur l'étape qu'il a franchie, et lui indique où
+    porter son effort suivant.
 
-```json
-{
-  "success": false,
-  "error": {
-    "code": "unauthorized",
-    "message": "Authentification API requise"
-  }
-}
-```
+    Forge rend donc un refus **opaque**. C'est la pratique qu'avaient adoptée
+    d'eux-mêmes `forge-mvc-iot`, `forge-mvc-video` et `forge-mvc-audio`, et que
+    l'ADR-088 a retenue en retirant l'implémentation concurrente qui distinguait
+    trois causes.
 
 ---
 
@@ -331,12 +357,16 @@ API_TOKEN=changeme-en-production
 ```python
 # mvc/controllers/api_status_controller.py
 
-from core.http import api_success
-from core.security.api_auth import require_api_token
+import os
 
-@require_api_token
+from core.http import json_error, json_response
+from core.http.bearer import is_bearer_authorized
+
+
 def status(request):
-    return api_success({"status": "ok", "version": "1.0"})
+    if not is_bearer_authorized(request, os.getenv("API_TOKEN") or None):
+        return json_error("unauthorized", 401)
+    return json_response({"status": "ok", "version": "1.0"})
 ```
 
 ### 3. Routes API
@@ -344,9 +374,14 @@ def status(request):
 ```python
 # mvc/api_routes.py
 
+import os
+
 from mvc.controllers import api_status_controller
 
+
 def register_api_routes(router):
+    if os.getenv("APP_ENV") == "prod" and not os.getenv("API_TOKEN"):
+        raise RuntimeError("API ouverte interdite en production : définir API_TOKEN.")
     router.add("GET", "/api/status", api_status_controller.status,
                public=True, api=True)
 ```
@@ -368,7 +403,7 @@ curl -H "Authorization: Bearer changeme-en-production" \
 
 - **Utiliser uniquement en HTTPS**, un Bearer token en HTTP clair est interceptable.
 - **Ne pas exposer `API_TOKEN` dans Git**, utilisez `env/prod` hors versionnement.
-- **Ne pas afficher le token dans les logs**, le module `api_auth` ne le logue jamais.
+- **Ne pas afficher le token dans les logs**, `core.http.bearer` ne le journalise jamais et ne le renvoie dans aucune réponse.
 - **Rotation des tokens**, changer `API_TOKEN` régulièrement en production.
 - **Auth minimale**, cette approche est adaptée aux projets simples.
   Pour une application SaaS publique ou multi-utilisateur, envisagez JWT ou OAuth dans un ticket futur.

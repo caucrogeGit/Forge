@@ -27,6 +27,31 @@
   Le banc de mesure est versé dans `tools/bench_router.py`, afin que ces chiffres soient contredisables en une commande plutôt que crus sur parole.
   Réserve à garder en tête : tout ceci reste sous la milliseconde, et à cent routes, taille d'une application Forge courante, le gain va de 10,2 à 5,8 µs, soit un dixième d'un aller-retour SQL.
 
+### Retiré
+
+- **`core.security.api_auth`, seconde implémentation Bearer du cœur (`CORE-API-AUTH-REMOVE-001`, ADR-088).**
+  Le cœur portait **deux** implémentations de l'authentification par jeton Bearer, divergentes jusque dans la lecture du préfixe, `"Bearer "` avec espace contre `"bearer"` comparé en minuscules.
+  Le ticket `CORE-HTTP-BEARER-PRIMITIVE-001` avait extrait `core/http/bearer.py` au motif qu'« un correctif de sécurité appliqué à une seule copie laisse les autres vulnérables » ; il a consolidé les trois opt-ins et laissé ce module de côté.
+  Le verdict d'usage était sans appel : quand `forge-mvc-iot`, `forge-mvc-video` puis `forge-mvc-audio` ont eu ce besoin exact, les trois ont importé `core.http.bearer` et écrit autre chose.
+  Sa posture de sécurité était par ailleurs en retrait : il distinguait trois causes de refus, `unauthorized`, `invalid_authorization_header` et `invalid_token`, donc renseignait un attaquant sur l'étape qu'il avait franchie, là où les opt-ins rendent délibérément un refus opaque.
+  Le module portait un correctif de sécurité issu d'un audit (`SECURITY-API-AUTH-COMPARE-DIGEST-001`, comparaison en temps constant). Sa suppression n'a été retenue qu'après avoir vérifié que `tests/test_core_http_bearer_001.py` verrouille la même garantie sur `core/http/bearer.py`, en lisant le source pour exiger `secrets.compare_digest`.
+  **Remplacement**, à écrire dans le contrôleur plutôt qu'en décorateur :
+
+  ```python
+  import os
+  from core.http import json_error, json_response
+  from core.http.bearer import is_bearer_authorized
+
+  def status(request):
+      if not is_bearer_authorized(request, os.getenv("API_TOKEN") or None):
+          return json_error("unauthorized", 401)
+      return json_response({"status": "ok"})
+  ```
+
+  Aucun décorateur n'est recréé. Si un besoin réel apparaît, sa place est `core/security/decorators.py`, auprès de `require_auth`, `require_csrf` et `require_role`, bâti sur la primitive et avec un code d'erreur unique.
+  `core/http/bearer.py` **gagne au passage sa page de documentation**, qu'il n'avait pas : supprimer l'implémentation documentée pour promouvoir l'indocumentée aurait été une régression.
+  La section d'authentification de `docs/reference/api-json.md` est réécrite, et elle dit désormais le piège que l'ancienne taisait : un jeton attendu à `None` ouvre l'API à tout le monde, et il faut refuser de démarrer en production plutôt que de servir sans le savoir.
+
 ### Ajouté
 
 - **Une seule fabrique de réponse d'erreur JSON (`CORE-API-ERROR-CANONICAL-001`, ADR-088).**

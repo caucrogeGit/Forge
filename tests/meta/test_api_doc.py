@@ -75,8 +75,15 @@ class TestConventionRoutes:
 
 
 class TestAuthApi:
-    def test_require_api_token(self):
-        assert "require_api_token" in _doc()
+    def test_primitive_bearer(self):
+        """ADR-088 : la page enseigne `is_bearer_authorized`, seule primitive.
+
+        Elle enseignait `@require_api_token`, décorateur d'une seconde
+        implémentation Bearer du cœur, retirée par l'ADR-088 : elle distinguait
+        trois causes de refus, donc renseignait l'attaquant sur l'étape franchie.
+        """
+        assert "is_bearer_authorized" in _doc()
+        assert "require_api_token" not in _doc()
 
     def test_authorization_bearer(self):
         assert "Authorization" in _doc() and "Bearer" in _doc()

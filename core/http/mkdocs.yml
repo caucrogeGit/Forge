@@ -9,6 +9,7 @@ nav:
       - L'objet Response (response.py): response.md
       - Helpers de réponse (helpers.py): helpers.md
       - Le routeur (router.py): router.md
+      - Jeton Bearer d'API (bearer.py): bearer.md
       - En-tête Range (byte_range.py): byte_range.md
       - Inspection de debug (debug_dumper.py): debug_dumper.md
       - Slugs d'URL (slug.py): slug.md
