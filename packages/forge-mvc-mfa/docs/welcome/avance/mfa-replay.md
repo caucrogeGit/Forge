@@ -132,13 +132,33 @@ with router.group("", public=True) as public:
 
 - Sans anti-rejeu, un attaquant interceptant un code valide pourrait le **rejouer** dans les ~30 s.
 - On raisonne par **step** (numéro de fenêtre), pas par code : une step consommée est refusée pour ce facteur.
-- L'état vit **en mémoire**, avec purge opportoniste des vieilles steps.
+- L'état vit **en mémoire**, avec purge opportuniste des vieilles steps.
+
+!!! danger "En mémoire veut dire par processus"
+    Le registre vit dans la mémoire **du processus**.
+    Derrière un serveur à plusieurs workers, gunicorn typiquement, chaque worker a le sien, et un même code peut donc être accepté une fois par worker.
+
+    La fenêtre est courte, un code TOTP vivant trente secondes, et l'attaquant doit déjà détenir le code.
+    Mais en production multi-worker, cette garde est affaiblie.
+
+    Forge livre un registre **partagé**, adossé à la base, que l'application pose au démarrage en une ligne.
+
+    ```python
+    from forge_mvc_mfa import set_replay_store
+    from forge_mvc_mfa.replay_store_db import DbTotpReplayStore
+
+    set_replay_store(DbTotpReplayStore())
+    ```
+
+    Sa table se provisionne par `forge mfa:init` puis `forge migration:apply`.
+    Le défaut ne change pas, le choix reste le vôtre selon votre modèle de menace.
 
 ## À retenir
 
 - Un code TOTP ne doit être accepté **qu'une fois** dans sa fenêtre.
 - `record_used` + `is_replay` portent cette garde, par facteur et par step.
 - `verify_totp_code` à lui seul ne protège pas du rejeu : d'où cette brique.
+- Le registre par défaut vaut **par processus** : en multi-worker, posez `DbTotpReplayStore`.
 
 ## Après ce starter
 

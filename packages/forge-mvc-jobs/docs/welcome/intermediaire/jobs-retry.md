@@ -39,6 +39,14 @@ print("en attente :", pending_count())
 - Une tâche sans gestionnaire associé est directement marquée `failed`.
 - `pending_count()` indique combien de tâches attendent encore d'être traitées.
 
+!!! info "Le réessai attend, il n'est pas immédiat"
+    Une tâche remise en file **n'est pas reprise tout de suite**.
+    Elle attend un délai qui double à chaque tentative, soit 10, 20, 40, 80, 160, 320, puis 600 secondes au plus.
+
+    Ne vous étonnez donc pas de voir la tâche rester `pending` après un échec, sans qu'un nouvel essai parte : c'est le délai qui court, pas une panne.
+
+    Sans ce délai, une tâche qui échoue vite consommait ses trois essais en une fraction de seconde, ce qui ne laissait aucune chance à une panne passagère de se résorber.
+
 ## 2. Suivre l'état d'une tâche
 
 ```python
@@ -59,6 +67,8 @@ if job is not None:
 ## À retenir
 
 - `max_attempts` fixe le nombre d'essais ; l'échec remet en file tant qu'il en reste.
+- Le réessai **attend** un délai croissant, de 10 à 600 secondes : une tâche `pending` après un échec est normale.
+- Un worker tué laisse sa tâche en `running` ; `forge jobs:reclaim` la reprend, voir la page de référence.
 - `get_job(id)` donne l'état complet d'une tâche (`status`, `attempts`, `last_error`).
 - `pending_count()` mesure la charge restante de la file.
 

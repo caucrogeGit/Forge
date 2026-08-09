@@ -16,6 +16,18 @@ Troisième palier du **niveau débutant** de la progression stats.
 - la liste des colonnes ;
 - une transformation **pure** (on montre le SQL, on ne l'exécute pas).
 
+!!! tip "Pour créer la table pour de vrai"
+    Cette page **montre** le SQL, elle ne le pose pas.
+    Créer la table dans votre projet se fait par la voie officielle, commune à tous les opt-ins adossés à la base.
+
+    ```bash
+    forge stats:init        # écrit la migration dans mvc/migrations/, sans l'exécuter
+    forge migration:apply   # après relecture
+    ```
+
+    `get_stats_events_schema_sql()` reste utile pour **lire** le schéma attendu, par exemple dans une page de diagnostic comme celle de ce palier.
+    Ne copiez pas sa sortie à la main dans votre base : la migration est là pour ça, et elle est rejouable.
+
 ## Classes Forge utilisées
 
 | Classe / fonction | Rôle dans ce starter | Référence |
