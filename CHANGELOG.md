@@ -3,6 +3,72 @@
 
 ## [Non publié]
 
+## [1.0.0-rc.5] - 2026-08-10
+
+### Ajouté
+
+- **Une seule fabrique de réponse d'erreur JSON (`CORE-API-ERROR-CANONICAL-001`, ADR-088).**
+  Forge portait deux formes d'erreur JSON qui s'étaient développées séparément, et un client recevait l'une ou l'autre selon la route touchée.
+  D'un côté une enveloppe déclarée dans `core/http/helpers.py`, documentée sur quatre cent onze lignes dans `docs/reference/api-json.md` et câblée dans le cœur ; de l'autre une forme plate qu'aucun document ne décrivait, mais que les trois opt-ins exposant réellement du JSON avaient adoptée seuls.
+  Mesuré : l'enveloppe comptait trois sites d'appel, tous dans un module qu'aucun opt-in n'emploie, et son pendant `api_success` n'en comptait aucun.
+  L'ADR-088 a tranché pour la forme pratiquée, et ce ticket l'établit : `core.http.json_error(code, status, message=...)` devient la seule fabrique, et `application.py` comme `forge-mvc-iot`, `forge-mvc-video` et `forge-mvc-audio` y convergent.
+  Le format en sortie ne bouge pas, les tests d'API des trois opt-ins passent sans modification, ce qui était le critère de validation du ticket.
+  Le champ `message` reste **facultatif et réservé aux erreurs de validation**, seul cas où le client a besoin de savoir quoi corriger ; un refus qui explique à quelle étape il a eu lieu renseigne l'attaquant.
+  Un garde-fou par analyse syntaxique refuse désormais tout corps d'erreur JSON composé hors de cette fabrique. Sans lui la divergence recommencerait, puisqu'elle est née exactement de l'absence d'un endroit unique où la forme soit écrite.
+  L'enveloppe `api_success` et `api_error` est marquée sortante mais **encore exportée** : son retrait, celui de `core/security/api_auth.py` et la réécriture de la référence forment des tickets distincts, pour ne pas laisser le dépôt cassé entre deux commits.
+
+
+- **La table d'événements statistiques gagne une politique de rétention (`STATS-RETENTION-001`).**
+  `forge_stats_events` reçoit une ligne par événement suivi et rien ne la bornait.
+  Une application qui trace consciencieusement y accumule des millions de lignes, et les agrégats ralentissent d'autant sans que rien ne prévienne.
+  `forge stats:gc --days N` compte les événements antérieurs à la borne et les affiche ; `--run` supprime.
+  Même forme que `audit:gc`, rétention à dire explicitement par l'option ou par `STATS_KEEP_DAYS`, refus d'une valeur nulle ou négative.
+  Le module de rétention suit la convention **du paquet** et non celle de `forge-mvc-audit` : il n'accède jamais à la base de lui-même, l'appelant fournit l'exécuteur, exactement comme `track_event` et `count_stats_events`.
+  La commande fait seule la jonction avec `core.database`.
+  La borne part en paramètre lié, aucune expression de date n'entrant dans le SQL, et `idx_forge_stats_events_created_at` rend la suppression indexée sans migration.
+  Purger détruit de l'information et aucun agrégat de remplacement n'est calculé, ce que la page de référence dit sans détour.
+  Le paquet reçoit au passage son **premier test d'intégration** : il rendait jusqu'ici un DDL que rien n'exécutait jamais, si bien qu'une erreur de rendu ne se serait vue qu'en production.
+
+- **`forge-mvc-stats` rejoint la convention de provisioning des opt-ins BDD (`STATS-OPTIN-CONFORM-001`).**
+  Le paquet était en retrait des neuf autres opt-ins adossés à la base.
+  Il décrivait bien sa table en `TableDefinition`, mais il n'avait ni `MIGRATIONS`, ni entry point `forge_mvc.commands`, ni dossier `cli/`, ni commande d'amorçage.
+  `forge_stats_events` n'était donc créée par aucune commande Forge, alors que l'ADR-071 fixe une convention unique de provisioning, et sa page de référence affirmait « cet opt-in n'apporte aucune table », ce qui était faux.
+  L'écart n'a été trouvé qu'en vérifiant un avis extérieur qui, lui, pointait autre chose.
+  `forge stats:init` rend désormais la migration pour le backend installé et l'écrit dans `mvc/migrations/`, sans exécuter de SQL.
+  La déclaration de la table déménage dans `tables.py`, emplacement conventionnel où le provisioning partagé va la chercher ; `schema.py` la réexporte, ces noms appartenant à l'API publique du paquet depuis son origine.
+  Un test vérifie que les deux modules désignent le même objet, deux `TableDefinition` pour une même table divergeant en silence.
+  Un projet antérieur avait créé `forge_stats_events` à la main, faute de commande. Vérifié en conditions réelles, les deux cas se passent bien.
+  Si sa table est conforme, la migration ne fait rien et s'enregistre, le DDL étant rendu en `CREATE TABLE IF NOT EXISTS` sur les quatre backends.
+  Si elle diverge, la migration **échoue franchement** en nommant la colonne absente, et **n'est pas enregistrée comme appliquée**, ce qui laisse le projet réparer puis rejouer.
+
+- **Les tâches de fond orphelines sont reprises au lieu de rester bloquées (`JOBS-STALE-RECLAIM-001`).**
+  Un worker réserve une tâche en la passant à `running`, puis rend son verdict.
+  Tué entre les deux, il ne rendait aucun verdict et personne ne le rendait à sa place : la tâche restait `running` indéfiniment, et la file se remplissait de lignes mortes que rien ne signalait.
+  La limite était assumée en toutes lettres dans le module, ce qui la rendait visible sans la rendre supportable.
+  `forge jobs:reclaim` remet en file les tâches dont le **bail** de réservation a expiré, et marque en échec celles qui ont épuisé leurs tentatives.
+  Aucune migration n'était nécessaire, `started_at` et `claim_token` existaient déjà dans la table.
+  L'échec de reprise porte un message distinct de celui d'une exception du gestionnaire : confondre les deux ferait chercher un bogue applicatif là où il y a eu une panne de processus.
+  Le réessai après échec attend désormais un **délai croissant**, 10, 20, 40, 80, 160, 320 puis 600 secondes, au lieu de repartir aussitôt.
+  Sans lui, une tâche qui échouait vite consommait toutes ses tentatives en une fraction de seconde et ne laissait aucune chance à une panne passagère de se résorber.
+  C'est un changement de comportement pour les files réglées à plus d'une tentative, et les tests qui encodaient le réessai immédiat disent maintenant le délai.
+  Détail de portabilité qui valait le détour : l'inégalité du bail est écrite `started_at + bail < maintenant` et non `started_at < maintenant - bail`.
+  Les deux sont équivalentes en mathématiques, pas en SQL portable.
+  Mesuré, le dialecte SQLite compose son modificateur par concaténation et rend **`NULL`** pour un intervalle négatif, si bien que la seconde forme n'aurait rien repris du tout sur SQLite, sans lever la moindre erreur.
+  Un garde-fou relit le SQL engendré pour empêcher la forme négative de revenir.
+  Deux limites écrites plutôt que découvertes : le bail est une durée fixe, donc une tâche légitimement plus longue que lui sera reprise alors qu'elle tourne encore et exécutée deux fois, ce qui impose des gestionnaires idempotents ; et le worker ne prolonge pas son bail pendant qu'il travaille.
+
+- **Le journal d'audit gagne une politique de rétention (`AUDIT-RETENTION-001`).**
+  `audit_log` grossissait à chaque action tracée et rien ne la bornait.
+  C'était la seule table d'opt-in adossé à la base sans purge, alors que `sessions:gc` avait posé le précédent, si bien que l'exploitant devait écrire lui-même son ménage en SQL.
+  `forge audit:gc --days N` compte les entrées antérieures à la borne et les affiche ; `--run` supprime.
+  La rétention doit être **dite**, par l'option ou par la variable `AUDIT_KEEP_DAYS`, l'option l'emportant sur la variable.
+  Aucune valeur par défaut n'est supposée, et une rétention nulle ou négative est refusée, car elle viderait le journal entier sans que rien ne distingue l'intention de l'étourderie.
+  Contrairement à `sessions:gc` qui supprime directement, la commande affiche d'abord (charte §7, motif déjà suivi par `fixtures:purge` et `db:init`).
+  La raison de cette asymétrie est écrite dans le module : une session expirée n'est plus rien pour personne, son expiration étant portée par la ligne elle-même, tandis qu'une entrée d'audit est un enregistrement délibéré dont aucune date ne dit qu'il a cessé de valoir.
+  La borne est calculée en Python et part en **paramètre lié**, sur le modèle de `forge-mvc-sessions-db` : aucune expression de date n'entre dans le SQL, ce qui évite d'emblée le piège mesuré par `OPTIN-DML-DIALECT-001`.
+  Aucune migration n'est requise, `idx_audit_created` portant déjà sur `created_at`, donc la suppression est indexée.
+  Deux limites écrites noir sur blanc : aucune archive n'est produite avant suppression, et la suppression tient en une instruction, donc sur une très grosse table le verrou peut être long.
+
 ### Modifié
 
 - **Le routeur énonce enfin sa règle de résolution, et indexe ses routes statiques (`ROUTER-STATIC-INDEX-001`).**
@@ -27,7 +93,7 @@
   Le banc de mesure est versé dans `tools/bench_router.py`, afin que ces chiffres soient contredisables en une commande plutôt que crus sur parole.
   Réserve à garder en tête : tout ceci reste sous la milliseconde, et à cent routes, taille d'une application Forge courante, le gain va de 10,2 à 5,8 µs, soit un dixième d'un aller-retour SQL.
 
-### Corrigé (pré-mortem rc5)
+### Corrigé
 
 - **Six tests d'empaquetage ne s'exécutaient nulle part (`CI-WHEEL-TESTS-NEVER-RAN-001`).**
   Ils vérifient que les cinq schémas JSON canoniques (ADR-058) sont bien **dans** le wheel et le sdist publiés. Un schéma absent d'une distribution ne se voit qu'après publication, chez l'utilisateur, sous la forme d'une commande qui échoue.
@@ -149,6 +215,63 @@
   Le test de non-régression passe par **`core.database.db`**, la couche de production, et non par un adaptateur. Vérifié : il échoue sur le code d'avant, il passe sur le code corrigé.
   Mesuré après correctif, jusqu'à vingt requêtes simultanées, sur facteur neuf comme sur ligne préexistante : exactement une acceptation, aucune erreur.
 
+
+- **Le drapeau `api` d'une route ne faisait rien, alors que la documentation lui prêtait un comportement (`CORE-ROUTE-API-FLAG-001`).**
+  Il était déclaré dans `RouteEntry`, propagé par `RouteGroup`, affiché par `routes:list`, et **lu par aucun code applicatif**.
+  Ses seules lectures dans tout le dépôt étaient celle de `forge.py`, pour l'afficher, et des tests vérifiant qu'il valait ce qu'on lui avait passé.
+  La documentation du routeur en promettait pourtant « réponses JSON, pas de redirection login » : une route marquée `api=True` recevant une requête non authentifiée renvoyait une redirection 302 vers une page HTML de connexion, et son client JSON échouait loin de la cause en tentant de désérialiser du HTML.
+  C'est le troisième cas de ce cycle où une documentation affirme un comportement que le code n'a pas, après la mise en service de `forge-mvc-stats` et le motif de saut des tests d'intégration.
+  Le drapeau tient désormais sa promesse pour tout ce que le framework rend **après** avoir trouvé la route : 401 sur défaut d'authentification, 403 sur jeton CSRF invalide, 503 sur base indisponible, 500 sur erreur non gérée, tous en JSON.
+  Un refus déjà explicite garde son statut, seule sa forme change : un middleware applicatif qui rend 403 continue de rendre 403.
+  Les en-têtes du refus sont conservés, **cookies compris**, et c'est le point délicat : `AuthMiddleware` ferme la session quand il détecte une session orpheline (ADR-080), et reconstruire la réponse sans ce cookie aurait laissé la session ouverte, transformant une correction de forme en régression de sécurité.
+  La cause d'une erreur non gérée n'est **jamais** exposée, même en `APP_ENV=dev`, contrairement à la page HTML : celle-ci est lue par un humain devant son navigateur, tandis qu'une réponse d'API part vers un client qui la journalise, la stocke ou la réexpose. La cause reste dans les journaux du serveur.
+  La forme `{"error": "<code>"}` n'est pas inventée ici : `forge-mvc-iot`, `forge-mvc-video`, `forge-mvc-audio` et `forge-mvc-admin` avaient déjà convergé seuls dessus, `video` et `audio` portant même la ligne à l'identique. Ce ticket la reprend, il ne la décrète pas, et ne touche pas encore aux quatre paquets.
+  **Limite assumée et écrite** : les 404 et 405 restent en HTML. Le drapeau appartient à une route, et dans ces deux cas aucune route n'a été trouvée, donc rien ne dit que le chemin visait une API.
+
+- **Le motif de saut des tests d'intégration désignait la mauvaise cause (`TEST-DB-SKIP-REASON-001`).**
+  Les douze fixtures d'intégration rangeaient toute erreur de connexion sous un mot unique, « injoignable », et le commentaire de `tests/db/conftest.py` assumait la confusion en toutes lettres.
+  Or « pas de serveur » et « serveur qui refuse mes identifiants » appellent des gestes opposés, démarrer un service dans un cas, corriger une variable d'environnement dans l'autre.
+  Le coût n'est pas théorique : un serveur MariaDB actif, à l'écoute, qui refusait seulement le mot de passe, a été lu comme un serveur arrêté, et le diagnostic s'est fourvoyé jusqu'à ce que l'erreur réelle soit relue.
+  En CI le point était masqué, `FORGE_REQUIRE_DB=1` transformant le saut en échec ; en local il produisait un faux diagnostic sans le moindre signal.
+  Un classificateur partagé vit désormais dans `forge-mvc-testing` (ADR-041), et les douze sites l'appellent au lieu de recopier le message.
+  Le motif nomme le geste attendu, « le serveur tourne, inutile de le démarrer, posez `FORGE_TEST_DB_PASSWORD` », ou « démarrez le serveur, ou vérifiez `FORGE_TEST_DB_HOST` et `FORGE_TEST_DB_PORT` ».
+  Une cause non reconnue n'est jamais rangée d'office dans l'une des deux autres : mieux vaut ne rien affirmer que d'affirmer faux avec l'aplomb du vrai.
+  Le classificateur est éprouvé sur des messages **réels** des trois pilotes, relevés en condition, et non sur des chaînes inventées.
+  Les deux scénarios ont été rejoués de bout en bout, mauvais mot de passe puis port sans serveur, pour vérifier que chacun produit bien son motif.
+
+### Sécurité
+
+- **L'anti-rejeu TOTP peut désormais être partagé par tous les processus (`MFA-TOTP-REPLAY-SHARED-001`).**
+  Le registre des codes déjà consommés vivait dans la mémoire d'un processus, donc chaque worker gunicorn avait le sien.
+  Or `deploy:init` génère précisément du gunicorn multi-worker, si bien que le chemin de déploiement officiel de Forge affaiblissait sa propre protection.
+  Un code intercepté pouvait être présenté à chaque worker tour à tour, et accepté autant de fois qu'il y a de workers.
+  La limite était connue, écrite et gardée par un test (`MFA-REPLAY-SCOPE-DOC-001`), qui laissait le remède au choix de l'exploitant ; ce ticket lui en donne un qui fonctionne, sans lui retirer le choix.
+  Le registre passe derrière un contrat, `TotpReplayStore`, et Forge en livre deux mises en œuvre.
+  Le **défaut ne change pas**, c'est toujours le registre en mémoire, si bien qu'aucun projet existant ne voit son comportement bouger.
+  `DbTotpReplayStore` s'adosse au backend BDD du projet et vaut alors pour tous les processus ; l'application le pose au démarrage par `set_replay_store()`, en une ligne visible (principe 3).
+  Aucune dépendance nouvelle, ni Redis ni broker, `core.database` venant de `forge-mvc` que le paquet exigeait déjà, et l'import restant paresseux pour que `forge-mvc-mfa` demeure utilisable sans backend.
+  Le contrat est reproduit **exactement**, y compris sa partie la moins visible.
+  Il refuse toute fenêtre antérieure ou égale à la dernière vue, et pas seulement le doublon exact, sans quoi un code plus ancien resterait rejouable tant que la tolérance de `verify_totp_code` l'accepte.
+  D'où une ligne par facteur portant sa dernière fenêtre, et non une ligne par code consommé, ce qui borne aussi la table au nombre de facteurs actifs.
+  L'atomicité est obtenue sans transaction applicative, par un `INSERT` dont l'échec en doublon bascule vers un `UPDATE` gardé par `last_step < ?`, le doublon étant reconnu par `is_unique_violation()` du contrat `DatabaseBackend`.
+  La purge compare des numéros de fenêtre et jamais des dates, ce qui la rend portable sans effort sur les quatre backends.
+  La table est **optionnelle**, `forge mfa:init` ne servant qu'aux projets qui installent le registre partagé ; le paquet reste une bibliothèque sans persistance pour tous les autres.
+  Le test central ouvre deux connexions distinctes et vérifie qu'un code accepté par la première est refusé par la seconde, propriété que le registre en mémoire ne peut pas offrir.
+
+- **Les listes blanches ancrées acceptaient la valeur suffixée d'un saut de ligne (`VALIDATION-ANCHOR-FULLMATCH-001`).**
+  En Python, `$` n'ancre pas tout à fait la fin de la chaîne, il accepte aussi la position qui précède un saut de ligne final.
+  Un validateur écrit `^...$` puis consulté par `match()` laissait donc passer ce qu'il prétendait interdire.
+  Mesuré, `_ident("titre\n")` rendait la chaîne intacte, et cette valeur est ensuite interpolée dans le `SELECT` de `forge-mvc-admin`.
+  Aucun cas exploitable n'a été trouvé, rien ne peut suivre ce saut de ligne, `"titre\nDROP TABLE x"` étant bien rejeté.
+  Mais plusieurs de ces valeurs composent ensuite un chemin de fichier, l'identifiant de session devenant `<dossier>/<identifiant>.json` et la locale `<dossier>/<locale>.json`, or un saut de ligne est un caractère légal dans un nom de fichier POSIX.
+  Une défense en profondeur ne se juge pas à son exploitabilité du jour.
+  Le critère de tri n'est pas la forme de l'expression mais la méthode d'appel, `fullmatch()` immunisant déjà même en gardant les ancres.
+  Le dépôt employait les deux formes, `core/forms/fields.py`, `forge_mvc_files` et `forge_mvc_entities` appelant déjà `fullmatch()`.
+  Le ticket retient `fullmatch()` partout, forme unique (principe 11), sur **29 sites répartis dans 18 fichiers**.
+  Quatre sites étaient couverts par accident, un `.strip()` en amont retirant le saut avant la validation ; **six laissaient réellement passer**.
+  Le garde-fou ne porte aucune liste de sites et détecte l'idiome par analyse syntaxique, si bien qu'un site futur le fera échouer sans que personne ait à l'y inscrire.
+  Il a d'ailleurs trouvé cinq sites qu'une recherche textuelle avait manqués, leurs variables ne suivant pas la convention de nommage attendue.
+
 ### Retiré
 
 - **L'enveloppe `api_success` et `api_error` (`CORE-API-ENVELOPE-REMOVE-001`, ADR-088).**
@@ -183,129 +306,6 @@
   Aucun décorateur n'est recréé. Si un besoin réel apparaît, sa place est `core/security/decorators.py`, auprès de `require_auth`, `require_csrf` et `require_role`, bâti sur la primitive et avec un code d'erreur unique.
   `core/http/bearer.py` **gagne au passage sa page de documentation**, qu'il n'avait pas : supprimer l'implémentation documentée pour promouvoir l'indocumentée aurait été une régression.
   La section d'authentification de `docs/reference/api-json.md` est réécrite, et elle dit désormais le piège que l'ancienne taisait : un jeton attendu à `None` ouvre l'API à tout le monde, et il faut refuser de démarrer en production plutôt que de servir sans le savoir.
-
-### Ajouté
-
-- **Une seule fabrique de réponse d'erreur JSON (`CORE-API-ERROR-CANONICAL-001`, ADR-088).**
-  Forge portait deux formes d'erreur JSON qui s'étaient développées séparément, et un client recevait l'une ou l'autre selon la route touchée.
-  D'un côté une enveloppe déclarée dans `core/http/helpers.py`, documentée sur quatre cent onze lignes dans `docs/reference/api-json.md` et câblée dans le cœur ; de l'autre une forme plate qu'aucun document ne décrivait, mais que les trois opt-ins exposant réellement du JSON avaient adoptée seuls.
-  Mesuré : l'enveloppe comptait trois sites d'appel, tous dans un module qu'aucun opt-in n'emploie, et son pendant `api_success` n'en comptait aucun.
-  L'ADR-088 a tranché pour la forme pratiquée, et ce ticket l'établit : `core.http.json_error(code, status, message=...)` devient la seule fabrique, et `application.py` comme `forge-mvc-iot`, `forge-mvc-video` et `forge-mvc-audio` y convergent.
-  Le format en sortie ne bouge pas, les tests d'API des trois opt-ins passent sans modification, ce qui était le critère de validation du ticket.
-  Le champ `message` reste **facultatif et réservé aux erreurs de validation**, seul cas où le client a besoin de savoir quoi corriger ; un refus qui explique à quelle étape il a eu lieu renseigne l'attaquant.
-  Un garde-fou par analyse syntaxique refuse désormais tout corps d'erreur JSON composé hors de cette fabrique. Sans lui la divergence recommencerait, puisqu'elle est née exactement de l'absence d'un endroit unique où la forme soit écrite.
-  L'enveloppe `api_success` et `api_error` est marquée sortante mais **encore exportée** : son retrait, celui de `core/security/api_auth.py` et la réécriture de la référence forment des tickets distincts, pour ne pas laisser le dépôt cassé entre deux commits.
-
-### Corrigé
-
-- **Le drapeau `api` d'une route ne faisait rien, alors que la documentation lui prêtait un comportement (`CORE-ROUTE-API-FLAG-001`).**
-  Il était déclaré dans `RouteEntry`, propagé par `RouteGroup`, affiché par `routes:list`, et **lu par aucun code applicatif**.
-  Ses seules lectures dans tout le dépôt étaient celle de `forge.py`, pour l'afficher, et des tests vérifiant qu'il valait ce qu'on lui avait passé.
-  La documentation du routeur en promettait pourtant « réponses JSON, pas de redirection login » : une route marquée `api=True` recevant une requête non authentifiée renvoyait une redirection 302 vers une page HTML de connexion, et son client JSON échouait loin de la cause en tentant de désérialiser du HTML.
-  C'est le troisième cas de ce cycle où une documentation affirme un comportement que le code n'a pas, après la mise en service de `forge-mvc-stats` et le motif de saut des tests d'intégration.
-  Le drapeau tient désormais sa promesse pour tout ce que le framework rend **après** avoir trouvé la route : 401 sur défaut d'authentification, 403 sur jeton CSRF invalide, 503 sur base indisponible, 500 sur erreur non gérée, tous en JSON.
-  Un refus déjà explicite garde son statut, seule sa forme change : un middleware applicatif qui rend 403 continue de rendre 403.
-  Les en-têtes du refus sont conservés, **cookies compris**, et c'est le point délicat : `AuthMiddleware` ferme la session quand il détecte une session orpheline (ADR-080), et reconstruire la réponse sans ce cookie aurait laissé la session ouverte, transformant une correction de forme en régression de sécurité.
-  La cause d'une erreur non gérée n'est **jamais** exposée, même en `APP_ENV=dev`, contrairement à la page HTML : celle-ci est lue par un humain devant son navigateur, tandis qu'une réponse d'API part vers un client qui la journalise, la stocke ou la réexpose. La cause reste dans les journaux du serveur.
-  La forme `{"error": "<code>"}` n'est pas inventée ici : `forge-mvc-iot`, `forge-mvc-video`, `forge-mvc-audio` et `forge-mvc-admin` avaient déjà convergé seuls dessus, `video` et `audio` portant même la ligne à l'identique. Ce ticket la reprend, il ne la décrète pas, et ne touche pas encore aux quatre paquets.
-  **Limite assumée et écrite** : les 404 et 405 restent en HTML. Le drapeau appartient à une route, et dans ces deux cas aucune route n'a été trouvée, donc rien ne dit que le chemin visait une API.
-
-- **Le motif de saut des tests d'intégration désignait la mauvaise cause (`TEST-DB-SKIP-REASON-001`).**
-  Les douze fixtures d'intégration rangeaient toute erreur de connexion sous un mot unique, « injoignable », et le commentaire de `tests/db/conftest.py` assumait la confusion en toutes lettres.
-  Or « pas de serveur » et « serveur qui refuse mes identifiants » appellent des gestes opposés, démarrer un service dans un cas, corriger une variable d'environnement dans l'autre.
-  Le coût n'est pas théorique : un serveur MariaDB actif, à l'écoute, qui refusait seulement le mot de passe, a été lu comme un serveur arrêté, et le diagnostic s'est fourvoyé jusqu'à ce que l'erreur réelle soit relue.
-  En CI le point était masqué, `FORGE_REQUIRE_DB=1` transformant le saut en échec ; en local il produisait un faux diagnostic sans le moindre signal.
-  Un classificateur partagé vit désormais dans `forge-mvc-testing` (ADR-041), et les douze sites l'appellent au lieu de recopier le message.
-  Le motif nomme le geste attendu, « le serveur tourne, inutile de le démarrer, posez `FORGE_TEST_DB_PASSWORD` », ou « démarrez le serveur, ou vérifiez `FORGE_TEST_DB_HOST` et `FORGE_TEST_DB_PORT` ».
-  Une cause non reconnue n'est jamais rangée d'office dans l'une des deux autres : mieux vaut ne rien affirmer que d'affirmer faux avec l'aplomb du vrai.
-  Le classificateur est éprouvé sur des messages **réels** des trois pilotes, relevés en condition, et non sur des chaînes inventées.
-  Les deux scénarios ont été rejoués de bout en bout, mauvais mot de passe puis port sans serveur, pour vérifier que chacun produit bien son motif.
-
-### Ajouté
-
-- **La table d'événements statistiques gagne une politique de rétention (`STATS-RETENTION-001`).**
-  `forge_stats_events` reçoit une ligne par événement suivi et rien ne la bornait.
-  Une application qui trace consciencieusement y accumule des millions de lignes, et les agrégats ralentissent d'autant sans que rien ne prévienne.
-  `forge stats:gc --days N` compte les événements antérieurs à la borne et les affiche ; `--run` supprime.
-  Même forme que `audit:gc`, rétention à dire explicitement par l'option ou par `STATS_KEEP_DAYS`, refus d'une valeur nulle ou négative.
-  Le module de rétention suit la convention **du paquet** et non celle de `forge-mvc-audit` : il n'accède jamais à la base de lui-même, l'appelant fournit l'exécuteur, exactement comme `track_event` et `count_stats_events`.
-  La commande fait seule la jonction avec `core.database`.
-  La borne part en paramètre lié, aucune expression de date n'entrant dans le SQL, et `idx_forge_stats_events_created_at` rend la suppression indexée sans migration.
-  Purger détruit de l'information et aucun agrégat de remplacement n'est calculé, ce que la page de référence dit sans détour.
-  Le paquet reçoit au passage son **premier test d'intégration** : il rendait jusqu'ici un DDL que rien n'exécutait jamais, si bien qu'une erreur de rendu ne se serait vue qu'en production.
-
-- **`forge-mvc-stats` rejoint la convention de provisioning des opt-ins BDD (`STATS-OPTIN-CONFORM-001`).**
-  Le paquet était en retrait des neuf autres opt-ins adossés à la base.
-  Il décrivait bien sa table en `TableDefinition`, mais il n'avait ni `MIGRATIONS`, ni entry point `forge_mvc.commands`, ni dossier `cli/`, ni commande d'amorçage.
-  `forge_stats_events` n'était donc créée par aucune commande Forge, alors que l'ADR-071 fixe une convention unique de provisioning, et sa page de référence affirmait « cet opt-in n'apporte aucune table », ce qui était faux.
-  L'écart n'a été trouvé qu'en vérifiant un avis extérieur qui, lui, pointait autre chose.
-  `forge stats:init` rend désormais la migration pour le backend installé et l'écrit dans `mvc/migrations/`, sans exécuter de SQL.
-  La déclaration de la table déménage dans `tables.py`, emplacement conventionnel où le provisioning partagé va la chercher ; `schema.py` la réexporte, ces noms appartenant à l'API publique du paquet depuis son origine.
-  Un test vérifie que les deux modules désignent le même objet, deux `TableDefinition` pour une même table divergeant en silence.
-  Un projet antérieur avait créé `forge_stats_events` à la main, faute de commande. Vérifié en conditions réelles, les deux cas se passent bien.
-  Si sa table est conforme, la migration ne fait rien et s'enregistre, le DDL étant rendu en `CREATE TABLE IF NOT EXISTS` sur les quatre backends.
-  Si elle diverge, la migration **échoue franchement** en nommant la colonne absente, et **n'est pas enregistrée comme appliquée**, ce qui laisse le projet réparer puis rejouer.
-
-- **Les tâches de fond orphelines sont reprises au lieu de rester bloquées (`JOBS-STALE-RECLAIM-001`).**
-  Un worker réserve une tâche en la passant à `running`, puis rend son verdict.
-  Tué entre les deux, il ne rendait aucun verdict et personne ne le rendait à sa place : la tâche restait `running` indéfiniment, et la file se remplissait de lignes mortes que rien ne signalait.
-  La limite était assumée en toutes lettres dans le module, ce qui la rendait visible sans la rendre supportable.
-  `forge jobs:reclaim` remet en file les tâches dont le **bail** de réservation a expiré, et marque en échec celles qui ont épuisé leurs tentatives.
-  Aucune migration n'était nécessaire, `started_at` et `claim_token` existaient déjà dans la table.
-  L'échec de reprise porte un message distinct de celui d'une exception du gestionnaire : confondre les deux ferait chercher un bogue applicatif là où il y a eu une panne de processus.
-  Le réessai après échec attend désormais un **délai croissant**, 10, 20, 40, 80, 160, 320 puis 600 secondes, au lieu de repartir aussitôt.
-  Sans lui, une tâche qui échouait vite consommait toutes ses tentatives en une fraction de seconde et ne laissait aucune chance à une panne passagère de se résorber.
-  C'est un changement de comportement pour les files réglées à plus d'une tentative, et les tests qui encodaient le réessai immédiat disent maintenant le délai.
-  Détail de portabilité qui valait le détour : l'inégalité du bail est écrite `started_at + bail < maintenant` et non `started_at < maintenant - bail`.
-  Les deux sont équivalentes en mathématiques, pas en SQL portable.
-  Mesuré, le dialecte SQLite compose son modificateur par concaténation et rend **`NULL`** pour un intervalle négatif, si bien que la seconde forme n'aurait rien repris du tout sur SQLite, sans lever la moindre erreur.
-  Un garde-fou relit le SQL engendré pour empêcher la forme négative de revenir.
-  Deux limites écrites plutôt que découvertes : le bail est une durée fixe, donc une tâche légitimement plus longue que lui sera reprise alors qu'elle tourne encore et exécutée deux fois, ce qui impose des gestionnaires idempotents ; et le worker ne prolonge pas son bail pendant qu'il travaille.
-
-- **Le journal d'audit gagne une politique de rétention (`AUDIT-RETENTION-001`).**
-  `audit_log` grossissait à chaque action tracée et rien ne la bornait.
-  C'était la seule table d'opt-in adossé à la base sans purge, alors que `sessions:gc` avait posé le précédent, si bien que l'exploitant devait écrire lui-même son ménage en SQL.
-  `forge audit:gc --days N` compte les entrées antérieures à la borne et les affiche ; `--run` supprime.
-  La rétention doit être **dite**, par l'option ou par la variable `AUDIT_KEEP_DAYS`, l'option l'emportant sur la variable.
-  Aucune valeur par défaut n'est supposée, et une rétention nulle ou négative est refusée, car elle viderait le journal entier sans que rien ne distingue l'intention de l'étourderie.
-  Contrairement à `sessions:gc` qui supprime directement, la commande affiche d'abord (charte §7, motif déjà suivi par `fixtures:purge` et `db:init`).
-  La raison de cette asymétrie est écrite dans le module : une session expirée n'est plus rien pour personne, son expiration étant portée par la ligne elle-même, tandis qu'une entrée d'audit est un enregistrement délibéré dont aucune date ne dit qu'il a cessé de valoir.
-  La borne est calculée en Python et part en **paramètre lié**, sur le modèle de `forge-mvc-sessions-db` : aucune expression de date n'entre dans le SQL, ce qui évite d'emblée le piège mesuré par `OPTIN-DML-DIALECT-001`.
-  Aucune migration n'est requise, `idx_audit_created` portant déjà sur `created_at`, donc la suppression est indexée.
-  Deux limites écrites noir sur blanc : aucune archive n'est produite avant suppression, et la suppression tient en une instruction, donc sur une très grosse table le verrou peut être long.
-
-### Sécurité
-
-- **L'anti-rejeu TOTP peut désormais être partagé par tous les processus (`MFA-TOTP-REPLAY-SHARED-001`).**
-  Le registre des codes déjà consommés vivait dans la mémoire d'un processus, donc chaque worker gunicorn avait le sien.
-  Or `deploy:init` génère précisément du gunicorn multi-worker, si bien que le chemin de déploiement officiel de Forge affaiblissait sa propre protection.
-  Un code intercepté pouvait être présenté à chaque worker tour à tour, et accepté autant de fois qu'il y a de workers.
-  La limite était connue, écrite et gardée par un test (`MFA-REPLAY-SCOPE-DOC-001`), qui laissait le remède au choix de l'exploitant ; ce ticket lui en donne un qui fonctionne, sans lui retirer le choix.
-  Le registre passe derrière un contrat, `TotpReplayStore`, et Forge en livre deux mises en œuvre.
-  Le **défaut ne change pas**, c'est toujours le registre en mémoire, si bien qu'aucun projet existant ne voit son comportement bouger.
-  `DbTotpReplayStore` s'adosse au backend BDD du projet et vaut alors pour tous les processus ; l'application le pose au démarrage par `set_replay_store()`, en une ligne visible (principe 3).
-  Aucune dépendance nouvelle, ni Redis ni broker, `core.database` venant de `forge-mvc` que le paquet exigeait déjà, et l'import restant paresseux pour que `forge-mvc-mfa` demeure utilisable sans backend.
-  Le contrat est reproduit **exactement**, y compris sa partie la moins visible.
-  Il refuse toute fenêtre antérieure ou égale à la dernière vue, et pas seulement le doublon exact, sans quoi un code plus ancien resterait rejouable tant que la tolérance de `verify_totp_code` l'accepte.
-  D'où une ligne par facteur portant sa dernière fenêtre, et non une ligne par code consommé, ce qui borne aussi la table au nombre de facteurs actifs.
-  L'atomicité est obtenue sans transaction applicative, par un `INSERT` dont l'échec en doublon bascule vers un `UPDATE` gardé par `last_step < ?`, le doublon étant reconnu par `is_unique_violation()` du contrat `DatabaseBackend`.
-  La purge compare des numéros de fenêtre et jamais des dates, ce qui la rend portable sans effort sur les quatre backends.
-  La table est **optionnelle**, `forge mfa:init` ne servant qu'aux projets qui installent le registre partagé ; le paquet reste une bibliothèque sans persistance pour tous les autres.
-  Le test central ouvre deux connexions distinctes et vérifie qu'un code accepté par la première est refusé par la seconde, propriété que le registre en mémoire ne peut pas offrir.
-
-- **Les listes blanches ancrées acceptaient la valeur suffixée d'un saut de ligne (`VALIDATION-ANCHOR-FULLMATCH-001`).**
-  En Python, `$` n'ancre pas tout à fait la fin de la chaîne, il accepte aussi la position qui précède un saut de ligne final.
-  Un validateur écrit `^...$` puis consulté par `match()` laissait donc passer ce qu'il prétendait interdire.
-  Mesuré, `_ident("titre\n")` rendait la chaîne intacte, et cette valeur est ensuite interpolée dans le `SELECT` de `forge-mvc-admin`.
-  Aucun cas exploitable n'a été trouvé, rien ne peut suivre ce saut de ligne, `"titre\nDROP TABLE x"` étant bien rejeté.
-  Mais plusieurs de ces valeurs composent ensuite un chemin de fichier, l'identifiant de session devenant `<dossier>/<identifiant>.json` et la locale `<dossier>/<locale>.json`, or un saut de ligne est un caractère légal dans un nom de fichier POSIX.
-  Une défense en profondeur ne se juge pas à son exploitabilité du jour.
-  Le critère de tri n'est pas la forme de l'expression mais la méthode d'appel, `fullmatch()` immunisant déjà même en gardant les ancres.
-  Le dépôt employait les deux formes, `core/forms/fields.py`, `forge_mvc_files` et `forge_mvc_entities` appelant déjà `fullmatch()`.
-  Le ticket retient `fullmatch()` partout, forme unique (principe 11), sur **29 sites répartis dans 18 fichiers**.
-  Quatre sites étaient couverts par accident, un `.strip()` en amont retirant le saut avant la validation ; **six laissaient réellement passer**.
-  Le garde-fou ne porte aucune liste de sites et détecte l'idiome par analyse syntaxique, si bien qu'un site futur le fera échouer sans que personne ait à l'y inscrire.
-  Il a d'ailleurs trouvé cinq sites qu'une recherche textuelle avait manqués, leurs variables ne suivant pas la convention de nommage attendue.
 
 ## [1.0.0-rc.4] - 2026-08-04
 

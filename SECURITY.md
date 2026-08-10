@@ -4,11 +4,11 @@
 
 | Version | Support sécurité |
 |---------|:----------------:|
-| `1.x` série préversion courante (`1.0.0rc4`, release candidate) | ✅ Actif |
+| `1.x` série préversion courante (`1.0.0rc5`, release candidate) | ✅ Actif |
 | `< 1.0.0-beta.1` | ❌ Non supporté |
 
 La série `1.x` est la seule supportée ; en phase de préversion, cela correspond
-à la release candidate courante `1.0.0rc4` (forme SemVer `1.0.0-rc.4`). Une fois
+à la release candidate courante `1.0.0rc5` (forme SemVer `1.0.0-rc.5`). Une fois
 la `1.0.0` stable publiée, la ligne supportée sera `1.0.x`.
 
 ---

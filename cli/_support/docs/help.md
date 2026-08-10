@@ -98,7 +98,7 @@ forge help
 Début de la sortie produite :
 
 ```text
-Forge 1.0.0rc4 - Framework MVC Python
+Forge 1.0.0rc5 - Framework MVC Python
 
   forge <commande> [arguments]
 
@@ -113,7 +113,7 @@ Construire le texte depuis du code Python :
 ```python
 from cli._support.help import build_help
 
-print(build_help("1.0.0rc4"))
+print(build_help("1.0.0rc5"))
 ```
 
 ## 7. Détails techniques

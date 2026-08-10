@@ -7,7 +7,7 @@
 # Infrastructure de test partagee de Forge : FakeRequest + plugin pytest,
 # charge automatiquement des l'installation (ADR-041). Version alignee sur
 # forge-mvc (verrouillee par tools/check_version_sync.py).
-forge-mvc-testing==1.0.0rc4
+forge-mvc-testing==1.0.0rc5
 
 # Chaine qualite invoquee par `make check` (typage strict par fichier, lint).
 pytest

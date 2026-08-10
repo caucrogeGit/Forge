@@ -7,32 +7,33 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> Version courante : **Forge 1.0.0-rc.4** (release candidate, préparée le 2026-08-04).
-> Dernière version publiée sur PyPI : **Forge 1.0.0-rc.3** (2026-07-31).
+> Version courante : **Forge 1.0.0-rc.5** (release candidate, préparée le 2026-08-10).
+> Dernière version publiée sur PyPI : **Forge 1.0.0-rc.4** (2026-08-05).
 
 ---
 
-## État actuel : Forge 1.0.0-rc.4
+## État actuel : Forge 1.0.0-rc.5
 
-**Tag courant : `v1.0.0-rc.4`**, quatrième release candidate avant la 1.0.0 stable.
+**Tag courant : `v1.0.0-rc.5`**, cinquième release candidate avant la 1.0.0 stable.
 
-Elle est née d'un chantier de vérification par exécution plutôt que par relecture. Les parcours d'accueil sont joués dans de vrais projets, les blocs de commande de la documentation sont exécutés, et chaque import ou commande cité est confronté à l'interpréteur et au CLI.
+Elle est née d'un pré-mortem mené sur la portabilité réelle des quatre backends, et de ce que la suite de tests taisait.
 
-Ce chantier a surtout servi à trouver des défauts que la relecture ne voyait pas.
-La sonde `GET /health`, au contrat de stabilité, répondait 404 sous WSGI, seul chemin de production supporté.
-Soixante-cinq tests, dont les trente-trois d'en-têtes de sécurité, ne s'exécutaient plus depuis l'ADR-044, en se sautant avec le vocabulaire d'un poste mal équipé.
-Le contrat de stabilité garantissait deux classes absentes du code et se contredisait sur leur statut.
-Un projet mis à jour gardait une unité systemd figée sur MariaDB sans que rien ne le lui dise.
+Cinq défauts de production ont été trouvés et corrigés, tous invisibles d'une suite pourtant verte à dix-sept mille tests.
+Le back-office ne savait ni modifier ni supprimer un enregistrement sur PostgreSQL et SQL Server, `UPDATE ... LIMIT` étant une extension MySQL (`ADMIN-JOBS-LIMIT-PORTABLE-001`).
+Le dépôt de `forge-mvc-video` était inutilisable sur ces deux mêmes moteurs, ses marqueurs de paramètre étant écrits au format du connecteur MariaDB (`VIDEO-DML-PORTABLE-001`).
+Le magasin anti-rejeu MFA portait un interblocage InnoDB et ne reconnaissait pas un doublon déjà qualifié, deux défauts qui n'apparaissent que sous concurrence réelle.
 
-Côté dépendances, `cryptography` passe à `>=50.0.0` et perd sa borne haute (`DEPS-CRYPTOGRAPHY-NO-CEILING-001`) : cette bibliothèque livre ses correctifs de sécurité dans une nouvelle majeure, si bien qu'un plafond les excluait au moment même de leur parution.
+La cause commune était l'instrument : les six tests d'intégration des paquets opt-in passaient par un adaptateur de connexion écrit à la main, donc à côté de la vraie couche d'accès, et ne s'exécutaient que sur MariaDB (`TEST-PACKAGE-INTEGRATION-REAL-LAYER-001`).
+Ils empruntent désormais `core.database.db` et s'exécutent sur les trois serveurs, un test écrit une seule fois produisant un cas par backend.
 
-Le moteur d'entités devient utilisable sans terminal (`ENTITIES-NON-INTERACTIVE-001` et `002`), ce qui rend les parcours rejouables.
+Trois défauts ont enfin été trouvés non par un test, mais en rendant visible ce que la suite passait sous silence : vingt-cinq tests dormaient depuis deux ADR faute d'une cible existante, six contrôles d'empaquetage ne s'exécutaient nulle part, et une paramétrisation vide rendait un test invisible par construction.
+Les motifs de saut sont maintenant imprimés partout, et une paramétrisation vide arrête la session.
 
 L'API publique reste gelée pour la 1.0 et tous les opt-ins restent en Beta (`Development Status :: 4 - Beta`).
 
-Précédent : v1.0.0-rc.3 (2026-07-31, correctif CRLF des en-têtes, DDL dialectale des opt-ins), v1.0.0-rc.2 (2026-07-01, refonte de la navigation documentaire, dispatch CLI par entry points ADR-059), v1.0.0-rc.1 (2026-06-26, première release candidate, briques opt-in ADR-052, déploiement extrait ADR-053), v1.0.0-beta.17 (2026-06-18, typage strict de bout en bout ADR-036), v1.0.0-beta.16 (2026-06-16, retrait de la génération de starters ADR-035), v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Précédent : v1.0.0-rc.4 (2026-08-05, vérification de la documentation par exécution, correctif `GET /health` sous WSGI), v1.0.0-rc.3 (2026-07-31, correctif CRLF des en-têtes, DDL dialectale des opt-ins), v1.0.0-rc.2 (2026-07-01, refonte de la navigation documentaire, dispatch CLI par entry points ADR-059), v1.0.0-rc.1 (2026-06-26, première release candidate, briques opt-in ADR-052, déploiement extrait ADR-053), v1.0.0-beta.17 (2026-06-18, typage strict de bout en bout ADR-036), v1.0.0-beta.16 (2026-06-16, retrait de la génération de starters ADR-035), v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
 
-**Statut : v1.0.0-rc.4, quatrième release candidate : API publique gelée, tous les opt-ins en Beta, documentation vérifiée par exécution et non par relecture.
+**Statut : v1.0.0-rc.5, cinquième release candidate : API publique gelée, tous les opt-ins en Beta, portabilité des quatre backends éprouvée sur serveurs réels.
 Les acquis des rc précédentes restent en place, comme ceux de beta.17 (typage strict ADR-036), beta.16 (parcours réalisés à la main ADR-035), beta.15 (i18n ADR-027, convention de route ADR-029) et beta.14 (squelette dédié ADR-024).**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).

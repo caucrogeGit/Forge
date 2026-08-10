@@ -27,7 +27,7 @@ from forge_mvc_import_export.engine import (
 )
 from forge_mvc_import_export.errors import CsvImportError
 
-__version__ = "1.0.0rc4"
+__version__ = "1.0.0rc5"
 
 __all__ = [
     "CsvImportError",

@@ -21,7 +21,7 @@ from forge_mvc_audit.store import (
     record_audit,
 )
 
-__version__ = "1.0.0rc4"
+__version__ = "1.0.0rc5"
 
 __all__ = [
     "AuditError",
