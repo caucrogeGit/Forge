@@ -1,11 +1,27 @@
-"""Tests — POST-JSON-SCHEMA-001 : présence des schémas JSON dans le wheel.
+"""POST-JSON-SCHEMA-001 : présence des schémas JSON dans les distributions.
 
-Vérifie que la distribution wheel et sdist contiennent les 6 fichiers
-schemas/*.json requis par schema:list, schema:doctor et entity:validate.
+Vérifie que le wheel et le sdist du cœur contiennent les cinq fichiers
+`cli/schemas/*.json` dont dépendent `schema:list`, `schema:doctor` et
+`entity:validate`. Un schéma absent de la distribution ne se voit qu'après
+publication, chez l'utilisateur, sous la forme d'une commande qui échoue.
+
+## Ce qui a changé (`CI-WHEEL-TESTS-NEVER-RAN-001`)
+
+Ces tests ne s'exécutaient **nulle part**. En CI, le job construit les
+distributions **après** avoir lancé la suite : `dist/` était vide au moment où
+ils passaient, et ils se sautaient. En local, ils tournaient contre un `dist/`
+résiduel d'une construction ancienne, donc contre une distribution qui ne
+correspondait plus au code.
+
+Le motif de saut est désormais gouverné par `FORGE_REQUIRE_DIST`, sur le modèle
+de `FORGE_REQUIRE_DB` : sauté sans distribution en local, **en échec** quand la
+CI affirme en avoir construit une. La garantie d'empaquetage ne doit jamais être
+verte par défaut.
 """
 
 from __future__ import annotations
 
+import os
 import tarfile
 import zipfile
 from pathlib import Path
@@ -13,6 +29,20 @@ from pathlib import Path
 import pytest
 
 DIST = Path("dist")
+
+#: Posé par la CI juste après la construction : l'absence de distribution
+#: devient alors un échec, jamais un saut.
+_REQUIRE_DIST = os.environ.get("FORGE_REQUIRE_DIST") == "1"
+
+
+def _exiger_distribution(quoi: str, chemin: "Path | None") -> Path:
+    """Rend la distribution, ou saute en local et échoue sous FORGE_REQUIRE_DIST."""
+    if chemin is not None:
+        return chemin
+    motif = f"{quoi} absent de dist/ — lancer `python -m build` d'abord"
+    if _REQUIRE_DIST:
+        pytest.fail(motif + " (FORGE_REQUIRE_DIST=1)")
+    pytest.skip(motif)
 EXPECTED_SCHEMAS = {
     "cli/schemas/common.schema.json",
     "cli/schemas/field.schema.json",
@@ -42,37 +72,28 @@ def _latest_sdist() -> Path | None:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.skipif(not DIST.exists(), reason="dist/ absent — lancer python -m build d'abord")
 def test_wheel_exists():
-    assert _latest_wheel() is not None, "Aucun wheel dans dist/"
+    """Le cœur produit bien un wheel : sans lui, les contrôles suivants n'ont pas d'objet."""
+    _exiger_distribution("wheel", _latest_wheel())
 
 
-@pytest.mark.skipif(_latest_wheel() is None and not DIST.exists(), reason="dist/ absent")
 def test_wheel_contains_registry():
-    wheel = _latest_wheel()
-    if wheel is None:
-        pytest.skip("Aucun wheel dans dist/")
+    wheel = _exiger_distribution("wheel", _latest_wheel())
     with zipfile.ZipFile(wheel) as z:
         names = set(z.namelist())
     assert "cli/schemas/forge.schema.index.json" in names
 
 
-@pytest.mark.skipif(_latest_wheel() is None and not DIST.exists(), reason="dist/ absent")
 def test_wheel_contains_all_schemas():
-    wheel = _latest_wheel()
-    if wheel is None:
-        pytest.skip("Aucun wheel dans dist/")
+    wheel = _exiger_distribution("wheel", _latest_wheel())
     with zipfile.ZipFile(wheel) as z:
         names = set(z.namelist())
     missing = sorted(EXPECTED_SCHEMAS - names)
     assert not missing, f"Schémas absents du wheel : {missing}"
 
 
-@pytest.mark.skipif(_latest_wheel() is None and not DIST.exists(), reason="dist/ absent")
 def test_wheel_schema_count():
-    wheel = _latest_wheel()
-    if wheel is None:
-        pytest.skip("Aucun wheel dans dist/")
+    wheel = _exiger_distribution("wheel", _latest_wheel())
     with zipfile.ZipFile(wheel) as z:
         names = set(z.namelist())
     found = names & EXPECTED_SCHEMAS
@@ -84,16 +105,13 @@ def test_wheel_schema_count():
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.skipif(not DIST.exists(), reason="dist/ absent — lancer python -m build d'abord")
 def test_sdist_exists():
-    assert _latest_sdist() is not None, "Aucun sdist dans dist/"
+    """Le cœur produit bien un sdist."""
+    _exiger_distribution("sdist", _latest_sdist())
 
 
-@pytest.mark.skipif(_latest_sdist() is None and not DIST.exists(), reason="dist/ absent")
 def test_sdist_contains_all_schemas():
-    sdist = _latest_sdist()
-    if sdist is None:
-        pytest.skip("Aucun sdist dans dist/")
+    sdist = _exiger_distribution("sdist", _latest_sdist())
     with tarfile.open(sdist) as t:
         names = {m.name for m in t.getmembers()}
     missing = []

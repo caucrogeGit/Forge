@@ -77,6 +77,33 @@ def test_le_job_mariadb_n_utilise_plus_le_selecteur_large() -> None:
     )
 
 
+def test_les_tests_d_empaquetage_tournent_apres_la_construction() -> None:
+    """Ils ne prouvent rien tant que `dist/` est vide (`CI-WHEEL-TESTS-NEVER-RAN-001`).
+
+    Le job lançait la suite **avant** de construire les distributions, si bien
+    que les contrôles de contenu de wheel se sautaient. Ils ne s'exécutaient
+    donc nulle part : en local non plus, où un `dist/` résiduel les faisait
+    passer contre une distribution périmée.
+
+    Deux propriétés à tenir ensemble : l'étape existe, et elle vient **après**
+    la construction.
+    """
+    texte = WORKFLOW.read_text(encoding="utf-8")
+
+    etape = texte.find("Test packaging")
+    build = texte.find("Build package")
+    assert etape != -1, "l'étape de test d'empaquetage a disparu du workflow"
+    assert build != -1
+    assert build < etape, (
+        "les tests d'empaquetage passent avant la construction : `dist/` sera "
+        "vide et ils se sauteront."
+    )
+    assert 'FORGE_REQUIRE_DIST: "1"' in texte, (
+        "sans ce drapeau, une distribution absente ferait sauter les tests au "
+        "lieu de faire échouer le job."
+    )
+
+
 def test_le_job_sans_base_exclut_les_trois_serveurs_d_un_seul_terme() -> None:
     """C'est ce que la combinaison des marqueurs achète, et qu'il ne faut pas perdre.
 

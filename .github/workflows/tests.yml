@@ -75,6 +75,22 @@ jobs:
             python -m build --no-isolation "$pkg"
           done
 
+      # CI-WHEEL-TESTS-NEVER-RAN-001 : ces tests vérifient que les schémas JSON
+      # canoniques (ADR-058) sont bien DANS les distributions. Ils vivaient dans
+      # la suite principale, lancée AVANT ce build : `dist/` était vide, et ils
+      # se sautaient. Ils ne s'exécutaient donc nulle part, ni ici ni en local,
+      # où un `dist/` résiduel les faisait passer contre une distribution
+      # périmée. Les relancer ici, distributions fraîches en main, est le seul
+      # moment où ils prouvent quelque chose.
+      #
+      # Étape séparée et non déplacement du build avant la suite : le job veille
+      # à ce que rien ne masque l'exécution de pytest (CI-AUDIT-BLOCKING-001), et
+      # un build en échec le ferait.
+      - name: Test packaging (distributions fraîches)
+        env:
+          FORGE_REQUIRE_DIST: "1"
+        run: python -m pytest tests/test_package_schemas_in_wheel.py -v
+
       - name: Build documentation
         run: mkdocs build --strict
 

@@ -29,6 +29,16 @@
 
 ### Corrigé (pré-mortem rc5)
 
+- **Six tests d'empaquetage ne s'exécutaient nulle part (`CI-WHEEL-TESTS-NEVER-RAN-001`).**
+  Ils vérifient que les cinq schémas JSON canoniques (ADR-058) sont bien **dans** le wheel et le sdist publiés. Un schéma absent d'une distribution ne se voit qu'après publication, chez l'utilisateur, sous la forme d'une commande qui échoue.
+  En CI, le job construit les distributions **après** avoir lancé la suite : `dist/` était vide au moment où ils passaient, et ils se sautaient. En local, ils tournaient contre un `dist/` résiduel d'une construction ancienne, donc contre une distribution ne correspondant plus au code.
+  Une étape les relance désormais après la construction, distributions fraîches en main, avec `FORGE_REQUIRE_DIST=1` : distribution absente devient un **échec**, sur le modèle de `FORGE_REQUIRE_DB`. La garantie d'empaquetage ne doit jamais être verte par défaut.
+  Étape séparée plutôt que déplacement du build avant la suite : le job veille à ce que rien ne masque l'exécution de pytest (`CI-AUDIT-BLOCKING-001`), et un build en échec le ferait.
+  Vérification faite, les schémas **sont** correctement empaquetés : aucun défaut, seulement une garantie qui ne garantissait rien.
+  Un garde-fou fige les deux propriétés, l'existence de l'étape et son ordre après la construction.
+
+  Ces six-là ont été trouvés par le passage de `-rs` en CI, décidé au ticket précédent. C'est le premier bénéfice de rendre les sauts lisibles, et il est arrivé au premier passage.
+
 - **Une paramétrisation vide rendait un test invisible, et mon relevé en avait manqué une (`TESTS-EMPTY-PARAMETRIZE-GUARD-001`).**
   `@pytest.mark.parametrize` sur une liste vide ne produit pas zéro test : pytest en produit **un**, marqué `skip`, avec le motif « got empty parameter set ».
   C'est exactement là que le contrôle compte le plus. Les cliquets de dette de Forge se vident à mesure qu'elle est payée, et la liste vide est justement l'état qu'on veut voir tenir.
