@@ -107,8 +107,13 @@ def test_make_public_show_genere_requete_sql_visible():
     controller = build_public_show_controller(build_public_list_spec(HEBERGEMENT_JSON))
 
     assert 'SELECT_PUBLIC_DETAIL = "SELECT Nom AS nom, Description AS description, Prix AS prix FROM hebergement WHERE Id = ?"' in controller
-    assert "cursor.execute(SELECT_PUBLIC_DETAIL, (public_id,))" in controller
-    assert "get_connection()" in controller
+    # API canonique et non connexion brute (`PUBLIC-GEN-CANONICAL-DB-001`) :
+    # `make:crud` employait déjà `core.database.db`, les générateurs publics
+    # non. Deux façons officielles d'accéder à la base dans du code engendré
+    # contredisaient le principe 11.
+    assert "row = fetch_one(SELECT_PUBLIC_DETAIL, (public_id,))" in controller
+    assert "from core.database.db import fetch_one" in controller
+    assert "get_connection" not in controller
     assert "ORM" not in controller
 
 

@@ -29,6 +29,18 @@
 
 ### Corrigé (pré-mortem rc5)
 
+- **Forge avait deux façons officielles d'accéder à la base dans le code qu'il engendre (`PUBLIC-GEN-CANONICAL-DB-001`).**
+  `make:crud` engendrait un modèle employant l'API canonique, `from core.database.db import fetch_one, fetch_all, execute, insert`.
+  `make:public-list`, `make:public-show` et `make:public-form` engendraient, eux, des connexions brutes : `get_connection()`, `connection.cursor(dictionary=True)`, `cursor.fetchall()`, `connection.commit()`, le tout dans un `try/finally` de dix lignes que l'utilisateur devait relire.
+  Deux façons de faire la même chose dans du code livré à l'utilisateur, contre le principe 11.
+  Les trois générateurs emploient désormais l'API canonique. Le contrôleur de liste passe de onze lignes à une.
+  **Le défaut n'était pas une régression de portabilité** : le motif brut fonctionne sur les trois serveurs, vérifié plutôt que supposé, et `cursor(dictionary=True)` est accepté partout parce que les backends normalisent le curseur. Ce que je soupçonnais d'abord était faux.
+  Quatre tests figeaient l'ancienne forme, donc l'écart. L'un d'eux s'appelait `test_form_controller_importe_get_connection` : son nom même consacrait le défaut qu'il verrouillait.
+  Le code engendré a été exécuté pour de vrai sur MariaDB, PostgreSQL et SQL Server, lecture, détail et insertion.
+  **La documentation décrivait le générateur d'avant** : `docs/features/crud.md` montrait le modèle `make:crud` sous sa forme à connexion brute, que le générateur n'émet plus. Le bloc est remplacé par la sortie réelle du générateur, engendrée pour l'occasion et non recopiée de mémoire.
+
+  Ce défaut a été trouvé en réveillant un test mort. `test_sql_examples_canonical_001.py` interdisait exactement cela, mais visait `mvc/models/`, dossier disparu depuis l'ADR-044 : il se sautait en silence depuis, pendant que les générateurs dérivaient.
+
 - **Le job d'intégration MariaDB payait quatre minutes pour des tests qu'il ne pouvait pas exécuter (`CI-DB-JOB-SELECTOR-001`).**
   Il sélectionnait `-m db`. Or un cas PostgreSQL ou SQL Server porte **aussi** `db`, si bien qu'il les collectait tous, et que leur fixture tentait une connexion vers un serveur absent avant de les sauter.
   Mesuré, fixture `real_pg_db` avec un hôte injoignable : **quinze secondes par cas**, contre deux et demie quand l'hôte refuse, ce qui est le cas d'un runner. Le job sélectionnait 312 tests pour 116 exécutables.

@@ -216,11 +216,18 @@ def test_form_controller_contient_form_fields():
     assert '"input_type": "textarea"' in controller
 
 
-def test_form_controller_importe_get_connection():
+def test_form_controller_importe_l_api_canonique():
+    """Le contrôleur engendré importe `insert`, pas une connexion brute.
+
+    Le nom de ce test consacrait le contraire : il exigeait l'import bas
+    niveau, donc verrouillait l'écart avec `make:crud`
+    (`PUBLIC-GEN-CANONICAL-DB-001`).
+    """
     spec = build_public_form_spec(DEMANDE_JSON)
     controller = build_public_form_controller(spec)
 
-    assert "from core.database.connection import get_connection, close_connection" in controller
+    assert "from core.database.db import insert" in controller
+    assert "get_connection" not in controller
 
 
 def test_form_controller_importe_flash_du_coeur():
@@ -246,8 +253,12 @@ def test_form_controller_contient_methode_create():
     controller = build_public_form_controller(spec)
 
     assert "def create(request: Request) -> Response:" in controller
-    assert "cursor.execute(INSERT_PUBLIC_FORM" in controller
-    assert "connection.commit()" in controller
+    # API canonique et non connexion brute (`PUBLIC-GEN-CANONICAL-DB-001`) :
+    # `make:crud` employait déjà `core.database.db`, les générateurs publics
+    # non. Deux façons officielles d'accéder à la base dans du code engendré
+    # contredisaient le principe 11.
+    assert "insert(INSERT_PUBLIC_FORM, tuple(_values))" in controller
+    assert "connection.commit()" not in controller
     assert "redirect_with_flash" in controller
 
 

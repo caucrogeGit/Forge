@@ -210,7 +210,7 @@ Le CRUD sans relation, ou avec un `relations.json` vide, conserve le comportemen
 Le modèle expose des fonctions avec SQL visible et paramétré. Pas d'abstraction cachée.
 
 ```python
-from core.database.connection import get_connection, close_connection
+from core.database.db import fetch_one, fetch_all, execute, insert
 
 SELECT_ALL   = "SELECT * FROM contact ORDER BY Id"
 SELECT_BY_ID = "SELECT * FROM contact WHERE Id = ?"
@@ -220,39 +220,31 @@ DELETE       = "DELETE FROM contact WHERE Id = ?"
 
 
 def get_contacts():
-    connection = None
-    cursor = None
-    try:
-        connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute(SELECT_ALL)
-        return cursor.fetchall()
-    finally:
-        if cursor:
-            cursor.close()
-        close_connection(connection)
+    return fetch_all(SELECT_ALL)
+
+
+def get_contact_by_id(id):
+    return fetch_one(SELECT_BY_ID, (id,))
 
 
 def add_contact(data):
-    connection = None
-    cursor = None
-    try:
-        connection = get_connection()
-        cursor = connection.cursor()
-        cursor.execute(INSERT, (data["nom"], data["prenom"], data["email"], data["telephone"]))
-        connection.commit()
-    finally:
-        if cursor:
-            cursor.close()
-        close_connection(connection)
+    return insert(INSERT, (data["nom"], data["prenom"], data["email"], data["telephone"],))
+
+
+def update_contact(id, data):
+    execute(UPDATE, (data["nom"], data["prenom"], data["email"], data["telephone"], id))
+
+
+def delete_contact(id):
+    execute(DELETE, (id,))
 ```
 
 Règles appliquées :
 - Noms de table et colonnes issus du JSON canonique
 - Paramètres `?`, jamais d'interpolation directe
 - La clé primaire auto-incrémentée est exclue des `INSERT`
-- `INSERT`, `UPDATE`, `DELETE` font un `commit()` explicite
-- Connexion et curseur fermés dans un `finally`
+- Accès par l'API canonique `core.database.db`, jamais par une connexion brute
+- Connexion, curseur et validation gérés par le cœur, donc absents du code métier
 
 ### Pagination, recherche et tri
 

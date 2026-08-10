@@ -226,17 +226,7 @@ def build_public_form_create_method(spec: PublicFormSpec) -> str:
         "                _values.append(1 if _raw else 0)\n",
         "            else:\n",
         "                _values.append(_raw if str(_raw).strip() else None)\n",
-        "        connection = None\n",
-        "        cursor = None\n",
-        "        try:\n",
-        "            connection = get_connection()\n",
-        "            cursor = connection.cursor()\n",
-        "            cursor.execute(INSERT_PUBLIC_FORM, _values)\n",
-        "            connection.commit()\n",
-        "        finally:\n",
-        "            if cursor:\n",
-        "                cursor.close()\n",
-        "            close_connection(connection)\n",
+        "        insert(INSERT_PUBLIC_FORM, tuple(_values))\n",
         "        return BaseController.redirect_with_flash(\n",
         "            request,\n",
         f'            "{spec.route_path}/new",\n',
@@ -247,7 +237,7 @@ def build_public_form_create_method(spec: PublicFormSpec) -> str:
 
 def build_public_form_controller(spec: PublicFormSpec) -> str:
     return "".join([
-        "from core.database.connection import get_connection, close_connection\n",
+        "from core.database.db import insert\n",
         "from core.http.request import Request\n",
         "from core.http.response import Response\n",
         "from core.mvc.controller.base_controller import BaseController\n",
@@ -384,9 +374,7 @@ def _ensure_form_controller(controller_path: Path, spec: PublicFormSpec) -> tupl
     if target_class is None or target_class.end_lineno is None:
         return False, f"Contrôleur à compléter manuellement : {controller_path.as_posix()}"
 
-    content, _ = _ensure_import(
-        content, "from core.database.connection import get_connection, close_connection"
-    )
+    content, _ = _ensure_import(content, "from core.database.db import insert")
     content, _ = _ensure_import(
         content, "from core.mvc.controller.base_controller import BaseController"
     )

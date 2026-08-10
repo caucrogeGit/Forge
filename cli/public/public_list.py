@@ -226,7 +226,7 @@ def build_public_list_controller(spec: PublicListSpec) -> str:
     )
     cover = _list_cover_entry(spec)
     parts: list[str] = [
-        "from core.database.connection import get_connection, close_connection\n",
+        "from core.database.db import fetch_all\n",
         "from core.http.request import Request\n",
         "from core.http.response import Response\n",
         "from core.mvc.controller.base_controller import BaseController\n",
@@ -244,17 +244,7 @@ def build_public_list_controller(spec: PublicListSpec) -> str:
         "\n",
         "    @staticmethod\n",
         "    def index(request: Request) -> Response:\n",
-        "        connection = None\n",
-        "        cursor = None\n",
-        "        try:\n",
-        "            connection = get_connection()\n",
-        "            cursor = connection.cursor(dictionary=True)\n",
-        "            cursor.execute(SELECT_PUBLIC_LIST)\n",
-        "            rows = cursor.fetchall()\n",
-        "        finally:\n",
-        "            if cursor:\n",
-        "                cursor.close()\n",
-        "            close_connection(connection)\n",
+        "        rows = fetch_all(SELECT_PUBLIC_LIST)\n",
     ]
     if cover is not None:
         parts += [
@@ -280,7 +270,7 @@ def build_public_show_controller(spec: PublicListSpec) -> str:
     )
     media_import = _media_import_line(spec)
     parts: list[str] = [
-        "from core.database.connection import get_connection, close_connection\n",
+        "from core.database.db import fetch_one\n",
         "from core.http.request import Request\n",
         "from core.http.response import Response\n",
         "from core.mvc.controller.base_controller import BaseController\n",
@@ -313,17 +303,7 @@ def build_public_show_method(
         "    @staticmethod\n",
         "    def show(request: Request) -> Response:\n",
         "        public_id = request.route_params.get(\"id\")\n",
-        "        connection = None\n",
-        "        cursor = None\n",
-        "        try:\n",
-        "            connection = get_connection()\n",
-        "            cursor = connection.cursor(dictionary=True)\n",
-        "            cursor.execute(SELECT_PUBLIC_DETAIL, (public_id,))\n",
-        "            row = cursor.fetchone()\n",
-        "        finally:\n",
-        "            if cursor:\n",
-        "                cursor.close()\n",
-        "            close_connection(connection)\n",
+        "        row = fetch_one(SELECT_PUBLIC_DETAIL, (public_id,))\n",
         "        if not row:\n",
         "            return BaseController.not_found()\n",
     ]
@@ -558,10 +538,7 @@ def _ensure_show_controller(controller_path: Path, spec: PublicListSpec) -> tupl
     if target_class is None or target_class.end_lineno is None:
         return False, f"Contrôleur à compléter manuellement : {controller_path.as_posix()}"
 
-    content, _ = _ensure_import(
-        content,
-        "from core.database.connection import get_connection, close_connection",
-    )
+    content, _ = _ensure_import(content, "from core.database.db import fetch_one")
     content, _ = _ensure_import(
         content,
         "from core.mvc.controller.base_controller import BaseController",

@@ -197,8 +197,13 @@ def test_make_public_list_genere_requete_sql_lisible():
     controller = build_public_list_controller(build_public_list_spec(HEBERGEMENT_JSON))
 
     assert 'SELECT_PUBLIC_LIST = "SELECT Nom AS nom, Description AS description, Prix AS prix FROM hebergement ORDER BY Id DESC"' in controller
-    assert "cursor.execute(SELECT_PUBLIC_LIST)" in controller
-    assert "get_connection()" in controller
+    # API canonique et non connexion brute (`PUBLIC-GEN-CANONICAL-DB-001`) :
+    # `make:crud` employait déjà `core.database.db`, les générateurs publics
+    # non. Deux façons officielles d'accéder à la base dans du code engendré
+    # contredisaient le principe 11.
+    assert "rows = fetch_all(SELECT_PUBLIC_LIST)" in controller
+    assert "from core.database.db import fetch_all" in controller
+    assert "get_connection" not in controller
     assert "ORM" not in controller
 
 
