@@ -184,12 +184,22 @@ class TestExpectedTicketsPresent:
             "« **livré** »."
         )
 
-    @pytest.mark.parametrize("ticket", _EXPECTED_PENDING_B10)
-    def test_pending_ticket_marked_a_faire(self, b10_section, ticket):
-        pattern = rf"\|\s*`{re.escape(ticket)}`\s*\|\s*à faire\s*\|"
-        assert re.search(pattern, b10_section), (
-            f"Le ticket `{ticket}` doit apparaître en B10 avec le statut "
-            "« à faire »."
+    def test_pending_ticket_marked_a_faire(self, b10_section):
+        """Chaque ticket encore à faire apparaît en B10 avec ce statut.
+
+        Écrit en boucle et non en `parametrize` (`TESTS-DEAD-SKIPS-REVIVE-001`).
+        `_EXPECTED_PENDING_B10` est vide, tous les tickets B10 étant livrés, et
+        une paramétrisation vide rend un test **sauté**, donc invisible. La
+        liste vide est justement l'état qu'on veut voir tenir.
+        """
+        manquants: list[str] = []
+        for ticket in _EXPECTED_PENDING_B10:
+            pattern = rf"\|\s*`{re.escape(ticket)}`\s*\|\s*à faire\s*\|"
+            if not re.search(pattern, b10_section):
+                manquants.append(ticket)
+        assert not manquants, (
+            "Ces tickets doivent apparaître en B10 avec le statut « à faire » : "
+            + ", ".join(manquants)
         )
 
 

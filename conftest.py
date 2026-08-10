@@ -38,6 +38,38 @@ os.environ.setdefault("DB_BACKEND", "mariadb")
 # `-m "db and not db_pg and not db_mssql"`. Aucune couverture n'est perdue, ces
 # cas s'exécutant dans le job de leur propre backend.
 
+# ── Garde des paramétrisations vides (TESTS-EMPTY-PARAMETRIZE-GUARD-001) ─────
+# Une `@pytest.mark.parametrize` sur une liste vide ne produit pas zéro test :
+# pytest en produit UN, marqué `skip`, avec le motif « got empty parameter set ».
+# Le test devient donc invisible, alors que c'est souvent là qu'il compte le
+# plus : les cliquets de dette de Forge se vident à mesure qu'elle est payée, et
+# la liste vide est justement l'état qu'on veut voir tenir.
+#
+# Trois occurrences ont été trouvées à la main dans ce cycle, dont une que le
+# relevé initial avait manquée faute de la bonne sélection. Ce garde les
+# attrape toutes, présentes et futures, sans coûter une collecte séparée.
+
+
+def pytest_collection_modifyitems(config: object, items: list) -> None:  # type: ignore[type-arg]
+    vides = [
+        item.nodeid
+        for item in items
+        for mark in item.iter_markers(name="skip")
+        if "got empty parameter set" in str(mark.kwargs.get("reason", ""))
+    ]
+    if not vides:
+        return
+    import pytest
+
+    pytest.exit(
+        "Paramétrisation vide, donc test invisible "
+        "(TESTS-EMPTY-PARAMETRIZE-GUARD-001) : écrivez une boucle dans le corps "
+        "du test plutôt qu'un `parametrize` sur une liste qui peut se vider.\n  "
+        + "\n  ".join(sorted(vides)),
+        returncode=1,
+    )
+
+
 _REQUIRE_DB = os.environ.get("FORGE_REQUIRE_DB") == "1"
 _REQUIRE_DB_PG = os.environ.get("FORGE_REQUIRE_DB_PG") == "1"
 _REQUIRE_DB_MSSQL = os.environ.get("FORGE_REQUIRE_DB_MSSQL") == "1"

@@ -29,6 +29,16 @@
 
 ### Corrigé (pré-mortem rc5)
 
+- **Une paramétrisation vide rendait un test invisible, et mon relevé en avait manqué une (`TESTS-EMPTY-PARAMETRIZE-GUARD-001`).**
+  `@pytest.mark.parametrize` sur une liste vide ne produit pas zéro test : pytest en produit **un**, marqué `skip`, avec le motif « got empty parameter set ».
+  C'est exactement là que le contrôle compte le plus. Les cliquets de dette de Forge se vident à mesure qu'elle est payée, et la liste vide est justement l'état qu'on veut voir tenir.
+  J'en avais corrigé deux à la main dans ce cycle. Une troisième restait, dans le contrôle de cohérence de la feuille de route, et mon relevé ne l'avait pas vue : je l'avais mené sur `-m "not docs"`, sélection où ce fichier n'apparaît pas. **Corriger à la main ce qui doit l'être par un garde-fou, c'est se donner rendez-vous avec le même défaut.**
+  Un garde de session les refuse désormais toutes, présentes et futures, sans coûter de collecte séparée. Éprouvé sur une sonde : la session s'arrête avec le nom du test fautif.
+
+- **Les motifs de saut sont imprimés partout, `-rs` par défaut.**
+  Un saut est invisible par construction. Ce cycle a montré ce que cela coûte : vingt-cinq tests dormaient depuis deux ADR, l'un cachant une dérive réelle des générateurs, l'autre une métadonnée publiée manquante.
+  La CI ne les imprimait pas, si bien qu'un écart de huit sauts entre elle et le poste de développement restait indéchiffrable. Il ne le sera plus.
+
 - **Vingt-cinq tests se sautaient en silence, dont un cachait une dérive réelle (`TESTS-DEAD-SKIPS-REVIVE-001`).**
   Chacun visait un chemin disparu et se sautait plutôt que d'échouer. Vingt et un pointaient vers `cli/starters/`, retiré par l'ADR-035, ou vers `mvc/`, sorti du dépôt par l'ADR-044.
   Ils sont repointés vers ce qui a pris la place, jamais supprimés : le générateur `make:auth` pour les quinze contrôles d'authentification, le squelette pour les routes et contrôleurs publics, les cinq racines productives réelles pour le balayage PBKDF2, les onze pages de la référence pour le contrôle de `cmd/`.
