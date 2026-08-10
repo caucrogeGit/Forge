@@ -18,9 +18,29 @@ SECURITY_SESSION = PROJECT_ROOT / "core" / "security" / "session.py"
 
 
 def _source() -> str:
-    if not SECURITY_SESSION.exists():
-        pytest.skip("core/security/session.py introuvable")
+    assert SECURITY_SESSION.exists(), (
+        f"{SECURITY_SESSION} introuvable : corrigez la cible du garde-fou au "
+        "lieu de le laisser se taire."
+    )
     return SECURITY_SESSION.read_text(encoding="utf-8")
+
+
+def _source_de(nom: str) -> str:
+    """Source réelle d'une fonction exposée par `core.security.session`.
+
+    Suit les réexportations : une fonction déplacée vers un autre module reste
+    jugée, là où une recherche de `def <nom>` dans le fichier la perdrait.
+    """
+    import inspect
+
+    from core.security import session as module
+
+    fonction = getattr(module, nom, None)
+    assert fonction is not None, (
+        f"core.security.session n'expose plus {nom} : retirez-la de la liste "
+        "au lieu de laisser ce contrôle se taire."
+    )
+    return inspect.getsource(fonction)
 
 
 _DEPRECATED_FUNCTIONS = [
@@ -87,15 +107,17 @@ class TestInfrastructureFunctionsNoWarnings:
 
     @pytest.mark.parametrize("func_name", _INFRASTRUCTURE_FUNCTIONS)
     def test_function_has_no_deprecation_warn(self, func_name):
-        """La fonction {func_name} ne contient pas de DeprecationWarning."""
-        source = _source()
-        if f"def {func_name}" not in source:
-            pytest.skip(f"{func_name} non présente dans le fichier")
+        """La fonction {func_name} ne contient pas de DeprecationWarning.
 
-        start = source.index(f"def {func_name}")
-        rest = source[start:]
-        next_def = rest.find("\ndef ", 4)
-        func_body = rest[:next_def] if next_def != -1 else rest
+        La source est résolue par l'**objet fonction**, non par une recherche
+        de `def <nom>` dans le fichier (`TESTS-DEAD-SKIPS-REVIVE-001`).
+        `get_session` et `get_session_id` ont été déplacées vers
+        `core/sessions/access.py` puis réexportées : la recherche textuelle ne
+        les trouvait plus et **sautait**, laissant deux fonctions
+        d'infrastructure sans surveillance. Passer par l'objet suit la
+        réexportation, et échoue franchement si le nom disparaît.
+        """
+        func_body = _source_de(func_name)
 
         assert "DeprecationWarning" not in func_body, (
             f"{func_name} ne devrait pas contenir DeprecationWarning — "

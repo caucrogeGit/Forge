@@ -332,10 +332,23 @@ class TestNoContactRouteOrController:
     """
 
     def test_no_contact_route_in_routes_py(self):
-        routes_path = _REPO_ROOT / "mvc" / "routes.py"
-        if not routes_path.is_file():
-            pytest.skip("mvc/routes.py absent — projet sans routes applicatives.")
-        text = routes_path.read_text(encoding="utf-8")
+        """Aucune route `/contact` dans les routes livrées par le squelette.
+
+        Ce contrôle visait `mvc/routes.py`, chemin disparu du dépôt avec
+        l'ADR-044 (le dépôt ne porte plus que le framework). Il se sautait
+        donc en silence (`TESTS-DEAD-SKIPS-REVIVE-001`). La cible est
+        maintenant le **squelette**, seul endroit du dépôt où Forge livre des
+        routes applicatives, et il ne peut pas disparaître sans que le
+        contrôle échoue.
+        """
+        routes_dir = _REPO_ROOT / "skeleton" / "data" / "mvc" / "routes"
+        assert routes_dir.is_dir(), (
+            f"{routes_dir} absent : le squelette ne livre plus de routes, "
+            "corrigez la cible au lieu de laisser ce contrôle se taire."
+        )
+        text = "\n".join(
+            f.read_text(encoding="utf-8") for f in sorted(routes_dir.rglob("*.py"))
+        )
         forbidden_patterns = (
             'add("GET", "/contact"',
             'add("POST", "/contact"',
@@ -346,16 +359,23 @@ class TestNoContactRouteOrController:
         )
         offenders = [p for p in forbidden_patterns if p in text]
         assert not offenders, (
-            f"`mvc/routes.py` contient un pattern de route `/contact` : "
+            f"le squelette contient un pattern de route `/contact` : "
             f"{offenders}. Le contact landing reste volontairement statique "
             "(mailto:forgemvc@gmail.com) — voir commentaire HTML dans "
             "`docs/index.html`."
         )
 
     def test_no_contact_controller_in_mvc_controllers(self):
-        controllers_dir = _REPO_ROOT / "mvc" / "controllers"
-        if not controllers_dir.is_dir():
-            pytest.skip("mvc/controllers/ absent.")
+        """Aucun `ContactController` dans les contrôleurs livrés par le squelette.
+
+        Même repointage que ci-dessus : `mvc/controllers/` a quitté le dépôt
+        avec l'ADR-044, et ce contrôle se sautait depuis.
+        """
+        controllers_dir = _REPO_ROOT / "skeleton" / "data" / "mvc" / "controllers"
+        assert controllers_dir.is_dir(), (
+            f"{controllers_dir} absent : le squelette ne livre plus de "
+            "contrôleurs, corrigez la cible."
+        )
         for path in controllers_dir.rglob("*.py"):
             assert "contact_controller" not in path.name.lower(), (
                 f"Fichier interdit : `{path.relative_to(_REPO_ROOT)}`. "

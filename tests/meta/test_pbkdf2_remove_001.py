@@ -99,11 +99,20 @@ class TestPbkdf2NeedsRehashKept:
 
 
 class TestNoCreationCallsRemain:
-    @pytest.mark.parametrize("root_dir", ["core", "mvc", "cli", "integrations"])
+    # Racines productives réelles (`TESTS-DEAD-SKIPS-REVIVE-001`). `mvc/` a
+    # quitté le dépôt avec l'ADR-044, et le balayage le sautait en silence au
+    # lieu de balayer ce qui l'a remplacé : le squelette et les paquets opt-in,
+    # deux endroits où du code de hachage peut vivre. Un saut n'est pas un
+    # succès, et une racine absente doit faire échouer, pas taire.
+    @pytest.mark.parametrize(
+        "root_dir", ["core", "cli", "integrations", "packages", "skeleton"]
+    )
     def test_no_hacher_mot_de_passe_calls(self, root_dir):
         root = ROOT / root_dir
-        if not root.exists():
-            pytest.skip(f"{root_dir}/ absent")
+        assert root.is_dir(), (
+            f"{root_dir}/ a disparu du dépôt : corrigez la liste des racines "
+            "productives au lieu de laisser ce contrôle se taire."
+        )
         offenders = [
             str(f.relative_to(ROOT))
             for f in root.rglob("*.py")

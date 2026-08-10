@@ -43,8 +43,15 @@ def test_no_obsolete_github_pages_url(pyproject):
 def test_documentation_points_to_forgemvc(pyproject):
     data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
     doc = data.get("project", {}).get("urls", {}).get("Documentation")
-    if doc is None:
-        pytest.skip(f"{pyproject.parent.name} ne déclare pas d'URL Documentation")
+    # Exigée, non plus optionnelle (`TESTS-DEAD-SKIPS-REVIVE-001`). Le saut
+    # d'origine avait laissé `forge-mvc-testing` sans URL de documentation
+    # pendant que les vingt-six autres paquets la déclaraient : sa page PyPI
+    # n'offrait aucun lien vers la doc. Un saut n'est pas un succès.
+    assert doc is not None, (
+        f"{pyproject.parent.name}/pyproject.toml ne déclare pas "
+        "[project.urls] Documentation : sa page PyPI n'offrira aucun lien "
+        "vers la documentation."
+    )
     assert "forgemvc.com" in doc, (
         f"{pyproject.parent.name}/pyproject.toml : Documentation = {doc!r} "
         "devrait pointer vers forgemvc.com."

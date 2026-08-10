@@ -194,18 +194,29 @@ def test_aucun_fichier_non_portable() -> None:
     )
 
 
-@pytest.mark.parametrize("relative_path", sorted(NON_PORTABLE_YET))
-def test_le_cliquet_se_resserre(relative_path: str) -> None:
+def test_le_cliquet_se_resserre() -> None:
     """Une entrée corrigée ou disparue doit être retirée de la liste.
 
     C'est ce qui empêche le cliquet de se relâcher : on ne peut pas oublier de
     le mettre à jour, le test le réclame.
+
+    Écrit en boucle et non en `parametrize` (`TESTS-DEAD-SKIPS-REVIVE-001`).
+    `NON_PORTABLE_YET` est vide depuis que le cliquet est arrivé au bout, et
+    une paramétrisation vide rend un test **sauté**, donc invisible. Or la
+    liste vide est justement l'état qu'on veut voir tenir : c'est là que le
+    contrôle a le plus de sens, pas le moins. Un saut n'est pas un succès.
     """
-    path = PROJECT_ROOT / relative_path
-    assert path.is_file(), (
-        f"{relative_path} n'existe plus : retirez-le de NON_PORTABLE_YET."
-    )
-    assert _markers_in(path), (
-        f"{relative_path} n'emploie plus de construction propre a MariaDB : "
-        "retirez-le de NON_PORTABLE_YET (le cliquet se resserre)."
+    a_retirer: list[str] = []
+    for relative_path in sorted(NON_PORTABLE_YET):
+        path = PROJECT_ROOT / relative_path
+        if not path.is_file():
+            a_retirer.append(f"{relative_path} n'existe plus")
+        elif not _markers_in(path):
+            a_retirer.append(
+                f"{relative_path} n'emploie plus de construction propre a MariaDB"
+            )
+
+    assert not a_retirer, (
+        "Retirez ces entrées de NON_PORTABLE_YET (le cliquet se resserre) :\n  "
+        + "\n  ".join(a_retirer)
     )

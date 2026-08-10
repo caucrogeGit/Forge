@@ -33,6 +33,7 @@ forge_mvc_testing = "forge_mvc_testing.plugin"
 [project.urls]
 Homepage = "https://github.com/caucrogeGit/Forge"
 Repository = "https://github.com/caucrogeGit/Forge"
+Documentation = "https://forgemvc.com/docs/forge/"
 
 [tool.setuptools.packages.find]
 where = ["."]

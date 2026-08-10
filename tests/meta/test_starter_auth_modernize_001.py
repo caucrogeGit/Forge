@@ -84,114 +84,65 @@ def test_middleware_does_not_call_create_session():
 
 
 # ---------------------------------------------------------------------------
-# mvc/controllers/auth_controller.py (runtime) — migration create_session
+# Le générateur `make:auth` — migration create_session
 # ---------------------------------------------------------------------------
+#
+# Ces contrôles visaient trois starters de `cli/starters/data/` et le
+# contrôleur runtime `mvc/controllers/auth_controller.py`. Les quatre chemins
+# ont disparu, les starters avec l'ADR-035, le dossier `mvc/` avec l'ADR-044 :
+# les quinze tests correspondants se **sautaient** en silence
+# (`TESTS-DEAD-SKIPS-REVIVE-001`).
+#
+# Le contrôleur d'authentification est aujourd'hui **engendré** par
+# `forge make:auth`. C'est donc la source du générateur qui porte la propriété,
+# et c'est une cible qui ne peut pas disparaître sous le garde-fou : si elle
+# disparaît, `_source_du_generateur` échoue au lieu de sauter.
 
 
-def test_runtime_auth_controller_does_not_import_create_session():
-    src = _read(_AUTH_CONTROLLER_RUNTIME)
-    assert "create_session" not in src, (
-        "mvc/controllers/auth_controller.py ne doit plus importer ou appeler create_session"
+def _source_du_generateur() -> str:
+    """Source de `make:auth`, où vit le gabarit du contrôleur engendré.
+
+    Lue par `__file__` plutôt que par un chemin en dur, conformément au
+    pattern B.2 des conventions : un déplacement du module ne doit pas
+    rendre le garde-fou muet.
+    """
+    from cli.security import make_auth
+
+    return Path(make_auth.__file__).read_text(encoding="utf-8")
+
+
+def test_le_generateur_n_emet_plus_create_session() -> None:
+    """`create_session()` est l'API legacy que ce ticket avait retirée."""
+    assert "create_session" not in _source_du_generateur(), (
+        "make:auth engendre un contrôleur employant create_session, API legacy "
+        "remplacée par get_session_store().create()"
     )
 
 
-def test_runtime_auth_controller_uses_session_store_create():
-    src = _read(_AUTH_CONTROLLER_RUNTIME)
-    assert "_get_session_store" in src and ".create()" in src, (
-        "mvc/controllers/auth_controller.py doit utiliser _get_session_store().create()"
+def test_le_generateur_emet_le_store_de_session() -> None:
+    """La forme canonique est `get_session_store().create()`."""
+    source = _source_du_generateur()
+
+    assert "from core.sessions.manager import get_session_store" in source
+    assert "get_session_store().create()" in source
+
+
+def test_le_generateur_emet_l_is_authenticated_canonique() -> None:
+    """Même règle que pour le middleware : `core.auth.session`, pas `core.security.session`."""
+    source = _source_du_generateur()
+
+    assert "from core.security.session import is_authenticated" not in source, (
+        "make:auth engendre un import legacy de is_authenticated"
     )
 
 
-# ---------------------------------------------------------------------------
-# starter utilisateurs-auth — migration create_session
-# ---------------------------------------------------------------------------
+def test_le_garde_fou_regarde_bien_quelque_chose() -> None:
+    """Un garde-fou dont la cible a disparu doit échouer, jamais sauter.
 
+    C'est la leçon de ce fichier : ses quinze contrôles ont dormi le temps de
+    deux ADR parce qu'ils sautaient quand leur fichier était absent.
+    """
+    source = _source_du_generateur()
 
-def test_starter_utilisateurs_does_not_import_create_session():
-    src = _read(_UTILISATEURS_CONTROLLER)
-    assert "create_session" not in src, (
-        "starter utilisateurs-auth ne doit plus importer create_session"
-    )
-
-
-def test_starter_utilisateurs_uses_session_store_create():
-    src = _read(_UTILISATEURS_CONTROLLER)
-    assert "_get_session_store" in src or "get_session_store" in src, (
-        "starter utilisateurs-auth doit utiliser get_session_store().create()"
-    )
-
-
-# ---------------------------------------------------------------------------
-# starter suivi-comportement-eleves — migration create_session
-# ---------------------------------------------------------------------------
-
-
-def test_starter_suivi_does_not_import_create_session():
-    src = _read(_SUIVI_CONTROLLER)
-    assert "create_session" not in src, (
-        "starter suivi-comportement-eleves ne doit plus importer create_session"
-    )
-
-
-def test_starter_suivi_uses_session_store_create():
-    src = _read(_SUIVI_CONTROLLER)
-    assert "_get_session_store" in src or "get_session_store" in src, (
-        "starter suivi-comportement-eleves doit utiliser get_session_store().create()"
-    )
-
-
-# ---------------------------------------------------------------------------
-# starter welcome-optin-mfa — migration create_session
-# ---------------------------------------------------------------------------
-
-
-def test_starter_auth_mfa_does_not_import_create_session():
-    src = _read(_AUTH_MFA_CONTROLLER)
-    assert "create_session" not in src, (
-        "starter auth-mfa ne doit plus importer create_session"
-    )
-
-
-def test_starter_auth_mfa_uses_session_store_create():
-    src = _read(_AUTH_MFA_CONTROLLER)
-    assert "_get_session_store" in src or "get_session_store" in src, (
-        "starter auth-mfa doit utiliser get_session_store().create()"
-    )
-
-
-# ---------------------------------------------------------------------------
-# Vérifications transversales — aucun starter ne réintroduit create_session
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    "controller_path",
-    [
-        _AUTH_MFA_CONTROLLER,
-        _SUIVI_CONTROLLER,
-        _UTILISATEURS_CONTROLLER,
-        _AUTH_CONTROLLER_RUNTIME,
-    ],
-    ids=["welcome-optin-mfa", "suivi-comportement-eleves", "users-core-auth", "runtime"],
-)
-def test_no_create_session_call_in_migrated_controllers(controller_path):
-    src = _read(controller_path)
-    assert "create_session()" not in src, (
-        f"{controller_path.name} ne doit pas appeler create_session()"
-    )
-
-
-@pytest.mark.parametrize(
-    "controller_path",
-    [
-        _AUTH_MFA_CONTROLLER,
-        _SUIVI_CONTROLLER,
-        _UTILISATEURS_CONTROLLER,
-    ],
-    ids=["welcome-optin-mfa", "suivi-comportement-eleves", "users-core-auth"],
-)
-def test_starters_import_session_store(controller_path):
-    src = _read(controller_path)
-    assert "get_session_store" in src, (
-        f"{controller_path.name} doit importer get_session_store depuis core.sessions.manager"
-    )
+    assert len(source) > 2000
+    assert "class AuthController" in source or "auth_controller" in source

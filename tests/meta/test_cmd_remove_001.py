@@ -89,11 +89,24 @@ class TestDeprecationDocsClean:
         )
 
     def test_reference_doc_does_not_promote_cmd(self):
-        path = ROOT / "docs" / "reference" / "reference.md"
-        if not path.exists():
-            pytest.skip("docs/reference/reference.md absent")
-        content = path.read_text(encoding="utf-8")
-        for pattern in ("python cmd/", "cmd/make.py", "cmd/mvc/", "cmd/security/"):
-            assert pattern not in content, (
-                f"docs/reference/reference.md contient encore '{pattern}'"
-            )
+        """Aucune page de référence ne promeut `cmd/`.
+
+        Ce contrôle visait le fichier unique `docs/reference/reference.md`,
+        découpé en onze pages par `DOCS-REFERENCE-SPLIT-001`. Il se sautait
+        donc depuis, et ne surveillait plus aucune des onze
+        (`TESTS-DEAD-SKIPS-REVIVE-001`). Il les balaie toutes désormais : le
+        dossier ne peut pas se vider sans que le contrôle échoue.
+        """
+        dossier = ROOT / "docs" / "reference"
+        pages = sorted(dossier.glob("*.md"))
+        assert len(pages) > 5, (
+            f"{dossier} ne contient que {len(pages)} page(s) : le relevé ne "
+            "surveille plus la référence."
+        )
+        fautes = []
+        for page in pages:
+            content = page.read_text(encoding="utf-8")
+            for pattern in ("python cmd/", "cmd/make.py", "cmd/mvc/", "cmd/security/"):
+                if pattern in content:
+                    fautes.append(f"{page.relative_to(ROOT)} contient '{pattern}'")
+        assert not fautes, "\n  ".join(fautes)
