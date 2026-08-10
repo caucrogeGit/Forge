@@ -1,5 +1,12 @@
 -r requirements.txt
 pytest>=8.0
+# Exécution parallèle de la suite (`pytest -n 4`), et surtout `--dist loadfile`,
+# posé dans `addopts` : plusieurs fichiers d'intégration sont des scénarios que
+# la répartition par défaut éparpille entre workers
+# (`TEST-DB-WORKER-ISOLATION-001`). Le greffon était installé sur le poste de
+# développement sans être déclaré ici : la CI, qui suit ce fichier, ne le
+# connaissait pas et refusait le drapeau.
+pytest-xdist>=3.0
 build>=1.0
 setuptools>=77.0.3
 twine>=5.0

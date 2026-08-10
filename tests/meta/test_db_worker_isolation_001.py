@@ -65,6 +65,31 @@ def test_la_repartition_par_fichier_est_le_defaut() -> None:
     )
 
 
+def test_le_greffon_du_drapeau_est_declare() -> None:
+    """`--dist` vient de pytest-xdist : le déclarer, sinon la CI refuse de démarrer.
+
+    Le drapeau a été posé dans `addopts` alors que `pytest-xdist` n'était
+    installé que sur le poste de développement. La CI suit `requirements-dev.txt`,
+    ne connaissait pas le greffon, et **les six jobs** ont échoué d'un coup sur
+    « unrecognized arguments: --dist », avant même le premier test.
+
+    Une validation locale ne pouvait pas le voir : le greffon y était présent.
+    C'est la dérive d'environnement entre le poste et le contrat déclaré.
+    """
+    addopts = re.search(
+        r"^addopts\s*=\s*(.+)$", PYTEST_INI.read_text(encoding="utf-8"), re.MULTILINE
+    )
+    assert addopts is not None
+
+    if "--dist" not in addopts.group(1):
+        return
+    requirements = (PROJECT_ROOT / "requirements-dev.txt").read_text(encoding="utf-8")
+    assert "pytest-xdist" in requirements, (
+        "`addopts` emploie `--dist`, drapeau de pytest-xdist, mais le greffon "
+        "n'est pas déclaré dans requirements-dev.txt : la CI refusera de démarrer."
+    )
+
+
 def test_chaque_worker_a_sa_propre_base(monkeypatch: pytest.MonkeyPatch) -> None:
     """Le nom de base porte l'identifiant du worker, et lui seul le porte."""
     monkeypatch.setenv("PYTEST_XDIST_WORKER", "gw3")
