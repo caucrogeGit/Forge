@@ -12,6 +12,8 @@ FORGE_REQUIRE_DB_MSSQL=1.
 """
 from __future__ import annotations
 
+import os
+
 import uuid
 from pathlib import Path
 from typing import Any
@@ -189,7 +191,11 @@ def test_introspection_reelle_du_schema(mssql_registry: None, tmp_path: Path) ->
     try:
         connection = _connect()
         try:
-            columns = mig.load_table_columns(table, db=connection, database="forge_test")
+            # Base du worker, jamais un littéral : sous `-n`, les tables
+            # vivent dans `forge_test_gwN` (`TEST-DB-WORKER-ISOLATION-001`).
+            columns = mig.load_table_columns(
+                table, db=connection, database=os.environ["DB_NAME"]
+            )
         finally:
             connection.close()
 

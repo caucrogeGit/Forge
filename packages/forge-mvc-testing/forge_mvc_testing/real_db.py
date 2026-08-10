@@ -53,13 +53,69 @@ _FIXTURE_PAR_BACKEND = {
 }
 
 
+def _nom_par_worker(base: str) -> str:
+    """Base propre au worker pytest-xdist, ou la base telle quelle hors parallèle.
+
+    `tables_temporaires` crée et jette des tables par leur **nom réel**, celui
+    que le code sous test emploie : deux workers qui exercent deux paquets
+    partageant une table se détruisent mutuellement leurs données. Mesuré sur
+    la suite d'intégration sous `-n 4` : entre 7 et 26 échecs sur 135, à chaque
+    passage (`TEST-DB-WORKER-ISOLATION-001`).
+
+    Une base par worker rétablit l'isolation que le montage précédent obtenait
+    en créant une base jetable par test. La CI n'était pas touchée, elle ne
+    parallélise pas les jobs d'intégration : seul le développeur qui lance la
+    suite entière avec `-n` voyait des échecs, et pouvait les prendre pour un
+    aléa.
+    """
+    worker = os.environ.get("PYTEST_XDIST_WORKER")
+    return f"{base}_{worker}" if worker else base
+
+
+def _creer_base(nom: str) -> None:
+    """Crée la base du worker si elle manque, par la connexion d'administration.
+
+    Le SQL diffère : MariaDB accepte `IF NOT EXISTS`, PostgreSQL non et exige
+    de regarder `pg_database`, SQL Server passe par `DB_ID`. `CREATE DATABASE`
+    n'accepte de paramètre lié sur aucun des trois, mais le nom vient de
+    l'environnement de test et de l'identifiant du worker, jamais d'une entrée
+    utilisateur.
+    """
+    from core.database.backend import get_backend
+
+    backend = get_backend()
+    admin: Any = backend.get_admin_connection()
+    try:
+        try:
+            admin.autocommit = True
+        except Exception:  # noqa: BLE001 — tous les pilotes ne l'exposent pas
+            pass
+        cursor = admin.cursor()
+        if backend.name == "postgres":
+            # `?`, jamais `%s` : la connexion passe par l'enveloppe Forge, qui
+            # traduit `?` vers le format du pilote et **double** tout `%`
+            # littéral. Écrire `%s` ici le transformerait en `%%s`, un texte,
+            # et rendrait « 0 marqueurs pour 1 paramètre ». C'est le défaut
+            # même que `VIDEO-DML-PORTABLE-001` venait de corriger ailleurs.
+            cursor.execute("SELECT 1 FROM pg_database WHERE datname = ?", (nom,))
+            if cursor.fetchone() is None:
+                cursor.execute(f'CREATE DATABASE "{nom}"')
+        elif backend.name == "mssql":
+            cursor.execute(f"IF DB_ID(N'{nom}') IS NULL CREATE DATABASE [{nom}]")
+        else:
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{nom}`")
+        cursor.close()
+    finally:
+        backend.close_connection(admin)
+
+
 def _db_params() -> dict[str, object]:
     return {
         "host": os.environ.get("FORGE_TEST_DB_HOST", "127.0.0.1"),
         "port": int(os.environ.get("FORGE_TEST_DB_PORT", "3306")),
         "user": os.environ.get("FORGE_TEST_DB_USER", "root"),
         "password": os.environ.get("FORGE_TEST_DB_PASSWORD", ""),
-        "name": os.environ.get("FORGE_TEST_DB_NAME", "forge_test"),
+        "name": _nom_par_worker(os.environ.get("FORGE_TEST_DB_NAME", "forge_test")),
     }
 
 
@@ -95,6 +151,10 @@ def real_db() -> Iterator[None]:
         "DB_APP_PWD": str(params["password"]),
         "DB_NAME": str(params["name"]),
         "DB_POOL_SIZE": "2",
+        # Identifiants d'administration (ADR-033), nécessaires pour créer la
+        # base du worker. Ce sont les mêmes qu'en test.
+        "DB_ADMIN_LOGIN": str(params["user"]),
+        "DB_ADMIN_PWD": str(params["password"]),
     }
     previous = {key: os.environ.get(key) for key in overrides}
     os.environ.update(overrides)
@@ -108,6 +168,7 @@ def real_db() -> Iterator[None]:
                 os.environ[key] = value
 
     try:
+        _creer_base(str(params["name"]))
         probe = connection.get_connection()  # crée le pool nommé une fois
         connection.close_connection(probe)
     except Exception as error:  # noqa: BLE001 — la cause est classée, pas supposée
@@ -145,10 +206,14 @@ def real_pg_db(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     monkeypatch.setenv("DB_PORT", os.environ.get("FORGE_TEST_PG_PORT", "5432"))
     monkeypatch.setenv("DB_APP_LOGIN", os.environ.get("FORGE_TEST_PG_USER", "postgres"))
     monkeypatch.setenv("DB_APP_PWD", os.environ.get("FORGE_TEST_PG_PASSWORD", "forge_test_pg"))
-    monkeypatch.setenv("DB_NAME", os.environ.get("FORGE_TEST_PG_NAME", "forge_test"))
+    monkeypatch.setenv("DB_ADMIN_LOGIN", os.environ.get("FORGE_TEST_PG_USER", "postgres"))
+    monkeypatch.setenv("DB_ADMIN_PWD", os.environ.get("FORGE_TEST_PG_PASSWORD", "forge_test_pg"))
+    nom = _nom_par_worker(os.environ.get("FORGE_TEST_PG_NAME", "forge_test"))
+    monkeypatch.setenv("DB_NAME", nom)
     forge.configure(app_name="forge_test")
     reset_backend()
     try:
+        _creer_base(nom)
         probe = connection.get_connection()
         connection.close_connection(probe)
     except Exception as error:  # noqa: BLE001 — la cause est classée, pas supposée
@@ -179,7 +244,7 @@ def real_mssql_db(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
 
     user = os.environ.get("FORGE_TEST_MSSQL_USER", "sa")
     password = os.environ.get("FORGE_TEST_MSSQL_PASSWORD", "Forge#Test#2026")
-    db_name = os.environ.get("FORGE_TEST_MSSQL_NAME", "forge_test")
+    db_name = _nom_par_worker(os.environ.get("FORGE_TEST_MSSQL_NAME", "forge_test"))
     monkeypatch.setenv("DB_BACKEND", "mssql")
     monkeypatch.setenv("DB_HOST", os.environ.get("FORGE_TEST_MSSQL_HOST", "127.0.0.1"))
     monkeypatch.setenv("DB_PORT", os.environ.get("FORGE_TEST_MSSQL_PORT", "1433"))

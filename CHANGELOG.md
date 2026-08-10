@@ -29,6 +29,24 @@
 
 ### Corrigé (pré-mortem rc5)
 
+- **Vingt-cinq tests se sautaient en silence, dont un cachait une dérive réelle (`TESTS-DEAD-SKIPS-REVIVE-001`).**
+  Chacun visait un chemin disparu et se sautait plutôt que d'échouer. Vingt et un pointaient vers `cli/starters/`, retiré par l'ADR-035, ou vers `mvc/`, sorti du dépôt par l'ADR-044.
+  Ils sont repointés vers ce qui a pris la place, jamais supprimés : le générateur `make:auth` pour les quinze contrôles d'authentification, le squelette pour les routes et contrôleurs publics, les cinq racines productives réelles pour le balayage PBKDF2, les onze pages de la référence pour le contrôle de `cmd/`.
+  Chaque cible neuve fait **échouer** le contrôle si elle disparaît à son tour, au lieu de le rendre muet. C'est le vrai correctif : un garde-fou qui saute quand sa cible manque finit toujours par dormir.
+  Deux autres sautaient parce qu'une `parametrize` sur une liste vide rend un test sauté. Les deux cliquets de dette concernés sont réécrits en boucle. La liste vide est justement l'état qu'on veut voir tenir, c'est là que le contrôle a le plus de sens.
+  Deux enfin cherchaient `def <nom>` dans un fichier, et ne trouvaient plus `get_session` ni `get_session_id`, déplacées puis réexportées. La source est maintenant résolue par l'objet fonction, ce qui suit la réexportation.
+  **Le vingt-cinquième cachait une omission réelle** : `forge-mvc-testing` ne déclarait pas d'URL de documentation quand les vingt-six autres paquets le faisaient, donc sa page PyPI n'offrait aucun lien vers la doc. La clé est déclarée, et le contrôle l'exige désormais au lieu de sauter.
+  Un vingt-sixième défaut a été trouvé par le réveil d'un de ces tests, et fait l'objet du ticket `PUBLIC-GEN-CANONICAL-DB-001` ci-dessous.
+  Reste zéro saut sur la suite entière, serveurs présents.
+
+- **La suite d'intégration ne tenait pas en parallèle (`TEST-DB-WORKER-ISOLATION-001`).**
+  Deux défauts distincts, découverts parce qu'un passage de la suite complète a échoué là où deux autres passaient.
+  Le premier est **de ce cycle** : `TEST-PACKAGE-INTEGRATION-REAL-LAYER-001` a remplacé la base jetable par test par des tables dans une base commune, et `tables_temporaires` les crée puis les jette par leur nom réel. Deux workers exerçant deux paquets qui partagent une table se détruisaient mutuellement leurs données. Mesuré sous `-n 4` : **7 à 26 échecs sur 135, à chaque passage**. Chaque worker travaille désormais dans sa propre base, créée au besoin.
+  Le second **préexistait**, vérifié en rejouant les fichiers d'avant le cycle : plusieurs fichiers d'intégration sont des scénarios dont une étape crée la table et une autre la lit, et la répartition par défaut de pytest-xdist les éparpille. Mesuré sur les deux scénarios E2E MariaDB : **2 à 4 échecs sur 19**, aucun en `--dist loadfile`, désormais posé par défaut. Le drapeau est sans effet sans `-n`, donc sans effet en CI.
+  Trois fichiers interrogeaient `information_schema` sur une base écrite en dur, donc regardaient ailleurs que là où leurs tables vivaient.
+  **La CI ne pouvait rien voir** : elle ne parallélise pas ses jobs d'intégration. Seule la boucle locale rencontrait ces échecs, et pouvait les prendre pour un aléa, ce qui est la forme la plus coûteuse d'un défaut.
+  Aveu utile : le premier correctif PostgreSQL a été écrit en `%s` sur une connexion qui traduit `?`, et a fait échouer les 98 cas PostgreSQL d'un coup. C'est le défaut même que `VIDEO-DML-PORTABLE-001` venait de corriger ailleurs. Un garde-fou le fige maintenant.
+
 - **Forge avait deux façons officielles d'accéder à la base dans le code qu'il engendre (`PUBLIC-GEN-CANONICAL-DB-001`).**
   `make:crud` engendrait un modèle employant l'API canonique, `from core.database.db import fetch_one, fetch_all, execute, insert`.
   `make:public-list`, `make:public-show` et `make:public-form` engendraient, eux, des connexions brutes : `get_connection()`, `connection.cursor(dictionary=True)`, `cursor.fetchall()`, `connection.commit()`, le tout dans un `try/finally` de dix lignes que l'utilisateur devait relire.

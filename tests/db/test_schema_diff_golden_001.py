@@ -104,24 +104,37 @@ def _fresh_table(database: str) -> Iterator[Any]:
         backend.close_connection(connection)
 
 
+def _base_configuree() -> str:
+    """Nom de la base réellement configurée par la fixture, jamais un littéral.
+
+    Les fixtures serveur donnent une base **par worker** sous `-n`
+    (`TEST-DB-WORKER-ISOLATION-001`) : « forge_test » codé en dur interrogeait
+    `information_schema` sur une base où la table n'existait pas, et le diff
+    rendait « table absente en base ».
+    """
+    import os
+
+    return os.environ["DB_NAME"]
+
+
 @pytest.fixture()
 def mariadb_table(real_db: None) -> Iterator[Any]:
-    yield from _fresh_table("forge_test")
+    yield from _fresh_table(_base_configuree())
 
 
 @pytest.fixture()
 def pg_table(real_pg_db: None) -> Iterator[Any]:
-    yield from _fresh_table("forge_test")
+    yield from _fresh_table(_base_configuree())
 
 
 @pytest.fixture()
 def mssql_table(real_mssql_db: None) -> Iterator[Any]:
-    yield from _fresh_table("forge_test")
+    yield from _fresh_table(_base_configuree())
 
 
 def _assert_diff_vide(connection: Any) -> None:
     dialect = _backend().dialect
-    actual = load_table_columns(TABLE, db=connection, database="forge_test")
+    actual = load_table_columns(TABLE, db=connection, database=_base_configuree())
     report = build_schema_diff_report("Golden", TABLE, _expected(dialect), actual)
 
     unexpected = [(row.status, row.column, row.detail) for row in report.rows if row.status != "OK"]
@@ -135,7 +148,7 @@ def _assert_diff_vide(connection: Any) -> None:
 def _assert_derive_detectee(connection: Any) -> None:
     """Contrôle négatif : une longueur qui ne correspond pas reste signalée."""
     dialect = _backend().dialect
-    actual = load_table_columns(TABLE, db=connection, database="forge_test")
+    actual = load_table_columns(TABLE, db=connection, database=_base_configuree())
 
     drifted = [
         ExpectedColumn(
@@ -189,11 +202,11 @@ def test_mssql_une_vraie_derive_reste_detectee(mssql_table: Any) -> None:
 @pytest.mark.db_pg
 def test_postgres_introspection_porte_la_longueur(pg_table: Any) -> None:
     """La cause du défaut : `data_type` seul ne portait pas la longueur."""
-    columns = {c.name: c for c in load_table_columns(TABLE, db=pg_table, database="forge_test")}
+    columns = {c.name: c for c in load_table_columns(TABLE, db=pg_table, database=_base_configuree())}
     assert "(255)" in columns["titre"].sql_type, columns["titre"].sql_type
 
 
 @pytest.mark.db_mssql
 def test_mssql_introspection_porte_la_longueur(mssql_table: Any) -> None:
-    columns = {c.name: c for c in load_table_columns(TABLE, db=mssql_table, database="forge_test")}
+    columns = {c.name: c for c in load_table_columns(TABLE, db=mssql_table, database=_base_configuree())}
     assert "(255)" in columns["titre"].sql_type, columns["titre"].sql_type
