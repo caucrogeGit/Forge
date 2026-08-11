@@ -3,6 +3,21 @@
 
 ## [Non publié]
 
+### Corrigé
+
+- **Un compte créé par la CLI ne pouvait pas se connecter sur SQLite (`AUTH-CASE-ASYMMETRY-001`).**
+  Forge écrit dans la table `users` par deux chemins, et ils ne suivaient pas la même convention.
+  La CLI `forge auth:user:*` abaissait la casse, à l'écriture comme à la lecture : prise seule, elle était cohérente. Le contrôleur et le modèle engendrés par `forge make:auth` ne normalisent rien, ils passent la saisie du formulaire telle quelle à `WHERE email = ?`.
+  Sur MariaDB, la collation `utf8mb4_unicode_ci` compare sans égard à la casse et l'écart n'a aucun effet observable. Sur SQLite, où `TEXT` compare en binaire, il **ferme une porte** : un compte créé par `forge auth:user:create`, donc stocké en minuscules, ne peut pas se connecter dès que l'utilisateur tape une majuscule. Dans l'autre sens, un compte créé par l'application est introuvable depuis la CLI.
+  Les deux moteurs sont au niveau plein depuis l'ADR-084, et le défaut a été expédié jusqu'à la 1.0.0-rc.5 incluse.
+  La normalisation quitte l'identité, qui conserve désormais la casse saisie. Ce n'est pas seulement le correctif le plus court, c'est le seul qui aille dans le sens du contrat : **rien dans Forge ne vérifie que cette colonne contient une adresse**, le cœur n'exigeant qu'une chaîne non vide (`core/auth/user.py`). Une application y met légitimement un identifiant de classe ou un nom de compte, et abaisser la casse d'une identité la déforme. La sensibilité à la casse relève de la collation du moteur, que Forge n'a pas à contredire.
+  Le nom `_normalize_email` est retiré au passage : il donnait à croire que cette colonne est une adresse, et c'est cette croyance qui a produit la ligne fautive.
+  Trois tests figeaient l'ancien comportement, dont un dans un fichier que le relevé initial n'avait pas ouvert.
+  Vérifié contre un **vrai SQLite** monté depuis la DDL dialectale, les deux chemins exercés : quatre tests, tous en échec sur le code d'avant.
+
+  **Limite connue, laissée à un ticket dédié.** La CLI impose par ailleurs une **forme** : `if "@" not in value` refuse l'argument avant toute requête. `forge auth:user:show 2TNE1-01` ne cherche donc pas le compte, il rejette la saisie, et `auth:user:create` ne peut pas créer un tel compte. C'est une seconde divergence entre la CLI et le cœur, de la même famille que celle-ci, mais son correctif est une décision de conception : elle appartient à l'ADR qui séparera l'identité du contact.
+
+
 ## [1.0.0-rc.5] - 2026-08-10
 
 ### Ajouté

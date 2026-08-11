@@ -102,14 +102,14 @@ class TestConventionErreurConseil:
 
     def test_erreur_email_invalide_contient_conseil(self):
         with pytest.raises(AuthAdminCliError) as exc:
-            from cli.security.auth import _normalize_email
-            _normalize_email("pasdetat")
+            from cli.security.auth import _validate_email_value
+            _validate_email_value("pasdetat")
         assert exc.value.conseil
 
     def test_erreur_email_vide_contient_conseil(self):
         with pytest.raises(AuthAdminCliError) as exc:
-            from cli.security.auth import _normalize_email
-            _normalize_email("")
+            from cli.security.auth import _validate_email_value
+            _validate_email_value("")
         assert exc.value.conseil
 
     def test_erreur_mot_de_passe_vide_contient_conseil(self):

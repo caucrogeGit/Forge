@@ -432,8 +432,34 @@ def _default_execute(sql: str, params: tuple[Any, ...]) -> int:
         raise _friendly_db_error(error) from error
 
 
-def _normalize_email(email: str | None) -> str:
-    value = (email or "").strip().lower()
+def _validate_email_value(email: str | None) -> str:
+    """Valide l'identifiant de connexion sans en changer la casse.
+
+    Cette fonction mettait la valeur en **minuscules**, sous le nom
+    `_normalize_email` (`AUTH-CASE-ASYMMETRY-001`). Deux raisons de ne plus le
+    faire, l'une immédiate et l'autre de fond.
+
+    La CLI était cohérente avec elle-même, normalisant à l'écriture comme à la
+    lecture, mais le contrôleur et le modèle engendrés par `make:auth` ne
+    normalisent pas : ils passent la saisie du formulaire telle quelle à
+    `WHERE email = ?`. Deux chemins d'écriture, une seule table, deux
+    conventions. Sur MariaDB la collation `utf8mb4_unicode_ci` masque l'écart ;
+    sur SQLite, où `TEXT` compare en binaire, un compte créé par la CLI ne peut
+    pas se connecter dès que l'utilisateur tape une majuscule, et un compte créé
+    par l'application est introuvable par la CLI. Une porte fermée sur un
+    backend de niveau plein (ADR-084).
+
+    Le fond : **cette colonne n'est pas une adresse**. Rien dans le paquet ne le
+    vérifie, la seule contrainte étant « chaîne non vide »
+    (`core/auth/user.py`). Une application y met légitimement `2TNE1-01` ou
+    `admin`, et abaisser la casse d'un identifiant le déforme. La normalisation
+    appartient au **contact**, pas à l'identité.
+
+    Ce qui reste : l'espacement de bordure est retiré, et la valeur vide refusée.
+    La sensibilité à la casse d'une comparaison relève désormais de la collation
+    du moteur, ce que Forge n'a pas à contredire dans un sens ni dans l'autre.
+    """
+    value = (email or "").strip()
     if not value:
         raise AuthAdminCliError(
             "Email obligatoire.",
@@ -517,7 +543,7 @@ def _resolve_user_id(
                 conseil="Verifiez l'identifiant avec forge auth:user:list",
             )
         return int(row["id"])
-    normalized = _normalize_email(email)
+    normalized = _validate_email_value(email)
     row = fetch_one("SELECT id FROM users WHERE email = ?", (normalized,))
     if not row:
         _log_user_not_found(attempted_email=normalized)
@@ -537,7 +563,7 @@ def create_auth_user(
 ) -> int:
     from core.auth.password import hash_password
 
-    normalized_email = _normalize_email(email)
+    normalized_email = _validate_email_value(email)
     password = _validate_password_value(password)
     fetch_one = fetch_one or _default_fetch_one
     insert = insert or _default_insert
@@ -586,7 +612,7 @@ def show_auth_user(
     else:
         row = fetch_one(
             "SELECT id, email, is_active, created_at FROM users WHERE email = ?",
-            (_normalize_email(email),),
+            (_validate_email_value(email),),
         )
     return _public_user_row(dict(row)) if row else None
 
@@ -914,7 +940,7 @@ def cmd_auth_user_create(
             fetch_one=fetch_one,
             insert=insert,
         )
-        print(out.created(f"Utilisateur cree : id={user_id}, email={_normalize_email(parsed.email)}"))
+        print(out.created(f"Utilisateur cree : id={user_id}, email={_validate_email_value(parsed.email)}"))
 
     _run_admin_command(action, root=root)
 

@@ -61,7 +61,12 @@ def test_create_auth_user_hashe_le_mot_de_passe():
     )
 
     assert user_id == 12
-    assert captured["params"][0] == "admin@example.test"
+    # La casse est CONSERVEE (`AUTH-CASE-ASYMMETRY-001`). La CLI abaissait la
+    # casse quand le controleur engendre par make:auth ne le fait pas : sur
+    # SQLite, qui compare en binaire, le compte devenait inaccessible depuis le
+    # formulaire de connexion. Et cette colonne n'est pas une adresse, une
+    # application y met legitimement `2TNE1-01`.
+    assert captured["params"][0] == "Admin@Example.Test"
     password_hash = captured["params"][1]
     assert password_hash != "secret123"
     assert verify_password("secret123", password_hash) is True
@@ -186,7 +191,8 @@ def test_show_auth_user_par_email():
 
     assert user == {
         "id": 1,
-        "email": "admin@example.test",
+        # Casse conservee, la recherche employant la valeur telle que saisie.
+        "email": "Admin@Example.Test",
         "is_active": True,
         "created_at": "2026-01-01",
     }

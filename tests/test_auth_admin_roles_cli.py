@@ -102,7 +102,9 @@ def test_add_resout_utilisateur_par_email():
     )
 
     assert result["user_id"] == 7
-    assert any(params == ("admin@example.test",) for _, params in seen)
+    # Casse conservee (`AUTH-CASE-ASYMMETRY-001`) : la CLI cherche la valeur
+    # telle que saisie, comme le fait le modele engendre par make:auth.
+    assert any(params == ("Admin@Example.Test",) for _, params in seen)
 
 
 def test_add_resout_role_par_id():
