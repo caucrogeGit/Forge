@@ -126,12 +126,20 @@ def test_password_ticket_does_not_create_advanced_auth_features():
         assert not hasattr(auth, name)
 
 
-def test_auth_user_contract_stays_unchanged():
+def test_auth_user_contract_est_fige():
+    """Le contrat est figé, et il a changé une fois, par décision (ADR-089).
+
+    `email` portait l'identité et le contact à la fois. Il porte maintenant le
+    seul contact, facultatif, et `login` porte l'identité. Ce test n'affirme
+    pas que le contrat ne bouge jamais, mais qu'il ne bouge pas sans qu'on
+    l'écrive ici.
+    """
     assert [field.name for field in fields(AuthUser)] == [
         "id",
-        "email",
+        "login",
         "password_hash",
         "is_active",
+        "email",
         "created_at",
         "updated_at",
     ]

@@ -130,7 +130,7 @@ def test_is_authenticated_still_works_for_canonical_session(isolated_store):
     session = isolated_store.get(sid)
     cookie = f"__Host-session_id={sid}"
     request = SimpleNamespace(session=session, headers={"Cookie": cookie})
-    user = AuthUser(id=55, email="x@example.com", password_hash="h", is_active=True)
+    user = AuthUser(id=55, login="x@example.com", password_hash="h", is_active=True)
     login_user(request, user)
 
     request2 = SimpleNamespace(headers={"Cookie": cookie})
@@ -272,7 +272,7 @@ def test_bridge_canonical_to_legacy_still_works(isolated_store):
     session = isolated_store.get(sid)
     cookie = f"__Host-session_id={sid}"
     request = SimpleNamespace(session=session, headers={"Cookie": cookie})
-    user = AuthUser(id=88, email="y@example.com", password_hash="h", is_active=True)
+    user = AuthUser(id=88, login="y@example.com", password_hash="h", is_active=True)
     login_user(request, user)
 
     request2 = SimpleNamespace(headers={"Cookie": cookie})

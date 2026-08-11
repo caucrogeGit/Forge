@@ -26,7 +26,11 @@ class AuthJinjaUser:
     """Utilisateur expose aux templates, sans secret ni hash de mot de passe."""
 
     id: int
-    email: str | None = None
+    #: L'identité, c'est-à-dire ce sous quoi l'utilisateur s'est connecté
+    #: (ADR-089). C'est ce qu'un gabarit affiche par « connecté en tant que ».
+    #: Le contact n'a pas sa place ici : il ne désigne pas la session en cours,
+    #: et deux comptes peuvent partager une adresse.
+    login: str | None = None
     is_active: bool | None = None
 
 
@@ -36,7 +40,7 @@ def sanitize_jinja_user(user: Any) -> AuthJinjaUser | None:
         return user
 
     if isinstance(user, AuthUser):
-        return AuthJinjaUser(id=user.id, email=user.email, is_active=user.is_active)
+        return AuthJinjaUser(id=user.id, login=user.login, is_active=user.is_active)
 
     if isinstance(user, dict):
         user_dict = cast("dict[str, Any]", user)
@@ -44,15 +48,15 @@ def sanitize_jinja_user(user: Any) -> AuthJinjaUser | None:
         if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
             return None
 
-        email = user_dict.get("email")
-        if email is not None and not isinstance(email, str):
-            email = None
+        login = user_dict.get("login")
+        if login is not None and not isinstance(login, str):
+            login = None
 
         is_active = user_dict.get("is_active")
         if is_active is not None and not isinstance(is_active, bool):
             is_active = None
 
-        return AuthJinjaUser(id=user_id, email=email, is_active=is_active)
+        return AuthJinjaUser(id=user_id, login=login, is_active=is_active)
 
     return None
 

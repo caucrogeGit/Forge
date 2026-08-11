@@ -95,7 +95,7 @@ def test_add_resout_utilisateur_par_email():
         return _fetch_for_roles(user={"id": 7}, role={"id": 2})(sql, params)
 
     result = add_auth_user_role(
-        email="Admin@Example.Test",
+        login="Admin@Example.Test",
         role="admin",
         fetch_one=fetch,
         execute=lambda *_: 1,
@@ -202,7 +202,7 @@ def test_add_refuse_id_et_email_ensemble():
     with pytest.raises(AuthAdminCliError, match="pas les deux"):
         add_auth_user_role(
             user_id=7,
-            email="admin@example.test",
+            login="admin@example.test",
             role="admin",
             fetch_one=_fetch_for_roles(user={"id": 7}, role={"id": 2}),
             execute=lambda *_: 1,
@@ -210,7 +210,7 @@ def test_add_refuse_id_et_email_ensemble():
 
 
 def test_add_exige_id_ou_email():
-    with pytest.raises(AuthAdminCliError, match="--id ou --email"):
+    with pytest.raises(AuthAdminCliError, match="--id ou --login"):
         add_auth_user_role(
             role="admin",
             fetch_one=_fetch_for_roles(user={"id": 7}, role={"id": 2}),

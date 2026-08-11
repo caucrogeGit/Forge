@@ -27,18 +27,18 @@ from cli.security.auth import (
 
 def test_create_auth_user_refuse_email_vide():
     with pytest.raises(AuthAdminCliError):
-        create_auth_user(email="", password="secret123", fetch_one=lambda *_: None, insert=lambda *_: 1)
+        create_auth_user(login="", password="secret123", fetch_one=lambda *_: None, insert=lambda *_: 1)
 
 
 def test_create_auth_user_refuse_password_vide():
     with pytest.raises(AuthAdminCliError):
-        create_auth_user(email="admin@example.test", password="", fetch_one=lambda *_: None, insert=lambda *_: 1)
+        create_auth_user(login="admin@example.test", password="", fetch_one=lambda *_: None, insert=lambda *_: 1)
 
 
 def test_create_auth_user_refuse_email_duplique():
     with pytest.raises(AuthAdminCliError, match="existe deja"):
         create_auth_user(
-            email="admin@example.test",
+            login="admin@example.test",
             password="secret123",
             fetch_one=lambda *_: {"id": 1},
             insert=lambda *_: 2,
@@ -54,7 +54,7 @@ def test_create_auth_user_hashe_le_mot_de_passe():
         return 12
 
     user_id = create_auth_user(
-        email="Admin@Example.Test",
+        login="Admin@Example.Test",
         password="secret123",
         fetch_one=lambda *_: None,
         insert=fake_insert,
@@ -67,7 +67,10 @@ def test_create_auth_user_hashe_le_mot_de_passe():
     # formulaire de connexion. Et cette colonne n'est pas une adresse, une
     # application y met legitimement `2TNE1-01`.
     assert captured["params"][0] == "Admin@Example.Test"
-    password_hash = captured["params"][1]
+    # L'INSERT porte (login, email, password_hash) depuis l'ADR-089 : le
+    # contact facultatif s'intercale, donc le hash est en troisieme.
+    assert captured["params"][1] is None, "aucun contact n'a ete fourni"
+    password_hash = captured["params"][2]
     assert password_hash != "secret123"
     assert verify_password("secret123", password_hash) is True
     assert "password_hash" not in captured["sql"].lower().split("values", 1)[-1]
@@ -77,13 +80,13 @@ def test_cmd_create_non_interactif_ne_sort_pas_le_mot_de_passe_ni_hash(monkeypat
     inserted = {}
 
     def fake_insert(sql, params):
-        inserted["hash"] = params[1]
+        inserted["hash"] = params[2]
         return 3
 
     monkeypatch.setattr("cli.security.auth._load_env_and_configure_forge", lambda root: None)
 
     cmd_auth_user_create(
-        ["--email", "admin@example.test", "--password", "secret123"],
+        ["--login", "admin@example.test", "--password", "secret123"],
         root=Path.cwd(),
         fetch_one=lambda *_: None,
         insert=fake_insert,
@@ -101,7 +104,7 @@ def test_cmd_create_prompt_masque(monkeypatch, capsys):
     monkeypatch.setattr("getpass.getpass", lambda prompt: "secret123")
 
     cmd_auth_user_create(
-        ["--email", "admin@example.test", "--password-prompt"],
+        ["--login", "admin@example.test", "--password-prompt"],
         fetch_one=lambda *_: None,
         insert=lambda *_: 4,
     )
@@ -119,7 +122,7 @@ def test_cmd_create_affiche_erreur_claire_si_db_indisponible(monkeypatch):
 
     with pytest.raises(SystemExit) as exc_info:
         cmd_auth_user_create(
-            ["--email", "admin@example.test", "--password", "secret123"],
+            ["--login", "admin@example.test", "--password", "secret123"],
             fetch_one=broken_fetch,
             insert=lambda *_: 1,
         )
@@ -132,6 +135,7 @@ def test_list_auth_users_retourne_uniquement_des_champs_publics():
         fetch_all=lambda *_: [
             {
                 "id": 1,
+                "login": "admin",
                 "email": "admin@example.test",
                 "is_active": True,
                 "created_at": "2026-01-01",
@@ -144,6 +148,7 @@ def test_list_auth_users_retourne_uniquement_des_champs_publics():
     assert users == (
         {
             "id": 1,
+            "login": "admin",
             "email": "admin@example.test",
             "is_active": True,
             "created_at": "2026-01-01",
@@ -177,12 +182,14 @@ def test_cmd_user_list_naffiche_aucun_secret(monkeypatch, capsys):
     assert "mfa-secret" not in stdout
 
 
-def test_show_auth_user_par_email():
+def test_show_auth_user_par_login():
+    """L'identite est cherchee telle que saisie, et le contact suit la ligne."""
     user = show_auth_user(
-        email="Admin@Example.Test",
+        login="2TNE1-01",
         fetch_one=lambda sql, params: {
             "id": 1,
-            "email": params[0],
+            "login": params[0],
+            "email": None,
             "is_active": True,
             "created_at": "2026-01-01",
             "password_hash": "hash",
@@ -192,7 +199,8 @@ def test_show_auth_user_par_email():
     assert user == {
         "id": 1,
         # Casse conservee, la recherche employant la valeur telle que saisie.
-        "email": "Admin@Example.Test",
+        "login": "2TNE1-01",
+        "email": None,
         "is_active": True,
         "created_at": "2026-01-01",
     }
@@ -206,7 +214,7 @@ def test_show_auth_user_exige_id_ou_email():
 def test_cmd_user_show_introuvable(monkeypatch, capsys):
     monkeypatch.setattr("cli.security.auth._load_env_and_configure_forge", lambda root: None)
 
-    cmd_auth_user_show(["--email", "missing@example.test"], fetch_one=lambda *_: None)
+    cmd_auth_user_show(["--login", "missing@example.test"], fetch_one=lambda *_: None)
 
     assert "Utilisateur introuvable" in capsys.readouterr().out
 
@@ -239,12 +247,12 @@ def test_dispatch_forge_auth_user_create(monkeypatch):
     def fake_auth_main(args):
         captured["args"] = args
 
-    monkeypatch.setattr("sys.argv", ["forge", "auth:user:create", "--email", "a@b.test"])
+    monkeypatch.setattr("sys.argv", ["forge", "auth:user:create", "--login", "a@b.test"])
     monkeypatch.setattr(forge, "auth_main", fake_auth_main)
 
     forge.main()
 
-    assert captured["args"] == ["auth:user:create", "--email", "a@b.test"]
+    assert captured["args"] == ["auth:user:create", "--login", "a@b.test"]
 
 
 def test_dispatch_forge_auth_user_list(monkeypatch):
@@ -326,7 +334,7 @@ def test_disable_auth_user_par_email():
         return 1
 
     uid = disable_auth_user(
-        email="Admin@Example.Test",
+        login="Admin@Example.Test",
         fetch_one=fake_fetch,
         execute=fake_exec,
     )
@@ -336,7 +344,7 @@ def test_disable_auth_user_par_email():
 
 
 def test_disable_auth_user_refuse_sans_id_ni_email():
-    with pytest.raises(AuthAdminCliError, match="--id ou --email"):
+    with pytest.raises(AuthAdminCliError, match="--id ou --login"):
         disable_auth_user(fetch_one=lambda *_: None, execute=lambda *_: 1)
 
 
@@ -344,7 +352,7 @@ def test_disable_auth_user_refuse_id_et_email():
     with pytest.raises(AuthAdminCliError, match="pas les deux"):
         disable_auth_user(
             user_id=1,
-            email="a@b.test",
+            login="a@b.test",
             fetch_one=lambda *_: {"id": 1},
             execute=lambda *_: 1,
         )
@@ -528,7 +536,7 @@ def test_cmd_disable_erreur_db_indisponible(monkeypatch):
 
     with pytest.raises(SystemExit) as exc_info:
         cmd_auth_user_disable(
-            ["--email", "a@b.test"],
+            ["--login", "a@b.test"],
             fetch_one=broken_fetch,
             execute=lambda *_: 1,
         )
@@ -603,7 +611,7 @@ def test_cmd_password_prompt_masque(monkeypatch, capsys):
     monkeypatch.setattr("getpass.getpass", lambda prompt: "MotDePassePrompt")
 
     cmd_auth_user_password(
-        ["--email", "a@b.test", "--password-prompt"],
+        ["--login", "a@b.test", "--password-prompt"],
         fetch_one=lambda *_: {"id": 9},
         execute=lambda *_: 1,
     )
@@ -649,12 +657,12 @@ def test_dispatch_forge_auth_user_enable(monkeypatch):
     def fake_auth_main(args):
         captured["args"] = args
 
-    monkeypatch.setattr("sys.argv", ["forge", "auth:user:enable", "--email", "a@b.test"])
+    monkeypatch.setattr("sys.argv", ["forge", "auth:user:enable", "--login", "a@b.test"])
     monkeypatch.setattr(forge, "auth_main", fake_auth_main)
 
     forge.main()
 
-    assert captured["args"] == ["auth:user:enable", "--email", "a@b.test"]
+    assert captured["args"] == ["auth:user:enable", "--login", "a@b.test"]
 
 
 def test_dispatch_forge_auth_user_password(monkeypatch):

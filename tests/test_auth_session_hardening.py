@@ -68,7 +68,7 @@ _UTILISATEUR = {
 
 _AUTH_USER = AuthUser(
     id=1,
-    email="test@example.com",
+    login="test@example.com",
     password_hash="$argon2id$fake",
     is_active=True,
 )

@@ -154,7 +154,7 @@ def test_login_user_plus_regenerate_produces_new_session_id(isolated_store):
     """login_user() + regenerate() retourne un session_id différent du précédent."""
     sid = isolated_store.create()
     request = _FakeRequest(sid)
-    auth_user = AuthUser(id=1, email="frank@example.com", password_hash="$argon2id$x", is_active=True)
+    auth_user = AuthUser(id=1, login="frank@example.com", password_hash="$argon2id$x", is_active=True)
     login_user(request, auth_user)
     nouveau_id = isolated_store.regenerate(sid)
     assert nouveau_id != sid
@@ -166,7 +166,7 @@ def test_login_user_plus_regenerate_authenticated_canonically(isolated_store):
 
     sid = isolated_store.create()
     request = _FakeRequest(sid)
-    auth_user = AuthUser(id=2, email="grace@example.com", password_hash="$argon2id$x", is_active=True)
+    auth_user = AuthUser(id=2, login="grace@example.com", password_hash="$argon2id$x", is_active=True)
     login_user(request, auth_user)
     nouveau_id = isolated_store.regenerate(sid)
 
@@ -178,7 +178,7 @@ def test_login_user_stores_only_auth_user_id_no_french_fields(isolated_store):
     """login_user() stocke uniquement _auth_user_id — pas de champ métier FR."""
     sid = isolated_store.create()
     request = _FakeRequest(sid)
-    auth_user = AuthUser(id=99, email="henry@example.com", password_hash="$argon2id$x", is_active=True)
+    auth_user = AuthUser(id=99, login="henry@example.com", password_hash="$argon2id$x", is_active=True)
     login_user(request, auth_user)
 
     session = isolated_store.get(sid)
@@ -192,7 +192,7 @@ def test_no_french_field_required_for_canonical_authentication(isolated_store):
     """Le flux canonique n'exige aucun champ métier FR pour authentifier une session."""
     sid = isolated_store.create()
     request = _FakeRequest(sid)
-    auth_user = AuthUser(id=42, email="iris@example.com", password_hash="$argon2id$x", is_active=True)
+    auth_user = AuthUser(id=42, login="iris@example.com", password_hash="$argon2id$x", is_active=True)
     login_user(request, auth_user)
 
     session = isolated_store.get(sid)
@@ -226,7 +226,7 @@ def test_canonical_session_recognized_by_legacy_bridge(isolated_store):
 
     sid = isolated_store.create()
     request = _FakeRequest(sid)
-    auth_user = AuthUser(id=33, email="jack@example.com", password_hash="$argon2id$x", is_active=True)
+    auth_user = AuthUser(id=33, login="jack@example.com", password_hash="$argon2id$x", is_active=True)
     login_user(request, auth_user)
 
     with warnings.catch_warnings():

@@ -6,7 +6,7 @@ même convention.
 La CLI `forge auth:user:*` abaissait la casse, à l'écriture comme à la lecture :
 prise seule, elle était cohérente. Le contrôleur et le modèle engendrés par
 `forge make:auth` ne normalisent rien, ils passent la saisie du formulaire
-telle quelle à `WHERE email = ?`.
+telle quelle à `WHERE login = ?`.
 
 Deux chemins d'écriture, une seule table, deux conventions.
 
@@ -40,14 +40,16 @@ import pytest
 
 pytestmark = pytest.mark.meta
 
-#: Adresse mêlant capitales et minuscules : c'est la forme qu'un utilisateur
-#: saisit spontanément, et celle que l'ancienne CLI détruisait.
-IDENTITE = "Admin@Example.Test"
+#: Identité mêlant capitales et minuscules. Depuis l'ADR-089, ce n'est plus
+#: forcément une adresse : `2TNE1-01` illustre mieux ce que la colonne porte.
+IDENTITE = "2TNE1-01"
 
 #: Requête du modèle engendré par `make:auth`, recopiée telle quelle. La figer
 #: ici rend le test aveugle à toute normalisation que le générateur
 #: introduirait sans le dire.
-SELECT_ENGENDRE = "SELECT id, email, password_hash, is_active FROM users WHERE email = ?"
+SELECT_ENGENDRE = (
+    "SELECT id, login, email, password_hash, is_active FROM users WHERE login = ?"
+)
 
 
 def _sqlite_avec_users() -> sqlite3.Connection:
@@ -78,7 +80,7 @@ def _creer_par_la_cli(conn: sqlite3.Connection, identite: str) -> int:
         return int(cur.lastrowid or 0)
 
     return create_auth_user(
-        email=identite, password="secret123", fetch_one=fetch_one, insert=insert
+        login=identite, password="secret123", fetch_one=fetch_one, insert=insert
     )
 
 
@@ -93,8 +95,8 @@ def _charger_par_le_modele_engendre(
 def test_un_compte_cree_par_la_cli_se_connecte_par_le_formulaire() -> None:
     """LE test du ticket : sans lui, la porte reste fermée sur SQLite.
 
-    Il échoue sur le code d'avant, la CLI ayant stocké `admin@example.test`
-    quand le formulaire cherche `Admin@Example.Test`.
+    Il échoue sur le code d'avant, la CLI ayant stocké `2tne1-01` quand le
+    formulaire cherche `2TNE1-01`.
     """
     conn = _sqlite_avec_users()
     try:
@@ -106,7 +108,7 @@ def test_un_compte_cree_par_la_cli_se_connecte_par_le_formulaire() -> None:
             "make:auth engendre : les deux chemins ne s'accordent pas sur la casse"
         )
         assert trouve["id"] == user_id
-        assert trouve["email"] == IDENTITE
+        assert trouve["login"] == IDENTITE
     finally:
         conn.close()
 
@@ -127,11 +129,11 @@ def test_la_cli_retrouve_ce_qu_elle_a_ecrit() -> None:
             row = conn.execute(sql, tuple(params)).fetchone()
             return dict(row) if row else None
 
-        vu = show_auth_user(email=IDENTITE, fetch_one=fetch_one)
+        vu = show_auth_user(login=IDENTITE, fetch_one=fetch_one)
 
         assert vu is not None
         assert vu["id"] == user_id
-        assert vu["email"] == IDENTITE
+        assert vu["login"] == IDENTITE
     finally:
         conn.close()
 
@@ -147,10 +149,10 @@ def test_la_casse_est_conservee_en_base() -> None:
     conn = _sqlite_avec_users()
     try:
         _creer_par_la_cli(conn, IDENTITE)
-        stocke = conn.execute("SELECT email FROM users").fetchone()
+        stocke = conn.execute("SELECT login FROM users").fetchone()
 
         assert stocke is not None
-        assert stocke["email"] == IDENTITE
+        assert stocke["login"] == IDENTITE
     finally:
         conn.close()
 
@@ -165,7 +167,7 @@ def test_la_cli_n_abaisse_plus_la_casse() -> None:
 
     from cli.security import auth
 
-    source = inspect.getsource(auth._validate_email_value)
+    source = inspect.getsource(auth._validate_login_value)
 
     assert ".lower()" not in source, (
         "la normalisation de casse est revenue sur l'identité : elle appartient "

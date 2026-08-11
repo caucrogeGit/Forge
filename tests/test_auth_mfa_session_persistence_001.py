@@ -53,7 +53,7 @@ class RealFakeRequest:
 def _make_user(user_id: int = 1) -> AuthUser:
     return AuthUser(
         id=user_id,
-        email=f"user{user_id}@example.com",
+        login=f"user{user_id}@example.com",
         password_hash="hash",
         is_active=True,
     )

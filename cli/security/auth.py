@@ -128,7 +128,8 @@ AUTH_FEATURES = (
 USERS_SQL = """\
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    login VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NULL,
     password_hash VARCHAR(255) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     email_verified_at DATETIME NULL,
@@ -432,7 +433,7 @@ def _default_execute(sql: str, params: tuple[Any, ...]) -> int:
         raise _friendly_db_error(error) from error
 
 
-def _validate_email_value(email: str | None) -> str:
+def _validate_login_value(login: str | None) -> str:
     """Valide l'identifiant de connexion sans en changer la casse.
 
     Cette fonction mettait la valeur en **minuscules**, sous le nom
@@ -459,16 +460,35 @@ def _validate_email_value(email: str | None) -> str:
     La sensibilité à la casse d'une comparaison relève désormais de la collation
     du moteur, ce que Forge n'a pas à contredire dans un sens ni dans l'autre.
     """
-    value = (email or "").strip()
+    value = (login or "").strip()
     if not value:
         raise AuthAdminCliError(
-            "Email obligatoire.",
-            conseil="Exemple : --email utilisateur@domaine.com",
+            "Identifiant obligatoire.",
+            conseil="Exemple : --login prof.durand, ou --login 2TNE1-01",
         )
+    return value
+
+
+def _validate_contact_value(email: str | None) -> "str | None":
+    """Valide le contact, facultatif, et le normalise en minuscules.
+
+    Le contrôle de forme `@` vit ici et non sur l'identité (ADR-089). Il y a du
+    sens : une adresse en a une. Sur l'identité il n'en avait aucun, et il
+    refusait la saisie avant même de chercher le compte, si bien que
+    `forge auth:user:show 2TNE1-01` ne cherchait pas, il rejetait.
+
+    Absent, le contact vaut `None` : un compte sans adresse est un compte
+    valide, et il n'est simplement pas récupérable par courriel.
+    """
+    if email is None:
+        return None
+    value = email.strip().lower()
+    if not value:
+        return None
     if "@" not in value:
         raise AuthAdminCliError(
-            "Email invalide.",
-            conseil="Format attendu : utilisateur@domaine.com",
+            "Email de contact invalide.",
+            conseil="Format attendu : utilisateur@domaine.com, ou omettez --email",
         )
     return value
 
@@ -497,8 +517,10 @@ def _log_user_not_found(
 
 
 def _public_user_row(row: dict[str, Any]) -> dict[str, Any]:
+    """Projection publique : identité ET contact, distincts (ADR-089)."""
     return {
         "id": row.get("id"),
+        "login": row.get("login"),
         "email": row.get("email"),
         "is_active": row.get("is_active"),
         "created_at": row.get("created_at"),
@@ -508,7 +530,8 @@ def _public_user_row(row: dict[str, Any]) -> dict[str, Any]:
 def _print_user(row: dict[str, Any]) -> None:
     public = _public_user_row(row)
     print(f"  id: {public.get('id')}")
-    print(f"  email: {public.get('email')}")
+    print(f"  login: {public.get('login')}")
+    print(f"  email: {public.get('email') or '(aucun contact)'}")
     print(f"  is_active: {public.get('is_active')}")
     print(f"  created_at: {public.get('created_at')}")
 
@@ -516,18 +539,18 @@ def _print_user(row: dict[str, Any]) -> None:
 def _resolve_user_id(
     *,
     user_id: int | None,
-    email: str | None,
+    login: str | None,
     fetch_one: DbFetchOne,
 ) -> int:
-    if user_id is None and email is None:
+    if user_id is None and login is None:
         raise AuthAdminCliError(
-            "Indiquez --id ou --email.",
-            conseil="Exemple : forge auth:user:disable --email utilisateur@domaine.com",
+            "Indiquez --id ou --login.",
+            conseil="Exemple : forge auth:user:disable --login prof.durand",
         )
-    if user_id is not None and email is not None:
+    if user_id is not None and login is not None:
         raise AuthAdminCliError(
-            "Utilisez --id ou --email, pas les deux.",
-            conseil="Choisissez un seul identifiant : --id ou --email.",
+            "Utilisez --id ou --login, pas les deux.",
+            conseil="Choisissez un seul identifiant : --id ou --login.",
         )
     if user_id is not None:
         if user_id <= 0:
@@ -543,40 +566,48 @@ def _resolve_user_id(
                 conseil="Verifiez l'identifiant avec forge auth:user:list",
             )
         return int(row["id"])
-    normalized = _validate_email_value(email)
-    row = fetch_one("SELECT id FROM users WHERE email = ?", (normalized,))
+    normalized = _validate_login_value(login)
+    row = fetch_one("SELECT id FROM users WHERE login = ?", (normalized,))
     if not row:
         _log_user_not_found(attempted_email=normalized)
         raise AuthAdminCliError(
             f"Utilisateur {normalized!r} introuvable.",
-            conseil="Verifiez l'email avec forge auth:user:list",
+            conseil="Verifiez l'identifiant avec forge auth:user:list",
         )
     return int(row["id"])
 
 
 def create_auth_user(
     *,
-    email: str,
+    login: str,
     password: str,
+    email: str | None = None,
     fetch_one: DbFetchOne | None = None,
     insert: DbInsert | None = None,
 ) -> int:
+    """Crée un compte : `login` est l'identité, `email` le contact facultatif.
+
+    Les deux sont séparés depuis l'ADR-089. `login` est obligatoire, unique et
+    sans contrainte de forme ; `email` peut manquer, auquel cas le compte n'est
+    pas récupérable par courriel, ce qui est le cas d'un élève mineur.
+    """
     from core.auth.password import hash_password
 
-    normalized_email = _validate_email_value(email)
+    identite = _validate_login_value(login)
+    contact = _validate_contact_value(email)
     password = _validate_password_value(password)
     fetch_one = fetch_one or _default_fetch_one
     insert = insert or _default_insert
 
-    existing = fetch_one("SELECT id FROM users WHERE email = ?", (normalized_email,))
+    existing = fetch_one("SELECT id FROM users WHERE login = ?", (identite,))
     if existing:
-        raise AuthAdminCliError("Un utilisateur avec cet email existe deja.")
+        raise AuthAdminCliError("Un utilisateur avec cet identifiant existe deja.")
 
     password_hash = hash_password(password)
     return int(
         insert(
-            "INSERT INTO users (email, password_hash, is_active) VALUES (?, ?, TRUE)",
-            (normalized_email, password_hash),
+            "INSERT INTO users (login, email, password_hash, is_active) VALUES (?, ?, ?, TRUE)",
+            (identite, contact, password_hash),
         )
     )
 
@@ -584,7 +615,7 @@ def create_auth_user(
 def list_auth_users(*, fetch_all: DbFetchAll | None = None) -> tuple[dict[str, Any], ...]:
     fetch_all = fetch_all or _default_fetch_all
     rows = fetch_all(
-        "SELECT id, email, is_active, created_at FROM users ORDER BY id",
+        "SELECT id, login, email, is_active, created_at FROM users ORDER BY id",
         (),
     )
     return tuple(_public_user_row(dict(row)) for row in rows)
@@ -593,26 +624,26 @@ def list_auth_users(*, fetch_all: DbFetchAll | None = None) -> tuple[dict[str, A
 def show_auth_user(
     *,
     user_id: int | None = None,
-    email: str | None = None,
+    login: str | None = None,
     fetch_one: DbFetchOne | None = None,
 ) -> dict[str, Any] | None:
     fetch_one = fetch_one or _default_fetch_one
-    if user_id is None and email is None:
-        raise AuthAdminCliError("Indiquez --id ou --email.")
+    if user_id is None and login is None:
+        raise AuthAdminCliError("Indiquez --id ou --login.")
     if user_id is not None and user_id <= 0:
         raise AuthAdminCliError("id doit etre un entier strictement positif.")
-    if user_id is not None and email is not None:
-        raise AuthAdminCliError("Utilisez --id ou --email, pas les deux.")
+    if user_id is not None and login is not None:
+        raise AuthAdminCliError("Utilisez --id ou --login, pas les deux.")
 
     if user_id is not None:
         row = fetch_one(
-            "SELECT id, email, is_active, created_at FROM users WHERE id = ?",
+            "SELECT id, login, email, is_active, created_at FROM users WHERE id = ?",
             (user_id,),
         )
     else:
         row = fetch_one(
-            "SELECT id, email, is_active, created_at FROM users WHERE email = ?",
-            (_validate_email_value(email),),
+            "SELECT id, login, email, is_active, created_at FROM users WHERE login = ?",
+            (_validate_login_value(login),),
         )
     return _public_user_row(dict(row)) if row else None
 
@@ -620,13 +651,13 @@ def show_auth_user(
 def disable_auth_user(
     *,
     user_id: int | None = None,
-    email: str | None = None,
+    login: str | None = None,
     fetch_one: DbFetchOne | None = None,
     execute: DbExecute | None = None,
 ) -> int:
     fetch_one = fetch_one or _default_fetch_one
     execute = execute or _default_execute
-    uid = _resolve_user_id(user_id=user_id, email=email, fetch_one=fetch_one)
+    uid = _resolve_user_id(user_id=user_id, login=login, fetch_one=fetch_one)
     execute("UPDATE users SET is_active = FALSE WHERE id = ?", (uid,))
     return uid
 
@@ -634,13 +665,13 @@ def disable_auth_user(
 def enable_auth_user(
     *,
     user_id: int | None = None,
-    email: str | None = None,
+    login: str | None = None,
     fetch_one: DbFetchOne | None = None,
     execute: DbExecute | None = None,
 ) -> int:
     fetch_one = fetch_one or _default_fetch_one
     execute = execute or _default_execute
-    uid = _resolve_user_id(user_id=user_id, email=email, fetch_one=fetch_one)
+    uid = _resolve_user_id(user_id=user_id, login=login, fetch_one=fetch_one)
     execute("UPDATE users SET is_active = TRUE WHERE id = ?", (uid,))
     return uid
 
@@ -648,7 +679,7 @@ def enable_auth_user(
 def change_auth_user_password(
     *,
     user_id: int | None = None,
-    email: str | None = None,
+    login: str | None = None,
     password: str,
     fetch_one: DbFetchOne | None = None,
     execute: DbExecute | None = None,
@@ -658,7 +689,7 @@ def change_auth_user_password(
     fetch_one = fetch_one or _default_fetch_one
     execute = execute or _default_execute
     _validate_password_value(password)
-    uid = _resolve_user_id(user_id=user_id, email=email, fetch_one=fetch_one)
+    uid = _resolve_user_id(user_id=user_id, login=login, fetch_one=fetch_one)
     new_hash = hash_password(password)
     execute("UPDATE users SET password_hash = ? WHERE id = ?", (new_hash, uid))
     return uid
@@ -692,14 +723,14 @@ def _resolve_role_id(*, role: str | None, fetch_one: DbFetchOne) -> int:
 def add_auth_user_role(
     *,
     user_id: int | None = None,
-    email: str | None = None,
+    login: str | None = None,
     role: str,
     fetch_one: DbFetchOne | None = None,
     execute: DbExecute | None = None,
 ) -> dict[str, Any]:
     fetch_one = fetch_one or _default_fetch_one
     execute = execute or _default_execute
-    uid = _resolve_user_id(user_id=user_id, email=email, fetch_one=fetch_one)
+    uid = _resolve_user_id(user_id=user_id, login=login, fetch_one=fetch_one)
     role_id = _resolve_role_id(role=role, fetch_one=fetch_one)
 
     existing = fetch_one(
@@ -719,14 +750,14 @@ def add_auth_user_role(
 def remove_auth_user_role(
     *,
     user_id: int | None = None,
-    email: str | None = None,
+    login: str | None = None,
     role: str,
     fetch_one: DbFetchOne | None = None,
     execute: DbExecute | None = None,
 ) -> dict[str, Any]:
     fetch_one = fetch_one or _default_fetch_one
     execute = execute or _default_execute
-    uid = _resolve_user_id(user_id=user_id, email=email, fetch_one=fetch_one)
+    uid = _resolve_user_id(user_id=user_id, login=login, fetch_one=fetch_one)
     role_id = _resolve_role_id(role=role, fetch_one=fetch_one)
 
     existing = fetch_one(
@@ -746,13 +777,13 @@ def remove_auth_user_role(
 def list_auth_user_roles(
     *,
     user_id: int | None = None,
-    email: str | None = None,
+    login: str | None = None,
     fetch_one: DbFetchOne | None = None,
     fetch_all: DbFetchAll | None = None,
 ) -> tuple[dict[str, Any], ...]:
     fetch_one = fetch_one or _default_fetch_one
     fetch_all = fetch_all or _default_fetch_all
-    uid = _resolve_user_id(user_id=user_id, email=email, fetch_one=fetch_one)
+    uid = _resolve_user_id(user_id=user_id, login=login, fetch_one=fetch_one)
 
     rows = fetch_all(
         """
@@ -925,7 +956,10 @@ def cmd_auth_user_create(
     insert: DbInsert | None = None,
 ) -> None:
     parser = argparse.ArgumentParser(prog="forge auth:user:create")
-    parser.add_argument("--email", required=True)
+    # ADR-089 : `--login` designe l'IDENTITE, obligatoire ; `--email` le
+    # CONTACT, facultatif. Un compte sans contact est valide.
+    parser.add_argument("--login", required=True)
+    parser.add_argument("--email")
     parser.add_argument("--password")
     parser.add_argument("--password-prompt", action="store_true")
     parsed = parser.parse_args(args)
@@ -935,12 +969,13 @@ def cmd_auth_user_create(
         if password is None or parsed.password_prompt:
             password = getpass.getpass("Mot de passe : ")
         user_id = create_auth_user(
+            login=parsed.login,
             email=parsed.email,
             password=password,
             fetch_one=fetch_one,
             insert=insert,
         )
-        print(out.created(f"Utilisateur cree : id={user_id}, email={_validate_email_value(parsed.email)}"))
+        print(out.created(f"Utilisateur cree : id={user_id}, login={_validate_login_value(parsed.login)}"))
 
     _run_admin_command(action, root=root)
 
@@ -980,13 +1015,13 @@ def cmd_auth_user_show(
 ) -> None:
     parser = argparse.ArgumentParser(prog="forge auth:user:show")
     parser.add_argument("--id", type=int)
-    parser.add_argument("--email")
+    parser.add_argument("--login")
     parsed = parser.parse_args(args)
 
     def action() -> None:
         user = show_auth_user(
             user_id=parsed.id,
-            email=parsed.email,
+            login=parsed.login,
             fetch_one=fetch_one,
         )
         print("\nForge auth:user:show\n")
@@ -1007,13 +1042,13 @@ def cmd_auth_user_disable(
 ) -> None:
     parser = argparse.ArgumentParser(prog="forge auth:user:disable")
     parser.add_argument("--id", type=int)
-    parser.add_argument("--email")
+    parser.add_argument("--login")
     parsed = parser.parse_args(args)
 
     def action() -> None:
         uid = disable_auth_user(
             user_id=parsed.id,
-            email=parsed.email,
+            login=parsed.login,
             fetch_one=fetch_one,
             execute=execute,
         )
@@ -1033,13 +1068,13 @@ def cmd_auth_user_enable(
 ) -> None:
     parser = argparse.ArgumentParser(prog="forge auth:user:enable")
     parser.add_argument("--id", type=int)
-    parser.add_argument("--email")
+    parser.add_argument("--login")
     parsed = parser.parse_args(args)
 
     def action() -> None:
         uid = enable_auth_user(
             user_id=parsed.id,
-            email=parsed.email,
+            login=parsed.login,
             fetch_one=fetch_one,
             execute=execute,
         )
@@ -1059,7 +1094,7 @@ def cmd_auth_user_password(
 ) -> None:
     parser = argparse.ArgumentParser(prog="forge auth:user:password")
     parser.add_argument("--id", type=int)
-    parser.add_argument("--email")
+    parser.add_argument("--login")
     parser.add_argument("--password")
     parser.add_argument("--password-prompt", action="store_true")
     parsed = parser.parse_args(args)
@@ -1070,7 +1105,7 @@ def cmd_auth_user_password(
             password = getpass.getpass("Nouveau mot de passe : ")
         uid = change_auth_user_password(
             user_id=parsed.id,
-            email=parsed.email,
+            login=parsed.login,
             password=password,
             fetch_one=fetch_one,
             execute=execute,
@@ -1084,7 +1119,7 @@ def cmd_auth_user_password(
 
 def _add_user_lookup_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--id", type=int)
-    parser.add_argument("--email")
+    parser.add_argument("--login")
 
 
 def cmd_auth_user_role_add(
@@ -1102,7 +1137,7 @@ def cmd_auth_user_role_add(
     def action() -> None:
         result = add_auth_user_role(
             user_id=parsed.id,
-            email=parsed.email,
+            login=parsed.login,
             role=parsed.role,
             fetch_one=fetch_one,
             execute=execute,
@@ -1140,7 +1175,7 @@ def cmd_auth_user_role_remove(
     def action() -> None:
         result = remove_auth_user_role(
             user_id=parsed.id,
-            email=parsed.email,
+            login=parsed.login,
             role=parsed.role,
             fetch_one=fetch_one,
             execute=execute,
@@ -1177,7 +1212,7 @@ def cmd_auth_user_roles(
     def action() -> None:
         roles = list_auth_user_roles(
             user_id=parsed.id,
-            email=parsed.email,
+            login=parsed.login,
             fetch_one=fetch_one,
             fetch_all=fetch_all,
         )

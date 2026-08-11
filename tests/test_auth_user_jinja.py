@@ -62,7 +62,7 @@ def test_loader_aware_sujet_existant_authentifie():
 
     context = make_auth_jinja_context(
         _authenticated_request(7),
-        user_loader=lambda uid: AuthUser(id=uid, email="u@x.fr", password_hash="x"),
+        user_loader=lambda uid: AuthUser(id=uid, login="u@x.fr", password_hash="x"),
     )
 
     assert context["is_authenticated"] is True
@@ -162,19 +162,19 @@ def test_current_user_utilise_un_loader_si_fourni():
         request,
         user_loader=lambda user_id: {
             "id": user_id,
-            "email": "ada@example.test",
+            "login": "ada@example.test",
             "password_hash": "secret",
             "is_active": True,
         },
     )
 
-    assert user == AuthJinjaUser(id=9, email="ada@example.test", is_active=True)
+    assert user == AuthJinjaUser(id=9, login="ada@example.test", is_active=True)
 
 
 def test_current_user_ne_fuit_pas_les_informations_sensibles():
     raw_user = AuthUser(
         id=3,
-        email="user@example.test",
+        login="user@example.test",
         password_hash="argon2-secret",
         is_active=True,
     )
@@ -183,7 +183,7 @@ def test_current_user_ne_fuit_pas_les_informations_sensibles():
 
     assert public_user == AuthJinjaUser(
         id=3,
-        email="user@example.test",
+        login="user@example.test",
         is_active=True,
     )
     assert not hasattr(public_user, "password_hash")

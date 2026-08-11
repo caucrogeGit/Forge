@@ -52,7 +52,7 @@ from forge_mvc_mfa import (
     verify_mfa_challenge,
 )
 
-_DEMO_USER = AuthUser(id=1, email="demo@forge.example", password_hash="(démo)", is_active=True)
+_DEMO_USER = AuthUser(id=1, login="demo", password_hash="(démo)", is_active=True)
 _SESSION_KEY = "mfa_challenge_factor"
 _COOKIE = "session_id={sid}; Path=/; HttpOnly; SameSite=Strict; Secure"
 

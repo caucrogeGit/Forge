@@ -253,7 +253,7 @@ def test_password_reset_request_is_a_dataclass():
 
 
 def _make_user(*, is_active: bool = True) -> AuthUser:
-    return AuthUser(id=2, email="bob@example.com", password_hash="hash", is_active=is_active)
+    return AuthUser(id=2, login="bob@example.com", password_hash="hash", is_active=is_active)
 
 
 def test_create_request_from_auth_user():
@@ -261,15 +261,52 @@ def test_create_request_from_auth_user():
     req = create_password_reset_request(user)
     assert isinstance(req, PasswordResetRequest)
     assert req.user_id == user.id
-    assert req.email == user.email
     assert isinstance(req.raw_token, str)
     assert isinstance(req.token_record, AuthToken)
 
 
+def test_la_demande_porte_le_contact_et_non_l_identite():
+    """`PasswordResetRequest.email` est le CONTACT, pas l'identifiant (ADR-089).
+
+    Avant la séparation, une seule colonne portait les deux, si bien que la
+    demande de réinitialisation partait forcément à l'identifiant de connexion.
+    """
+    user = AuthUser(
+        id=7,
+        login="2TNE1-01",
+        password_hash="hash",
+        email="prof.durand@ecole.fr",
+    )
+
+    req = create_password_reset_request(user)
+
+    assert req.email == "prof.durand@ecole.fr"
+    assert req.email != user.login
+
+
+def test_un_compte_sans_contact_n_est_pas_recuperable_par_courriel():
+    """La demande se crée, mais sans adresse où l'envoyer, et cela se voit.
+
+    C'est le cas d'un élève mineur. L'application qui reçoit `None` ne doit
+    rien poster : le contrat le lui dit explicitement plutôt que de la laisser
+    envoyer à l'identifiant, qui n'est pas une adresse.
+    """
+    req = create_password_reset_request(_make_user())
+
+    assert req.email is None
+    assert isinstance(req.raw_token, str)
+
+
 def test_create_request_from_dict():
-    data = {"id": 3, "email": "carol@example.com", "password_hash": "hash"}
+    data = {
+        "id": 3,
+        "login": "carol",
+        "email": "Carol@Example.com",
+        "password_hash": "hash",
+    }
     req = create_password_reset_request(data)
     assert req.user_id == 3
+    # Le contact est normalisé en minuscules, l'identité ne l'est pas.
     assert req.email == "carol@example.com"
 
 
@@ -300,7 +337,7 @@ def test_create_request_refuses_invalid_data():
         create_password_reset_request(None)
 
     with pytest.raises(Exception):
-        create_password_reset_request({"id": -1, "email": "x@y.com", "password_hash": "h"})
+        create_password_reset_request({"id": -1, "login": "x@y.com", "password_hash": "h"})
 
 
 def test_create_request_does_not_modify_user():

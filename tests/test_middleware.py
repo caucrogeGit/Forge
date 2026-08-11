@@ -8,7 +8,7 @@ _UTILISATEUR = {
     "Email": "", "Actif": True, "PasswordHash": "x", "roles": [],
 }
 
-_VALID_USER = AuthUser(id=1, email="u@x.fr", password_hash="x", is_active=True)
+_VALID_USER = AuthUser(id=1, login="u@x.fr", password_hash="x", is_active=True)
 
 
 def _req(cookie=""):
@@ -68,7 +68,7 @@ class TestAuthMiddlewareSubjectValidation:
         assert "__Host-session_id=" in resp.headers.get("Set-Cookie", "")
 
     def test_inactive_subject_is_orphan(self):
-        inactive = AuthUser(id=1, email="u@x.fr", password_hash="x", is_active=False)
+        inactive = AuthUser(id=1, login="u@x.fr", password_hash="x", is_active=False)
         mw = AuthMiddleware("/login", user_loader=lambda _uid: inactive)
         session = {"_auth_user_id": 1}
         resp = mw.check(_req_session(session))

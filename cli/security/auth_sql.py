@@ -80,7 +80,11 @@ AUTH_TABLE_SPECS: dict[str, AuthTableSpec] = {
         table="users",
         columns=(
             _identity(),
-            AuthColumn("email", "string", length=255, unique=True),
+            # ADR-089 : `login` porte l'IDENTITÉ, unique et obligatoire, sans
+            # contrainte de forme. `email` porte le CONTACT, facultatif et NON
+            # unique, deux comptes pouvant partager une adresse de dépannage.
+            AuthColumn("login", "string", length=255, unique=True),
+            AuthColumn("email", "string", length=255, nullable=True),
             AuthColumn("password_hash", "string", length=255),
             AuthColumn("is_active", "boolean", default_bool=True),
             AuthColumn("email_verified_at", "datetime", nullable=True),

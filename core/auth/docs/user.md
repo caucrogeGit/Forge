@@ -103,9 +103,10 @@ from core.auth import AuthUser
 
 user = AuthUser(
     id=42,
-    email="lea@example.com",
+    login="lea",
     password_hash="$argon2id$...",
     is_active=True,
+    email="lea@example.com",
 )
 ```
 
@@ -138,7 +139,7 @@ def load_user_by_email(email: str) -> AuthUser | None:
         return None
     return AuthUser(
         id=row["id"],
-        email=row["email"],
+        login=row["login"],
         password_hash=row["password_hash"],
         is_active=bool(row["is_active"]),
     )

@@ -237,7 +237,7 @@ Les fonctions publiques sont aussi appelables depuis du code Python, avec des ac
 ```python
 from cli.security.auth import create_auth_user, list_auth_users
 
-user_id = create_auth_user(email="alice@exemple.fr", password="motdepasse")
+user_id = create_auth_user(login="alice", password="motdepasse", email="alice@exemple.fr")
 comptes = list_auth_users()
 ```
 

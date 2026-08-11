@@ -3,6 +3,18 @@
 
 ## [Non publié]
 
+### Modifié
+
+- **L'identité et le contact sont deux colonnes distinctes (`AUTH-IDENTITY-CONTACT-001`, ADR-089).**
+  La table `users` n'avait qu'une colonne d'identité, `email`, et **rien ne vérifiait qu'elle contienne une adresse** : le cœur n'exige qu'une chaîne non vide. Poser son adresse changeait donc son identifiant de connexion, et une application y inscrivait légitimement `2TNE1-01`.
+  Le vocabulaire avait produit du comportement, deux fois. Une fonction nommée `_normalize_email` abaissait la casse, fermant la connexion sur SQLite. Et la CLI refusait tout argument sans `@`, si bien que `forge auth:user:show 2TNE1-01` rejetait la saisie au lieu de chercher le compte, alors que le cœur l'acceptait sans réserve.
+  `login` porte désormais l'identité : unique, obligatoire, sans contrainte de forme, casse conservée. `email` porte le contact, facultatif et **non unique**, normalisé en minuscules, et `email_verified_at` le suit.
+  Un compte sans contact est un compte valide, ce qui est le cas d'un élève mineur, et `PasswordResetRequest.email` vaut alors `None` : l'application sait qu'elle n'a rien à poster, au lieu d'envoyer à un identifiant qui n'est pas une adresse.
+  La CLI distingue `--login` et `--email`, et le contrôle de forme suit le contact, où il a un sens.
+  `AuthJinjaUser` expose `login` : un gabarit qui affiche « connecté en tant que » désigne la session, pas une adresse que deux comptes peuvent partager.
+  **Rupture d'API publique**, assumée et prise avant le tag 1.0.0 précisément pour éviter la migration en trois temps qu'elle imposerait après. Aucune migration : la convention pré-1.0 l'autorise et la seule application existante peut reconstruire sa base.
+  Le compteur des deux mois sans changement d'API publique repart. Ce coût est imputable au défaut, non à sa correction : un socle dont le champ d'identité est mal nommé et refuse par la CLI ce que le cœur accepte n'est pas taggable en 1.0.0.
+
 ### Corrigé
 
 - **Un compte créé par la CLI ne pouvait pas se connecter sur SQLite (`AUTH-CASE-ASYMMETRY-001`).**

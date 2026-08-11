@@ -67,7 +67,7 @@ def _make_canonical_session(store: MemorySessionStore, user_id: int = 99) -> tup
         session=session,
         headers={"Cookie": cookie},
     )
-    user = AuthUser(id=user_id, email="bob@example.com", password_hash="x", is_active=True)
+    user = AuthUser(id=user_id, login="bob@example.com", password_hash="x", is_active=True)
     login_user(request, user)
     return sid, cookie
 

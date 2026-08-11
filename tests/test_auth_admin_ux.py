@@ -37,9 +37,10 @@ def _fake_fetch_by_id(uid: int):
     return fetch
 
 
-def _fake_fetch_by_email(email: str, uid: int = 42):
+def _fake_fetch_by_login(login: str, uid: int = 42):
+    """La CLI designe un compte par son IDENTITE, donc par `WHERE login = ?`."""
     def fetch(sql, params):
-        if "WHERE email = ?" in sql and params == (email,):
+        if "WHERE login = ?" in sql and params == (login,):
             return {"id": uid}
         return None
     return fetch
@@ -74,7 +75,7 @@ class TestConventionErreurConseil:
         _patch_env(monkeypatch)
         with pytest.raises(SystemExit) as exc:
             cmd_auth_user_disable(
-                ["--id", "1", "--email", "a@b.test"],
+                ["--id", "1", "--login", "a@b.test"],
                 fetch_one=_fake_fetch_by_id(1),
                 execute=lambda *_: 1,
             )
@@ -94,22 +95,33 @@ class TestConventionErreurConseil:
         _patch_env(monkeypatch)
         with pytest.raises(SystemExit) as exc:
             cmd_auth_user_disable(
-                ["--email", "inconnu@test.com"],
+                ["--login", "inconnu@test.com"],
                 fetch_one=lambda *_: None,
                 execute=lambda *_: 1,
             )
         assert "Conseil :" in str(exc.value)
 
-    def test_erreur_email_invalide_contient_conseil(self):
+    def test_erreur_contact_invalide_contient_conseil(self):
+        """Le controle de forme vit desormais sur le CONTACT (ADR-089).
+
+        Sur l'identite il n'avait aucun sens et refusait la saisie avant meme
+        de chercher le compte : `2TNE1-01` etait rejete, pas cherche.
+        """
         with pytest.raises(AuthAdminCliError) as exc:
-            from cli.security.auth import _validate_email_value
-            _validate_email_value("pasdetat")
+            from cli.security.auth import _validate_contact_value
+            _validate_contact_value("pasdetat")
         assert exc.value.conseil
+
+    def test_une_identite_sans_arobase_est_acceptee(self):
+        """C'est le point du ticket : `2TNE1-01` est une identite valide."""
+        from cli.security.auth import _validate_login_value
+
+        assert _validate_login_value("2TNE1-01") == "2TNE1-01"
 
     def test_erreur_email_vide_contient_conseil(self):
         with pytest.raises(AuthAdminCliError) as exc:
-            from cli.security.auth import _validate_email_value
-            _validate_email_value("")
+            from cli.security.auth import _validate_login_value
+            _validate_login_value("")
         assert exc.value.conseil
 
     def test_erreur_mot_de_passe_vide_contient_conseil(self):
@@ -135,20 +147,20 @@ class TestConventionErreurConseil:
             raise AuthAdminCliError("Base de donnees Auth/User indisponible.", conseil="Verifiez env/dev.")
 
         with pytest.raises(SystemExit) as exc:
-            cmd_auth_user_disable(["--email", "a@b.test"], fetch_one=broken, execute=lambda *_: 1)
+            cmd_auth_user_disable(["--login", "a@b.test"], fetch_one=broken, execute=lambda *_: 1)
         assert "Conseil :" in str(exc.value)
 
 
 # ---------------------------------------------------------------------------
-# disable par email et par id
+# disable par login et par id
 # ---------------------------------------------------------------------------
 
 class TestDisable:
-    def test_disable_par_email_affiche_confirmation(self, monkeypatch, capsys):
+    def test_disable_par_login_affiche_confirmation(self, monkeypatch, capsys):
         _patch_env(monkeypatch)
         cmd_auth_user_disable(
-            ["--email", "user@example.com"],
-            fetch_one=_fake_fetch_by_email("user@example.com", uid=7),
+            ["--login", "user@example.com"],
+            fetch_one=_fake_fetch_by_login("user@example.com", uid=7),
             execute=lambda *_: 1,
         )
         assert "desactive" in capsys.readouterr().out
@@ -188,7 +200,7 @@ class TestDisable:
         _patch_env(monkeypatch)
         with pytest.raises(SystemExit) as exc:
             cmd_auth_user_disable(
-                ["--id", "1", "--email", "a@b.test"],
+                ["--id", "1", "--login", "a@b.test"],
                 fetch_one=_fake_fetch_by_id(1),
                 execute=lambda *_: 1,
             )
@@ -211,11 +223,11 @@ class TestDisable:
 # ---------------------------------------------------------------------------
 
 class TestEnable:
-    def test_enable_par_email_affiche_confirmation(self, monkeypatch, capsys):
+    def test_enable_par_login_affiche_confirmation(self, monkeypatch, capsys):
         _patch_env(monkeypatch)
         cmd_auth_user_enable(
-            ["--email", "user@example.com"],
-            fetch_one=_fake_fetch_by_email("user@example.com", uid=8),
+            ["--login", "user@example.com"],
+            fetch_one=_fake_fetch_by_login("user@example.com", uid=8),
             execute=lambda *_: 1,
         )
         assert "reactive" in capsys.readouterr().out
@@ -279,8 +291,8 @@ class TestPassword:
     def test_password_par_email_affiche_confirmation(self, monkeypatch, capsys):
         _patch_env(monkeypatch)
         cmd_auth_user_password(
-            ["--email", "user@example.com", "--password", "nouveauSecret99"],
-            fetch_one=_fake_fetch_by_email("user@example.com", uid=9),
+            ["--login", "user@example.com", "--password", "nouveauSecret99"],
+            fetch_one=_fake_fetch_by_login("user@example.com", uid=9),
             execute=lambda *_: 1,
         )
         assert "modifie" in capsys.readouterr().out

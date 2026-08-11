@@ -24,7 +24,7 @@ class FakeRequest:
 def _user(user_id: int = 1, *, active: bool = True) -> AuthUser:
     return AuthUser(
         id=user_id,
-        email="admin@example.test",
+        login="admin@example.test",
         password_hash=hash_password("secret123"),
         is_active=active,
     )
@@ -58,7 +58,7 @@ def test_current_user_returns_auth_user_from_dict():
         request,
         lambda user_id: {
             "id": user_id,
-            "email": "admin@example.test",
+            "login": "admin@example.test",
             "password_hash": password_hash,
             "is_active": True,
         },

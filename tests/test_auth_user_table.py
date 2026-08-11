@@ -161,7 +161,7 @@ def test_auth_init_ponts_optin_ecrits_si_presents(tmp_path, monkeypatch):
 
 
 def test_auth_user_existing_contract_stays_compatible():
-    user = AuthUser(id=1, email="a@b.com", password_hash="hash")
+    user = AuthUser(id=1, login="a@b.com", password_hash="hash")
     assert user.is_active is True
     assert user.created_at is None
     assert user.updated_at is None
@@ -169,7 +169,7 @@ def test_auth_user_existing_contract_stays_compatible():
 
 
 def test_core_auth_public_imports_stay_stable():
-    user = normalize_auth_user({"id": 1, "email": " a@b.com ", "password_hash": "hash"})
-    assert user == AuthUser(id=1, email="a@b.com", password_hash="hash")
+    user = normalize_auth_user({"id": 1, "login": " a@b.com ", "password_hash": "hash"})
+    assert user == AuthUser(id=1, login="a@b.com", password_hash="hash")
     assert validate_auth_user_contract(user) is None
     assert issubclass(InvalidAuthUserError, AuthError)

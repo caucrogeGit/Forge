@@ -253,7 +253,7 @@ def test_password_reset_timestamp_still_works():
 
 
 def test_create_password_reset_request_still_works():
-    user = AuthUser(id=1, email="a@b.com", password_hash="h" * 10)
+    user = AuthUser(id=1, login="a@b.com", password_hash="h" * 10)
     req = create_password_reset_request(user)
     assert isinstance(req, PasswordResetRequest)
 

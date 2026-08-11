@@ -33,7 +33,7 @@ from core.sessions.memory_store import MemorySessionStore
 def _active_user() -> AuthUser:
     return AuthUser(
         id=42,
-        email="admin@example.test",
+        login="admin@example.test",
         password_hash=hash_password("secret123"),
         is_active=True,
     )

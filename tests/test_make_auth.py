@@ -43,13 +43,13 @@ def test_write_if_new_avertit_sur_existant_divergent(tmp_path: Path):
 
 def test_controleur_cable_sur_le_backend_auth():
     # Flux : authenticate_user (loader users), login_user, régénération anti-fixation.
-    assert "authenticate_user(email, password, load_user_by_email)" in AUTH_CONTROLLER
+    assert "authenticate_user(login, password, load_user_by_login)" in AUTH_CONTROLLER
     assert "login_user(request, user)" in AUTH_CONTROLLER
     assert "regenerate_session(session_id)" in AUTH_CONTROLLER
     assert "logout_user(request)" in AUTH_CONTROLLER
     # MAKE-AUTH-MODEL-LAYER-001 : le SQL a quitté le contrôleur pour le modèle.
-    assert "FROM users WHERE email = ?" not in AUTH_CONTROLLER
-    assert "from mvc.models.user_model import load_user_by_email" in AUTH_CONTROLLER
+    assert "FROM users WHERE login = ?" not in AUTH_CONTROLLER
+    assert "from mvc.models.user_model import load_user_by_login" in AUTH_CONTROLLER
     assert 'BaseController.redirect("/login")' in AUTH_CONTROLLER
 
 
@@ -176,8 +176,8 @@ def test_le_loader_sql_vit_dans_le_modele(tmp_path: Path):
     documentation Forge enseigne. Un générateur ne peut pas enseigner une
     doctrine qu'il enfreint lui-même.
     """
-    assert "FROM users WHERE email = ?" in AUTH_USER_MODEL
-    assert "def load_user_by_email" in AUTH_USER_MODEL
+    assert "FROM users WHERE login = ?" in AUTH_USER_MODEL
+    assert "def load_user_by_login" in AUTH_USER_MODEL
     assert "from core.database.db import fetch_one" in AUTH_USER_MODEL
 
     result = make_auth(root=tmp_path)

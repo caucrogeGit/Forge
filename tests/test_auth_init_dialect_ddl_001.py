@@ -111,7 +111,8 @@ def test_rendu_sqlite_insertion_et_cascade_fonctionnent() -> None:
     try:
         for table_name in CONSTANTS:
             conn.executescript(render_auth_sql(table_name, SQLiteDialect()))
-        conn.execute("INSERT INTO users (email, password_hash) VALUES ('a@b.com', 'hash')")
+        # ADR-089 : `login` est l'identité obligatoire, `email` le contact facultatif.
+        conn.execute("INSERT INTO users (login, password_hash) VALUES ('2TNE1-01', 'hash')")
         conn.execute(
             "INSERT INTO auth_tokens (user_id, purpose, token_hash, expires_at) "
             "VALUES (1, 'reset', 'h', '2026-01-01 00:00:00')"

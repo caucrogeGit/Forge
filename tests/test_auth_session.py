@@ -22,7 +22,7 @@ def _request(session: dict | None = None):
 def _active_user(email: str = "admin@example.test") -> AuthUser:
     return AuthUser(
         id=1,
-        email=email,
+        login=email,
         password_hash=hash_password("secret123"),
         is_active=True,
     )
@@ -48,14 +48,14 @@ def test_authenticate_user_accepts_normalizable_dict():
         "secret123",
         lambda email: {
             "id": 1,
-            "email": email,
+            "login": email,
             "password_hash": password_hash,
             "is_active": True,
         },
     )
 
     assert isinstance(user, AuthUser)
-    assert user.email == "admin@example.test"
+    assert user.login == "admin@example.test"
 
 
 def test_authenticate_user_accepts_sql_int_is_active():
@@ -63,7 +63,7 @@ def test_authenticate_user_accepts_sql_int_is_active():
     # Le login échouait car normalize_auth_user refusait l'int avant la vérif du mot de passe.
     password_hash = hash_password("secret123")
     loader = lambda email: {  # noqa: E731
-        "id": 1, "email": email, "password_hash": password_hash, "is_active": 1,
+        "id": 1, "login": email, "password_hash": password_hash, "is_active": 1,
     }
     user = authenticate_user("admin@example.test", "secret123", loader)
     assert isinstance(user, AuthUser)
@@ -74,7 +74,7 @@ def test_authenticate_user_refuses_sql_int_is_active_zero():
     # is_active=0 (int) doit être traité comme inactif, pas comme une erreur de contrat.
     password_hash = hash_password("secret123")
     loader = lambda email: {  # noqa: E731
-        "id": 1, "email": email, "password_hash": password_hash, "is_active": 0,
+        "id": 1, "login": email, "password_hash": password_hash, "is_active": 0,
     }
     assert authenticate_user("admin@example.test", "secret123", loader) is None
 
@@ -85,13 +85,13 @@ def test_authenticate_user_returns_none_if_loader_returns_none():
 
 def test_authenticate_user_returns_none_if_password_is_wrong():
     user = _active_user()
-    assert authenticate_user(user.email, "wrong", lambda email: user) is None
+    assert authenticate_user(user.login, "wrong", lambda email: user) is None
 
 
 def test_authenticate_user_returns_none_if_user_inactive():
     inactive = AuthUser(
         id=1,
-        email="admin@example.test",
+        login="admin@example.test",
         password_hash=hash_password("secret123"),
         is_active=False,
     )
@@ -99,7 +99,7 @@ def test_authenticate_user_returns_none_if_user_inactive():
 
 
 def test_authenticate_user_returns_none_if_loader_data_invalid():
-    invalid = {"id": 1, "email": "admin@example.test"}
+    invalid = {"id": 1, "login": "admin@example.test"}
     assert authenticate_user("admin@example.test", "secret123", lambda email: invalid) is None
 
 
@@ -220,7 +220,7 @@ def test_auth_session_does_not_access_database(monkeypatch):
         monkeypatch.setattr(connection_module, "get_connection", lambda: calls.append(True))
 
     user = _active_user()
-    assert authenticate_user(user.email, "secret123", lambda email: user) == user
+    assert authenticate_user(user.login, "secret123", lambda email: user) == user
     login_user(_request(), user)
     assert calls == []
 

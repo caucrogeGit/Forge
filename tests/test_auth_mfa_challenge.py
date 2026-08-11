@@ -51,7 +51,7 @@ class FakeRequest:
 def _make_user(user_id: int = 1, is_active: bool = True) -> AuthUser:
     return AuthUser(
         id=user_id,
-        email=f"user{user_id}@example.com",
+        login=f"user{user_id}@example.com",
         password_hash="$argon2id$fake",
         is_active=is_active,
     )
@@ -125,7 +125,7 @@ class TestStartMfaChallenge:
         req = FakeRequest()
         user_dict = {
             "id": 5,
-            "email": "dict@example.com",
+            "login": "dict@example.com",
             "password_hash": "$argon2id$fake",
             "is_active": True,
         }

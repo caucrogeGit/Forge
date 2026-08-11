@@ -13,7 +13,7 @@ autres liens (même principe qu'`opt-in:enable` qui injecte par ancrage dans rou
 Sans ancrage, il n'écrit pas et affiche le bloc à coller. Le bouton s'appuie sur
 `is_authenticated`, injecté dans tout template par `BaseController.render`.
 
-Périmètre v1 : socle standard `users` (email / password_hash / is_active, produit
+Périmètre v1 : socle standard `users` (login / password_hash / is_active, produit
 par `forge auth:init`), avec défense anti-fixation de session (régénération +
 cookie) et limitation anti-bruteforce par IP (principe §7 « sécuriser par
 défaut »). MFA et audit sont laissés en extension (voir le contrôleur de
@@ -35,7 +35,10 @@ AUTH_CONTROLLER = '''\
 
 Flux de connexion sur le socle `users` (forge auth:init) : formulaire, POST de
 login (défense anti-fixation de session + limitation anti-bruteforce par IP), et
-logout. Le loader charge un utilisateur par email pour `authenticate_user` (cœur).
+logout. Le loader charge un utilisateur par son identifiant de connexion pour
+`authenticate_user` (cœur). Identité et contact sont deux colonnes distinctes
+depuis l'ADR-089 : `login` sert à se connecter, `email` est un contact
+facultatif qui n'a aucun effet sur la connexion.
 """
 from core.auth.rate_limit import is_login_rate_limited, record_login_attempt
 from core.auth.session import authenticate_user, login_user, logout_user
@@ -45,7 +48,7 @@ from core.mvc.controller.base_controller import BaseController
 from core.security.cookies import clear_session_cookie, set_session_cookie
 from core.security.session import get_session, get_session_id, regenerate_session
 from core.sessions.manager import get_session_store
-from mvc.models.user_model import load_user_by_email
+from mvc.models.user_model import load_user_by_login
 
 
 class AuthController(BaseController):
@@ -80,9 +83,9 @@ class AuthController(BaseController):
             set_session_cookie(response, session_id)
             return response
 
-        email = request.form("email", "")
+        login = request.form("login", "")
         password = request.form("password", "")
-        user = authenticate_user(email, password, load_user_by_email)
+        user = authenticate_user(login, password, load_user_by_login)
         if user is not None:
             login_user(request, user)
             # Défense anti-fixation : nouvel identifiant de session + réémission du cookie.
@@ -124,16 +127,20 @@ from typing import Any
 from core.database.db import fetch_one
 
 
-def load_user_by_email(email: str) -> dict[str, Any] | None:
-    """Charge un utilisateur du socle `users` par email.
+def load_user_by_login(login: str) -> dict[str, Any] | None:
+    """Charge un utilisateur du socle `users` par son identifiant de connexion.
 
     C'est le loader attendu par `authenticate_user` du cœur. Il rend la ligne
     complète nécessaire à la vérification du mot de passe et au contrôle
-    d'activation, ou `None` si aucun compte ne porte cet email.
+    d'activation, ou `None` si aucun compte ne porte cet identifiant.
+
+    La valeur est employée **telle que saisie** : `login` est une identité, sa
+    casse lui appartient, et rien n'exige que ce soit une adresse (ADR-089).
+    La sensibilité à la casse relève de la collation du moteur.
     """
     return fetch_one(
-        "SELECT id, email, password_hash, is_active FROM users WHERE email = ?",
-        (email,),
+        "SELECT id, login, email, password_hash, is_active FROM users WHERE login = ?",
+        (login,),
     )
 '''
 
@@ -153,7 +160,7 @@ AUTH_LOGIN_VIEW = '''\
 
     <form method="POST" action="/login" class="space-y-4">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-        {{ field(name="email", label="Email", type="email", required=True) }}
+        {{ field(name="login", label="Identifiant", type="text", required=True) }}
         {{ field(name="password", label="Mot de passe", type="password", required=True) }}
         {{ submit(label="Se connecter") }}
     </form>

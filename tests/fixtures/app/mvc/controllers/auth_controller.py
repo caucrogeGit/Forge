@@ -98,7 +98,7 @@ class AuthController(BaseController):
             )
             auth_user = AuthUser(
                 id=utilisateur["UtilisateurId"],
-                email=_email,
+                login=_email,
                 password_hash=utilisateur["PasswordHash"],
                 is_active=True,
             )

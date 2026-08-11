@@ -39,7 +39,7 @@ Les comptes de la première application n'ont pas pu être créés par la CLI : 
 ### Ce qu'une identité et un contact ne partagent pas
 
 Une identité est stable, unique, choisie une fois, sans contrainte de forme, et sa casse lui appartient.
-Un contact change au fil d'une carrière, peut être partagé entre deux comptes, et peut ne pas exister du tout — c'est le cas d'un élève mineur.
+Un contact change au fil d'une carrière, peut être partagé entre deux comptes, et peut ne pas exister du tout, ce qui est le cas d'un élève mineur.
 
 Une seule colonne ne peut pas porter les deux jeux de propriétés sans en trahir un.
 
@@ -72,7 +72,7 @@ La recherche appartient donc à l'application, et cet ADR ne la lui retire pas.
 
 Il en fixe la **conséquence** : le contact n'étant pas unique, toute recherche par contact peut rendre plusieurs comptes.
 Une application qui sert le premier trouvé se trompera un jour de compte.
-`PasswordResetRequest.email` porte désormais le contact, et vaut `None` quand le compte n'en a pas — auquel cas la récupération par courriel n'est pas possible, et c'est voulu.
+`PasswordResetRequest.email` porte désormais le contact, et vaut `None` quand le compte n'en a pas. La récupération par courriel n'est alors pas possible, et c'est voulu.
 
 ### 4. `last_login_at` reste sur la ligne d'utilisateur
 

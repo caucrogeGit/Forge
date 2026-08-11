@@ -35,7 +35,10 @@ class PasswordResetRequest:
     """
 
     user_id: int
-    email: str
+    #: Contact du compte, ou `None` s'il n'en a pas (ADR-089). Un compte sans
+    #: adresse est un compte valide, et il n'est alors pas récupérable par
+    #: courriel : l'application qui reçoit `None` ne doit rien envoyer.
+    email: str | None
     raw_token: str
     token_record: AuthToken
 

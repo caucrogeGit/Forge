@@ -205,7 +205,7 @@ def test_role_sql_reads_only_user_roles():
 
 
 def test_auth_user_model_does_not_store_permissions():
-    user = AuthUser(id=1, email="a@example.test", password_hash="hash")
+    user = AuthUser(id=1, login="a@example.test", password_hash="hash")
 
     assert not hasattr(user, "permissions")
     assert not hasattr(user, "roles")
