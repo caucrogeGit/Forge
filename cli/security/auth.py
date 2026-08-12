@@ -135,8 +135,8 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     email_verified_at DATETIME NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
     token_hash CHAR(64) NOT NULL UNIQUE,
     expires_at DATETIME NOT NULL,
     used_at DATETIME NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
     INDEX idx_auth_tokens_user_purpose (user_id, purpose),
     INDEX idx_auth_tokens_expires_at (expires_at),
     CONSTRAINT fk_auth_tokens_user_id
@@ -180,8 +180,8 @@ CREATE TABLE IF NOT EXISTS auth_mfa_factors (
     label VARCHAR(120) NULL,
     confirmed_at DATETIME NULL,
     last_used_at DATETIME NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     INDEX idx_auth_mfa_factors_user_id (user_id),
     INDEX idx_auth_mfa_factors_user_status (user_id, status),
     CONSTRAINT fk_auth_mfa_factors_user_id
@@ -198,8 +198,8 @@ CREATE TABLE IF NOT EXISTS auth_mfa_recovery_codes (
     user_id INT NOT NULL,
     code_hash CHAR(64) NOT NULL UNIQUE,
     used_at DATETIME NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     INDEX idx_auth_mfa_recovery_codes_user_id (user_id),
     INDEX idx_auth_mfa_recovery_codes_used_at (used_at),
     CONSTRAINT fk_auth_mfa_recovery_codes_user_id
@@ -214,7 +214,7 @@ USER_ROLES_SQL = """\
 CREATE TABLE IF NOT EXISTS user_roles (
     user_id INT NOT NULL,
     role_id INT NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
     PRIMARY KEY (user_id, role_id),
     INDEX idx_user_roles_user_id (user_id),
     INDEX idx_user_roles_role_id (role_id),
@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS auth_audit_log (
     ip_address VARCHAR(45) NULL,
     user_agent VARCHAR(255) NULL,
     metadata_json TEXT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
     INDEX idx_auth_audit_log_event_type (event_type),
     INDEX idx_auth_audit_log_user_id (user_id),
     INDEX idx_auth_audit_log_actor_user_id (actor_user_id),
@@ -264,7 +264,7 @@ CREATE TABLE IF NOT EXISTS auth_rate_limit_attempts (
     ip_address VARCHAR(45) NULL,
     user_id INT NULL,
     success BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
     INDEX idx_auth_rate_limit_action_key (action, rate_key),
     INDEX idx_auth_rate_limit_created_at (created_at),
     INDEX idx_auth_rate_limit_user_id (user_id),

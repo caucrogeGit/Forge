@@ -112,10 +112,15 @@ def test_rendu_sqlite_insertion_et_cascade_fonctionnent() -> None:
         for table_name in CONSTANTS:
             conn.executescript(render_auth_sql(table_name, SQLiteDialect()))
         # ADR-089 : `login` est l'identité obligatoire, `email` le contact facultatif.
-        conn.execute("INSERT INTO users (login, password_hash) VALUES ('2TNE1-01', 'hash')")
+        # ADR-081 : la colonne n'a plus de defaut, donc l'insertion la NOMME.
+        # C'est precisement ce que le retrait rend obligatoire.
         conn.execute(
-            "INSERT INTO auth_tokens (user_id, purpose, token_hash, expires_at) "
-            "VALUES (1, 'reset', 'h', '2026-01-01 00:00:00')"
+            "INSERT INTO users (login, password_hash, created_at, updated_at) "
+            "VALUES ('2TNE1-01', 'hash', '2026-01-01 00:00:00', '2026-01-01 00:00:00')"
+        )
+        conn.execute(
+            "INSERT INTO auth_tokens (user_id, purpose, token_hash, expires_at, created_at) "
+            "VALUES (1, 'reset', 'h', '2026-01-01 00:00:00', '2026-01-01 00:00:00')"
         )
         row = conn.execute("SELECT is_active, created_at FROM users").fetchone()
         assert row[0] == 1 and row[1] is not None

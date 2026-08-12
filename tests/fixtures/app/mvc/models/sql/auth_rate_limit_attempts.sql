@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS auth_rate_limit_attempts (
     ip_address VARCHAR(45) NULL,
     user_id INT NULL,
     success BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
     INDEX idx_auth_rate_limit_action_key (action, rate_key),
     INDEX idx_auth_rate_limit_created_at (created_at),
     INDEX idx_auth_rate_limit_user_id (user_id),

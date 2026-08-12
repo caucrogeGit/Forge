@@ -136,7 +136,7 @@ class TestUserRolesSql:
 
         assert "user_id INT NOT NULL" in sql
         assert "role_id INT NOT NULL" in sql
-        assert "created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" in sql
+        assert "created_at DATETIME NOT NULL" in sql
 
     def test_sql_contains_primary_key_user_role(self):
         sql = _normalized(_source_sql())

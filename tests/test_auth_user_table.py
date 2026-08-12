@@ -62,13 +62,25 @@ def test_users_sql_contains_last_login_at():
 
 
 def test_users_sql_contains_created_at():
+    """`NOT NULL` sans défaut : Python est l'autorité (ADR-081).
+
+    Ce test exigeait `DEFAULT CURRENT_TIMESTAMP`, donc figeait l'écart entre le
+    socle et la règle que Forge impose partout ailleurs
+    (`AUTH-TIMESTAMPS-REMOVE-DEFAULTS-001`).
+    """
     sql = _normalized_sql(SQL_FILE.read_text(encoding="utf-8"))
-    assert "created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" in sql
+    assert "created_at DATETIME NOT NULL" in sql
+    assert "created_at DATETIME NOT NULL DEFAULT" not in sql
 
 
 def test_users_sql_contains_updated_at():
+    """Sans `ON UPDATE` non plus : Python decide aussi de la mise a jour.
+
+    C'est la seconde moitie de la double horloge que l'ADR-081 refuse.
+    """
     sql = _normalized_sql(SQL_FILE.read_text(encoding="utf-8"))
-    assert "updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" in sql
+    assert "updated_at DATETIME NOT NULL" in sql
+    assert "ON UPDATE CURRENT_TIMESTAMP" not in sql
 
 
 def test_auth_init_creates_users_sql(tmp_path):

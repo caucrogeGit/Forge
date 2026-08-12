@@ -32,7 +32,7 @@ def test_auth_rate_limit_attempts_sql_contient_colonnes_requises():
     assert "ip_address VARCHAR(45) NULL" in sql
     assert "user_id INT NULL" in sql
     assert "success BOOLEAN NOT NULL DEFAULT FALSE" in sql
-    assert "created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" in sql
+    assert "created_at DATETIME NOT NULL" in sql
 
 
 def test_auth_rate_limit_attempts_sql_contient_index_action_rate_key():

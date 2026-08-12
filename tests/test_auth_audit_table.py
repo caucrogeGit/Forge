@@ -31,7 +31,7 @@ def test_auth_audit_log_sql_contient_colonnes_requises():
     assert "ip_address VARCHAR(45) NULL" in sql
     assert "user_agent VARCHAR(255) NULL" in sql
     assert "metadata_json TEXT NULL" in sql
-    assert "created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" in sql
+    assert "created_at DATETIME NOT NULL" in sql
 
 
 def test_auth_audit_log_sql_contient_index_event_type():

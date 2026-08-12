@@ -30,6 +30,14 @@
 
 ### Modifié
 
+- **Les défauts SQL d'horodatage sont retirés du socle, seconde moitié (`AUTH-TIMESTAMPS-REMOVE-DEFAULTS-001`, ADR-081).**
+  Les sept tables du socle d'authentification portaient `DEFAULT CURRENT_TIMESTAMP`, et quatre `ON UPDATE CURRENT_TIMESTAMP`. Elles étaient les seules de Forge à déléguer leur horodatage au moteur, alors que l'ADR-081 avait **examiné puis refusé** ce mécanisme au motif qu'il introduit une double horloge.
+  Le retrait ne vient qu'après que les écritures du framework ont été rendues explicites, et l'ordre était le ticket lui-même : l'inverse aurait rendu `NOT NULL` sans valeur et empêché toute création de compte, partout à la fois.
+  Le DDL est désormais `DATETIME NOT NULL`, conforme à ce que Forge impose à toute entité engendrée.
+  **La recette documentée de persistance d'audit est corrigée au passage, sur deux points.** Elle ne nommait pas `created_at`, donc s'appuyait sur le défaut retiré. Et elle employait des marqueurs `%s` là où Forge écrit `?` : le cœur traduit `?` vers le format de chaque pilote et **double** tout `%` littéral, si bien que ce code recopié rendait « 0 marqueurs pour 6 paramètres » sur PostgreSQL comme sur SQL Server. C'est le défaut même corrigé dans `forge-mvc-video` ce cycle, présent dans une documentation que l'ADR-008 invite à recopier.
+  Sept tests figeaient l'ancienne DDL, dont deux qui **exigeaient explicitement** le défaut, plus quatre fixtures SQL sur disque.
+  Le cliquet d'inventaire est vidé, et conservé pour faire échouer un retour du mécanisme.
+
 - **Les horodatages du socle sont posés par Python, première moitié (`AUTH-TIMESTAMPS-EXPLICIT-001`, ADR-081).**
   L'ADR-081 a tranché que l'autorité sur les horodatages est Python, jamais le moteur, après avoir **examiné et refusé** les défauts SQL au motif qu'ils introduisent une double horloge.
   Les entités engendrées suivent cette règle. **Les sept tables du socle d'authentification, non** : elles sont les seules de Forge à s'en écarter, et quatre portent aussi `ON UPDATE CURRENT_TIMESTAMP`. Le relevé initial ne nommait que `users` ; l'inventaire a montré que les sept sont concernées.

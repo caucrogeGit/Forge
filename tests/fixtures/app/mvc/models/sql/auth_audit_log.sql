@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS auth_audit_log (
     ip_address VARCHAR(45) NULL,
     user_agent VARCHAR(255) NULL,
     metadata_json TEXT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
     INDEX idx_auth_audit_log_event_type (event_type),
     INDEX idx_auth_audit_log_user_id (user_id),
     INDEX idx_auth_audit_log_actor_user_id (actor_user_id),

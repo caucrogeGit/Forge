@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS auth_tokens (
     token_hash CHAR(64) NOT NULL UNIQUE,
     expires_at DATETIME NOT NULL,
     used_at DATETIME NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
     INDEX idx_auth_tokens_user_purpose (user_id, purpose),
     INDEX idx_auth_tokens_expires_at (expires_at),
     CONSTRAINT fk_auth_tokens_user_id

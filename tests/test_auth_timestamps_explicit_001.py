@@ -30,25 +30,26 @@ import pytest
 pytestmark = pytest.mark.meta
 
 
-def _sqlite_avec(table: str, *, sans_defauts: bool = False) -> sqlite3.Connection:
+def _sqlite_avec(table: str, *, sans_defauts: bool = True) -> sqlite3.Connection:
     """Base en mémoire portant une table du socle, DDL rendue par le dialecte.
 
-    `sans_defauts` retire les `DEFAULT CURRENT_TIMESTAMP` du DDL, ce qui rend
-    la table conforme à l'ADR-081 et **révèle** un écrivain qui ne nomme pas ses
-    horodatages : la colonne reste alors vide.
+    La DDL est **conforme à l'ADR-081 depuis `AUTH-TIMESTAMPS-REMOVE-DEFAULTS-001`**,
+    donc `NOT NULL` sans défaut : une insertion qui ne nomme pas ses
+    horodatages échoue, ce qui est exactement la propriété recherchée.
 
-    Sans cela, un test ne prouve rien. Le moteur remplit la colonne, si bien
-    qu'une assertion « created_at non vide » passe aussi sur du code qui ne
-    l'écrit pas, ce qui a été vérifié en rejouant les insertions d'avant.
+    Le paramètre est conservé pour mémoire. Tant que le moteur remplissait la
+    colonne, une assertion « created_at non vide » passait aussi sur du code
+    qui ne l'écrivait pas, ce qui a été vérifié en rejouant les insertions
+    d'avant : le test ne prouvait rien.
     """
     from cli.security.auth_sql import render_auth_sql
     from forge_mvc_sqlite.dialect import SQLiteDialect
 
     ddl = render_auth_sql(table, SQLiteDialect())
-    if sans_defauts:
-        ddl = ddl.replace(" DEFAULT CURRENT_TIMESTAMP", "")
-        # `NOT NULL` sans défaut est précisément l'état visé par l'ADR-081, et
-        # c'est ce qui fait échouer une insertion qui ne nomme pas la colonne.
+    assert "DEFAULT CURRENT_TIMESTAMP" not in ddl, (
+        "la DDL du socle porte de nouveau un défaut SQL : l'autorité repasse "
+        "au moteur, contre l'ADR-081"
+    )
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
     for instruction in ddl.split(";"):
@@ -170,22 +171,13 @@ def test_l_attribution_de_role_pose_aussi_son_horodatage() -> None:
 # L'inventaire pour la seconde livraison
 # ---------------------------------------------------------------------------
 
-#: Les sept tables du socle et leurs colonnes encore adossées au moteur.
-#: Le ticket ne nommait que `users` ; l'inventaire a montré que les sept sont
-#: concernées, et que quatre portent aussi `ON UPDATE CURRENT_TIMESTAMP`.
+#: **Vide depuis `AUTH-TIMESTAMPS-REMOVE-DEFAULTS-001`.** Les sept tables du
+#: socle déléguaient leur horodatage au moteur, quatre portant aussi
+#: `ON UPDATE CURRENT_TIMESTAMP`. Le relevé initial ne nommait que `users`.
 #:
-#: Cette liste est la **feuille de route du retrait**, pas une exclusion. Elle
-#: doit se vider, et le cliquet ci-dessous échoue dès qu'une entrée devient
-#: fausse dans un sens ou dans l'autre.
-_DEFAUTS_A_RETIRER = {
-    "users": (["created_at", "updated_at"], ["updated_at"]),
-    "auth_tokens": (["created_at"], []),
-    "auth_mfa_factors": (["created_at", "updated_at"], ["updated_at"]),
-    "auth_mfa_recovery_codes": (["created_at", "updated_at"], ["updated_at"]),
-    "user_roles": (["created_at"], []),
-    "auth_audit_log": (["created_at"], []),
-    "auth_rate_limit_attempts": (["created_at"], []),
-}
+#: La liste est conservée vide plutôt que supprimée : elle documente le
+#: mécanisme et fait échouer le cliquet si un défaut réapparaît.
+_DEFAUTS_A_RETIRER: "dict[str, tuple[list[str], list[str]]]" = {}
 
 
 def test_l_inventaire_des_defauts_est_exact() -> None:

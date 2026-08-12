@@ -64,11 +64,21 @@ def _identity() -> AuthColumn:
 
 
 def _created_at() -> AuthColumn:
-    return AuthColumn("created_at", "datetime", timestamp_default=True)
+    """ADR-081 : `DATETIME NOT NULL`, sans défaut, Python posant la valeur.
+
+    Les sept tables du socle étaient les seules de Forge à déléguer leur
+    horodatage au moteur, alors que l'ADR-081 avait examiné puis REFUSÉ ce
+    mécanisme, qui introduit une double horloge. Les écritures du framework ont
+    été rendues explicites d'abord (`AUTH-TIMESTAMPS-EXPLICIT-001`), le retrait
+    ne vient qu'ensuite : l'inverse aurait rendu `NOT NULL` sans valeur et
+    empêché toute création de compte.
+    """
+    return AuthColumn("created_at", "datetime")
 
 
 def _updated_at() -> AuthColumn:
-    return AuthColumn("updated_at", "datetime", timestamp_default=True, timestamp_on_update=True)
+    """Même règle, et sans `ON UPDATE` : Python décide aussi de la mise à jour."""
+    return AuthColumn("updated_at", "datetime")
 
 
 def _fk_users(constraint_name: str, column: str, on_delete: str) -> AuthForeignKey:

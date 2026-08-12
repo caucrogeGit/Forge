@@ -664,6 +664,7 @@ Exemple avec un handler :
 ```python
 import logging
 import json
+from datetime import datetime, timezone
 
 
 class AuditSqlHandler(logging.Handler):
@@ -682,14 +683,15 @@ def _insert_audit(event):
     from mvc.db import execute
     execute(
         "INSERT INTO auth_audit_log "
-        "(event_type, user_id, ip_address, user_agent, metadata_json) "
-        "VALUES (%s, %s, %s, %s, %s)",
+        "(event_type, user_id, ip_address, user_agent, metadata_json, created_at) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
         (
             event.event_type,
             event.user_id,
             event.ip_address,
             event.user_agent,
             json.dumps(event.metadata or {}),
+            datetime.now(timezone.utc),
         ),
     )
 
@@ -697,6 +699,19 @@ def _insert_audit(event):
 # Dans l'initialisation de l'application (ex. app.py ou config.py)
 logging.getLogger("forge.auth.audit").addHandler(AuditSqlHandler())
 ```
+
+!!! warning "Deux points de cette recette ont été corrigés"
+
+    `created_at` est **nommé**. La table n'a plus de `DEFAULT CURRENT_TIMESTAMP` :
+    l'autorité sur les horodatages est Python (ADR-081), et une insertion qui ne
+    nomme pas la colonne échouerait sur `NOT NULL`.
+
+    Les marqueurs de paramètre sont des `?`, jamais des `%s`.
+    Forge traduit `?` vers le format de chaque pilote et **double** tout `%`
+    littéral au passage : écrit en `%s`, ce code rendait « 0 marqueurs pour 6
+    paramètres » sur PostgreSQL comme sur SQL Server.
+
+
 
 Ce snippet est documentaire, à adapter au modèle d'accès DB de l'application.
 Voir [ADR-008](../adr/008-auth-audit-architecture.md) pour les approches alternatives (wrapper applicatif, stream externe).
