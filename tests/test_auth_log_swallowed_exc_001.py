@@ -33,10 +33,23 @@ def test_loader_exception_logged_as_warning(caplog):
 
 
 def test_unknown_user_is_not_logged(caplog):
+    """Un échec d'auth normal n'est pas une panne d'INFRASTRUCTURE.
+
+    La distinction que ce test protège vaut pour le logger `core.auth.session`,
+    où seule une défaillance du loader applicatif doit apparaître. Depuis
+    l'ADR-091, l'échec produit en revanche un événement d'AUDIT sur
+    `forge.auth.audit`, et c'est voulu : le cas d'échec est celui qui intéresse
+    une enquête.
+    """
     with caplog.at_level(logging.WARNING, logger="core.auth.session"):
         result = authenticate_user("user@example.test", "secret", _unknown_user_loader)
 
     assert result is None
-    assert not [r for r in caplog.records if r.levelno == logging.WARNING], (
-        "un échec d'auth normal (utilisateur inconnu) ne doit pas être journalisé"
+    bruit = [
+        r for r in caplog.records
+        if r.levelno == logging.WARNING and r.name == "core.auth.session"
+    ]
+    assert not bruit, (
+        "un échec d'auth normal (utilisateur inconnu) ne doit pas être journalisé "
+        "comme une panne d'infrastructure"
     )

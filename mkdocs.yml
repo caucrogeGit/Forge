@@ -349,6 +349,7 @@ nav:
             - ADR-088 Contrat unique des réponses d'API JSON: adr/088-json-api-response-contract.md
             - "ADR-089 : identité et contact dans l'authentification": adr/089-auth-identity-contact-separation.md
             - "ADR-090 : empreinte de contrat des fichiers engendrés": adr/090-generated-file-contract-marker.md
+            - "ADR-091 : le cœur émet les événements d'authentification": adr/091-core-emits-auth-events.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

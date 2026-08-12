@@ -5,6 +5,19 @@
 
 ### Ajouté
 
+- **Forge annonçait trois événements d'authentification et n'en émettait aucun (`AUTH-EVENTS-EMIT-001`, ADR-091).**
+  Un retour terrain relève une table `auth_audit_log` vide après des semaines d'usage, et propose que le cœur l'alimente. **La proposition est écartée** : l'ADR-008 a rangé la persistance du côté applicatif, qualifie cette table de latente, et anticipe même la confusion constatée.
+  Le défaut réel est ailleurs, et l'ADR-008 ne le couvre pas. Le générateur du contrôleur d'authentification n'appelle **jamais** `safe_log_auth_event` : aucun événement n'est émis, **pas même vers le logger**. Une application configurant consciencieusement un handler sur `forge.auth.audit`, comme l'ADR-008 le lui demande, ne recevait rien. C'est la brique 2 de cet ADR qui manquait, pas la persistance.
+  Le cœur émet désormais `login.success`, `login.failed` et `logout`, et c'est `authenticate_user` qui le fait parce qu'il est **le seul à savoir pourquoi une connexion échoue** : l'appelant ne reçoit qu'un `None` et ne peut distinguer un identifiant inconnu, un compte désactivé, un mot de passe faux ou un loader qui a levé. L'échec porte donc la raison, et c'est le cas qui intéresse une enquête.
+  Le mot de passe n'entre jamais dans un événement, ni la valeur saisie quand elle a échoué : une faute de frappe sur un mot de passe ressemble trop à un mot de passe. L'émission passe par `safe_log_auth_event`, si bien qu'une table saturée ou un verrou ne peut jamais empêcher quelqu'un d'entrer.
+  **`last_login_at` est retirée.** Créée par le cœur et écrite par personne depuis toujours, elle est un horodatage géré dont l'ADR-081 confierait l'autorité à Python, ce qui suppose un écrivain que le cœur n'a pas ; il n'écrit nulle part ailleurs dans `users`. Le journal répond déjà à la même question, avec la raison en prime.
+  Un test existant affirmait qu'un échec d'auth normal n'est pas journalisé. Il visait le logger d'**infrastructure**, et cette distinction est rétablie explicitement plutôt que perdue.
+
+- **Un garde-fou documentaire lisait le cache de pytest, et devenait intermittent (`TESTS-DOCS-SCAN-CACHE-001`).**
+  `.pytest_cache` manquait à la liste d'exclusions du balayage, où figurent pourtant `.venv`, `site` et `build`.
+  En série le cache est écrit une fois puis stable ; sous `-n`, quatre workers le réécrivent pendant que le balayage le lit.
+  Le défaut s'est manifesté deux fois sans se reproduire à la demande, et j'ai eu tort de le laisser passer la première fois en le disant « à surveiller » : c'était un défaut explicable, pas un aléa.
+
 - **Un fichier engendré dit par quel contrat il l'a été, et `forge doctor` le compare (`GENERATED-CONTRACT-MARKER-001`, ADR-090).**
   Forge engendre du code puis ne le retouche plus, et c'est le principe 9. La conséquence est qu'un correctif livré dans un générateur **n'atteint aucune application déjà engendrée**, et que son auteur ne l'apprend pas.
   Le cycle en cours le démontre au lieu de le supposer : deux tickets viennent de corriger `make:auth`, dont un qui rouvre la connexion sur SQLite, et la seule application Forge existante porte une copie du contrôleur d'avant.

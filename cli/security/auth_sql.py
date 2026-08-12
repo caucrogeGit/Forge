@@ -88,7 +88,6 @@ AUTH_TABLE_SPECS: dict[str, AuthTableSpec] = {
             AuthColumn("password_hash", "string", length=255),
             AuthColumn("is_active", "boolean", default_bool=True),
             AuthColumn("email_verified_at", "datetime", nullable=True),
-            AuthColumn("last_login_at", "datetime", nullable=True),
             _created_at(),
             _updated_at(),
         ),

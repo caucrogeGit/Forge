@@ -49,6 +49,12 @@ EXCLUDED_PATHS = [
     "CLAUDE.md",        # note de mise à jour historique "Forge 2.10.0"
     "tests",
     "__pycache__",
+    # Artefact d'outillage, au même titre que `.venv`, `site` et `build`.
+    # Son absence de cette liste rendait le relevé intermittent : `pytest`
+    # écrit `.pytest_cache/README.md`, et sous `-n` quatre workers le
+    # réécrivent pendant que le balayage le lit. En série, le cache est posé
+    # une fois puis stable, si bien que le défaut ne se voyait pas.
+    ".pytest_cache",
     ".git",
     ".claude",          # worktrees et cache d'agents
     ".venv",

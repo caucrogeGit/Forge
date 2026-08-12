@@ -8,6 +8,11 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any, cast
 
+from core.auth.audit import (
+    AUTH_EVENT_LOGIN_FAILED,
+    AUTH_EVENT_LOGIN_SUCCESS,
+    AUTH_EVENT_LOGOUT,
+)
 from core.auth.exceptions import AuthError, InvalidAuthUserError
 from core.auth.password import verify_password
 from core.auth.user import AuthUser, normalize_auth_user, validate_auth_user_contract
@@ -39,21 +44,63 @@ def authenticate_user(
             "(distinct d'un mot de passe invalide). Vérifiez le loader applicatif / la base.",
             exc_info=True,
         )
+        _emettre_echec("loader_error")
         return None
 
     if raw_user is None:
+        _emettre_echec("user_not_found")
         return None
 
     try:
         user = raw_user if isinstance(raw_user, AuthUser) else normalize_auth_user(raw_user)
     except (InvalidAuthUserError, TypeError, ValueError):
+        _emettre_echec("invalid_user_row")
         return None
 
     if not user.is_active:
+        _emettre_echec("user_inactive", user_id=user.id)
         return None
     if not verify_password(password, user.password_hash):
+        _emettre_echec("bad_password", user_id=user.id)
         return None
+
+    _emettre(AUTH_EVENT_LOGIN_SUCCESS, user_id=user.id)
     return user
+
+
+# ── Émission des événements d'authentification (ADR-091) ─────────────────────
+#
+# `authenticate_user` est le SEUL endroit qui sait pourquoi une connexion
+# échoue : l'appelant ne reçoit qu'un `None` et ne peut distinguer un
+# identifiant inconnu d'un mot de passe faux ou d'un compte désactivé. C'est
+# donc ici que l'événement est émis, et non dans le contrôleur engendré, où il
+# serait à la fois moins précis et supprimable en silence.
+#
+# L'ADR-008 reste inchangé : Forge ÉMET vers le logger `forge.auth.audit`, et
+# la persistance appartient à l'application. Ce qui manquait n'était pas la
+# persistance mais l'émission elle-même, que Forge annonçait sans la faire.
+
+
+def _emettre(event_type: str, *, user_id: int | None = None, **metadata: Any) -> None:
+    """Émet un événement d'audit sans jamais interrompre l'authentification.
+
+    `safe_log_auth_event` avale l'exception, la journalise et incrémente un
+    compteur : une table saturée, un disque plein ou un verrou ne doivent
+    jamais empêcher quelqu'un d'entrer.
+    """
+    from core.auth.audit import safe_log_auth_event
+
+    safe_log_auth_event(event_type, user_id=user_id, metadata=metadata or None)
+
+
+def _emettre_echec(raison: str, *, user_id: int | None = None) -> None:
+    """Émet `login.failed` en portant la RAISON, jamais la valeur saisie.
+
+    Ni le mot de passe, ni sa longueur, ni l'identifiant tenté ne sont émis :
+    une faute de frappe sur un mot de passe ressemble trop à un mot de passe.
+    La raison suffit à une enquête et ne divulgue rien.
+    """
+    _emettre(AUTH_EVENT_LOGIN_FAILED, user_id=user_id, reason=raison)
 
 
 def login_user(request: Any, user: AuthUser) -> None:
@@ -89,12 +136,19 @@ def login_user(request: Any, user: AuthUser) -> None:
 
 
 def logout_user(request: Any) -> None:
-    """Retire l'identifiant utilisateur Auth/User de la session et persiste."""
+    """Retire l'identifiant utilisateur Auth/User de la session et persiste.
+
+    Émet `logout` en portant le compte quitté (ADR-091). L'identifiant est lu
+    AVANT le retrait, sans quoi l'événement ne dirait pas qui part.
+    """
     session = _resolve_request_session(request)
     if session is None:
         return
+    quitte = session.get(AUTH_USER_ID_SESSION_KEY)
     session.pop(AUTH_USER_ID_SESSION_KEY, None)
     _persist_request_session(request, session)
+    if isinstance(quitte, int):
+        _emettre(AUTH_EVENT_LOGOUT, user_id=quitte)
 
 
 def get_authenticated_user_id(request: Any) -> int | None:
