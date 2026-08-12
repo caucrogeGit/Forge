@@ -3,6 +3,18 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **Un fichier engendré dit par quel contrat il l'a été, et `forge doctor` le compare (`GENERATED-CONTRACT-MARKER-001`, ADR-090).**
+  Forge engendre du code puis ne le retouche plus, et c'est le principe 9. La conséquence est qu'un correctif livré dans un générateur **n'atteint aucune application déjà engendrée**, et que son auteur ne l'apprend pas.
+  Le cycle en cours le démontre au lieu de le supposer : deux tickets viennent de corriger `make:auth`, dont un qui rouvre la connexion sur SQLite, et la seule application Forge existante porte une copie du contrôleur d'avant.
+  L'empreinte porte le **numéro de contrat du générateur**, et c'est la décision qui fait tenir le reste. Pas un condensat du contenu, un fichier engendré étant fait pour être édité, si bien qu'un condensat serait faux dès la première ligne ajoutée et l'avertissement permanent, donc invisible. Pas la version du framework, qui ferait crier à chaque montée et s'apprendrait à être ignorée.
+  Un registre par générateur dit ce qui a changé à chaque montée, et signale celles qui touchent la sécurité. Sans lui, l'avertissement dit « en retard » sans dire de quoi, et ne se traduit pas en geste.
+  Trois issues, la troisième comptant autant que les autres. Contrat identique : **silence**. Contrat inférieur : le fichier est nommé, la montée décrite, le geste donné. Empreinte absente : le contrôle **dit qu'il ne sait pas**, ce qui est vrai des applications antérieures comme d'un fichier dont l'auteur a effacé l'en-tête, et il n'accuse pas.
+  Éprouvé sur le cas réel, un contrôleur extrait de l'historique du dépôt : sans empreinte il obtient un avertissement qui ne l'accuse pas, avec l'empreinte du contrat 1 il obtient un échec nommant le changement de sécurité, regénéré il obtient le silence.
+  Neuf autres générateurs restent sans empreinte, **inscrits en dette listée** avec un cliquet, plutôt qu'exclus en silence.
+  Forge ne réécrit toujours rien : le contrôle avertit, l'auteur décide.
+
 ### Modifié
 
 - **L'identité et le contact sont deux colonnes distinctes (`AUTH-IDENTITY-CONTACT-001`, ADR-089).**

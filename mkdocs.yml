@@ -348,6 +348,7 @@ nav:
             - ADR-087 Style rédactionnel canonique de la documentation: adr/087-documentation-style-canonical.md
             - ADR-088 Contrat unique des réponses d'API JSON: adr/088-json-api-response-contract.md
             - "ADR-089 : identité et contact dans l'authentification": adr/089-auth-identity-contact-separation.md
+            - "ADR-090 : empreinte de contrat des fichiers engendrés": adr/090-generated-file-contract-marker.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

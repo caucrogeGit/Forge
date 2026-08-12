@@ -27,10 +27,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from cli._support.scaffold import CREATED, PRESERVED, write_if_new
+from cli._support.generated_marker import ligne_de_marqueur
 from cli.project.views_namespace import entity_view_dir, resolve_app_views_namespace
 
 
 AUTH_CONTROLLER = '''\
+{marqueur}
 """Contrôleur d'authentification (généré par forge make:auth).
 
 Flux de connexion sur le socle `users` (forge auth:init) : formulaire, POST de
@@ -113,6 +115,7 @@ class AuthController(BaseController):
 
 
 AUTH_USER_MODEL = '''\
+{marqueur}
 """Modèle du socle `users` (généré par forge make:auth).
 
 Le SQL de l'application vit dans les modèles, jamais dans les contrôleurs : le
@@ -284,10 +287,21 @@ def make_auth(root: Path | None = None, views_namespace: str = "") -> MakeAuthRe
     # La fonction reste plate par défaut (""), la CLI passe le namespace résolu.
     # view_dir est figé dans le chemin écrit ET dans les render(...) du contrôleur.
     view_dir = entity_view_dir("auth", views_namespace)
-    controller = AUTH_CONTROLLER.replace('"auth/login.html"', f'"{view_dir}/login.html"')
+    # ADR-090 : les deux fichiers de code portent l'empreinte du contrat de ce
+    # générateur, pour que `forge doctor` sache dire à une application qu'elle
+    # est restée sur une version antérieure. Forge ne réécrit rien pour autant.
+    marqueur = ligne_de_marqueur("make:auth")
+    # `replace` et non `format` : les gabarits contiennent des accolades
+    # (dictionnaires Python, gabarits Jinja), que `format` interpréterait.
+    controller = (
+        AUTH_CONTROLLER
+        .replace("{marqueur}", marqueur)
+        .replace('"auth/login.html"', f'"{view_dir}/login.html"')
+    )
+    modele = AUTH_USER_MODEL.replace("{marqueur}", marqueur)
     # Le loader SQL vit dans un modèle, pas dans le contrôleur : même séparation
     # que `make:crud` (ticket MAKE-AUTH-MODEL-LAYER-001).
-    _write_if_new(base / "mvc" / "models" / "user_model.py", AUTH_USER_MODEL, result)
+    _write_if_new(base / "mvc" / "models" / "user_model.py", modele, result)
     _write_if_new(base / "mvc" / "controllers" / "auth_controller.py", controller, result)
     _write_if_new(base / "mvc" / "views" / view_dir / "login.html", AUTH_LOGIN_VIEW, result)
     # ADR-068 : les routes du contrôleur auth vivent dans leur propre fichier ;

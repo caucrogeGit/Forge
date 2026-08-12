@@ -561,6 +561,71 @@ def check_optin_registry(root: Path) -> CheckResult:
     return CheckResult("ok", "Registre opt-ins", f"{len(imports)} inscrit(s), tous installés")
 
 
+def check_generated_contracts(root: Path) -> CheckResult:
+    """Signale les fichiers engendrés restés sur un contrat antérieur (ADR-090).
+
+    Forge engendre puis ne retouche plus, si bien qu'un correctif livré dans un
+    générateur n'atteint aucune application déjà engendrée. Ce contrôle rend
+    l'écart visible ; il ne répare rien, conformément au principe 9.
+
+    Trois issues, et la troisième compte autant que les deux autres.
+    Contrat identique : silence. Contrat inférieur : le fichier est nommé et
+    chaque montée manquée décrite. Empreinte absente : le contrôle dit qu'il ne
+    sait pas, ce qui est vrai, et n'accuse pas.
+    """
+    from cli._support.generated_marker import contrat_du_fichier, montees_manquees
+
+    #: Fichiers portant une empreinte, avec le générateur qui les produit.
+    surveilles = {
+        "mvc/controllers/auth_controller.py": "make:auth",
+        "mvc/models/user_model.py": "make:auth",
+    }
+
+    en_retard: list[str] = []
+    sans_empreinte: list[str] = []
+    securite = False
+
+    for relatif, commande in surveilles.items():
+        chemin = root / relatif
+        if not chemin.is_file():
+            continue
+        empreinte = contrat_du_fichier(chemin)
+        if empreinte is None:
+            sans_empreinte.append(relatif)
+            continue
+        _, contrat = empreinte
+        montees = montees_manquees(commande, contrat)
+        if not montees:
+            continue
+        for montee in montees:
+            marque = "SÉCURITÉ, " if montee.securite else ""
+            securite = securite or montee.securite
+            en_retard.append(f"{relatif} ({marque}contrat {contrat} vers {montee.contrat}) : {montee.resume}")
+
+    if en_retard:
+        detail = " | ".join(en_retard)
+        conseil = (
+            " — Forge ne réécrit pas votre code : relisez ces fichiers et reportez "
+            "le changement, puis mettez l'en-tête `# forge:generated` à jour."
+        )
+        return CheckResult(
+            "warn" if not securite else "fail",
+            "Code engendré",
+            detail + conseil,
+        )
+
+    if sans_empreinte:
+        return CheckResult(
+            "warn",
+            "Code engendré",
+            f"engendré avant l'empreinte de contrat (ADR-090), version d'origine inconnue : "
+            f"{', '.join(sans_empreinte)} — comparez-les une fois à la sortie courante "
+            "de leur générateur, puis ajoutez l'en-tête `# forge:generated`",
+        )
+
+    return CheckResult("ok", "Code engendré", "contrats à jour")
+
+
 def run_all(root: Path, version: str) -> list[CheckResult]:
     """Exécute tous les checks dans l'ordre et retourne la liste des résultats."""
     config = load_project_config(root)
@@ -580,6 +645,7 @@ def run_all(root: Path, version: str) -> list[CheckResult]:
         lambda: check_node(),
         lambda: check_db(root, config),
         lambda: check_prod_security(root, config),
+        lambda: check_generated_contracts(root),
     ]
     results: list[CheckResult] = []
     for fn in checks:
