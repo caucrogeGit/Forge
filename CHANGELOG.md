@@ -17,6 +17,16 @@
 
 ### Modifié
 
+- **Les horodatages du socle sont posés par Python, première moitié (`AUTH-TIMESTAMPS-EXPLICIT-001`, ADR-081).**
+  L'ADR-081 a tranché que l'autorité sur les horodatages est Python, jamais le moteur, après avoir **examiné et refusé** les défauts SQL au motif qu'ils introduisent une double horloge.
+  Les entités engendrées suivent cette règle. **Les sept tables du socle d'authentification, non** : elles sont les seules de Forge à s'en écarter, et quatre portent aussi `ON UPDATE CURRENT_TIMESTAMP`. Le relevé initial ne nommait que `users` ; l'inventaire a montré que les sept sont concernées.
+  C'est là que la double horloge coûte le plus, `users` étant la seule table que toute application Forge possède.
+  **Cette livraison rend les écritures explicites et ne retire aucun défaut**, et l'ordre est le ticket lui-même. Aucune écriture ne nommait ces colonnes, ni la CLI ni les applications : retirer les `DEFAULT` d'abord aurait rendu `NOT NULL` sans valeur et empêché toute création de compte, partout à la fois.
+  Le framework ne compte que deux écritures dans ce socle, `INSERT INTO users` et `INSERT INTO user_roles`. Les cinq autres tables n'ont **aucun écrivain** dans Forge, ce qui rend le retrait de leurs défauts dépendant des applications, angle mort que l'ADR-090 vient précisément d'outiller.
+  Un cliquet inventorie l'écart restant et échoue dans les deux sens, pour que la seconde livraison ait sa liste et qu'elle ne dérive pas.
+
+  **Aveu de méthode.** Mes premiers tests passaient aussi sur le code d'avant : SQLite remplissait la colonne par son défaut, si bien qu'une assertion « `created_at` non vide » était vraie des deux côtés. Refaits sur une DDL privée de ses défauts, donc conforme à l'ADR-081, et sur la requête elle-même. Le contrôle négatif fait alors tomber quatre tests sur six, là où il n'en faisait tomber aucun.
+
 - **L'identité et le contact sont deux colonnes distinctes (`AUTH-IDENTITY-CONTACT-001`, ADR-089).**
   La table `users` n'avait qu'une colonne d'identité, `email`, et **rien ne vérifiait qu'elle contienne une adresse** : le cœur n'exige qu'une chaîne non vide. Poser son adresse changeait donc son identifiant de connexion, et une application y inscrivait légitimement `2TNE1-01`.
   Le vocabulaire avait produit du comportement, deux fois. Une fonction nommée `_normalize_email` abaissait la casse, fermant la connexion sur SQLite. Et la CLI refusait tout argument sans `@`, si bien que `forge auth:user:show 2TNE1-01` rejetait la saisie au lieu de chercher le compte, alors que le cœur l'acceptait sans réserve.

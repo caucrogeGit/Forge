@@ -157,7 +157,13 @@ def test_add_insere_dans_user_roles():
 
     assert result == {"user_id": 7, "role_id": 2, "created": True}
     assert "INSERT INTO user_roles" in executed["sql"]
-    assert executed["params"] == (7, 2)
+    # L'horodatage est pose par Python et non par le moteur (ADR-081,
+    # AUTH-TIMESTAMPS-EXPLICIT-001) : l'INSERT porte donc un troisieme
+    # parametre, un datetime.
+    from datetime import datetime
+
+    assert executed["params"][:2] == (7, 2)
+    assert isinstance(executed["params"][2], datetime)
 
 
 def test_add_ne_duplique_pas_association_existante():

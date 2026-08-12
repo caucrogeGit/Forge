@@ -18,6 +18,8 @@ forge auth:user:roles — liste les roles RBAC attribues a un utilisateur
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 import argparse
 import getpass
 from dataclasses import dataclass
@@ -604,10 +606,21 @@ def create_auth_user(
         raise AuthAdminCliError("Un utilisateur avec cet identifiant existe deja.")
 
     password_hash = hash_password(password)
+    # ADR-081 : Python est la seule autorité sur les horodatages, jamais le
+    # moteur. La table du socle s'appuyait pourtant sur `DEFAULT
+    # CURRENT_TIMESTAMP`, seule table de Forge à le faire, et l'ADR avait
+    # examiné puis REFUSÉ ce mécanisme, qui introduit une double horloge.
+    #
+    # Les rendre explicites vient AVANT de retirer les défauts SQL, et l'ordre
+    # est imposé : personne n'écrivait ces colonnes, si bien qu'un retrait
+    # préalable aurait rendu `NOT NULL` sans valeur et empêché toute création
+    # de compte, par l'application comme par la CLI (`AUTH-TIMESTAMPS-EXPLICIT-001`).
+    maintenant = datetime.now(timezone.utc)
     return int(
         insert(
-            "INSERT INTO users (login, email, password_hash, is_active) VALUES (?, ?, ?, TRUE)",
-            (identite, contact, password_hash),
+            "INSERT INTO users (login, email, password_hash, is_active, created_at, updated_at) "
+            "VALUES (?, ?, ?, TRUE, ?, ?)",
+            (identite, contact, password_hash, maintenant, maintenant),
         )
     )
 
@@ -741,8 +754,9 @@ def add_auth_user_role(
         return {"user_id": uid, "role_id": role_id, "created": False}
 
     execute(
-        "INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)",
-        (uid, role_id),
+        # Horodatage posé par Python, comme ci-dessus (ADR-081).
+        "INSERT INTO user_roles (user_id, role_id, created_at) VALUES (?, ?, ?)",
+        (uid, role_id, datetime.now(timezone.utc)),
     )
     return {"user_id": uid, "role_id": role_id, "created": True}
 
