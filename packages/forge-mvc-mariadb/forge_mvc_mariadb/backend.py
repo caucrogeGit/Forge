@@ -217,6 +217,15 @@ class MariaDBBackend:
             if emprunte and self._gate is not None:
                 self._gate.release()
 
+    def is_undefined_table_error(self, error: Exception) -> bool:
+        """Table absente MariaDB : errno 1146 (ER_NO_SUCH_TABLE).
+
+        Mesuré : `mariadb.ProgrammingError`, errno 1146, SQLSTATE 42S02, message
+        « Table 'base.nom' doesn't exist ». L'errno est retenu, seul signal
+        stable quelle que soit la langue du serveur.
+        """
+        return getattr(error, "errno", None) == 1146
+
     def is_unique_violation(self, error: Exception) -> bool:
         """Doublon MariaDB : errno 1062 (ER_DUP_ENTRY).
 

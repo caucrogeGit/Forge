@@ -39,6 +39,23 @@ def is_unique_violation(error: Exception) -> bool:
         return False
 
 
+def is_undefined_table_error(error: Exception) -> bool:
+    """Demande au backend actif si `error` signale une table absente.
+
+    Même enveloppe que `is_unique_violation`, pour la même raison : un backend
+    tiers qui n'implémenterait pas la méthode ne doit jamais masquer l'erreur
+    d'origine.
+
+    Ne participe pas à `qualify` : une table absente relève du diagnostic et de
+    l'outillage, pas du chemin de requête applicatif. Le cœur n'enveloppe que
+    ce qui a un usage métier, le doublon et l'indisponibilité.
+    """
+    try:
+        return bool(get_backend().is_undefined_table_error(error))
+    except Exception:  # noqa: BLE001 — un backend muet ne masque rien
+        return False
+
+
 def is_unavailable(error: Exception) -> bool:
     """Demande au backend actif si `error` invite à réessayer.
 

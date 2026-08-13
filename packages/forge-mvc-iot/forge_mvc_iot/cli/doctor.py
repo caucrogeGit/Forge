@@ -60,10 +60,6 @@ __all__ = [
     "main",
 ]
 
-# Codes d'erreur MariaDB qui signifient « la table est absente ».
-# Référence : https://mariadb.com/kb/en/mariadb-error-codes/
-# - 1146 = ER_NO_SUCH_TABLE
-_MARIADB_TABLE_NOT_FOUND_ERRNO = 1146
 
 # Reason codes CONNACK MQTT signifiant « authentification refusée ».
 # - MQTT 3.1.1 : 4 = bad user/password, 5 = not authorized
@@ -223,17 +219,24 @@ def info_db_not_tested() -> CheckResult:
 
 
 def _is_table_missing_error(exc: Exception) -> bool:
-    """Détecte une erreur « table iot_events absente » indépendamment
-    du driver utilisé.
+    """Détecte une table absente en déléguant au backend actif.
 
-    On reconnaît :
-    - ``errno == 1146`` (MariaDB / MySQL — ER_NO_SUCH_TABLE) ;
-    - ``"doesn't exist"`` dans le message (filet de sécurité si l'erreur
-      est wrappée et perd ``errno``).
+    La détection vivait ici, et ne connaissait que MariaDB : errno 1146 et la
+    locution anglaise « doesn't exist ». Sur PostgreSQL et SQL Server, une
+    migration oubliée était donc classée comme une base injoignable, et le
+    diagnostic envoyait l'exploitant chercher la mauvaise cause
+    (`IOT-DOCTOR-MISSING-TABLE-001`).
+
+    Le signal appartient au pilote, donc au backend, comme pour le doublon
+    (`is_unique_violation`). Le repli sur le message est conservé pour les
+    exceptions enveloppées, qui perdent leurs attributs.
     """
-    if getattr(exc, "errno", None) == _MARIADB_TABLE_NOT_FOUND_ERRNO:
+    from core.database.qualify import is_undefined_table_error
+
+    if is_undefined_table_error(exc):
         return True
-    return "doesn't exist" in str(exc).lower()
+    # Filet pour une exception enveloppée, qui n'a plus ni errno ni sqlstate.
+    return "doesn't exist" in str(exc).lower() or "no such table" in str(exc).lower()
 
 
 def _load_project_config_if_present() -> None:
@@ -276,8 +279,8 @@ def check_database_table(fetch_one_func: _FetchOne | None = None) -> CheckResult
     Retourne :
 
     - ``ok`` si la requête réussit (avec le nombre de lignes) ;
-    - ``warn`` si la table est absente (``errno == 1146`` ou
-      « doesn't exist » dans le message) — conseille
+    - ``warn`` si la table est absente, le backend actif qualifiant
+      l'erreur — conseille
       ``forge iot:init`` puis ``forge migration:apply`` ;
     - ``fail`` pour toute autre erreur (connexion, auth, db absente,
       etc.) — message volontairement sobre, pas de stacktrace.
@@ -314,7 +317,7 @@ def check_database_table(fetch_one_func: _FetchOne | None = None) -> CheckResult
         return CheckResult(
             status="fail",
             label="base iot_events",
-            detail=f"connexion MariaDB impossible — {type(exc).__name__}: {exc}",
+            detail=f"connexion à la base impossible — {type(exc).__name__}: {exc}",
         )
 
     count = int(row["n"]) if row else 0

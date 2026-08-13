@@ -324,15 +324,35 @@ class TestNoDbImportWhenFlagAbsent:
     n'est déclenché — c'est l'import paresseux côté check function."""
 
     def test_check_function_does_not_import_db_until_called(self):
-        # Sanity : la déclaration de check_database_table elle-même
-        # n'importe pas core.database.db au niveau module. L'import
-        # est dans le corps de la fonction.
-        src = DOCTOR_FILE.read_text(encoding="utf-8")
-        # On cherche dans la partie hors fonction du module.
-        head, *_ = src.split("def check_database_table")
-        assert "from core.database" not in head, (
-            "core.database doit être importé paresseusement dans "
-            "check_database_table, pas au niveau module"
+        """Aucun import de `core.database` au niveau module, quel qu'en soit l'endroit.
+
+        Le relevé se faisait en coupant le fichier au nom de
+        `check_database_table` et en cherchant le motif dans la moitié haute.
+        Deux défauts : un import paresseux placé dans une fonction **déclarée
+        avant** y était compté à tort, et un import de niveau module placé
+        **après** échappait complètement au contrôle.
+
+        L'arbre syntaxique répond exactement à la question posée : cet import
+        est-il à la racine du module ?
+        """
+        import ast
+
+        arbre = ast.parse(DOCTOR_FILE.read_text(encoding="utf-8"))
+        au_niveau_module = [
+            noeud.module or ""
+            for noeud in arbre.body
+            if isinstance(noeud, ast.ImportFrom)
+        ] + [
+            alias.name
+            for noeud in arbre.body
+            if isinstance(noeud, ast.Import)
+            for alias in noeud.names
+        ]
+        fautifs = [nom for nom in au_niveau_module if nom.startswith("core.database")]
+
+        assert not fautifs, (
+            "core.database doit être importé paresseusement, dans le corps des "
+            f"fonctions qui en ont besoin, pas au niveau module : {fautifs}"
         )
 
 

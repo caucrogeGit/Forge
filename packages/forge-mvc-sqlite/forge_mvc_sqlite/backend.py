@@ -218,6 +218,20 @@ class SQLiteBackend:
         if connection is not None:
             connection.close()
 
+    def is_undefined_table_error(self, error: Exception) -> bool:
+        """Table absente SQLite : `sqlite3.OperationalError` au message explicite.
+
+        Mesuré : « no such table: nom ». SQLite n'expose ni SQLSTATE ni code
+        distinct sur l'exception, `sqlite_errorname` valant `SQLITE_ERROR` pour
+        toute la famille des erreurs de compilation. Le message reste donc le
+        seul signal, et il n'est pas traduit.
+        """
+        import sqlite3
+
+        if not isinstance(error, sqlite3.OperationalError):
+            return False
+        return "no such table" in str(error).lower()
+
     def is_unique_violation(self, error: Exception) -> bool:
         """Doublon SQLite : `sqlite3.IntegrityError` au message explicite.
 

@@ -307,6 +307,19 @@ class MSSQLBackend:
         if connection is not None:
             connection.close()
 
+    def is_undefined_table_error(self, error: Exception) -> bool:
+        """Table absente SQL Server : numéro natif 208 (`Invalid object name`).
+
+        Mesuré : `pyodbc.ProgrammingError`, `args[0]` valant « 42S02 », message
+        « Invalid object name 'nom'. (208) ». pyodbc n'expose pas le numéro
+        natif en attribut ; il figure dans le message, comme pour le doublon.
+
+        Le numéro natif est préféré au SQLSTATE 42S02 : ce dernier couvre aussi
+        les colonnes absentes, et confondre les deux ferait conseiller une
+        migration là où c'est la requête qui se trompe de nom.
+        """
+        return "(208)" in str(error)
+
     def is_unique_violation(self, error: Exception) -> bool:
         """Doublon SQL Server : numéro natif 2627 (contrainte) ou 2601 (index).
 

@@ -375,6 +375,18 @@ class PostgreSQLBackend:
                 pass
             self._pool = None
 
+    def is_undefined_table_error(self, error: Exception) -> bool:
+        """Table absente PostgreSQL : SQLSTATE 42P01 (`undefined_table`).
+
+        Mesuré : `psycopg.errors.UndefinedTable`, SQLSTATE 42P01.
+
+        **Le message ne convient pas** : il est traduit. Un serveur en français
+        rend « la relation ... n'existe pas », un serveur en anglais
+        « relation ... does not exist ». Une détection par le texte dépendrait
+        de la langue du serveur, ce qui n'est pas une propriete du programme.
+        """
+        return getattr(error, "sqlstate", None) == "42P01"
+
     def is_unique_violation(self, error: Exception) -> bool:
         """Doublon PostgreSQL : SQLSTATE 23505 (`unique_violation`).
 

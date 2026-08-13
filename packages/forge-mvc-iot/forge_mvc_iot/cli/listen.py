@@ -47,8 +47,6 @@ __all__ = [
     "main",
 ]
 
-# Code d'erreur MariaDB « table absente » (ER_NO_SUCH_TABLE).
-_MARIADB_TABLE_NOT_FOUND_ERRNO = 1146
 
 # Codes d'erreur MariaDB qui signifient « la base est injoignable / refuse
 # la connexion » (par opposition à une erreur SQL applicative).
@@ -91,14 +89,24 @@ class ListenStats:
 
 
 def _is_storage_missing(exc: Exception) -> bool:
-    """Détecte une erreur « table ``iot_events`` absente ».
+    """Détecte une table absente en déléguant au backend actif.
 
-    Reconnaît ``errno == 1146`` (MariaDB) ou ``"doesn't exist"`` dans le
-    message (filet de sécurité si l'exception est wrappée).
+    La détection vivait ici, et ne connaissait que MariaDB : errno 1146 et la
+    locution anglaise « doesn't exist ». Sur PostgreSQL et SQL Server, une
+    migration oubliée était donc classée comme une base injoignable, et le
+    diagnostic envoyait l'exploitant chercher la mauvaise cause
+    (`IOT-DOCTOR-MISSING-TABLE-001`).
+
+    Le signal appartient au pilote, donc au backend, comme pour le doublon
+    (`is_unique_violation`). Le repli sur le message est conservé pour les
+    exceptions enveloppées, qui perdent leurs attributs.
     """
-    if getattr(exc, "errno", None) == _MARIADB_TABLE_NOT_FOUND_ERRNO:
+    from core.database.qualify import is_undefined_table_error
+
+    if is_undefined_table_error(exc):
         return True
-    return "doesn't exist" in str(exc).lower()
+    # Filet pour une exception enveloppée, qui n'a plus ni errno ni sqlstate.
+    return "doesn't exist" in str(exc).lower() or "no such table" in str(exc).lower()
 
 
 def _is_connection_error(exc: Exception) -> bool:

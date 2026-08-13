@@ -507,6 +507,36 @@ class DatabaseBackend(Protocol):
         """Restitue/ferme la connexion empruntée."""
         ...
 
+    def is_undefined_table_error(self, error: Exception) -> bool:
+        """Vrai si `error` signale une table absente de la base.
+
+        Sur le backend et non sur `Dialect`, pour la même raison que
+        `is_unique_violation` : reconnaître une exception relève du pilote.
+
+        Cette condition sépare deux situations qu'un exploitant ne traite pas
+        de la même façon, la migration oubliée et la base injoignable. Les
+        confondre est pire qu'un silence : le diagnostic désigne alors la
+        mauvaise cause et envoie chercher ailleurs.
+
+        Aucun signal n'est portable, mesuré sur les quatre backends :
+
+            MariaDB      mariadb.ProgrammingError    errno 1146, sqlstate 42S02
+            SQLite       sqlite3.OperationalError    message « no such table »
+            PostgreSQL   psycopg.errors.UndefinedTable  sqlstate 42P01
+            SQL Server   pyodbc.ProgrammingError     sqlstate 42S02 dans args[0]
+
+        Piège à ne pas reproduire : **le message de PostgreSQL est traduit**.
+        Un serveur en français rend « la relation ... n'existe pas », un serveur
+        en anglais « relation ... does not exist ». Une détection par le texte
+        dépendrait donc de la langue du serveur, ce qui n'est pas une propriété
+        du programme. Seul le SQLSTATE tient.
+
+        L'implémentation doit être **stricte** : dans le doute, renvoyer faux.
+        Un faux positif ferait conseiller une migration là où la base est
+        injoignable, et la migration échouerait à son tour.
+        """
+        ...
+
     def is_unique_violation(self, error: Exception) -> bool:
         """Vrai si `error` signale une violation de contrainte d'unicité.
 
