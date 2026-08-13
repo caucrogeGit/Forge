@@ -205,7 +205,23 @@ def current_user(request: Any, user_loader: Callable[[int], Any]) -> AuthUser | 
 
     try:
         user = raw_user if isinstance(raw_user, AuthUser) else normalize_auth_user(raw_user)
-    except (InvalidAuthUserError, TypeError, ValueError):
+    except (InvalidAuthUserError, TypeError, ValueError) as _invalide:
+        # La branche du dessus journalise, celle-ci se taisait
+        # (`CORE-WSGI-AUTH-GATE-001`). Or les deux situations n'ont pas la même
+        # cause : un loader qui lève est un incident, un loader qui rend une
+        # ligne incomplète est un **défaut de programmation**, et il produit
+        # une boucle de redirection vers `/login` que rien n'explique.
+        #
+        # Le cas se produit dès qu'un `load_user_by_id` applicatif omet une
+        # colonne obligatoire, `password_hash` la première. La session est
+        # valide, le compte existe, et l'utilisateur ne peut simplement plus
+        # entrer. Le refus reste le bon comportement ; le silence, non.
+        logger.warning(
+            "Le user_loader a rendu un utilisateur invalide (%s) ; session traitée "
+            "comme anonyme. Vérifiez que le loader rend tous les champs "
+            "obligatoires d'AuthUser.",
+            _invalide,
+        )
         return None
 
     if not user.is_active:
