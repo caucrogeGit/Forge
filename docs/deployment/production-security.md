@@ -89,7 +89,7 @@ Les headers suivants sont émis sur **toutes** les réponses HTTP (200, 302, 404
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | Limit l'envoi du Referer |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=()` | Désactive les API sensibles |
 | `Content-Security-Policy` | voir ci-dessous | Politique de contenu |
-| `Cache-Control` | `no-store` sur routes auth | Interdit la mise en cache des pages sensibles |
+| `Cache-Control` | `no-store` sur routes auth, **serveur de développement seulement** | Interdit la mise en cache des pages sensibles |
 
 !!! note "HSTS et reverse proxy"
     Le tableau décrit le comportement quand Forge termine lui-même TLS (serveur de développement HTTPS, `APP_SSL_ENABLED=true`).
@@ -120,7 +120,18 @@ APP_CSP_NONCE_ENABLED=true
 
 ### Cache-Control sur les routes auth
 
-Depuis **SECURITY-CACHE-001**, les routes d'authentification reçoivent automatiquement `Cache-Control: no-store` :
+Les routes d'authentification reçoivent `Cache-Control: no-store` **sur le serveur de développement uniquement**.
+
+!!! warning "Absent du déploiement de production"
+
+    L'en-tête est posé par `app.py`, le serveur de développement.
+    Le déploiement officiel passe par Gunicorn et l'adaptateur WSGI du cœur, qui ne le pose pas : `/login`, `/login/mfa` et `/logout` y sont donc servis sans `no-store`.
+    Un navigateur peut alors conserver ces pages dans son cache local.
+
+    En attendant que Forge tranche la question, posez l'en-tête sur votre proxy inverse pour ces trois chemins.
+    Le cœur ne peut pas la déduire seul : `/login` est une route **publique**, donc indiscernable d'une page ordinaire par le contrat de route.
+
+Le tableau ci-dessous décrit le comportement du serveur de développement :
 
 | Route | Méthode | No-store |
 |---|---|---|

@@ -269,6 +269,11 @@ Cache-Control: no-store
 
 Ce header interdit au navigateur et aux caches intermédiaires de stocker la réponse.
 Il est ajouté centralement dans `app.py` (`_send_response()`) pour toutes les méthodes HTTP (GET et POST) sur ces chemins.
+
+!!! warning "`app.py` est le serveur de développement"
+
+    Le déploiement de production passe par Gunicorn et l'adaptateur WSGI du cœur, qui ne traverse pas `app.py`.
+    L'en-tête n'y est donc **pas** posé : voir [Sécurité en production](../deployment/production-security.md).
 Les fichiers statiques ne sont pas affectés, ils conservent leur propre `Cache-Control: max-age=…`.
 
 ### Cookie CSRF

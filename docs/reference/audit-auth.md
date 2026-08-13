@@ -151,8 +151,9 @@ Le flag `Secure` des cookies suit une règle différente et plus simple : il est
 
 ### Limites restantes
 
-- `Cache-Control: no-store` absent sur les pages HTML authentifiées (login, admin).
-  Le navigateur peut mettre ces pages en cache local. Ticket futur : `SECURITY-CACHE-001`.
+- `Cache-Control: no-store` posé sur `/login`, `/login/mfa` et `/logout` par le **serveur de développement seulement**.
+  L'adaptateur WSGI ne le pose pas : le déploiement de production sert ces pages sans, et le navigateur peut les conserver en cache local.
+  Le cœur ne peut pas déduire la règle du contrat de route, `/login` étant une route publique. Posez l'en-tête sur le proxy inverse.
 - La CSP ne liste pas explicitement `font-src` et `connect-src` (couverts par `default-src 'self'`).
   `img-src` et `form-action` sont déclarés explicitement (voir section ci-dessus).
 - `Permissions-Policy` ne couvre pas exhaustivement toutes les API navigateur (gyroscope, accelerometer, usb…).
