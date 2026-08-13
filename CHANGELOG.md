@@ -5,6 +5,12 @@
 
 ### Ajouté
 
+- **Le parcours de connexion est éprouvé du WSGI à la base (`AUTH-WSGI-LOGIN-REAL-001`).**
+  Trois changements de ce cycle se rencontrent dans ce parcours, et aucun n'était vérifié **ensemble** : l'identité passée de `email` à `login` (ADR-089), l'émission des événements par le cœur (ADR-091), et les horodatages en UTC naïf.
+  Le test entre par une requête WSGI, vérifie un mot de passe contre une vraie base, et lit l'événement qui en sort, sur les trois serveurs.
+  Il vérifie ce que le cycle a rendu possible : `2TNE1-01` se connecte, sans arobase et avec ses capitales, sur un compte **sans contact**. Et ce que l'ADR-091 promet : trois tentatives, trois événements, l'échec distinguant le compte trouvé du compte inconnu, et aucun ne portant le mot de passe ni la valeur saisie.
+  La leçon qui l'a motivé : un jumeau de test ne prouve rien sur ce que sert la production. Une sonde `/health` au contrat de stabilité a déjà répondu 404 sous WSGI alors que tous ses tests passaient.
+
 - **La surface base non exercée des opt-ins est couverte (`OPTIN-SURFACE-COVERAGE-001`).**
   Le pré-mortem a mesuré, opt-in par opt-in, la part réellement **exécutée** contre un serveur : `rbac` 0 sur 15, `admin` 9 sur 15, `images` 3 sur 8.
   C'est cette mesure qui a mené aux deux défauts corrigés plus haut, tous deux invisibles d'une suite verte parce que les tests des paquets exerçaient la **construction** du SQL et jamais son effet.
