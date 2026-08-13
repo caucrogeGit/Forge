@@ -219,7 +219,8 @@ Le flag `Secure` est **toujours activé**, quel que soit `app_env`.
 Forge suppose que toute configuration de déploiement, y compris le développement local, passe par HTTPS ou un reverse-proxy TLS.
 Il n'existe pas de mode "dev sans Secure".
 
-Ce choix est cohérent avec le header `Strict-Transport-Security` qui est lui aussi émis sur toutes les réponses, y compris en dev (voir [Sécurité en production](../deployment/production-security.md)).
+Le header `Strict-Transport-Security`, lui, suit une règle **différente** : le serveur de développement le pose sur toutes les réponses, l'adaptateur WSGI seulement si `wsgi.url_scheme` vaut `https`.
+Derrière un proxy inverse qui termine le TLS, c'est donc au proxy de le poser (voir [Sécurité en production](../deployment/production-security.md) et [Audit de l'authentification](../reference/audit-auth.md)).
 
 Si votre environnement local ne supporte pas HTTPS, configurez un proxy TLS local (mkcert, Caddy, ngrok) ou utilisez les tests unitaires qui contournent HTTP.
 

@@ -132,7 +132,22 @@ La CSP ne contient jamais `unsafe-inline` ni `unsafe-eval`.
 
 ### HSTS
 
-`Strict-Transport-Security: max-age=31536000; includeSubDomains` est émis sur toutes les réponses, y compris en développement local. Forge suppose que toute configuration (y compris dev) passe par HTTPS ou un proxy TLS (cohérent avec le flag `Secure` sur les cookies).
+`Strict-Transport-Security: max-age=31536000; includeSubDomains` n'est pas émis dans les mêmes conditions selon le serveur, et la différence compte pour qui déploie.
+
+| Serveur | Condition |
+|---|---|
+| Serveur de développement (`python app.py`) | émis sur toutes les réponses |
+| Adaptateur WSGI (Gunicorn, uWSGI) | émis **uniquement** si `wsgi.url_scheme` vaut `https` |
+
+Derrière un proxy inverse qui termine le TLS, ce qui est le déploiement décrit par [Mise en production](../deployment/mise-en-production.md), `wsgi.url_scheme` vaut `http`.
+Forge n'émet donc **pas** l'en-tête sur ce chemin, et c'est au proxy inverse de le poser.
+
+!!! warning "À vérifier sur votre déploiement"
+
+    Si votre proxy inverse ne pose pas `Strict-Transport-Security`, votre site n'en a pas.
+    L'en-tête ne peut pas être émis utilement par une application qui ignore si sa réponse voyagera en clair.
+
+Le flag `Secure` des cookies suit une règle différente et plus simple : il est toujours posé, sans condition.
 
 ### Limites restantes
 
