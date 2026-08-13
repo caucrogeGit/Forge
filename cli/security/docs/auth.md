@@ -28,7 +28,7 @@ Les commandes d'administration des comptes parlent à la base avec les identifia
 | Module Python | `cli.security.auth` |
 | Catégorie | sécurité / authentification |
 | Rôle | installer le socle d'authentification et administrer les comptes locaux |
-| Entrées | options de ligne de commande (`--email`, `--password`, `--id`, `--role`, ...), variables d'environnement de connexion base |
+| Entrées | options de ligne de commande (`--login`, `--email`, `--password`, `--id`, `--role`, ...), variables d'environnement de connexion base |
 | Sorties | fichiers SQL générés sous `mvc/models/sql/`, rapports de diagnostic à l'écran, lignes de comptes ou de rôles |
 | Fichiers touchés | `mvc/models/sql/*.sql` en write-if-new pour `auth:init`, aucun fichier pour les autres commandes |
 | Mode Forge | génère (`auth:init`), lit (`auth:status`, `auth:doctor`, `auth:list-sql`), administre la base (`auth:user:*`) |
@@ -153,7 +153,8 @@ sequenceDiagram
 | `forge auth:user:role:remove` | retire un rôle RBAC existant d'un compte | administre |
 | `forge auth:user:roles` | liste les rôles attribués à un compte | administre |
 
-Options principales : `--email` et `--id` désignent le compte (un seul des deux), `--password` ou `--password-prompt` fournissent le mot de passe, `--role` désigne un rôle par id, slug ou nom.
+Options principales : `--login` et `--id` désignent le compte (un seul des deux), `--password` ou `--password-prompt` fournissent le mot de passe, `--role` désigne un rôle par id, slug ou nom.
+Depuis l'ADR-089, `--email` n'est plus un identifiant de connexion mais une adresse de contact, posée à la création.
 
 ### 4.2 Fonctions publiques du module
 
@@ -214,22 +215,22 @@ Liste des comptes, puis affichage d'un compte précis.
 
 ```bash
 forge auth:user:list
-forge auth:user:show --email alice@exemple.fr
+forge auth:user:show --login alice
 ```
 
 Désactivation puis réactivation d'un compte.
 
 ```bash
-forge auth:user:disable --email alice@exemple.fr
+forge auth:user:disable --login alice
 forge auth:user:enable --id 42
 ```
 
 Gestion des rôles RBAC d'un compte.
 
 ```bash
-forge auth:user:role:add --email alice@exemple.fr --role admin
-forge auth:user:roles --email alice@exemple.fr
-forge auth:user:role:remove --email alice@exemple.fr --role admin
+forge auth:user:role:add --login alice --role admin
+forge auth:user:roles --login alice
+forge auth:user:role:remove --login alice --role admin
 ```
 
 Les fonctions publiques sont aussi appelables depuis du code Python, avec des accès base injectables.
@@ -251,7 +252,7 @@ comptes = list_auth_users()
     Cela respecte le principe 9 : Forge n'écrit pas en silence dans le code utilisateur.
 
 !!! tip "Désigner un compte"
-    Les commandes de comptes acceptent `--id` ou `--email`, mais jamais les deux à la fois.
+    Les commandes de comptes acceptent `--id` ou `--login`, mais jamais les deux à la fois.
 
     Si aucun des deux n'est fourni, Forge renvoie une erreur lisible avec un conseil.
 
