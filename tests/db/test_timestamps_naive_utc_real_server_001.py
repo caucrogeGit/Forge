@@ -103,11 +103,13 @@ def test_utc_now_ne_porte_pas_de_fuseau() -> None:
 
 
 def test_aucun_ecrivain_ne_pose_la_forme_consciente() -> None:
-    """Une seule façon officielle (principe 11), et un relevé qui le tient.
+    """Relevé conservé pour les quatre écrivains du ticket d'origine.
 
-    Le piège est que la forme consciente **paraît plus juste**, puisqu'elle
-    porte l'information de fuseau. Elle l'est en Python, pas au passage du
-    pilote.
+    Le balayage **automatique** du dépôt entier vit désormais dans
+    `test_optin_aware_timestamp_real_server_001.py`. Il a trouvé deux écrivains
+    que cette liste manuelle ne pouvait pas voir, `forge-mvc-iot` et
+    `forge-mvc-mail`, parce qu'une liste écrite à la main ne couvre que ce qui
+    existait le jour où on l'a écrite.
     """
     import ast
     from pathlib import Path

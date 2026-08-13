@@ -16,8 +16,10 @@ la migration versionnée par ``IOT-STORAGE-MIGRATION-001``.
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
+
+from core.database.timestamps import utc_now
 
 from forge_mvc_iot.mqtt.contract import Measurement
 
@@ -84,7 +86,7 @@ def serialize_measurement_for_storage(
       ``COLUMNS`` pour produire un tuple positionnel ordonné.
     """
     if received_at is None:
-        received_at = datetime.now(UTC)
+        received_at = utc_now()
 
     metadata_json: str | None
     if measurement.metadata is None:

@@ -61,12 +61,21 @@ def test_record_champs_obligatoires():
     assert isinstance(r.created_at, datetime)
 
 
-def test_record_created_at_utc_par_defaut():
+def test_record_created_at_utc_naif_par_defaut():
+    """L'horodatage est un UTC **naïf**, comme toutes les colonnes de Forge.
+
+    Ce test exigeait l'inverse, `tzinfo is not None`, et épinglait ainsi le
+    défaut : la forme consciente était convertie par le pilote PostgreSQL vers
+    l'heure locale du serveur, soit 7200 s d'écart mesurés
+    (`OPTIN-AWARE-TIMESTAMP-001`).
+    """
     r = MailLogRecord(
         message_type="", to_email="x@y.com",
         subject="s", transport="t", status="sent",
     )
-    assert r.created_at.tzinfo is not None
+    assert r.created_at.tzinfo is None
+    ecart = abs((r.created_at - datetime.now(timezone.utc).replace(tzinfo=None)).total_seconds())
+    assert ecart < 5
 
 
 def test_record_tous_champs():

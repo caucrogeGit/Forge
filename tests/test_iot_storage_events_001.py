@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -125,21 +125,29 @@ class TestSerializeBasics:
 class TestReceivedAtDefault:
     def test_received_at_defaults_to_now_utc(self):
         m = _make_measurement()
-        before = datetime.now(UTC)
+        before = datetime.now(UTC).replace(tzinfo=None)
         row = serialize_measurement_for_storage(m)
-        after = datetime.now(UTC)
+        after = datetime.now(UTC).replace(tzinfo=None)
 
         received = row["received_at"]
         assert isinstance(received, datetime)
         # Doit être dans la fenêtre [before, after].
         assert before <= received <= after
 
-    def test_received_at_default_is_timezone_aware_utc(self):
+    def test_received_at_default_is_naive_utc(self):
+        """L'horodatage est un UTC **naïf**, comme toutes les colonnes de Forge.
+
+        Ce test exigeait l'inverse, `tzinfo is not None`, et épinglait ainsi le
+        défaut : la forme consciente était convertie par le pilote PostgreSQL
+        vers l'heure locale du serveur, soit 7200 s d'écart mesurés
+        (`OPTIN-AWARE-TIMESTAMP-001`).
+        """
         m = _make_measurement()
         row = serialize_measurement_for_storage(m)
         received = row["received_at"]
-        assert received.tzinfo is not None
-        assert received.utcoffset() == timedelta(0)
+        assert received.tzinfo is None
+        ecart = abs((received - datetime.now(UTC).replace(tzinfo=None)).total_seconds())
+        assert ecart < 5
 
 
 class TestMetadataSerialization:
@@ -289,7 +297,15 @@ class TestModuleStaysPure:
             line for line in text.splitlines()
             if line.lstrip().startswith(("import ", "from "))
         ]
-        offenders = [line for line in import_lines if "core.database" in line]
+        # `core.database.timestamps` est écarté : il n'importe que la
+        # bibliothèque standard, et ne porte donc aucun couplage à la base.
+        # L'exemption est bornée par
+        # `test_l_exemption_timestamps_ne_peut_pas_s_elargir`, qui vérifie que
+        # ce module reste sans dépendance.
+        offenders = [
+            line for line in import_lines
+            if "core.database" in line and "core.database.timestamps" not in line
+        ]
         assert not offenders, (
             "events.py ne doit pas importer core.database à ce ticket "
             f"(branchement prévu dans IOT-STORAGE-REPOSITORY-001) : {offenders}"

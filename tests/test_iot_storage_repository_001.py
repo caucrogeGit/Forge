@@ -169,16 +169,23 @@ class TestInsertParameters:
         params = adapter.execute.call_args.args[1]
         assert params[COLUMNS.index("received_at")] == custom
 
-    def test_received_at_default_is_now_utc(self):
+    def test_received_at_default_is_naive_utc(self):
+        """L'horodatage est un UTC **naïf**, comme toutes les colonnes de Forge.
+
+        Ce test exigeait l'inverse, `tzinfo is not None`, et épinglait ainsi le
+        défaut : la forme consciente était convertie par le pilote PostgreSQL
+        vers l'heure locale du serveur, soit 7200 s d'écart mesurés
+        (`OPTIN-AWARE-TIMESTAMP-001`).
+        """
         adapter = MagicMock()
         repo = IotEventRepository(db_adapter=adapter)
-        before = datetime.now(UTC)
+        before = datetime.now(UTC).replace(tzinfo=None)
         repo.insert(_make_measurement())
-        after = datetime.now(UTC)
+        after = datetime.now(UTC).replace(tzinfo=None)
         params = adapter.execute.call_args.args[1]
         received = params[COLUMNS.index("received_at")]
         assert before <= received <= after
-        assert received.tzinfo is not None
+        assert received.tzinfo is None
 
     def test_metadata_none_stays_none(self):
         adapter = MagicMock()

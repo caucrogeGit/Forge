@@ -232,9 +232,15 @@ class TestStorageModuleStaysPure:
             line for line in text.splitlines()
             if line.lstrip().startswith(("import ", "from "))
         ]
+        # `core.database.timestamps` est écarté : il n'importe que la
+        # bibliothèque standard, et ne porte donc aucun couplage à la base.
+        # L'exemption est bornée par
+        # `test_l_exemption_timestamps_ne_peut_pas_s_elargir`, qui vérifie que
+        # ce module reste sans dépendance.
         offenders = [
             line for line in import_lines
-            if "core.database" in line or "mariadb" in line
+            if ("core.database" in line and "core.database.timestamps" not in line)
+            or "mariadb" in line
         ]
         assert not offenders, (
             "storage/events.py ne doit pas importer de connecteur DB "

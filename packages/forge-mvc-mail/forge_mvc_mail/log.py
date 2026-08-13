@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Literal
+
+from core.database.timestamps import utc_now
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +49,7 @@ class MailLogRecord:
     error_message:  str = ""
     related_entity: str = ""
     related_id:     int | None = None
-    created_at:     datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at:     datetime = field(default_factory=utc_now)
     sent_at:        datetime | None = None
 
 
