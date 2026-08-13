@@ -5,6 +5,11 @@
 
 ### Ajouté
 
+- **La chaîne de permission RBAC est éprouvée sur les trois serveurs (`RBAC-PERMISSION-CHAIN-REAL-001`).**
+  `forge-mvc-rbac` porte quinze fonctions touchant la base, et **aucune n'était exercée contre un serveur réel**. C'est l'opt-in qui décide si un utilisateur a le droit de faire quelque chose, et la question « ce SQL rend-il la bonne réponse sur PostgreSQL » n'avait jamais été posée.
+  Le relevé est rassurant, et il faut le dire : les trois requêtes rendent le même résultat partout. Elles étaient écrites avec les précautions qui comptent, colonnes en minuscules et alias explicites, là où d'autres paquets ont payé leur absence.
+  Le test couvre la chaîne complète, trois jointures et un `DISTINCT`, plus le cas d'un utilisateur sans rôle : un défaut de jointure y rendrait la liste entière des permissions au lieu d'une liste vide, et personne ne le verrait avant l'incident.
+
 - **Forge annonçait trois événements d'authentification et n'en émettait aucun (`AUTH-EVENTS-EMIT-001`, ADR-091).**
   Un retour terrain relève une table `auth_audit_log` vide après des semaines d'usage, et propose que le cœur l'alimente. **La proposition est écartée** : l'ADR-008 a rangé la persistance du côté applicatif, qualifie cette table de latente, et anticipe même la confusion constatée.
   Le défaut réel est ailleurs, et l'ADR-008 ne le couvre pas. Le générateur du contrôleur d'authentification n'appelle **jamais** `safe_log_auth_event` : aucun événement n'est émis, **pas même vers le logger**. Une application configurant consciencieusement un handler sur `forge.auth.audit`, comme l'ADR-008 le lui demande, ne recevait rien. C'est la brique 2 de cet ADR qui manquait, pas la persistance.
@@ -59,6 +64,10 @@
   Le compteur des deux mois sans changement d'API publique repart. Ce coût est imputable au défaut, non à sa correction : un socle dont le champ d'identité est mal nommé et refuse par la CLI ce que le cœur accepte n'est pas taggable en 1.0.0.
 
 ### Corrigé
+
+- **`tables_temporaires` jetait les tables dans le mauvais ordre (`TESTING-DROP-ORDER-FK-001`).**
+  Les tables étaient créées parent avant enfant, ce qui est nécessaire, mais **jetées dans le même ordre** : une table référencée par une clé étrangère partait donc avant celle qui la référence. Les trois moteurs le refusent, chacun avec son message, et le démontage échouait sans que le test lui-même ait rien à se reprocher.
+  Le défaut ne s'était pas vu parce qu'aucun test n'avait encore employé ce helper avec des tables liées ; il est apparu au premier, celui de la chaîne de permission RBAC.
 
 - **Tout ce que Forge horodate était décalé de deux heures sur PostgreSQL (`TIMESTAMPS-NAIVE-UTC-001`, ADR-081).**
   L'ADR-081 avait tranché que l'autorité sur les horodatages est Python, sans dire sous quelle **forme** la valeur devait être passée. L'omission a coûté deux heures.

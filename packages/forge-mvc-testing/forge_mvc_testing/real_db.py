@@ -316,14 +316,19 @@ def tables_temporaires(*definitions: Any) -> Iterator[Any]:
 
     backend = get_backend()
     noms = [definition.name for definition in definitions]
-    _jeter(db, noms, backend.name)
+    # Les tables sont créées dans l'ordre donné, parent avant enfant, et jetées
+    # dans l'ordre INVERSE : une table référencée par une clé étrangère ne peut
+    # pas partir avant celle qui la référence. Les trois moteurs le refusent,
+    # chacun avec son message, et la suppression échouait au démontage sans que
+    # le test lui-même ait rien à se reprocher (`TESTING-DROP-ORDER-FK-001`).
+    _jeter(db, list(reversed(noms)), backend.name)
     for definition in definitions:
         for sql in render_create_table(definition, backend.dialect):
             db.execute(sql)
     try:
         yield db
     finally:
-        _jeter(db, noms, backend.name)
+        _jeter(db, list(reversed(noms)), backend.name)
 
 
 @pytest.fixture(
