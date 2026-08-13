@@ -1,6 +1,7 @@
 """forge-mvc-testing — infrastructure de test partagée pour Forge (dev only).
 
-Fournit `FakeRequest` et, via un plugin pytest (point d'entrée `pytest11`,
+Fournit `FakeRequest`, `code_sans_prose` (lecture d'un source sans sa prose,
+pour les garde-fous de structure) et, via un plugin pytest (point d'entrée `pytest11`,
 voir `forge_mvc_testing.plugin`), les fixtures partagées : configuration du
 noyau, nettoyage entre tests, et `fake_request`.
 
@@ -10,6 +11,7 @@ développement (ADR-041).
 from __future__ import annotations
 
 from forge_mvc_testing.fake_request import FakeRequest
+from forge_mvc_testing.source_scan import code_sans_prose, lignes_de_prose
 
-__all__ = ["FakeRequest"]
+__all__ = ["FakeRequest", "code_sans_prose", "lignes_de_prose"]
 __version__ = "1.0.0rc5"

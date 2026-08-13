@@ -179,6 +179,33 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
 
     Le plugin s'active par le point d'entrée `pytest11` : aucune configuration `conftest` n'est requise.
 
+    ### Lecture d'un source sans sa prose (`source_scan.py`)
+
+    Un garde-fou de structure cherche presque toujours une propriété du **code**.
+    Or lire un fichier rend aussi ses docstrings et ses commentaires, si bien que la prose qui **explique** la règle est jugée au même titre que le code qui l'applique.
+    Le faux positif frappe au pire moment, lorsqu'on documente précisément ce que le code ne fait plus.
+
+    | Élément | Signature | Rôle |
+    |---|---|---|
+    | `code_sans_prose` | `code_sans_prose(source) -> str` | le source privé de ses docstrings et de ses commentaires |
+    | `lignes_de_prose` | `lignes_de_prose(source) -> set[int]` | numéros de ligne occupés par une docstring ou un commentaire |
+
+    ```python
+    from forge_mvc_testing.source_scan import code_sans_prose
+
+    code = code_sans_prose(chemin.read_text(encoding="utf-8"))
+    assert "CURRENT_TIMESTAMP" not in code
+    ```
+
+    Les lignes retirées deviennent vides plutôt que de disparaître, afin que la numérotation reste celle du fichier et que les messages d'échec restent utilisables.
+    Le source d'une méthode, tel que `inspect.getsource` le rend, porte l'indentation de sa classe et est dédenté au besoin.
+
+    !!! warning "`inspect.cleandoc` ne convient pas pour dédenter du code"
+
+        Il aligne toutes les lignes sur la première et aplatit le corps, ce qui casse la syntaxe.
+        L'analyse échoue alors en silence et la docstring reste dans le texte examiné.
+        C'est `textwrap.dedent` qui convient, puisqu'il ne retire que la marge commune.
+
     ### Motifs de saut des tests d'intégration (`db_probe.py`)
 
     Une fixture d'intégration qui ne peut pas se connecter doit dire **pourquoi**, car les deux causes possibles appellent des gestes opposés.

@@ -91,12 +91,13 @@ def test_l_insertion_ne_delegue_plus_au_moteur() -> None:
 
     from forge_mvc_images import media_repository
 
-    # Les lignes de COMMENTAIRE sont écartées : elles citent l'expression pour
-    # dire qu'elle n'est plus employée, et les juger reviendrait à juger de la
-    # prose. Le même piège s'est produit deux fois dans ce cycle.
-    source = "\n".join(
-        ligne for ligne in inspect.getsource(media_repository.create_media_record).splitlines()
-        if not ligne.lstrip().startswith("#")
+    # Commentaires et docstrings écartés : ils citent l'expression pour dire
+    # qu'elle n'est plus employée, et les juger reviendrait à juger la prose.
+    # La règle vit dans `forge_mvc_testing.source_scan`, une seule fois.
+    from forge_mvc_testing.source_scan import code_sans_prose
+
+    source = code_sans_prose(
+        inspect.getsource(media_repository.create_media_record)
     )
 
     assert "CURRENT_TIMESTAMP" not in source, (
