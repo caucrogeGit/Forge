@@ -60,6 +60,16 @@
 
 ### Corrigé
 
+- **Le back-office ne savait créer aucun enregistrement dans une entité à horodatages gérés (`ADMIN-MANAGED-TIMESTAMPS-001`).**
+  L'ADR-081 a retiré les `DEFAULT CURRENT_TIMESTAMP` des tables d'entités : `created_at` et `updated_at` y sont `NOT NULL` **sans défaut**, Python posant la valeur.
+  `forge-mvc-admin` ignorait ce mécanisme, sans une seule mention dans tout le paquet.
+  Mesuré sur les trois serveurs avant correctif : `Field 'CreatedAt' doesn't have a default value` sur MariaDB, violation de `NOT NULL` sur PostgreSQL, `Cannot insert the value NULL` sur SQL Server. **Créer un enregistrement était impossible** dans toute entité engendrée avec `options.timestamps`, sur les quatre backends.
+  La modification, elle, passait sans erreur en laissant `updated_at` figé, ce qui est plus discret et plus durable : l'horodatage mentait alors sur la dernière modification.
+  Le défaut date de l'ADR-081, le 13 juillet, et traverse les rc4 et rc5. Aucun test ne l'a vu parce que ceux d'`admin` exercent la **construction** du SQL et jamais son exécution contre une table à horodatages gérés. C'est la forme même des cinq défauts trouvés avant la rc5.
+  `AdminResource` gagne un champ `timestamps`, déclaré et non deviné (principe 3), à `False` par défaut : une ressource existante ne change pas de comportement. Déclaré, le back-office pose les deux valeurs à la création et rafraîchit `updated_at` à la modification, sans jamais réécrire `created_at`. Le contrat refuse ces colonnes dans `form_fields`, un champ géré n'étant pas éditable.
+  Neuf cas vérifiés sur les trois serveurs, six tombant sur le code d'avant.
+  Trouvé par le pré-mortem d'avant rc6, au premier angle.
+
 - **Un compte créé par la CLI ne pouvait pas se connecter sur SQLite (`AUTH-CASE-ASYMMETRY-001`).**
   Forge écrit dans la table `users` par deux chemins, et ils ne suivaient pas la même convention.
   La CLI `forge auth:user:*` abaissait la casse, à l'écriture comme à la lecture : prise seule, elle était cohérente. Le contrôleur et le modèle engendrés par `forge make:auth` ne normalisent rien, ils passent la saisie du formulaire telle quelle à `WHERE email = ?`.

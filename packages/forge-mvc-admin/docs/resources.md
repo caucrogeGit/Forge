@@ -29,6 +29,7 @@ Elle ne lit ni le contrat d'entité ni la base : le rapprochement avec l'entité
 | `table` | `str` | table physique (snake_case) ; non dérivable du nom d'entité |
 | `order_by` | `str` | colonne de tri par défaut (vide → premier `list_fields`) |
 | `pk` | `str` | colonne de clé primaire pour la vue détail (défaut `id`) |
+| `timestamps` | `bool` | la table porte `created_at` et `updated_at` gérés (défaut `False`) |
 
 Règles de validation, sinon `AdminResourceError` :
 
@@ -36,7 +37,30 @@ Règles de validation, sinon `AdminResourceError` :
 - `slug` en minuscules, chiffres et tirets, commençant par une lettre ;
 - `label` et `plural_label` non vides ;
 - `list_fields` et `form_fields` non vides, chaque nom en snake_case, sans doublon ;
-- `table` et `pk` en snake_case ; `order_by`, s'il est fourni, en snake_case.
+- `table` et `pk` en snake_case ; `order_by`, s'il est fourni, en snake_case ;
+- `created_at` et `updated_at` absents de `form_fields` quand `timestamps` vaut `True` : ce sont des champs **gérés**, que le framework pose lui-même.
+
+## Horodatages gérés
+
+Une entité engendrée avec `options.timestamps` porte `created_at` et `updated_at` en `NOT NULL` **sans défaut SQL** : l'autorité sur la valeur est Python, jamais le moteur (ADR-081).
+
+Déclarez-le sur la ressource, et le back-office les posera à la création comme à la modification.
+
+```python
+AdminResource(
+    entity="Article", slug="articles", label="Article", plural_label="Articles",
+    table="articles", list_fields=("titre",), form_fields=("titre",),
+    timestamps=True,
+)
+```
+
+!!! warning "Sans cette déclaration, la création échoue"
+
+    Le back-office ignorait ce mécanisme jusqu'à `ADMIN-MANAGED-TIMESTAMPS-001`.
+    Créer un enregistrement levait alors une violation de contrainte sur les quatre backends,
+    et modifier laissait `updated_at` figé, ce qui est plus discret et plus durable.
+
+    Le défaut par défaut reste `False` : une ressource déclarée avant ce ticket ne change pas de comportement.
 
 ```python
 from forge_mvc_admin import AdminResource

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Sequence
+from datetime import datetime, timezone
 from typing import Any
 
 from forge_mvc_admin.exceptions import AdminResourceError
@@ -105,8 +106,17 @@ def get_row(
 
 
 def build_insert_sql(resource: AdminResource) -> str:
-    """`INSERT INTO <table> (<form_fields>) VALUES (?, …)`."""
+    """`INSERT INTO <table> (<form_fields>[, created_at, updated_at]) VALUES (?, …)`.
+
+    Les horodatages gérés sont **nommés** quand la ressource les déclare
+    (ADR-081, `ADMIN-MANAGED-TIMESTAMPS-001`). Le back-office les ignorait, si
+    bien qu'une création échouait sur `NOT NULL` dans toute entité engendrée
+    avec `options.timestamps`, sur les quatre backends, l'ADR-081 ayant retiré
+    les défauts SQL de ces colonnes.
+    """
     columns = [_ident(col) for col in resource.form_fields]
+    if resource.timestamps:
+        columns += ["created_at", "updated_at"]
     table = _ident(resource.table)
     placeholders = ", ".join("?" for _ in columns)
     return f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({placeholders})"
@@ -118,8 +128,17 @@ def insert_row(
     *,
     values: Sequence[Any],
 ) -> int:
-    """Insère une ligne (valeurs dans l'ordre de `form_fields`). Retourne lastrowid."""
-    return insert(build_insert_sql(resource), tuple(values))
+    """Insère une ligne (valeurs dans l'ordre de `form_fields`). Retourne lastrowid.
+
+    Les horodatages gérés sont posés **ici, en Python**, jamais par le moteur :
+    c'est l'autorité que l'ADR-081 a tranchée, et la même que celle du modèle
+    engendré par `make:crud`.
+    """
+    parametres = tuple(values)
+    if resource.timestamps:
+        maintenant = datetime.now(timezone.utc)
+        parametres = (*parametres, maintenant, maintenant)
+    return insert(build_insert_sql(resource), parametres)
 
 
 def build_update_sql(resource: AdminResource) -> str:
@@ -133,7 +152,13 @@ def build_update_sql(resource: AdminResource) -> str:
 
     La clause portant sur la clé primaire, au plus une ligne est touchée.
     """
-    assignments = ", ".join(f"{_ident(col)} = ?" for col in resource.form_fields)
+    colonnes = list(resource.form_fields)
+    assignments = ", ".join(f"{_ident(col)} = ?" for col in colonnes)
+    if resource.timestamps:
+        # `updated_at` seul : `created_at` ne se réécrit pas. Sans cela, la
+        # modification passait sans erreur mais laissait l'horodatage figé, ce
+        # qui est plus discret et plus durable qu'un échec.
+        assignments += ", updated_at = ?"
     table = _ident(resource.table)
     pk = _ident(resource.pk)
     return f"UPDATE {table} SET {assignments} WHERE {pk} = ?"
@@ -150,7 +175,10 @@ def update_row(
 
     Retourne le nombre de lignes affectées (0 si la clé n'existe pas).
     """
-    return execute(build_update_sql(resource), (*tuple(values), pk_value))
+    parametres = tuple(values)
+    if resource.timestamps:
+        parametres = (*parametres, datetime.now(timezone.utc))
+    return execute(build_update_sql(resource), (*parametres, pk_value))
 
 
 def build_delete_sql(resource: AdminResource) -> str:

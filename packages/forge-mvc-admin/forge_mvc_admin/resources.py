@@ -25,6 +25,10 @@ _ENTITY_RE = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 _FIELD_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 
 
+#: Colonnes d'horodatage gérées par le framework (ADR-081), posées en Python.
+_MANAGED_TIMESTAMP_COLUMNS = ("created_at", "updated_at")
+
+
 @dataclass(frozen=True)
 class AdminResource:
     """Déclaration d'une entité administrable.
@@ -60,6 +64,14 @@ class AdminResource:
     table: str
     order_by: str = ""
     pk: str = "id"
+    #: La table porte les horodatages gérés de l'ADR-081, `created_at` et
+    #: `updated_at`, `NOT NULL` et **sans défaut SQL** : l'autorité est Python.
+    #:
+    #: Déclaré et non deviné (principe 3). Le back-office ignorait ce mécanisme
+    #: depuis l'ADR-081, si bien que créer un enregistrement échouait sur les
+    #: quatre backends, et que modifier laissait `updated_at` figé
+    #: (`ADMIN-MANAGED-TIMESTAMPS-001`).
+    timestamps: bool = False
 
     def __post_init__(self) -> None:
         if not _ENTITY_RE.fullmatch(self.entity):
@@ -85,6 +97,16 @@ class AdminResource:
             raise AdminResourceError(
                 f"order_by invalide : {self.order_by!r} (snake_case attendu)."
             )
+        if not isinstance(self.timestamps, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
+            raise AdminResourceError(
+                f"timestamps invalide : {self.timestamps!r} (booléen attendu)."
+            )
+        for gere in _MANAGED_TIMESTAMP_COLUMNS:
+            if self.timestamps and gere in self.form_fields:
+                raise AdminResourceError(
+                    f"{gere} est un horodatage géré : il ne peut pas figurer dans "
+                    "form_fields, le framework le pose lui-même (ADR-081)."
+                )
         if not _FIELD_RE.fullmatch(self.pk):
             raise AdminResourceError(
                 f"pk invalide : {self.pk!r} (snake_case attendu, ex. 'id')."
