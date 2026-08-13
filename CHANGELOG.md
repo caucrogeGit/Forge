@@ -60,6 +60,24 @@
 
 ### Corrigé
 
+- **Tout ce que Forge horodate était décalé de deux heures sur PostgreSQL (`TIMESTAMPS-NAIVE-UTC-001`, ADR-081).**
+  L'ADR-081 avait tranché que l'autorité sur les horodatages est Python, sans dire sous quelle **forme** la valeur devait être passée. L'omission a coûté deux heures.
+  Les colonnes de Forge sont des `DATETIME` sans fuseau. Un `datetime` conscient du fuseau y laisse le pilote décider, et chaque pilote décide autrement. Mesuré sur serveurs réels, serveur en UTC+2 : PostgreSQL convertit vers l'heure locale, soit **7200 secondes d'écart** ; MariaDB et SQL Server n'y touchent pas.
+  Le piège est que la forme consciente **paraît plus juste**, puisqu'elle porte l'information de fuseau. Elle l'est en Python, pas au passage du pilote.
+  Tous les écrivains de Forge la posaient : le socle d'authentification, le back-office, le dépôt de médias, et le modèle engendré par `make:crud`. Le défaut précède ce cycle pour le dernier.
+  `core.database.timestamps.utc_now()` devient la seule façon officielle d'en produire un, et un relevé par analyse syntaxique refuse tout `datetime.now(...)` chez les quatre écrivains.
+  L'ADR-081 gagne la section qui lui manquait, avec la mesure.
+
+- **Le CRUD engendré affichait des cellules vides sur PostgreSQL (`CRUD-PG-COLUMN-CASE-001`).**
+  PostgreSQL replie tout identifiant non protégé en minuscules : une colonne déclarée `Nom` s'y relit `nom`. MariaDB et SQL Server conservent la casse.
+  `make:crud` engendrait `SELECT * FROM contact`, sans alias, et les vues qu'il engendre lisent `{{ contact.Nom }}`, par **nom de colonne**. Sur PostgreSQL, l'attribut n'existait donc pas, et **Jinja ne lève pas sur un attribut absent** : le tableau s'affichait entièrement vide, lignes et boutons présents, contenu manquant, sans une ligne de journal. Les liens `/contact/show/{{ contact.Id }}` pointaient tous vers `/contact/show/`.
+  Silencieux, sur un backend que l'ADR-084 donne au niveau plein depuis juillet, et pour toute application dont les colonnes sont en PascalCase.
+  La projection est désormais **nommée et aliasée entre guillemets**, forme acceptée par les quatre backends et vérifiée sur serveurs réels. Les vues sont inchangées, et le SQL y gagne en lisibilité (principe 5).
+
+- **L'horodatage des médias venait du moteur, en heure locale (`IMAGES-MEDIA-TIMESTAMP-UTC-001`).**
+  `forge-mvc-images` écrivait `CreatedAt` avec `CURRENT_TIMESTAMP`. Sur MariaDB, cette expression rend l'heure **locale du serveur** : un média enregistré à midi UTC était daté de 14 h, dans une base où tout le reste est en UTC.
+  C'est aussi la première épreuve de ce paquet contre un serveur réel : il écrivait en base sans qu'aucun test ne l'exerce ailleurs qu'en mémoire.
+
 - **Le back-office ne savait créer aucun enregistrement dans une entité à horodatages gérés (`ADMIN-MANAGED-TIMESTAMPS-001`).**
   L'ADR-081 a retiré les `DEFAULT CURRENT_TIMESTAMP` des tables d'entités : `created_at` et `updated_at` y sont `NOT NULL` **sans défaut**, Python posant la valeur.
   `forge-mvc-admin` ignorait ce mécanisme, sans une seule mention dans tout le paquet.

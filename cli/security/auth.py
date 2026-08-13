@@ -18,7 +18,7 @@ forge auth:user:roles — liste les roles RBAC attribues a un utilisateur
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from core.database.timestamps import utc_now
 
 import argparse
 import getpass
@@ -614,7 +614,7 @@ def create_auth_user(
     # est imposé : personne n'écrivait ces colonnes, si bien qu'un retrait
     # préalable aurait rendu `NOT NULL` sans valeur et empêché toute création
     # de compte, par l'application comme par la CLI (`AUTH-TIMESTAMPS-EXPLICIT-001`).
-    maintenant = datetime.now(timezone.utc)
+    maintenant = utc_now()
     return int(
         insert(
             "INSERT INTO users (login, email, password_hash, is_active, created_at, updated_at) "
@@ -755,7 +755,7 @@ def add_auth_user_role(
     execute(
         # Horodatage posé par Python, comme ci-dessus (ADR-081).
         "INSERT INTO user_roles (user_id, role_id, created_at) VALUES (?, ?, ?)",
-        (uid, role_id, datetime.now(timezone.utc)),
+        (uid, role_id, utc_now()),
     )
     return {"user_id": uid, "role_id": role_id, "created": True}
 

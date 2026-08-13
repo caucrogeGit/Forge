@@ -8,7 +8,7 @@ Une entité avec `options.timestamps: true` produit des horodatages
   saisit pas ;
 - posés par le modèle généré à l'INSERT (`created_at` et `updated_at`) et à
   l'UPDATE (`updated_at` seul, `created_at` stable), via
-  `datetime.now(timezone.utc)`, jamais lus depuis `data` ;
+  `utc_now()`, jamais lus depuis `data` ;
 - sans `DEFAULT` SQL (Python reste la seule autorité, cohérent sessions-db) ;
 - absents de toutes les vues générées (formulaire, liste, fiche détail) : ce
   sont des métadonnées système, consultables en base (ADR-081 révisé, retour
@@ -93,12 +93,12 @@ def test_show_view_excludes_timestamps(definition):
 
 def test_model_inserts_both_timestamps_from_now(definition):
     model = build_model(definition)
-    assert "from datetime import datetime, timezone" in model
+    assert "from core.database.timestamps import utc_now" in model
     insert_line = next(l for l in model.splitlines() if l.startswith("INSERT"))
     assert "CreatedAt" in insert_line and "UpdatedAt" in insert_line
     add_body = next(l for l in model.splitlines() if "insert(INSERT" in l)
     # created_at ET updated_at valués par now(), pas par data.
-    assert add_body.count("datetime.now(timezone.utc)") == 2
+    assert add_body.count("utc_now()") == 2
 
 
 def test_model_update_touches_only_updated_at(definition):
@@ -107,7 +107,7 @@ def test_model_update_touches_only_updated_at(definition):
     assert "UpdatedAt = ?" in update_line
     assert "CreatedAt" not in update_line  # création stable à l'édition
     update_body = next(l for l in model.splitlines() if "execute(UPDATE" in l)
-    assert update_body.count("datetime.now(timezone.utc)") == 1
+    assert update_body.count("utc_now()") == 1
 
 
 def test_model_does_not_read_timestamps_from_data(definition):

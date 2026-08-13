@@ -173,7 +173,7 @@ Types **non supportés** (erreur à la validation) : `TEXT`, `DATE`, `DATETIME`,
 Recherche `q` et filtres sont combinés avec `AND` ; chaque groupe de LIKE est entre parenthèses :
 
 ```sql
-SELECT * FROM contact
+SELECT contact.Id AS "Id", contact.Nom AS "Nom" FROM contact
 WHERE (Nom LIKE ? OR Email LIKE ?)
   AND Statut = ?
 ORDER BY Id DESC

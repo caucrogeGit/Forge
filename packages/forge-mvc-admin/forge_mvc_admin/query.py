@@ -11,9 +11,9 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Sequence
-from datetime import datetime, timezone
 from typing import Any
 
+from core.database.timestamps import utc_now
 from forge_mvc_admin.exceptions import AdminResourceError
 from forge_mvc_admin.resources import AdminResource
 
@@ -136,7 +136,7 @@ def insert_row(
     """
     parametres = tuple(values)
     if resource.timestamps:
-        maintenant = datetime.now(timezone.utc)
+        maintenant = utc_now()
         parametres = (*parametres, maintenant, maintenant)
     return insert(build_insert_sql(resource), parametres)
 
@@ -177,7 +177,7 @@ def update_row(
     """
     parametres = tuple(values)
     if resource.timestamps:
-        parametres = (*parametres, datetime.now(timezone.utc))
+        parametres = (*parametres, utc_now())
     return execute(build_update_sql(resource), (*parametres, pk_value))
 
 

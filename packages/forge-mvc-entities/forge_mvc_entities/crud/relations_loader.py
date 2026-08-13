@@ -197,10 +197,35 @@ def _first_relation_label_field(definition: dict[str, Any]) -> dict[str, Any]:
     return _pk_field(definition)
 
 
-def _build_select_base(table: str, relations: list[CrudManyToOneRelation] | None) -> str:
-    """Génère la clause SELECT...FROM...LEFT JOIN pour les requêtes de liste."""
+def _build_select_base(
+    table: str,
+    relations: list[CrudManyToOneRelation] | None,
+    columns: list[str] | None = None,
+) -> str:
+    """Génère la clause SELECT...FROM...LEFT JOIN pour les requêtes de liste.
+
+    Les colonnes sont **nommées et aliasées entre guillemets** quand elles sont
+    fournies (`CRUD-PG-COLUMN-CASE-001`). C'est ce qui préserve leur casse.
+
+    PostgreSQL replie tout identifiant non protégé en minuscules : une colonne
+    déclarée `Nom` s'y relit `nom`. Le `SELECT *` d'avant rendait donc des clés
+    minuscules là où les vues engendrées lisent `{{ contact.Nom }}`, et Jinja
+    ne lève pas sur un attribut absent : le tableau s'affichait **entièrement
+    vide**, lignes et boutons présents, contenu manquant, sans une ligne de
+    journal. MariaDB et SQL Server conservent la casse, si bien que le défaut
+    ne se voyait que sur un backend, promu au niveau plein depuis l'ADR-084.
+
+    L'alias entre guillemets est accepté par les quatre backends, vérifié sur
+    serveurs réels. Nommer les colonnes rend au passage le SQL plus lisible,
+    conformément au principe 5.
+    """
+    projection = (
+        ", ".join(f'{table}.{col} AS \\"{col}\\"' for col in columns)
+        if columns
+        else f"{table}.*"
+    )
     if not relations:
-        return f"SELECT * FROM {table}"
+        return f"SELECT {projection} FROM {table}"
     join_cols = ", ".join(
         f"{rel.target_table}.{rel.target_label_column} AS {rel.field_name}_label"
         for rel in relations
@@ -210,7 +235,7 @@ def _build_select_base(table: str, relations: list[CrudManyToOneRelation] | None
         f" ON {table}.{rel.field_column} = {rel.target_table}.{rel.target_pk_column}"
         for rel in relations
     )
-    return f"SELECT {table}.*, {join_cols} FROM {table} {joins}"
+    return f"SELECT {projection}, {join_cols} FROM {table} {joins}"
 
 
 def _unique_choice_relations(

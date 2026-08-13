@@ -62,14 +62,14 @@ def test_delete_is_soft_update(definition):
     assert "UPDATE article SET DeletedAt = ?" in delete_const
     assert "DELETE FROM" not in delete_const
     body = next(l for l in model.splitlines() if "execute(DELETE" in l)
-    assert "datetime.now(timezone.utc)" in body
+    assert "utc_now()" in body
 
 
 def test_bulk_delete_is_soft_update(definition):
     model = build_model(definition)
     bulk = next(l for l in model.splitlines() if "DeletedAt = ? WHERE Id IN" in l)
     assert "UPDATE article SET DeletedAt = ?" in bulk
-    assert "datetime.now(timezone.utc)" in bulk
+    assert "utc_now()" in bulk
 
 
 # ── Lectures filtrées ────────────────────────────────────────────────────────

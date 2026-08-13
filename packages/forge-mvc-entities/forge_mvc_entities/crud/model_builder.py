@@ -33,10 +33,10 @@ def _column_value_expr(field: dict[str, Any]) -> str:
     """Expression Python de la valeur d'une colonne dans l'INSERT/UPDATE généré.
 
     Un horodatage géré (ADR-081) est posé par le modèle via
-    ``datetime.now(timezone.utc)`` ; les autres colonnes lisent ``data``.
+    ``utc_now()`` du cœur ; les autres colonnes lisent ``data``.
     """
     if _is_managed(field):
-        return "datetime.now(timezone.utc)"
+        return "utc_now()"
     return f'data["{field["name"]}"]'
 
 
@@ -106,7 +106,7 @@ def _render_model_query(
         f'def find_{plural}_paginated(q: str | None = None, sort: str | None = None, direction: str = "asc", limit: int = 10, offset: int = 0, filters: dict[str, Any] | None = None) -> list[dict[str, Any]]:',
         "    sort_col = _ALLOWED_SORT.get(sort or \"\", _DEFAULT_SORT)",
         '    sort_dir = "DESC" if direction == "desc" else "ASC"',
-        f'    base = "{_build_select_base(table, relations)}"',
+        f'    base = "{_build_select_base(table, relations, [pk_col] + [f["column"] for f in non_pk])}"',
         f"    clauses: list[str] = {initial_clauses}",
         "    params: list[Any] = []",
         "    if q and _SEARCH_COLS:",
@@ -245,6 +245,9 @@ def build_model(
     table = definition["table"]
     pk = _pk_field(definition)
     pk_col = pk["column"]
+    # Colonnes projetees et aliasees, pour que PostgreSQL n'en replie pas la
+    # casse (`CRUD-PG-COLUMN-CASE-001`).
+    colonnes_projetees = [pk_col] + [f["column"] for f in _non_pk_fields(definition)]
     pk_name = pk["name"]
     non_pk = _non_pk_fields(definition)
     auto_inc = pk.get("auto_increment", False)
@@ -302,9 +305,9 @@ def build_model(
     # physique (DELETE). Idem pour la suppression groupée.
     if soft_col:
         delete_constant = f'"UPDATE {table} SET {soft_col} = ? WHERE {pk_col} = ?"'
-        delete_exec = f"execute(DELETE, (datetime.now(timezone.utc), {pk_name}))"
+        delete_exec = f"execute(DELETE, (utc_now(), {pk_name}))"
         bulk_delete_sql = f'"UPDATE {table} SET {soft_col} = ? WHERE {pk_col} IN (" + placeholders + ")"'
-        bulk_delete_params = "[datetime.now(timezone.utc), *ids]"
+        bulk_delete_params = "[utc_now(), *ids]"
     else:
         delete_constant = f'"DELETE FROM {table} WHERE {pk_col} = ?"'
         delete_exec = f"execute(DELETE, ({pk_name},))"
@@ -312,13 +315,13 @@ def build_model(
         bulk_delete_params = "list(ids)"
 
     lines: list[str] = [
-        *(["from datetime import datetime, timezone", ""] if needs_datetime else []),
+        *(["from core.database.timestamps import utc_now", ""] if needs_datetime else []),
         "from typing import Any",
         "",
         "from core.database.db import fetch_one, fetch_all, execute, insert",
         "",
-        f'SELECT_ALL   = "{_build_select_base(table, relations)}{soft_where_all} ORDER BY {main_q}{pk_col}"',
-        f'SELECT_BY_ID = "{_build_select_base(table, relations)} WHERE {main_q}{pk_col} = ?{soft_where_by_id}"',
+        f'SELECT_ALL   = "{_build_select_base(table, relations, colonnes_projetees)}{soft_where_all} ORDER BY {main_q}{pk_col}"',
+        f'SELECT_BY_ID = "{_build_select_base(table, relations, colonnes_projetees)} WHERE {main_q}{pk_col} = ?{soft_where_by_id}"',
         f'INSERT       = "INSERT INTO {table} ({insert_cols}) VALUES ({insert_placeholders})"',
         f'UPDATE       = {update_constant}',
         f'DELETE       = {delete_constant}',

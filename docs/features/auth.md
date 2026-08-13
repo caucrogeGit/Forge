@@ -664,7 +664,7 @@ Exemple avec un handler :
 ```python
 import logging
 import json
-from datetime import datetime, timezone
+from core.database.timestamps import utc_now
 
 
 class AuditSqlHandler(logging.Handler):
@@ -691,7 +691,7 @@ def _insert_audit(event):
             event.ip_address,
             event.user_agent,
             json.dumps(event.metadata or {}),
-            datetime.now(timezone.utc),
+            utc_now(),
         ),
     )
 

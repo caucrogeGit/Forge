@@ -44,6 +44,24 @@ Le normaliseur pose une clé `managed` sur ces champs :
 
 Le DDL reste `DATETIME NOT NULL`, **sans** `DEFAULT CURRENT_TIMESTAMP` ni `ON UPDATE`. Python (le modèle) est la seule autorité sur la valeur, cohérent avec le choix de `forge-mvc-sessions-db` (pas de double horloge entre la base et le code). Une seule façon officielle d'horodater (principe 11).
 
+### La forme de la valeur (complété par `TIMESTAMPS-NAIVE-UTC-001`)
+
+La valeur passée est un `datetime` **naïf, en UTC**, produit par `core.database.timestamps.utc_now()`.
+
+Cet ADR disait que Python fait autorité, sans dire sous quelle forme, et l'omission a coûté deux heures.
+Les colonnes sont des `DATETIME` sans fuseau : un `datetime` conscient du fuseau y laisse le pilote décider, et chaque pilote décide autrement.
+Mesuré sur serveurs réels, serveur en UTC+2 :
+
+```text
+mariadb     aware -> 12:14:07  (écart 0 s)      naïf -> 12:14:07  (0 s)
+postgres    aware -> 14:14:07  (écart 7200 s)   naïf -> 12:14:07  (0 s)
+mssql       aware -> 12:14:07  (écart 0 s)      naïf -> 12:14:07  (0 s)
+```
+
+PostgreSQL convertit vers l'heure locale du serveur.
+Le piège est que la forme consciente **paraît plus juste**, puisqu'elle porte l'information de fuseau.
+Elle l'est en Python, elle ne l'est pas au passage du pilote.
+
 ## Conséquences
 
 - `forge make:crud` sur une entité horodatée produit un formulaire sans champ d'horodatage, un modèle qui pose lui-même `created_at`/`updated_at`, et un DDL sans défaut : plus de saisie manuelle, plus de `KeyError` runtime sur `data["created_at"]`.

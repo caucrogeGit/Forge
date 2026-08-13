@@ -28,17 +28,7 @@ class FakeMediaDb:
         self.calls.append(("insert", sql, params))
         media_id = self.next_id
         self.next_id += 1
-        (
-            entity_name,
-            entity_id,
-            path,
-            original_name,
-            mime_type,
-            size,
-            role,
-            position,
-            alt_text,
-        ) = params
+        (entity_name, entity_id, path, original_name, mime_type, size, role, position, alt_text, created_at) = params
         self.rows.append({
             "id": media_id,
             "entity_name": entity_name,
@@ -114,7 +104,11 @@ def test_create_media_record_insere_un_media():
     assert db.rows[0]["role"] == "gallery"
     assert db.rows[0]["position"] == 1
     assert "INSERT INTO media" in db.calls[0][1]
-    assert "CURRENT_TIMESTAMP" in db.calls[0][1]
+    # L'horodatage est pose par Python et non par le moteur
+    # (`IMAGES-MEDIA-TIMESTAMP-UTC-001`, ADR-081) : `CURRENT_TIMESTAMP`
+    # rendait l'heure locale du serveur sur MariaDB, deux heures d'ecart
+    # avec l'UTC employe partout ailleurs.
+    assert "CURRENT_TIMESTAMP" not in db.calls[0][1]
     assert "?" in db.calls[0][1]
 
 

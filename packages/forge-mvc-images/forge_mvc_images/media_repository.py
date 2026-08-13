@@ -1,6 +1,8 @@
 # pyright: strict
 from __future__ import annotations
 
+from core.database.timestamps import utc_now
+
 from collections.abc import Sequence
 from pathlib import Path, PurePosixPath
 from typing import Any, Protocol
@@ -68,10 +70,17 @@ def create_media_record(
     stored_original_name = original_name or PurePosixPath(normalized_path).name
     stored_mime_type = mime_type or "application/octet-stream"
 
+    # ADR-081 : l'horodatage est posé par **Python**, jamais par le moteur.
+    #
+    # `CURRENT_TIMESTAMP` rendait l'heure LOCALE du serveur sur MariaDB, soit
+    # deux heures d'écart avec l'UTC que Forge emploie partout ailleurs : un
+    # média enregistré à midi UTC était daté de 14 h. Deux référentiels
+    # horaires coexistaient donc dans la même base
+    # (`IMAGES-MEDIA-TIMESTAMP-UTC-001`).
     sql = """
         INSERT INTO media
             (EntityName, EntityId, Path, OriginalName, MimeType, Size, Role, Position, AltText, CreatedAt)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
     return _db(db).insert(
         sql,
@@ -85,6 +94,7 @@ def create_media_record(
             role,
             position,
             alt_text,
+            utc_now(),
         ),
     )
 

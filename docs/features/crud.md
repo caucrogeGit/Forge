@@ -212,8 +212,8 @@ Le modèle expose des fonctions avec SQL visible et paramétré. Pas d'abstracti
 ```python
 from core.database.db import fetch_one, fetch_all, execute, insert
 
-SELECT_ALL   = "SELECT * FROM contact ORDER BY Id"
-SELECT_BY_ID = "SELECT * FROM contact WHERE Id = ?"
+SELECT_ALL   = "SELECT contact.Id AS \"Id\", contact.Nom AS \"Nom\" FROM contact ORDER BY Id"
+SELECT_BY_ID = "SELECT contact.Id AS \"Id\", contact.Nom AS \"Nom\" FROM contact WHERE Id = ?"
 INSERT       = "INSERT INTO contact (Nom, Prenom, Email, Telephone) VALUES (?, ?, ?, ?)"
 UPDATE       = "UPDATE contact SET Nom = ?, Prenom = ?, Email = ?, Telephone = ? WHERE Id = ?"
 DELETE       = "DELETE FROM contact WHERE Id = ?"

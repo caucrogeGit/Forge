@@ -1138,7 +1138,7 @@ def test_many_to_one_select_all_contient_left_join(tmp_path):
     make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
     code = (tmp_path / "mvc" / "models" / "contact_model.py").read_text(encoding="utf-8")
     assert "LEFT JOIN ville" in code
-    assert "SELECT contact.*" in code
+    assert r'SELECT contact.Id AS \"Id\"' in code
 
 
 def test_many_to_one_select_all_alias_stable(tmp_path):
@@ -1162,7 +1162,7 @@ def test_many_to_one_find_paginated_base_contient_left_join(tmp_path):
     )
     make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
     code = (tmp_path / "mvc" / "models" / "contact_model.py").read_text(encoding="utf-8")
-    assert 'base = "SELECT contact.*' in code
+    assert r'base = "SELECT contact.Id AS \"Id\"' in code
     assert "LEFT JOIN ville ON contact.VilleId = ville.Id" in code
 
 
@@ -1223,7 +1223,7 @@ def test_sans_relation_pas_de_left_join(tmp_path):
     make_crud("Contact", entities_root=entities_root, output_root=tmp_path)
     code = (tmp_path / "mvc" / "models" / "contact_model.py").read_text(encoding="utf-8")
     assert "LEFT JOIN" not in code
-    assert 'SELECT_ALL   = "SELECT * FROM contact' in code
+    assert r'SELECT_ALL   = "SELECT contact.Id AS \"Id\"' in code
 
 
 def test_sans_relation_colonnes_non_qualifiees(tmp_path):

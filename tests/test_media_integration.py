@@ -58,10 +58,7 @@ class FakeMediaDb:
     def insert(self, sql, params):
         media_id = self.next_id
         self.next_id += 1
-        (
-            entity_name, entity_id, path, original_name, mime_type,
-            size, role, position, alt_text,
-        ) = params
+        (entity_name, entity_id, path, original_name, mime_type, size, role, position, alt_text, created_at) = params
         self.rows.append({
             "id": media_id,
             "entity_name": entity_name,

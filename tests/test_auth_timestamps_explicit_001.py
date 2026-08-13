@@ -127,13 +127,18 @@ def test_la_valeur_posee_est_un_datetime_python() -> None:
         vues.extend(params)
         return 1
 
-    avant = datetime.now(timezone.utc)
+    # Naïf en UTC, comme la valeur posée : la forme consciente du fuseau est
+    # convertie par le pilote PostgreSQL (`TIMESTAMPS-NAIVE-UTC-001`).
+    avant = datetime.now(timezone.utc).replace(tzinfo=None)
     create_auth_user(
         login="admin", password="secret123", fetch_one=lambda *_: None, insert=insert
     )
 
     horodatages = [v for v in vues if isinstance(v, datetime)]
     assert len(horodatages) == 2, "created_at et updated_at doivent être passés en paramètres"
+    assert all(h.tzinfo is None for h in horodatages), (
+        "un horodatage géré ne porte pas de fuseau : il serait converti par le pilote"
+    )
     assert all(h >= avant for h in horodatages)
 
 
