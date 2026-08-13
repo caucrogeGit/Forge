@@ -177,11 +177,14 @@ def _response_to_wsgi(
     apply_security_headers(
         headers_dict,
         include_hsts=is_https,
-        # En WSGI on n'a pas (encore) de nonce CSP par requête : on pose une
-        # CSP par défaut sans nonce. L'application peut toujours définir sa
-        # propre `Content-Security-Policy` dans `response.headers` — le
-        # setdefault la respecte.
-        csp=_csp.build_csp_header(None),
+        # Le nonce de la requête en cours, posé par le callable WSGI. `None`
+        # quand `APP_CSP_NONCE_ENABLED` est absent, et la CSP reste alors
+        # `script-src 'self'`, sans `unsafe-inline`.
+        #
+        # L'application peut toujours définir sa propre
+        # `Content-Security-Policy` dans `response.headers` : le `setdefault`
+        # la respecte.
+        csp=_csp.build_csp_header(_csp.get_request_nonce()),
     )
 
     # CORE-HEADER-CRLF-001 : contrôle AVANT `start_response`, tant qu'aucune
@@ -216,6 +219,23 @@ def create_wsgi_app(application: Any) -> Callable[[dict[str, Any], Callable[...,
     """
 
     def app(environ: dict[str, Any], start_response: Callable[..., Any]) -> Iterable[bytes]:
+        # CORE-WSGI-CSP-NONCE-001 : le nonce est posé pour toute la durée de la
+        # requête, exactement comme le fait le serveur de développement. Sans
+        # lui, `APP_CSP_NONCE_ENABLED` n'agissait qu'en développement alors que
+        # la documentation le prescrit en production, et le script inline d'un
+        # gabarit était silencieusement bloqué une fois déployé.
+        #
+        # L'enveloppe couvre le rendu ET la construction de l'en-tête : le
+        # gabarit et la CSP doivent voir la même valeur, faute de quoi le
+        # mécanisme ne sert à rien.
+        with _csp.request_nonce(
+            _csp.generate_nonce() if _csp.nonce_enabled() else None
+        ):
+            return _repondre(environ, start_response)
+
+    def _repondre(
+        environ: dict[str, Any], start_response: Callable[..., Any]
+    ) -> Iterable[bytes]:
         is_https = environ.get("wsgi.url_scheme") == "https"
         try:
             handler = _WsgiHandlerStub(environ)

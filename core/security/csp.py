@@ -48,6 +48,30 @@ def clear_request_nonce() -> None:
     _local.nonce = None
 
 
+def nonce_enabled() -> bool:
+    """Lit `APP_CSP_NONCE_ENABLED` dans l'environnement, seule règle officielle.
+
+    Le drapeau était lu par le seul serveur de développement, dans le
+    `config.py` du squelette. L'adaptateur WSGI ne le consultait pas et servait
+    toujours une CSP sans nonce : le réglage, pourtant documenté comme un
+    réglage de **production**, n'agissait qu'en développement
+    (`CORE-WSGI-CSP-NONCE-001`).
+
+    La lecture vit donc ici, au même endroit que le nonce lui-même, pour que
+    les deux serveurs répondent à la même question de la même façon
+    (principe 11).
+
+    La valeur est relue à chaque appel plutôt que figée à l'import : le cœur
+    n'a pas de moment d'initialisation où la figer, et le coût d'un `getenv`
+    est sans commune mesure avec celui d'une requête.
+    """
+    import os
+
+    return os.getenv("APP_CSP_NONCE_ENABLED", "false").strip().lower() in {
+        "1", "true", "yes", "on",
+    }
+
+
 @contextmanager
 def request_nonce(nonce: "str | None") -> "Generator[str | None, None, None]":
     """Porte le nonce CSP le temps d'une requête, puis garantit sa remise à zéro.
