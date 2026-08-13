@@ -35,7 +35,7 @@ def _patch_csrf(monkeypatch, session_token: str | None, form_token: str | None):
 
     monkeypatch.setattr(mw, "get_session_id", lambda r: "sid123")
     monkeypatch.setattr(mw, "get_session", lambda sid: {"csrf_token": session_token} if session_token else {})
-    monkeypatch.setattr(mw, "_html", _fake_html)
+    monkeypatch.setattr(mw, "_error_page", _fake_html)
 
     body = {"csrf_token": [form_token]} if form_token is not None else {}
     return _FakeRequest(body=body)
@@ -85,7 +85,7 @@ def test_middleware_accepts_header_token(monkeypatch):
     import core.security.middleware as mw
     monkeypatch.setattr(mw, "get_session_id", lambda r: "sid")
     monkeypatch.setattr(mw, "get_session", lambda sid: {"csrf_token": "head_tok"})
-    monkeypatch.setattr(mw, "_html", _fake_html)
+    monkeypatch.setattr(mw, "_error_page", _fake_html)
     request = _FakeRequest(body={}, headers={"X-CSRF-Token": "head_tok"})
     assert CsrfMiddleware().check(request) is None
 

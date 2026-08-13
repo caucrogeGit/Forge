@@ -20,7 +20,7 @@ class TestCsrfConstantTime:
         from core.security import middleware as mw
         monkeypatch.setattr(mw, "get_session_id", lambda r: "sid")
         monkeypatch.setattr(mw, "get_session", lambda sid: {"csrf_token": "abc123"})
-        monkeypatch.setattr(mw, "_html", _fake_html)
+        monkeypatch.setattr(mw, "_error_page", _fake_html)
         request = _FakeRequest(body={"csrf_token": ["abc123"]})
         assert CsrfMiddleware().check(request) is None
 
@@ -28,7 +28,7 @@ class TestCsrfConstantTime:
         from core.security import middleware as mw
         monkeypatch.setattr(mw, "get_session_id", lambda r: "sid")
         monkeypatch.setattr(mw, "get_session", lambda sid: {"csrf_token": "abc123"})
-        monkeypatch.setattr(mw, "_html", _fake_html)
+        monkeypatch.setattr(mw, "_error_page", _fake_html)
         request = _FakeRequest(body={"csrf_token": ["wrong"]})
         result = CsrfMiddleware().check(request)
         assert result is not None and result.status == 403
@@ -37,7 +37,7 @@ class TestCsrfConstantTime:
         from core.security import middleware as mw
         monkeypatch.setattr(mw, "get_session_id", lambda r: "sid")
         monkeypatch.setattr(mw, "get_session", lambda sid: {"csrf_token": "abc123"})
-        monkeypatch.setattr(mw, "_html", _fake_html)
+        monkeypatch.setattr(mw, "_error_page", _fake_html)
         request = _FakeRequest(body={})
         result = CsrfMiddleware().check(request)
         assert result is not None and result.status == 403
@@ -46,7 +46,7 @@ class TestCsrfConstantTime:
         from core.security import middleware as mw
         monkeypatch.setattr(mw, "get_session_id", lambda r: "sid")
         monkeypatch.setattr(mw, "get_session", lambda sid: {})
-        monkeypatch.setattr(mw, "_html", _fake_html)
+        monkeypatch.setattr(mw, "_error_page", _fake_html)
         request = _FakeRequest(body={"csrf_token": ["abc123"]})
         result = CsrfMiddleware().check(request)
         assert result is not None and result.status == 403

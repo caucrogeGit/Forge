@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
-from core.http.helpers import html as _html
+from core.http.helpers import error_page as _error_page
 from core.http.response import Response
 from core.security.middleware import CsrfMiddleware as _CsrfMiddleware
 # is_authenticated : API canonique (core.auth.session), avec pont legacy intégré.
@@ -71,7 +71,7 @@ def require_role(role: str) -> "Callable[[Handler], Handler]":
             if not is_authenticated(request):
                 return Response(302, headers={"Location": "/login"})
             if not user_has_role(request, role):
-                return _html("errors/403.html", 403)
+                return _error_page("errors/403.html", 403)
             return func(request)
         return wrapper
     return decorator

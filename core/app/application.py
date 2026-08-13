@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from core.app.api_routes_loader import load_api_routes as _load_api_routes
 from core.database.errors import DatabaseUnavailableError
-from core.http.helpers import html as _html
+from core.http.helpers import error_page as _error_page
 from core.http.router import Router
 from core.errors.runtime_error_logger import (
     build_dev_error_context as _dev_error_context,
@@ -29,30 +29,20 @@ def _service_unavailable() -> Response:
     page ne l'a pas. Faire échouer le rendu la ferait retomber en 500, soit
     exactement le message trompeur que ce 503 corrige.
 
-    Le repli est volontairement minimal, en texte brut : à ce stade la base est
-    saturée, ce n'est pas le moment de solliciter davantage le serveur.
+    Ce repli, écrit ici en premier, est devenu la règle générale de toutes les
+    pages d'erreur (`error_page`, `CORE-WSGI-CSRF-POST-001`). Cette fonction ne
+    garde donc que ce qui lui est propre : un texte qui nomme la cause et
+    invite à réessayer, ce que le repli générique ne peut pas deviner.
     """
-    from core.http.response import Response
-
-    try:
-        rendue = _html("errors/503.html", 503)
-    except Exception:  # noqa: BLE001 - moteur de rendu indisponible
-        rendue = None
-    if rendue is not None and rendue.status == 503:
-        return rendue
-
-    # `_html` ne lève pas quand le gabarit manque : il **rend une 500**, ce qui
-    # écraserait le code que l'on vient de choisir. On teste donc le statut
-    # obtenu, pas la levée d'une exception.
-    return Response(
-            status=503,
-            body=(
-                "Service momentanement indisponible.\n"
-                "Le service recoit plus de demandes qu'il ne peut en traiter ; "
-                "reessayez dans quelques instants.\n"
-            ).encode("utf-8"),
-            content_type="text/plain; charset=utf-8",
-        )
+    return _error_page(
+        "errors/503.html",
+        503,
+        fallback=(
+            "Service momentanement indisponible.\n"
+            "Le service recoit plus de demandes qu'il ne peut en traiter ; "
+            "reessayez dans quelques instants.\n"
+        ),
+    )
 
 
 def _internal_error(exc: BaseException, request: Any, *, est_api: bool) -> Response:
@@ -109,7 +99,7 @@ def _internal_error(exc: BaseException, request: Any, *, est_api: bool) -> Respo
         contexte = None
 
     try:
-        return _html("errors/500.html", 500, contexte)
+        return _error_page("errors/500.html", 500, contexte)
     except Exception:  # noqa: BLE001 — le gabarit du projet est en défaut
         logger.exception("Le rendu de errors/500.html a échoué à son tour")
 
@@ -224,10 +214,10 @@ class Application:
                 # en-tête Allow, sémantique HTTP correcte).
                 allowed = self._router.allowed_methods(request.path)
                 if allowed:
-                    response = _html("errors/405.html", 405)
+                    response = _error_page("errors/405.html", 405)
                     response.headers["Allow"] = ", ".join(allowed)
                     return response
-                return _html("errors/404.html", 404)
+                return _error_page("errors/404.html", 404)
 
             route, params = result
             request.route_params = params

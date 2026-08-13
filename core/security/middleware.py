@@ -11,7 +11,7 @@ from core.auth.session import (
     logout_user as _logout_user,
 )
 from core.http.response import Response
-from core.http.helpers import html as _html
+from core.http.helpers import error_page as _error_page
 from core.security.cookies import clear_session_cookie as _clear_session_cookie
 from core.security.session import get_session_id, get_session
 
@@ -89,9 +89,9 @@ class CsrfMiddleware:
         provided = self._extract_token(request)
 
         if not expected or not provided:
-            return _html("errors/403.html", 403)
+            return _error_page("errors/403.html", 403)
         if not _hmac.compare_digest(str(provided), str(expected)):
-            return _html("errors/403.html", 403)
+            return _error_page("errors/403.html", 403)
         return None
 
     def _extract_token(self, request: Request) -> str | None:

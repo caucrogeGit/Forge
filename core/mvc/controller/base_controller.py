@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from core.forge import get as _cfg
-from core.http.helpers import html as _html
+from core.http.helpers import error_page as _error_page, html as _html
 from core.http.response import Response
 from core.templating.manager import template_manager
 from core.security.session import get_session_id, get_session, set_flash, get_user
@@ -77,15 +77,15 @@ class BaseController:
 
     @staticmethod
     def not_found() -> Response:
-        return _html("errors/404.html", 404)
+        return _error_page("errors/404.html", 404)
 
     @staticmethod
     def bad_request(context: dict[str, Any] | None = None) -> Response:
-        return _html("errors/400.html", 400, context)
+        return _error_page("errors/400.html", 400, context)
 
     @staticmethod
     def forbidden(context: dict[str, Any] | None = None) -> Response:
-        return _html("errors/403.html", 403, context)
+        return _error_page("errors/403.html", 403, context)
 
     @staticmethod
     def validation_error(template: str = "errors/422.html", context: dict[str, Any] | None = None, *, request: Request | None = None) -> Response:
@@ -93,7 +93,7 @@ class BaseController:
 
     @staticmethod
     def server_error(context: dict[str, Any] | None = None) -> Response:
-        return _html("errors/500.html", 500, context)
+        return _error_page("errors/500.html", 500, context)
 
     @staticmethod
     def set_flash(request: Request, message: str, level: str = "success") -> None:

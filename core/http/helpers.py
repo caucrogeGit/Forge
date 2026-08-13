@@ -130,3 +130,79 @@ def json_error(code: str, status: int, *, message: "str | None" = None) -> Respo
     if message is not None:
         corps["message"] = message
     return json_response(corps, status)
+
+
+#: Corps de repli des pages d'erreur, par code. Volontairement sobre : à ce
+#: stade le gabarit du projet est indisponible, ce n'est pas le moment de
+#: solliciter davantage le moteur de rendu.
+_REPLIS: "dict[int, str]" = {
+    400: "Requete invalide.\n",
+    403: "Acces refuse.\n",
+    404: "Page introuvable.\n",
+    405: "Methode non autorisee.\n",
+    500: "Erreur interne du serveur.\n",
+    503: "Service momentanement indisponible.\n",
+}
+
+
+def error_page(
+    template: str,
+    status: int,
+    context: "dict[str, Any] | None" = None,
+    *,
+    fallback: "str | None" = None,
+) -> Response:
+    """Page d'erreur dont le **code HTTP est garanti**, quoi qu'il arrive au gabarit.
+
+    Les gabarits `errors/*.html` **appartiennent à l'utilisateur** : le squelette
+    les livre et Forge n'y réécrit jamais (principe 4). Un projet peut donc les
+    casser, ou ne pas les avoir, et cela ne doit pas changer ce que le code de
+    statut annonce.
+
+    Deux situations produisaient un `500` à la place du code voulu
+    (`CORE-WSGI-CSRF-POST-001`) :
+
+    - **gabarit cassé.** `html` ne rattrape que `TemplateNotFoundError` ; une
+      syntaxe Jinja invalide, un filtre inconnu ou une variable absente
+      ressortaient ;
+    - **gabarit absent.** `html` ne lève pas, il rend une réponse `500`
+      explicative, ce qui écrase le code choisi.
+
+    Or le code de statut d'un refus n'est pas cosmétique. Un `403` annonce une
+    requête invalide, qu'il ne sert à rien de rejouer ; un `500` annonce une
+    panne et invite à réessayer. Un `404` dit qu'une ressource n'existe pas ;
+    un `500` dit que le serveur est en défaut. Côté exploitant, la différence
+    sépare une vague de fausses pannes d'un fonctionnement normal.
+
+    Le **corps** explicatif de `DX-RENDER-ERROR-001` est conservé quand il
+    existe : signaler au développeur qu'un gabarit manque reste utile. Seul le
+    code est corrigé. Il n'y a donc pas de divergence entre les environnements,
+    et c'en est le point important : un chemin d'erreur qui se comporte
+    autrement en développement qu'en production est un chemin qu'on ne teste
+    jamais là où il compte.
+    """
+    try:
+        rendue = html(template, status, context)
+    except Exception:  # noqa: BLE001 — le gabarit du projet est en défaut
+        _logger.exception("Rendu de %s impossible ; repli sur une reponse minimale", template)
+        rendue = None
+
+    if rendue is not None and rendue.status == status:
+        return rendue
+
+    if rendue is not None and fallback is None:
+        # Gabarit absent : `html` a rendu une réponse explicative, mais en 500,
+        # ce qui écrase le code voulu. On garde son corps et on rétablit le code.
+        #
+        # Un `fallback` explicite l'emporte en revanche sur cette explication :
+        # l'appelant qui en fournit un a une chose à dire au visiteur que le
+        # générique ne peut pas deviner, comme l'invitation à réessayer d'un
+        # 503. Le développeur, lui, a déjà l'avertissement au journal.
+        return Response(
+            status,
+            rendue.body,
+            content_type=rendue.headers.get("Content-Type", _TEXT_CONTENT_TYPE),
+        )
+
+    corps = fallback if fallback is not None else _REPLIS.get(status, "Erreur.\n")
+    return Response(status, corps.encode("utf-8"), content_type=_TEXT_CONTENT_TYPE)
