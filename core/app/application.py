@@ -55,6 +55,74 @@ def _service_unavailable() -> Response:
         )
 
 
+def _internal_error(exc: BaseException, request: Any, *, est_api: bool) -> Response:
+    """Réponse 500, construite de façon à ne jamais pouvoir lever.
+
+    Le rattrapage d'erreur est le seul code dont l'échec n'a pas de filet : il
+    s'exécute déjà dans un bloc `except`, et ce qu'il lève ressort de
+    `dispatch`. Le serveur répond alors à la place de Forge, sans les en-têtes
+    de sécurité, et **la cause première est perdue** : l'exploitant lit
+    l'erreur du gabarit d'erreur, pas celle qui a réellement échoué.
+
+    Trois choses peuvent échouer ici, et les trois échouaient
+    (`CORE-WSGI-ERROR-PATH-001`) :
+
+    - le rendu de `errors/500.html`. Ce gabarit **appartient à l'utilisateur**,
+      le squelette le livre et Forge n'y réécrit jamais (principe 4). Une
+      syntaxe Jinja invalide, un filtre inconnu ou une variable absente y
+      suffisaient, et `core.http.helpers.html` ne rattrape que le gabarit
+      introuvable ;
+    - l'écriture du journal, quand le disque est plein. C'est précisément le
+      moment où la page d'erreur doit tenir ;
+    - la construction du contexte de dev, qui inspecte l'exception et sa pile.
+
+    Le repli suit `_service_unavailable` : minimal, en texte brut, sans
+    dépendre de quoi que ce soit que le projet puisse avoir cassé.
+    """
+    from core.http.response import Response
+
+    try:
+        _log_runtime_error(exc, request)
+    except Exception:  # noqa: BLE001 — journal indisponible, la réponse prime
+        logger.exception("Le journal d'erreurs a échoué à son tour")
+
+    if est_api:
+        # Aucun détail sur l'erreur, même en dev. La page HTML peut afficher la
+        # cause, elle est lue par un humain devant son navigateur ; une réponse
+        # d'API part vers un client qui la journalise, la stocke ou la
+        # réexpose. La cause reste dans les journaux du serveur.
+        try:
+            return _api_error(500, API_ERROR_INTERNAL)
+        except Exception:  # noqa: BLE001
+            logger.exception("La réponse d'erreur JSON a échoué à son tour")
+            return Response(
+                status=500,
+                body=b'{"error":"internal_error"}',
+                content_type="application/json; charset=utf-8",
+            )
+
+    try:
+        # En APP_ENV=dev, la page 500 affiche la cause ; None en prod.
+        contexte = _dev_error_context(exc)
+    except Exception:  # noqa: BLE001 — l'introspection a échoué, pas la réponse
+        logger.exception("Le contexte d'erreur de dev a échoué à son tour")
+        contexte = None
+
+    try:
+        return _html("errors/500.html", 500, contexte)
+    except Exception:  # noqa: BLE001 — le gabarit du projet est en défaut
+        logger.exception("Le rendu de errors/500.html a échoué à son tour")
+
+    return Response(
+        status=500,
+        body=(
+            "Erreur interne du serveur.\n"
+            "La cause a ete journalisee cote serveur.\n"
+        ).encode("utf-8"),
+        content_type="text/plain; charset=utf-8",
+    )
+
+
 #: Codes d'erreur des réponses d'API, stables et lisibles côté client.
 #: La forme est celle de l'ADR-088, rendue par `core.http.json_error`, seule
 #: fabrique de réponse d'erreur JSON du dépôt.
@@ -201,14 +269,7 @@ class Application:
 
         except Exception as _exc:
             logger.exception("Erreur non gérée — %s %s", request.method, request.path)
-            _log_runtime_error(_exc, request)
-            if est_api:
-                # Aucun détail sur l'erreur, même en dev. La page HTML peut se
-                # permettre d'afficher la cause, elle est lue par un humain
-                # devant son navigateur ; une réponse d'API part vers un client
-                # qui la journalise, la stocke ou la réexpose. La cause reste
-                # dans les journaux du serveur, où `_log_runtime_error` vient
-                # de l'écrire.
-                return _api_error(500, API_ERROR_INTERNAL)
-            # En APP_ENV=dev, la page 500 affiche la cause ; None en prod.
-            return _html("errors/500.html", 500, _dev_error_context(_exc))
+            # Journalisation, contexte et rendu vivent dans `_internal_error`,
+            # qui ne peut pas lever : ce qui sortirait d'ici ressortirait de
+            # `dispatch`, et le serveur répondrait à la place de Forge.
+            return _internal_error(_exc, request, est_api=est_api)

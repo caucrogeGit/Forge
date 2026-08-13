@@ -110,6 +110,32 @@ def _extract_location(frames: list[dict[str, Any]]) -> dict[str, Any] | None:
 
 # ── Filtrage des informations de requête ──────────────────────────────────────
 
+#: Marqueur des valeurs retirées. Explicite plutôt que muet : une valeur
+#: simplement absente se lit comme une valeur vide, ce qui est un autre fait.
+MASKED_QUERY_VALUE = "[masqué]"
+
+
+def _mask_query(query: str | None) -> str:
+    """Rend la chaîne de requête avec ses noms, sans ses valeurs.
+
+    Le découpage ne cherche pas à décoder : il travaille sur le texte reçu.
+    Décoder puis réencoder changerait la chaîne consignée, et le journal doit
+    montrer ce qui est arrivé, non une version normalisée.
+
+    Un fragment sans `=` est un nom seul (`?debug`), conservé tel quel : il ne
+    porte aucune valeur à masquer.
+    """
+    if not query:
+        return ""
+    fragments: list[str] = []
+    for fragment in query.split("&"):
+        if not fragment:
+            continue
+        nom, separateur, _valeur = fragment.partition("=")
+        fragments.append(f"{nom}={MASKED_QUERY_VALUE}" if separateur else nom)
+    return "&".join(fragments)
+
+
 def safe_request_info(
     method: str | None,
     path: str | None,
@@ -122,11 +148,22 @@ def safe_request_info(
 
     Seuls les noms des champs POST sont conservés, jamais les valeurs.
     Les headers sont filtrés pour exclure les valeurs sensibles.
+
+    La chaîne de requête suit désormais la **même règle que le POST** : les
+    noms sont conservés, les valeurs masquées (`CORE-WSGI-ERROR-PATH-001`).
+    Elle était écrite telle quelle, alors que c'est l'endroit où les jetons
+    voyagent en pratique : lien de réinitialisation de mot de passe, clé d'API,
+    lien magique. Un `GET` est la façon la plus courante de faire entrer un
+    secret dans un journal.
+
+    Le journal d'erreurs est un fichier lu par un humain, souvent recopié dans
+    un ticket. La valeur de `page=3` s'y perd, ce qui est le prix de cette
+    règle, et il est plus faible que celui d'un jeton recopié.
     """
     safe: dict[str, Any] = {
         "method": method or "",
         "path":   path   or "",
-        "query":  query  or "",
+        "query":  _mask_query(query),
     }
     if post_keys is not None:
         safe["post_keys"] = [str(k) for k in post_keys]
