@@ -389,9 +389,15 @@ def cmd_mail_logs(args: list[str], root: Path | None = None) -> None:
     try:
         rows = MailLogger.fetch_recent(limit)
     except Exception as exc:
+        from core.database.qualify import is_undefined_table_error
+
         msg = str(exc)
         hint = ""
-        if "mail_log" in msg.lower() or "doesn't exist" in msg.lower() or "doesn't exist" in msg:
+        # La détection cherchait la locution anglaise de MariaDB, absente de
+        # PostgreSQL en français et de SQL Server. Le backend actif la qualifie
+        # désormais (`IOT-DOCTOR-MISSING-TABLE-001`) ; le repli sur le message
+        # reste pour les exceptions enveloppées.
+        if is_undefined_table_error(exc) or "mail_log" in msg.lower() or "doesn't exist" in msg.lower():
             hint = "\n  La table mail_log n'existe pas encore — lancez : forge db:apply"
         sys.exit(f"Erreur : impossible de lire mail_log : {exc}{hint}")
 

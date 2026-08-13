@@ -124,6 +124,65 @@ def test_postgres_ne_detecte_pas_par_le_message() -> None:
     assert "sqlstate" in rendu.lower()
 
 
+#: Tous les modules qui distinguent « table absente » d'une panne. La liste a
+#: grandi après coup : le premier ticket n'avait converti que `forge-mvc-iot`,
+#: et un audit de ses propres correctifs a trouvé deux adoptants oubliés
+#: (`OPTIN-TIMESTAMP-WIDEN-001`). Réparer un seul site est le défaut que ce
+#: relevé existe pour empêcher.
+DETECTEURS = (
+    "packages/forge-mvc-iot/forge_mvc_iot/cli/doctor.py",
+    "packages/forge-mvc-iot/forge_mvc_iot/cli/listen.py",
+    "packages/forge-mvc-rbac/forge_mvc_rbac/resolver.py",
+    "packages/forge-mvc-mail/forge_mvc_mail/cli.py",
+)
+
+
+@pytest.mark.parametrize("chemin", DETECTEURS)
+def test_chaque_detecteur_delegue_au_backend(chemin: str) -> None:
+    """Une détection locale ne connaît que le pilote qu'on avait sous la main.
+
+    Celle de `forge-mvc-rbac` se disait « robuste à la locale » et cherchait
+    des locutions anglaises, que PostgreSQL en français ne produit pas. C'est
+    le piège que le contrat existe pour fermer.
+    """
+    code = code_sans_prose((PROJECT_ROOT / chemin).read_text(encoding="utf-8"))
+
+    assert "is_undefined_table_error" in code, (
+        f"{chemin} qualifie une table absente sans demander au backend actif"
+    )
+
+
+def test_aucun_detecteur_ne_cherche_le_message_de_postgres() -> None:
+    """Le repli sur le message reste permis, mais pas pour PostgreSQL.
+
+    Son message est traduit : y chercher une locution serait vrai ou faux selon
+    un réglage du serveur, ce qui n'est pas une propriété du programme.
+    """
+    fautes: list[str] = []
+    for chemin in DETECTEURS:
+        arbre = ast.parse((PROJECT_ROOT / chemin).read_text(encoding="utf-8"))
+        for noeud in ast.walk(arbre):
+            # Seules les COMPARAISONS sont jugées. Un message d'aide peut
+            # légitimement écrire « la table n'existe pas encore » : il
+            # s'adresse à un humain, il ne teste rien. Ce garde-fou l'avait
+            # d'abord accusé, ce qui est la même erreur que juger la prose.
+            if not isinstance(noeud, ast.Compare):
+                continue
+            if not any(isinstance(op, ast.In) for op in noeud.ops):
+                continue
+            if not (isinstance(noeud.left, ast.Constant) and isinstance(noeud.left.value, str)):
+                continue
+            cherche = noeud.left.value.lower()
+            for locution in ("does not exist", "n'existe pas", "la relation"):
+                if locution in cherche:
+                    fautes.append(f"{chemin}:{noeud.lineno} compare à « {locution} »")
+
+    assert not fautes, (
+        "Ces comparaisons cherchent le message de PostgreSQL, qui est traduit :\n  "
+        + "\n  ".join(fautes)
+    )
+
+
 def test_iot_ne_porte_plus_sa_propre_detection() -> None:
     """La détection dupliquée dans l'opt-in est remplacée par la délégation.
 

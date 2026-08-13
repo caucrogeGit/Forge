@@ -13,10 +13,17 @@ Un événement IoT reçu à midi UTC était donc daté de 14 h dans une base où
 le reste est en UTC, et le journal d'envoi de mails souffrait du même décalage.
 Aucune erreur n'était levée : la valeur reste plausible, seulement fausse.
 
-Ce fichier remplace la liste manuelle par un **relevé automatique**. Tout
-module du dépôt qui écrit en base est examiné, sans qu'il faille penser à
-l'inscrire. C'est la différence entre un garde-fou qui tient et un garde-fou
-qui vieillit.
+Ce fichier remplace la liste manuelle par un **relevé automatique**.
+
+Le relevé a lui-même dû être élargi. Il ne retenait d'abord que les modules
+contenant une instruction SQL, et a manqué `forge-mvc-mail/mailer.py`, qui
+**fabrique** les horodatages que `log.py` **écrit**. Rien n'oblige le
+producteur d'une valeur à être son écrivain, et c'est une limite structurelle
+de tout critère fondé sur la présence de SQL.
+
+La charge est donc inversée : tout le code de production est examiné, et un
+module qui pose la forme consciente doit **prouver** qu'elle ne persiste pas,
+en figurant dans `_NE_PERSISTENT_PAS` avec sa raison.
 """
 from __future__ import annotations
 
@@ -31,10 +38,27 @@ RACINE = Path(__file__).resolve().parent.parent.parent
 #: Une instruction d'écriture suffit à classer un module comme écrivain.
 _SQL_ECRITURE = re.compile(r"\b(INSERT INTO|UPDATE\s+\w|DELETE FROM)\b", re.IGNORECASE)
 
-#: Ces modules rendent une **chaîne** via `strftime`, jamais un `datetime`.
-#: Le pilote ne peut donc rien convertir, et la forme consciente y est sans
-#: effet. Ils sont écartés avec leur raison, pour qu'une relecture puisse la
-#: contester plutôt que de buter sur un silence.
+#: Ces modules posent la forme consciente sans qu'elle atteigne jamais une
+#: colonne : comparaison en mémoire, valeur rendue à l'application qui la
+#: persiste elle-même (ADR-008), ou horodatage d'affichage. Chaque entrée porte
+#: sa raison, pour qu'une relecture puisse la contester plutôt que de buter sur
+#: un silence.
+_NE_PERSISTENT_PAS = {
+    "core/auth/email.py": "jeton de vérification, rendu à l'application (ADR-008)",
+    "core/auth/rate_limit.py": "fenêtre glissante en mémoire, rien n'est écrit",
+    "core/auth/reset.py": "expiration rendue à l'application, qui la persiste",
+    "core/auth/tokens.py": "expiration rendue à l'application, qui la persiste",
+    "core/errors/runtime_error_markdown.py": "horodatage d'un rapport Markdown",
+    "core/errors/runtime_errors.py": "horodatage d'un événement JSONL, pas d'une colonne",
+    "packages/forge-mvc-iot/forge_mvc_iot/cli/simulate.py": "relevé simulé, envoyé par MQTT",
+    "packages/forge-mvc-mail/forge_mvc_mail/cli.py": "horodatage d'un affichage CLI",
+    "packages/forge-mvc-mail/forge_mvc_mail/transports.py": "en-tête `Date` d'un message",
+    "packages/forge-mvc-mfa/forge_mvc_mfa/mfa.py": "facteurs rendus à l'application, qui les persiste",
+    "packages/forge-mvc-mfa/forge_mvc_mfa/recovery.py": "codes rendus à l'application, qui les persiste",
+}
+
+#: Ces modules rendent une chaîne via `strftime` : le pilote ne peut rien
+#: convertir, et la forme consciente y est sans effet.
 _RENDENT_UNE_CHAINE = {
     "packages/forge-mvc-audit/forge_mvc_audit/store.py": "borne de rétention formatée en chaîne",
     "packages/forge-mvc-stats/forge_mvc_stats/retention.py": "borne de rétention formatée en chaîne",
@@ -71,6 +95,19 @@ def _est_rendu_naif(appel: ast.Call, arbre: ast.Module) -> bool:
 
 
 def _ecrivains() -> list[tuple[str, ast.Module]]:
+    """Tout module du code de production, qu'il porte du SQL ou non.
+
+    Le relevé ne retenait d'abord que les modules contenant une instruction
+    d'écriture. Il a manqué `forge-mvc-mail/mailer.py`, qui **fabrique** les
+    horodatages que `log.py` **écrit** : la valeur naît dans un module sans
+    SQL et se persiste dans un autre.
+
+    C'est la limite de tout critère fondé sur la présence de SQL, et elle est
+    structurelle : rien n'oblige le producteur d'une valeur à être son
+    écrivain. Le relevé porte donc sur tout le code, et la charge est inversée.
+    Un module qui pose la forme consciente doit désormais **prouver** qu'elle
+    ne persiste pas, en figurant dans `_NE_PERSISTENT_PAS` avec sa raison.
+    """
     trouves: list[tuple[str, ast.Module]] = []
     for chemin in sorted(RACINE.rglob("*.py")):
         rel = chemin.relative_to(RACINE).as_posix()
@@ -82,8 +119,7 @@ def _ecrivains() -> list[tuple[str, ast.Module]]:
             arbre = ast.parse(chemin.read_text(encoding="utf-8"))
         except (SyntaxError, UnicodeDecodeError):
             continue
-        if _ecrit_en_base(arbre):
-            trouves.append((rel, arbre))
+        trouves.append((rel, arbre))
     return trouves
 
 
@@ -106,7 +142,7 @@ def test_aucun_opt_in_ne_pose_la_forme_consciente() -> None:
     fautes: list[str] = []
 
     for rel, arbre in _ecrivains():
-        if rel in _RENDENT_UNE_CHAINE:
+        if rel in _RENDENT_UNE_CHAINE or rel in _NE_PERSISTENT_PAS:
             continue
         for noeud in ast.walk(arbre):
             if (
@@ -135,6 +171,14 @@ def test_les_exemptions_sont_toujours_justifiees() -> None:
     ordinaire et l'exemption doit tomber avec son motif.
     """
     perimees: list[str] = []
+
+    for rel in _NE_PERSISTENT_PAS:
+        chemin = RACINE / rel
+        if not chemin.exists():
+            perimees.append(f"{rel} (le fichier n'existe plus)")
+            continue
+        if "datetime.now" not in chemin.read_text(encoding="utf-8"):
+            perimees.append(f"{rel} (ne pose plus la forme consciente)")
 
     for rel in _RENDENT_UNE_CHAINE:
         chemin = RACINE / rel

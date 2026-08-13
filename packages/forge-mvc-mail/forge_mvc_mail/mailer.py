@@ -2,10 +2,11 @@
 """Mailer Forge — point d'entrée unique pour envoyer un mail."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 from forge_mvc_mail.config import MailConfig
 from forge_mvc_mail.exceptions import MailSendError
+from core.database.timestamps import utc_now
 from forge_mvc_mail.log import MailLogRecord, MailLogger
 from forge_mvc_mail.message import MailMessage
 from forge_mvc_mail.transports import BaseTransport, TransportResult
@@ -47,7 +48,7 @@ class Mailer:
         related_entity: str = "",
         related_id: int | None = None,
     ) -> TransportResult:
-        created_at = datetime.now(timezone.utc)
+        created_at = utc_now()
         try:
             result = self._transport.send(message)
         except MailSendError as exc:
@@ -85,7 +86,7 @@ def _log_result(
         status = "failed"
 
     to_email = ", ".join(message.to_addresses)[:255]
-    sent_at = datetime.now(timezone.utc) if status == "sent" else None
+    sent_at = utc_now() if status == "sent" else None
 
     record = MailLogRecord(
         message_type=message_type,

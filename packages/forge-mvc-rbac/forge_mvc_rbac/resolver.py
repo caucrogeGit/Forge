@@ -67,11 +67,23 @@ def _default_fetch_all(sql: str, params: tuple[Any, ...]) -> Iterable[dict[str, 
 
 
 def _is_missing_table_error(error: Exception) -> bool:
-    # Détection canonique par code d'erreur du driver (robuste à la locale et à
-    # la version du serveur) : MariaDB/MySQL exposent `errno` sur leurs exceptions.
+    """Détecte une table absente en déléguant au backend actif.
+
+    La détection vivait ici et se disait « robuste à la locale ». Elle ne
+    l'était pas : son repli cherche des locutions **anglaises**, et PostgreSQL
+    traduit ses messages. Sur un serveur en français, « la relation ... n'existe
+    pas » ne correspond à aucun marqueur (`IOT-DOCTOR-MISSING-TABLE-001`).
+
+    Le signal appartient au pilote, donc au backend, comme pour le doublon.
+    Le repli sur le message reste, pour les exceptions enveloppées qui ont
+    perdu leurs attributs.
+    """
+    from core.database.qualify import is_undefined_table_error
+
+    if is_undefined_table_error(error):
+        return True
     if getattr(error, "errno", None) == _MISSING_TABLE_ERRNO:
         return True
-    # Repli string-matching pour les drivers sans `errno` ou les erreurs enveloppées.
     message = str(error).lower()
     return any(marker in message for marker in _MISSING_TABLE_MARKERS)
 
