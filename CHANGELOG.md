@@ -5,6 +5,12 @@
 
 ### Ajouté
 
+- **La surface base non exercée des opt-ins est couverte (`OPTIN-SURFACE-COVERAGE-001`).**
+  Le pré-mortem a mesuré, opt-in par opt-in, la part réellement **exécutée** contre un serveur : `rbac` 0 sur 15, `admin` 9 sur 15, `images` 3 sur 8.
+  C'est cette mesure qui a mené aux deux défauts corrigés plus haut, tous deux invisibles d'une suite verte parce que les tests des paquets exerçaient la **construction** du SQL et jamais son effet.
+  Les trous restants sont fermés : lecture, pagination, comptage et suppression du back-office, rattachement, position, texte alternatif et suppression des médias.
+  Aucun défaut trouvé sur ces chemins, et c'est un résultat en soi. Le fichier existe pour que cela le reste.
+
 - **La chaîne de permission RBAC est éprouvée sur les trois serveurs (`RBAC-PERMISSION-CHAIN-REAL-001`).**
   `forge-mvc-rbac` porte quinze fonctions touchant la base, et **aucune n'était exercée contre un serveur réel**. C'est l'opt-in qui décide si un utilisateur a le droit de faire quelque chose, et la question « ce SQL rend-il la bonne réponse sur PostgreSQL » n'avait jamais été posée.
   Le relevé est rassurant, et il faut le dire : les trois requêtes rendent le même résultat partout. Elles étaient écrites avec les précautions qui comptent, colonnes en minuscules et alias explicites, là où d'autres paquets ont payé leur absence.
