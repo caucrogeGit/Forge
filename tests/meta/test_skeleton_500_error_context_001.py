@@ -49,9 +49,15 @@ def test_error_context_gate_sur_dev():
 
 
 def test_les_deux_rendus_500_passent_le_contexte():
+    """Les rendus passent par `_error_page` depuis `TWIN-ERROR-PAGE-PARITY-001`.
+
+    La fabrique garantit le code HTTP quand le gabarit du projet est cassé ou
+    absent. Ce qui est vérifié ici reste le **contexte** passé au rendu, la
+    propriété d'origine du garde-fou.
+    """
     src = _src()
-    assert '_html("errors/500.html", 500, _error_context())' in src
-    assert src.count('_html("errors/500.html", 500, _error_context())') == 2, (
+    assert '_error_page("errors/500.html", 500, _error_context())' in src
+    assert src.count('_error_page("errors/500.html", 500, _error_context())') == 2, (
         "Les deux points de rendu de la 500 (GET et requêtes dynamiques) doivent "
         "passer _error_context()."
     )
@@ -59,7 +65,7 @@ def test_les_deux_rendus_500_passent_le_contexte():
 
 def test_plus_de_rendu_500_sans_contexte():
     # La forme sans contexte (cause de l'incident) ne doit plus exister.
-    assert '_html("errors/500.html", 500)' not in _src()
+    assert '_error_page("errors/500.html", 500)' not in _src()
 
 
 # ── Détail dev des pages 404 / 413 (SKELETON-ERROR-PAGES-DEV-DETAIL-001) ──────
@@ -77,13 +83,13 @@ def test_helper_dev_error_gate_sur_dev():
 
 def test_413_passe_la_taille_recue_en_dev():
     src = _src()
-    assert '_html("errors/413.html", 413, _dev_error({"received"' in src
+    assert '_error_page("errors/413.html", 413, _dev_error({"received"' in src
 
 
 def test_404_passe_le_chemin_en_dev():
     src = _src()
-    assert '_html("errors/404.html", 404, _dev_error({"path": path}))' in src
-    assert '_html("errors/404.html", 404)' not in src
+    assert '_error_page("errors/404.html", 404, _dev_error({"path": path}))' in src
+    assert '_error_page("errors/404.html", 404)' not in src
 
 
 def test_templates_404_413_ont_un_bloc_detail():

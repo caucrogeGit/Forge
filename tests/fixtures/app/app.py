@@ -105,7 +105,7 @@ forge.configure(
 from core.http.health import health_response, is_health_request
 from core.http.request import Request, RequestEntityTooLarge
 from core.http.response import Response
-from core.http.helpers import html as _html
+from core.http.helpers import error_page as _error_page
 from core.app.application import Application
 # CORE-DROP-UPLOADS-001 (ADR-019) : le service de fichiers est un opt-in
 # (forge-mvc-files). Import lazy dans le handler /media (l'app démarre sans).
@@ -207,7 +207,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self._send_response(self._dispatch(request))
             except Exception:
                 logger.exception("Erreur GET %s", self.path)
-                self._send_response(_html("errors/500.html", 500, _error_context()))
+                self._send_response(_error_page("errors/500.html", 500, _error_context()))
 
     def do_POST(self):
         """Traite les requêtes HTTP POST."""
@@ -233,10 +233,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self._send_response(self._dispatch(request))
             except RequestEntityTooLarge as exc:
                 received = exc.args[0] if exc.args else None
-                self._send_response(_html("errors/413.html", 413, _dev_error({"received": received})))
+                self._send_response(_error_page("errors/413.html", 413, _dev_error({"received": received})))
             except Exception:
                 logger.exception("Erreur %s %s", label, self.path)
-                self._send_response(_html("errors/500.html", 500, _error_context()))
+                self._send_response(_error_page("errors/500.html", 500, _error_context()))
 
     def _dispatch(self, request: Request) -> Response:
         """Délègue le routage et le contrôle d'accès à l'Application.
@@ -290,11 +290,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         filepath = _os.path.realpath(_os.path.join(STATIC_DIR, path.removeprefix("/static/")))
 
         if not _is_safe_static_path(STATIC_DIR, filepath):
-            self._send_response(_html("errors/403.html", 403))
+            self._send_response(_error_page("errors/403.html", 403))
             return
 
         if not _os.path.isfile(filepath):
-            self._send_response(_html("errors/404.html", 404, _dev_error({"path": path})))
+            self._send_response(_error_page("errors/404.html", 404, _dev_error({"path": path})))
             return
 
         try:
@@ -305,7 +305,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._send_response(Response(200, content, content_type,
                                          headers={"Cache-Control": STATIC_CACHE}))
         except FileNotFoundError:
-            self._send_response(_html("errors/404.html", 404, _dev_error({"path": path})))
+            self._send_response(_error_page("errors/404.html", 404, _dev_error({"path": path})))
 
     def _serve_media(self, path: str, request: Any = None) -> None:
         try:

@@ -182,3 +182,29 @@ def test_les_serveurs_de_dev_listes_existent() -> None:
 
     for fichier in SERVEURS_DE_DEV:
         assert (racine / fichier).is_file(), fichier
+
+
+@pytest.mark.parametrize("fichier", SERVEURS_DE_DEV)
+def test_aucun_serveur_de_dev_ne_rend_ses_pages_d_erreur_a_la_main(fichier: str) -> None:
+    """Les pages d'erreur passent par `error_page`, qui garantit le code HTTP.
+
+    Le correctif de `CORE-WSGI-CSRF-POST-001` avait converti les onze sites du
+    **cœur**, et laissé les serveurs de développement appeler `html` en direct.
+    Réparer un seul jumeau est le défaut que ce fichier existe pour empêcher.
+
+    Ce qui restait ouvert de leur côté :
+
+    - un gabarit `errors/*.html` cassé faisait ressortir l'exception du
+      gestionnaire, et le client recevait une réponse tronquée ;
+    - un gabarit absent rendait un `500` à la place du code voulu, si bien
+      qu'une page manquante se présentait comme une panne.
+    """
+    from pathlib import Path
+
+    source = (Path(__file__).resolve().parent.parent / fichier).read_text(encoding="utf-8")
+
+    assert '_html("errors/' not in source, (
+        f"{fichier} rend une page d'erreur sans garantir son code HTTP ; "
+        "employez `error_page`, la seule façon officielle (principe 11)"
+    )
+    assert "_error_page(" in source, f"{fichier} ne rend aucune page d'erreur"
