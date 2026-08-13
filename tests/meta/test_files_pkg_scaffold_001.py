@@ -17,6 +17,7 @@ import tomllib
 from pathlib import Path
 
 import pytest
+from forge_mvc_testing.source_scan import code_sans_prose
 
 pytestmark = pytest.mark.meta
 
@@ -75,12 +76,15 @@ class TestCoreIndependence:
         for py in CORE_DIR.rglob("*.py"):
             if py.parent.name == "uploads":
                 continue  # shims transitoires autorisés
+            # Docstrings ET commentaires écartés : un module qui documente
+            # `from forge_mvc_files import ...` dans sa docstring, pour montrer
+            # ce que l'opt-in fournit, serait compté comme un import réel.
             for lineno, line in enumerate(
-                py.read_text(encoding="utf-8", errors="replace").splitlines(), 1
+                code_sans_prose(
+                    py.read_text(encoding="utf-8", errors="replace")
+                ).splitlines(), 1
             ):
                 stripped = line.lstrip()
-                if stripped.startswith("#"):
-                    continue
                 if line == stripped and (
                     stripped.startswith("import forge_mvc_files")
                     or stripped.startswith("from forge_mvc_files")

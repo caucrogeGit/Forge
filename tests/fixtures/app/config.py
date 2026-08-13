@@ -24,6 +24,8 @@ Ce module ne produit aucun effet de bord à l'import :
 from dotenv import load_dotenv
 import os
 
+from core.security.csp import nonce_enabled as _csp_nonce_enabled
+
 # ── Détection de l'environnement ───────────────────────────────────────────────
 
 APP_ENV = os.getenv("APP_ENV", "dev")
@@ -77,9 +79,11 @@ APP_SSL_ENABLED   = os.getenv("APP_SSL_ENABLED", _ssl_default).strip().lower() i
 }
 SSL_CERTFILE      = os.getenv("SSL_CERTFILE", "cert.pem")
 SSL_KEYFILE       = os.getenv("SSL_KEYFILE", "key.pem")
-APP_CSP_NONCE_ENABLED = os.getenv("APP_CSP_NONCE_ENABLED", "false").strip().lower() in {
-    "1", "true", "yes", "on"
-}
+# La règle de lecture vit dans `core.security.csp`, pour que le serveur de
+# développement et l'adaptateur WSGI répondent identiquement (principe 11).
+# Elle était écrite ici en double : les deux jeux de valeurs coïncidaient, mais
+# rien ne les y obligeait (CORE-WSGI-CSP-NONCE-001).
+APP_CSP_NONCE_ENABLED = _csp_nonce_enabled()
 
 # Reverse proxy — IPs des proxies de confiance autorisés à fournir X-Real-IP.
 # Liste séparée par virgules, espaces tolérés. Vide par défaut : Forge ignore

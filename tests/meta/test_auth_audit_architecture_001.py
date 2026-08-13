@@ -12,6 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from forge_mvc_testing.source_scan import code_sans_prose
 pytestmark = pytest.mark.meta
 
 
@@ -115,11 +116,13 @@ class TestForgeDoesNotInsertAudit:
             for py_file in root.rglob("*.py"):
                 if "__pycache__" in str(py_file):
                     continue
-                content = py_file.read_text(encoding="utf-8")
+                # Docstrings ET commentaires écartés : une docstring citant
+                # `INSERT INTO auth_audit_log` pour dire que le cœur ne le fait
+                # PAS serait comptée comme une faute. Cinq garde-fous de ce
+                # cycle ont trébuché sur ce motif (`SOURCE-SCAN-001`).
+                content = code_sans_prose(py_file.read_text(encoding="utf-8"))
                 for line in content.splitlines():
                     stripped = line.strip()
-                    if stripped.startswith("#"):
-                        continue
                     if "INSERT" in line and "auth_audit_log" in line:
                         offenders.append(f"{py_file}: {stripped[:80]}")
         assert not offenders, (
