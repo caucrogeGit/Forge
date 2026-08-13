@@ -226,12 +226,41 @@ def test_auth_session_does_not_access_database(monkeypatch):
 
 
 def test_auth_session_does_not_create_form_or_template():
+    """Le module de session ne fabrique ni formulaire ni gabarit.
+
+    Le relevé écarte **commentaires et docstrings** : il jugeait la prose comme
+    du code, et le mot « forme » suffisait à le faire échouer. C'est la
+    quatrième fois de ce cycle qu'un garde-fou trébuche sur une explication
+    écrite pour dire ce que le code ne fait pas.
+    """
+    import ast
     import core.auth.session as session_module
 
     source = open(session_module.__file__, encoding="utf-8").read()
-    assert "form" not in source.lower()
-    assert "template" not in source.lower()
-    assert "render" not in source.lower()
+    arbre = ast.parse(source)
+
+    lignes_de_prose: set[int] = set()
+    for noeud in ast.walk(arbre):
+        corps = getattr(noeud, "body", None)
+        if isinstance(corps, list) and corps:
+            premier = corps[0]
+            if (
+                isinstance(premier, ast.Expr)
+                and isinstance(premier.value, ast.Constant)
+                and isinstance(premier.value.value, str)
+            ):
+                fin = premier.end_lineno or premier.lineno
+                lignes_de_prose.update(range(premier.lineno, fin + 1))
+
+    code = "\n".join(
+        ligne
+        for numero, ligne in enumerate(source.splitlines(), start=1)
+        if numero not in lignes_de_prose and not ligne.lstrip().startswith("#")
+    ).lower()
+
+    assert "form" not in code
+    assert "template" not in code
+    assert "render" not in code
 
 
 def test_auth_session_does_not_modify_rbac():

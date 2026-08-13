@@ -115,7 +115,7 @@ sequenceDiagram
     participant DB as core.database.db
     participant Audit as core.auth.audit
 
-    Operateur->>CLI: forge auth:user:create --email ... --password-prompt
+    Operateur->>CLI: forge auth:user:create --login ... --password-prompt
     CLI->>Config: charge env du projet
     CLI->>Forge: configure la connexion (DB_APP_*)
     CLI->>DB: vérifie l'unicité de l'email
@@ -207,7 +207,7 @@ forge auth:doctor
 Création d'un compte avec saisie sécurisée du mot de passe.
 
 ```bash
-forge auth:user:create --email alice@exemple.fr --password-prompt
+forge auth:user:create --login alice --email alice@exemple.fr --password-prompt
 ```
 
 Liste des comptes, puis affichage d'un compte précis.

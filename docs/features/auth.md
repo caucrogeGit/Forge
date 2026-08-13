@@ -168,7 +168,7 @@ Voir [ADR-002, Stratégie de session](../adr/002-session-strategy.md).
 ```python
 from core.auth import authenticate_user, login_user, logout_user
 
-user = authenticate_user(email, password, load_user_by_email)
+user = authenticate_user(login, password, load_user_by_login)
 
 if user is not None:
     login_user(request, user)
@@ -178,7 +178,7 @@ logout_user(request)
 
 API :
 
-- `authenticate_user(email, password, user_loader) -> AuthUser | None`
+- `authenticate_user(login, password, user_loader) -> AuthUser | None`
 - `login_user(request, user) -> None`
 - `logout_user(request) -> None`
 - `get_authenticated_user_id(request) -> int | None`
@@ -424,16 +424,22 @@ forge auth:init
 forge auth:doctor
 forge auth:status
 forge auth:list-sql
-forge auth:user:create --email admin@example.com --password-prompt
+forge auth:user:create --login admin --email admin@example.com --password-prompt
 forge auth:user:list
-forge auth:user:show --email admin@example.com
-forge auth:user:disable --email user@example.com
-forge auth:user:enable --email user@example.com
-forge auth:user:password --email user@example.com --password-prompt
-forge auth:user:role:add --email user@example.com --role admin
-forge auth:user:role:remove --email user@example.com --role admin
-forge auth:user:roles --email user@example.com
+forge auth:user:show --login admin
+forge auth:user:disable --login prof.durand
+forge auth:user:enable --login prof.durand
+forge auth:user:password --login prof.durand --password-prompt
+forge auth:user:role:add --login prof.durand --role admin
+forge auth:user:role:remove --login prof.durand --role admin
+forge auth:user:roles --login prof.durand
 ```
+
+!!! note "`--login` désigne le compte, `--email` son contact"
+
+    Depuis l'ADR-089, l'identité de connexion et l'adresse de contact sont deux colonnes distinctes.
+    `--login` est obligatoire, unique, sans contrainte de forme et sa casse est conservée : `2TNE1-01` est un identifiant valide.
+    `--email` est facultatif et sert au dépannage ; le poser ou le changer ne change jamais la façon de se connecter.
 
 `forge auth:init` cree ou preserve les SQL optionnels suivants :
 
@@ -474,8 +480,8 @@ Conseil : <suggestion>
 
 | Erreur | Conseil associe |
 |---|---|
-| Indiquez --id ou --email. | Exemple : forge auth:user:disable --email utilisateur@domaine.com |
-| Utilisez --id ou --email, pas les deux. | Choisissez un seul identifiant : --id ou --email. |
+| Indiquez --id ou --login. | Exemple : forge auth:user:disable --login prof.durand |
+| Utilisez --id ou --login, pas les deux. | Choisissez un seul identifiant : --id ou --login. |
 | Utilisateur id=X introuvable. | Verifiez l'identifiant avec forge auth:user:list |
 | Utilisateur 'email' introuvable. | Verifiez l'email avec forge auth:user:list |
 | Email invalide. | Format attendu : utilisateur@domaine.com |
@@ -800,7 +806,7 @@ Forge ne stocke aucun mot de passe, token ou secret dans les tentatives et ne br
 ```python
 from core.auth import authenticate_user, login_user
 
-user = authenticate_user(email, password, load_user_by_email)
+user = authenticate_user(login, password, load_user_by_login)
 
 if user is None:
     return invalid_credentials_response()
@@ -879,7 +885,7 @@ decision = check_auth_rate_limit(
 if not decision.allowed:
     return too_many_attempts(decision.retry_after_seconds)
 
-user = authenticate_user(email, password, load_user_by_email)
+user = authenticate_user(login, password, load_user_by_login)
 attempt = create_auth_rate_limit_attempt(
     action=AUTH_RATE_LIMIT_LOGIN,
     key=email,

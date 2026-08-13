@@ -24,12 +24,19 @@ AUTH_USER_ID_SESSION_KEY = "_auth_user_id"
 
 
 def authenticate_user(
-    email: str,
+    login: str,
     password: str,
     user_loader: Callable[[str], Any],
 ) -> AuthUser | None:
-    """Authentifie un email/mot de passe via un loader applicatif."""
-    if not isinstance(email, str) or not email.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
+    """Authentifie un identifiant et un mot de passe via un loader applicatif.
+
+    Le premier paramètre s'appelait `email` alors qu'il reçoit une **identité**,
+    laquelle n'est pas nécessairement une adresse depuis l'ADR-089 : une
+    application y met légitimement `2TNE1-01`. Le nom disait donc le contraire
+    de ce que la valeur porte, et c'est ce genre d'écart qui a produit les deux
+    divergences de la CLI, sur la casse et sur la forme.
+    """
+    if not isinstance(login, str) or not login.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
         return None
     if not isinstance(password, str) or not password:  # pyright: ignore[reportUnnecessaryIsInstance]
         return None
@@ -37,7 +44,7 @@ def authenticate_user(
         raise AuthError("user_loader doit etre callable")
 
     try:
-        raw_user = user_loader(email.strip())
+        raw_user = user_loader(login.strip())
     except Exception:
         logger.warning(
             "Le user_loader a levé une exception à l'authentification ; traité comme échec d'auth "

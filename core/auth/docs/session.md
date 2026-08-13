@@ -36,7 +36,7 @@ classDiagram
     direction LR
 
     class Authentification {
-        +authenticate_user(email, password, user_loader) AuthUser
+        +authenticate_user(login, password, user_loader) AuthUser
         +current_user(request, user_loader) AuthUser
     }
 
@@ -80,7 +80,7 @@ sequenceDiagram
     participant Store as Store de session
 
     User->>Ctrl: POST email + mot de passe
-    Ctrl->>Auth: authenticate_user(email, password, loader)
+    Ctrl->>Auth: authenticate_user(login, password, loader)
     Auth-->>Ctrl: AuthUser ou None
     Ctrl->>Auth: login_user(request, user)
     Auth->>Store: persiste _auth_user_id
@@ -101,7 +101,7 @@ sequenceDiagram
 
 | Fonction | Signature | Rôle |
 |---|---|---|
-| `authenticate_user` | `authenticate_user(email: str, password: str, user_loader: Callable[[str], Any]) -> AuthUser | None` | authentifie via un loader ; retourne l'utilisateur ou `None` |
+| `authenticate_user` | `authenticate_user(login: str, password: str, user_loader: Callable[[str], Any]) -> AuthUser | None` | authentifie via un loader ; retourne l'utilisateur ou `None` |
 | `login_user` | `login_user(request: Any, user: AuthUser) -> None` | stocke et persiste l'identifiant utilisateur en session |
 | `logout_user` | `logout_user(request: Any) -> None` | retire l'identifiant de la session et persiste |
 | `get_authenticated_user_id` | `get_authenticated_user_id(request: Any) -> int | None` | l'identifiant en session, ou `None` |
@@ -127,7 +127,7 @@ Connexion :
 ```python
 from core.auth import authenticate_user, login_user
 
-user = authenticate_user(email, password, load_user_by_email)
+user = authenticate_user(login, password, load_user_by_login)
 if user is not None:
     login_user(request, user)
     # régénérer l'id de session puis réémettre le cookie (voir la note sécurité)

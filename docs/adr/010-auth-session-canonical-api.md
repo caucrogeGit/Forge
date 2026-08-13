@@ -18,13 +18,20 @@ Forge dispose de deux piles parallèles pour la gestion des sessions et de l'aut
 
 | Fonction | Rôle |
 |---|---|
-| `authenticate_user(email, password, user_loader)` | Vérification email + mot de passe via loader applicatif |
+| `authenticate_user(login, password, user_loader)` | Vérification identifiant + mot de passe via loader applicatif |
 | `login_user(request, user)` | Stocke `_auth_user_id` dans la session |
 | `logout_user(request)` | Retire `_auth_user_id` de la session |
 | `get_authenticated_user_id(request)` | Lit l'identifiant utilisateur typé (`int`) |
 | `current_user(request, user_loader)` | Retourne l'`AuthUser` courant |
 | `is_authenticated(request)` | Vérifie la présence de `_auth_user_id` |
 | `@login_required` | Décorateur contrôleur, 401 ou redirect |
+
+!!! info "Renommage du premier paramètre (ADR-089)"
+
+    Ce paramètre s'appelait `email` jusqu'à l'ADR-089, qui a séparé l'identité de connexion de l'adresse de contact.
+    Il recevait déjà une identité quelconque : le nom disait le contraire de ce que la valeur porte.
+    Aucun appel nommé n'existait dans le dépôt, tous étant positionnels.
+
 
 Cette pile est compatible avec `AuthUser`, le protocole `SessionStore` (Phase 3) et tous les modules opt-in (`forge-mvc-mfa`, `forge-mvc-rbac`).
 

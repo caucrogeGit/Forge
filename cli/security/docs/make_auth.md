@@ -32,7 +32,7 @@ Le bloc affiche « Connexion » (lien vers `/login`) pour un visiteur, ou « Dé
 
 Le contrôleur s'appuie sur le socle standard `users` (produit par `forge auth:init`) :
 
-- `login` : `authenticate_user(email, password, load_user_by_email)` du cœur, puis `login_user`, puis régénération de session anti-fixation (`regenerate_session`) et réémission du cookie ;
+- `login` : `authenticate_user(login, password, load_user_by_login)` du cœur, puis `login_user`, puis régénération de session anti-fixation (`regenerate_session`) et réémission du cookie ;
 
 Le loader `load_user_by_email` est **importé depuis `mvc/models/user_model.py`** : le SQL vit dans le modèle, jamais dans le contrôleur.
 C'est la séparation que produit déjà `make:crud`, et celle que la documentation Forge enseigne ; un générateur ne peut pas prescrire une doctrine qu'il enfreint lui-même.

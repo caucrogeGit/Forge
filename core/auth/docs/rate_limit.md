@@ -160,7 +160,7 @@ from core.auth.rate_limit import is_login_rate_limited, record_login_attempt, cl
 if is_login_rate_limited(request.ip):
     return Response.text("Trop de tentatives, réessayez plus tard")
 
-user = authenticate_user(email, password, load_user_by_email)
+user = authenticate_user(login, password, load_user_by_login)
 if user is None:
     record_login_attempt(request.ip)
 else:
