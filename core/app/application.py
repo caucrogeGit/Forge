@@ -234,7 +234,21 @@ class Application:
                     if denied:
                         return _api_denial(denied) if est_api else denied
 
-            return route.handler(request)
+            reponse = route.handler(request)
+            if route.no_store:
+                # NO-STORE-ROUTE-FLAG-001 : posé ici, donc par les DEUX
+                # serveurs, qui partagent `dispatch`. La règle vivait dans une
+                # liste de chemins codée en dur du serveur de développement :
+                # l'adaptateur WSGI ne la connaissait pas, et le déploiement de
+                # production servait `/login` sans, un navigateur pouvant alors
+                # conserver la page.
+                #
+                # `setdefault` : un contrôleur qui pose sa propre directive de
+                # cache garde la main.
+                _entetes: dict[str, str] | None = getattr(reponse, "headers", None)
+                if isinstance(_entetes, dict):
+                    _entetes.setdefault("Cache-Control", "no-store")
+            return reponse
 
         except DatabaseUnavailableError as _indispo:
             # Condition passagère, pas un défaut de l'application : soit toutes

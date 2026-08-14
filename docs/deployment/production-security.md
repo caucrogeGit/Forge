@@ -89,7 +89,7 @@ Les headers suivants sont émis sur **toutes** les réponses HTTP (200, 302, 404
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | Limit l'envoi du Referer |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=()` | Désactive les API sensibles |
 | `Content-Security-Policy` | voir ci-dessous | Politique de contenu |
-| `Cache-Control` | `no-store` sur routes auth, **serveur de développement seulement** | Interdit la mise en cache des pages sensibles |
+| `Cache-Control` | `no-store` sur les routes marquées `no_store=True` | Interdit la mise en cache des pages sensibles |
 
 !!! note "HSTS et reverse proxy"
     Le tableau décrit le comportement quand Forge termine lui-même TLS (serveur de développement HTTPS, `APP_SSL_ENABLED=true`).
@@ -120,18 +120,33 @@ APP_CSP_NONCE_ENABLED=true
 
 ### Cache-Control sur les routes auth
 
-Les routes d'authentification reçoivent `Cache-Control: no-store` **sur le serveur de développement uniquement**.
+Les routes d'authentification reçoivent `Cache-Control: no-store` sur **les deux serveurs**, développement et production.
 
-!!! warning "Absent du déploiement de production"
+L'en-tête vient du drapeau `no_store` de la route, honoré par `Application.dispatch`.
+`forge make:auth` le pose sur les trois routes qu'il engendre :
 
-    L'en-tête est posé par `app.py`, le serveur de développement.
-    Le déploiement officiel passe par Gunicorn et l'adaptateur WSGI du cœur, qui ne le pose pas : `/login`, `/login/mfa` et `/logout` y sont donc servis sans `no-store`.
-    Un navigateur peut alors conserver ces pages dans son cache local.
+```python
+router.add("GET", "/login", AuthController.login_form, public=True, name="auth-login_form",
+           no_store=True)
+```
 
-    En attendant que Forge tranche la question, posez l'en-tête sur votre proxy inverse pour ces trois chemins.
-    Le cœur ne peut pas la déduire seul : `/login` est une route **publique**, donc indiscernable d'une page ordinaire par le contrat de route.
+Marquez de la même façon vos propres pages sensibles, une fiche de paie ou un export nominatif :
 
-Le tableau ci-dessous décrit le comportement du serveur de développement :
+```python
+router.add("GET", "/paie/{id}", PaieController.show, name="paie-show", no_store=True)
+```
+
+!!! note "Un contrôleur garde la main"
+
+    L'en-tête est posé en `setdefault`.
+    Une réponse qui définit elle-même sa directive de cache la conserve.
+
+!!! warning "Projets créés avant Forge 1.0.0-rc.7"
+
+    La règle vivait auparavant dans une liste de chemins codée en dur du serveur de développement, que la production ne connaissait pas.
+    Un projet dont les routes ont été engendrées avant ce changement ne porte pas `no_store=True` : ajoutez-le à la main dans `mvc/routes/`, Forge ne réécrit jamais ce fichier (principe 9).
+
+Le tableau ci-dessous décrit les en-têtes du socle de sécurité :
 
 | Route | Méthode | No-store |
 |---|---|---|

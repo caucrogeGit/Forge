@@ -145,8 +145,6 @@ STATIC_TYPES  = {"css": "text/css", "js": "application/javascript", "svg": "imag
                  "ico": "image/x-icon", "woff2": "font/woff2", "woff": "font/woff"}
 # 1h en dev (rechargement facile), 7 jours en prod (fichiers versionnés)
 STATIC_CACHE  = "max-age=3600" if APP_ENV == "dev" else "max-age=604800, immutable"
-# Chemins auth sensibles — aucun cache navigateur toléré
-_AUTH_NO_STORE_PATHS = frozenset({"/login", "/login/mfa", "/logout"})
 
 
 def _is_safe_static_path(static_dir: str, filepath: str) -> bool:
@@ -302,8 +300,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         # un seul contrat. `include_hsts=True` : le serveur de dev sait quand
         # il sert TLS via APP_SSL_ENABLED ; HSTS sur HTTP local est inoffensif.
         headers_out: dict[str, str] = {str(k): str(v) for k, v in response.headers.items()}
-        if self.path.split("?")[0] in _AUTH_NO_STORE_PATHS:
-            headers_out.setdefault("Cache-Control", "no-store")
+        # `Cache-Control: no-store` vient désormais du drapeau `no_store` de la
+        # route, honoré par `Application.dispatch`, donc par les DEUX serveurs
+        # (NO-STORE-ROUTE-FLAG-001). La liste de chemins qui vivait ici ne
+        # valait que pour le serveur de développement : la production servait
+        # `/login` sans l'en-tête.
         apply_security_headers(
             headers_out,
             include_hsts=True,

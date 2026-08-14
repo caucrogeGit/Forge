@@ -268,12 +268,14 @@ Cache-Control: no-store
 ```
 
 Ce header interdit au navigateur et aux caches intermédiaires de stocker la réponse.
-Il est ajouté centralement dans `app.py` (`_send_response()`) pour toutes les méthodes HTTP (GET et POST) sur ces chemins.
+Il vient du drapeau `no_store` de la route, posé par `forge make:auth` sur les trois routes qu'il engendre, et honoré par `Application.dispatch`.
+Les deux serveurs partageant `dispatch`, l'en-tête est présent en développement comme en production.
 
-!!! warning "`app.py` est le serveur de développement"
+Marquez de la même façon vos propres pages sensibles :
 
-    Le déploiement de production passe par Gunicorn et l'adaptateur WSGI du cœur, qui ne traverse pas `app.py`.
-    L'en-tête n'y est donc **pas** posé : voir [Sécurité en production](../deployment/production-security.md).
+```python
+router.add("GET", "/paie/{id}", PaieController.show, name="paie-show", no_store=True)
+```
 Les fichiers statiques ne sont pas affectés, ils conservent leur propre `Cache-Control: max-age=…`.
 
 ### Cookie CSRF

@@ -31,7 +31,8 @@ class RouteEntry:
 
     def __init__(self, method: str | list[str], pattern: str, handler: Handler,
                  *, name: str | None = None, public: bool = False,
-                 csrf: bool = True, api: bool = False) -> None:
+                 csrf: bool = True, api: bool = False,
+                 no_store: bool = False) -> None:
         # Validation à l'enregistrement (donc dans le frame de mvc/routes/).
         # Un handler non appelable ne casserait sinon qu'au dispatch
         # (`route.handler(request)`), erreur différée pointant le routeur et
@@ -50,6 +51,11 @@ class RouteEntry:
         self.public   = public
         self.csrf     = csrf
         self.api      = api
+        # NO-STORE-ROUTE-FLAG-001 : la réponse ne doit pas être conservée par le
+        # navigateur ni par un cache intermédiaire. Le drapeau est porté par la
+        # ROUTE et non déduit : `/login` est publique, donc indiscernable d'une
+        # page ordinaire par tout autre critère.
+        self.no_store = no_store
         self.regex, self.is_static = self._compile(pattern)
         # ROUTER-METHOD-HOIST-001 : les méthodes en ensemble, calculées une fois
         # à l'enregistrement. Les boucles de résolution testaient auparavant
@@ -127,13 +133,14 @@ class RouteGroup:
 
     def add(self, method: str | list[str], pattern: str, handler: Handler, *,
             name: str | None = None, public: bool | None = None,
-            csrf: bool | None = None, api: bool | None = None) -> RouteGroup:
+            csrf: bool | None = None, api: bool | None = None,
+            no_store: bool = False) -> RouteGroup:
         is_public = public if public is not None else self._public
         csrf_enabled = csrf if csrf is not None else self._csrf
         is_api = api if api is not None else self._api
         self._router.add(method, self._prefix + pattern, handler,
                          name=name, public=is_public,
-                         csrf=csrf_enabled, api=is_api)
+                         csrf=csrf_enabled, api=is_api, no_store=no_store)
         return self
 
     def __enter__(self) -> RouteGroup:
@@ -181,10 +188,17 @@ class Router:
 
     def add(self, method: str | list[str], pattern: str, handler: Handler, *,
             name: str | None = None, public: bool = False, csrf: bool = True,
-            api: bool = False) -> Router:
-        """Enregistre une route. Retourne self pour le chaînage."""
+            api: bool = False, no_store: bool = False) -> Router:
+        """Enregistre une route. Retourne self pour le chaînage.
+
+        `no_store` marque une route dont la réponse ne doit être conservée ni
+        par le navigateur ni par un cache intermédiaire : page de connexion,
+        second facteur, déconnexion, ou toute page d'une application qui
+        affiche ce qu'un poste partagé ne doit pas garder.
+        """
         entry = RouteEntry(method, pattern, handler, name=name,
-                           public=public, csrf=csrf, api=api)
+                           public=public, csrf=csrf, api=api,
+                           no_store=no_store)
         self._entries.append(entry)
         if entry.is_static:
             self._static.setdefault(entry.pattern, []).append(entry)
