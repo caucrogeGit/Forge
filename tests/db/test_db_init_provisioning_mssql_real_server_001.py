@@ -33,7 +33,11 @@ pytest.importorskip("forge_mvc_entities")
 
 from forge_mvc_entities.db_init import ProvisioningEnv, generate_provisioning_sql_mssql
 
-pytestmark = pytest.mark.db_mssql
+#: `db` ET `db_mssql`, comme l'exige la convention de `pytest.ini`. Marqué
+#: `db_mssql` seul, le fichier était **sélectionné par le job ordinaire**, qui
+#: filtre sur `-m "not db"` : il y tournait sans serveur ni pilote ODBC et
+#: rougissait la CI, alors qu'il n'a de sens que face à un vrai SQL Server.
+pytestmark = [pytest.mark.db, pytest.mark.db_mssql]
 
 _PREFIXE = "forge_initprobe"
 _BASE = f"{_PREFIXE}_base"
@@ -108,8 +112,27 @@ def _purger(connexion: Any) -> None:
 
 @pytest.fixture
 def terrain():
+    """Ouvre la connexion d'administration, ou saute en disant pourquoi.
+
+    `importorskip` ne suffit pas : `pyodbc` s'importe très bien sans que le
+    **pilote ODBC** soit installé, et c'est alors la connexion qui lève. Le
+    motif de saut nomme le geste attendu, comme le fait le reste de
+    l'infrastructure d'intégration.
+    """
+    import os
+
     pytest.importorskip("pyodbc", reason="pyodbc (backend forge-mvc-mssql) absent")
-    connexion = _connexion()
+    from forge_mvc_testing.db_probe import connection_failure_message
+
+    try:
+        connexion = _connexion()
+    except Exception as erreur:  # noqa: BLE001 — le motif importe plus que le type
+        motif = connection_failure_message(
+            "SQL Server", erreur, env_prefix="FORGE_TEST_MSSQL"
+        )
+        if os.environ.get("FORGE_REQUIRE_DB_MSSQL") == "1":
+            pytest.fail(motif)
+        pytest.skip(motif)
     _purger(connexion)
     try:
         yield connexion

@@ -29,7 +29,11 @@ pytest.importorskip("forge_mvc_entities")
 
 from forge_mvc_entities.db_init import ProvisioningEnv, generate_provisioning_sql_postgres
 
-pytestmark = pytest.mark.db_pg
+#: `db` ET `db_pg`, comme l'exige la convention de `pytest.ini`. Marqué
+#: `db_pg` seul, le fichier était **sélectionné par le job ordinaire**, qui
+#: filtre sur `-m "not db"` : il y tournait sans serveur PostgreSQL et
+#: rougissait la CI.
+pytestmark = [pytest.mark.db, pytest.mark.db_pg]
 
 #: Préfixe reconnaissable : si une purge échoue, l'objet reste identifiable.
 _PREFIXE = "forge_initprobe"
@@ -104,8 +108,25 @@ def _purger() -> None:
 
 @pytest.fixture
 def terrain():
+    """Prépare le terrain, ou saute en disant pourquoi.
+
+    Deux prérequis, et chacun a son motif : `psql`, seul capable des
+    méta-commandes du script, et un serveur qui réponde. Un serveur muet ne
+    doit pas produire une avalanche d'échecs de comparaison.
+    """
     if shutil.which("psql") is None:
         pytest.skip("psql absent : le script de provisionnement s'exécute par psql")
+
+    sonde = _psql("SELECT 1;")
+    if sonde.returncode != 0:
+        motif = (
+            "PostgreSQL de test injoignable par psql. Posez FORGE_TEST_PG_HOST, "
+            f"FORGE_TEST_PG_PORT, FORGE_TEST_PG_USER et FORGE_TEST_PG_PASSWORD.\n{sonde.stderr}"
+        )
+        if os.environ.get("FORGE_REQUIRE_DB_PG") == "1":
+            pytest.fail(motif)
+        pytest.skip(motif)
+
     _purger()
     try:
         yield
