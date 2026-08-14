@@ -19,10 +19,15 @@ APP_SETTINGS = TableDefinition(
         Column("setting_key", "string", length=191),
         Column("setting_value", "text"),
         Column("value_type", "string", length=16, default="str"),
-        # `on_update_now` n'est honoré que par les dialectes qui le connaissent
-        # (MariaDB) ; ailleurs le simple DEFAULT est rendu et l'application
-        # pose la date, comme le store le fait déjà.
-        Column("updated_at", "datetime", default_now=True, on_update_now=True),
+        # `on_update_now` est retiré : il n'était honoré que par MariaDB, si
+        # bien que la colonne restait figée sur la date de création ailleurs.
+        # Le commentaire qui tenait ici affirmait que « le store pose la date,
+        # comme il le fait déjà » ; le store ne l'écrivait pas. Il le fait
+        # désormais (`SETTINGS-UPDATED-AT-001`), sur les quatre backends.
+        #
+        # Le DEFAULT reste utile pour une ligne insérée hors du store, par une
+        # migration ou à la main.
+        Column("updated_at", "datetime", default_now=True),
     ],
     primary_key=["setting_key"],
 )

@@ -192,9 +192,19 @@ class PostgreSQLDialect:
         return "TRUE" if value else "FALSE"
 
     def timestamp_default_clause(self, *, on_update: bool) -> str:
-        # PostgreSQL n'a pas d'ON UPDATE CURRENT_TIMESTAMP déclaratif : la mise
-        # à jour de la colonne est à la charge de l'application (ou d'un trigger).
-        return "DEFAULT CURRENT_TIMESTAMP"
+        """Défaut d'horodatage, **en UTC**, comme toutes les colonnes de Forge.
+
+        `CURRENT_TIMESTAMP` rendait l'heure **locale du serveur** ici, alors
+        que SQLite et SQL Server rendaient déjà de l'UTC : une même base
+        portait deux référentiels selon le backend, et la rétention d'audit
+        comparait une borne calculée en UTC par Python à des valeurs locales
+        (`DIALECT-UTC-DEFAULT-001`).
+
+        PostgreSQL n'a pas d'`ON UPDATE` déclaratif : la mise à jour de la
+        colonne est à la charge de l'application, ce que l'ADR-081 demande de
+        toute façon.
+        """
+        return "DEFAULT (now() AT TIME ZONE 'utc')"
 
     def collated_table_suffix(self) -> str:
         return ""
@@ -205,8 +215,16 @@ class PostgreSQLDialect:
     # ── Horodatage serveur (DML, OPTIN-DML-DIALECT-001) ──────────────────────
 
     def now_expression(self) -> str:
-        """`CURRENT_TIMESTAMP`, la même valeur que la clause DEFAULT."""
-        return "CURRENT_TIMESTAMP"
+        """L'instant présent **en UTC**, la même horloge que la clause DEFAULT.
+
+        Cette docstring disait déjà « la même valeur que la clause DEFAULT », et
+        c'est une propriété que le dépôt vérifie. Passer le défaut en UTC sans
+        passer celle-ci aurait donc désynchronisé les deux horloges d'un même
+        moteur : `forge-mvc-jobs` compare `available_at <= <expression>`, et un
+        travail daté en UTC comparé à l'heure locale serait pris deux heures
+        trop tôt. Pire que le défaut d'origine (`DIALECT-UTC-DEFAULT-001`).
+        """
+        return "(now() AT TIME ZONE 'utc')"
 
     def interval_seconds_expression(self, base: str) -> str:
         # `? * INTERVAL '1 second'` plutôt que `INTERVAL '? seconds'` : un

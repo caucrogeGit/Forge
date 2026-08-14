@@ -29,7 +29,11 @@ class FakeDb:
 
     def execute(self, sql: str, params: Any = ()) -> int:
         if sql.startswith("INSERT INTO"):
-            key, value, value_type = params
+            # `updated_at` est le quatrième paramètre depuis
+            # `SETTINGS-UPDATED-AT-001` : la colonne est écrite par Python, la
+            # laisser au moteur la figeait sur la date de création partout sauf
+            # sur MariaDB.
+            key, value, value_type, _updated_at = params
             self.rows[key] = (value, value_type)
             return 1
         if sql.startswith("DELETE FROM"):

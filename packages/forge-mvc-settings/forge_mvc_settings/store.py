@@ -17,6 +17,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from core.database.timestamps import utc_now
 from core.database.errors import UniqueViolationError
 from forge_mvc_settings.errors import SettingsError
 
@@ -37,11 +38,24 @@ _KEY_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_.]{0,190}$")
 
 _SELECT_ONE_SQL = f"SELECT setting_value, value_type FROM {TABLE_NAME} WHERE setting_key = ?"
 _SELECT_ALL_SQL = f"SELECT setting_key, setting_value, value_type FROM {TABLE_NAME} ORDER BY setting_key"
+#: `updated_at` est écrit par Python, jamais laissé au moteur (ADR-081).
+#:
+#: Mesuré avant correctif, sur les trois serveurs : la colonne ne suivait la
+#: modification que sur MariaDB, grâce à son `ON UPDATE` déclaratif, et restait
+#: FIGÉE sur la date de création sur PostgreSQL et SQL Server, qui n'en ont pas
+#: (`SETTINGS-UPDATED-AT-001`). Un paramètre modifié y annonçait donc, à jamais,
+#: la date à laquelle il avait été créé.
+#:
+#: MariaDB refuse par ailleurs `ON UPDATE UTC_TIMESTAMP()` : le tenir aurait mis
+#: le défaut en UTC et la mise à jour en heure locale, deux référentiels dans
+#: une seule colonne. Python tranche les deux problèmes d'un coup.
 _UPDATE_SQL = (
-    f"UPDATE {TABLE_NAME} SET setting_value = ?, value_type = ? WHERE setting_key = ?"
+    f"UPDATE {TABLE_NAME} SET setting_value = ?, value_type = ?, updated_at = ? "
+    "WHERE setting_key = ?"
 )
 _INSERT_SQL = (
-    f"INSERT INTO {TABLE_NAME} (setting_key, setting_value, value_type) VALUES (?, ?, ?)"
+    f"INSERT INTO {TABLE_NAME} (setting_key, setting_value, value_type, updated_at) "
+    "VALUES (?, ?, ?, ?)"
 )
 _DELETE_SQL = f"DELETE FROM {TABLE_NAME} WHERE setting_key = ?"
 
@@ -106,12 +120,13 @@ def set_setting(key: str, value: SettingValue, *, db: Any = None) -> None:
     # écrivains simultanés sur une clé absente ne peuvent pas insérer tous les
     # deux, et le perdant reprend par la mise à jour. Le doublon est reconnu
     # par le cœur (ADR-054), donc de la même façon sur les quatre backends.
-    if database.execute(_UPDATE_SQL, (serialized, value_type, key)):
+    maintenant = utc_now()
+    if database.execute(_UPDATE_SQL, (serialized, value_type, maintenant, key)):
         return
     try:
-        database.execute(_INSERT_SQL, (key, serialized, value_type))
+        database.execute(_INSERT_SQL, (key, serialized, value_type, maintenant))
     except UniqueViolationError:
-        database.execute(_UPDATE_SQL, (serialized, value_type, key))
+        database.execute(_UPDATE_SQL, (serialized, value_type, maintenant, key))
 
 
 def get_setting(

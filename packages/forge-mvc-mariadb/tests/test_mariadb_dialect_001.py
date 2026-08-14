@@ -72,10 +72,14 @@ def test_ddl_auth_adr_084() -> None:
     assert D.char_type(64) == "CHAR(64)"
     assert D.boolean_default_literal(True) == "TRUE"
     assert D.boolean_default_literal(False) == "FALSE"
-    assert D.timestamp_default_clause(on_update=False) == "DEFAULT CURRENT_TIMESTAMP"
-    assert D.timestamp_default_clause(on_update=True) == (
-        "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
-    )
+    # DIALECT-UTC-DEFAULT-001 : le défaut est en UTC, comme SQL Server le
+    # faisait déjà. `CURRENT_TIMESTAMP` rendait l'heure locale du serveur, si
+    # bien qu'une base portait deux référentiels selon le backend.
+    assert D.timestamp_default_clause(on_update=False) == "DEFAULT UTC_TIMESTAMP"
+    # `on_update` n'est plus honoré : MariaDB REFUSE `ON UPDATE UTC_TIMESTAMP()`,
+    # et mêler un défaut UTC à une mise à jour locale mettrait deux référentiels
+    # dans une seule colonne. La colonne est écrite par Python (ADR-081).
+    assert D.timestamp_default_clause(on_update=True) == "DEFAULT UTC_TIMESTAMP"
     assert D.collated_table_suffix() == (
         " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     )

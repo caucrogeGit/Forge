@@ -93,8 +93,13 @@ def test_ddl_auth_adr_084() -> None:
     assert D.boolean_default_literal(True) == "TRUE"
     assert D.boolean_default_literal(False) == "FALSE"
     # Pas d'ON UPDATE déclaratif en PostgreSQL : clause identique dans les deux cas.
-    assert D.timestamp_default_clause(on_update=False) == "DEFAULT CURRENT_TIMESTAMP"
-    assert D.timestamp_default_clause(on_update=True) == "DEFAULT CURRENT_TIMESTAMP"
+    # DIALECT-UTC-DEFAULT-001 : le défaut est en UTC, comme SQL Server le
+    # faisait déjà. `CURRENT_TIMESTAMP` rendait l'heure locale du serveur, si
+    # bien qu'une base portait deux référentiels selon le backend.
+    attendu = "DEFAULT (now() AT TIME ZONE 'utc')"
+    assert D.timestamp_default_clause(on_update=False) == attendu
+    # PostgreSQL n'a pas d'`ON UPDATE` déclaratif : le drapeau ne change rien.
+    assert D.timestamp_default_clause(on_update=True) == attendu
     assert D.collated_table_suffix() == ""
 
 
