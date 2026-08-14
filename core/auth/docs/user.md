@@ -130,10 +130,10 @@ Loader applicatif passé à `authenticate_user` :
 from core.auth import AuthUser
 
 
-def load_user_by_email(email: str) -> AuthUser | None:
+def load_user_by_login(login: str) -> AuthUser | None:
     row = db.fetch_one(
-        "SELECT id, email, password_hash, is_active FROM users WHERE email = ?",
-        [email],
+        "SELECT id, login, password_hash, is_active FROM users WHERE login = ?",
+        [login],
     )
     if row is None:
         return None

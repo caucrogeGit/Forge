@@ -3,6 +3,15 @@
 !!! note "Prérequis : installer l'opt-in"
     Installez `forge-mvc-testing` avant de commencer : voir sa [référence](../../reference.md).
 
+    ```bash
+    pip install --pre forge-mvc-testing    # installe le paquet
+    forge opt-in:enable testing          # le branche au projet
+    ```
+
+    Sans le paquet, l'application refuse de démarrer sur un `ModuleNotFoundError` au chargement des routes.
+
+    `forge opt-in:install testing` **affiche** la commande d'installation adaptée à votre environnement, pipx compris ; il n'installe rien lui-même (ADR-016).
+
 Objectif : premier contact avec l'outillage **dev-only** `forge-mvc-testing`.
 
 **Ce que vous allez apprendre :** `FakeRequest` imite l'objet `Request` du cœur, ce qui permet d'appeler un contrôleur sans serveur HTTP.

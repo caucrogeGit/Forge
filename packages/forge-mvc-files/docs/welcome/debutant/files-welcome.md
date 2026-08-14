@@ -3,6 +3,15 @@
 !!! note "Prérequis : installer l'opt-in"
     Installez `forge-mvc-files` avant de commencer : voir sa [référence](../../reference.md).
 
+    ```bash
+    pip install --pre forge-mvc-files    # installe le paquet
+    forge opt-in:enable files          # le branche au projet
+    ```
+
+    Sans le paquet, l'application refuse de démarrer sur un `ModuleNotFoundError` au chargement des routes.
+
+    `forge opt-in:install files` **affiche** la commande d'installation adaptée à votre environnement, pipx compris ; il n'installe rien lui-même (ADR-016).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-files`, le pipeline d'upload générique de Forge.
 
 **Ce que vous allez apprendre :** vérifier que le module répond et **inspecter sa politique** : racine de stockage (`upload_root`), extensions, types MIME et taille max autorisés.

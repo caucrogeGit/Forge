@@ -3,6 +3,15 @@
 !!! note "Prérequis : installer l'opt-in"
     Installez `forge-mvc-sessions-db` avant de commencer : voir sa [référence](../../reference.md).
 
+    ```bash
+    pip install --pre forge-mvc-sessions-db    # installe le paquet
+    forge opt-in:enable sessions-db          # le branche au projet
+    ```
+
+    Sans le paquet, l'application refuse de démarrer sur un `ModuleNotFoundError` au chargement des routes.
+
+    `forge opt-in:install sessions-db` **affiche** la commande d'installation adaptée à votre environnement, pipx compris ; il n'installe rien lui-même (ADR-016).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-sessions-db`.
 
 **Ce que vous allez apprendre :** `DbSessionStore` est un store de session qui range ses données en base, dans la table `forge_sessions`.

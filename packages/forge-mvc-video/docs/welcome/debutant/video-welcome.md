@@ -3,6 +3,15 @@
 !!! note "Prérequis : installer l'opt-in"
     Installez `forge-mvc-video` avant de commencer : voir sa [référence](../../reference.md).
 
+    ```bash
+    pip install --pre forge-mvc-video    # installe le paquet
+    forge opt-in:enable video          # le branche au projet
+    ```
+
+    Sans le paquet, l'application refuse de démarrer sur un `ModuleNotFoundError` au chargement des routes.
+
+    `forge opt-in:install video` **affiche** la commande d'installation adaptée à votre environnement, pipx compris ; il n'installe rien lui-même (ADR-016).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-video` et sa configuration.
 
 **Ce que vous allez apprendre :** vérifier que le module vidéo répond, et **inspecter sa configuration** avec `load_video_config`, en **masquant le token**.

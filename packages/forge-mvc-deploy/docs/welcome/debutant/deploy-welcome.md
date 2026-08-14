@@ -3,6 +3,15 @@
 !!! note "Prérequis : installer l'opt-in"
     Installez `forge-mvc-deploy` avant de commencer : voir sa [référence](../../reference.md).
 
+    ```bash
+    pip install --pre forge-mvc-deploy    # installe le paquet
+    forge opt-in:enable deploy          # le branche au projet
+    ```
+
+    Sans le paquet, l'application refuse de démarrer sur un `ModuleNotFoundError` au chargement des routes.
+
+    `forge opt-in:install deploy` **affiche** la commande d'installation adaptée à votre environnement, pipx compris ; il n'installe rien lui-même (ADR-016).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-deploy`.
 
 **Ce que vous allez apprendre :** déployer une application Forge demande quelques fichiers de configuration toujours semblables (point d'entrée WSGI, reverse proxy Nginx, service systemd).

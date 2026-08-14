@@ -3,6 +3,15 @@
 !!! note "Prérequis : installer l'opt-in"
     Installez `forge-mvc-entities` avant de commencer : voir sa [référence](../../reference.md).
 
+    ```bash
+    pip install --pre forge-mvc-entities    # installe le paquet
+    forge opt-in:enable entities          # le branche au projet
+    ```
+
+    Sans le paquet, l'application refuse de démarrer sur un `ModuleNotFoundError` au chargement des routes.
+
+    `forge opt-in:install entities` **affiche** la commande d'installation adaptée à votre environnement, pipx compris ; il n'installe rien lui-même (ADR-016).
+
 Objectif : premier contact avec le **moteur d'entités**, l'opt-in `forge-mvc-entities`.
 
 **Ce que vous allez apprendre :** une **entité** est décrite par un contrat JSON explicite, versionné avec votre code.

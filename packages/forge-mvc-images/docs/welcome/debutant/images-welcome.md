@@ -3,6 +3,15 @@
 !!! note "Prérequis : installer l'opt-in"
     Installez `forge-mvc-images` avant de commencer : voir sa [référence](../../reference.md).
 
+    ```bash
+    pip install --pre forge-mvc-images    # installe le paquet
+    forge opt-in:enable images          # le branche au projet
+    ```
+
+    Sans le paquet, l'application refuse de démarrer sur un `ModuleNotFoundError` au chargement des routes.
+
+    `forge opt-in:install images` **affiche** la commande d'installation adaptée à votre environnement, pipx compris ; il n'installe rien lui-même (ADR-016).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-images` et ce qu'il sait traiter.
 
 **Ce que vous allez apprendre :** vérifier que le module Images répond, et **inspecter ses capacités** : les formats d'image autorisés (`ALLOWED_IMAGE_EXTENSIONS`) et les tailles des variantes générées (`IMAGE_VARIANT_SIZES`).

@@ -84,17 +84,23 @@ def test_le_parcours_porte_des_blocs() -> None:
         f"{len(BLOCS)} bloc(s) trouvé(s) sous {WELCOME} : chemin probablement faux")
 
 
-def test_aucun_bloc_bash_a_jouer() -> None:
+def test_les_blocs_bash_sont_joues_ailleurs() -> None:
     """Le motif de ce fichier, énoncé et vérifié.
 
-    Si le parcours gagnait des blocs `bash`, c'est `run_welcome_parcours.py` qui
-    devrait les jouer, et ce fichier ne serait plus la seule couverture.
+    Ce fichier ne couvre que le **python** du parcours. Les blocs `bash` sont
+    joués par `tools/run_welcome_parcours.py`, qui suit l'ordre du site.
+
+    Le contrôle exigeait auparavant `bash == 0`. Le parcours a gagné son bloc
+    d'installation, sans lequel un lecteur partait sur un `ModuleNotFoundError`
+    (`WELCOME-PREREQUIS-ACTIONNABLE-001`). Exiger l'absence de bash revenait à
+    interdire au parcours de dire comment l'installer.
     """
     bash = sum(page.read_text(encoding="utf-8").count("```bash") for page in PAGES)
 
-    assert bash == 0, (
-        f"{bash} bloc(s) bash sont apparus : les faire jouer par "
-        f"tools/run_welcome_parcours.py, ce fichier ne couvre que le python")
+    assert bash <= 2, (
+        f"{bash} bloc(s) bash dans le parcours : au-delà du prérequis "
+        "d'installation, ils relèvent de tools/run_welcome_parcours.py, et ce "
+        "fichier cesserait d'être une couverture suffisante")
 
 
 # ── Chaque bloc parse ────────────────────────────────────────────────────────

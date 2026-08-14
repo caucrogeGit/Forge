@@ -77,7 +77,12 @@ BLOQUANTES = ("forge run", "mkdocs serve", "npm run dev", "python -m http.server
 #: session d'administration pour y coller le SQL de provisioning que `db:init`
 #: affiche (ADR-067). C'est un geste d'administrateur, distinct du projet, et
 #: la session ainsi ouverte attend une saisie humaine.
-MANUELLES = ("$EDITOR", "nano ", "vim ", "code ", "sudo ")
+#: Gestes hors du terminal. Le motif désigne une **commande**, donc en tête de
+#: ligne ou après un opérateur de shell : `"code "` cherché n'importe où
+#: classait « manuelle » toute ligne citant `forge-mvc-qrcode`, dont le nom se
+#: termine par « code » (`WELCOME-PREREQUIS-ACTIONNABLE-001`). Un bloc écarté à
+#: tort n'est pas joué, et le parcours passe sans avoir rien prouvé.
+MANUELLES = ("$EDITOR", "nano", "vim", "code", "sudo")
 
 #: Commandes qui interrogent le lecteur, et l'option documentée qui s'en passe.
 #:
@@ -287,6 +292,24 @@ def poser_fichier(chemin: str, contenu: str, projet: Path) -> str:
     return "ÉCRIT"
 
 
+def _invoque_une_commande(script: str, motifs: "tuple[str, ...]") -> bool:
+    """Vrai si l'un des motifs est INVOQUÉ, et non simplement cité.
+
+    Une commande occupe le début d'une ligne, ou suit un opérateur de shell.
+    La chercher n'importe où confond `code monfichier` avec
+    `forge-mvc-qrcode`, dont le nom se termine par les mêmes quatre lettres :
+    toute ligne citant cet opt-in était classée « manuelle », donc jamais
+    jouée, et le parcours passait sans avoir rien prouvé
+    (`WELCOME-PREREQUIS-ACTIONNABLE-001`).
+    """
+    for ligne in script.splitlines():
+        for morceau in re.split(r"\|\||&&|[|;&]", ligne):
+            mots = morceau.strip().split()
+            if mots and mots[0] in motifs:
+                return True
+    return False
+
+
 FICHIER_LANCE = re.compile(r"^\s*python3?\s+([\w./-]+\.py)", re.MULTILINE)
 
 
@@ -295,7 +318,7 @@ def raison_de_sauter(script: str, projet: "Path | None" = None) -> "str | None":
         return "PLACEHOLDER"
     if any(motif in script for motif in BLOQUANTES):
         return "BLOQUANT"
-    if any(motif in script for motif in MANUELLES):
+    if _invoque_une_commande(script, MANUELLES):
         return "MANUEL"
     if any(motif in script for motif in INTERACTIVES):
         return "INTERACTIF"
@@ -433,8 +456,20 @@ def appeler_routes(routes: "list[tuple[str, str]]", projet: Path) -> "tuple[bool
 
 
 def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
-              welcome_seul: bool = True, section: "str | None" = None) -> int:
-    if section is not None:
+              welcome_seul: bool = True, section: "str | None" = None,
+              pages_explicites: "list[Path] | None" = None) -> int:
+    """Joue un parcours, résolu depuis le `nav` du paquet ou fourni tel quel.
+
+    `pages_explicites` sert aux garde-fous du harnais lui-même. La propriété
+    « un parcours sans rien de jouable annonce RIEN JOUÉ » était vérifiée sur
+    un vrai paquet, choisi parce qu'il ne jouait rien : `iot`, puis `mail`,
+    puis `import-export` l'ont tour à tour perdue en gagnant du contenu
+    jouable. Adosser une propriété du harnais à l'état d'un paquet la rend
+    fragile à toute amélioration de la documentation.
+    """
+    if pages_explicites is not None:
+        pages = pages_explicites
+    elif section is not None:
         reference = PROJECT_ROOT / "packages" / f"forge-mvc-{paquet}" / "docs" / "reference.md"
         if not reference.is_file():
             raise SystemExit(f"Erreur : {reference} est introuvable.")

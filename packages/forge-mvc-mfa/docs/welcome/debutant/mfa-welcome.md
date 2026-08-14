@@ -3,6 +3,15 @@
 !!! note "Prérequis : installer l'opt-in"
     Installez `forge-mvc-mfa` avant de commencer : voir sa [référence](../../reference.md).
 
+    ```bash
+    pip install --pre forge-mvc-mfa    # installe le paquet
+    forge opt-in:enable mfa          # le branche au projet
+    ```
+
+    Sans le paquet, l'application refuse de démarrer sur un `ModuleNotFoundError` au chargement des routes.
+
+    `forge opt-in:install mfa` **affiche** la commande d'installation adaptée à votre environnement, pipx compris ; il n'installe rien lui-même (ADR-016).
+
 Objectif : premier contact avec le module **opt-in** `forge-mvc-mfa`.
 
 **Ce que vous allez apprendre :** vérifier que le module répond et **inspecter ses briques** : facteurs (`TOTP`, `recovery`), statuts (`pending`/`active`/`disabled`), et la présence de la clé de chiffrement `FORGE_MFA_SECRET_KEY` (sans la révéler).

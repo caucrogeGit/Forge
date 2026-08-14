@@ -169,11 +169,27 @@ def test_un_parcours_sans_bloc_joue_le_dit(capsys: pytest.CaptureFixture[str],
     Même leçon que le verdict pytest lu dans le texte plutôt que dans le code
     retour : un contrôle qui n'a rien contrôlé doit le dire.
     """
-    # `import-export` n'a ni bloc `bash`, ni bloc nommant un fichier, ni route
-    # déclarée : rien n'y est mécaniquement vérifiable, et c'est le seul cas.
-    # `iot` et `mail` ne conviennent plus, leurs routes répondant depuis que le
-    # harnais les appelle.
-    harnais.parcourir("import-export", tmp_path, lister=False)
+    # Le harnais doit dire « RIEN JOUÉ » quand il n'a rien joué. La propriété
+    # se vérifie donc sur un parcours factice, et non sur un paquet réel :
+    # `import-export` remplissait ce rôle jusqu'à ce qu'il gagne son bloc
+    # d'installation (`WELCOME-PREREQUIS-ACTIONNABLE-001`), et `iot` comme
+    # `mail` l'avaient perdu avant lui. Adosser une propriété du harnais à
+    # l'état d'un paquet la rend fragile à toute amélioration de la doc.
+    # La page vit sous la racine du dépôt : `parcourir` affiche un chemin
+    # relatif à celle-ci, et un fichier de `/tmp` le ferait échouer.
+    dossier = harnais.PROJECT_ROOT / ".pytest_parcours_factice"
+    dossier.mkdir(exist_ok=True)
+    page = dossier / "sans_rien_de_jouable.md"
+    page.write_text(
+        "# Sans rien de jouable\n\nDu texte, et aucun bloc de code.\n",
+        encoding="utf-8",
+    )
+    try:
+        harnais.parcourir("factice", tmp_path / "projet", lister=False,
+                          pages_explicites=[page])
+    finally:
+        page.unlink(missing_ok=True)
+        dossier.rmdir()
 
     assert "RIEN JOUÉ" in capsys.readouterr().out
 
