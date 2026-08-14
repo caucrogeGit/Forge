@@ -87,7 +87,7 @@
   </div>
 
   <div class="landing-version-strip landing-accent-text flex flex-wrap justify-center gap-2 text-sm font-medium mb-12">
-    <a href="https://github.com/caucrogeGit/Forge/releases" target="_blank" rel="noopener noreferrer" class="hover:underline">v1.0.0-rc.5</a><span class="opacity-40">·</span>
+    <a href="https://github.com/caucrogeGit/Forge/releases" target="_blank" rel="noopener noreferrer" class="hover:underline">v1.0.0-rc.6</a><span class="opacity-40">·</span>
     <a href="https://docs.python.org/3.12/" target="_blank" rel="noopener noreferrer" class="hover:underline">Python 3.12+</a><span class="opacity-40">·</span>
     <a href="https://mariadb.com/kb/en/" target="_blank" rel="noopener noreferrer" class="hover:underline">MariaDB 11.8</a><span class="opacity-40">·</span>
     <a href="https://www.sqlite.org/docs.html" target="_blank" rel="noopener noreferrer" class="hover:underline">SQLite</a><span class="opacity-40">·</span>
@@ -106,33 +106,33 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-rc.5 : portabilité des quatre backends éprouvée, défauts trouvés par cette épreuve, tests remis sur la vraie couche, ce que la suite taisait. -->
+<!-- Nouveautés 1.0.0-rc.6 : pré-mortem du cœur et des opt-ins, chemin d'erreur, jumeaux dev et production, documentation confrontée au code. -->
 <section id="nouveautes" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
-      <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-rc.5</div>
+      <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-rc.6</div>
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Quatre backends, éprouvés pour de vrai</h3>
-        <p class="text-white/60 text-sm leading-relaxed">MariaDB, PostgreSQL, SQL Server et SQLite sont annoncés au même niveau de support. Ce cycle l'a vérifié plutôt que déclaré : les tests d'intégration des paquets s'exécutent désormais sur trois serveurs réels, un test écrit une seule fois produisant un cas par moteur.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Le chemin d'erreur ne lâche plus</h3>
+        <p class="text-white/60 text-sm leading-relaxed">La page 500 appartient à votre projet, donc vous pouvez la casser. Elle le faisait au pire moment : l'exception ressortait, le serveur répondait à la place de Forge, et la cause première était perdue. Le code HTTP d'une page d'erreur est désormais garanti, quoi qu'il arrive au gabarit.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Ce que l'épreuve a trouvé</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Le back-office ne savait ni modifier ni supprimer un enregistrement sur deux des quatre moteurs. Le dépôt vidéo y était inutilisable. Le registre anti-rejeu de l'authentification à deux facteurs cédait sous concurrence réelle. Cinq défauts corrigés, tous invisibles d'une suite pourtant verte.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Ce que le serveur de dev cachait</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Le serveur de développement et le serveur de production ne sont pas jumeaux. Cinq divergences trouvées, dont un nonce CSP qui n'existait que chez vous : le script inline de vos gabarits était bloqué en production, sans erreur ni page cassée. Les tests qui le validaient lançaient le serveur de développement.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Les tests passent par la vraie couche</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Six tests d'intégration montaient leur propre connexion, donc contournaient la couche d'accès de Forge et sa qualification d'erreur. Ils restaient verts sur du code qui ne l'était pas. Ils empruntent maintenant le chemin de production, celui que l'application emprunte.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Un test qui construit sans exécuter</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Une requête comparée à une chaîne attendue ne dit rien de ce que le moteur en fait. Le script de <code>forge db:init</code>, première commande d'un projet, est maintenant exécuté pour de vrai sur PostgreSQL et SQL Server, sur de vrais rôles et de vraies bases.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Ce que la suite taisait</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Un test sauté ressemble à un test réussi. Vingt-cinq dormaient depuis deux refontes, faute d'une cible existante, et six contrôles d'empaquetage ne s'exécutaient nulle part. Les motifs de saut sont désormais imprimés partout, et un test rendu invisible par construction arrête la suite.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">La documentation confrontée au code</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Huit passages promettaient ce que le code ne faisait plus, dont deux protections qu'un déploiement n'avait pas. Les 433 invocations de <code>forge</code> montrées par la documentation sont désormais vérifiées : commande existante, options existantes.</p>
       </div>
 
     </div>

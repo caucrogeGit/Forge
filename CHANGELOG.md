@@ -1,6 +1,68 @@
 # Changelog
 
 
+## [1.0.0-rc.6] - 2026-08-14
+
+Cycle de pré-mortem du cœur et des opt-ins, demandé avant de passer à la rc6.
+Dix-huit tickets, dont **onze défauts de comportement** qu'une suite de 17 000 tests verts ne montrait pas.
+
+Trois motifs expliquent presque tout, et ils reviennent d'un bout à l'autre du cycle.
+
+**Un test vérifie la construction, jamais l'effet.** Une requête est comparée à une chaîne attendue, sans être soumise à un moteur ; un script de provisionnement est comparé à un texte, sans être exécuté. La chaîne peut être exactement celle qu'on voulait écrire et rester refusée par le serveur.
+
+**La documentation affirme ce que le code ne fait plus, ou pas partout.** Huit occurrences, dont deux avec une conséquence de sécurité : un exploitant se croyait protégé par une en-tête que son déploiement n'émettait pas.
+
+**Deux jumeaux, un seul exercé.** Le serveur de développement et l'adaptateur WSGI, MariaDB et les trois autres backends. Cinq divergences trouvées, dont une qui rendait une fonctionnalité documentée pour la production **silencieusement inerte** une fois déployée.
+
+### Corrigé
+
+- **Le nonce CSP n'existait que sur le serveur de développement (`CORE-WSGI-CSP-NONCE-001`).**
+  `APP_CSP_NONCE_ENABLED` est documenté comme un réglage de production, avec le helper `csp_nonce()` à poser dans les gabarits. L'adaptateur WSGI n'établissait aucun nonce et servait `script-src 'self'` : le script inline d'un gabarit était **silencieusement bloqué** en production. Pas d'erreur, pas de page cassée, la fonctionnalité ne marchait simplement pas.
+  Les tests E2E du nonce existaient et passaient : ils lancent le serveur de développement. C'est la démonstration la plus nette qu'un test passant par le jumeau ne prouve rien sur la production.
+
+- **Le chemin d'erreur 500 pouvait laisser échapper son exception (`CORE-WSGI-ERROR-PATH-001`).**
+  Six défauts sur le code qui ne tourne que lorsque tout le reste a déjà échoué, et qu'aucun appel WSGI réel n'exerçait. Un gabarit `errors/500.html` cassé, un journal inécrivable ou un contexte de dev défaillant faisaient ressortir l'exception du callable : le serveur répondait à la place de Forge, sans les en-têtes de sécurité, et **la cause première était perdue** — l'exploitant lisait l'erreur du gabarit d'erreur.
+  Le journal consignait par ailleurs la chaîne de requête en clair, là où voyagent les jetons de réinitialisation. Elle suit désormais la règle du POST : les noms restent, les valeurs sont masquées.
+
+- **Le code HTTP des pages d'erreur n'était pas garanti (`CORE-WSGI-CSRF-POST-001`, `TWIN-ERROR-PAGE-PARITY-001`).**
+  Les gabarits `errors/*.html` appartiennent à l'utilisateur : un projet peut les casser, ou ne pas les avoir. Un gabarit **absent** faisait rendre un 500 à la place du code voulu, si bien qu'une page manquante se présentait comme une panne. Un gabarit **cassé** faisait de même pour un refus CSRF.
+  `error_page` devient la seule façon officielle de rendre une page d'erreur, sur les vingt-trois sites du cœur **et des deux serveurs de développement** : le premier correctif n'avait réparé qu'un jumeau.
+
+- **Deux opt-ins écrivaient des horodatages conscients du fuseau (`OPTIN-AWARE-TIMESTAMP-001`, `OPTIN-TIMESTAMP-WIDEN-001`).**
+  Mesuré sur serveurs réels : 7200 s d'écart sur PostgreSQL, zéro sur MariaDB et SQL Server. Deux moteurs sur trois ne montrent rien, ce qui explique la durée de vie du défaut. Un événement IoT reçu à midi UTC était daté de 14 h dans une base où tout le reste est en UTC.
+  Trois tests exigeaient explicitement la forme fautive : ils épinglaient le défaut plutôt que la règle.
+
+- **« Table absente » n'était qualifiée que sur MariaDB (`IOT-DOCTOR-MISSING-TABLE-001`).**
+  Un exploitant PostgreSQL ou SQL Server qui oubliait sa migration recevait un échec annonçant une base injoignable, avec un message parlant de MariaDB. `is_undefined_table_error` rejoint `is_unique_violation` sur le contrat de backend, implémenté sur les quatre.
+  Piège consigné : **le message de PostgreSQL est traduit**. Une détection par le texte dépendrait de la langue du serveur, ce qui n'est pas une propriété du programme.
+
+- **`current_user` se taisait sur un loader incomplet (`CORE-WSGI-AUTH-GATE-001`).**
+  Deux branches de refus voisines, une seule journalisée. Un `load_user_by_id` omettant `password_hash` produisait une boucle de redirection vers `/login` que rien n'expliquait, sur un compte existant et une session valide.
+
+### Documentation
+
+- **HSTS n'est pas émis par les deux serveurs de la même façon (`HSTS-TWIN-DIVERGENCE-001`).**
+  Le serveur de développement le pose toujours, l'adaptateur WSGI seulement en HTTPS. Le choix est délibéré et le guide de déploiement confie l'en-tête au proxy inverse, mais deux pages l'annonçaient « sur toutes les réponses » sans réserve : un exploitant croyait disposer d'une protection que son déploiement n'avait pas.
+
+- **`Cache-Control: no-store` n'existe que côté développement (`NO-STORE-TWIN-DIVERGENCE-001`).**
+  Trois pages en disaient trois choses différentes. Le code n'est **pas** corrigé, délibérément : `/login` est une route publique, donc indiscernable par le contrat de route, et fermer l'écart demande une décision d'API.
+
+- **La documentation d'authentification suit le contrat login/email (`AUTH-DOC-LOGIN-CONTRACT-001`).**
+  Trente passages promettaient `--email` là où la CLI attend `--login` depuis l'ADR-089, y compris des messages d'erreur que la CLI n'émet plus.
+
+### Tests
+
+- **Les surfaces SQL jamais soumises à un moteur sont exercées** (`OPTIN-SQL-SURFACE-EXEC-001`, `DB-INIT-PROVISION-REAL-001`, `DB-INIT-PROVISION-MSSQL-001`, `CORE-WSGI-AUTH-GATE-001`).
+  `forge db:init` est la première commande d'un projet : son script est désormais **exécuté** par `psql` et par le pilote SQL Server, sur de vrais rôles et de vraies bases. Un script invalide y bloquerait un projet avant qu'il existe, sans rattrapage.
+  La protection d'accès est vérifiée par un témoin d'exécution et non par un code de statut : la propriété qui compte n'est pas « le middleware rend une redirection » mais « le contrôleur protégé ne s'exécute pas ».
+
+- **Les commandes et options montrées par la documentation existent (`DOC-CLI-INVOCATIONS-001`).**
+  823 blocs bash, dont 433 invocations de `forge`, dont aucune n'était vérifiée.
+
+- **Un garde-fou ne juge plus la prose (`SOURCE-SCAN-001`).**
+  Cinq fois dans ce cycle, un relevé a échoué sur une docstring qui expliquait précisément ce que le code ne fait pas. `code_sans_prose` porte la règle une seule fois, adopté par huit garde-fous.
+
+
 ## [Non publié]
 
 ### Ajouté

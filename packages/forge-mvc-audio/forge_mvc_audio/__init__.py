@@ -22,7 +22,7 @@ explicitement. Aucune écriture dans le code utilisateur (charte §9).
 
 from __future__ import annotations
 
-__version__ = "1.0.0rc5"
+__version__ = "1.0.0rc6"
 
 from forge_mvc_audio.config import AudioConfig, load_audio_config
 from forge_mvc_audio.http import register_audio_routes
