@@ -67,7 +67,7 @@ sequenceDiagram
 
 | Symbole | Signature | Rôle |
 |---|---|---|
-| `make_crud` | `make_crud(...) -> MakeCrudResult` | génère l'ensemble des fichiers CRUD d'une entité |
+| `make_crud` | `make_crud(entity_name, *, entities_root, output_root, dry_run=False, views_namespace="") -> MakeCrudResult` | génère l'ensemble des fichiers CRUD d'une entité |
 | `cmd_make_crud_main` | `cmd_make_crud_main(args: list[str]) -> None` | point d'entrée de `forge make:crud` |
 | `MakeCrudResult` | dataclass | résultat de génération (fichiers créés, fichiers préservés) |
 
