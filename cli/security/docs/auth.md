@@ -77,15 +77,15 @@ classDiagram
     }
 
     class CommandesComptes {
-        +create_auth_user(email, password)
+        +create_auth_user(login, password, email)
         +list_auth_users()
-        +show_auth_user(user_id, email)
-        +disable_auth_user(user_id, email)
-        +enable_auth_user(user_id, email)
-        +change_auth_user_password(user_id, email, password)
-        +add_auth_user_role(user_id, email, role)
-        +remove_auth_user_role(user_id, email, role)
-        +list_auth_user_roles(user_id, email)
+        +show_auth_user(user_id, login)
+        +disable_auth_user(user_id, login)
+        +enable_auth_user(user_id, login)
+        +change_auth_user_password(user_id, login, password)
+        +add_auth_user_role(user_id, login, role)
+        +remove_auth_user_role(user_id, login, role)
+        +list_auth_user_roles(user_id, login)
     }
 
     CommandesInstallation --> AuthSqlFile : décrit
@@ -162,15 +162,15 @@ Les fonctions publiques du module sont réutilisables et acceptent des accès ba
 
 | Fonction | Signature |
 |---|---|
-| `create_auth_user` | `create_auth_user(*, email, password, fetch_one=None, insert=None) -> int` |
+| `create_auth_user` | `create_auth_user(*, login, password, email=None, fetch_one=None, insert=None) -> int` |
 | `list_auth_users` | `list_auth_users(*, fetch_all=None) -> tuple[dict, ...]` |
-| `show_auth_user` | `show_auth_user(*, user_id=None, email=None, fetch_one=None) -> dict \| None` |
-| `disable_auth_user` | `disable_auth_user(*, user_id=None, email=None, fetch_one=None, execute=None) -> int` |
-| `enable_auth_user` | `enable_auth_user(*, user_id=None, email=None, fetch_one=None, execute=None) -> int` |
-| `change_auth_user_password` | `change_auth_user_password(*, user_id=None, email=None, password, fetch_one=None, execute=None) -> int` |
-| `add_auth_user_role` | `add_auth_user_role(*, user_id=None, email=None, role, fetch_one=None, execute=None) -> dict` |
-| `remove_auth_user_role` | `remove_auth_user_role(*, user_id=None, email=None, role, fetch_one=None, execute=None) -> dict` |
-| `list_auth_user_roles` | `list_auth_user_roles(*, user_id=None, email=None, fetch_one=None, fetch_all=None) -> tuple[dict, ...]` |
+| `show_auth_user` | `show_auth_user(*, user_id=None, login=None, fetch_one=None) -> dict \| None` |
+| `disable_auth_user` | `disable_auth_user(*, user_id=None, login=None, fetch_one=None, execute=None) -> int` |
+| `enable_auth_user` | `enable_auth_user(*, user_id=None, login=None, fetch_one=None, execute=None) -> int` |
+| `change_auth_user_password` | `change_auth_user_password(*, user_id=None, login=None, password, fetch_one=None, execute=None) -> int` |
+| `add_auth_user_role` | `add_auth_user_role(*, user_id=None, login=None, role, fetch_one=None, execute=None) -> dict` |
+| `remove_auth_user_role` | `remove_auth_user_role(*, user_id=None, login=None, role, fetch_one=None, execute=None) -> dict` |
+| `list_auth_user_roles` | `list_auth_user_roles(*, user_id=None, login=None, fetch_one=None, fetch_all=None) -> tuple[dict, ...]` |
 | `list_auth_sql_files` | `list_auth_sql_files(root=None) -> tuple[AuthCliCheck, ...]` |
 | `build_auth_status` | `build_auth_status(root=None) -> tuple[AuthCliCheck, ...]` |
 | `run_auth_doctor` | `run_auth_doctor(root=None) -> tuple[AuthCliCheck, ...]` |
