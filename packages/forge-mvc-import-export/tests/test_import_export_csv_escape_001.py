@@ -29,7 +29,7 @@ def _cellules(texte: str) -> "list[list[str]]":
     return list(csv.reader(io.StringIO(texte)))
 
 
-@pytest.mark.parametrize("dangereuse", ["=1+1", "+1", "-1", "@SUM(A1)",
+@pytest.mark.parametrize("dangereuse", ["=1+1", "+1+cmd", "-1+1", "@SUM(A1)",
                                         '=HYPERLINK("http://x","clic")',
                                         "\t=cmd", "\r=cmd"])
 def test_une_cellule_de_formule_sort_inerte(dangereuse: str) -> None:
@@ -77,3 +77,61 @@ def test_l_export_passe_par_la_primitive_du_coeur() -> None:
 
     assert "from core.security.csv_export import escape_csv_field" in source
     assert "FORMULA_TRIGGERS" not in source, "la règle ne se recopie pas"
+
+
+@pytest.mark.parametrize("nombre", ["-1", "+1", "-12", "-3.5", "-1e-3", "+33612345678"])
+def test_un_nombre_sort_intact(nombre: str) -> None:
+    """Un nombre ne peut pas être une formule, et l'échapper coûte cher.
+
+    Ce fichier épinglait `+1` et `-1` comme devant être échappés. C'était la
+    liste OWASP recopiée, pas un arbitrage sur les nombres : rien n'est écrit
+    nulle part sur ce cas, et il a un coût mesuré
+    (`CSV-NOMBRE-NEGATIF-001`).
+
+    Tout nombre négatif d'un export devenait `'-12`, avec deux conséquences :
+
+    - dans le tableur, la colonne des montants passait en **texte**, et les
+      sommes cessaient silencieusement de compter les valeurs négatives ;
+    - au réimport, la valeur revenait comme la chaîne `'-12`, qu'aucune
+      conversion numérique n'accepte. Or exporter, corriger dans un tableur,
+      réimporter est la raison d'être de ce module.
+
+    L'exemption ne retire aucune protection : `-1+1` n'est pas un nombre et
+    reste échappé, comme `+1+cmd`. Un tableur affiche `-12` comme moins douze,
+    jamais comme un calcul.
+    """
+    rendu = to_csv([{"a": nombre}], ["a"])
+
+    valeur = _cellules(rendu)[1][0]
+
+    assert valeur == nombre, (
+        f"le nombre {nombre!r} est sorti échappé en {valeur!r} : il deviendra "
+        "du texte dans le tableur et refusera de se réimporter"
+    )
+
+
+def test_un_export_se_reimporte_a_l_identique() -> None:
+    """L'aller-retour dans le sens qui compte : exporter puis relire.
+
+    Le fichier ne testait que `parse` puis `export`. Le sens inverse est celui
+    qu'un exploitant emprunte réellement : il exporte, corrige dans un tableur,
+    réimporte. C'est là que l'échappement des nombres se payait, et rien ne
+    l'exerçait.
+    """
+    from forge_mvc_import_export.csv_reader import parse_csv
+
+    lignes = [
+        {"nom": "Dupont", "solde": "-12", "note": "=1+1"},
+        {"nom": "Martin", "solde": "40", "note": "ordinaire"},
+    ]
+
+    relu = parse_csv(to_csv(lignes, ["nom", "solde", "note"]))
+
+    assert [ligne["solde"] for ligne in relu] == ["-12", "40"], (
+        "les soldes ne reviennent pas tels qu'ils sont partis : une conversion "
+        "numérique les refusera"
+    )
+    assert relu[0]["nom"] == "Dupont"
+    # La formule, elle, revient neutralisée : c'est la protection qui agit, et
+    # c'est le seul champ que l'aller-retour modifie légitimement.
+    assert relu[0]["note"] == "'=1+1"

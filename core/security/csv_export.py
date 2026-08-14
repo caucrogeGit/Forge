@@ -69,5 +69,42 @@ def escape_csv_field(value: str) -> str:
 
     first = value.lstrip("".join(INVISIBLE_LEADERS))[:1]
     if first and first in FORMULA_TRIGGERS:
+        if _est_un_nombre(value):
+            return value
         return "'" + value
     return value
+
+
+def _est_un_nombre(value: str) -> bool:
+    """Vrai si `value` est un nombre écrit tel quel, sans rien autour.
+
+    Un nombre ne peut pas être une formule : un tableur affiche `-12` comme le
+    nombre moins douze, pas comme un calcul. L'exempter ne retire donc aucune
+    protection, et retire un défaut bien réel (`CSV-NOMBRE-NEGATIF-001`).
+
+    Sans cette exemption, tout nombre négatif d'un export devenait `'-12` :
+
+    - dans le tableur, la colonne des montants passait en **texte**, et les
+      sommes cessaient silencieusement de compter les valeurs négatives ;
+    - au réimport, la valeur revenait comme la chaîne `'-12`, qu'aucune
+      conversion numérique n'accepte. L'aller-retour exporter, corriger dans un
+      tableur, réimporter est pourtant la raison d'être du module d'import et
+      d'export.
+
+    Le contrôle est **strict**, et c'est voulu :
+
+    - `float()` accepte les espaces de tête, `-1\t` ou ` -1` passeraient. On
+      exige donc que la valeur soit égale à sa forme sans espaces ;
+    - `-1+1` n'est pas un nombre et reste échappé, comme `=1+1` ;
+    - `nan` et `inf` sont refusés : ce ne sont pas des nombres qu'un export
+      légitime produit, et leur laisser une exemption ouvrirait la porte à
+      des formes exotiques pour un gain nul.
+    """
+    if value != value.strip():
+        return False
+    try:
+        nombre = float(value)
+    except ValueError:
+        return False
+    # `float("nan")` et `float("inf")` réussissent : on les écarte.
+    return nombre == nombre and nombre not in (float("inf"), float("-inf"))
