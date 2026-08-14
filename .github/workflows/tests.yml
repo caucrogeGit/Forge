@@ -22,6 +22,16 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      # Le depot epingle Node dans `.nvmrc` (24.17.0), `package.json` declare
+      # `engines.node` et `.npmrc` active `engine-strict`. La CI prenait le
+      # Node du runner, en 22 : `forge new` y echouait sur `npm install`, et
+      # rien ne l'avait montre parce qu'aucun test n'en dependait avant
+      # `GUIDE-PRISE-EN-MAIN-EXEC-001`.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
       - name: Install system dependencies
         run: |
           sudo apt-get update

@@ -43,10 +43,47 @@ import pytest
 pytest.importorskip("forge_mvc_entities")
 pytest.importorskip("forge_mvc_sqlite")
 
-pytestmark = pytest.mark.smoke
 
 PROJECT_ROOT = Path(__file__).parent.parent
 FORGE = str(PROJECT_ROOT / "forge.py")
+
+
+def _node_trop_ancien() -> str | None:
+    """Motif de saut si Node est trop ancien pour `forge new`, sinon `None`.
+
+    Le squelette épingle Node dans `.nvmrc`, déclare `engines.node` et active
+    `engine-strict` : `npm install` **refuse** de tourner sous une version
+    inférieure, et `forge new` échoue donc entièrement.
+
+    Un contributeur sous une version plus ancienne ne doit pas voir une suite
+    rouge pour une raison étrangère à son changement. La CI, elle, installe la
+    version épinglée : le parcours y est réellement joué
+    (`GUIDE-PRISE-EN-MAIN-EXEC-001`).
+    """
+    if shutil.which("npm") is None:
+        return "npm absent : `forge new` ne peut pas installer les dépendances Node."
+    exige = (PROJECT_ROOT / ".nvmrc").read_text(encoding="utf-8").strip()
+    resultat = subprocess.run(["node", "--version"], capture_output=True, text=True, timeout=60)
+    if resultat.returncode != 0:
+        return "node absent : `forge new` ne peut pas installer les dépendances Node."
+    presente = resultat.stdout.strip().lstrip("v")
+
+    def _cle(version: str) -> tuple[int, ...]:
+        return tuple(int(x) for x in version.split(".") if x.isdigit())
+
+    if _cle(presente) < _cle(exige):
+        return (
+            f"Node {presente} < {exige} exigé par .nvmrc : `npm install` refuse "
+            "de tourner (engine-strict), donc `forge new` échoue. Installez la "
+            "version épinglée (nvm use) pour couvrir le parcours."
+        )
+    return None
+
+
+pytestmark = [
+    pytest.mark.smoke,
+    pytest.mark.skipif(_node_trop_ancien() is not None, reason=_node_trop_ancien() or ""),
+]
 
 
 def _forge(*args: str, cwd: Path, timeout: int = 300) -> subprocess.CompletedProcess[str]:
