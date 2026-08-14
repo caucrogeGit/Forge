@@ -133,15 +133,36 @@ class TestGlobalHelpStillWorks:
 class TestNativeHelpPreserved:
     """Les commandes avec --help natif gardent leur aide détaillée."""
 
-    def test_make_entity_keeps_native_help(self):
-        """make:entity a un `__doc__` détaillé, pas l'aide générique."""
-        result = _run_forge("make:entity", "--help")
+    @pytest.mark.parametrize(
+        ("commande", "marqueur"),
+        [
+            ("make:entity", "Grammaire d'un champ"),
+            ("make:relation", "--inverse-name"),
+            ("migration:make", "--from-diff"),
+        ],
+    )
+    def test_l_aide_native_est_bien_celle_qui_s_affiche(self, commande, marqueur):
+        """Ces commandes portent leur aide, et c'est elle qui doit sortir.
+
+        Le contrôle vérifiait seulement l'ABSENCE du marqueur `Description:`
+        du gabarit centralisé. Le repli générique des opt-ins, « cette commande
+        n'expose pas d'aide détaillée », le satisfaisait aussi : le garde-fou
+        passait sur l'état exact qu'il devait empêcher
+        (`OPTIN-NATIVE-HELP-001`).
+
+        Il exige désormais la **présence** d'un contenu que seule l'aide native
+        porte. Une absence ne se démontre pas par une autre absence.
+        """
+        result = _run_forge(commande, "--help")
+
         assert result.returncode == 0
-        # Marqueur de l'aide native (présent dans __doc__ de make_entity.py)
-        # mais ABSENT du template générique (qui contient 'Description:')
-        assert "Description:" not in result.stdout, (
-            "L'interception centrale a écrasé l'aide native de make:entity. "
-            f"Sortie : {result.stdout!r}"
+        assert "n'expose pas d'aide détaillée" not in result.stdout, (
+            f"forge {commande} --help rend le repli générique au lieu de son "
+            f"aide native. Sortie : {result.stdout!r}"
+        )
+        assert marqueur in result.stdout, (
+            f"l'aide de forge {commande} ne porte pas « {marqueur} », marqueur "
+            f"de son aide native. Sortie : {result.stdout!r}"
         )
 
     def test_auth_user_create_keeps_argparse_help(self):
@@ -165,3 +186,49 @@ class TestUnknownCommandUnchanged:
         # pas, le dispatcher tombe sur cli_fail("commande inconnue").
         assert result.returncode != 0
         assert "commande inconnue" in (result.stdout + result.stderr).lower()
+
+
+class TestNativeHelpNeVaJamaisPlusLoin:
+    """`native_help` atteste que la commande sort sur `-h` sans aucun effet.
+
+    Le drapeau lève l'interception centrale (F40, ADR-072) : c'est donc le
+    handler lui-même qui doit garantir qu'aucun effet ne se produit. Sans ce
+    contrôle, le drapeau serait une affirmation que personne ne vérifie, et
+    `forge make:entity --help` pourrait un jour écrire un fichier.
+    """
+
+    @pytest.mark.parametrize(
+        "commande", ["make:entity", "make:relation", "migration:make"]
+    )
+    def test_aucun_fichier_n_est_ecrit_par_l_aide(self, commande, tmp_path):
+        """L'aide est demandée depuis un dossier vide : il doit le rester."""
+        avant = set(tmp_path.rglob("*"))
+
+        result = subprocess.run(
+            [sys.executable, str(PROJECT_ROOT / "forge.py"), commande, "--help"],
+            cwd=tmp_path, capture_output=True, text=True, timeout=120,
+        )
+
+        assert result.returncode == 0, result.stderr
+        assert set(tmp_path.rglob("*")) == avant, (
+            f"forge {commande} --help a écrit dans le dossier courant : "
+            f"{sorted(set(tmp_path.rglob('*')) - avant)}"
+        )
+
+
+class TestChaqueCommandeNativeEstDeclaree:
+    """La liste du test et celle du registre doivent coïncider.
+
+    Une commande retirée de `native_help` sans que le test le sache
+    retomberait en silence sur le repli générique.
+    """
+
+    def test_les_trois_commandes_declarent_native_help(self):
+        from cli.commands.optin_dispatch import all_optin_commands
+
+        commandes = all_optin_commands()
+        for nom in ("make:entity", "make:relation", "migration:make"):
+            assert commandes[nom].native_help, (
+                f"{nom} ne déclare plus `native_help` : son aide propre sera "
+                "masquée par le repli générique des opt-ins"
+            )

@@ -18,11 +18,13 @@ _PKG = "forge_mvc_entities"
 
 _MODEL: dict[str, object] = {"module": f"{_PKG}.model", "full": True, "exit_rc": False}
 _MIGR: dict[str, object] = {"module": f"{_PKG}.migrations", "full": True, "exit_rc": False}
+#: `migration:make` porte son aide ; les autres commandes de ce module non.
+_MIGR_AIDE: dict[str, object] = dict(_MIGR, native_help=True)
 
 COMMANDS: dict[str, dict[str, object]] = {
-    "make:entity": {"module": f"{_PKG}.make_entity", "exit_rc": False},
+    "make:entity": {"module": f"{_PKG}.make_entity", "exit_rc": False, "native_help": True},
     "make:crud": {"module": f"{_PKG}.make_crud", "attr": "cmd_make_crud_main", "exit_rc": False},
-    "make:relation": {"module": f"{_PKG}.make_relation", "exit_rc": False},
+    "make:relation": {"module": f"{_PKG}.make_relation", "exit_rc": False, "native_help": True},
     "make:pivot-crud": {
         "module": f"{_PKG}.make_pivot_crud", "attr": "cmd_make_pivot_crud_main", "exit_rc": False,
     },
@@ -34,7 +36,7 @@ COMMANDS: dict[str, dict[str, object]] = {
     "check:model": _MODEL,
     "migration:status": _MIGR,
     "migration:apply": _MIGR,
-    "migration:make": _MIGR,
+    "migration:make": _MIGR_AIDE,
     "migration:diff": _MIGR,
     "db:config": {"module": f"{_PKG}.db_config", "exit_rc": True},
 }

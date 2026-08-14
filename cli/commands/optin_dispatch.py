@@ -32,6 +32,7 @@ class OptinCommand:
     pass_full_args: bool = False  # le handler reçoit les args complets (commande incluse)
     exit_on_rc: bool = True       # sys.exit(rc) si le handler renvoie un code non nul
     needs_config: bool = False    # amorcer la config projet (env/dev) avant le handler
+    native_help: bool = False     # le handler traite lui-même -h/--help et sort sans effet
 
 
 _discovered_cache: dict[str, OptinCommand] | None = None
@@ -61,6 +62,7 @@ def _discovered_commands() -> dict[str, OptinCommand]:
                 pass_full_args=bool(spec.get("full", False)),
                 exit_on_rc=bool(spec.get("exit_rc", True)),
                 needs_config=bool(spec.get("config", False)),
+                native_help=bool(spec.get("native_help", False)),
             )
     _discovered_cache = discovered
     return _discovered_cache
@@ -103,11 +105,21 @@ def dispatch_optin(command: str, args: list[str]) -> bool:
         detailed = format_command_help(command)
         if detailed is not None:
             print(detailed)
-        else:
+            return True
+        if not spec.native_help:
             print(f"forge {command} — commande fournie par l'opt-in {spec.package}.")
             print("Cette commande n'expose pas d'aide détaillée ; "
                   "consultez la documentation de l'opt-in.")
-        return True
+            return True
+        # `native_help` : la commande porte sa propre aide et traite `-h`
+        # elle-même, en sortant avant tout effet. L'intercepter ici la
+        # masquait derrière le repli générique, si bien que `make:entity`,
+        # `make:relation` et `migration:make` répondaient « n'expose pas
+        # d'aide détaillée » alors qu'elles en ont une, riche et à jour
+        # (`OPTIN-NATIVE-HELP-001`).
+        #
+        # La garantie F40 tient toujours : le drapeau atteste que la commande
+        # sort sur `-h` sans rien produire, et un garde-fou l'exige.
 
     try:
         module = importlib.import_module(spec.module)
