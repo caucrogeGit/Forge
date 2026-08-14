@@ -23,12 +23,37 @@ from forge_mvc_video.storage.files import mp4_relpath, poster_relpath
 from forge_mvc_video.storage.repository import VideoRepository
 from forge_mvc_video.transcode import FfmpegError, generate_poster, transcode_to_mp4
 
-__all__ = ["VideoProcessError", "process_video"]
+__all__ = ["VideoProcessError", "instant_de_l_affiche", "process_video"]
 
 # Briques injectables : probe (chemin → métadonnées) et poster/transcode
 # (source, destination → effet de bord ffmpeg).
 _ProbeFn = Callable[[str], VideoMetadata]
 _OutputFn = Callable[[str, str], None]
+
+
+#: Instant de capture de l'affiche, en secondes, pour une vidéo assez longue.
+_AFFICHE_PAR_DEFAUT_SECONDES = 1
+
+
+def instant_de_l_affiche(duration_seconds: int | None) -> int:
+    """Instant où prendre l'affiche, borné par la durée de la vidéo.
+
+    `ffmpeg` cherchait à une seconde sans regarder la durée. Sur une vidéo
+    d'une seconde ou moins, la recherche tombe après la dernière image, aucune
+    image n'est écrite, et ffmpeg échoue. Le pipeline marquait alors la vidéo
+    entière en échec, alors que le transcodage aurait réussi
+    (`VIDEO-AFFICHE-COURTE-001`).
+
+    Une vidéo d'une seconde n'a rien d'exceptionnel : un clip de produit, un
+    GIF converti, une capture rapide.
+
+    La durée est connue, la sonde ayant déjà tourné. Le calcul est fait ici,
+    au vu, plutôt que par une reprise silencieuse dans `generate_poster` : le
+    framework ne devine pas, il choisit et le montre (principe 3).
+    """
+    if duration_seconds is None or duration_seconds <= _AFFICHE_PAR_DEFAUT_SECONDES:
+        return 0
+    return _AFFICHE_PAR_DEFAUT_SECONDES
 
 
 class VideoProcessError(Exception):
@@ -64,8 +89,14 @@ def process_video(
     original_abs = str(root / row["original_path"])
 
     probe: _ProbeFn = probe_fn or (lambda p: probe_video(p, config=cfg))
+    #: L'instant de capture est décidé APRÈS la sonde, la durée étant alors
+    #: connue ; la fermeture le lit au moment de l'appel.
+    instant_affiche = {"secondes": _AFFICHE_PAR_DEFAUT_SECONDES}
     poster: _OutputFn = poster_fn or (
-        lambda src, dst: generate_poster(src, dst, ffmpeg_bin=cfg.ffmpeg_bin)
+        lambda src, dst: generate_poster(
+            src, dst, ffmpeg_bin=cfg.ffmpeg_bin,
+            at_seconds=instant_affiche["secondes"],
+        )
     )
     transcode: _OutputFn = transcode_fn or (
         lambda src, dst: transcode_to_mp4(src, dst, ffmpeg_bin=cfg.ffmpeg_bin)
@@ -89,6 +120,7 @@ def process_video(
 
         mp4_abs.parent.mkdir(parents=True, exist_ok=True)
         poster_abs.parent.mkdir(parents=True, exist_ok=True)
+        instant_affiche["secondes"] = instant_de_l_affiche(meta.duration_seconds)
         poster(original_abs, str(poster_abs))
         transcode(original_abs, str(mp4_abs))
 
