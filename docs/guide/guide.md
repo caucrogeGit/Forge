@@ -91,7 +91,7 @@ DB_APP_PWD=<mot_de_passe_applicatif>
     | `SSL_KEYFILE` | Clé SSL | `key.pem` |
 
 !!! warning "Ne pas confondre les deux comptes MariaDB"
-    `DB_ADMIN_LOGIN` est utilisé uniquement par `forge db:init` pour créer la base et l'utilisateur applicatif.
+    `DB_ADMIN_LOGIN` est le compte que `forge db:init` inscrit dans le SQL de provisioning qu'il **affiche**, et qu'il emploie avec `--run` pour créer la base et le compte applicatif (ADR-067).
     `DB_APP_LOGIN` est utilisé ensuite par l'application en fonctionnement normal et par `forge db:apply` en développement.
 
 ### 3. Initialiser la base MariaDB

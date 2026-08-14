@@ -40,7 +40,7 @@ Le but est de montrer Forge : comment les entités s'organisent, comment les rel
 forge make:entity   → crée l'entité JSON (vous éditez les champs)
 forge make:relation → déclare les relations dans relations.json
 forge build:model   → régénère TOUT depuis le JSON : SQL, _base.py, relations.sql
-forge db:init       → crée la base et applique le SQL généré
+forge db:init       → AFFICHE le SQL de provisioning (--run pour l'exécuter)
 forge make:crud     → génère contrôleurs, formulaires et vues
 forge run           → lance l'application
 ```
@@ -274,7 +274,19 @@ Les fichiers de `Contact` suivent le même schéma (`contact_controller.py`, `co
     Si `forge make:crud` est relancé sur une entité existante, il refuse sans l'option `--force`.
     Votre code est en sécurité.
 
-Les routes sont ajoutées automatiquement dans `mvc/routes/__init__.py`.
+`forge make:crud` écrit `mvc/routes/<entite>_routes.py`, puis **affiche** le branchement à coller dans `mvc/routes/__init__.py` :
+
+```python
+from mvc.routes.contact_routes import register_contact_routes
+register_contact_routes(router)
+```
+
+!!! warning "Ce collage n'est pas facultatif"
+
+    Forge n'écrit jamais dans `mvc/routes/__init__.py` : ce fichier vous appartient (charte, principe 9).
+    Sans ce collage, `forge routes:list` ne montrera aucune route de l'entité, et l'application répondra 404 sur `/contact`.
+
+    Cette page annonçait auparavant un branchement « automatique ». Il ne l'a jamais été, et un lecteur qui s'y fiait obtenait un 404 sans comprendre pourquoi (`GUIDE-PRISE-EN-MAIN-EXEC-001`).
 
 ---
 
