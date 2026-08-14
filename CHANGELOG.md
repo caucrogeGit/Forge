@@ -4,7 +4,7 @@
 ## [1.0.0-rc.6] - 2026-08-14
 
 Cycle de pré-mortem du cœur et des opt-ins, demandé avant de passer à la rc6.
-Dix-huit tickets, dont **onze défauts de comportement** qu'une suite de 17 000 tests verts ne montrait pas.
+Vingt-quatre tickets, dont **quinze défauts de comportement** qu'une suite de 17 000 tests verts ne montrait pas.
 
 Trois motifs expliquent presque tout, et ils reviennent d'un bout à l'autre du cycle.
 
@@ -15,6 +15,26 @@ Trois motifs expliquent presque tout, et ils reviennent d'un bout à l'autre du 
 **Deux jumeaux, un seul exercé.** Le serveur de développement et l'adaptateur WSGI, MariaDB et les trois autres backends. Cinq divergences trouvées, dont une qui rendait une fonctionnalité documentée pour la production **silencieusement inerte** une fois déployée.
 
 ### Corrigé
+
+- **Le moteur datait en heure locale sur deux backends (`DIALECT-UTC-DEFAULT-001`).**
+  Neuf colonnes réparties dans sept opt-ins laissent le moteur poser leur horodatage. MariaDB et PostgreSQL rendaient l'heure **locale** du serveur, SQLite et SQL Server de l'UTC.
+  SQL Server employait déjà `SYSUTCDATETIME()` : l'intention était l'UTC dès l'origine, les deux autres n'avaient jamais été convertis. Une même base portait donc deux référentiels selon le backend.
+  Un test existant a rattrapé une régression introduite par ce correctif : `now_expression()` et la clause `DEFAULT` doivent porter la même horloge, sans quoi `forge-mvc-jobs` aurait pris ses travaux deux heures trop tôt.
+  Au passage, `settings.updated_at` annonçait la date de **création** sur PostgreSQL et SQL Server, faute d'`ON UPDATE` déclaratif, et un commentaire affirmait que le store écrivait la colonne. Il ne l'écrivait pas ; il le fait désormais.
+
+- **Les nombres négatifs étaient corrompus à l'export CSV (`CSV-NOMBRE-NEGATIF-001`).**
+  La protection contre l'injection de formule préfixait d'une apostrophe toute cellule commençant par `=`, `+`, `-` ou `@`. Tout nombre négatif en faisait partie : `-12` sortait `'-12`.
+  Dans le tableur, la colonne des montants passait en texte et les sommes cessaient silencieusement de compter les valeurs négatives. Au réimport, la valeur ne se convertissait plus. L'aller-retour exporter, corriger, réimporter est pourtant la raison d'être du module.
+  Un nombre ne peut pas être une formule : l'exemption ne retire aucune protection, `-1+1` et `+1+cmd` restant échappés.
+
+- **Une vidéo d'une seconde était rejetée en entier (`VIDEO-AFFICHE-COURTE-001`).**
+  L'affiche était prise à une seconde sans regarder la durée. La recherche tombait après la dernière image, ffmpeg échouait, et le pipeline marquait la vidéo entière en échec alors que le transcodage aurait réussi.
+  Trouvé en exécutant vraiment `ffmpeg`, que rien n'exerçait : la commande était construite et comparée à une chaîne, jamais lancée, et le parseur de `ffprobe` était nourri d'un JSON écrit à la main.
+
+- **L'aide de trois commandes était masquée (`OPTIN-NATIVE-HELP-001`).**
+  `make:entity`, `make:relation` et `migration:make` répondaient « cette commande n'expose pas d'aide détaillée » alors qu'elles en portent une. L'interception d'aide des opt-ins passait devant celles qui traitent `-h` elles-mêmes.
+  Le garde-fou censé protéger cette aide était **creux** : il vérifiait l'absence d'un marqueur, que le message de repli satisfaisait aussi. Il passait donc sur l'état exact qu'il devait empêcher.
+
 
 - **Le nonce CSP n'existait que sur le serveur de développement (`CORE-WSGI-CSP-NONCE-001`).**
   `APP_CSP_NONCE_ENABLED` est documenté comme un réglage de production, avec le helper `csp_nonce()` à poser dans les gabarits. L'adaptateur WSGI n'établissait aucun nonce et servait `script-src 'self'` : le script inline d'un gabarit était **silencieusement bloqué** en production. Pas d'erreur, pas de page cassée, la fonctionnalité ne marchait simplement pas.
@@ -39,6 +59,12 @@ Trois motifs expliquent presque tout, et ils reviennent d'un bout à l'autre du 
 - **`current_user` se taisait sur un loader incomplet (`CORE-WSGI-AUTH-GATE-001`).**
   Deux branches de refus voisines, une seule journalisée. Un `load_user_by_id` omettant `password_hash` produisait une boucle de redirection vers `/login` que rien n'expliquait, sur un compte existant et une session valide.
 
+### Ajouté
+
+- **Drapeau de route `no_store` (`NO-STORE-ROUTE-FLAG-001`).**
+  `Cache-Control: no-store` vivait dans une liste de chemins codée en dur du serveur de développement, que l'adaptateur WSGI ne connaissait pas : la production servait la page de connexion sans l'en-tête.
+  Le cœur ne pouvait pas déduire la règle, `/login` étant une route publique. Elle est donc déclarée, et honorée par `Application.dispatch`, donc par les deux serveurs. `forge make:auth` pose le drapeau sur les routes qu'il engendre, et une application marque ses propres pages sensibles de la même façon.
+
 ### Documentation
 
 - **HSTS n'est pas émis par les deux serveurs de la même façon (`HSTS-TWIN-DIVERGENCE-001`).**
@@ -55,6 +81,10 @@ Trois motifs expliquent presque tout, et ils reviennent d'un bout à l'autre du 
 - **Les surfaces SQL jamais soumises à un moteur sont exercées** (`OPTIN-SQL-SURFACE-EXEC-001`, `DB-INIT-PROVISION-REAL-001`, `DB-INIT-PROVISION-MSSQL-001`, `CORE-WSGI-AUTH-GATE-001`).
   `forge db:init` est la première commande d'un projet : son script est désormais **exécuté** par `psql` et par le pilote SQL Server, sur de vrais rôles et de vraies bases. Un script invalide y bloquerait un projet avant qu'il existe, sans rattrapage.
   La protection d'accès est vérifiée par un témoin d'exécution et non par un code de statut : la propriété qui compte n'est pas « le middleware rend une redirection » mais « le contrôleur protégé ne s'exécute pas ».
+
+- **Le QR Code encode vraiment son texte (`QRCODE-ENCODE-REEL-001`).**
+  Les contrôles vérifiaient que la sortie ressemble à une image. Mesure par contrôle négatif : un générateur modifié pour ignorer son argument laissait les 47 tests d'origine verts.
+  Les pixels du PNG sont désormais relus et comparés à la matrice, ce qui ferme d'un coup l'image blanche, l'image tronquée, l'échelle non appliquée et la marge absente.
 
 - **Les commandes et options montrées par la documentation existent (`DOC-CLI-INVOCATIONS-001`).**
   823 blocs bash, dont 433 invocations de `forge`, dont aucune n'était vérifiée.

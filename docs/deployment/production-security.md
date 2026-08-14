@@ -141,7 +141,7 @@ router.add("GET", "/paie/{id}", PaieController.show, name="paie-show", no_store=
     L'en-tête est posé en `setdefault`.
     Une réponse qui définit elle-même sa directive de cache la conserve.
 
-!!! warning "Projets créés avant Forge 1.0.0-rc.7"
+!!! warning "Projets créés avant Forge 1.0.0-rc.6"
 
     La règle vivait auparavant dans une liste de chemins codée en dur du serveur de développement, que la production ne connaissait pas.
     Un projet dont les routes ont été engendrées avant ce changement ne porte pas `no_store=True` : ajoutez-le à la main dans `mvc/routes/`, Forge ne réécrit jamais ce fichier (principe 9).
