@@ -12,6 +12,7 @@ Le SQL reste visible : une migration est un fichier que vous relisez avant de l'
 ## Préparer la base
 
 ```bash
+forge db:config    # amorce DB_NAME dans env/ (une seule fois)
 forge db:init
 ```
 

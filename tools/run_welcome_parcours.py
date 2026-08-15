@@ -507,12 +507,35 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
             if langage != "bash":
                 continue
             script = contenu
-            raison = raison_de_sauter(script, projet)
-            premiere = script.strip().splitlines()[0] if script.strip() else ""
-            if raison:
+            # Le tri se fait LIGNE PAR LIGNE, pas bloc par bloc. Un bloc qui
+            # enchaîne `forge db:init` puis `forge run` était écarté en entier
+            # parce qu'il se termine par un serveur : la commande utile, celle
+            # qui crée la table, n'était jamais jouée. Les routes du parcours
+            # répondaient alors 503, et le harnais concluait à un échec du
+            # parcours au lieu du sien (`WELCOME-HARNAIS-LIGNE-A-LIGNE-001`).
+            #
+            # Chaque ligne est donc classée pour elle-même ; le bloc n'est
+            # sauté en entier que si aucune de ses lignes n'est jouable.
+            lignes_du_bloc = [l for l in script.splitlines() if l.strip()]
+            jouables = [l for l in lignes_du_bloc if raison_de_sauter(l, projet) is None]
+            # La commande annoncée est la première JOUÉE, pas la première du
+            # bloc : afficher celle qu'on a écartée désignerait un coupable
+            # innocent dans le message d'échec.
+            premiere = (jouables or lignes_du_bloc or [""])[0]
+            if not jouables:
+                raison = raison_de_sauter(script, projet) or "BLOQUANT"
                 sautes[raison] = sautes.get(raison, 0) + 1
                 print(f"  [SAUTÉ {raison}] {relatif}:{ligne} — {premiere}")
                 continue
+            if len(jouables) < len(lignes_du_bloc):
+                # Un saut partiel est ANNONCÉ : taire ce qu'on n'a pas fait,
+                # c'est laisser lire une couverture complète (principe 3).
+                for ecartee in lignes_du_bloc:
+                    motif = raison_de_sauter(ecartee, projet)
+                    if motif:
+                        sautes[motif] = sautes.get(motif, 0) + 1
+                        print(f"  [SAUTÉ {motif}] {relatif}:{ligne} — {ecartee.strip()}")
+            script = "\n".join(jouables)
             if lister:
                 print(f"  [À JOUER] {relatif}:{ligne} — {premiere}")
                 joues += 1

@@ -25,7 +25,10 @@ La table `iot_events` est garantie par la migration livrée.
 ## Tester
 
 ```bash
+forge db:config    # amorce DB_NAME dans env/ (une seule fois)
 forge db:init
+forge iot:init    # copie la migration de l'opt-in
+forge migration:apply    # l'applique en base
 forge run
 ```
 
