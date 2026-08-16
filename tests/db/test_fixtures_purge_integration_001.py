@@ -1,9 +1,16 @@
-"""Intégration réelle de forge fixtures:purge contre MariaDB (ADR-074).
+"""Intégration réelle de forge fixtures:purge sur les trois serveurs (ADR-074).
 
 Prouve que le chemin --run vide réellement les tables ciblées : on charge des
 lignes, on purge, on vérifie que la table est vide et que le schéma survit.
 
-Marqués `db` : sautés en local sans base, imposés en CI (FORGE_REQUIRE_DB=1).
+Comme `fixtures:load`, la purge n'était exercée que contre MariaDB, sa table de
+test étant créée par une DDL écrite en dur dans ce dialecte
+(`FIXTURES-LOAD-PURGE-TROIS-SERVEURS-001`). Les deux commandes sont converties
+ensemble : n'en traiter qu'une aurait laissé la moitié du chemin non exercée,
+alors qu'elles partagent le levier de contraintes du dialecte.
+
+Le relevé est rassurant, et il faut le dire : aucun défaut trouvé sur les trois
+moteurs.
 """
 from __future__ import annotations
 
@@ -15,21 +22,31 @@ pytestmark = pytest.mark.db
 
 pytest.importorskip("forge_mvc_fixtures")
 
+from core.database.table_ddl import Column, TableDefinition
+from forge_mvc_testing.real_db import tables_temporaires
+
 from forge_mvc_fixtures.cli.load import load_fixtures
 from forge_mvc_fixtures.cli.purge import purge_fixtures
 
 
-@pytest.fixture()
-def ville_table(real_db):
-    from core.database import db
+#: FIXTURES-LOAD-PURGE-TROIS-SERVEURS-001 : la table était créée par une DDL
+#: MariaDB écrite en dur (`INT AUTO_INCREMENT PRIMARY KEY`), et c'est cela seul
+#: qui clouait ce fichier à un moteur. Décrite en vocabulaire Forge, sa DDL est
+#: rendue par le dialecte actif, donc le même test vaut sur les trois serveurs.
+VILLE = TableDefinition(
+    name="ville",
+    columns=[
+        Column("id", "identity"),
+        Column("nom", "string", length=100),
+    ],
+    primary_key=["id"],
+)
 
-    db.execute("DROP TABLE IF EXISTS ville", ())
-    db.execute(
-        "CREATE TABLE ville (id INT AUTO_INCREMENT PRIMARY KEY, nom VARCHAR(100) NOT NULL)",
-        (),
-    )
-    yield db
-    db.execute("DROP TABLE IF EXISTS ville", ())
+
+@pytest.fixture()
+def ville_table(real_backend_db: str):
+    with tables_temporaires(VILLE) as db:
+        yield db
 
 
 def _write_fixture(root: Path, name: str, sql: str) -> None:
