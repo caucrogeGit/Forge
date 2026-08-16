@@ -146,7 +146,11 @@ def test_auth_user_contract_est_fige():
 
 
 def test_users_sql_stays_unchanged_for_password_ticket():
-    sql = open("tests/fixtures/app/mvc/models/sql/users.sql", encoding="utf-8").read()
+    # AUTH-DDL-TESTS-SOURCE-001 : lit la constante canonique et non la fixture,
+    # qui n'est qu'une copie (tenue par `test_auth_ddl_fixture_parity_001`).
+    from cli.security.auth import USERS_SQL
+
+    sql = USERS_SQL
     assert "password_hash VARCHAR(255) NOT NULL" in sql
     assert "CREATE TABLE IF NOT EXISTS users" in sql
     assert "INSERT INTO users" not in sql

@@ -24,52 +24,52 @@ def test_auth_tokens_sql_file_exists():
 
 
 def test_auth_tokens_sql_contains_create_table():
-    sql = SQL_FILE.read_text(encoding="utf-8")
+    sql = AUTH_TOKENS_SQL
     assert "CREATE TABLE IF NOT EXISTS auth_tokens" in sql
 
 
 def test_auth_tokens_sql_contains_user_id():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_TOKENS_SQL)
     assert "user_id INT NOT NULL" in sql
 
 
 def test_auth_tokens_sql_contains_purpose():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_TOKENS_SQL)
     assert "purpose VARCHAR(80) NOT NULL" in sql
 
 
 def test_auth_tokens_sql_contains_token_hash_unique():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_TOKENS_SQL)
     assert "token_hash CHAR(64) NOT NULL UNIQUE" in sql
 
 
 def test_auth_tokens_sql_contains_expires_at():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_TOKENS_SQL)
     assert "expires_at DATETIME NOT NULL" in sql
 
 
 def test_auth_tokens_sql_contains_used_at_null():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_TOKENS_SQL)
     assert "used_at DATETIME NULL" in sql
 
 
 def test_auth_tokens_sql_contains_created_at():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_TOKENS_SQL)
     assert "created_at" in sql
 
 
 def test_auth_tokens_sql_contains_index_user_purpose():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_TOKENS_SQL)
     assert "idx_auth_tokens_user_purpose" in sql
 
 
 def test_auth_tokens_sql_contains_index_expires_at():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_TOKENS_SQL)
     assert "idx_auth_tokens_expires_at" in sql
 
 
 def test_auth_tokens_sql_contains_fk_to_users():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_TOKENS_SQL)
     assert "REFERENCES users(id)" in sql
 
 

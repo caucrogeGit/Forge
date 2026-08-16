@@ -19,13 +19,13 @@ def test_auth_rate_limit_attempts_sql_existe():
 
 
 def test_auth_rate_limit_attempts_sql_contient_create_table():
-    sql = SQL_FILE.read_text(encoding="utf-8")
+    sql = AUTH_RATE_LIMIT_ATTEMPTS_SQL
 
     assert "CREATE TABLE IF NOT EXISTS auth_rate_limit_attempts" in sql
 
 
 def test_auth_rate_limit_attempts_sql_contient_colonnes_requises():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_RATE_LIMIT_ATTEMPTS_SQL)
 
     assert "action VARCHAR(120) NOT NULL" in sql
     assert "rate_key VARCHAR(255) NOT NULL" in sql
@@ -36,25 +36,27 @@ def test_auth_rate_limit_attempts_sql_contient_colonnes_requises():
 
 
 def test_auth_rate_limit_attempts_sql_contient_index_action_rate_key():
-    sql = SQL_FILE.read_text(encoding="utf-8")
+    sql = AUTH_RATE_LIMIT_ATTEMPTS_SQL
 
     assert "idx_auth_rate_limit_action_key" in sql
 
 
 def test_auth_rate_limit_attempts_sql_contient_index_created_at():
-    sql = SQL_FILE.read_text(encoding="utf-8")
+    sql = AUTH_RATE_LIMIT_ATTEMPTS_SQL
 
     assert "idx_auth_rate_limit_created_at" in sql
 
 
 def test_auth_rate_limit_attempts_sql_contient_fk_users():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_RATE_LIMIT_ATTEMPTS_SQL)
 
     assert "CONSTRAINT fk_auth_rate_limit_user_id FOREIGN KEY (user_id) REFERENCES users(id)" in sql
 
 
-def test_auth_rate_limit_attempts_sql_constant_correspond_au_fichier():
-    assert SQL_FILE.read_text(encoding="utf-8") == AUTH_RATE_LIMIT_ATTEMPTS_SQL
+# AUTH-DDL-TESTS-SOURCE-001 : parité reprise par
+# `test_auth_ddl_fixture_parity_001`, qui la tient pour tous les fichiers du
+# dossier au lieu de deux tables sur quatre. Voir la note de
+# `test_auth_audit_table` pour le raisonnement.
 
 
 def test_auth_init_cree_auth_rate_limit_attempts_sql(tmp_path):

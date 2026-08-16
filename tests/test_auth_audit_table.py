@@ -19,11 +19,11 @@ def test_auth_audit_log_sql_existe():
 
 
 def test_auth_audit_log_sql_contient_create_table():
-    assert "CREATE TABLE IF NOT EXISTS auth_audit_log" in SQL_FILE.read_text(encoding="utf-8")
+    assert "CREATE TABLE IF NOT EXISTS auth_audit_log" in AUTH_AUDIT_LOG_SQL
 
 
 def test_auth_audit_log_sql_contient_colonnes_requises():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_AUDIT_LOG_SQL)
 
     assert "event_type VARCHAR(120) NOT NULL" in sql
     assert "user_id INT NULL" in sql
@@ -35,35 +35,38 @@ def test_auth_audit_log_sql_contient_colonnes_requises():
 
 
 def test_auth_audit_log_sql_contient_index_event_type():
-    assert "idx_auth_audit_log_event_type" in SQL_FILE.read_text(encoding="utf-8")
+    assert "idx_auth_audit_log_event_type" in AUTH_AUDIT_LOG_SQL
 
 
 def test_auth_audit_log_sql_contient_index_user_id():
-    assert "idx_auth_audit_log_user_id" in SQL_FILE.read_text(encoding="utf-8")
+    assert "idx_auth_audit_log_user_id" in AUTH_AUDIT_LOG_SQL
 
 
 def test_auth_audit_log_sql_contient_index_actor_user_id():
-    assert "idx_auth_audit_log_actor_user_id" in SQL_FILE.read_text(encoding="utf-8")
+    assert "idx_auth_audit_log_actor_user_id" in AUTH_AUDIT_LOG_SQL
 
 
 def test_auth_audit_log_sql_contient_index_created_at():
-    assert "idx_auth_audit_log_created_at" in SQL_FILE.read_text(encoding="utf-8")
+    assert "idx_auth_audit_log_created_at" in AUTH_AUDIT_LOG_SQL
 
 
 def test_auth_audit_log_sql_contient_fk_user_id_vers_users():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_AUDIT_LOG_SQL)
 
     assert "CONSTRAINT fk_auth_audit_log_user_id FOREIGN KEY (user_id) REFERENCES users(id)" in sql
 
 
 def test_auth_audit_log_sql_contient_fk_actor_user_id_vers_users():
-    sql = _normalized(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized(AUTH_AUDIT_LOG_SQL)
 
     assert "CONSTRAINT fk_auth_audit_log_actor_user_id FOREIGN KEY (actor_user_id) REFERENCES users(id)" in sql
 
 
-def test_auth_audit_log_sql_constant_correspond_au_fichier():
-    assert SQL_FILE.read_text(encoding="utf-8") == AUTH_AUDIT_LOG_SQL
+# AUTH-DDL-TESTS-SOURCE-001 : la parité entre cette fixture et sa constante est
+# désormais tenue pour TOUTE la famille par `test_auth_ddl_fixture_parity_001`,
+# par relevé du dossier. Elle n'existait ici et dans le rate-limit que pour deux
+# tables sur quatre, et `users.sql`, qui ne l'avait pas, a dérivé pendant deux
+# tickets. Garder les deux mécanismes en laisserait un partiel à côté du complet.
 
 
 def test_auth_init_cree_auth_audit_log_sql(tmp_path):

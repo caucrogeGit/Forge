@@ -275,13 +275,15 @@ def test_no_database_access(monkeypatch):
 
 
 def test_users_sql_still_contains_email_verified_at():
-    from pathlib import Path
-    sql = Path("tests/fixtures/app/mvc/models/sql/users.sql").read_text(encoding="utf-8")
-    assert "email_verified_at DATETIME NULL" in sql
+    # AUTH-DDL-TESTS-SOURCE-001 : la constante canonique fait foi, pas la copie.
+    from cli.security.auth import USERS_SQL
+
+    assert "email_verified_at DATETIME NULL" in USERS_SQL
 
 
 def test_auth_tokens_sql_unchanged():
-    from pathlib import Path
-    sql = Path("tests/fixtures/app/mvc/models/sql/auth_tokens.sql").read_text(encoding="utf-8")
+    from cli.security.auth import AUTH_TOKENS_SQL
+
+    sql = AUTH_TOKENS_SQL
     assert "CREATE TABLE IF NOT EXISTS auth_tokens" in sql
     assert "token_hash CHAR(64) NOT NULL UNIQUE" in sql

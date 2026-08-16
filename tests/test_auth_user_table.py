@@ -15,6 +15,11 @@ from core.auth import (
 from cli.security.auth import USERS_SQL, cmd_auth_init
 
 
+# AUTH-DDL-TESTS-SOURCE-001 : les assertions de contenu portent sur USERS_SQL,
+# la constante canonique, et non sur cette fixture. La fixture est une COPIE,
+# tenue par `test_auth_ddl_fixture_parity_001` ; elle a dérivé pendant deux
+# tickets sans que rien ne le voie. Ce chemin ne sert donc plus qu'à vérifier
+# que le projet d'exemple porte bien le fichier.
 SQL_FILE = Path("tests/fixtures/app/mvc/models/sql/users.sql")
 
 
@@ -27,38 +32,55 @@ def test_users_sql_file_exists():
 
 
 def test_users_sql_contains_create_table():
-    sql = SQL_FILE.read_text(encoding="utf-8")
-    assert "CREATE TABLE IF NOT EXISTS users" in sql
+    assert "CREATE TABLE IF NOT EXISTS users" in USERS_SQL
 
 
 def test_users_sql_contains_id_primary_key():
-    sql = _normalized_sql(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized_sql(USERS_SQL)
     assert "id INT AUTO_INCREMENT PRIMARY KEY" in sql
 
 
-def test_users_sql_contains_email_unique():
-    sql = _normalized_sql(SQL_FILE.read_text(encoding="utf-8"))
-    assert "email VARCHAR(255) NOT NULL UNIQUE" in sql
+def test_users_sql_login_porte_identite_et_email_reste_contact():
+    """`login` porte l'identité, `email` le contact (ADR-089).
+
+    Ce test exigeait auparavant `email VARCHAR(255) NOT NULL UNIQUE`, donc
+    l'inverse de la règle en vigueur : il lisait une fixture restée à l'état
+    d'avant l'ADR-089, si bien qu'il restait vert en affirmant une règle abrogée.
+    """
+    sql = _normalized_sql(USERS_SQL)
+    assert "login VARCHAR(255) NOT NULL UNIQUE" in sql
+    assert "email VARCHAR(255) NULL" in sql
+    # Le contact n'est ni obligatoire ni unique : deux comptes peuvent partager
+    # une adresse, et un compte peut ne pas en avoir.
+    assert "email VARCHAR(255) NOT NULL" not in sql
 
 
 def test_users_sql_contains_password_hash():
-    sql = _normalized_sql(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized_sql(USERS_SQL)
     assert "password_hash VARCHAR(255) NOT NULL" in sql
 
 
 def test_users_sql_contains_is_active_default():
-    sql = _normalized_sql(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized_sql(USERS_SQL)
     assert "is_active BOOLEAN NOT NULL DEFAULT TRUE" in sql
 
 
 def test_users_sql_contains_email_verified_at():
-    sql = _normalized_sql(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized_sql(USERS_SQL)
     assert "email_verified_at DATETIME NULL" in sql
 
 
-def test_users_sql_contains_last_login_at():
-    sql = _normalized_sql(SQL_FILE.read_text(encoding="utf-8"))
-    assert "last_login_at DATETIME NULL" in sql
+def test_users_sql_ne_porte_plus_last_login_at():
+    """La colonne est retirée (ADR-091, `AUTH-EVENTS-EMIT-001`).
+
+    Créée par le cœur et écrite par personne, elle supposait un écrivain que le
+    cœur n'a pas : il n'écrit nulle part ailleurs dans `users`. Le journal
+    d'authentification répond à la même question, avec la raison de l'échec.
+
+    Ce test exigeait la colonne, et restait vert sur une fixture périmée.
+    """
+    sql = _normalized_sql(USERS_SQL)
+    assert "last_login_at" not in sql
 
 
 def test_users_sql_contains_created_at():
@@ -68,7 +90,7 @@ def test_users_sql_contains_created_at():
     socle et la règle que Forge impose partout ailleurs
     (`AUTH-TIMESTAMPS-REMOVE-DEFAULTS-001`).
     """
-    sql = _normalized_sql(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized_sql(USERS_SQL)
     assert "created_at DATETIME NOT NULL" in sql
     assert "created_at DATETIME NOT NULL DEFAULT" not in sql
 
@@ -78,7 +100,7 @@ def test_users_sql_contains_updated_at():
 
     C'est la seconde moitie de la double horloge que l'ADR-081 refuse.
     """
-    sql = _normalized_sql(SQL_FILE.read_text(encoding="utf-8"))
+    sql = _normalized_sql(USERS_SQL)
     assert "updated_at DATETIME NOT NULL" in sql
     assert "ON UPDATE CURRENT_TIMESTAMP" not in sql
 
