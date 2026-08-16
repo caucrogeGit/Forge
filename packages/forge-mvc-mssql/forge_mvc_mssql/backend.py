@@ -332,6 +332,20 @@ class MSSQLBackend:
         message = str(error)
         return "(2627)" in message or "(2601)" in message
 
+    def is_insufficient_privilege_error(self, error: Exception) -> bool:
+        """Droit refusé SQL Server : numéros natifs 229 et 262.
+
+        Mesuré contre le serveur avec un login sans droits : 229 pour une
+        permission refusée sur un objet (« The SELECT permission was denied »),
+        262 pour une permission de base (« CREATE DATABASE permission denied »).
+
+        Comme pour les autres conditions, pyodbc n'expose pas le numéro natif en
+        attribut ; il figure dans le message. Le SQLSTATE 42000 ne convient pas,
+        SQL Server le rendant aussi pour une faute de syntaxe.
+        """
+        texte = str(error)
+        return "(229)" in texte or "(262)" in texte
+
     def is_unavailable(self, error: Exception) -> bool:
         """Indisponibilité SQL Server : connexion coupée, ou attente de verrou bornée.
 

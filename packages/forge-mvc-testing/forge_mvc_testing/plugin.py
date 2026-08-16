@@ -26,6 +26,7 @@ from forge_mvc_testing.real_db import (  # noqa: F401 — exposées comme fixtur
     real_db,
     real_mssql_db,
     real_pg_db,
+    real_pg_db_sans_privilege,
 )
 
 

@@ -352,3 +352,101 @@ def real_backend_db(request: pytest.FixtureRequest) -> str:
     """
     request.getfixturevalue(_FIXTURE_PAR_BACKEND[str(request.param)])
     return str(request.param)
+
+
+@pytest.fixture()
+def real_pg_db_sans_privilege(
+    real_pg_db: None, monkeypatch: pytest.MonkeyPatch
+) -> "Iterator[str]":
+    """Monte Forge sur le PostgreSQL de test avec un rôle **ordinaire**.
+
+    `real_pg_db` se connecte en `postgres`, superutilisateur. Un test de droits
+    écrit dessus passerait donc toujours, et ne prouverait rien : c'est ce qui a
+    laissé vivre `FIXTURES-PG-FK-PRIVILEGE-001`, où `SET session_replication_role`
+    exige un privilège que le compte applicatif d'un projet Forge n'a pas
+    (ADR-033, `forge_app` reste DML strict).
+
+    Le rôle créé ici peut lire et écrire les données, et **rien de plus** : il
+    reproduit le compte applicatif, pas un compte bridé au point d'échouer pour
+    une autre raison. Un test qui échouerait faute de droit d'écriture ne dirait
+    rien du droit qu'il vise.
+
+    Retourne le nom du rôle, pour les messages d'échec.
+    """
+    import psycopg
+
+    from core.database.backend import get_backend, reset_backend
+
+    role = "forge_role_ordinaire"
+    mot_de_passe = "role_ordinaire"
+    base = os.environ["DB_NAME"]
+
+    def _admin(database: "str | None" = None) -> Any:
+        # Sans argument, la connexion d'administration PostgreSQL vise la base
+        # de maintenance « postgres ». Les droits de SCHÉMA doivent au contraire
+        # être accordés **dans la base de test**, sans quoi le rôle se voit
+        # refuser `CREATE TABLE` avec « droit refusé pour le schéma public »,
+        # et le test échouerait pour une raison étrangère à son objet.
+        connexion = get_backend().get_admin_connection(database=database)
+        connexion.autocommit = True
+        return connexion
+
+    def _sans_role(curseur: Any) -> None:
+        # `DROP OWNED` jette les objets du rôle **et** ses privilèges, ce qui
+        # suffit à libérer `DROP ROLE`. Surtout, pas de `REASSIGN OWNED` avant :
+        # il transfère les tables à `CURRENT_USER` au lieu de les jeter, si bien
+        # qu'une table du test survivait au démontage et que le test suivant se
+        # voyait répondre « doit être le propriétaire de la table ». Mesuré.
+        curseur.execute(f"DROP OWNED BY {role}")
+        curseur.execute(f"DROP ROLE IF EXISTS {role}")
+
+    def _nettoyer() -> None:
+        # Le rôle possède des objets dans la base de test : y passer d'abord,
+        # sinon `DROP ROLE` échoue sur une dépendance.
+        for database in (base, None):
+            connexion = _admin(database)
+            try:
+                _sans_role(connexion.cursor())
+            except psycopg.errors.UndefinedObject:
+                pass  # le rôle n'existait pas, cas nominal du premier montage
+            finally:
+                connexion.close()
+
+    _nettoyer()
+
+    admin = _admin()
+    try:
+        curseur = admin.cursor()
+        curseur.execute(
+            f"CREATE ROLE {role} LOGIN PASSWORD '{mot_de_passe}' NOSUPERUSER"
+        )
+        curseur.execute(f"GRANT CONNECT ON DATABASE {base} TO {role}")
+    finally:
+        admin.close()
+
+    admin = _admin(base)
+    try:
+        admin.cursor().execute(f"GRANT USAGE, CREATE ON SCHEMA public TO {role}")
+    finally:
+        admin.close()
+
+    # Le superutilisateur reste nécessaire au nettoyage : on retient ses
+    # identifiants plutôt que d'appeler `monkeypatch.undo()`, qui annulerait
+    # aussi la configuration posée par `real_pg_db` et ferait retomber la
+    # connexion d'administration sur le backend par défaut (mesuré : MariaDB,
+    # « Access denied for user 'roger' »).
+    login_admin = os.environ["DB_APP_LOGIN"]
+    pwd_admin = os.environ["DB_APP_PWD"]
+
+    monkeypatch.setenv("DB_APP_LOGIN", role)
+    monkeypatch.setenv("DB_APP_PWD", mot_de_passe)
+    reset_backend()
+
+    try:
+        yield role
+    finally:
+        monkeypatch.setenv("DB_APP_LOGIN", login_admin)
+        monkeypatch.setenv("DB_APP_PWD", pwd_admin)
+        reset_backend()
+        _nettoyer()
+        reset_backend()

@@ -397,6 +397,19 @@ class PostgreSQLBackend:
         """
         return getattr(error, "sqlstate", None) == "23505"
 
+    def is_insufficient_privilege_error(self, error: Exception) -> bool:
+        """Droit refusé PostgreSQL : SQLSTATE 42501 (`insufficient_privilege`).
+
+        Mesuré contre le serveur avec un rôle `NOSUPERUSER` :
+        `psycopg.errors.InsufficientPrivilege`, SQLSTATE 42501, pour
+        `SET session_replication_role` comme pour un `CREATE TABLE` refusé.
+
+        **Le message ne convient pas** : il est traduit. Un serveur en français
+        rend « droit refusé pour ... », un serveur en anglais « permission
+        denied for ... ». Seul le SQLSTATE est une propriété du programme.
+        """
+        return getattr(error, "sqlstate", None) == "42501"
+
     def is_unavailable(self, error: Exception) -> bool:
         """Indisponibilité PostgreSQL : classe SQLSTATE 08, arrêts 57Pxx, verrou 55P03.
 

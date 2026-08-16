@@ -493,10 +493,15 @@ def load_fixtures(
     #   connexion rendue au pool aussitôt, et les insertions suivantes
     #   repartaient sur des connexions où les FK étaient toujours actives.
     #   `--no-fk-checks` était donc sans effet, sans le moindre message.
+    from forge_mvc_fixtures.cli._privilege import (
+        PrivilegeRefuse,
+        executer_levier,
+        message_refus,
+    )
+
     try:
         with transaction() as tx:
-            for statement in disable_ddl:
-                db.execute(statement, tx=tx)
+            executer_levier(db, disable_ddl, tx)
             try:
                 for unit in units:
                     if unit.kind == "callable" and unit.fixture is not None:
@@ -527,6 +532,16 @@ def load_fixtures(
                 # pool : variable de session, que le rollback ne remet pas.
                 for statement in enable_ddl:
                     db.execute(statement, tx=tx)
+    except PrivilegeRefuse as refus:
+        # Avant ce cas, le refus tombait dans le `except Exception` ci-dessous
+        # et se rendait « Erreur en chargeant » suivi du message du serveur :
+        # la commande échouait bien, mais rien ne disait qu'il s'agissait d'un
+        # droit, ni quoi faire (FIXTURES-PG-FK-PRIVILEGE-001).
+        print(
+            message_refus(refus, commande="fixtures:load --no-fk-checks"),
+            file=sys.stderr,
+        )
+        return 1
     except _LoadFailure as failure:
         print(f"{failure} (chargement annulé)", file=sys.stderr)
         return 1

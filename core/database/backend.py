@@ -608,6 +608,53 @@ class DatabaseBackend(Protocol):
         """
         ...
 
+    def is_insufficient_privilege_error(self, error: Exception) -> bool:
+        """Vrai si `error` dit « votre compte n'a pas ce droit ».
+
+        Sur le backend et non sur `Dialect`, pour la raison de ses trois
+        voisins : reconnaître une exception relève du pilote.
+
+        La question sépare deux situations qu'un exploitant ne traite pas de la
+        même façon, le droit manquant et la requête fautive. Les confondre
+        envoie chercher du côté des permissions une erreur de SQL, ou l'inverse.
+
+        Le cas qui a motivé le contrat : `fixtures:load --no-fk-checks` émet
+        `SET session_replication_role` sur PostgreSQL, qui **exige un rôle
+        superutilisateur**. Le compte applicatif d'un projet Forge ne l'est pas
+        (ADR-033, `forge_app` reste DML strict), si bien que l'option échouait
+        sur une exception de pilote traversant jusqu'à une trace Python.
+
+        Aucun signal n'est portable, mesuré sur les quatre backends contre
+        leurs serveurs, avec un compte volontairement privé de droits :
+
+            MariaDB      mariadb.OperationalError      errno 1044, 1142, 1227
+            SQLite       aucun                          pas de système de droits
+            PostgreSQL   psycopg.errors.InsufficientPrivilege  sqlstate 42501
+            SQL Server   pyodbc.ProgrammingError       numéros natifs 229, 262
+
+        Piège à ne pas reproduire, le même que pour `is_unique_violation` : le
+        SQLSTATE ne discrimine pas. MariaDB **et** SQL Server rendent `42000`
+        pour un droit refusé comme pour une faute de syntaxe. Seuls les codes
+        natifs tiennent sur ces deux moteurs, quand PostgreSQL a bien un
+        SQLSTATE dédié.
+
+        Second piège, déjà relevé pour `is_undefined_table_error` : **le message
+        de PostgreSQL est traduit**. Un serveur en français rend « droit refusé
+        pour ... », un serveur en anglais « permission denied for ... ». Une
+        détection par le texte dépendrait de la langue du serveur.
+
+        Un échec d'**authentification** n'en fait pas partie, et ne doit pas
+        être reconnu ici. Se voir refuser la connexion (MariaDB errno 1045)
+        décrit une configuration fausse, pas un droit manquant sur une
+        opération : les confondre ferait conseiller un `GRANT` à qui s'est
+        trompé de mot de passe.
+
+        L'implémentation doit être **stricte** : dans le doute, renvoyer faux.
+        Un faux positif ferait annoncer un privilège manquant là où la requête
+        est simplement fautive.
+        """
+        ...
+
 
 _backend: "DatabaseBackend | None" = None
 _lock = threading.Lock()

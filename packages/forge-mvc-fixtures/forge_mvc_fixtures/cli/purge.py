@@ -150,10 +150,15 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
 
     deleted = 0
     purged_callables = 0
+    from forge_mvc_fixtures.cli._privilege import (
+        PrivilegeRefuse,
+        executer_levier,
+        message_refus,
+    )
+
     try:
         with transaction() as tx:
-            for statement in disable_ddl:
-                db.execute(statement, tx=tx)
+            executer_levier(db, disable_ddl, tx)
             try:
                 for unit in teardown:
                     if unit.kind == "callable" and unit.fixture is not None:
@@ -168,6 +173,11 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
                 # (variable de session non transactionnelle : pas remise par le rollback).
                 for statement in enable_ddl:
                     db.execute(statement, tx=tx)
+    except PrivilegeRefuse as refus:
+        # Même chemin que `fixtures:load`, donc même traitement : réparer une
+        # seule des deux commandes n'aurait réparé qu'un jumeau.
+        print(message_refus(refus, commande="fixtures:purge"), file=sys.stderr)
+        return 1
     except Exception as exc:  # noqa: BLE001 — la transaction a été annulée (rollback)
         print(
             f"Erreur en purgeant (démontage annulé) : {exc}",

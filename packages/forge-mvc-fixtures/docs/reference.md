@@ -325,6 +325,10 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
 
     Pour un jeu non triable (cycle de dépendances), `--no-fk-checks` encadre le chargement par le levier du dialecte : `SET FOREIGN_KEY_CHECKS` en MariaDB, `PRAGMA defer_foreign_keys` en SQLite, `session_replication_role` en PostgreSQL, sans effet en SQL Server.
 
+    Sur PostgreSQL, ce levier **exige un rôle superutilisateur**, que le compte applicatif d'un projet Forge n'est pas (ADR-033).
+    L'option y est donc refusée par le serveur, et la commande s'arrête en nommant le droit manquant plutôt qu'en rendant le message brut du moteur.
+    Les deux issues sont alors d'ordonner les fixtures par leurs dépendances, ce que `fixtures:load` fait seul dès que le jeu est triable, ou de charger sous un compte qui possède ce droit.
+
     Le levier SQLite reporte la vérification au `COMMIT`, il ne la supprime pas.
     Un enfant dont le parent n'existe toujours pas à la fin fait donc échouer le chargement entier, là où MariaDB l'aurait laissé passer.
     C'est le cycle de dépendances que l'option sert à charger, pas un jeu incohérent.

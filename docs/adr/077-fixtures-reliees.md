@@ -66,6 +66,10 @@ Replis :
 - `relations.json` absent, table inconnue, ou **cycle** de dépendances : retour à l'ordre par nom de fichier (le préfixe numérique `01_`, `02_` reste un ordre déclaratif de secours) ;
 - option `--no-fk-checks` : encadre le chargement par la désactivation des contraintes du dialecte (`SET FOREIGN_KEY_CHECKS=0/1` en MariaDB ; équivalent PostgreSQL exposé par le backend), pour les jeux non triables.
 
+Le levier PostgreSQL, `SET session_replication_role`, **exige un rôle superutilisateur**.
+Le compte applicatif d'un projet Forge n'en est pas un (ADR-033), si bien que l'option y est refusée par le serveur avec le SQLSTATE 42501.
+Le refus est reconnu par `is_insufficient_privilege_error` sur le contrat de backend, et la commande s'arrête en nommant le levier et les deux issues, trier les fixtures ou charger sous un compte qui possède ce droit (`FIXTURES-PG-FK-PRIVILEGE-001`).
+
 ### Piste « fixtures callable » (différée)
 
 Deux étapes d'un seed complet restent de la logique métier hors SQL : import d'un référentiel depuis un JSON canonique, et données calculées (agrégations).

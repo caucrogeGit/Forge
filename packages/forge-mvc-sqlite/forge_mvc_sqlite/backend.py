@@ -247,6 +247,20 @@ class SQLiteBackend:
             return False
         return "UNIQUE constraint failed" in str(error)
 
+    def is_insufficient_privilege_error(self, error: Exception) -> bool:
+        """Toujours faux : SQLite n'a pas de système de droits.
+
+        Le moteur est un fichier, et l'autorisation est celle du système de
+        fichiers. Un fichier non inscriptible rend `SQLITE_READONLY`, ce qui
+        décrit un support en lecture seule et non un compte sans privilège :
+        le confondre ferait conseiller un `GRANT` là où il faut changer des
+        permissions de fichier.
+
+        Un backend n'est pas tenu de reconnaître une famille qu'il ne connaît
+        pas, seulement de le dire, comme `is_unavailable` le fait déjà.
+        """
+        return False
+
     def is_unavailable(self, error: Exception) -> bool:
         """Indisponibilité SQLite : le fichier est verrouillé par un autre écrivain.
 

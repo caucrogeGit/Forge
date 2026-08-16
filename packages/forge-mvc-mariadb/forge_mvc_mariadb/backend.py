@@ -234,6 +234,23 @@ class MariaDBBackend:
         """
         return getattr(error, "errno", None) == 1062
 
+    def is_insufficient_privilege_error(self, error: Exception) -> bool:
+        """Droit refusé MariaDB : errno 1044, 1142 et 1227.
+
+        Mesuré contre le serveur avec un compte sans aucun droit : 1044 pour la
+        base (ER_DBACCESS_DENIED_ERROR), 1142 pour la table
+        (ER_TABLEACCESS_DENIED_ERROR), 1227 pour une opération privilégiée
+        comme `SET GLOBAL` (ER_SPECIFIC_ACCESS_DENIED_ERROR).
+
+        Le SQLSTATE ne convient pas : MariaDB renvoie `42000` pour ces refus
+        comme pour une faute de syntaxe. Seuls les errno discriminent.
+
+        L'errno 1045 (ER_ACCESS_DENIED_ERROR) est volontairement **exclu** : il
+        signale un refus de connexion, donc une configuration fausse, et non un
+        droit manquant sur une opération.
+        """
+        return getattr(error, "errno", None) in (1044, 1142, 1227)
+
     def is_unavailable(self, error: Exception) -> bool:
         """Indisponibilité MariaDB : la connexion coupée, ou le verrou tenu ailleurs.
 
