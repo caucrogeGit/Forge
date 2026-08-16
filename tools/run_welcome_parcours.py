@@ -292,6 +292,50 @@ def poser_fichier(chemin: str, contenu: str, projet: Path) -> str:
     return "ÉCRIT"
 
 
+#: Mots-clés qui ouvrent une construction shell sur plusieurs lignes.
+_CONSTRUCTIONS_SHELL = ("if ", "for ", "while ", "case ", "until ", "function ")
+
+
+def _lignes_logiques(script: str) -> "list[str]":
+    """Lignes du bloc, continuations `\\` réunies en une seule.
+
+    Le tri et l'exécution se font ligne par ligne ; une commande étalée sur
+    plusieurs lignes doit donc rester d'un seul tenant, faute de quoi sa suite
+    est prise pour une commande (`WELCOME-HARNAIS-LIGNE-A-LIGNE-001`).
+    """
+    logiques: "list[str]" = []
+    courante = ""
+    for brute in script.splitlines():
+        if not brute.strip():
+            continue
+        courante = f"{courante}\n{brute}" if courante else brute
+        if not brute.rstrip().endswith("\\"):
+            logiques.append(courante)
+            courante = ""
+    if courante:
+        logiques.append(courante)
+    return logiques
+
+
+def _porte_une_construction_shell(script: str) -> bool:
+    """Vrai si le bloc ne peut pas être coupé ligne par ligne.
+
+    Un `if ... then ... fi`, une boucle ou un heredoc forment un tout : les
+    jouer séparément fait rendre à `bash` « fin de fichier prématurée », et le
+    harnais accuserait alors le parcours de son propre découpage
+    (`WELCOME-HARNAIS-LIGNE-A-LIGNE-001`).
+    """
+    if "<<" in script:
+        return True
+    for ligne in script.splitlines():
+        nue = ligne.strip()
+        if any(nue.startswith(mot) for mot in _CONSTRUCTIONS_SHELL):
+            return True
+        if nue.endswith("\\"):
+            return True
+    return False
+
+
 def _invoque_une_commande(script: str, motifs: "tuple[str, ...]") -> bool:
     """Vrai si l'un des motifs est INVOQUÉ, et non simplement cité.
 
@@ -322,8 +366,14 @@ def raison_de_sauter(script: str, projet: "Path | None" = None) -> "str | None":
         return "MANUEL"
     if any(motif in script for motif in INTERACTIVES):
         return "INTERACTIF"
-    if any(motif in script for motif in SANS_ARGUMENTS_INFERABLES):
-        return "ARGUMENTS"
+    # `forge make:relation` NU ouvre un dialogue ; muni de ses options il est
+    # parfaitement jouable. La regle les confondait, et sautait une ligne qui
+    # portait deja tout ce qu'il faut (`WELCOME-HARNAIS-LIGNE-A-LIGNE-001`).
+    for motif in SANS_ARGUMENTS_INFERABLES:
+        for ligne in script.splitlines():
+            nue = ligne.split("#")[0].strip()
+            if nue.startswith(motif) and nue == motif:
+                return "ARGUMENTS"
     if any(hote in script for hote in SERVEUR_LOCAL):
         return "SERVEUR"
     if any(motif in script for motif in SERVICES_EXTERNES):
@@ -516,7 +566,11 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
             #
             # Chaque ligne est donc classée pour elle-même ; le bloc n'est
             # sauté en entier que si aucune de ses lignes n'est jouable.
-            lignes_du_bloc = [l for l in script.splitlines() if l.strip()]
+            # Une commande peut s'étaler sur plusieurs lignes par `\\` : les
+            # séparer enverrait sa suite au shell comme une commande à part
+            # entière. Mesuré sur le `docker run` du parcours SQL Server, dont
+            # la seconde ligne partait seule en « -p : commande introuvable ».
+            lignes_du_bloc = _lignes_logiques(script)
             jouables = [l for l in lignes_du_bloc if raison_de_sauter(l, projet) is None]
             # La commande annoncée est la première JOUÉE, pas la première du
             # bloc : afficher celle qu'on a écartée désignerait un coupable
@@ -545,11 +599,33 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
             if substitution:
                 substitutions += 1
                 print(f"  [SUBSTITUÉ] {relatif}:{ligne} — {substitution}")
-            code, sortie = executer(script, projet)
+            # Chaque ligne est jouée SÉPARÉMENT, pour que l'échec nomme la
+            # commande fautive. Groupées dans un seul `bash -e`, elles ne
+            # rendaient qu'un code, et le message accusait la première du
+            # bloc : `forge stats:init` était désigné alors que
+            # `forge migration:apply` avait échoué juste après.
+            # Une construction shell multiligne ne se coupe pas : `if ... fi`,
+            # une boucle ou un heredoc perdent leur sens ligne par ligne, et
+            # `bash` rend « fin de fichier prématurée ». Ces blocs restent
+            # joués d'un seul tenant, au prix d'un message moins précis.
+            if _porte_une_construction_shell(script):
+                code, sortie = executer(script, projet)
+                fautive = premiere
+                lignes_a_jouer: "list[str]" = []
+            else:
+                code, sortie, fautive = 0, "", premiere
+                lignes_a_jouer = script.splitlines()
+            for une_ligne in lignes_a_jouer:
+                if not une_ligne.strip():
+                    continue
+                code, sortie = executer(une_ligne, projet)
+                if code != 0:
+                    fautive = une_ligne
+                    break
             joues += 1
             if code != 0:
                 print(f"  [ÉCHEC] {relatif}:{ligne} — code {code}")
-                print(f"          commande : {premiere}")
+                print(f"          commande : {fautive.strip()}")
                 for l in sortie.strip().splitlines()[-12:]:
                     print(f"          | {l}")
                 print(f"ARRÊT : le lecteur se serait arrêté ici, à la page {relatif}.")

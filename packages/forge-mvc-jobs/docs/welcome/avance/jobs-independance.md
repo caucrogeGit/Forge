@@ -57,6 +57,8 @@ en écrit le DDL dans `mvc/migrations/`, rendu pour le backend que vous avez
 installé.
 
 ```bash
+forge db:config          # amorce la connexion dans env/ (une seule fois)
+forge db:init            # provisionne la base
 forge jobs:init            # écrit la migration, sans rien exécuter
 cat mvc/migrations/*_create_jobs.sql   # relisez-la
 forge migration:apply           # puis appliquez-la

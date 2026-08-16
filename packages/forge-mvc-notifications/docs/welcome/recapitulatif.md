@@ -38,6 +38,8 @@ Synthèse de l'API de `forge-mvc-notifications`, à garder sous la main.
 ## Mise en place de la table
 
 ```bash
+forge db:config          # amorce la connexion dans env/ (une seule fois)
+forge db:init            # provisionne la base
 forge notifications:init
 forge migration:apply
 ```

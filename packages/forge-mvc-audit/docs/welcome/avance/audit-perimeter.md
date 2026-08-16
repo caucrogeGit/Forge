@@ -48,6 +48,10 @@ Sur une application active, la table finit par peser sur les lectures, sans qu'u
 La rétention est une **décision applicative**, comme la décision de tracer : Forge ne choisit pas à votre place ce que vous détruisez.
 
 ```bash
+forge db:config          # amorce la connexion dans env/ (une seule fois)
+forge db:init            # provisionne la base
+forge audit:init         # copie la migration de l'opt-in
+forge migration:apply    # l'applique en base
 forge audit:gc --days 90          # affiche le nombre d'entrées visées
 forge audit:gc --days 90 --run    # supprime
 ```

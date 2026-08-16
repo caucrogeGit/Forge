@@ -20,6 +20,35 @@ Dès qu'un pivot porte au moins un champ **requis** ou **non nullable**, `make:c
 |----------|----------------------|-----------|
 | `forge make:pivot-crud` | Génère le sous-CRUD d'un pivot enrichi. | [Pivot avancé](../../reference.md) |
 
+!!! note "Prérequis : la relation doit exister"
+
+    Cette page part d'une association `Article` ↔ `tags` **déjà déclarée**, avec au moins un attribut requis sur le pivot.
+    Les paliers précédents la construisent en dialogue, avec vos propres noms ; pour rejouer celle-ci telle quelle :
+
+    `Article` vient des paliers précédents ; `Tag` et la relation restent à déclarer :
+
+    ```bash
+    forge make:entity Tag --no-input
+    forge make:relation --type many_to_many --from Article --to Tag --name tags
+    ```
+
+    Il reste à donner un **attribut** au pivot, ce qui distingue `make:pivot-crud` de `make:crud`.
+    La ligne de commande ne sait pas le faire : ouvrez `mvc/entities/relations.json` et complétez la relation.
+
+    ```json
+    "pivot": {
+      "table": "article_tag",
+      "fields": [
+        {"name": "position", "type": "integer", "required": true}
+      ]
+    }
+    ```
+
+    Puis `forge build:model`.
+
+    Sans relation déclarée, la commande répond « Entité source inconnue ».
+    Sans attribut sur le pivot, elle répond « pivot.fields[] est absent ou vide » et renvoie vers `make:crud`.
+
 ## Générer (mode aperçu)
 
 Commencez toujours par un **aperçu** `--dry-run` : rien n'est écrit, tout est affiché.

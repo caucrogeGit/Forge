@@ -43,6 +43,8 @@ La table n'est pas créée automatiquement.
 On la prépare une seule fois, depuis la racine du projet :
 
 ```bash
+forge db:config          # amorce la connexion dans env/ (une seule fois)
+forge db:init            # provisionne la base
 forge settings:init
 forge migration:apply
 ```

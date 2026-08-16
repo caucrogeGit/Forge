@@ -22,6 +22,8 @@ Le préfixe `01_` fixe l'ordre de chargement quand vous aurez plusieurs fichiers
 Lancez la commande **sans option** :
 
 ```bash
+forge db:config          # amorce la connexion dans env/ (une seule fois)
+forge db:init            # provisionne la base
 forge fixtures:load
 ```
 

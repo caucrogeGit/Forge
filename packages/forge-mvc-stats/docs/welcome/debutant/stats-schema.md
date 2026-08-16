@@ -21,6 +21,8 @@ Troisième palier du **niveau débutant** de la progression stats.
     Créer la table dans votre projet se fait par la voie officielle, commune à tous les opt-ins adossés à la base.
 
     ```bash
+    forge db:config          # amorce la connexion dans env/ (une seule fois)
+    forge db:init            # provisionne la base
     forge stats:init        # écrit la migration dans mvc/migrations/, sans l'exécuter
     forge migration:apply   # après relecture
     ```

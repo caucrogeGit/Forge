@@ -47,6 +47,8 @@ Appliquez-la sur votre base, une seule fois.
 
 ```bash
 forge sessions:init
+forge db:config          # amorce la connexion dans env/ (une seule fois)
+forge db:init            # provisionne la base
 forge migration:apply
 ```
 

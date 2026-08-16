@@ -4,13 +4,12 @@
     Installez `forge-mvc-testing` avant de commencer : voir sa [référence](../../reference.md).
 
     ```bash
-    pip install --pre forge-mvc-testing    # installe le paquet
-    forge opt-in:enable testing          # le branche au projet
+    pip install --pre forge-mvc-testing
     ```
 
-    Sans le paquet, l'application refuse de démarrer sur un `ModuleNotFoundError` au chargement des routes.
-
-    `forge opt-in:install testing` **affiche** la commande d'installation adaptée à votre environnement, pipx compris ; il n'installe rien lui-même (ADR-016).
+    Ce paquet n'est **pas** un opt-in d'exécution : il n'y a rien à activer, et il ne doit jamais figurer dans les dépendances de production.
+    C'est une infrastructure de test, installée avec les dépendances de développement (ADR-041).
+    Le plugin pytest s'active seul, par son point d'entrée `pytest11`.
 
 Objectif : premier contact avec l'outillage **dev-only** `forge-mvc-testing`.
 
