@@ -25,26 +25,18 @@ Dès qu'un pivot porte au moins un champ **requis** ou **non nullable**, `make:c
     Cette page part d'une association `Article` ↔ `tags` **déjà déclarée**, avec au moins un attribut requis sur le pivot.
     Les paliers précédents la construisent en dialogue, avec vos propres noms ; pour rejouer celle-ci telle quelle :
 
-    `Article` vient des paliers précédents ; `Tag` et la relation restent à déclarer :
+    `Article` vient des paliers précédents ; `Tag` et la relation restent à déclarer.
+    L'**attribut** du pivot se donne à la déclaration, et c'est lui qui distingue `make:pivot-crud` de `make:crud`.
 
     ```bash
     forge make:entity Tag --no-input
-    forge make:relation --type many_to_many --from Article --to Tag --name tags
+    forge make:relation --type many_to_many --from Article --to Tag --name tags \
+      --pivot-field "position:integer"
+    forge build:model
     ```
 
-    Il reste à donner un **attribut** au pivot, ce qui distingue `make:pivot-crud` de `make:crud`.
-    La ligne de commande ne sait pas le faire : ouvrez `mvc/entities/relations.json` et complétez la relation.
-
-    ```json
-    "pivot": {
-      "table": "article_tag",
-      "fields": [
-        {"name": "position", "type": "integer", "required": true}
-      ]
-    }
-    ```
-
-    Puis `forge build:model`.
+    L'option `--pivot-field` est répétable et suit la grammaire de `make:entity --field`, soit `nom:type[:attributs]`.
+    Le dialogue de `forge make:relation` pose la même question, un attribut par ligne, vide pour terminer.
 
     Sans relation déclarée, la commande répond « Entité source inconnue ».
     Sans attribut sur le pivot, elle répond « pivot.fields[] est absent ou vide » et renvoie vers `make:crud`.

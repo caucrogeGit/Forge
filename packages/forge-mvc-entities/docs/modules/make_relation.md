@@ -67,14 +67,21 @@ sequenceDiagram
 |---|---|---|
 | `main` | `main(argv: list[str] \| None = None) -> None` | point d'entrée de `forge make:relation` |
 
-Le module est principalement interactif.
-Son point d'entrée assemble la relation à partir des réponses de l'utilisateur, puis l'écrit dans `relations.json`.
+Le module offre deux modes, de surface identique.
+Sans argument, il assemble la relation à partir des réponses de l'utilisateur ; avec `--from` et `--to`, il la décrit entièrement en ligne de commande, avec les mêmes défauts (`ENTITIES-NON-INTERACTIVE-002`).
 
 Invocation :
 
 | Invocation | Effet |
 |---|---|
 | `forge make:relation` | lance l'assistant interactif de déclaration de relation |
+| `forge make:relation --from Eleve --to Classe` | déclare une relation `many_to_one` sans terminal |
+| `forge make:relation --type many_to_many --from Article --to Tag` | déclare une relation `many_to_many` à pivot simple |
+| `--pivot-field "nom:type[:attributs]"` | ajoute un attribut au pivot, option répétable |
+
+Un pivot qui porte au moins un attribut relève de `make:pivot-crud` et non de `make:crud`.
+La grammaire de `--pivot-field` est celle de `make:entity --field`, et le dialogue pose la même question, un attribut par ligne.
+Deux types d'entité ne s'y appliquent pas, `foreign_key` et `slug` ; les noms `id`, `from_key` et `to_key` sont gérés par Forge.
 
 ## 5. Contextes d'utilisation
 
@@ -92,6 +99,18 @@ forge make:relation
 ```
 
 L'assistant pose successivement le type de relation, les entités concernées et les actions, puis ajoute l'entrée dans `relations.json`.
+Pour une relation `many_to_many`, il demande enfin les attributs du pivot, un par ligne, une réponse vide terminant la saisie.
+
+Déclarer la même relation enrichie sans terminal :
+
+```bash
+forge make:relation --type many_to_many --from Article --to Tag --name tags \
+  --pivot-field "position:integer" \
+  --pivot-field "note:string:max_length=200,optional"
+```
+
+Les deux attributs deviennent des colonnes de la table pivot, dans cet ordre.
+Le sous-CRUD correspondant se génère ensuite avec `forge make:pivot-crud Article tags`.
 
 ## 7. Ajout sans destruction
 

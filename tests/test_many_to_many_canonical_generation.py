@@ -103,6 +103,7 @@ def _run_make_relation_m2m(
     from_key: str = "",
     to_key: str = "",
     on_delete: str = "",
+    pivot_fields: "list[str] | None" = None,
     confirm: str = "o",
 ) -> None:
     monkeypatch.chdir(tmp_path)
@@ -116,6 +117,11 @@ def _run_make_relation_m2m(
         from_key,
         to_key,
         on_delete,
+        # ENTITIES-PIVOT-FIELDS-001 : le dialogue demande désormais les attributs
+        # du pivot, un par ligne, une réponse vide terminant la saisie. Le défaut
+        # ci-dessous n'en déclare aucun, donc le pivot reste simple comme avant.
+        *(pivot_fields or []),
+        "",
         confirm,
     ])
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))

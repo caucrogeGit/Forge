@@ -246,6 +246,8 @@ def test_make_relation_many_to_many_writes_canonical_relation(monkeypatch: pytes
             "",             # from_key (default: "contact_id")
             "",             # to_key (default: "groupe_id")
             "",             # on_delete (default: "cascade")
+            # ENTITIES-PIVOT-FIELDS-001 : attributs du pivot, vide pour terminer.
+            "",             # aucun attribut : le pivot reste simple
             "o",            # confirm
         ]
     )

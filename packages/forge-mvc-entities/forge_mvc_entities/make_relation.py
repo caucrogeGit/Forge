@@ -27,6 +27,20 @@ many_to_many :
     --pivot-table <table>             defaut <source>_<cible>
     --from-key <colonne>              defaut <source>_id
     --to-key <colonne>                defaut <cible>_id
+    --pivot-field <spec>              attribut du pivot, repetable
+
+Attributs de pivot (ENTITIES-PIVOT-FIELDS-001) :
+
+    forge make:relation --type many_to_many --from Article --to Tag         --pivot-field "position:integer"         --pivot-field "note:string:max_length=200,optional"
+
+Meme grammaire que `make:entity --field` : nom:type[:attributs]. Une relation
+qui porte au moins un attribut releve de `make:pivot-crud` et non de
+`make:crud`. Sans option, le pivot reste simple, comme avant.
+
+Deux des quatorze types d'entite ne s'appliquent pas a un pivot : `foreign_key`,
+la cle etrangere etant deja portee par from_key et to_key, et `slug`, qui
+designe une ressource et non un lien. Les noms `id`, from_key et to_key sont
+geres par Forge et ne peuvent pas etre redeclares.
 """
 
 from __future__ import annotations
@@ -165,6 +179,47 @@ def _load_relations_document(path: Path) -> dict[str, Any]:
     return cast("dict[str, Any]", data)
 
 
+def _prompt_pivot_fields(
+    *,
+    from_key: str,
+    to_key: str,
+    input_fn: Callable[[str], str] | None = None,
+) -> "list[dict[str, Any]]":
+    """Demande les attributs du pivot, un par ligne, jusqu'a une reponse vide.
+
+    Le dialogue ne posait pas la question et ecrivait toujours une liste vide,
+    si bien que `make:pivot-crud` restait hors d'atteinte des deux modes
+    (ENTITIES-PIVOT-FIELDS-001).
+
+    Repondre vide d'emblee rend exactement l'ancien comportement, un pivot
+    simple : ouvrir des attributs par defaut ferait basculer vers l'autre
+    generateur des relations qui n'ont rien demande.
+
+    Une saisie fautive est signalee et **redemandee**, jamais fatale : le
+    dialogue a deja pose huit reponses, les perdre pour une virgule serait
+    payer cher une faute de frappe.
+    """
+    if input_fn is None:
+        input_fn = input
+
+    print(
+        "Attributs du pivot, un par ligne, vide pour terminer.\n"
+        "  Grammaire : nom:type[:attributs] — la meme que make:entity --field.\n"
+        "  Exemple   : position:integer  ou  note:string:max_length=200,optional"
+    )
+    fields: list[dict[str, Any]] = []
+    while True:
+        spec = _prompt_text("Attribut du pivot", allow_empty=True, input_fn=input_fn)
+        if not spec:
+            return fields
+        try:
+            fields.append(
+                parse_pivot_field_spec(spec, from_key=from_key, to_key=to_key)
+            )
+        except ValueError as exc:
+            print(f"{exc} Reessayez.")
+
+
 def _build_m2m_relation_interactively(
     entity_map: dict[str, dict[str, Any]],
     entity_names: list[str],
@@ -197,6 +252,10 @@ def _build_m2m_relation_interactively(
 
     on_delete = _prompt_action_canonical("ON DELETE pivot", default="cascade", input_fn=input_fn)
 
+    pivot_fields = _prompt_pivot_fields(
+        from_key=from_key, to_key=to_key, input_fn=input_fn
+    )
+
     relation: dict[str, Any] = {
         "type": "many_to_many",
         "from": from_entity,
@@ -212,7 +271,7 @@ def _build_m2m_relation_interactively(
         "id": True,
         "unique_pair": True,
         "on_delete": on_delete,
-        "fields": [],
+        "fields": pivot_fields,
     }
     return relation
 
@@ -346,6 +405,50 @@ def _inject_fk_field_into_entity(
     return entity_path.as_posix()
 
 
+#: Types d'entite qui n'ont pas de sens sur une association
+#: (ENTITIES-PIVOT-FIELDS-001). La cle etrangere est deja portee par `from_key`
+#: et `to_key`, et un slug designe une ressource et non un lien. Mesure : les
+#: types admis par le pivot sont les quatorze de l'entite moins ces deux-la.
+_TYPES_HORS_PIVOT = frozenset({"foreign_key", "slug"})
+
+
+def parse_pivot_field_spec(spec: str, *, from_key: str, to_key: str) -> "dict[str, Any]":
+    """Traduit « nom:type:attributs » en attribut de pivot canonique.
+
+    La grammaire est **celle de `make:entity --field`**, et le parseur est le
+    meme : une seconde grammaire pour la meme intention contredirait le
+    principe 11, et divergerait au premier attribut ajoute d'un cote.
+
+    Deux refus viennent en plus, parce qu'un pivot n'est pas une entite. Ils
+    tombent ici, a la commande, plutot qu'a la validation du document : celle-ci
+    dirait « type invalide » sans dire que c'est le pivot qui le refuse.
+    """
+    from forge_mvc_entities.make_entity import parse_field_spec
+
+    # Le type se lit AVANT le parsage : `parse_field_spec` exige `references=`
+    # sur un `foreign_key` et rendrait ce reproche-la, qui n'est pas la raison.
+    # Un type sans emploi ici doit s'entendre dire cela, et rien d'autre.
+    parties = spec.split(":")
+    demande = parties[1].strip().lower() if len(parties) > 1 else ""
+    if demande in _TYPES_HORS_PIVOT:
+        nom = parties[0].strip()
+        raise ValueError(
+            f"Le type «{demande}» ne s'applique pas a un attribut de pivot "
+            f"(champ «{nom}»). La cle etrangere est deja portee par from_key "
+            "et to_key, et un slug designe une ressource, pas un lien."
+        )
+
+    field = parse_field_spec(spec)
+    reserves = {"id", from_key, to_key}
+    if field["name"] in reserves:
+        raise ValueError(
+            f"«{field['name']}» est gere par Forge dans la table pivot "
+            f"(reserves : {', '.join(sorted(reserves))}). Le redeclarer "
+            "produirait une colonne en double."
+        )
+    return field
+
+
 class _Options:
     """Ce que la ligne de commande a demande, sans defaut applique."""
 
@@ -362,6 +465,7 @@ class _Options:
         self.pivot_table: str | None = None
         self.from_key: str | None = None
         self.to_key: str | None = None
+        self.pivot_fields: list[str] = []
 
 
 _AVEC_VALEUR = {
@@ -378,6 +482,14 @@ def parse_relation_args(args: list[str]) -> _Options:
     for index, arg in enumerate(args):
         if saute:
             saute = False
+            continue
+        if arg == "--pivot-field":
+            # Repetable, contrairement aux options de _AVEC_VALEUR qui
+            # ecrasent : l'ordre des attributs decide de celui des colonnes.
+            if index + 1 >= len(args):
+                raise ValueError("L'option --pivot-field attend une valeur.")
+            options.pivot_fields.append(args[index + 1].strip())
+            saute = True
             continue
         if arg in _AVEC_VALEUR:
             if index + 1 >= len(args):
@@ -408,6 +520,13 @@ def build_relation_from_options(options: _Options) -> dict[str, Any]:
         )
     if not options.from_entity or not options.to_entity:
         raise ValueError("--from et --to sont requis en mode non interactif.")
+    if options.pivot_fields and options.type != "many_to_many":
+        # Accepter l'option sans pivot serait un silence : la relation partirait
+        # sans les attributs demandes, et rien ne le dirait.
+        raise ValueError(
+            "--pivot-field ne vaut que pour une relation many_to_many : "
+            f"le type demande est «{options.type}», qui n'a pas de table pivot."
+        )
 
     from_snake = to_snake(options.from_entity)
     to_snake_name = to_snake(options.to_entity)
@@ -419,17 +538,22 @@ def build_relation_from_options(options: _Options) -> dict[str, Any]:
     }
 
     if options.type == "many_to_many":
+        from_key = options.from_key or f"{from_snake}_id"
+        to_key = options.to_key or f"{to_snake_name}_id"
         relation["name"] = options.name or f"{to_snake_name}s"
         if options.inverse_name:
             relation["inverse_name"] = options.inverse_name
         relation["pivot"] = {
             "table": options.pivot_table or f"{from_snake}_{to_snake_name}",
-            "from_key": options.from_key or f"{from_snake}_id",
-            "to_key": options.to_key or f"{to_snake_name}_id",
+            "from_key": from_key,
+            "to_key": to_key,
             "id": True,
             "unique_pair": True,
             "on_delete": options.on_delete or "cascade",
-            "fields": [],
+            "fields": [
+                parse_pivot_field_spec(spec, from_key=from_key, to_key=to_key)
+                for spec in options.pivot_fields
+            ],
         }
         return relation
 
