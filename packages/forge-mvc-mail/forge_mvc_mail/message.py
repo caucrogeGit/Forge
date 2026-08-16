@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
 from email.message import EmailMessage
 from typing import Iterable
@@ -11,11 +10,32 @@ from typing import Iterable
 from forge_mvc_mail.exceptions import MailValidationError
 
 
-_NEWLINE_RE = re.compile(r"[\r\n]")
+def _coupe_une_ligne(value: str) -> bool:
+    """Vrai si `value` contient un séparateur de ligne, au sens de Python.
+
+    `MAIL-SEPARATEURS-LIGNE-001` : le contrôle ne cherchait que `[\\r\\n]`, alors
+    que Python coupe une ligne sur huit autres caractères, dont la tabulation
+    verticale, le saut de page, la nouvelle ligne NEL et les deux séparateurs
+    Unicode de ligne et de paragraphe. Mesuré, les huit passaient ce contrôle,
+    puis `EmailMessage` levait un `ValueError` de la bibliothèque standard.
+
+    Aucune en-tête forgée ne partait, la bibliothèque standard refusant ces
+    valeurs. Mais l'appelant recevait une exception d'un autre type que le
+    `MailValidationError` annoncé, donc une panne là où il attendait un refus.
+
+    `splitlines()` plutôt qu'une liste écrite à la main : c'est la définition
+    que la bibliothèque standard applique elle-même, et une liste en dériverait
+    en silence à la première version de Python qui l'étendrait.
+
+    La comparaison ne peut pas être `len(...) > 1` : un séparateur **final** ne
+    crée pas de seconde ligne, si bien que « abc\\n » y passerait. C'est le même
+    piège que l'ancrage `$` d'une expression rationnelle.
+    """
+    return bool(value) and value.splitlines() != [value]
 
 
 def _check_no_injection(value: str, label: str) -> str:
-    if _NEWLINE_RE.search(value):
+    if _coupe_une_ligne(value):
         raise MailValidationError(
             f"{label} contient des caractères interdits (injection de headers)."
         )
