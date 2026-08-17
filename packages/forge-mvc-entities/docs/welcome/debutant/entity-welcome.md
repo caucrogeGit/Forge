@@ -1,14 +1,19 @@
 # Welcome Entités
 
-!!! note "Prérequis : installer l'opt-in"
+!!! note "Prérequis : l'opt-in et un backend de base de données"
     Installez `forge-mvc-entities` avant de commencer : voir sa [référence](../../reference.md).
 
     ```bash
-    pip install --pre forge-mvc-entities    # installe le paquet
-    forge opt-in:enable entities          # le branche au projet
+    pip install --pre forge-mvc-entities forge-mvc-sqlite    # le moteur et un backend
+    forge opt-in:enable entities                             # le branche au projet
     ```
 
     Sans le paquet, l'application refuse de démarrer sur un `ModuleNotFoundError` au chargement des routes.
+
+    **Le backend est requis dès la première commande.**
+    Un projet neuf n'en porte aucun (ADR-060), et le cœur est agnostique (ADR-054) : c'est le backend qui décide du type de la clé primaire.
+    Sans lui, `forge make:entity` s'arrête sur « Aucun backend BDD installé ».
+    `forge-mvc-sqlite` est le plus simple pour ce parcours, aucun serveur n'étant à démarrer ; les trois autres conviennent aussi.
 
     `forge opt-in:install entities` **affiche** la commande d'installation adaptée à votre environnement, pipx compris ; il n'installe rien lui-même (ADR-016).
 

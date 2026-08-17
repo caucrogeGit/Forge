@@ -31,9 +31,14 @@ Dès qu'un pivot porte au moins un champ **requis** ou **non nullable**, `make:c
     ```bash
     forge make:entity Tag --no-input
     forge make:relation --type many_to_many --from Article --to Tag --name tags \
-      --pivot-field "position:integer"
+      --pivot-field "position:integer" \
+      --pivot-field "epingle:integer"
     forge build:model
+    forge db:apply     # crée la table pivot en base
     ```
+
+    Les paliers suivants lisent **ces deux attributs**, `position` et `epingle`.
+    N'en déclarer qu'un fait répondre 500 à la page de liste, la requête portant alors sur une colonne absente.
 
     L'option `--pivot-field` est répétable et suit la grammaire de `make:entity --field`, soit `nom:type[:attributs]`.
     Le dialogue de `forge make:relation` pose la même question, un attribut par ligne, vide pour terminer.

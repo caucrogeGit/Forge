@@ -14,10 +14,16 @@ Le SQL reste visible : une migration est un fichier que vous relisez avant de l'
 ```bash
 forge db:config    # amorce DB_NAME dans env/ (une seule fois)
 forge db:init
+forge db:apply     # crée en base les tables de vos entités
 ```
 
 `db:init` **affiche** le SQL de provisioning (base et comptes) dérivé de votre environnement ; `--run` l'exécute.
 Vous voyez donc ce qui va être fait avant que ce soit fait.
+
+`db:apply` est l'étape que l'on oublie, et c'est celle qui rend le reste utilisable.
+Les paliers précédents ont produit le SQL de vos entités dans `mvc/entities/`, mais produire du SQL n'est pas le poser en base.
+Sans cette commande, les tables n'existent pas et les écrans engendrés par `make:crud` répondent 500 sur une table absente.
+À relancer chaque fois que vous ajoutez une entité ou une relation.
 
 ## Créer une migration
 
