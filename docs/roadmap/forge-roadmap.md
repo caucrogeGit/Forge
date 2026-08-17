@@ -8,7 +8,9 @@ Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
 > Version courante : **Forge 1.0.0-rc.6** (release candidate, préparée le 2026-08-14).
-> Dernière version publiée sur PyPI : **Forge 1.0.0-rc.5** (2026-08-10).
+> Dernière version publiée sur PyPI : **Forge 1.0.0-rc.6** (2026-08-14).
+> Quatorze tickets sont livrés depuis ce tag et attendent une publication : voir la section « Non publié » du `CHANGELOG.md`.
+> Deux d'entre eux ajoutent de l'API publique, et le parcours d'accueil du moteur d'entités ne se déroule en entier qu'avec une version publiée les portant.
 
 ---
 

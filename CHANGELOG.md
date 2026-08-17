@@ -1,6 +1,85 @@
 # Changelog
 
 
+## [Non publié]
+
+Quatorze tickets livrés après le tag `v1.0.0-rc.6`, en deux temps.
+
+Le premier a vérifié la documentation en l'exécutant, plutôt qu'en la relisant.
+Le second a cherché les écarts entre ce que Forge annonce et ce qu'il fait, et c'est là que presque tout s'est trouvé.
+
+Un seul défaut de comportement dans le lot, sur les privilèges PostgreSQL.
+Les autres étaient des garanties creuses, des contrats rompus ou des promesses que le code ne tenait plus, ce qui est cohérent avec un dépôt qui vient de passer un pré-mortem complet : ce qui reste se cache moins dans le code que dans ce qu'on croit savoir de lui.
+
+Deux ajouts d'API publique en découlent, à prendre en compte pour la prochaine publication.
+
+### Ajouté
+
+- **Un droit refusé par le serveur est reconnu et expliqué (`FIXTURES-PG-FK-PRIVILEGE-001`).**
+  `fixtures:load --no-fk-checks` et `fixtures:purge` encadrent leur travail par le levier de contraintes du dialecte.
+  Sur PostgreSQL ce levier est `SET session_replication_role`, qui **exige un rôle superutilisateur**, alors que l'ADR-033 fait tourner l'applicatif en compte DML strict.
+  Dans la configuration que Forge recommande, l'option était donc refusée par le serveur, et les deux commandes échouaient sans qualifier la cause, en rendant le message brut du moteur, traduit selon sa langue.
+  Ni l'ADR-077 ni la référence de l'opt-in ne mentionnaient ce prérequis, que le commentaire du dialecte connaissait pourtant.
+  `is_insufficient_privilege_error` rejoint les trois prédicats du contrat de backend, implémenté sur les quatre. Signaux mesurés contre les serveurs avec un compte privé de droits : MariaDB errno 1044, 1142 et 1227, PostgreSQL SQLSTATE 42501, SQL Server numéros natifs 229 et 262, SQLite toujours faux faute de système de droits.
+  Le SQLSTATE ne discrimine ni sur MariaDB ni sur SQL Server, tous deux rendant `42000` pour un refus comme pour une faute de syntaxe. L'errno 1045 est volontairement exclu, décrivant un refus de connexion et non un droit manquant sur une opération.
+  Le test se connecte avec un rôle ordinaire, jamais en `postgres` : la fixture `real_pg_db` est superutilisateur, et un test écrit dessus serait passé sans rien prouver. C'est ce qui a laissé vivre le défaut.
+
+- **Les attributs d'un pivot se déclarent par l'outillage (`ENTITIES-PIVOT-FIELDS-001`).**
+  `make:relation` écrivait toujours `pivot.fields: []` et ne posait jamais la question, **ni en dialogue ni en ligne de commande**, alors que `make:pivot-crud` exige `pivot.fields[]` non vide.
+  La commande était donc inatteignable par le seul outillage : la seule voie était d'éditer `mvc/entities/relations.json` à la main, ce que la documentation disait franchement.
+  C'était le seul endroit où Forge demandait d'écrire un contrat JSON à la main, et aucun agent ne pouvait modéliser un pivot enrichi alors que Forge écrit lui-même leur guidance (ADR-047).
+  L'option `--pivot-field` est répétable et le dialogue pose la même question, un attribut par ligne. Les deux modes reçoivent la capacité ensemble : n'ouvrir que la ligne de commande aurait créé l'asymétrie inverse de celle qu'`ENTITIES-NON-INTERACTIVE-002` a corrigée.
+  La grammaire n'est pas inventée, c'est celle de `make:entity --field`, et le parseur est le même. Deux des quatorze types d'entité sont écartés, la clé étrangère étant déjà portée par `from_key` et `to_key`, et un slug désignant une ressource et non un lien.
+
+### Corrigé
+
+- **Le mail refusait deux séparateurs de ligne sur dix (`MAIL-SEPARATEURS-LIGNE-001`).**
+  Le contrôle anti-injection d'en-têtes ne cherchait que `[\r\n]`, alors que Python coupe une ligne sur huit autres caractères, dont la tabulation verticale, la nouvelle ligne NEL et les deux séparateurs Unicode.
+  Il n'y avait pas de faille, la bibliothèque standard refusant ces valeurs, donc aucune en-tête forgée ne partait. Le défaut est un **contrat rompu** : l'appelant recevait un `ValueError` au lieu du `MailValidationError` annoncé, donc une erreur cinq cents là où il avait prévu un refus de formulaire.
+  Le contrôle suit désormais `str.splitlines()`, la définition que la bibliothèque standard applique elle-même, plutôt qu'une liste tenue à la main qui dériverait au premier élargissement de Python.
+  La comparaison ne peut pas être « plus d'une ligne » : un séparateur **final** n'en crée pas de seconde, si bien qu'une valeur terminée par un saut passait. C'est le piège de l'ancrage `$` d'une expression rationnelle.
+
+- **Le vingt-septième parcours d'accueil n'allait pas au bout (`WELCOME-ENTITIES-EXECUTION-001`).**
+  Joué dans un projet neuf, le parcours du moteur d'entités révèle trois manques, aucun visible à la lecture : chaque commande était juste prise isolément, le manque n'existant qu'entre elles.
+  `make:entity` exige un backend BDD, cité seulement au troisième chapitre alors que le besoin est à la première commande.
+  Surtout, le parcours ne disait **jamais** d'appliquer le SQL à la base. Mesuré : après tout le parcours, la base ne contenait que `forge_migrations`, ni `article`, ni `tag`, ni la table pivot. Le parcours engendrait des écrans CRUD sur des tables inexistantes et enseignait les migrations sur une base vide.
+  Ce dernier manque n'est apparu que par la vérification des **routes**, tous les blocs de commandes passant : sans elle, le parcours aurait été déclaré bon.
+  Les vingt-sept parcours sur vingt-sept vont désormais au bout.
+
+- **Deux promesses fausses du tutoriel et neuf signatures d'API périmées (`GUIDE-PRISE-EN-MAIN-EXEC-001`, `DOC-SIGNATURES-REELLES-001`).**
+  Trouvées en jouant le tutoriel et en confrontant au code les deux cent cinquante-quatre signatures publiées, plutôt qu'en les relisant.
+  Le renommage `--email` vers `--login` avait été appliqué aux exemples, mais ni aux tableaux ni au diagramme de classe.
+
+- **Le prérequis d'installation était inactionnable, et deux parcours ne mettaient rien en base (`WELCOME-PREREQUIS-ACTIONNABLE-001`, `WELCOME-HARNAIS-LIGNE-A-LIGNE-001`, `WELCOME-PARCOURS-COMPLETS-001`).**
+  Vingt-six parcours sur vingt-sept menés jusqu'au bout, contre seize au départ.
+
+### Tests
+
+- **Les tests du DDL du socle validaient une copie figée (`AUTH-DDL-TESTS-SOURCE-001`).**
+  Le SQL du socle Auth existe en trois copies : la spec déclarative rendue par dialecte, la constante canonique, et la fixture du projet d'exemple. Les deux premières étaient verrouillées par une parité stricte ; la troisième ne l'était qu'à moitié, deux tables sur quatre portant une parité locale.
+  `users.sql`, qui n'en avait pas, était restée à l'état d'avant l'ADR-089, où `email` portait l'identité, et d'avant l'ADR-091, qui a retiré `last_login_at`.
+  Neuf assertions affirmaient le contrat de la table en lisant cette copie, dont deux affirmaient l'inverse de la règle en vigueur, en restant vertes.
+  Aucun défaut de comportement : la fixture n'est jamais appliquée à une base, vérifié par relevé. Le défaut était une garantie creuse.
+  Un garde-fou dérivé du système de fichiers tient désormais la parité pour tous les fichiers du dossier, et fait échouer sur un fichier qu'il ne sait ni résoudre ni justifier plutôt que de le sauter en silence.
+
+- **`fixtures:load` et `fixtures:purge` n'étaient exercés que sur MariaDB (`FIXTURES-LOAD-PURGE-TROIS-SERVEURS-001`).**
+  Ce sont les deux commandes principales de l'opt-in, et la cause tenait en une ligne : leur table de test était créée par une DDL écrite en dur dans ce dialecte.
+  Mesuré par collecte et non d'après les marqueurs, qui trompent : `real_backend_db` porte les siens sur ses paramètres, si bien qu'un marqueur de module s'y ajoute sans restreindre.
+  Aucun défaut trouvé, les trois moteurs se comportant identiquement, apostrophe comprise. C'est un résultat en soi, et les docstrings le disent.
+
+### Intégration continue
+
+- **Le SAST est ramené à zéro signalement et devient bloquant (`CI-BANDIT-PERIMETRE-001`).**
+  Bandit rendait cent signalements sans qu'aucun n'arrête rien : il était la seule des quatre portes du job en `continue-on-error` **sans** entrée dans le garde final, si bien qu'il sortait en échec à chaque exécution et que son annotation se lisait comme du bruit.
+  Mesuré sur les cent, aucun défaut réel. Quatre-vingt-huit relevaient d'une décision d'architecture, le SQL construit par chaîne étant un choix assumé du principe 5, sept venaient de fichiers de test, quatre de comparaisons ou de valeurs par défaut, et un était un faux positif vérifié.
+  Le plus parlant des quatre visait la liste des hôtes **refusés** : le scanner signalait comme risque le code qui l'interdit.
+  `bandit.yaml` écarte la seule règle structurelle et écrit ce que cela coûte plutôt que de le taire. Les cinq derniers signalements sont annotés à leur site avec leur raison, jamais exclus globalement, pour qu'un vrai bind public ou un `Markup` non échappé reste attrapé.
+  C'est le zéro qui rend le prochain signalement utile, et c'est lui qui justifie que la porte devienne bloquante.
+
+- **La CI ignorait le Node épinglé du projet (`CI-NODE-NVMRC-001`).**
+  Le fichier `.nvmrc` fixe la version, mais le workflow ne la lisait pas.
+
+
 ## [1.0.0-rc.6] - 2026-08-14
 
 Cycle de pré-mortem du cœur et des opt-ins, demandé avant de passer à la rc6.
@@ -93,7 +172,11 @@ Trois motifs expliquent presque tout, et ils reviennent d'un bout à l'autre du 
   Cinq fois dans ce cycle, un relevé a échoué sur une docstring qui expliquait précisément ce que le code ne fait pas. `code_sans_prose` porte la règle une seule fois, adopté par huit garde-fous.
 
 
-## [Non publié]
+## [1.0.0-rc.6] - 2026-08-14 (seconde partie du cycle)
+
+Ces entrées ont porté le titre « Non publié » jusqu'au 2026-08-17, alors que leurs quinze tickets sont tous dans le tag `v1.0.0-rc.6`.
+Vérifié un par un contre le tag, aucun n'en était absent.
+La section avait été ouverte pendant le cycle, puis la release en a créé une seconde au-dessus sans refermer celle-ci : le changelog annonçait donc comme non publié ce qui l'était depuis trois jours.
 
 ### Ajouté
 
