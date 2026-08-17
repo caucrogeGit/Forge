@@ -16,7 +16,7 @@ expose des **shims transitoires** (``core/uploads``) supprimés au ticket
 
 from __future__ import annotations
 
-__version__ = "1.0.0rc6"
+__version__ = "1.0.0rc7"
 
 # Validation/exceptions : réexport depuis le core (où elles restent).
 from core.forms.upload_exceptions import (

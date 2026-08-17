@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import json
 import os
+import re as _re
 import shutil
 import sqlite3
 import subprocess
@@ -80,9 +81,50 @@ def _node_trop_ancien() -> str | None:
     return None
 
 
+def _version_non_publiee() -> str | None:
+    """Motif de saut si la version du dépôt n'est pas encore sur PyPI, sinon `None`.
+
+    `GUIDE-EXEC-VERSION-NON-PUBLIEE-001` : le squelette épingle
+    `forge-mvc==<version du dépôt>` (ADR-024), et `forge new` résout donc depuis
+    PyPI. Entre le bump de préparation d'une release et sa publication, cette
+    version n'existe pas encore : `pip` répond « No matching distribution » et
+    les cinq tests de ce fichier échouent pour une raison étrangère au code.
+
+    C'est l'œuf et la poule d'une pré-release, que `release-validate.sh` traite
+    déjà pour l'audit des dépendances. Ces tests sont nés après la rc6 : la
+    préparation de la rc7 est la première où le cas se présente, et il rendrait
+    la CI rouge sur le commit de bump.
+
+    Le saut est **explicite et motivé**, jamais silencieux : la couverture
+    revient d'elle-même dès la publication, sans geste ni relance à programmer.
+    """
+    version = _re.search(
+        r'^version = "([^"]+)"',
+        (PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8"),
+        _re.MULTILINE,
+    )
+    if version is None:  # pragma: no cover - pyproject toujours versionné
+        return None
+    attendue = version.group(1)
+    try:
+        with urllib.request.urlopen("https://pypi.org/pypi/forge-mvc/json", timeout=15) as reponse:
+            publiees = set(json.loads(reponse.read()).get("releases", {}))
+    except Exception:  # noqa: BLE001 - réseau absent : on ne bloque pas la suite
+        return "PyPI injoignable : impossible de vérifier que forge-mvc est publié."
+    if attendue in publiees:
+        return None
+    return (
+        f"forge-mvc {attendue} n'est pas publié sur PyPI : le squelette l'épingle "
+        "(ADR-024), donc `forge new` ne peut pas résoudre ses dépendances. "
+        "Attendu entre le bump de préparation et la publication ; ce parcours "
+        "redevient couvert dès que la version est en ligne."
+    )
+
+
 pytestmark = [
     pytest.mark.smoke,
     pytest.mark.skipif(_node_trop_ancien() is not None, reason=_node_trop_ancien() or ""),
+    pytest.mark.skipif(_version_non_publiee() is not None, reason=_version_non_publiee() or ""),
 ]
 
 

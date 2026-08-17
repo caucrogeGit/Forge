@@ -7,16 +7,16 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> Version courante : **Forge 1.0.0-rc.6** (release candidate, préparée le 2026-08-14).
+> Version courante : **Forge 1.0.0-rc.7** (release candidate, préparée le 2026-08-17).
 > Dernière version publiée sur PyPI : **Forge 1.0.0-rc.6** (2026-08-14).
 > Quatorze tickets sont livrés depuis ce tag et attendent une publication : voir la section « Non publié » du `CHANGELOG.md`.
 > Deux d'entre eux ajoutent de l'API publique, et le parcours d'accueil du moteur d'entités ne se déroule en entier qu'avec une version publiée les portant.
 
 ---
 
-## État actuel : Forge 1.0.0-rc.6
+## État actuel : Forge 1.0.0-rc.7
 
-**Tag courant : `v1.0.0-rc.6`**, sixième release candidate avant la 1.0.0 stable.
+**Tag courant : `v1.0.0-rc.7`**, sixième release candidate avant la 1.0.0 stable.
 
 Elle est née d'un pré-mortem mené sur le cœur et sur chaque opt-in, demandé avant de passer à cette version.
 Dix-huit tickets, dont onze défauts de comportement qu'une suite de dix-sept mille tests verts ne montrait pas.

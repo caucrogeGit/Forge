@@ -17,10 +17,10 @@ PostgreSQL, SQL Server) s'ajoute en opt-in.
 
 ## Statut
 
-Forge **1.0.0-rc.6**, release candidate (préversion finale avant 1.0.0 stable).
+Forge **1.0.0-rc.7**, release candidate (préversion finale avant 1.0.0 stable).
 
 - Paquet PyPI : [`forge-mvc`](https://pypi.org/project/forge-mvc/)
-- Préversion PEP 440 (`1.0.0rc6`) : installation avec `--pre`
+- Préversion PEP 440 (`1.0.0rc7`) : installation avec `--pre`
 - Python 3.12+
 - API publique gelée pour la 1.0.0
 

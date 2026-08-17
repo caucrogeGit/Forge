@@ -1,9 +1,9 @@
 # Changelog
 
 
-## [Non publié]
+## [1.0.0-rc.7] - 2026-08-17
 
-Quatorze tickets livrés après le tag `v1.0.0-rc.6`, en deux temps.
+Vingt et un tickets livrés après le tag `v1.0.0-rc.6`, en deux temps.
 
 Le premier a vérifié la documentation en l'exécutant, plutôt qu'en la relisant.
 Le second a cherché les écarts entre ce que Forge annonce et ce qu'il fait, et c'est là que presque tout s'est trouvé.
@@ -78,6 +78,39 @@ Deux ajouts d'API publique en découlent, à prendre en compte pour la prochaine
 
 - **La CI ignorait le Node épinglé du projet (`CI-NODE-NVMRC-001`).**
   Le fichier `.nvmrc` fixe la version, mais le workflow ne la lisait pas.
+
+- **La couche base n'était éprouvée que sur une version de Python (`CI-DB-PYTHON-VERSION-001`).**
+  Forge déclare supporter 3.12, 3.13 et 3.14, et les vingt-sept paquets le déclarent aussi, vérifié sans écart. Mais les 457 tests d'intégration ne s'exécutaient que sur 3.13, choix qui n'était expliqué nulle part.
+  Or c'est la couche qui repose sur des extensions C, `mariadb`, `psycopg` et `pyodbc`. Le job matriciel prouve qu'elles **s'installent** sur 3.14 ; seuls les jobs base prouvent qu'elles **fonctionnent** contre un serveur.
+  Les trois jobs passent en 3.14, à coût constant, et les trois pilotes tiennent. Le compromis d'une seule version reste assumé, mais il est désormais écrit.
+
+- **Les actions GitHub tournaient sur un runtime Node déprécié (`CI-ACTIONS-NODE24-001`).**
+  Chaque exécution posait une annotation, six par run. Ce n'est pas le Node du projet, en 24.17.0 depuis `CI-NODE-NVMRC-001`, mais le moteur interne que chaque action déclare dans son propre `action.yml`, sur lequel Forge n'a de prise qu'en montant de version majeure.
+  Dix-sept montées, ruptures vérifiées **avant** de monter et non après : le cache automatique de `setup-node@v5` ne s'applique pas, `package.json` ne portant pas de champ `packageManager`, et le blocage des forks de `checkout@v7` ne concerne aucun des quatre workflows, qui n'emploient ni `pull_request_target` ni `workflow_run`.
+  Mesure après fusion : six annotations avant, zéro après.
+
+### Outillage de release
+
+- **Le script de validation rendait trois échecs sur un dépôt sain (`RELEASE-VALIDATE-FAUX-POSITIFS-001`).**
+  Deux venaient de lui. `pytest` ne démarrait pas, et le script le rapportait comme un échec des **tests** : `pytest.ini` impose `--dist loadfile`, donc pytest-xdist est obligatoire, et le garde-fou d'interpréteur vérifiait `pytest`, `mkdocs` et `ruff` par un import. Importer pytest ne prouve pas qu'il démarre. La suite n'avait jamais tourné alors que le rapport annonçait un échec.
+  Le contrôle lance désormais une collecte réelle, qui lit la configuration et vaut donc pour tout plugin exigé par les addopts, plutôt qu'une liste d'imports qui dériverait au premier changement.
+  L'autre était une incohérence : `--ignore-vuln` figurait sur deux relevés et manquait au troisième, si bien que le même avis accepté ailleurs bloquait sur `requirements-dev.txt`.
+
+- **Un commentaire cassait un garde-fou (`RELEASE-VALIDATE-IGNORE-VULN-REGEX-001`).**
+  Le relevé des exclusions capturait l'identifiant **avec** la ponctuation qui le suit : une mention entre apostrophes inverses, dans un commentaire, rendait un identifiant inconnu du veilleur et faisait échouer les trois matrices.
+  Le garde est rendu insensible à la mise en forme sans rien perdre de sa portée, vérifié par contrôle négatif dans les deux cas, en commande comme en commentaire.
+
+- **Le script donnait un feu vert sur une suite amputée (`RELEASE-VALIDATE-SKIPS-SILENCIEUX-001`).**
+  Un test d'intégration qui ne trouve pas son serveur se **saute**, il n'échoue pas. Le dépôt porte 438 tests marqués `db`, `db_pg` ou `db_mssql` : sans les `FORGE_REQUIRE_*`, ils disparaissent de la suite sans que le vert n'en souffre.
+  Mesuré sur une validation réelle : **152 tests sautés**, verdict « prêt à releaser » inchangé. C'est le piège du pré-mortem rc3, où l'arrêt d'un serveur avait fait ignorer des milliers de tests sans que rien ne le montre.
+  Ces variables ne changent pas ce qui est exécuté, mais ce qui se passe quand la connexion échoue, un saut devenant un échec. Le script les exige avant de lancer les tests, `--sans-serveurs` permettant d'assumer la lacune explicitement. Le nombre de sauts est désormais énoncé même quand tout est vert.
+  Effet mesuré au passage suivant : de 20804 tests et 152 sauts, à **20973 tests et aucun saut**.
+
+### Documentation
+
+- **Le changelog annonçait comme à venir ce qui était sorti (`RELEASE-CHANGELOG-POST-RC6-001`).**
+  Une section « Non publié » subsistait entre rc6 et rc5, alors que ses quinze tickets étaient tous dans le tag rc6, vérifiés un par un. Elle avait été ouverte pendant le cycle, la release en ayant créé une seconde au-dessus sans refermer celle-ci.
+  La roadmap annonçait de son côté la rc5 comme dernière version publiée sur PyPI, alors que la rc6 l'était depuis trois jours.
 
 
 ## [1.0.0-rc.6] - 2026-08-14

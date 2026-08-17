@@ -22,7 +22,7 @@ from forge_mvc_notifications.store import (
     unread_count,
 )
 
-__version__ = "1.0.0rc6"
+__version__ = "1.0.0rc7"
 
 __all__ = [
     "NotificationError",

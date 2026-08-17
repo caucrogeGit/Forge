@@ -14,4 +14,4 @@ from forge_mvc_testing.fake_request import FakeRequest
 from forge_mvc_testing.source_scan import code_sans_prose, lignes_de_prose
 
 __all__ = ["FakeRequest", "code_sans_prose", "lignes_de_prose"]
-__version__ = "1.0.0rc6"
+__version__ = "1.0.0rc7"

@@ -87,7 +87,7 @@
   </div>
 
   <div class="landing-version-strip landing-accent-text flex flex-wrap justify-center gap-2 text-sm font-medium mb-12">
-    <a href="https://github.com/caucrogeGit/Forge/releases" target="_blank" rel="noopener noreferrer" class="hover:underline">v1.0.0-rc.6</a><span class="opacity-40">·</span>
+    <a href="https://github.com/caucrogeGit/Forge/releases" target="_blank" rel="noopener noreferrer" class="hover:underline">v1.0.0-rc.7</a><span class="opacity-40">·</span>
     <a href="https://docs.python.org/3.12/" target="_blank" rel="noopener noreferrer" class="hover:underline">Python 3.12+</a><span class="opacity-40">·</span>
     <a href="https://mariadb.com/kb/en/" target="_blank" rel="noopener noreferrer" class="hover:underline">MariaDB 11.8</a><span class="opacity-40">·</span>
     <a href="https://www.sqlite.org/docs.html" target="_blank" rel="noopener noreferrer" class="hover:underline">SQLite</a><span class="opacity-40">·</span>
@@ -106,33 +106,33 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-rc.6 : pré-mortem du cœur et des opt-ins, chemin d'erreur, jumeaux dev et production, documentation confrontée au code. -->
+<!-- Nouveautés 1.0.0-rc.7 : écarts entre ce que Forge annonce et ce qu'il fait. Tests validant une copie, droits refusés, parcours d'accueil, portes de qualité. -->
 <section id="nouveautes" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
-      <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-rc.6</div>
+      <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-rc.7</div>
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Le chemin d'erreur ne lâche plus</h3>
-        <p class="text-white/60 text-sm leading-relaxed">La page 500 appartient à votre projet, donc vous pouvez la casser. Elle le faisait au pire moment : l'exception ressortait, le serveur répondait à la place de Forge, et la cause première était perdue. Le code HTTP d'une page d'erreur est désormais garanti, quoi qu'il arrive au gabarit.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Un test peut valider autre chose</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Neuf assertions décrivaient la table des comptes en lisant une copie du schéma, restée deux versions en arrière. Elles étaient vertes, et deux affirmaient l'inverse de la règle en vigueur. Les tests portent désormais sur la source, et un contrôle dérivé du disque garde toute la famille.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Ce que le serveur de dev cachait</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Le serveur de développement et le serveur de production ne sont pas jumeaux. Cinq divergences trouvées, dont un nonce CSP qui n'existait que chez vous : le script inline de vos gabarits était bloqué en production, sans erreur ni page cassée. Les tests qui le validaient lançaient le serveur de développement.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Un droit refusé se dit</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Sur PostgreSQL, désactiver les contraintes le temps d'un chargement demande un rôle privilégié, que le compte applicatif d'un projet Forge n'est pas. La commande échouait sur le message brut du moteur, traduit selon sa langue. Le refus est reconnu par le backend et nommé, avec les deux issues.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Un test qui construit sans exécuter</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Une requête comparée à une chaîne attendue ne dit rien de ce que le moteur en fait. Le script de <code>forge db:init</code>, première commande d'un projet, est maintenant exécuté pour de vrai sur PostgreSQL et SQL Server, sur de vrais rôles et de vraies bases.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Le dernier parcours d'accueil</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Joué dans un projet neuf, le parcours du moteur d'entités révèle trois manques qu'aucune relecture ne montrait, dont l'étape qui crée les tables, absente de bout en bout : il engendrait des écrans sur des tables inexistantes. Les vingt-sept parcours vont maintenant jusqu'au bout.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">La documentation confrontée au code</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Huit passages promettaient ce que le code ne faisait plus, dont deux protections qu'un déploiement n'avait pas. Les 433 invocations de <code>forge</code> montrées par la documentation sont désormais vérifiées : commande existante, options existantes.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Une porte qui n'arrête rien</h3>
+        <p class="text-white/60 text-sm leading-relaxed">L'analyse de sécurité rendait cent signalements sans jamais bloquer, et son échec quotidien se lisait comme du bruit. Aucun n'était réel : quatre-vingt-huit décrivaient un choix d'architecture. Ramenée à zéro et rendue bloquante, pour que le prochain compte.</p>
       </div>
 
     </div>

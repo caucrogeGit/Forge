@@ -6,6 +6,6 @@ L'API publique se réduit au backend lui-même.
 """
 from forge_mvc_mariadb.backend import MariaDBBackend
 
-__version__ = "1.0.0rc6"
+__version__ = "1.0.0rc7"
 
 __all__ = ["MariaDBBackend"]

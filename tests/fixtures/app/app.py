@@ -1,5 +1,5 @@
 """
-app.py - Point d'entrée — Forge 1.0.0-rc.6
+app.py - Point d'entrée — Forge 1.0.0-rc.7
 ======================================
 Serveur HTTP/HTTPS multi-thread pur Python basé sur http.server.
 Le chiffrement SSL est activé via APP_SSL_ENABLED pour le développement local.
