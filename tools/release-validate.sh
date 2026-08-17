@@ -68,11 +68,16 @@ WITH_PACKAGES=false
 # résolu via --find-links). Hors flag, comportement inchangé (le smoke est
 # coûteux : venv jetable + forge new complet).
 WITH_SMOKE=false
+# RELEASE-VALIDATE-SKIPS-SILENCIEUX-001 — `--sans-serveurs` assume explicitement
+# une validation qui n'exerce pas les tests d'intégration. Sans ce drapeau, le
+# script exige les `FORGE_REQUIRE_*` : voir le contrôle plus bas.
+SANS_SERVEURS=false
 _ARGS=()
 for _arg in "$@"; do
     case "$_arg" in
         --with-packages) WITH_PACKAGES=true ;;
         --with-smoke) WITH_SMOKE=true ;;
+        --sans-serveurs) SANS_SERVEURS=true ;;
         *) _ARGS+=("$_arg") ;;
     esac
 done
@@ -262,6 +267,39 @@ fi
 # ── 4. Tests ──────────────────────────────────────────────────────────────────
 echo ""
 echo "--- Exécution des tests (pytest -x -q) ---"
+# RELEASE-VALIDATE-SKIPS-SILENCIEUX-001 — un test d'intégration qui ne trouve
+# pas son serveur se SAUTE, il n'échoue pas. Sans les `FORGE_REQUIRE_*`, le
+# dépôt porte 438 tests base qui peuvent disparaître de la suite sans que le
+# vert n'en souffre, et le script concluait « prêt à releaser » sur une suite
+# amputée. Mesuré sur une validation réelle : 152 tests sautés, MariaDB
+# refusant les identifiants par défaut, verdict inchangé.
+#
+# C'est le piège du pré-mortem rc3, où l'arrêt d'un serveur avait fait ignorer
+# des milliers de tests d'intégration sans que rien ne le montre.
+#
+# Ces variables ne changent pas ce qui est exécuté : elles changent ce qui se
+# passe quand la connexion échoue, un saut devenant un échec. C'est exactement
+# ce qu'on veut d'une validation de release, et jamais d'une boucle de
+# développement. `--sans-serveurs` permet de l'assumer explicitement, ce qui
+# reste préférable à un silence.
+if ! $SANS_SERVEURS; then
+    _MANQUANTES=""
+    for _v in FORGE_REQUIRE_DB FORGE_REQUIRE_DB_PG FORGE_REQUIRE_DB_MSSQL; do
+        [ -n "${!_v:-}" ] || _MANQUANTES="$_MANQUANTES $_v"
+    done
+    if [ -n "$_MANQUANTES" ]; then
+        printf "[FAIL]  Tests d'intégration non exigés :%s\n" "$_MANQUANTES" >&2
+        printf "         Sans elles, un serveur injoignable fait SAUTER ses tests au lieu\n" >&2
+        printf "         d'échouer, et la suite reste verte en ayant moins tourné.\n" >&2
+        printf "         Posez-les avec les mots de passe des serveurs de test, par exemple :\n" >&2
+        printf "           FORGE_REQUIRE_DB=1 FORGE_TEST_DB_PASSWORD=... \\\\\n" >&2
+        printf "           FORGE_REQUIRE_DB_PG=1 FORGE_TEST_PG_PASSWORD=... \\\\\n" >&2
+        printf "           FORGE_REQUIRE_DB_MSSQL=1 FORGE_TEST_MSSQL_PASSWORD=... \\\\\n" >&2
+        printf "           bash tools/release-validate.sh <version>\n" >&2
+        printf "         Ou assumez la lacune : --sans-serveurs\n" >&2
+        exit 1
+    fi
+fi
 # RELEASE-AUDIT-SHIPPED-SURFACE-001 : le verdict vient du CODE RETOUR, pas du
 # texte de sortie. L'ancien motif cherchait « passed|no tests ran » : une suite
 # ne collectant AUCUN test (pytest sort en 5) affichait « no tests ran » et
@@ -273,6 +311,17 @@ else
     PYTEST_CODE=$?
 fi
 echo "$PYTEST_OUT" | tail -5
+# RELEASE-VALIDATE-SKIPS-SILENCIEUX-001 : le compte des sauts est ÉNONCÉ, même
+# quand tout est vert. Un saut n'est pas un succès, et le taire laisse lire une
+# suite amputée comme une suite complète (principe 3).
+_SKIPS="$(printf '%s' "$PYTEST_OUT" | sed -n 's/.*[^0-9]\([0-9][0-9]*\) skipped.*/\1/p' | tail -1)"
+if [ -n "$_SKIPS" ] && [ "$_SKIPS" -gt 0 ] 2>/dev/null; then
+    if $SANS_SERVEURS; then
+        _warn "Tests : $_SKIPS sauté(s) — validation lancée avec --sans-serveurs, lacune assumée"
+    else
+        _warn "Tests : $_SKIPS sauté(s) malgré les FORGE_REQUIRE_* — lire les motifs ci-dessus"
+    fi
+fi
 case "$PYTEST_CODE" in
     0) _ok "Tests : OK" ;;
     5) _fail "Tests : échec — aucun test collecté (pytest code 5), configuration à vérifier" ;;
