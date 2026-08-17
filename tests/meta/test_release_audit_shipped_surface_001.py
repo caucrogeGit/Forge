@@ -96,12 +96,25 @@ def test_la_surveillance_des_exclusions_est_bloquante() -> None:
 
 
 def test_les_exclusions_sont_declarees_au_meme_endroit() -> None:
-    """Un `--ignore-vuln` ajouté ailleurs doit être connu du veilleur."""
+    """Un `--ignore-vuln` ajouté ailleurs doit être connu du veilleur.
+
+    La capture s'arrête à l'identifiant et ne prend pas la ponctuation qui le
+    suit (`RELEASE-VALIDATE-FAUX-POSITIFS-001`). Avec `(\\S+)`, une mention en
+    **commentaire** entre apostrophes inverses rendait « PYSEC-2026-217` », que
+    le veilleur déclarait inconnu : le garde échouait sur une mise en forme, pas
+    sur une exclusion.
+
+    Sa portée ne change pas : tout `--ignore-vuln` reste relevé, y compris en
+    commentaire, ce qui est voulu. Une exclusion citée sans être déclarée doit
+    se voir, où qu'elle soit écrite.
+    """
     from tools.check_ignored_vulns import IGNORED_VULNERABILITIES
 
     declared = set(IGNORED_VULNERABILITIES)
     for path in (RELEASE_VALIDATE, PROJECT_ROOT / ".github" / "workflows" / "tests.yml"):
-        used = set(re.findall(r"--ignore-vuln\s+(\S+)", path.read_text(encoding="utf-8")))
+        used = set(
+            re.findall(r"--ignore-vuln\s+\W*([\w.-]+)", path.read_text(encoding="utf-8"))
+        )
         assert used <= declared, (
             f"{path.name} ignore {used - declared}, absent(s) de "
             "tools/check_ignored_vulns.py : l'exclusion ne serait pas surveillée."

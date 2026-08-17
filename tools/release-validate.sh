@@ -357,7 +357,7 @@ else
         _fail "Avis ignorés : un correctif est paru, relever la borne et retirer l'exclusion"
         printf '%s\n' "$IGNORED_OUT" | head -20 | sed 's/^/         /' || true
     fi
-    # RELEASE-VALIDATE-FAUX-POSITIFS-001 : `--ignore-vuln PYSEC-2026-217` comme
+    # RELEASE-VALIDATE-FAUX-POSITIFS-001 : l'avis PYSEC-2026-217 est exclu comme
     # sur les deux relevés ci-dessus. Il manquait ici seul, si bien que le MÊME
     # avis était accepté sur `requirements.txt` et `requirements-audit.txt` et
     # bloquant sur `requirements-dev.txt`. Mesuré : c'est l'unique vulnérabilité
