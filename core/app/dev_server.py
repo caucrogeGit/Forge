@@ -37,7 +37,7 @@ def format_startup_messages(host: str, port: int, ssl_enabled: bool) -> list[str
     scheme = scheme_for(ssl_enabled)
     lines: list[str] = [f"Serveur en écoute sur {scheme}://{host}:{port}"]
 
-    if host == "0.0.0.0":
+    if host == "0.0.0.0":  # nosec B104 — comparaison, pas une écoute
         lines.append(f"Depuis cette machine : {scheme}://127.0.0.1:{port}")
         lines.append(
             "Depuis une autre machine du réseau : utilisez l'IP réelle de "
@@ -66,7 +66,9 @@ def format_startup_messages(host: str, port: int, ssl_enabled: bool) -> list[str
 # `::` en `APP_ENV=prod` est presque toujours une mauvaise configuration —
 # on refuse explicitement plutôt que d'émettre un WARN ignorable.
 
-_DANGEROUS_PUBLIC_HOSTS: frozenset[str] = frozenset({"0.0.0.0", "::"})
+# nosec B104 — liste des hôtes REFUSÉS : ce code interdit l'écoute publique,
+# il ne la pratique pas. Le scanner y voit le contraire de ce qu'elle fait.
+_DANGEROUS_PUBLIC_HOSTS: frozenset[str] = frozenset({"0.0.0.0", "::"})  # nosec B104
 
 
 def is_dangerous_public_host(host: str) -> bool:

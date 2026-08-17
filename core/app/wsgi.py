@@ -118,7 +118,9 @@ class _WsgiHandlerStub:
         self.path = f"{path}?{qs}" if qs else path
         self.command = environ.get("REQUEST_METHOD", "GET")
         self.headers = _WsgiHeaders(environ)
-        remote = environ.get("REMOTE_ADDR", "0.0.0.0") or "0.0.0.0"
+        # nosec B104 — valeur de repli pour l'adresse du CLIENT, lue dans
+        # l'environnement WSGI. Aucune socket n'est ouverte ici.
+        remote = environ.get("REMOTE_ADDR", "0.0.0.0") or "0.0.0.0"  # nosec B104
         self.client_address = (remote, 0)
         try:
             length = int(environ.get("CONTENT_LENGTH") or 0)

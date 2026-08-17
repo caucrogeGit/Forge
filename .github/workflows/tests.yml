@@ -43,11 +43,15 @@ jobs:
           python -m pip install -e .
           python -m pip install -r requirements-dev.txt
 
-      # CI-AUDIT-BLOCKING-001 / CI-PYRIGHT-ORDER-001 :
-      # pip-audit, ruff et pyright sont en `continue-on-error` (avec `id`) pour
-      # qu'ils ne masquent JAMAIS l'exécution de la suite pytest (piège ADR-044).
+      # CI-AUDIT-BLOCKING-001 / CI-PYRIGHT-ORDER-001 / CI-BANDIT-PERIMETRE-001 :
+      # pip-audit, ruff, pyright et bandit sont en `continue-on-error` (avec
+      # `id`) pour qu'ils ne masquent JAMAIS l'exécution de la suite pytest
+      # (piège ADR-044).
       # Un « Quality gate » final (if: always) fait échouer le job si l'un d'eux
       # a échoué : ils restent donc bloquants, mais sans masquer le reste.
+      # Les quatre y sont désormais : bandit était le seul en `continue-on-error`
+      # SANS entrée dans le garde final, donc le seul dont l'échec ne faisait
+      # rien d'autre que poser une annotation que personne ne lisait.
 
       - name: Audit dépendances Python (pip-audit)
         id: pipaudit
@@ -104,17 +108,25 @@ jobs:
       - name: Build documentation
         run: mkdocs build --strict
 
-      - name: SAST (bandit, informatif, non bloquant)
+      # CI-BANDIT-PERIMETRE-001 : bandit rejoint les trois autres portes.
+      # Il rendait cent signalements sans qu'aucun n'arrête rien, étant la seule
+      # étape en `continue-on-error` sans garde final : il sortait en échec à
+      # chaque exécution, et l'annotation se lisait comme du bruit. Ramené à
+      # zéro par `bandit.yaml`, qui écrit ce qui est écarté et pourquoi, il
+      # devient bloquant : c'est le zéro qui rend le prochain signalement utile.
+      - name: SAST (bandit)
+        id: bandit
         continue-on-error: true
-        run: bandit -q -ll -r core packages
+        run: bandit -q -c bandit.yaml -ll -r core packages
 
-      - name: Quality gate (pip-audit + ruff + pyright)
+      - name: Quality gate (pip-audit + ruff + pyright + bandit)
         if: always()
         run: |
           fail=0
           if [ "${{ steps.pipaudit.outcome }}" = "failure" ]; then echo "::error::pip-audit a signale une vulnerabilite"; fail=1; fi
           if [ "${{ steps.ruff.outcome }}" = "failure" ]; then echo "::error::ruff a echoue"; fail=1; fi
           if [ "${{ steps.pyright.outcome }}" = "failure" ]; then echo "::error::pyright a echoue"; fail=1; fi
+          if [ "${{ steps.bandit.outcome }}" = "failure" ]; then echo "::error::bandit a signale un risque"; fail=1; fi
           exit $fail
 
   tests-db:

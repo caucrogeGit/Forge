@@ -1,0 +1,40 @@
+# Configuration bandit de Forge (CI-BANDIT-PERIMETRE-001).
+#
+# Bandit rendait cent signalements et personne ne les lisait : l'étape était en
+# `continue-on-error` sans garde final, seule des quatre portes du job dans ce
+# cas, si bien qu'elle sortait en échec à chaque exécution sans rien arrêter.
+# Un outil qui crie toujours ne dit plus rien.
+#
+# Mesuré sur les cent : aucun défaut réel. Quatre-vingt-huit relevaient d'une
+# décision d'architecture, sept de fichiers de test, quatre d'une comparaison ou
+# d'une valeur par défaut, un d'un faux positif vérifié.
+#
+# Ce fichier ramène le relevé à zéro, pour que le prochain signalement compte.
+# La porte devient bloquante en conséquence : c'est l'un qui justifie l'autre.
+
+# `B608` (SQL construit par chaîne) est écarté, et c'est la seule règle exclue.
+#
+# Forge construit son SQL par concaténation **par conception** : les noms de
+# tables et de colonnes ne peuvent pas être des paramètres liés, sur aucun des
+# quatre moteurs. C'est le principe 5 de la charte, garder le SQL visible.
+# Quatre-vingt-huit signalements sur cent venaient de là, tous sur des
+# identifiants dérivés de contrats JSON validés, jamais d'une entrée HTTP.
+#
+# Ce que cette exclusion coûte, écrit plutôt que tu : bandit ne dira plus rien
+# d'une injection SQL. La protection repose ailleurs, sur les paramètres liés du
+# cœur pour les valeurs, et sur la validation des identifiants par les schémas.
+skips:
+  - B608
+
+# Les tests sortent du périmètre : ils exécutent délibérément ce qu'un scanner
+# de sécurité signale, `exec` sur des blocs de documentation, chemins sous
+# `/tmp`. Sept des cent signalements venaient de là, aucun n'étant du code
+# livré. Les scanner mêlait le code de production au code qui l'éprouve.
+#
+# `build` est exclu pour une raison différente : ces dossiers sont des copies
+# locales produites par `python -m build`, absentes de la CI. Sans cette ligne,
+# un développeur mesure cent trente-quatre signalements là où la CI en voit
+# cent, et les deux relevés ne se comparent plus.
+exclude_dirs:
+  - /tests/
+  - /build/

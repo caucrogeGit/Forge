@@ -58,7 +58,10 @@ def workflow_status_badge(status: WorkflowStatus | str | None) -> Markup:
     """
     label = workflow_status_label(status)
     classes = workflow_status_badge_class(status)
-    return Markup(f'<span class="{classes}">{escape(label)}</span>')
+    # nosec B704 — les deux interpolations sont sûres et le restent : `classes`
+    # sort d'un dictionnaire fermé (`_BADGE_CLASSES`), et `label` passe par
+    # `escape()` juste ici. Retirer l'un ou l'autre rouvrirait la faille.
+    return Markup(f'<span class="{classes}">{escape(label)}</span>')  # nosec B704
 
 
 def make_workflow_jinja_helpers() -> dict[str, object]:
