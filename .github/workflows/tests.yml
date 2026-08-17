@@ -15,10 +15,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -28,7 +28,7 @@ jobs:
       # rien ne l'avait montre parce qu'aucun test n'en dependait avant
       # `GUIDE-PRISE-EN-MAIN-EXEC-001`.
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
 
@@ -147,7 +147,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # CI-DB-PYTHON-VERSION-001 : la couche base est éprouvée sur la version
       # la PLUS RÉCENTE que Forge déclare supporter, et non sur celle du milieu.
@@ -159,7 +159,7 @@ jobs:
       # pyodbc) contre un vrai serveur. Le job matriciel prouve qu'elles
       # s'installent sur 3.14 ; lui seul prouve qu'elles fonctionnent.
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.14"
 
@@ -210,11 +210,11 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # CI-DB-PYTHON-VERSION-001 : même version que les autres jobs base.
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.14"
 
@@ -260,11 +260,11 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # CI-DB-PYTHON-VERSION-001 : même version que les autres jobs base.
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.14"
 
