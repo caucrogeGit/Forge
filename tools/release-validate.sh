@@ -134,6 +134,31 @@ for _outil in pytest mkdocs ruff; do
         exit 1
     fi
 done
+# RELEASE-VALIDATE-FAUX-POSITIFS-001 — importer `pytest` ne prouve pas qu'il
+# DÉMARRE. `pytest.ini` impose `addopts = --strict-markers --dist loadfile -rs`,
+# donc pytest-xdist est obligatoire : sans lui, pytest s'arrête sur
+# « unrecognized arguments: --dist » et sort en 4, que le script rapportait
+# comme un échec des tests. Mesuré sur une validation réelle, où la suite n'a
+# jamais démarré alors que le rapport annonçait « Tests : échec ».
+#
+# Le contrôle lance une collecte réelle plutôt que d'ajouter `xdist` à la liste
+# ci-dessus : il lit `pytest.ini` et vaut donc pour TOUT plugin exigé par les
+# addopts, y compris ceux qu'on y ajoutera demain. Une liste d'imports écrite à
+# la main dériverait de la configuration au premier changement.
+_PYTEST_START="$("$PYTHON_BIN" -m pytest --collect-only -q tools 2>&1)" && _PYTEST_CODE=0 || _PYTEST_CODE=$?
+# Codes acceptés : 0 (des tests collectés) et 5 (aucun, ce qui est le cas de
+# `tools/`). Ce qu'on cherche est le code 4, « unrecognized arguments », seul
+# signe que pytest n'a pas pu lire sa configuration. Confondre 5 avec un échec
+# ferait refuser un environnement sain, et le contrôle négatif l'a montré.
+case "$_PYTEST_CODE" in
+    0|5) : ;;
+    *)
+        printf "[FAIL]  pytest ne démarre pas avec la configuration du dépôt (pytest.ini).\n" >&2
+        printf "%s\n" "$_PYTEST_START" | head -5 | sed 's/^/         /' >&2
+        printf "         Installez les dépendances de développement, ou activez le venv du projet.\n" >&2
+        exit 1
+        ;;
+esac
 
 echo "=== Validation pré-release Forge ${VERSION:-<version non fournie>} ==="
 if $WITH_PACKAGES; then
@@ -332,8 +357,16 @@ else
         _fail "Avis ignorés : un correctif est paru, relever la borne et retirer l'exclusion"
         printf '%s\n' "$IGNORED_OUT" | head -20 | sed 's/^/         /' || true
     fi
-    if PIP_AUDIT_DEV_OUT=$("$PYTHON_BIN" -m pip_audit -r requirements-dev.txt 2>&1); then
-        _ok "pip-audit (requirements-dev.txt) : aucune vulnérabilité"
+    # RELEASE-VALIDATE-FAUX-POSITIFS-001 : `--ignore-vuln PYSEC-2026-217` comme
+    # sur les deux relevés ci-dessus. Il manquait ici seul, si bien que le MÊME
+    # avis était accepté sur `requirements.txt` et `requirements-audit.txt` et
+    # bloquant sur `requirements-dev.txt`. Mesuré : c'est l'unique vulnérabilité
+    # que ce fichier remonte, `mariadb` y étant tiré comme partout ailleurs.
+    # Une release valide echouait donc sur une incoherence du script.
+    # L'exclusion reste surveillee par `check_ignored_vulns.py` ci-dessus, qui
+    # echoue des qu'un correctif amont parait.
+    if PIP_AUDIT_DEV_OUT=$("$PYTHON_BIN" -m pip_audit --ignore-vuln PYSEC-2026-217 -r requirements-dev.txt 2>&1); then
+        _ok "pip-audit (requirements-dev.txt) : aucune vulnérabilité (hors PYSEC-2026-217 accepté)"
     elif printf '%s' "$PIP_AUDIT_DEV_OUT" | grep -qiE 'No matching distribution found for forge-mvc|Could not find a version that satisfies the requirement forge-mvc'; then
         # Œuf-poule pré-release : requirements-dev.txt installe les opt-ins
         # locaux en éditable, qui dépendent de forge-mvc>=<version> pas encore
