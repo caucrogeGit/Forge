@@ -48,7 +48,7 @@ class TestRacineReconnue:
     def test_projet_anterieur_reste_reconnu(self, tmp_path: Path) -> None:
         """Un projet pré-ADR-068 n'a pas cessé d'être un projet Forge."""
         racine = _socle(tmp_path)
-        (racine / "mvc" / "routes.py").write_text("", encoding="utf-8")
+        (racine / "mvc" / "routes.py").write_text("", encoding="utf-8")  # adr-068-forme-anterieure
 
         assert _looks_like_forge_project(racine)
 

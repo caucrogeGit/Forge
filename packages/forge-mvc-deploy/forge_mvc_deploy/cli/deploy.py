@@ -313,7 +313,9 @@ def _looks_like_forge_project(root: Path) -> bool:
     ]
     if not all(path.exists() for path in required):
         return False
-    return (routes / "__init__.py").is_file() or (root / "mvc" / "routes.py").is_file()
+    if (routes / "__init__.py").is_file():
+        return True
+    return (root / "mvc" / "routes.py").is_file()  # adr-068-forme-anterieure
 
 
 def _write_if_new(path: Path, content: str) -> bool:
