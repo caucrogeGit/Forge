@@ -1,12 +1,12 @@
 """DEPLOY-CHECK-ROUTES-PACKAGE-001 — `deploy:check` reconnaît un projet rc7.
 
-Le contrôle de racine exigeait `mvc/routes.py`, chemin supprimé par l'ADR-068
-au profit du package `mvc/routes/`, un fichier par contrôleur. Depuis,
+Le contrôle de racine exigeait le fichier de routes unique, supprimé par
+l'ADR-068 au profit du package `mvc/routes/`, un fichier par contrôleur. Depuis,
 `deploy:check` n'a reconnu AUCUN projet généré : il ouvrait son diagnostic de
 production par « racine non détectée », sur une racine parfaitement valide.
 
 Le défaut a survécu à sa propre suite de tests parce que celle-ci fabriquait
-son projet jetable avec un `mvc/routes.py`. Le test validait donc un projet
+son projet jetable avec cet ancien fichier. Le test validait donc un projet
 d'avant l'ADR-068, et ne pouvait pas voir ce que voyait tout utilisateur.
 
 C'est le motif à retenir : une fixture qui construit le monde d'avant valide

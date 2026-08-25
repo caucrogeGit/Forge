@@ -274,14 +274,14 @@ def _truthy(value: str | None) -> bool:
 def _looks_like_forge_project(root: Path) -> bool:
     """Le dossier courant est-il un projet Forge ?
 
-    Le controle exigeait `mvc/routes.py`, chemin supprime par l'ADR-068 au
+    Le controle exigeait le fichier de routes unique, supprime par l'ADR-068 au
     profit du package `mvc/routes/`. Depuis, `deploy:check` ne reconnaissait
     plus AUCUN projet genere : il ouvrait son diagnostic de production par
     « racine non detectee », sur une racine parfaitement valide
     (DEPLOY-CHECK-ROUTES-PACKAGE-001).
 
-    Le defaut a survecu parce que le test fabriquait lui-meme un `mvc/routes.py`
-    : il validait un projet d'avant l'ADR-068, jamais un projet reel.
+    Le defaut a survecu parce que le test fabriquait lui-meme cet ancien
+    fichier : il validait un projet d'avant l'ADR-068, jamais un projet reel.
 
     Les deux formes sont acceptees. Le package est la forme canonique ; le
     fichier reste celle des projets anterieurs, qui n'ont pas cesse d'etre des
@@ -442,7 +442,10 @@ def _verifier_unite_systemd(root: Path) -> _Result:
 
 
 #: Repere une en-tete de section d'unite systemd (`[Unit]`, `[Service]`...).
-_SECTION_SYSTEMD = re.compile(r"^\[([^\]]+)\]\s*$")
+#:
+#: Consultee par `fullmatch`, jamais par `match` : sur un motif ancre, `match`
+#: accepte un saut de ligne final, et la ligne suivante avec lui.
+_SECTION_SYSTEMD = re.compile(r"\[([^\]]+)\]\s*")
 
 
 def _section_de_la_cle(texte: str, cle: str) -> "str | None":
@@ -456,7 +459,7 @@ def _section_de_la_cle(texte: str, cle: str) -> "str | None":
     courante: "str | None" = None
     for ligne in texte.splitlines():
         depouillee = ligne.strip()
-        entete = _SECTION_SYSTEMD.match(depouillee)
+        entete = _SECTION_SYSTEMD.fullmatch(depouillee)
         if entete is not None:
             courante = entete.group(1)
             continue
@@ -572,7 +575,7 @@ def _valeur_de_la_cle(texte: str, cle: str, section: str) -> "str | None":
     courante: "str | None" = None
     for ligne in texte.splitlines():
         depouillee = ligne.strip()
-        entete = _SECTION_SYSTEMD.match(depouillee)
+        entete = _SECTION_SYSTEMD.fullmatch(depouillee)
         if entete is not None:
             courante = entete.group(1)
             continue
