@@ -6,7 +6,11 @@ via `core.app.prod_warnings`, exactement une fois au moment de la
 construction de l'application — jamais à chaque requête WSGI.
 
 `create_wsgi_app(application)` (entrée WSGI minimale, ticket
-`WSGI-ENTRYPOINT-001`) ne doit toujours rien émettre.
+`WSGI-ENTRYPOINT-001`) les émet désormais lui aussi, sous les mêmes règles.
+Ce partage a été renversé par `WSGI-UNARMED-APP-GUARD-001` (ADR-092) : le point
+d'entrée recommandé étant devenu celui qui sert l'application déjà armée,
+laisser l'avertissement dans la seule fabrique générique l'aurait fait
+disparaître du chemin que tout le monde suit.
 """
 from __future__ import annotations
 
@@ -189,18 +193,56 @@ class TestOptOutAndCustomLogger:
 # ── Cohérence avec create_wsgi_app (entrée minimale) ────────────────────────
 
 
-class TestMinimalEntrypointStaysSilent:
-    def test_create_wsgi_app_does_not_emit_warning(self, caplog):
+class TestMinimalEntrypointWarnsToo:
+    """Contrat renversé par WSGI-UNARMED-APP-GUARD-001 (ADR-092).
+
+    `create_wsgi_app` se taisait, la responsabilité revenant à
+    `create_configured_wsgi_app`. Ce partage a cessé d'avoir un sens le jour où
+    le point d'entrée recommandé est devenu celui qui sert l'application déjà
+    armée : l'avertissement aurait disparu du chemin que tout le monde suit,
+    sans que personne le remarque.
+
+    Ce qui comptait vraiment dans l'ancien test est conservé : l'émission a lieu
+    UNE fois, à la construction, et jamais par requête.
+    """
+
+    def test_create_wsgi_app_emet_a_la_construction(self, caplog):
         caplog.set_level(logging.WARNING)
         forge.configure(app_env="prod", session_store=None)
+
+        create_wsgi_app(_build_dummy_app())
+
+        assert len(_warning_records(caplog)) == 1
+
+    def test_aucune_emission_par_requete(self, caplog):
+        """Le point qui comptait dans l'ancien contrat, et qui tient toujours."""
+        forge.configure(app_env="prod", session_store=None)
         app = create_wsgi_app(_build_dummy_app())
-        # invocation
-        start_response, _ = _capture()
-        list(app(_environ(), start_response))
-        assert _warning_records(caplog) == [], (
-            "create_wsgi_app(application) ne doit pas émettre de warning : "
-            "la responsabilité revient à create_configured_wsgi_app()."
-        )
+
+        caplog.clear()
+        caplog.set_level(logging.WARNING)
+        for _ in range(3):
+            start_response, _ = _capture()
+            list(app(_environ(), start_response))
+
+        assert _warning_records(caplog) == []
+
+    def test_emission_desactivable_pour_les_tests(self, caplog):
+        caplog.set_level(logging.WARNING)
+        forge.configure(app_env="prod", session_store=None)
+
+        create_wsgi_app(_build_dummy_app(), emit_prod_warnings=False)
+
+        assert _warning_records(caplog) == []
+
+    def test_pas_de_double_emission_par_la_fabrique(self, caplog, freeze_forge_config):
+        """`create_configured_wsgi_app` délègue : une émission, pas deux."""
+        caplog.set_level(logging.WARNING)
+        forge.configure(app_env="prod", session_store=None)
+
+        create_configured_wsgi_app()
+
+        assert len(_warning_records(caplog)) == 1
 
 
 # ── App reste fonctionnelle après émission ──────────────────────────────────

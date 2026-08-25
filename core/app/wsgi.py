@@ -4,9 +4,14 @@
 Tickets :
 - WSGI-ENTRYPOINT-001 : `create_wsgi_app(application)` — adaptateur minimal
   qui prend une `Application` déjà construite et retourne un callable WSGI ;
-- WSGI-APP-FACTORY-CONFIG-001 : `create_configured_wsgi_app()` — charge la
-  même configuration que `python app.py` (via `core.app.app_factory`) et
-  retourne le callable WSGI prêt à l'emploi ;
+- WSGI-APP-FACTORY-CONFIG-001 : `create_configured_wsgi_app()` — applique la
+  configuration de `config.py` (via `core.app.app_factory`) et retourne le
+  callable WSGI. Il ne charge PAS ce que `app.py` câble : middlewares et
+  magasin de sessions y sont des objets construits, que `config.py` ne porte
+  pas. La docstring affirmait le contraire, et c'est ce qui empêchait de
+  soupçonner le problème ;
+- WSGI-UNARMED-APP-GUARD-001 : d'où le refus. `create_configured_wsgi_app()`
+  ne construit plus quand `app.py` câble ce qu'elle ne verra pas (ADR-092) ;
 - WSGI-PROD-WARNINGS-001 : `create_configured_wsgi_app()` émet aussi
   les warnings production (`MemorySessionStore` en `APP_ENV=prod`) — une
   seule fois à la construction de l'application, jamais par requête ;
@@ -19,14 +24,19 @@ Tickets :
   `Content-Length` au-delà de la limite), il n'est lu que pour les méthodes
   à corps, et son dépassement répond 413 (plus jamais 400).
 
-Usage typique — dans le `wsgi.py` de l'application :
+Usage typique — dans le `wsgi.py` de l'application, servir l'application DÉJÀ
+ARMÉE, celle que construit `app.py` :
 
-    from core.app.wsgi import create_configured_wsgi_app
+    from app import application
+    from core.app.wsgi import create_wsgi_app
 
-    application = create_configured_wsgi_app()
+    application = create_wsgi_app(application)
 
 Puis exposer `application` à un serveur WSGI externe (ex.
 `gunicorn wsgi:application`).
+
+`create_configured_wsgi_app()` reste la voie d'un projet dont tout le câblage
+tient dans `config.py`.
 
 Périmètre :
 - ne remplace pas `python app.py` (serveur de développement) ;
@@ -214,11 +224,38 @@ def _response_to_wsgi(
     return body_iter
 
 
-def create_wsgi_app(application: Any) -> Callable[[dict[str, Any], Callable[..., Any]], Iterable[bytes]]:
+def create_wsgi_app(
+    application: Any,
+    *,
+    emit_prod_warnings: bool = True,
+    logger: logging.Logger | None = None,
+) -> Callable[[dict[str, Any], Callable[..., Any]], Iterable[bytes]]:
     """Retourne un callable WSGI qui dispatche via l'`Application` Forge fournie.
 
     `application` doit exposer `dispatch(request) -> Response`.
+
+    Émet aussi, une seule fois à la construction et jamais par requête, les
+    avertissements de production de `core.app.prod_warnings` (magasin de
+    sessions en mémoire sous `APP_ENV=prod`).
+
+    Ils vivaient dans `create_configured_wsgi_app` seul. Le point d'entrée
+    recommandé étant devenu celui qui sert l'application déjà armée
+    (ADR-092), les y laisser aurait fait disparaître l'avertissement du chemin
+    que tout le monde suit, sans que personne le remarque. Ils appartiennent au
+    passage en WSGI, pas à une fabrique particulière.
+
+    Passer `emit_prod_warnings=False` pour les tests qui ne veulent pas polluer
+    le logger.
     """
+    if emit_prod_warnings:
+        import core.forge as forge
+        from core.app.prod_warnings import emit_memory_store_warning_if_needed
+
+        emit_memory_store_warning_if_needed(
+            str(forge.get("app_env") or ""),
+            forge.get("session_store"),
+            logger=logger,
+        )
 
     def app(environ: dict[str, Any], start_response: Callable[..., Any]) -> Iterable[bytes]:
         # CORE-WSGI-CSP-NONCE-001 : le nonce est posé pour toute la durée de la
@@ -278,11 +315,20 @@ def create_configured_wsgi_app(
     emit_prod_warnings: bool = True,
     logger: logging.Logger | None = None,
 ) -> Callable[[dict[str, Any], Callable[..., Any]], Iterable[bytes]]:
-    """Construit l'`Application` Forge configurée et retourne le callable WSGI.
+    """Construit l'`Application` depuis `config.py` et retourne le callable WSGI.
 
-    Source unique d'initialisation : charge la même configuration que
-    `python app.py` via `core.app.app_factory.build_application`, puis enveloppe
-    l'application dans un adaptateur WSGI standard.
+    Applique la configuration via `core.app.app_factory.build_application`, puis
+    enveloppe l'application dans un adaptateur WSGI standard.
+
+    **Ne charge pas ce que `app.py` câble.** `build_application()` lit
+    `config.py` et le module de routes ; middlewares et magasin de sessions sont
+    des objets construits, que `config.py` ne porte pas. Un projet qui les câble
+    dans `app.py`, comme le squelette le prescrit, obtiendrait ici une
+    application privée de toutes ses gardes sauf la première.
+
+    D'où le refus posé par l'ADR-092 : quand `app.py` déclare un câblage
+    invisible d'ici, cette fonction lève `UnarmedApplicationError` au lieu de
+    construire. Servir l'application déjà armée passe par `create_wsgi_app`.
 
     Garantit que les paramètres `forge.configure(...)` (dont
     `trusted_proxies`) sont appliqués avant que la première requête WSGI
@@ -294,15 +340,22 @@ def create_configured_wsgi_app(
     Passer `emit_prod_warnings=False` pour les tests qui ne veulent pas
     polluer le logger.
     """
-    import core.forge as forge
-    from core.app.app_factory import build_application
-    from core.app.prod_warnings import emit_memory_store_warning_if_needed
+    from core.app.app_factory import build_application, project_root
+    from core.app.wiring_guard import assert_wiring_is_visible
+
+    # ADR-092 : refuser AVANT de construire. Un `app.py` qui câble des
+    # middlewares ou un magasin de sessions les rend invisibles à cette
+    # fabrique, qui lit `config.py` et les routes, jamais lui. L'application
+    # démarrait alors sans ses gardes, en répondant 200.
+    #
+    # La vérification est statique (`ast`), jamais un import : importer `app.py`
+    # serait exécuter ce que ce chemin cherche justement à éviter.
+    racine = project_root()
+    if racine is not None:
+        assert_wiring_is_visible(racine / "app.py")
 
     application = build_application()
-    if emit_prod_warnings:
-        emit_memory_store_warning_if_needed(
-            str(forge.get("app_env") or ""),
-            forge.get("session_store"),
-            logger=logger,
-        )
-    return create_wsgi_app(application)
+    # Les avertissements sont emis par `create_wsgi_app`, une seule fois : les
+    # emettre ici aussi les doublerait sur ce chemin.
+    return create_wsgi_app(
+        application, emit_prod_warnings=emit_prod_warnings, logger=logger)

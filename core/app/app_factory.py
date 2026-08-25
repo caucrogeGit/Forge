@@ -3,11 +3,18 @@
 
 Ticket : WSGI-APP-FACTORY-CONFIG-001.
 
-Source unique d'initialisation : lit `config.py`, applique
-`forge.configure(...)`, branche le renderer Jinja2, charge les routes et
-construit l'`Application`. Réutilisée par les points d'entrée serveur de
-développement (`app.py`) et WSGI (`core.app.wsgi.create_configured_wsgi_app`)
-pour qu'aucune divergence de configuration ne s'installe entre les deux.
+Lit `config.py`, applique `forge.configure(...)`, branche le renderer Jinja2,
+charge les routes et construit l'`Application`.
+
+Portée exacte, et elle est plus étroite que ce qui était écrit ici : cette
+fabrique voit ce que `config.py` DÉCLARE, c'est à dire des valeurs. Les
+middlewares et le magasin de sessions sont des objets, construits dans `app.py`
+là où le squelette le prescrit, et elle ne peut pas les voir.
+
+Elle n'est donc pas la source unique d'initialisation des deux points d'entrée.
+Le croire a coûté une mise en production servie sans ses gardes (ADR-092) :
+`core.app.wsgi.create_configured_wsgi_app` refuse désormais de construire quand
+`app.py` câble ce que cette fabrique ignore.
 
 Les fonctions sont idempotentes : un second appel reconfigure Forge sans
 casser l'état précédent (`forge.configure(**kwargs)` réécrit les clés
@@ -20,6 +27,8 @@ import importlib
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from core.app.application import Application
 
 
@@ -43,6 +52,30 @@ def _forge_config_kwargs() -> dict[str, Any]:
         trusted_proxies=config.APP_TRUSTED_PROXIES,
     )
     return kwargs
+
+
+def project_root() -> "Path | None":
+    """Racine du projet applicatif, déduite de l'emplacement de `config.py`.
+
+    `config.py` vit à la racine par contrat du squelette : son dossier EST la
+    racine, ce que ni le répertoire courant ni `sys.path[0]` ne garantissent
+    sous un serveur WSGI.
+
+    Rend `None` quand la question n'a pas de réponse ici (pas de `config`
+    importable, module sans fichier). Aucun appelant ne doit en faire une
+    erreur : ce chemin sert à des vérifications qui se taisent quand elles ne
+    peuvent pas conclure.
+    """
+    from pathlib import Path
+
+    try:
+        config: Any = importlib.import_module("config")
+    except Exception:  # noqa: BLE001 — absence de config : rien à déduire
+        return None
+    fichier = getattr(config, "__file__", None)
+    if not fichier:
+        return None
+    return Path(str(fichier)).resolve().parent
 
 
 def apply_forge_config() -> None:

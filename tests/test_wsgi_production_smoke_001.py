@@ -211,20 +211,40 @@ class TestProdWarningsLifecycle:
         assert len(_warning_records(caplog)) == baseline
 
 
-# ── 8. create_wsgi_app(application) reste silencieux ────────────────────────
+# ── 8. create_wsgi_app(application) avertit à la construction ───────────────
 
 
-class TestMinimalEntrypointIsSilent:
-    def test_create_wsgi_app_does_not_warn_in_prod(self, caplog):
+class TestMinimalEntrypointWarnsAtBuild:
+    """Contrat renversé par WSGI-UNARMED-APP-GUARD-001 (ADR-092).
+
+    `create_wsgi_app` est devenu le point d'entrée recommandé, celui qui sert
+    l'application déjà armée. Laisser l'avertissement de production dans la
+    seule fabrique générique l'aurait fait disparaître du chemin que tout le
+    monde suit, sans que personne le remarque.
+
+    Ce que l'ancien test protégeait vraiment reste vrai, et est vérifié ici :
+    aucune émission par requête.
+    """
+
+    def test_create_wsgi_app_avertit_une_fois_en_prod(self, caplog):
         caplog.set_level(logging.WARNING)
         forge.configure(app_env="prod", session_store=None)
+
+        create_wsgi_app(_build_echo_ip_app())
+
+        assert len(_warning_records(caplog)) == 1
+
+    def test_aucune_emission_par_requete(self, caplog):
+        forge.configure(app_env="prod", session_store=None)
         app = create_wsgi_app(_build_echo_ip_app())
-        start_response, _ = _capture()
-        list(app(_environ(), start_response))
-        assert _warning_records(caplog) == [], (
-            "create_wsgi_app(application) ne doit pas émettre de warnings : "
-            "l'orchestration revient à create_configured_wsgi_app()."
-        )
+
+        caplog.clear()
+        caplog.set_level(logging.WARNING)
+        for _ in range(3):
+            start_response, _ = _capture()
+            list(app(_environ(), start_response))
+
+        assert _warning_records(caplog) == []
 
 
 # ── 9. Cohérence headers WSGI (_WsgiHeaders) ────────────────────────────────

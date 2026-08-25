@@ -83,15 +83,20 @@ def _format_prod_refusal() -> str:
         "\n"
         "En production, Forge s'expose via WSGI derrière un reverse proxy :\n"
         "\n"
-        "  gunicorn --workers 1 --bind 127.0.0.1:8000 \\\n"
-        "      'core.app.wsgi:create_configured_wsgi_app()'\n"
+        "  gunicorn --workers 1 --bind 127.0.0.1:8000 wsgi:application\n"
         "\n"
         "Nginx ou Caddy terminent HTTPS et reverse-proxy vers Gunicorn.\n"
+        "\n"
+        "Le wsgi.py sert l'application déjà armée, celle que construit app.py.\n"
+        "Ne pas servir 'core.app.wsgi:create_configured_wsgi_app()' : cette\n"
+        "fabrique ne lit que config.py, donc aucun de vos middlewares (ADR-092).\n"
+        "\n"
+        "Pour l'engendrer :\n"
+        "  - forge opt-in:enable deploy --apply, puis forge deploy:init\n"
         "\n"
         "Voir :\n"
         "  - docs/deployment/wsgi-deployment.md\n"
         "  - docs/deployment/production-limits.md\n"
-        "  - forge deploy:init  (génère nginx/forge-app.conf + systemd)\n"
     )
 
 
