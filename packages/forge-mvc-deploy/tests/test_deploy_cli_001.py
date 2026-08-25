@@ -172,10 +172,15 @@ def test_deploy_check_signale_cwd_non_forge(tmp_path):
 
 
 def test_deploy_check_detecte_projet_forge(tmp_path):
+    # La structure que `forge new` ecrit reellement : `mvc/routes/` est un
+    # package depuis l'ADR-068. Cette fixture posait un `mvc/routes.py`, donc
+    # un projet d'avant l'ADR, et masquait ainsi le defaut qu'elle etait censee
+    # couvrir (DEPLOY-CHECK-ROUTES-PACKAGE-001). La forme anterieure garde son
+    # test dedie.
     (tmp_path / "app.py").write_text("", encoding="utf-8")
     (tmp_path / "config.py").write_text("", encoding="utf-8")
-    (tmp_path / "mvc").mkdir()
-    (tmp_path / "mvc" / "routes.py").write_text("", encoding="utf-8")
+    (tmp_path / "mvc" / "routes").mkdir(parents=True)
+    (tmp_path / "mvc" / "routes" / "__init__.py").write_text("", encoding="utf-8")
     (tmp_path / "env").mkdir()
     (tmp_path / "env" / "example").write_text("", encoding="utf-8")
 

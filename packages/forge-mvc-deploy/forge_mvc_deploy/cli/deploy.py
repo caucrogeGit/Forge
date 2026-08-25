@@ -254,13 +254,30 @@ def _truthy(value: str | None) -> bool:
 
 
 def _looks_like_forge_project(root: Path) -> bool:
+    """Le dossier courant est-il un projet Forge ?
+
+    Le controle exigeait `mvc/routes.py`, chemin supprime par l'ADR-068 au
+    profit du package `mvc/routes/`. Depuis, `deploy:check` ne reconnaissait
+    plus AUCUN projet genere : il ouvrait son diagnostic de production par
+    « racine non detectee », sur une racine parfaitement valide
+    (DEPLOY-CHECK-ROUTES-PACKAGE-001).
+
+    Le defaut a survecu parce que le test fabriquait lui-meme un `mvc/routes.py`
+    : il validait un projet d'avant l'ADR-068, jamais un projet reel.
+
+    Les deux formes sont acceptees. Le package est la forme canonique ; le
+    fichier reste celle des projets anterieurs, qui n'ont pas cesse d'etre des
+    projets Forge.
+    """
+    routes = root / "mvc" / "routes"
     required = [
         root / "app.py",
         root / "config.py",
-        root / "mvc" / "routes.py",
         root / "env" / "example",
     ]
-    return all(path.exists() for path in required)
+    if not all(path.exists() for path in required):
+        return False
+    return (routes / "__init__.py").is_file() or (root / "mvc" / "routes.py").is_file()
 
 
 def _write_if_new(path: Path, content: str) -> bool:
