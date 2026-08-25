@@ -351,6 +351,7 @@ nav:
             - "ADR-090 : empreinte de contrat des fichiers engendrés": adr/090-generated-file-contract-marker.md
             - "ADR-091 : le cœur émet les événements d'authentification": adr/091-core-emits-auth-events.md
             - "ADR-092 : le chemin WSGI refuse une application désarmée": adr/092-wsgi-entrypoint-wiring-parity.md
+            - "ADR-093 : le câblage vit dans une source unique": adr/093-application-wiring-module.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

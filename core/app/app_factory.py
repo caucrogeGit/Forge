@@ -24,6 +24,7 @@ n'est déjà enregistré).
 from __future__ import annotations
 
 import importlib
+import importlib.util
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -78,6 +79,36 @@ def project_root() -> "Path | None":
     return Path(str(fichier)).resolve().parent
 
 
+#: Module de câblage du projet, lu par les DEUX points d'entrée (ADR-093).
+BOOTSTRAP_MODULE = "bootstrap"
+
+
+def load_bootstrap() -> "Any | None":
+    """Module de câblage du projet, ou `None` s'il n'en a pas.
+
+    Ticket : `SKELETON-BOOTSTRAP-WIRING-001`. Décision : ADR-093.
+
+    Le câblage (middlewares, magasin de sessions) vivait dans `app.py`, que
+    cette fabrique ne lit pas : le chemin WSGI construisait donc une
+    application privée de ses gardes (ADR-092). Il vit désormais dans un module
+    que les deux points d'entrée lisent, ce qui rend la divergence impossible
+    plutôt que détectable.
+
+    Un projet sans `bootstrap.py` n'en a pas besoin : `None`, et le
+    comportement d'avant s'applique. Forge n'écrit jamais dans un projet
+    existant (principe 9), et il n'y a rien à migrer.
+
+    **Une erreur DANS le module remonte.** La distinction est le tout du
+    ticket : `find_spec` demande « ce module existe il ? », l'import demande
+    « se charge t il ? ». Attraper l'ImportError de l'import ferait retomber un
+    `bootstrap.py` cassé, un opt-in absent par exemple, sur une application
+    silencieusement désarmée. C'est exactement le défaut que ce module corrige.
+    """
+    if importlib.util.find_spec(BOOTSTRAP_MODULE) is None:
+        return None
+    return importlib.import_module(BOOTSTRAP_MODULE)
+
+
 def apply_forge_config() -> None:
     """Applique la configuration Forge depuis `config.py`. Idempotent."""
     import core.forge as forge
@@ -102,4 +133,25 @@ def build_application() -> "Application":
         template_manager.register(Jinja2Renderer(config.VIEWS_DIR))
     routes_mod = importlib.import_module(config.APP_ROUTES_MODULE)
     forge.configure(router=routes_mod.router)
-    return Application(routes_mod.router)
+
+    # ADR-093 : le câblage du projet, lu ici comme par `app.py`.
+    # `configure_services` avant les middlewares : un middleware peut avoir
+    # besoin d'un service, l'inverse ne se produit pas.
+    bootstrap = load_bootstrap()
+    middlewares: list[Any] | None = None
+    if bootstrap is not None:
+        configurer = getattr(bootstrap, "configure_services", None)
+        if callable(configurer):
+            configurer()
+        construire = getattr(bootstrap, "build_middlewares", None)
+        if callable(construire):
+            # `bootstrap` est un module APPLICATIF : l'analyse statique du
+            # framework ne peut pas le résoudre, et ce n'est pas son rôle (même
+            # traitement que `config`). Le contrat est vérifié à l'exécution.
+            produits: Any = construire()
+            middlewares = list(produits)
+
+    # `None` laisse le défaut d'`Application`, soit `[AuthMiddleware(...)]`.
+    # Une liste VIDE est un choix explicite du projet, et retire jusqu'à
+    # l'authentification : elle est transmise telle quelle.
+    return Application(routes_mod.router, middlewares=middlewares)

@@ -16,7 +16,6 @@ Verrouille la cohérence d'initialisation entre `python app.py` et
 from __future__ import annotations
 
 import ast
-import re
 from io import BytesIO
 from pathlib import Path
 
@@ -165,7 +164,7 @@ class TestTrustedProxiesAppliedInWsgi:
 
 
 class TestConfigParity:
-    """Les kwargs `forge.configure(...)` de app.py et app_factory sont identiques."""
+    """Une seule séquence de construction, donc plus rien à comparer (ADR-093)."""
 
     @staticmethod
     def _extract_configure_kwargs(source: str) -> set[str]:
@@ -189,19 +188,32 @@ class TestConfigParity:
                     keys.add(kw.arg)
         return keys
 
-    def test_app_py_and_factory_kwargs_match(self):
+    def test_app_py_ne_configure_plus_rien_lui_meme(self):
+        """La parité n'est plus comparée : elle est structurelle (ADR-093).
+
+        Ce test comparait les kwargs de `forge.configure(...)` des deux côtés,
+        pour détecter une divergence entre deux séquences de construction. Il
+        n'avait de sens que tant qu'il y en avait deux, et il n'a jamais rien
+        pu dire des MIDDLEWARES, qui sont des objets et non des valeurs : c'est
+        précisément par là qu'une production a servi sans ses gardes (ADR-092).
+
+        Depuis l'ADR-093, `app.py` délègue à la fabrique. Il n'y a plus deux
+        séquences, donc plus rien à comparer : il y a une chose à empêcher, que
+        la seconde revienne.
+        """
         app_keys = self._extract_configure_kwargs(APP_PY.read_text(encoding="utf-8"))
-        # On retire `router` : il est posé en seconde passe via une seule
-        # ligne dédiée des deux côtés (après chargement des routes).
-        app_keys.discard("router")
-        factory_keys = set(_forge_config_kwargs())
-        missing_in_factory = app_keys - factory_keys
-        extra_in_factory = factory_keys - app_keys
-        assert not missing_in_factory and not extra_in_factory, (
-            f"Divergence forge.configure() app.py ↔ app_factory :\n"
-            f"  manquant côté factory : {sorted(missing_in_factory)}\n"
-            f"  en trop côté factory  : {sorted(extra_in_factory)}"
-        )
+
+        assert app_keys == set(), (
+            f"app.py reconfigure Forge ({sorted(app_keys)}) alors que la "
+            f"fabrique le fait : deux séquences de construction, donc deux "
+            f"comportements possibles pour une seule application")
+
+    def test_la_fabrique_reste_la_seule_a_configurer(self):
+        """Le pendant du test précédent : la séquence unique existe bien."""
+        assert set(_forge_config_kwargs()) >= {
+            "app_name", "app_env", "views_dir", "sql_dir",
+            "upload_max_size", "trusted_proxies",
+        }
 
 
 # ── Compatibilité API antérieure ────────────────────────────────────────────
@@ -220,12 +232,17 @@ class TestLegacyApi:
         mod = importlib.import_module("app")
         assert mod is not None
 
-    def test_app_py_still_calls_forge_configure(self):
-        # Sanity : la ligne d'appel n'a pas disparu d'app.py.
+    def test_app_py_delegue_la_construction(self):
+        """Contrat renversé par l'ADR-093.
+
+        `app.py` devait conserver son appel à `forge.configure(...)` tant qu'il
+        construisait lui-même. Il délègue désormais, et c'est l'appel à la
+        fabrique qui ne doit pas disparaître.
+        """
         text = APP_PY.read_text(encoding="utf-8")
-        assert re.search(r"forge\.configure\s*\(", text), (
-            "app.py doit conserver son appel à forge.configure(...)"
-        )
+
+        assert "build_application()" in text, (
+            "app.py doit construire son application par la fabrique")
 
 
 # ── build_application : construit bien une Application Forge ────────────────

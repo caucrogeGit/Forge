@@ -96,10 +96,11 @@ class TestCablageDetecte:
 class TestPasDeFauxRefus:
 
     def test_squelette_reel_ne_declenche_rien(self) -> None:
-        """LE test de ce ticket : le squelette livre l'exemple EN COMMENTAIRE.
+        """Le squelette d'aujourd'hui ne câble plus rien dans `app.py`.
 
-        Un détecteur par recherche de texte le prendrait pour une déclaration et
-        refuserait de démarrer tout projet nu.
+        Depuis l'ADR-093, le câblage vit dans `bootstrap.py`, que la fabrique
+        lit : il n'y a donc plus rien à refuser. Ce test garde sa valeur, en
+        vérifiant qu'un projet neuf démarre sans se heurter au garde.
         """
         wiring = read_app_wiring(SKELETON_APP.read_text(encoding="utf-8"))
 
@@ -107,13 +108,30 @@ class TestPasDeFauxRefus:
             "le squelette nu ne câble rien ; le détecteur a lu son commentaire "
             "d'exemple comme une déclaration")
 
-    def test_le_commentaire_d_exemple_est_bien_toujours_la(self) -> None:
-        """Sinon le test précédent ne prouverait plus rien."""
-        source = SKELETON_APP.read_text(encoding="utf-8")
+    def test_le_commentaire_d_exemple_historique_ne_declenche_rien(self) -> None:
+        """Le piège figé en dur, et non plus lu dans le squelette.
 
-        assert "middlewares=[" in source
-        ligne = next(l for l in source.splitlines() if "middlewares=[" in l)
-        assert ligne.strip().startswith("#")
+        Le squelette portait ce commentaire d'exemple jusqu'à l'ADR-093, qui a
+        déplacé le câblage dans `bootstrap.py`. Le test le lisait donc dans
+        `app.py`, et aurait cessé de prouver quoi que ce soit sans bruit.
+
+        Le cas reste vivant : tout projet créé avant l'ADR-093 porte encore ce
+        commentaire, et le détecteur doit continuer à ne pas s'y tromper.
+        """
+        historique = (
+            "# Les middlewares (auth, RBAC, ...) se câblent ICI, dans app.py.\n"
+            "#\n"
+            "#     from core.security.middleware import AuthMiddleware\n"
+            "#     _app = Application(_routes.router, middlewares=[\n"
+            "#         AuthMiddleware(\"/login\"),\n"
+            "#     ])\n"
+            "_app = Application(_routes.router)\n"
+        )
+
+        assert "middlewares=[" in historique, "le piège doit rester dans le texte"
+        assert read_app_wiring(historique).is_empty, (
+            "le détecteur a lu un commentaire comme une déclaration : il "
+            "refuserait de démarrer un projet nu")
 
     def test_application_sans_middlewares(self) -> None:
         assert read_app_wiring("_app = Application(_routes.router)\n").is_empty

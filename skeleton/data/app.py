@@ -91,12 +91,10 @@ import socket
 import ssl
 import traceback
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
-import importlib
+# Seules les valeurs dont CE fichier a besoin : le serveur de développement et
+# ses pages d'erreur. Tout ce qui configure l'application est lu par la fabrique.
 from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFILE,
-                    APP_ENV, APP_NAME, APP_ROUTES_MODULE,
-                    VIEWS_DIR, SQL_DIR,
-                    UPLOAD_MAX_SIZE,
-                    APP_CSP_NONCE_ENABLED, APP_TRUSTED_PROXIES)
+                    APP_ENV, APP_CSP_NONCE_ENABLED)
 import core.security.csp as _csp
 from core.security.headers import apply_security_headers, assert_headers_are_safe
 import core.forge as forge
@@ -106,56 +104,31 @@ from core.app.dev_server import (
     format_startup_messages,
     should_block_prod_public_host,
 )
-forge.configure(
-    app_name     = APP_NAME,
-    app_env      = APP_ENV,
-    views_dir    = VIEWS_DIR,
-    sql_dir      = SQL_DIR,
-    upload_max_size = UPLOAD_MAX_SIZE,
-    trusted_proxies = APP_TRUSTED_PROXIES,
-)
+# La configuration Forge, le renderer Jinja et les routes sont posés par
+# `build_application()` (plus bas), qui lit config.py. Les refaire ici
+# rouvrirait la porte que l'ADR-093 ferme : deux séquences de construction pour
+# une seule application, et la divergence qui vient avec.
 from core.http.health import health_response, is_health_request
 from core.http.media import media_response
 from core.http.request import Request, RequestEntityTooLarge
 from core.http.response import Response
 from core.http.helpers import error_page as _error_page
-from core.app.application import Application
+from core.app.app_factory import build_application
 # CORE-DROP-UPLOADS-001 (ADR-019) : le service de fichiers est un opt-in
 # (forge-mvc-files). Import lazy dans le handler /media (l'app démarre sans).
-from integrations.jinja2.renderer import Jinja2Renderer
-from core.templating.manager import template_manager
-
-template_manager.register(Jinja2Renderer(VIEWS_DIR))
-
-_routes = importlib.import_module(APP_ROUTES_MODULE)
-forge.configure(router=_routes.router)
-# Les middlewares (auth, RBAC, ...) se câblent ICI, dans app.py, pas dans mvc/.
-# Chacun expose check(request) -> Response | None ; le premier qui renvoie une
-# Response court-circuite la requête. Par défaut aucun (projet nu). Exemple pour
-# exiger l'authentification et protéger des domaines par préfixe d'URL :
+# L'application est construite par la fabrique du cœur, qui lit config.py, les
+# routes, puis VOTRE câblage dans bootstrap.py (ADR-093).
 #
-#     from core.security.middleware import AuthMiddleware
-#     from forge_mvc_rbac import PrefixPermissionMiddleware   # opt-in forge-mvc-rbac
-#     application = Application(_routes.router, middlewares=[
-#         AuthMiddleware("/login"),
-#         PrefixPermissionMiddleware({"/admin": "admin.access"}),
-#     ])
+# Ce fichier ne construit plus l'Application lui-même, et c'est le sujet. Le
+# câblage vivait ici, où la fabrique WSGI ne le lisait pas : la production
+# servait alors une application privée de ses gardes, sans rien dire (ADR-092).
+# Une seule séquence de construction, donc plus aucune divergence possible.
 #
-# Le magasin de sessions se câble ICI aussi, pour la même raison :
+# Vos middlewares et votre magasin de sessions se câblent dans bootstrap.py.
 #
-#     from forge_mvc_sessions_db import DbSessionStore   # opt-in
-#     forge.configure(session_store=DbSessionStore())
-#
-# Ce câblage vit dans app.py (à vous) : copier seulement mvc/ vers un nouveau
-# projet le perdrait (et retirerait vos protections). Préférez « forge
-# skeleton:upgrade » (montée en place) à une copie. Voir la doc « Anatomie
-# d'une app Forge ».
-#
-# `application` porte un nom PUBLIC, et c'est ce qui permet à wsgi.py de servir
-# cette application ci, celle qui a vos gardes. Le souligné d'autrefois disait
-# « personne d'autre que ce fichier », ce qui a cessé d'être vrai le jour où une
-# production a existé (ADR-092). Ne pas le renommer.
-application = Application(_routes.router)
+# `application` porte un nom PUBLIC : c'est ce que wsgi.py sert en production.
+# Ne pas le renommer.
+application = build_application()
 
 logger = logging.getLogger(__name__)
 

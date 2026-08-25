@@ -67,7 +67,14 @@ class TestNomPublic:
         """Deux noms pour un objet, c'est le second qui finit servi par erreur."""
         assert "_app" not in _affectations_de_module(arbre)
 
-    def test_c_est_bien_une_Application(self, arbre: ast.Module) -> None:
+    def test_c_est_bien_l_application_de_la_fabrique(self, arbre: ast.Module) -> None:
+        """Le nom vient de `build_application()` depuis l'ADR-093.
+
+        `app.py` construisait lui-même son `Application` : c'était la seconde
+        séquence de construction, celle qui pouvait diverger de la fabrique. Il
+        délègue désormais, et le nom public désigne l'application de la
+        fabrique.
+        """
         affectation = next(
             n for n in arbre.body
             if isinstance(n, ast.Assign)
@@ -75,7 +82,7 @@ class TestNomPublic:
         )
         appel = affectation.value
         assert isinstance(appel, ast.Call)
-        assert isinstance(appel.func, ast.Name) and appel.func.id == "Application"
+        assert isinstance(appel.func, ast.Name) and appel.func.id == "build_application"
 
     def test_le_handler_dispatche_sur_ce_nom(self) -> None:
         """Le serveur de développement et wsgi.py servent le MÊME objet."""

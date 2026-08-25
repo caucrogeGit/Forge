@@ -61,15 +61,34 @@ def test_forge_config_kwargs_garde_max_size_sans_les_autres(monkeypatch):
     assert not (_MOVED_KEYS & set(kwargs)), "aucune des 4 clés déplacées ne doit être threadée"
 
 
+#: Fichiers du squelette où AUCUNE des clés déplacées ne doit être affectée.
+#: `bootstrap.py` y figure depuis l'ADR-093 : c'est là que le projet câble, donc
+#: là qu'une clé déplacée pourrait revenir.
+_FICHIERS_INSPECTES = ("env/example", "config.py", "app.py", "bootstrap.py")
+
+#: Fichiers où `UPLOAD_MAX_SIZE`, seule clé restée au cœur (ADR-032), doit vivre.
+#: `app.py` n'y est plus depuis l'ADR-093 : il ne construit plus l'application,
+#: donc il n'a plus à lire une valeur que la fabrique passe elle-même à
+#: `forge.configure(...)`. La valeur n'a pas quitté le squelette, elle a cessé
+#: de transiter par un fichier qui n'en avait plus l'usage.
+_FICHIERS_PORTEURS = ("env/example", "config.py")
+
+
 def test_squelette_nu_sans_config_upload_deplacee():
-    """env/example, config.py, app.py du squelette : UPLOAD_MAX_SIZE conservé,
-    aucune AFFECTATION des clés déplacées (les commentaires explicatifs sont tolérés)."""
-    for rel in ("env/example", "config.py", "app.py"):
+    """Aucune AFFECTATION des clés déplacées (les commentaires sont tolérés)."""
+    for rel in _FICHIERS_INSPECTES:
         text = (_SKELETON / rel).read_text(encoding="utf-8")
-        # Affectations majuscules (env var / module config.py) et kwargs minuscules (app.py).
+        # Affectations majuscules (env var / module config.py) et kwargs minuscules.
         assert not re.search(r"(?mi)^\s*UPLOAD_ROOT\s*=", text), rel
         assert not re.search(r"(?mi)^\s*UPLOAD_ALLOWED_EXTENSIONS\s*=", text), rel
         assert not re.search(r"(?mi)^\s*UPLOAD_ALLOWED_MIME_TYPES\s*=", text), rel
         assert not re.search(r"(?m)^\s*upload_root\s*=", text), rel
         assert not re.search(r"(?m)^\s*upload_allowed_(extensions|mime_types)\s*=", text), rel
+
+
+def test_le_squelette_conserve_la_seule_cle_restee_au_coeur():
+    """`UPLOAD_MAX_SIZE` est la seule clé d'upload que le cœur garde (ADR-032)."""
+    for rel in _FICHIERS_PORTEURS:
+        text = (_SKELETON / rel).read_text(encoding="utf-8")
+
         assert "UPLOAD_MAX_SIZE" in text, f"{rel} doit conserver UPLOAD_MAX_SIZE"

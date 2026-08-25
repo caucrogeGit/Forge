@@ -18,7 +18,8 @@ La gestion de l'authentification (login, logout, protection des routes) est
 entièrement du ressort de l'application : voir mvc/controllers/auth_controller.py.
 Le framework fournit uniquement les outils (sessions, CSRF, hashing, décorateurs).
 
-Les routes sont déclarées dans mvc/routes.py.
+Les routes sont déclarées dans le package mvc/routes/ (un fichier par contrôleur,
+branchés dans mvc/routes/__init__.py — ADR-068).
 La configuration (hôte, port, certificats) est dans config.py.
 Les classes Request et Response sont dans core/http/request.py
 et core/http/response.py.
@@ -64,14 +65,25 @@ import argparse as _argparse
 import errno as _errno
 import os as _os
 import sys as _sys
-from typing import Any, cast
+from typing import Any
 
 # ── Détection de l'environnement avant tout import de config ──────────────────
-# L'argument --env est parsé ici, point d'entrée unique de la CLI.
-# config.py lit ensuite os.environ["APP_ENV"] sans effet de bord.
-_p = _argparse.ArgumentParser(add_help=False)
-_p.add_argument("--env", choices=["dev", "prod"], default="dev")
-_os.environ.setdefault("APP_ENV", _p.parse_known_args()[0].env)
+# L'argument --env est parsé ici, point d'entrée unique de la CLI, et AVANT
+# l'import de config.py qui lit ensuite os.environ["APP_ENV"].
+#
+# Le garde `__name__ == "__main__"` n'est pas décoratif. Ce fichier est aussi
+# IMPORTÉ par wsgi.py en production, et sys.argv est alors celui de Gunicorn :
+# --env y est absent, le défaut vaudrait "dev", et `setdefault` poserait
+# APP_ENV=dev sur un serveur de production dès que l'environnement du processus
+# ne la déclare pas lui-même. Les pages d'erreur rendraient alors leur
+# traceback au visiteur.
+#
+# Sous le garde, l'import ne décide de rien : APP_ENV vient de l'environnement,
+# et de lui seul.
+if __name__ == "__main__":
+    _p = _argparse.ArgumentParser(add_help=False)
+    _p.add_argument("--env", choices=["dev", "prod"], default="dev")
+    _os.environ.setdefault("APP_ENV", _p.parse_known_args()[0].env)
 
 import logging
 import mimetypes
@@ -79,14 +91,12 @@ import socket
 import ssl
 import traceback
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
-import importlib
+# Seules les valeurs dont CE fichier a besoin : le serveur de développement et
+# ses pages d'erreur. Tout ce qui configure l'application est lu par la fabrique.
 from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFILE,
-                    APP_ENV, APP_NAME, APP_ROUTES_MODULE,
-                    VIEWS_DIR, SQL_DIR,
-                    UPLOAD_MAX_SIZE,
-                    APP_CSP_NONCE_ENABLED, APP_TRUSTED_PROXIES)
+                    APP_ENV, APP_CSP_NONCE_ENABLED)
 import core.security.csp as _csp
-from core.security.headers import apply_security_headers
+from core.security.headers import apply_security_headers, assert_headers_are_safe
 import core.forge as forge
 from core.app.dev_server import (
     format_port_in_use_message,
@@ -94,30 +104,31 @@ from core.app.dev_server import (
     format_startup_messages,
     should_block_prod_public_host,
 )
-forge.configure(
-    app_name     = APP_NAME,
-    app_env      = APP_ENV,
-    views_dir    = VIEWS_DIR,
-    sql_dir      = SQL_DIR,
-    upload_max_size = UPLOAD_MAX_SIZE,
-    trusted_proxies = APP_TRUSTED_PROXIES,
-)
+# La configuration Forge, le renderer Jinja et les routes sont posés par
+# `build_application()` (plus bas), qui lit config.py. Les refaire ici
+# rouvrirait la porte que l'ADR-093 ferme : deux séquences de construction pour
+# une seule application, et la divergence qui vient avec.
 from core.http.health import health_response, is_health_request
+from core.http.media import media_response
 from core.http.request import Request, RequestEntityTooLarge
 from core.http.response import Response
 from core.http.helpers import error_page as _error_page
-from core.app.application import Application
+from core.app.app_factory import build_application
 # CORE-DROP-UPLOADS-001 (ADR-019) : le service de fichiers est un opt-in
 # (forge-mvc-files). Import lazy dans le handler /media (l'app démarre sans).
-from integrations.jinja2.renderer import Jinja2Renderer
-from core.templating.manager import template_manager
-
-template_manager.register(Jinja2Renderer(VIEWS_DIR))
-
-_routes = importlib.import_module(APP_ROUTES_MODULE)
-forge.configure(router=_routes.router)
-# Nom PUBLIC : le wsgi.py de production sert cet objet ci (ADR-092).
-application = Application(_routes.router)
+# L'application est construite par la fabrique du cœur, qui lit config.py, les
+# routes, puis VOTRE câblage dans bootstrap.py (ADR-093).
+#
+# Ce fichier ne construit plus l'Application lui-même, et c'est le sujet. Le
+# câblage vivait ici, où la fabrique WSGI ne le lisait pas : la production
+# servait alors une application privée de ses gardes, sans rien dire (ADR-092).
+# Une seule séquence de construction, donc plus aucune divergence possible.
+#
+# Vos middlewares et votre magasin de sessions se câblent dans bootstrap.py.
+#
+# `application` porte un nom PUBLIC : c'est ce que wsgi.py sert en production.
+# Ne pas le renommer.
+application = build_application()
 
 logger = logging.getLogger(__name__)
 
@@ -254,9 +265,31 @@ class RequestHandler(BaseHTTPRequestHandler):
         une route applicative qui définit explicitement un de ces headers
         garde la main. Voir `WSGI-SECURITY-HEADERS-001`.
         """
+        # Corps : soit un itérable de streaming (Response.file → Range/206,
+        # CORE-HTTP-FILE-RANGE-001), soit le `body` bytes habituel. Même contrat
+        # que le chemin WSGI (`core/app/wsgi.py`) : dans le cas streaming,
+        # `Content-Length` vient de `response.content_length`, taille de la
+        # tranche servie, et non de `len(body)` qui vaut alors zéro.
+        stream = getattr(response, "stream", None)
+        content_length = (
+            (getattr(response, "content_length", None) or 0)
+            if stream is not None else
+            len(response.body)
+        )
+
+        # CORE-HEADER-CRLF-001 : contrôle AVANT la première ligne. Ce serveur
+        # émet ses en-têtes un par un ; une fois `send_response` appelé, il est
+        # trop tard pour refuser la réponse.
+        _entetes_a_controler: dict[str, str] = {
+            str(k): str(v) for k, v in response.headers.items()
+        }
+        for _c in getattr(response, "set_cookies", []):
+            _entetes_a_controler[f"Set-Cookie::{len(_entetes_a_controler)}"] = str(_c)
+        assert_headers_are_safe(_entetes_a_controler)
+
         self.send_response(response.status)
         self.send_header("Content-Type", response.content_type)
-        self.send_header("Content-Length", str(len(response.body)))
+        self.send_header("Content-Length", str(content_length))
 
         # Couche de défense partagée avec le chemin WSGI : un seul helper,
         # un seul contrat. `include_hsts=True` : le serveur de dev sait quand
@@ -279,7 +312,17 @@ class RequestHandler(BaseHTTPRequestHandler):
         for cookie in getattr(response, "set_cookies", []):
             self.send_header("Set-Cookie", str(cookie))
         self.end_headers()
-        self.wfile.write(response.body)
+        if stream is None:
+            self.wfile.write(response.body)
+            return
+        try:
+            for chunk in stream:
+                self.wfile.write(chunk)
+        except (BrokenPipeError, ConnectionResetError):
+            # Le client a coupé en cours de téléchargement (lecteur vidéo qui
+            # saute, onglet fermé). Les en-têtes sont déjà partis : il n'y a
+            # plus de réponse d'erreur à envoyer, seulement une trace.
+            logger.info("Client déconnecté pendant l'envoi de %s", self.path)
 
     def _serve_static(self, path: str) -> None:
         """
@@ -310,16 +353,18 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._send_response(_error_page("errors/404.html", 404, _dev_error({"path": path})))
 
     def _serve_media(self, path: str, request: Any = None) -> None:
-        try:
-            # Opt-in forge-mvc-files : absent d'un squelette nu, chargé en lazy.
-            from forge_mvc_files import serve_media_file  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
-        except ImportError:
-            self._send_response(Response(404, b"Not found", "text/plain; charset=utf-8"))
-            return
-        relative_path = path.removeprefix("/media/")
-        # Propage `request` pour le support HTTP Range (FILES-SERVE-RANGE-DELEGATE-001).
-        media_response = cast(Response, serve_media_file(relative_path, request=request))
-        self._send_response(media_response)
+        """Sert un média, par la source unique partagée avec le chemin WSGI.
+
+        Ce handler portait sa propre copie du service : import de l'opt-in,
+        retrait du préfixe, repli 404. Le chemin WSGI n'en avait aucune, et une
+        application déployée rendait 404 sur TOUS ses médias en servant ses
+        pages normalement (CORE-WSGI-MEDIA-PARITY-001).
+
+        La réponse vient désormais de `core.http.media`, que les deux serveurs
+        appellent. Un écart de comportement entre eux devient impossible,
+        puisqu'il n'y a plus deux comportements.
+        """
+        self._send_response(media_response(path, request))
 
     def log_message(self, format: str, *args: Any) -> None:
         """Affiche chaque requête reçue dans le terminal avec l'adresse IP du client."""
@@ -448,7 +493,8 @@ if __name__ == "__main__":
         logger.warning(
             "AVERTISSEMENT — Forge utilise des sessions mémoire (backend mono-processus). "
             "Le multi-worker n'est pas supporté sans backend de session partagé. "
-            "Voir ADR-002 : docs/adr/002-session-strategy.md"
+            "Activez un store partagé, par exemple l'opt-in forge-mvc-sessions-db : "
+            "forge.configure(session_store=DbSessionStore())."
         )
 
     from core.app.prod_warnings import emit_memory_store_warning_if_needed
