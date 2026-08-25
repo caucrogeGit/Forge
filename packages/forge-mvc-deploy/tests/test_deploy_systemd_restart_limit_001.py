@@ -36,11 +36,14 @@ from forge_mvc_deploy.cli import deploy
 def unite(tmp_path: Path):
     """Écrit une unité systemd dans un projet jetable et rend sa racine."""
     def _ecrire(contenu: "str | None") -> Path:
+        # Rend le chemin de l'UNITÉ : les contrôles le reçoivent depuis
+        # DEPLOY-CHECK-CHEMINS-DECLARABLES-001.
+        dossier = tmp_path / "deploy" / "systemd"
+        chemin = dossier / "forge-app.service"
         if contenu is not None:
-            dossier = tmp_path / "deploy" / "systemd"
             dossier.mkdir(parents=True, exist_ok=True)
-            (dossier / "forge-app.service").write_text(contenu, encoding="utf-8")
-        return tmp_path
+            chemin.write_text(contenu, encoding="utf-8")
+        return chemin
     return _ecrire
 
 
@@ -119,9 +122,9 @@ class TestControle:
     """`deploy:check` sur un projet provisionné avant ce correctif."""
 
     def test_cle_absente_avertit(self, unite) -> None:
-        racine = unite("[Unit]\nDescription=X\n\n[Service]\nRestart=always\nRestartSec=5\n")
+        chemin = unite("[Unit]\nDescription=X\n\n[Service]\nRestart=always\nRestartSec=5\n")
 
-        resultat = deploy._verifier_limite_redemarrage(racine)
+        resultat = deploy._verifier_limite_redemarrage(chemin)
 
         assert resultat is not None
         assert resultat.status == "warn"
@@ -130,53 +133,53 @@ class TestControle:
 
     def test_cle_dans_service_avertit(self, unite) -> None:
         """Le cas vécu : la clé posée au mauvais endroit, ignorée en silence."""
-        racine = unite(
+        chemin = unite(
             "[Unit]\nDescription=X\n\n"
             "[Service]\nRestart=always\nStartLimitIntervalSec=0\n"
         )
 
-        resultat = deploy._verifier_limite_redemarrage(racine)
+        resultat = deploy._verifier_limite_redemarrage(chemin)
 
         assert resultat is not None
         assert resultat.status == "warn"
         assert "[Service]" in resultat.detail
 
     def test_cle_dans_unit_valide(self, unite) -> None:
-        racine = unite(
+        chemin = unite(
             "[Unit]\nDescription=X\nStartLimitIntervalSec=0\n\n"
             "[Service]\nRestart=always\n"
         )
 
-        resultat = deploy._verifier_limite_redemarrage(racine)
+        resultat = deploy._verifier_limite_redemarrage(chemin)
 
         assert resultat is not None
         assert resultat.status == "ok"
 
     def test_sans_restart_rien_a_plafonner(self, unite) -> None:
-        racine = unite("[Unit]\nDescription=X\n\n[Service]\nType=oneshot\n")
+        chemin = unite("[Unit]\nDescription=X\n\n[Service]\nType=oneshot\n")
 
-        resultat = deploy._verifier_limite_redemarrage(racine)
+        resultat = deploy._verifier_limite_redemarrage(chemin)
 
         assert resultat is not None
         assert resultat.status == "ok"
 
     def test_unite_absente_ne_dit_rien(self, tmp_path: Path) -> None:
         """L'absence est déjà signalée ailleurs ; une ligne de plus brouille."""
-        assert deploy._verifier_limite_redemarrage(tmp_path) is None
+        assert deploy._verifier_limite_redemarrage(tmp_path / 'absente.service') is None
 
     def test_le_gabarit_neuf_passe_son_propre_controle(self, unite) -> None:
         """Ce que Forge écrit ne doit jamais déclencher son propre avertissement."""
-        racine = unite(deploy._systemd_service(Path("/srv/app")))
+        chemin = unite(deploy._systemd_service(Path("/srv/app")))
 
-        resultat = deploy._verifier_limite_redemarrage(racine)
+        resultat = deploy._verifier_limite_redemarrage(chemin)
 
         assert resultat is not None
         assert resultat.status == "ok"
 
-    def test_le_controle_figure_dans_le_diagnostic(self, unite) -> None:
+    def test_le_controle_figure_dans_le_diagnostic(self, unite, tmp_path: Path) -> None:
         """La vérification est branchée, pas seulement écrite."""
-        racine = unite("[Unit]\nDescription=X\n\n[Service]\nRestart=always\n")
+        unite("[Unit]\nDescription=X\n\n[Service]\nRestart=always\n")
 
-        labels = [r.label for r in deploy._check_results(racine)]
+        labels = [r.label for r in deploy._check_results(tmp_path)]
 
         assert "Redémarrage systemd" in labels

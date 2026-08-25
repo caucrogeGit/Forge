@@ -254,6 +254,39 @@ def _upload_max_mb(root: Path) -> int:
     return 5
 
 
+#: Emplacements par defaut des artefacts, tels que `deploy:init` les ecrit.
+UNITE_PAR_DEFAUT = Path("deploy") / "systemd" / "forge-app.service"
+NGINX_PAR_DEFAUT = Path("deploy") / "nginx" / "forge-app.conf"
+
+
+class Artefacts(NamedTuple):
+    """Ou vivent l'unite systemd et la configuration Nginx de CE projet.
+
+    DEPLOY-CHECK-CHEMINS-DECLARABLES-001. Le pre-vol codait ces chemins en dur,
+    ce qui contredisait ce que le module enonce lui-meme : l'unite appartient au
+    projet, Forge ne la reecrit pas. Un projet qui suit ce principe, qui adapte
+    son unite, la renomme ou la range ailleurs, devenait invisible du pre-vol.
+
+    Il repondait alors « Unite systemd absente, sera ecrite par deploy:init »
+    sur une unite qui tourne en production. Un vert qui ne verifie rien est pire
+    qu'un rouge : il rassure.
+    """
+
+    unite: Path
+    nginx: Path
+
+    @classmethod
+    def par_defaut(cls, root: Path) -> "Artefacts":
+        return cls(unite=root / UNITE_PAR_DEFAUT, nginx=root / NGINX_PAR_DEFAUT)
+
+    def resolus(self, root: Path) -> "Artefacts":
+        """Chemins absolus, un chemin relatif etant lu depuis la racine."""
+        return Artefacts(
+            unite=self.unite if self.unite.is_absolute() else root / self.unite,
+            nginx=self.nginx if self.nginx.is_absolute() else root / self.nginx,
+        )
+
+
 def _upload_root(root: Path) -> str:
     """Emplacement des medias, tel que le lira l'opt-in `forge-mvc-files`.
 
@@ -404,7 +437,7 @@ def _verifier_backend_bdd() -> _Result:
 _APRES_SYSTEMD = re.compile(r"^After=(.*)$", re.MULTILINE)
 
 
-def _verifier_unite_systemd(root: Path) -> _Result:
+def _verifier_unite_systemd(unite: Path) -> _Result:
     """L'unite deja ecrite attend-elle le service du backend resolu ?
 
     DEPLOY-SYSTEMD-STALE-AFTER-001. `DEPLOY-BACKEND-AGNOSTIC-001` a rendu
@@ -421,9 +454,13 @@ def _verifier_unite_systemd(root: Path) -> _Result:
     la reecrit pas (principe 9). Il dit quoi corriger, la main reste a
     l'exploitant.
     """
-    unite = root / "deploy" / "systemd" / "forge-app.service"
     if not unite.is_file():
-        return _Result("ok", "Unité systemd", "absente — sera écrite par forge deploy:init")
+        # Un avertissement, pas un « OK » : c'était un vert qui ne vérifiait
+        # rien (DEPLOY-CHECK-CHEMINS-DECLARABLES-001), et il contredisait la
+        # ligne « deploy/systemd/forge-app.service — absent » affichée plus bas.
+        return _Result("warn", "Unité systemd",
+                       f"absente de {unite} — écrire par forge deploy:init, "
+                       f"ou déclarer son emplacement avec --unite")
 
     trouve = _APRES_SYSTEMD.search(unite.read_text(encoding="utf-8"))
     if trouve is None:
@@ -491,7 +528,7 @@ def _section_de_la_cle(texte: str, cle: str) -> "str | None":
     return None
 
 
-def _verifier_limite_redemarrage(root: Path) -> "_Result | None":
+def _verifier_limite_redemarrage(unite: Path) -> "_Result | None":
     """`Restart=always` tient-il vraiment, ou renonce-t-il apres cinq essais ?
 
     DEPLOY-SYSTEMD-RESTART-LIMIT-001. Le gabarit pose desormais
@@ -513,7 +550,6 @@ def _verifier_limite_redemarrage(root: Path) -> "_Result | None":
     diagnostic. Un avertissement, jamais une erreur : l'unite appartient au
     projet, Forge ne la reecrit pas.
     """
-    unite = root / "deploy" / "systemd" / "forge-app.service"
     if not unite.is_file():
         return None
 
@@ -545,7 +581,7 @@ def _verifier_limite_redemarrage(root: Path) -> "_Result | None":
 _LOCATION_NGINX = re.compile(r"^\s*location\s+[=~^*\s]*?(\S+)\s*\{", re.MULTILINE)
 
 
-def _verifier_locations_nginx(root: Path) -> "_Result | None":
+def _verifier_locations_nginx(conf: Path) -> "_Result | None":
     """La configuration sert-elle ce que le chemin WSGI ne sert plus ?
 
     DEPLOY-NGINX-STATIC-LOCATIONS-001. `/static/` vit dans le
@@ -563,7 +599,6 @@ def _verifier_locations_nginx(root: Path) -> "_Result | None":
     Rend `None` quand la configuration est absente : son absence est deja
     signalee ailleurs.
     """
-    conf = root / "deploy" / "nginx" / "forge-app.conf"
     if not conf.is_file():
         return None
 
@@ -648,7 +683,7 @@ def _peut_lire(chemin: Path, utilisateur: str) -> "bool | None":
     return bool(mode & 0o004)
 
 
-def _verifier_lecture_env_prod(root: Path) -> "_Result | None":
+def _verifier_lecture_env_prod(root: Path, unite: Path) -> "_Result | None":
     """Le compte declare dans l'unite peut-il lire le fichier de secrets ?
 
     DEPLOY-ENVFILE-READABLE-001. L'unite pointe `EnvironmentFile=env/prod`, qui
@@ -665,7 +700,6 @@ def _verifier_lecture_env_prod(root: Path) -> "_Result | None":
     pas d'`EnvironmentFile`, compte inconnu de cette machine. Le pre-vol se
     lance souvent ailleurs qu'en production.
     """
-    unite = root / "deploy" / "systemd" / "forge-app.service"
     if not unite.is_file():
         return None
 
@@ -733,7 +767,11 @@ def _verifier_app_env_prod(cfg: dict[str, str], env_prod_existe: bool) -> "_Resu
         f"vaut « {valeur} » dans env/prod — déclarer APP_ENV=prod")
 
 
-def _check_results(root: Path) -> list[_Result]:
+def _check_results(root: Path, artefacts: "Artefacts | None" = None) -> list[_Result]:
+    # Les artefacts vivent la ou le projet les a mis (principe 9) : le pre-vol
+    # les lit ou on le lui dit, et retombe sur les emplacements que
+    # `deploy:init` ecrit (DEPLOY-CHECK-CHEMINS-DECLARABLES-001).
+    ou = (artefacts or Artefacts.par_defaut(root)).resolus(root)
     results: list[_Result] = []
 
     # cwd projet Forge
@@ -809,7 +847,7 @@ def _check_results(root: Path) -> list[_Result]:
         results.append(_Result("warn", "Dossier storage/uploads/", "absent — lancer forge upload:init"))
 
     # HTTP/HTTPS local
-    nginx_conf = root / "deploy" / "nginx" / "forge-app.conf"
+    nginx_conf = ou.nginx
     nginx_expects_http = False
     if nginx_conf.exists():
         try:
@@ -852,14 +890,14 @@ def _check_results(root: Path) -> list[_Result]:
     # Le coeur est agnostique et resout son backend par entry point (ADR-054) :
     # cette verification pose donc la meme question que lui.
     results.append(_verifier_backend_bdd())
-    results.append(_verifier_unite_systemd(root))
-    limite = _verifier_limite_redemarrage(root)
+    results.append(_verifier_unite_systemd(ou.unite))
+    limite = _verifier_limite_redemarrage(ou.unite)
     if limite is not None:
         results.append(limite)
-    statiques = _verifier_locations_nginx(root)
+    statiques = _verifier_locations_nginx(ou.nginx)
     if statiques is not None:
         results.append(statiques)
-    lecture = _verifier_lecture_env_prod(root)
+    lecture = _verifier_lecture_env_prod(root, ou.unite)
     if lecture is not None:
         results.append(lecture)
 
@@ -889,28 +927,62 @@ def _check_results(root: Path) -> list[_Result]:
             "absent — lancer forge deploy:init",
         ))
 
-    # fichiers deploy/
-    for rel in (
-        "deploy/nginx/forge-app.conf",
-        "deploy/systemd/forge-app.service",
-        "deploy/README_DEPLOY.md",
-    ):
-        path = root / rel
+    # artefacts de déploiement, aux emplacements déclarés
+    attendus = [
+        (ou.nginx, "--nginx"),
+        (ou.unite, "--unite"),
+        (root / "deploy" / "README_DEPLOY.md", None),
+    ]
+    for path, drapeau in attendus:
+        try:
+            libelle = str(path.relative_to(root))
+        except ValueError:
+            libelle = str(path)
         if path.exists():
-            results.append(_Result("ok", rel, "présent"))
+            results.append(_Result("ok", libelle, "présent"))
         else:
-            results.append(_Result("warn", rel, "absent — lancer forge deploy:init"))
+            aide = "absent — lancer forge deploy:init"
+            if drapeau:
+                aide += f", ou déclarer son emplacement avec {drapeau}"
+            results.append(_Result("warn", libelle, aide))
 
     return results
 
 
-def cmd_deploy_check(root: Path | None = None) -> None:
+def _parser_artefacts(args: list[str]) -> "Artefacts | None":
+    """Lit `--unite <chemin>` et `--nginx <chemin>`, ou `None` si aucun.
+
+    Sans ces drapeaux, un projet qui a adapté son déploiement, ce que le
+    principe 9 l'invite à faire, devient invisible du pré-vol : les
+    vérifications ne s'exécutent jamais chez ceux qui en ont le plus besoin.
+    """
+    valeurs: dict[str, Path] = {}
+    reste = list(args)
+    while reste:
+        drapeau = reste.pop(0)
+        if drapeau not in ("--unite", "--nginx"):
+            continue
+        if not reste:
+            raise SystemExit(f"{drapeau} attend un chemin.")
+        valeurs[drapeau] = Path(reste.pop(0))
+
+    if not valeurs:
+        return None
+    return Artefacts(
+        unite=valeurs.get("--unite", UNITE_PAR_DEFAUT),
+        nginx=valeurs.get("--nginx", NGINX_PAR_DEFAUT),
+    )
+
+
+def cmd_deploy_check(
+    root: Path | None = None, artefacts: "Artefacts | None" = None,
+) -> None:
     if root is None:
         root = Path.cwd()
 
     print("\nforge deploy:check\n")
 
-    results = _check_results(root)
+    results = _check_results(root, artefacts)
     has_error = False
 
     for r in results:
@@ -942,7 +1014,7 @@ def main(args: list[str]) -> None:
     if command == "deploy:init":
         cmd_deploy_init()
     elif command == "deploy:check":
-        cmd_deploy_check()
+        cmd_deploy_check(artefacts=_parser_artefacts(args[1:]))
     else:
         print(f"Commande inconnue : {command!r}")
         raise SystemExit(1)

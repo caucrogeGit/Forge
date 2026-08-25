@@ -29,12 +29,16 @@ from forge_mvc_deploy.cli import deploy
 def projet(tmp_path: Path):
     """Rend une fabrique d'unité systemd dans un projet jetable."""
     def _ecrire(contenu: "str | None") -> Path:
+        # Rend le chemin de l'UNITÉ, et non la racine : les contrôles le
+        # reçoivent depuis DEPLOY-CHECK-CHEMINS-DECLARABLES-001, l'unité
+        # pouvant vivre ailleurs que là où deploy:init l'écrit.
+        dossier = tmp_path / "deploy" / "systemd"
+        unite = dossier / "forge-app.service"
         if contenu is not None:
-            dossier = tmp_path / "deploy" / "systemd"
             dossier.mkdir(parents=True, exist_ok=True)
-            (dossier / "forge-app.service").write_text(
+            unite.write_text(
                 f"[Unit]\nDescription=Forge Application\n{contenu}\n", encoding="utf-8")
-        return tmp_path
+        return unite
     return _ecrire
 
 
@@ -51,9 +55,9 @@ def backend(monkeypatch):
 def test_unite_figee_sur_mariadb_sous_postgres_avertit(projet, backend) -> None:
     """Le projet rc3 mis à jour, exactement."""
     backend("postgres")
-    racine = projet("After=network.target mariadb.service")
+    unite = projet("After=network.target mariadb.service")
 
-    resultat = deploy._verifier_unite_systemd(racine)
+    resultat = deploy._verifier_unite_systemd(unite)
 
     assert resultat.status == "warn"
     assert "postgresql.service" in resultat.detail
@@ -68,9 +72,9 @@ def test_unite_figee_sur_mariadb_sous_postgres_avertit(projet, backend) -> None:
 def test_unite_accordee_au_backend_passe(projet, backend, nom: str, service: str) -> None:
     """Contre-épreuve : sans elle, le contrôle pourrait crier sur tout."""
     backend(nom)
-    racine = projet(f"After=network.target {service}")
+    unite = projet(f"After=network.target {service}")
 
-    assert deploy._verifier_unite_systemd(racine).status == "ok"
+    assert deploy._verifier_unite_systemd(unite).status == "ok"
 
 
 # ── SQLite n'attend aucun service ────────────────────────────────────────────
@@ -78,9 +82,9 @@ def test_unite_accordee_au_backend_passe(projet, backend, nom: str, service: str
 def test_sqlite_avec_un_service_avertit(projet, backend) -> None:
     """Attendre un serveur là où il n'y en a pas retarde le démarrage pour rien."""
     backend("sqlite")
-    racine = projet("After=network.target mariadb.service")
+    unite = projet("After=network.target mariadb.service")
 
-    resultat = deploy._verifier_unite_systemd(racine)
+    resultat = deploy._verifier_unite_systemd(unite)
 
     assert resultat.status == "warn"
     assert "sqlite" in resultat.detail
@@ -88,9 +92,9 @@ def test_sqlite_avec_un_service_avertit(projet, backend) -> None:
 
 def test_sqlite_sans_service_passe(projet, backend) -> None:
     backend("sqlite")
-    racine = projet("After=network.target")
+    unite = projet("After=network.target")
 
-    assert deploy._verifier_unite_systemd(racine).status == "ok"
+    assert deploy._verifier_unite_systemd(unite).status == "ok"
 
 
 # ── Ce que le contrôle n'affirme pas ─────────────────────────────────────────
@@ -102,28 +106,44 @@ def test_sans_backend_resolu_il_n_affirme_rien(projet, backend) -> None:
     second serait faux : sans backend, on ignore quel service attendre.
     """
     backend(None)
-    racine = projet("After=network.target mariadb.service")
+    unite = projet("After=network.target mariadb.service")
 
-    resultat = deploy._verifier_unite_systemd(racine)
+    resultat = deploy._verifier_unite_systemd(unite)
 
     assert resultat.status == "warn"
     assert "non vérifiable" in resultat.detail
 
 
-def test_unite_absente_n_est_pas_une_anomalie(projet, backend) -> None:
-    """Un projet qui n'a pas encore lancé `deploy:init` n'a rien fait de mal."""
-    backend("postgres")
-    racine = projet(None)
+def test_unite_absente_avertit_au_lieu_de_rassurer(projet, backend) -> None:
+    """Contrat renversé par DEPLOY-CHECK-CHEMINS-DECLARABLES-001.
 
-    assert deploy._verifier_unite_systemd(racine).status == "ok"
+    Ce contrôle rendait « OK — absente, sera écrite par deploy:init ». Un projet
+    qui n'a pas encore lancé `deploy:init` n'a effectivement rien fait de mal,
+    mais ce n'est pas ce que la ligne disait à celui qui déployait.
+
+    Relevé sur le terrain : un projet dont l'unité vit ailleurs, sous un autre
+    nom, et qui tourne en production, lisait « Unité systemd absente ». Un vert
+    sur un fichier qui existe et n'a jamais été regardé est pire qu'un rouge :
+    il rassure. Et il contredisait la ligne « absent » affichée plus bas pour le
+    même fichier.
+
+    L'avertissement nomme le chemin cherché et le drapeau qui le déclare.
+    """
+    backend("postgres")
+    unite = projet(None)
+
+    resultat = deploy._verifier_unite_systemd(unite)
+
+    assert resultat.status == "warn"
+    assert "--unite" in resultat.detail
 
 
 def test_unite_sans_ligne_after_avertit(projet, backend) -> None:
     """Sans `After=`, l'ordre de démarrage n'est garanti par rien."""
     backend("postgres")
-    racine = projet("Wants=network.target")
+    unite = projet("Wants=network.target")
 
-    resultat = deploy._verifier_unite_systemd(racine)
+    resultat = deploy._verifier_unite_systemd(unite)
 
     assert resultat.status == "warn"
     assert "After=" in resultat.detail
@@ -131,13 +151,12 @@ def test_unite_sans_ligne_after_avertit(projet, backend) -> None:
 
 # ── Le contrôle est bien câblé dans deploy:check ─────────────────────────────
 
-def test_le_controle_figure_dans_deploy_check(projet, backend) -> None:
+def test_le_controle_figure_dans_deploy_check(projet, backend, tmp_path) -> None:
     """Un contrôle juste que `deploy:check` n'appelle pas ne sert à rien."""
     backend("postgres")
-    racine = projet("After=network.target mariadb.service")
-    (racine / "mvc").mkdir(exist_ok=True)
+    projet("After=network.target mariadb.service")
 
-    labels = [r.label for r in deploy._check_results(racine)]
+    labels = [r.label for r in deploy._check_results(tmp_path)]
 
     assert "Unité systemd" in labels
 
@@ -145,11 +164,10 @@ def test_le_controle_figure_dans_deploy_check(projet, backend) -> None:
 def test_il_avertit_sans_jamais_reecrire(projet, backend) -> None:
     """Principe 9 : l'unité appartient au projet, Forge n'y touche pas."""
     backend("postgres")
-    racine = projet("After=network.target mariadb.service")
-    unite = racine / "deploy" / "systemd" / "forge-app.service"
+    unite = projet("After=network.target mariadb.service")
     avant = unite.read_text(encoding="utf-8")
 
-    resultat = deploy._verifier_unite_systemd(racine)
+    resultat = deploy._verifier_unite_systemd(unite)
 
     assert resultat.status != "error"
     assert unite.read_text(encoding="utf-8") == avant

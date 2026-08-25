@@ -56,7 +56,9 @@ def projet(tmp_path: Path):
             fichier = tmp_path / "env" / "prod"
             fichier.write_text("DB_NAME=x\n", encoding="utf-8")
             fichier.chmod(mode)
-        return tmp_path
+        # Rend (racine, unité) : le contrôle a besoin des deux, et l'unité peut
+        # vivre ailleurs (DEPLOY-CHECK-CHEMINS-DECLARABLES-001).
+        return tmp_path, dossier / "forge-app.service"
     return _poser
 
 
@@ -141,7 +143,7 @@ class TestPeutLire:
 class TestControle:
 
     def test_compte_qui_lit_valide(self, projet) -> None:
-        resultat = _verifier_lecture_env_prod(projet())
+        resultat = _verifier_lecture_env_prod(*projet())
 
         assert resultat is not None
         assert resultat.status == "ok"
@@ -149,10 +151,10 @@ class TestControle:
     @pytest.mark.skipif(os.geteuid() == 0, reason="root lit tout : le cas ne se produit pas")
     def test_compte_qui_ne_lit_pas_est_une_erreur(self, projet) -> None:
         """La panne est franche : ce n'est pas un avertissement."""
-        racine = projet(mode=0o600)
+        racine, unite = projet(mode=0o600)
         (racine / "env" / "prod").chmod(0o200)
 
-        resultat = _verifier_lecture_env_prod(racine)
+        resultat = _verifier_lecture_env_prod(racine, unite)
 
         assert resultat is not None
         assert resultat.status == "error"
@@ -160,16 +162,16 @@ class TestControle:
     @pytest.mark.skipif(os.geteuid() == 0, reason="root lit tout : le cas ne se produit pas")
     def test_le_message_nomme_le_geste_juste(self, projet) -> None:
         """Et pas celui qu'on ferait d'instinct."""
-        racine = projet(mode=0o200)
+        racine, unite = projet(mode=0o200)
 
-        resultat = _verifier_lecture_env_prod(racine)
+        resultat = _verifier_lecture_env_prod(racine, unite)
 
         assert resultat is not None
         assert "chown" in resultat.detail
         assert "élargir les droits" in resultat.detail
 
     def test_compte_inconnu_avertit_sans_conclure(self, projet) -> None:
-        resultat = _verifier_lecture_env_prod(projet(utilisateur="compte-inconnu-ici"))
+        resultat = _verifier_lecture_env_prod(*projet(utilisateur="compte-inconnu-ici"))
 
         assert resultat is not None
         assert resultat.status == "warn"
@@ -177,16 +179,16 @@ class TestControle:
 
     def test_env_prod_absent_ne_dit_rien(self, projet) -> None:
         """Son absence est déjà signalée ailleurs."""
-        assert _verifier_lecture_env_prod(projet(avec_env=False)) is None
+        assert _verifier_lecture_env_prod(*projet(avec_env=False)) is None
 
     def test_unite_absente_ne_dit_rien(self, tmp_path: Path) -> None:
-        assert _verifier_lecture_env_prod(tmp_path) is None
+        assert _verifier_lecture_env_prod(tmp_path, tmp_path / 'absente.service') is None
 
     def test_le_tiret_de_fichier_optionnel_est_ignore(self, projet, tmp_path: Path) -> None:
         """`EnvironmentFile=-/chemin` dit à systemd de tolérer l'absence."""
-        racine = projet(env_file=f"-{tmp_path / 'env' / 'prod'}")
+        racine, unite = projet(env_file=f"-{tmp_path / 'env' / 'prod'}")
 
-        resultat = _verifier_lecture_env_prod(racine)
+        resultat = _verifier_lecture_env_prod(racine, unite)
 
         assert resultat is not None
         assert resultat.status == "ok"

@@ -132,16 +132,18 @@ class TestUploadRoot:
 class TestControle:
 
     def _ecrire(self, racine: Path, contenu: str) -> Path:
+        """Rend le chemin de la CONFIGURATION, que le contrôle reçoit."""
         dossier = racine / "deploy" / "nginx"
         dossier.mkdir(parents=True, exist_ok=True)
-        (dossier / "forge-app.conf").write_text(contenu, encoding="utf-8")
-        return racine
+        conf = dossier / "forge-app.conf"
+        conf.write_text(contenu, encoding="utf-8")
+        return conf
 
     def test_conf_sans_static_avertit(self, tmp_path: Path) -> None:
         """La configuration rc7 d'origine, exactement."""
-        racine = self._ecrire(tmp_path, "server {\n    location / {\n    }\n}\n")
+        conf = self._ecrire(tmp_path, "server {\n    location / {\n    }\n}\n")
 
-        resultat = deploy._verifier_locations_nginx(racine)
+        resultat = deploy._verifier_locations_nginx(conf)
 
         assert resultat is not None
         assert resultat.status == "warn"
@@ -149,23 +151,23 @@ class TestControle:
 
     def test_un_bloc_static_commente_ne_compte_pas(self, tmp_path: Path) -> None:
         """C'est le cas qu'un contrôle naïf rate : le texte est là, pas la règle."""
-        racine = self._ecrire(
+        conf = self._ecrire(
             tmp_path,
             "server {\n    # location /static/ {\n    #     alias /srv/app/static/;\n"
             "    # }\n    location / {\n    }\n}\n")
 
-        resultat = deploy._verifier_locations_nginx(racine)
+        resultat = deploy._verifier_locations_nginx(conf)
 
         assert resultat is not None
         assert resultat.status == "warn"
 
     def test_conf_avec_static_valide(self, tmp_path: Path) -> None:
-        racine = self._ecrire(
+        conf = self._ecrire(
             tmp_path,
             "server {\n    location /static/ {\n        alias /srv/app/static/;\n"
             "    }\n    location / {\n    }\n}\n")
 
-        resultat = deploy._verifier_locations_nginx(racine)
+        resultat = deploy._verifier_locations_nginx(conf)
 
         assert resultat is not None
         assert resultat.status == "ok"
@@ -176,27 +178,28 @@ class TestControle:
         "location ~ /static/.*\\.css$ {",
     ])
     def test_reconnait_les_formes_usuelles(self, tmp_path: Path, ligne: str) -> None:
-        racine = self._ecrire(tmp_path, f"server {{\n    {ligne}\n    }}\n}}\n")
+        conf = self._ecrire(tmp_path, f"server {{\n    {ligne}\n    }}\n}}\n")
 
-        resultat = deploy._verifier_locations_nginx(racine)
+        resultat = deploy._verifier_locations_nginx(conf)
 
         assert resultat is not None
         assert resultat.status == "ok"
 
     def test_conf_absente_ne_dit_rien(self, tmp_path: Path) -> None:
-        assert deploy._verifier_locations_nginx(tmp_path) is None
+        assert deploy._verifier_locations_nginx(tmp_path / 'absente.conf') is None
 
     def test_le_gabarit_neuf_passe_son_propre_controle(self, tmp_path: Path) -> None:
-        racine = self._ecrire(tmp_path, _conf())
+        conf = self._ecrire(tmp_path, _conf())
 
-        resultat = deploy._verifier_locations_nginx(racine)
+        resultat = deploy._verifier_locations_nginx(conf)
 
         assert resultat is not None
         assert resultat.status == "ok"
 
     def test_le_controle_figure_dans_le_diagnostic(self, tmp_path: Path) -> None:
-        racine = self._ecrire(tmp_path, "server {\n    location / {\n    }\n}\n")
+        """La vérification est branchée, pas seulement écrite."""
+        self._ecrire(tmp_path, "server {\n    location / {\n    }\n}\n")
 
-        labels = [r.label for r in deploy._check_results(racine)]
+        labels = [r.label for r in deploy._check_results(tmp_path)]
 
         assert "Nginx /static/" in labels
