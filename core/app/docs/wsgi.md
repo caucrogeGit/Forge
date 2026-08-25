@@ -19,7 +19,13 @@ Il ne voit pas ce que `app.py` câble, `config.py` ne portant que des valeurs, j
 Depuis l'ADR-092, il refuse de construire quand `app.py` déclare un câblage qu'il ignorerait.
 Le module applique aussi le socle de headers de sécurité partagé avec le serveur de développement, et émet une fois les avertissements de production au démarrage.
 
-Le périmètre est volontairement limité : il ne remplace pas le serveur de développement, ne sert pas les fichiers statiques (rôle du reverse proxy) et ne couvre pas la production complète.
+Le périmètre est volontairement limité.
+Il ne remplace pas le serveur de développement, ne sert pas les fichiers statiques (rôle du reverse proxy) et ne couvre pas la production complète.
+
+Deux chemins font exception, et pour la même raison.
+`GET /health` et `GET /media/...` sont servis **avant le routage**, ici comme sur le serveur de développement.
+Ce sont des préfixes, pas des routes, et leur interception ne vivait que dans le serveur de développement : une application déployée répondait 404 sur sa sonde, puis sur tous ses médias.
+La réponse vient désormais de `core.http.health` et de `core.http.media`, chacune source unique de son chemin.
 
 ## 2. Vue d'ensemble rapide
 
@@ -118,6 +124,7 @@ wsgi_app = create_wsgi_app(app)
 
 !!! warning "Périmètre de production"
     Le callable WSGI ne sert pas les fichiers statiques : confier ce rôle au reverse proxy.
+    Les médias (`/media/`) font exception et sont servis par l'application, leur résolution anti-traversal et leurs tranches HTTP Range étant hors de portée du proxy.
     Il ne couvre pas tous les aspects de la production ; consulter le guide de déploiement WSGI du projet pour la configuration complète.
 
 ## Voir aussi

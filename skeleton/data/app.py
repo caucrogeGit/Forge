@@ -65,7 +65,7 @@ import argparse as _argparse
 import errno as _errno
 import os as _os
 import sys as _sys
-from typing import Any, cast
+from typing import Any
 
 # ── Détection de l'environnement avant tout import de config ──────────────────
 # L'argument --env est parsé ici, point d'entrée unique de la CLI, et AVANT
@@ -115,6 +115,7 @@ forge.configure(
     trusted_proxies = APP_TRUSTED_PROXIES,
 )
 from core.http.health import health_response, is_health_request
+from core.http.media import media_response
 from core.http.request import Request, RequestEntityTooLarge
 from core.http.response import Response
 from core.http.helpers import error_page as _error_page
@@ -379,16 +380,18 @@ class RequestHandler(BaseHTTPRequestHandler):
             self._send_response(_error_page("errors/404.html", 404, _dev_error({"path": path})))
 
     def _serve_media(self, path: str, request: Any = None) -> None:
-        try:
-            # Opt-in forge-mvc-files : absent d'un squelette nu, chargé en lazy.
-            from forge_mvc_files import serve_media_file  # pyright: ignore[reportMissingImports, reportUnknownVariableType]
-        except ImportError:
-            self._send_response(Response(404, b"Not found", "text/plain; charset=utf-8"))
-            return
-        relative_path = path.removeprefix("/media/")
-        # Propage `request` pour le support HTTP Range (FILES-SERVE-RANGE-DELEGATE-001).
-        media_response = cast(Response, serve_media_file(relative_path, request=request))
-        self._send_response(media_response)
+        """Sert un média, par la source unique partagée avec le chemin WSGI.
+
+        Ce handler portait sa propre copie du service : import de l'opt-in,
+        retrait du préfixe, repli 404. Le chemin WSGI n'en avait aucune, et une
+        application déployée rendait 404 sur TOUS ses médias en servant ses
+        pages normalement (CORE-WSGI-MEDIA-PARITY-001).
+
+        La réponse vient désormais de `core.http.media`, que les deux serveurs
+        appellent. Un écart de comportement entre eux devient impossible,
+        puisqu'il n'y a plus deux comportements.
+        """
+        self._send_response(media_response(path, request))
 
     def log_message(self, format: str, *args: Any) -> None:
         """Affiche chaque requête reçue dans le terminal avec l'adresse IP du client."""

@@ -40,7 +40,9 @@ tient dans `config.py`.
 
 Périmètre :
 - ne remplace pas `python app.py` (serveur de développement) ;
-- ne sert pas les fichiers statiques (responsabilité du reverse proxy) ;
+- ne sert pas les fichiers statiques (responsabilité du reverse proxy), mais
+  sert bien `/media/`, qui passe par une couche applicative que le proxy ne
+  saurait pas reproduire (`CORE-WSGI-MEDIA-PARITY-001`) ;
 - ajoute le socle de headers de sécurité partagé avec `app.py` via
   `core.security.headers.apply_security_headers` (`WSGI-SECURITY-HEADERS-001`)
   — HSTS conditionné à `wsgi.url_scheme == "https"` ; derrière un reverse
@@ -51,10 +53,12 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
+from http import HTTPStatus
 from io import BytesIO
 from typing import Any, Iterable
 
 from core.http.health import health_response, is_health_request
+from core.http.media import is_media_request, media_response
 from core.http.request import (
     BODY_METHODS,
     Request,
@@ -151,7 +155,25 @@ class _WsgiHandlerStub:
 
 
 def _format_status(code: int) -> str:
-    reason = _REASONS.get(code, "")
+    """Statut WSGI `"<code> <raison>"`, jamais un code nu.
+
+    La table ci dessus ne portait ni 206, ni 416, ni 503 : ces codes sortaient
+    donc sans phrase de raison, ce que le validateur de la PEP 3333 signale
+    (`The status string ('206') should be a three-digit integer followed by a
+    single space and a status explanation`). 503 est rendu par le cœur lui même,
+    et 206/416 le sont par tout média servi avec un en-tête `Range`, ce que
+    `CORE-WSGI-MEDIA-PARITY-001` vient de rendre possible.
+
+    Compléter la table à la main l'aurait laissée incomplète une fois de plus.
+    Elle ne garde donc que les formulations propres à Forge, et `http.HTTPStatus`
+    fournit le reste.
+    """
+    reason = _REASONS.get(code)
+    if reason is None:
+        try:
+            reason = HTTPStatus(code).phrase
+        except ValueError:
+            reason = ""
     return f"{code} {reason}".rstrip()
 
 
@@ -304,6 +326,14 @@ def create_wsgi_app(
         if is_health_request(request.path):
             return _response_to_wsgi(
                 health_response(), start_response, is_https=is_https)
+        # CORE-WSGI-MEDIA-PARITY-001 : `/media/` est un préfixe servi avant le
+        # routage, comme sur le serveur de développement. Cette interception
+        # n'existait que là bas, et une application déployée rendait 404 sur
+        # TOUS ses médias, en servant ses pages normalement.
+        if is_media_request(request.path):
+            return _response_to_wsgi(
+                media_response(request.path, request),
+                start_response, is_https=is_https)
         response = application.dispatch(request)
         return _response_to_wsgi(response, start_response, is_https=is_https)
 

@@ -28,6 +28,12 @@ classifiers = [
 [project.entry-points."forge_mvc.commands"]
 forge_mvc_files = "forge_mvc_files.commands:COMMANDS"
 
+# Fournisseur de medias du coeur (CORE-WSGI-MEDIA-PARITY-001). Le coeur sert
+# GET /media/... avant le routage, sur les DEUX serveurs, et decouvre son
+# fournisseur ici : il ne nomme aucun opt-in dans son code.
+[project.entry-points."forge_mvc.media_server"]
+files = "forge_mvc_files:serve_media_file"
+
 [project.urls]
 Homepage = "https://github.com/caucrogeGit/Forge"
 Repository = "https://github.com/caucrogeGit/Forge"

@@ -68,22 +68,35 @@ class TestGabarit:
 
 
 class TestMediasNonServis:
-    """Le bloc /media/ est écrit, commenté, et le reste."""
+    """Nginx ne sert pas /media/, et depuis CORE-WSGI-MEDIA-PARITY-001 il n'a
+    plus aucune raison de le faire : l'application les sert sur les deux
+    serveurs, avec sa résolution anti-traversal et ses tranches HTTP Range.
+
+    Le décommenter reste possible, et reste une décision : cela rendrait public
+    tout `UPLOAD_ROOT`.
+    """
 
     def test_media_n_est_pas_un_bloc_actif(self) -> None:
         assert not any(c.startswith("/media") for c in _blocs_actifs(_conf()))
 
-    def test_le_bloc_commente_montre_le_bon_chemin(self) -> None:
+    def test_le_texte_montre_le_bon_chemin(self) -> None:
+        """Celui qui décide de décharger Nginx doit lire le vrai chemin."""
         conf = _conf(upload_root="/var/lib/sequenciel/uploads")
 
-        assert "#     alias /var/lib/sequenciel/uploads/;" in conf
+        assert "/var/lib/sequenciel/uploads/" in conf
 
     def test_la_reserve_est_ecrite_dans_le_fichier(self) -> None:
         """Celui qui déploie doit lire la question au moment de la trancher."""
         conf = _conf()
 
-        assert "route authentifiee" in conf
         assert "UPLOAD_ROOT" in conf
+        assert "public" in conf
+
+    def test_le_fichier_dit_que_l_application_les_sert(self) -> None:
+        """Sans ça, le contournement reste tentant pour une panne disparue."""
+        conf = _conf()
+
+        assert "CORE-WSGI-MEDIA-PARITY-001" in conf
 
 
 # ── La résolution de UPLOAD_ROOT ─────────────────────────────────────────────

@@ -115,7 +115,8 @@ server {
 }
 ```
 
-Les fichiers statiques (`/static/...`) et les médias (`/media/...`) peuvent être servis directement par le reverse proxy pour soulager Gunicorn, voir [§7](#7-limites-actuelles-en-production).
+Les fichiers statiques (`/static/...`) sont servis directement par le reverse proxy, voir [§7](#7-limites-actuelles-en-production).
+Les médias (`/media/...`), eux, restent servis par l'application : leur résolution anti-traversal et leurs tranches HTTP Range sont hors de portée du proxy.
 
 ### 4.1 Headers de sécurité et HSTS
 
@@ -250,7 +251,10 @@ Les limites suivantes restent à la charge de l'opérateur :
 - **Multi-worker** : Forge émet déjà un avertissement supplémentaire au démarrage `python app.py` si `WEB_CONCURRENCY > 1` ou si `SERVER_SOFTWARE` contient `gunicorn`/`uwsgi`.
   Lire ce warning au premier démarrage Gunicorn.
 - **Fichiers statiques (`/static/...`)** : faire servir directement par le reverse proxy, plus rapide et plus sûr qu'un dispatch Python.
-- **Médias (`/media/...`)** : à cadrer selon l'application, `app.py` fournit `serve_media_file` mais le chemin WSGI minimal ne le gère pas automatiquement.
+- **Médias (`/media/...`)** : servis par l'application sur les deux serveurs depuis `CORE-WSGI-MEDIA-PARITY-001`.
+  Le chemin WSGI les rendait auparavant en 404, ce qui donnait une application déployée servant ses pages et perdant tous ses médias.
+  Ne pas les faire servir par le reverse proxy : cela rendrait public tout `UPLOAD_ROOT` et retirerait à l'application le droit de décider qui lit quoi.
+  `/media/` ne demande **aucune authentification**, ici comme en développement : une application qui distingue des fichiers publics de fichiers personnels doit servir les seconds par une route authentifiée.
 - **HTTPS** : à terminer **côté reverse proxy**.
   Le pipeline Gunicorn ↔ Forge reste en HTTP local sur `127.0.0.1`.
 - **Pas de support `X-Forwarded-For`** : seul `X-Real-IP` est honoré, et uniquement derrière un proxy de confiance.

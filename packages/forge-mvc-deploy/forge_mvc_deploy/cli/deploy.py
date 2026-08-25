@@ -69,20 +69,19 @@ server {{
         log_not_found off;
     }}
 
-    # Les medias, eux, ne sont PAS decommentes par defaut, et c'est un choix.
+    # /media/ n'est PAS servi ici, et il n'a pas a l'etre : depuis
+    # CORE-WSGI-MEDIA-PARITY-001, l'application sert ses medias sur les deux
+    # serveurs, avec sa resolution anti-traversal et son support des tranches
+    # (HTTP Range). Le bloc `location /` ci dessous les relaie a Gunicorn.
     #
-    # Servir /media/ ici rend public tout ce que contient UPLOAD_ROOT, et
-    # court-circuite definitivement la couche applicative : plus aucune route
-    # Forge ne peut decider qui a le droit de lire quoi. Une application qui
-    # distingue des fichiers publics de fichiers personnels (travaux d'eleves,
-    # pieces jointes, justificatifs) doit laisser ce bloc commente et servir
-    # ces fichiers par une route authentifiee.
+    # Un `location /media/ {{ alias {upload_root}/; }}` rendrait public tout ce
+    # que contient UPLOAD_ROOT et retirerait definitivement a l'application le
+    # droit de decider qui lit quoi. C'est la mauvaise sortie de secours d'un
+    # probleme qui n'existe plus.
     #
-    # Ne decommenter que si TOUT le contenu de UPLOAD_ROOT est public :
-    #
-    # location /media/ {{
-    #     alias {upload_root}/;
-    # }}
+    # Une application qui sert de gros fichiers a forte charge peut vouloir
+    # decharger Nginx malgre tout : ce n'est alors legitime que si TOUT le
+    # contenu de UPLOAD_ROOT est public, et cela se decide, cela ne se subit pas.
 
     location / {{
         # Forge écoute en HTTP local en mode prod ; Nginx termine HTTPS côté public.
