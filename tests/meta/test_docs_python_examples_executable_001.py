@@ -48,7 +48,11 @@ OPTIONAL_MODULES = {
 # `optins.*` est la couche de branchement local générée dans le projet
 # utilisateur (cf docs/architecture/optins-project-structure.md) — comme
 # `mvc.*`, elle n'est pas importable depuis le repo Forge racine.
-SKIP_ALL_MODULES = {"mvc", "modules", "optins"}
+# `app` et `config` vivent à la racine du projet applicatif, jamais dans le
+# dépôt framework (ADR-044). Ils y sont entrés le jour où le point d'entrée WSGI
+# recommandé est devenu `from app import application` (ADR-092) : la doc montre
+# désormais le fichier `wsgi.py` d'un projet, qui importe son propre `app.py`.
+SKIP_ALL_MODULES = {"mvc", "modules", "optins", "app", "config"}
 
 
 def _active_md_files() -> list[Path]:

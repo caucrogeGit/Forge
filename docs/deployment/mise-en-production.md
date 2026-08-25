@@ -177,19 +177,21 @@ En multi-processus, les sessions doivent être **partagées** entre workers.
 Le store par défaut du cœur garde les sessions en mémoire du processus, donc un visiteur perdrait la sienne à chaque worker changé.
 Installez `forge-mvc-sessions-db`, qui fournit `DbSessionStore`, adossé à la base configurée du projet.
 Ce store est agnostique du backend et fonctionne à l'identique sur les quatre (ADR-054).
-Créez la table `forge_sessions` (`forge sessions:init` puis `forge migration:apply`), puis éditez `wsgi.py` :
+Créez la table `forge_sessions` (`forge sessions:init` puis `forge migration:apply`), puis éditez `app.py` :
 
 ```python
-# wsgi.py
+# app.py, à côté du câblage des middlewares
 import core.forge as forge
 from forge_mvc_sessions_db import DbSessionStore
-from core.app.wsgi import create_configured_wsgi_app
 
 forge.configure(session_store=DbSessionStore())
-application = create_configured_wsgi_app()
 ```
 
-`forge.configure(session_store=...)` ne réécrit que cette clé ; la factory applique ensuite le reste de `config.py`.
+Le magasin de sessions se câble dans `app.py`, avec les middlewares, et non dans `wsgi.py`.
+Les deux serveurs partent alors du même câblage, ce qui est exactement ce que l'[ADR-092](../adr/092-wsgi-entrypoint-wiring-parity.md) impose.
+Le déclarer dans `wsgi.py` seul le ferait manquer au serveur de développement, et l'écart se paierait plus tard.
+
+`forge.configure(session_store=...)` ne réécrit que cette clé, le reste de `config.py` s'appliquant par ailleurs.
 Sans cela, chaque worker garderait ses sessions en mémoire et l'utilisateur serait déconnecté au hasard.
 
 ---

@@ -83,16 +83,36 @@ def test_le_wsgi_engendre_est_du_python_valide(artefacts: Path) -> None:
     ast.parse(source)  # lève SyntaxError si le gabarit a dérivé
 
 
+#: Modules du PROJET, absents du dépôt framework (ADR-044). Leur contenu est
+#: engendré par le squelette : c'est là qu'on vérifie ce qu'ils exposent.
+MODULES_DU_PROJET = {"app": Path("skeleton") / "data" / "app.py"}
+
+
+def _noms_exposes_par(source: str) -> set[str]:
+    """Noms affectés au niveau module, sans exécuter le fichier."""
+    noms: set[str] = set()
+    for noeud in ast.parse(source).body:
+        if isinstance(noeud, ast.Assign):
+            noms.update(c.id for c in noeud.targets if isinstance(c, ast.Name))
+    return noms
+
+
 def test_le_symbole_importe_par_le_wsgi_existe_vraiment(artefacts: Path) -> None:
     """LE test du ticket, et il ne demande aucun outil externe.
 
-    `wsgi.py` importe `create_configured_wsgi_app` de `core.app.wsgi`. Un
-    renommage de ce symbole casserait **tous les déploiements engendrés**, et
-    aucun contrôle de sous-chaîne ne l'aurait dit : le fichier contiendrait
-    toujours le mot attendu.
+    `wsgi.py` importe `create_wsgi_app` de `core.app.wsgi` et `application` de
+    `app`. Un renommage de l'un ou l'autre casserait **tous les déploiements
+    engendrés**, et aucun contrôle de sous-chaîne ne l'aurait dit : le fichier
+    contiendrait toujours le mot attendu.
+
+    Le second import ne se résout pas ici, `app.py` vivant dans le projet et
+    non dans le dépôt framework. Il est donc vérifié là où il est écrit, dans le
+    squelette. C'est cette moitié ci qui compte le plus : le ticket 67 est né
+    d'un `wsgi.py` qui servait autre chose que l'application de `app.py`.
     """
     import importlib
 
+    racine_depot = Path(__file__).resolve().parent.parent
     arbre = ast.parse((artefacts / "wsgi.py").read_text(encoding="utf-8"))
 
     importes = [
@@ -105,6 +125,12 @@ def test_le_symbole_importe_par_le_wsgi_existe_vraiment(artefacts: Path) -> None
 
     absents: list[str] = []
     for module, symbole in importes:
+        fichier_projet = MODULES_DU_PROJET.get(module)
+        if fichier_projet is not None:
+            source = (racine_depot / fichier_projet).read_text(encoding="utf-8")
+            if symbole not in _noms_exposes_par(source):
+                absents.append(f"{module}.{symbole} (absent de {fichier_projet})")
+            continue
         try:
             objet = importlib.import_module(module)
         except ImportError:

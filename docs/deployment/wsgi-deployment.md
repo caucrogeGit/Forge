@@ -19,7 +19,7 @@ Voir aussi : [Guide de déploiement](deployment.md) et [Sécurité en production
 flowchart LR
     I(["Internet<br/>HTTPS :443"]) -->|"TLS terminé"| P["Reverse proxy<br/>Caddy / Nginx"]
     P -->|"HTTP local"| G["Gunicorn<br/>workers Python"]
-    G -->|"WSGI"| F["Forge<br/>create_configured_wsgi_app()"]
+    G -->|"WSGI"| F["Forge<br/>create_wsgi_app(application)"]
     F -->|"SQL"| M[("MariaDB<br/>:3306")]
 ```
 
@@ -38,18 +38,30 @@ Trois responsabilités sont séparées :
 
 ```python
 # wsgi.py
-from core.app.wsgi import create_configured_wsgi_app
+from app import application as _application
+from core.app.wsgi import create_wsgi_app
 
-application = create_configured_wsgi_app()
+application = create_wsgi_app(_application)
 ```
 
-La factory `create_configured_wsgi_app()` :
+Ce point d'entrée sert l'application **déjà armée**, celle que construit `app.py`.
+C'est elle qui porte vos middlewares et votre magasin de sessions, puisque le squelette prescrit de les câbler là.
 
-- charge la même configuration que `python app.py` (via `core.app.app_factory.build_application`) ;
-- applique `forge.configure(...)` avec toutes les variables d'environnement (dont `APP_TRUSTED_PROXIES`) ;
-- enregistre le renderer Jinja2 ;
-- charge le router applicatif depuis `APP_ROUTES_MODULE` ;
-- émet une fois, à la construction, les [avertissements production](#6-warnings-production-au-demarrage), jamais à chaque requête.
+`create_wsgi_app(application)` n'ajoute rien à cette application.
+Il l'enveloppe dans un adaptateur WSGI, qui traduit `environ` en `Request`, sert `GET /health` avant le routage, contrôle la taille du corps et pose le socle de headers de sécurité.
+
+### La fabrique générique, et pourquoi elle ne convient pas ici
+
+`create_configured_wsgi_app()` construit une application depuis `config.py` seul.
+
+C'est utile quand tout le câblage d'un projet tient dans des valeurs.
+Ce n'est pas le cas d'un projet Forge ordinaire : `config.py` ne porte que des valeurs, jamais des objets construits, si bien que middlewares et magasin de sessions lui sont invisibles.
+
+Une application servie ainsi démarre, répond 200, authentifie encore (`Application` pose `AuthMiddleware` par défaut), et laisse passer tout ce que les gardes suivantes auraient refusé.
+Elle a l'air de fonctionner, ce qui est précisément le danger.
+
+Depuis l'[ADR-092](../adr/092-wsgi-entrypoint-wiring-parity.md), la fabrique refuse de construire lorsqu'elle détecte dans `app.py` un câblage qu'elle ne verra pas.
+Le service ne démarre pas, et l'erreur nomme les gardes manquantes.
 
 ---
 
@@ -186,7 +198,7 @@ Ticket de référence : `HTTP-TRUSTED-PROXY-IP-001`.
 
 ## 6. Warnings production au démarrage
 
-`create_configured_wsgi_app()` émet, **une seule fois, à la construction de l'application, jamais par requête**, un avertissement si Forge est configuré en `APP_ENV=prod` avec un store de session mémoire :
+Les deux points d'entrée émettent, **une seule fois, à la construction de l'application, jamais par requête**, un avertissement si Forge est configuré en `APP_ENV=prod` avec un store de session mémoire :
 
 ```
 AVERTISSEMENT-PROD - Forge tourne en APP_ENV=prod avec stockage mémoire.
@@ -200,19 +212,23 @@ publique (ex. forge.configure(session_store=FileSessionStore(...))).
 Pour silencer le warning dans les tests :
 
 ```python
-application = create_configured_wsgi_app(emit_prod_warnings=False)
+application = create_wsgi_app(_application, emit_prod_warnings=False)
 ```
 
 Pour rediriger le warning vers un logger applicatif :
 
 ```python
 import logging
-application = create_configured_wsgi_app(
+application = create_wsgi_app(
+    _application,
     logger=logging.getLogger("my_app.startup"),
 )
 ```
 
-Tickets de référence : `AUTH-RATE-LIMIT-PROD-WARNING-001`, `WSGI-PROD-WARNINGS-001`.
+Cet avertissement a vécu dans la seule fabrique générique, ce qui l'aurait fait disparaître du chemin recommandé le jour où celui ci a changé.
+Il appartient au passage en WSGI, pas à une fabrique particulière.
+
+Tickets de référence : `AUTH-RATE-LIMIT-PROD-WARNING-001`, `WSGI-PROD-WARNINGS-001`, `WSGI-UNARMED-APP-GUARD-001`.
 
 ---
 

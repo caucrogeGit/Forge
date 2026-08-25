@@ -12,7 +12,11 @@ Un serveur WSGI externe attend un objet appelable qui prend `environ` et `start_
 
 Ce module adapte l'`Application` Forge à ce contrat.
 `create_wsgi_app(application)` enveloppe une `Application` déjà construite.
-`create_configured_wsgi_app()` charge la même configuration que `python app.py` via la fabrique, puis retourne le callable prêt à l'emploi.
+C'est le point d'entrée de production : il sert l'application armée, celle que construit `app.py`, avec ses middlewares et son magasin de sessions.
+
+`create_configured_wsgi_app()` construit une application depuis `config.py` seul, puis retourne le callable.
+Il ne voit pas ce que `app.py` câble, `config.py` ne portant que des valeurs, jamais des objets construits.
+Depuis l'ADR-092, il refuse de construire quand `app.py` déclare un câblage qu'il ignorerait.
 Le module applique aussi le socle de headers de sécurité partagé avec le serveur de développement, et émet une fois les avertissements de production au démarrage.
 
 Le périmètre est volontairement limité : il ne remplace pas le serveur de développement, ne sert pas les fichiers statiques (rôle du reverse proxy) et ne couvre pas la production complète.
@@ -64,30 +68,35 @@ sequenceDiagram
 
 | Fonction | Signature | Rôle |
 |---|---|---|
-| `create_wsgi_app` | `create_wsgi_app(application: Any) -> Callable` | enveloppe une `Application` déjà construite en callable WSGI |
-| `create_configured_wsgi_app` | `create_configured_wsgi_app(*, emit_prod_warnings: bool = True, logger: logging.Logger | None = None) -> Callable` | construit l'`Application` configurée et retourne son callable WSGI |
+| `create_wsgi_app` | `create_wsgi_app(application: Any, *, emit_prod_warnings: bool = True, logger: logging.Logger | None = None) -> Callable` | enveloppe une `Application` déjà construite en callable WSGI |
+| `create_configured_wsgi_app` | `create_configured_wsgi_app(*, emit_prod_warnings: bool = True, logger: logging.Logger | None = None) -> Callable` | construit l'`Application` depuis `config.py` et retourne son callable WSGI |
 
 !!! note "Avertissements de production"
-    Avec `emit_prod_warnings=True` (défaut), `create_configured_wsgi_app` émet une seule fois, à la construction, les avertissements de production (par exemple un store de session en mémoire en `APP_ENV=prod`).
+    Avec `emit_prod_warnings=True` (défaut), les deux fonctions émettent une seule fois, à la construction, les avertissements de production (par exemple un store de session en mémoire en `APP_ENV=prod`).
+    Ils vivaient dans la seule fabrique générique, ce qui les aurait fait disparaître du chemin recommandé.
     Passer `emit_prod_warnings=False` pour les tests qui ne veulent pas polluer le logger.
 
 ## 5. Contextes d'utilisation
 
 | Besoin | Élément |
 |---|---|
-| Servir en production avec Gunicorn | `create_configured_wsgi_app()` dans le `wsgi.py` du projet |
-| Envelopper une `Application` déjà construite | `create_wsgi_app(application)` |
-| Éviter les warnings dans un test | `create_configured_wsgi_app(emit_prod_warnings=False)` |
+| Servir en production avec Gunicorn | `create_wsgi_app(application)` dans le `wsgi.py` du projet, sur l'application de `app.py` |
+| Servir un projet dont tout le câblage tient dans `config.py` | `create_configured_wsgi_app()` |
+| Éviter les warnings dans un test | l'une ou l'autre, avec `emit_prod_warnings=False` |
 
 ## 6. Exemples d'utilisation
 
 Fichier `wsgi.py` du projet, exposé à Gunicorn :
 
 ```python
-from core.app.wsgi import create_configured_wsgi_app
+from app import application as _application
+from core.app.wsgi import create_wsgi_app
 
-application = create_configured_wsgi_app()
+application = create_wsgi_app(_application)
 ```
+
+`app.py` doit exposer son `Application` sous un nom public.
+Servir `create_configured_wsgi_app()` ici donnerait une application privée de ses middlewares, qui démarrerait quand même.
 
 Lancement avec Gunicorn :
 

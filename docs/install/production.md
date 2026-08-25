@@ -11,7 +11,7 @@ Le contenu détaillé reste dans les pages dédiées, ne pas dupliquer ici.
 
 ## À lire dans l'ordre
 
-1. [Déploiement WSGI minimal](../deployment/wsgi-deployment.md), architecture cible, `create_configured_wsgi_app()`, configuration Gunicorn de référence.
+1. [Déploiement WSGI minimal](../deployment/wsgi-deployment.md), architecture cible, point d'entrée `wsgi.py`, configuration Gunicorn de référence.
 2. [Limites de production](../deployment/production-limits.md), ce que Forge ne fait pas et où poser des garde-fous applicatifs.
 3. [Guide de déploiement](../deployment/deployment.md), pas-à-pas systemd, MariaDB, HTTPS, contrôles `forge deploy:check`.
 

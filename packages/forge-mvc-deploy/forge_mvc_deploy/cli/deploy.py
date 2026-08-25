@@ -159,13 +159,20 @@ proxy qui termine HTTPS :
 
     gunicorn wsgi:application --workers 4 --bind 127.0.0.1:8000
 
-`create_configured_wsgi_app()` charge la même configuration que
-`python app.py` (voir `core.app.wsgi`). Le serveur de développement
-(`forge run` / `app.py`) n'est pas destiné à l'exposition publique.
-"""
-from core.app.wsgi import create_configured_wsgi_app
+Ce fichier sert l'application DÉJÀ ARMÉE, celle que construit `app.py` :
+c'est elle qui porte vos middlewares et votre magasin de sessions.
 
-application = create_configured_wsgi_app()
+`create_configured_wsgi_app()` construit une application depuis `config.py`
+seul, qui ne porte que des valeurs, jamais des objets : elle n'aurait aucune
+de vos gardes, et démarrerait quand même (ADR-092). Ne pas l'utiliser ici.
+
+Le serveur de développement (`forge run` / `app.py`) n'est pas destiné à
+l'exposition publique.
+"""
+from app import application as _application
+from core.app.wsgi import create_wsgi_app
+
+application = create_wsgi_app(_application)
 '''
 
 
@@ -179,7 +186,7 @@ Ce dossier contient les fichiers générés par `forge deploy:init`.
 
 | Fichier | Rôle |
 |---------|------|
-| `../wsgi.py` (racine du projet) | Point d'entrée WSGI servi par Gunicorn |
+| `../wsgi.py` (racine du projet) | Point d'entrée WSGI servi par Gunicorn, sur l'application de `app.py` |
 | `nginx/forge-app.conf` | Configuration Nginx (reverse proxy) |
 | `systemd/forge-app.service` | Unité systemd (daemon Gunicorn) |
 
@@ -218,6 +225,18 @@ Ce dossier contient les fichiers générés par `forge deploy:init`.
 9. Vérifier : `forge deploy:check`
 
 > Ces fichiers sont des modèles. Adaptez-les à votre infrastructure.
+
+## Le point d'entrée sert l'application armée
+
+`wsgi.py` fait `from app import application`, et sert donc l'application que
+construit `app.py` : celle qui porte vos middlewares et votre magasin de
+sessions.
+
+Si votre `app.py` nomme encore son `Application` `_app`, renommez le en
+`application`. C'est le seul geste demandé, et il est nécessaire : la fabrique
+générique `create_configured_wsgi_app()` ne lit que `config.py`, qui ne porte
+que des valeurs. Servie à sa place, elle démarrerait sans aucune de vos gardes,
+en répondant 200 (ADR-092).
 """
 
 

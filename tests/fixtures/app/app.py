@@ -116,7 +116,8 @@ template_manager.register(Jinja2Renderer(VIEWS_DIR))
 
 _routes = importlib.import_module(APP_ROUTES_MODULE)
 forge.configure(router=_routes.router)
-_app    = Application(_routes.router)
+# Nom PUBLIC : le wsgi.py de production sert cet objet ci (ADR-092).
+application = Application(_routes.router)
 
 logger = logging.getLogger(__name__)
 
@@ -243,7 +244,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         (cycle de vie thread-local nettoyé en `finally`), conformément au contrat
         de `core/security/csp.py`.
         """
-        return _app.dispatch(request)
+        return application.dispatch(request)
 
     def _send_response(self, response: Response) -> None:
         """Envoie un objet Response au navigateur avec les headers de sécurité.

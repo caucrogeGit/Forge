@@ -96,12 +96,17 @@ def test_systemd_lance_gunicorn(tmp_path):
 
 
 def test_deploy_init_cree_wsgi_py(tmp_path):
+    # Le point d'entree sert l'application DEJA ARMEE, celle de app.py
+    # (ADR-092). La fabrique generique ne lit que config.py, donc aucun des
+    # middlewares du projet : servie ici, elle demarrerait sans les gardes.
     cmd_deploy_init(tmp_path)
     wsgi = tmp_path / "wsgi.py"
     assert wsgi.exists()
     content = wsgi.read_text(encoding="utf-8")
-    assert "from core.app.wsgi import create_configured_wsgi_app" in content
-    assert "application = create_configured_wsgi_app()" in content
+    assert "from app import application as _application" in content
+    assert "from core.app.wsgi import create_wsgi_app" in content
+    assert "application = create_wsgi_app(_application)" in content
+    assert "application = create_configured_wsgi_app()" not in content
 
 
 def test_deploy_check_signale_wsgi_py_apres_init(tmp_path):

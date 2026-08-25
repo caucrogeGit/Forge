@@ -18,7 +18,7 @@ Elle complète les pages [Mise en production pas à pas](mise-en-production.md),
 |---|---|---|
 | **Développement** | code local, hot reload manuel, démos | `python app.py` |
 | **Test / démo** | smoke tests, environnements éphémères | `python app.py` ou WSGI |
-| **Production encadrée** | exposition derrière reverse proxy, charge modérée | `create_configured_wsgi_app()` + Gunicorn + reverse proxy |
+| **Production encadrée** | exposition derrière reverse proxy, charge modérée | `create_wsgi_app(application)` + Gunicorn + reverse proxy |
 | **Production publique sérieuse** | charge forte, multi-instance, HA | nécessite cadrage explicite hors Forge (cf §7-8) |
 
 ---
@@ -28,7 +28,7 @@ Elle complète les pages [Mise en production pas à pas](mise-en-production.md),
 | Domaine | État 1.0 | Recommandation |
 |---|---|---|
 | Serveur HTTP direct | Développement uniquement | Ne pas exposer `python app.py` publiquement |
-| WSGI | Chemin recommandé | Utiliser `create_configured_wsgi_app()` |
+| WSGI | Chemin recommandé | Servir l'application de `app.py` via `create_wsgi_app(...)` |
 | Reverse proxy | Requis en production | Caddy ou Nginx devant Gunicorn |
 | HTTPS | Hors Forge | Terminer TLS côté reverse proxy |
 | IP client | Support `X-Real-IP` sécurisé | Configurer `APP_TRUSTED_PROXIES` |
@@ -81,7 +81,7 @@ Sélection explicite via `forge.configure(session_store=...)` ou [ADR-002](../ad
 
 ### Avertissement automatique
 
-`create_configured_wsgi_app()` émet **une fois au démarrage** (et jamais par requête) un avertissement si `APP_ENV=prod` avec un session store mémoire, voir [Déploiement WSGI § warnings](wsgi-deployment.md#6-warnings-production-au-demarrage).
+Le point d'entrée WSGI émet **une fois au démarrage** (et jamais par requête) un avertissement si `APP_ENV=prod` avec un session store mémoire, voir [Déploiement WSGI § warnings](wsgi-deployment.md#6-warnings-production-au-demarrage).
 Cet avertissement signale le risque, il ne le corrige pas.
 
 ---
@@ -114,7 +114,7 @@ Détail et exemples : [Déploiement WSGI § APP_TRUSTED_PROXIES](wsgi-deployment
 
 ## 7. Multi-worker
 
-Un déploiement Gunicorn multi-worker (`--workers N > 1`) **fonctionne** côté dispatch WSGI : chaque worker construit son `Application` via `create_configured_wsgi_app()` et traite ses requêtes indépendamment.
+Un déploiement Gunicorn multi-worker (`--workers N > 1`) **fonctionne** côté dispatch WSGI : chaque worker construit son `Application` en important `app.py` et traite ses requêtes indépendamment.
 
 **Limite importante** : les stores mémoire (sessions, rate-limits) sont **propres à chaque worker**.
 Augmenter le nombre de workers sans configurer un session store partagé donne une **fausse impression de robustesse** :
@@ -131,7 +131,7 @@ Pour un déploiement multi-worker fiable, **configurer `DbSessionStore` explicit
 
 ### Garanti
 
-- entrée WSGI configurée : `core.app.wsgi.create_configured_wsgi_app()` ;
+- entrée WSGI : `core.app.wsgi.create_wsgi_app(application)`, sur l'application de `app.py` ;
 - factory partagée `core.app.app_factory.build_application()` (même config qu'`app.py`) ;
 - warnings production émis à la construction de l'application WSGI (`MemorySessionStore` en `APP_ENV=prod`) ;
 - résolution sécurisée de l'IP client via `APP_TRUSTED_PROXIES` ;

@@ -68,11 +68,22 @@ import sys as _sys
 from typing import Any, cast
 
 # ── Détection de l'environnement avant tout import de config ──────────────────
-# L'argument --env est parsé ici, point d'entrée unique de la CLI.
-# config.py lit ensuite os.environ["APP_ENV"] sans effet de bord.
-_p = _argparse.ArgumentParser(add_help=False)
-_p.add_argument("--env", choices=["dev", "prod"], default="dev")
-_os.environ.setdefault("APP_ENV", _p.parse_known_args()[0].env)
+# L'argument --env est parsé ici, point d'entrée unique de la CLI, et AVANT
+# l'import de config.py qui lit ensuite os.environ["APP_ENV"].
+#
+# Le garde `__name__ == "__main__"` n'est pas décoratif. Ce fichier est aussi
+# IMPORTÉ par wsgi.py en production, et sys.argv est alors celui de Gunicorn :
+# --env y est absent, le défaut vaudrait "dev", et `setdefault` poserait
+# APP_ENV=dev sur un serveur de production dès que l'environnement du processus
+# ne la déclare pas lui-même. Les pages d'erreur rendraient alors leur
+# traceback au visiteur.
+#
+# Sous le garde, l'import ne décide de rien : APP_ENV vient de l'environnement,
+# et de lui seul.
+if __name__ == "__main__":
+    _p = _argparse.ArgumentParser(add_help=False)
+    _p.add_argument("--env", choices=["dev", "prod"], default="dev")
+    _os.environ.setdefault("APP_ENV", _p.parse_known_args()[0].env)
 
 import logging
 import mimetypes
@@ -124,16 +135,26 @@ forge.configure(router=_routes.router)
 #
 #     from core.security.middleware import AuthMiddleware
 #     from forge_mvc_rbac import PrefixPermissionMiddleware   # opt-in forge-mvc-rbac
-#     _app = Application(_routes.router, middlewares=[
+#     application = Application(_routes.router, middlewares=[
 #         AuthMiddleware("/login"),
 #         PrefixPermissionMiddleware({"/admin": "admin.access"}),
 #     ])
+#
+# Le magasin de sessions se câble ICI aussi, pour la même raison :
+#
+#     from forge_mvc_sessions_db import DbSessionStore   # opt-in
+#     forge.configure(session_store=DbSessionStore())
 #
 # Ce câblage vit dans app.py (à vous) : copier seulement mvc/ vers un nouveau
 # projet le perdrait (et retirerait vos protections). Préférez « forge
 # skeleton:upgrade » (montée en place) à une copie. Voir la doc « Anatomie
 # d'une app Forge ».
-_app    = Application(_routes.router)
+#
+# `application` porte un nom PUBLIC, et c'est ce qui permet à wsgi.py de servir
+# cette application ci, celle qui a vos gardes. Le souligné d'autrefois disait
+# « personne d'autre que ce fichier », ce qui a cessé d'être vrai le jour où une
+# production a existé (ADR-092). Ne pas le renommer.
+application = Application(_routes.router)
 
 logger = logging.getLogger(__name__)
 
@@ -260,7 +281,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         (cycle de vie thread-local nettoyé en `finally`), conformément au contrat
         de `core/security/csp.py`.
         """
-        return _app.dispatch(request)
+        return application.dispatch(request)
 
     def _send_response(self, response: Response) -> None:
         """Envoie un objet Response au navigateur avec les headers de sécurité.
