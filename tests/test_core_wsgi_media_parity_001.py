@@ -307,17 +307,53 @@ class TestCheminWsgi:
 # ── Le formatage des statuts ─────────────────────────────────────────────────
 
 class TestFormatStatus:
-    """La table du module ne portait ni 206, ni 416, ni 503."""
+    """La table du module ne portait ni 206, ni 416, ni 503.
+
+    Première version de ce ticket : ces trois codes étaient laissés à
+    `http.HTTPStatus`. La CI l'a refusé, et elle avait raison — sa phrase change
+    avec la version de Python. 416 vaut « Requested Range Not Satisfiable »
+    jusqu'en 3.12 et « Range Not Satisfiable » à partir de 3.13, qui réaligne ces
+    noms sur la RFC 9110 :
+
+        AssertionError: assert '416 Range Not Satisfiable'
+                            == '416 Requested Range Not Satisfiable'
+
+    Deux serveurs de production sur des Python différents auraient émis deux
+    lignes de statut différentes pour la même réponse. Les phrases des codes que
+    Forge émet sont donc figées dans le module.
+    """
 
     @pytest.mark.parametrize(("code", "attendu"), [
         (206, "206 Partial Content"),
-        (416, "416 Requested Range Not Satisfiable"),
+        (416, "416 Range Not Satisfiable"),
         (503, "503 Service Unavailable"),
     ])
-    def test_les_codes_absents_de_la_table_ont_leur_raison(
+    def test_les_codes_emis_par_forge_ont_leur_raison(
         self, code: int, attendu: str,
     ) -> None:
         assert _format_status(code) == attendu
+
+    @pytest.mark.parametrize("code", [206, 416, 503, 200, 404, 413])
+    def test_la_phrase_ne_depend_pas_de_la_version_de_python(self, code: int) -> None:
+        """Le garde-fou que la CI a réclamé : la stdlib n'a pas voix ici.
+
+        Ces codes doivent tous venir de la table de Forge, jamais du repli.
+        Un futur contributeur qui en retirerait un pour « alléger » ferait
+        varier une réponse HTTP au gré de l'interpréteur.
+        """
+        from core.app.wsgi import _REASONS
+
+        assert code in _REASONS, (
+            f"{code} est émis par Forge : sa phrase doit être figée ici, "
+            f"pas empruntée à http.HTTPStatus dont la formulation change "
+            f"d'une version de Python à l'autre")
+
+    def test_les_codes_de_range_sont_ceux_que_la_doc_annonce(self) -> None:
+        """`Response.file` documente les deux réponses qu'il rend."""
+        source = (PROJECT_ROOT / "core" / "http" / "response.py").read_text(encoding="utf-8")
+
+        assert "206 Partial Content" in source
+        assert "416 Range Not Satisfiable" in source
 
     def test_503_est_rendu_par_le_coeur_lui_meme(self) -> None:
         """Ce n'est pas un cas d'école : `_service_unavailable` le renvoie."""

@@ -85,6 +85,23 @@ _REASONS = {
     405: "Method Not Allowed",
     413: "Payload Too Large",
     500: "Internal Server Error",
+    # Les trois codes que Forge émet SANS littéral `Response(<code>, ...)`, et
+    # qui manquaient : 206 et 416 viennent de `Response.file` (HTTP Range), 503
+    # de `_service_unavailable` et de `_api_error`.
+    #
+    # Ils sont figés ici, et pas laissés à `http.HTTPStatus`, parce que la
+    # phrase de raison de la stdlib change avec la version de Python : 416 vaut
+    # « Requested Range Not Satisfiable » jusqu'en 3.12 et « Range Not
+    # Satisfiable » à partir de 3.13, qui réaligne ces noms sur la RFC 9110.
+    #
+    # Deux serveurs de production sur des Python différents auraient alors émis
+    # deux lignes de statut différentes pour la même réponse. La CI l'a dit en
+    # premier, la matrice couvrant 3.12 à 3.14 : ce que Forge émet ne doit
+    # dépendre que de Forge. Les formulations retenues sont celles de la RFC
+    # 9110, déjà employées par la documentation de `Response.file`.
+    206: "Partial Content",
+    416: "Range Not Satisfiable",
+    503: "Service Unavailable",
 }
 
 
@@ -164,9 +181,15 @@ def _format_status(code: int) -> str:
     et 206/416 le sont par tout média servi avec un en-tête `Range`, ce que
     `CORE-WSGI-MEDIA-PARITY-001` vient de rendre possible.
 
-    Compléter la table à la main l'aurait laissée incomplète une fois de plus.
-    Elle ne garde donc que les formulations propres à Forge, et `http.HTTPStatus`
-    fournit le reste.
+    Ces trois codes y figurent désormais, avec une phrase FIXÉE. S'en remettre à
+    `http.HTTPStatus` pour eux paraissait plus élégant, et c'était un piège : sa
+    phrase change avec la version de Python, si bien que la même réponse sortait
+    en « Requested Range Not Satisfiable » sous 3.12 et « Range Not Satisfiable »
+    sous 3.13. Ce que Forge émet ne doit dépendre que de Forge.
+
+    `HTTPStatus` reste le repli des codes que Forge n'émet pas lui même, qu'une
+    application est libre de rendre : mieux vaut une phrase de la stdlib qu'un
+    code nu.
     """
     reason = _REASONS.get(code)
     if reason is None:
