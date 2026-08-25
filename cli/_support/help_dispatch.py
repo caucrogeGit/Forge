@@ -2730,8 +2730,12 @@ Effets:
   - parse env/prod et contrôle DB_HOST, DB_NAME, DB_APP_LOGIN,
     UPLOAD_ROOT ;
   - vérifie storage/ et storage/uploads/ ;
-  - vérifie la cohérence APP_SSL_ENABLED vs deploy/nginx/forge-app.conf
+  - vérifie la cohérence APP_SSL_ENABLED vs la configuration Nginx
     (Nginx termine TLS, Forge écoute en HTTP local) ;
+  - refuse plusieurs travailleurs Gunicorn sans magasin de sessions
+    partagé : chacun aurait le sien, en mémoire ;
+  - vérifie que chaque chemin de ReadWritePaths existe, un chemin
+    absent faisant boucler le service sans rien écrire au journal ;
   - imprime un tableau de statuts + résumé ;
   - exit 1 s'il existe au moins une erreur.
 

@@ -767,6 +767,137 @@ def _verifier_app_env_prod(cfg: dict[str, str], env_prod_existe: bool) -> "_Resu
         f"vaut « {valeur} » dans env/prod — déclarer APP_ENV=prod")
 
 
+#: Repere `--workers N` dans la ligne de commande de l'unite.
+_TRAVAILLEURS = re.compile(r"--workers[= ]+(\d+)")
+
+
+def _travailleurs_declares(texte: str) -> "int | None":
+    """Nombre de travailleurs Gunicorn declares par l'unite, ou `None`."""
+    ligne = _valeur_de_la_cle(texte, "ExecStart", "Service")
+    if ligne is None:
+        return None
+    trouve = _TRAVAILLEURS.search(ligne)
+    return int(trouve.group(1)) if trouve else None
+
+
+def _magasin_partage_cable(root: Path) -> bool:
+    """Le projet cable-t-il un magasin de sessions ? Lu statiquement.
+
+    Le pre-vol ne construit pas l'application : il lit le source, comme le fait
+    le garde de l'ADR-092. Le detecteur du coeur est reutilise plutot que
+    reecrit, pour que les deux repondent toujours la meme chose.
+
+    Les deux emplacements possibles sont regardes : `bootstrap.py` depuis
+    l'ADR-093, et `app.py` pour les projets anterieurs, qui sont justement ceux
+    qui n'ont pas migre.
+    """
+    try:
+        from core.app.wiring_guard import read_app_wiring_from
+    except ImportError:  # pragma: no cover — coeur absent, rien a affirmer
+        return False
+    return any(
+        read_app_wiring_from(root / nom).session_store
+        for nom in ("bootstrap.py", "app.py")
+    )
+
+
+def _verifier_sessions_multi_travailleurs(root: Path, unite: Path) -> "_Result | None":
+    """Plusieurs travailleurs avec un magasin de sessions en memoire ?
+
+    DEPLOY-CHECK-SESSIONS-WORKERS-001, retour terrain SequenCiel (ticket 69).
+    L'unite engendree lance quatre travailleurs. Chacun a son propre
+    `MemorySessionStore` : une session ouverte par l'un est inconnue des trois
+    autres, la connexion reussit une fois sur quatre, et l'utilisateur est
+    renvoye a la porte sans explication.
+
+    C'est une ERREUR, pas un avertissement : l'application ne fonctionnera pas,
+    il n'y a rien a nuancer. Le coeur emet bien un avertissement au demarrage,
+    mais dans un journal, la ou personne ne le lit.
+    """
+    if not unite.is_file():
+        return None
+    try:
+        texte = unite.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+    travailleurs = _travailleurs_declares(texte)
+    if travailleurs is None or travailleurs <= 1:
+        return None
+
+    if _magasin_partage_cable(root):
+        return _Result("ok", "Sessions et travailleurs",
+                       f"{travailleurs} travailleurs, magasin de sessions partagé")
+
+    return _Result(
+        "error", "Sessions et travailleurs",
+        f"{travailleurs} travailleurs sans magasin de sessions partagé — chacun "
+        f"aura le sien, en mémoire, et une connexion sur {travailleurs} seulement "
+        f"aboutira ; câbler un magasin partagé dans bootstrap.py "
+        f"(forge.configure(session_store=...)), ou revenir à --workers 1")
+
+
+#: Repere la cle `ReadWritePaths=` d'une unite durcie.
+def _chemins_inscriptibles(texte: str) -> list[str]:
+    """Chemins declares par `ReadWritePaths=`, dans l'ordre."""
+    valeur = _valeur_de_la_cle(texte, "ReadWritePaths", "Service")
+    return valeur.split() if valeur else []
+
+
+def _verifier_read_write_paths(root: Path, unite: Path) -> "_Result | None":
+    """Chaque chemin de `ReadWritePaths` existe-t-il ?
+
+    DEPLOY-CHECK-READWRITEPATHS-001, retour terrain SequenCiel (ticket 69) :
+    la panne la plus opaque de leur mise en production. Sous
+    `ProtectSystem=strict`, un chemin annonce mais absent fait echouer le
+    montage de l'espace de noms : le service redemarre toutes les dix secondes,
+    le journal reste VIDE, et `systemctl status` ne montre qu'un `MainPID=0`.
+    La cause etait un dossier ignore par git.
+
+    Le gabarit de Forge ne pose pas cette cle : ce controle ne sert donc qu'aux
+    unites durcies par le projet, et c'est bien la que la panne survient.
+
+    Un chemin hors de la racine du projet n'est pas verifiable depuis un poste
+    qui n'est pas le serveur : il est signale comme tel, jamais accuse.
+    """
+    if not unite.is_file():
+        return None
+    try:
+        texte = unite.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+    chemins = _chemins_inscriptibles(texte)
+    if not chemins:
+        return None
+
+    manquants: list[str] = []
+    ailleurs: list[str] = []
+    racine = root.resolve()
+    for brut in chemins:
+        chemin = Path(brut.lstrip("-"))
+        absolu = chemin if chemin.is_absolute() else racine / chemin
+        if absolu.exists():
+            continue
+        if absolu.resolve().is_relative_to(racine):
+            manquants.append(str(chemin))
+        else:
+            ailleurs.append(str(chemin))
+
+    if manquants:
+        return _Result(
+            "error", "ReadWritePaths",
+            f"chemin(s) absent(s) : {', '.join(manquants)} — sous "
+            f"ProtectSystem=strict le service bouclera SANS RIEN ÉCRIRE au "
+            f"journal ; créer ces dossiers (un .gitkeep suffit à les versionner)")
+    if ailleurs:
+        return _Result(
+            "warn", "ReadWritePaths",
+            f"non vérifiable(s) depuis ici : {', '.join(ailleurs)} — "
+            f"hors du projet, contrôler depuis le serveur de production")
+    return _Result("ok", "ReadWritePaths", f"{len(chemins)} chemin(s) présent(s)")
+
+
 def _check_results(root: Path, artefacts: "Artefacts | None" = None) -> list[_Result]:
     # Les artefacts vivent la ou le projet les a mis (principe 9) : le pre-vol
     # les lit ou on le lui dit, et retombe sur les emplacements que
@@ -900,6 +1031,12 @@ def _check_results(root: Path, artefacts: "Artefacts | None" = None) -> list[_Re
     lecture = _verifier_lecture_env_prod(root, ou.unite)
     if lecture is not None:
         results.append(lecture)
+    sessions = _verifier_sessions_multi_travailleurs(root, ou.unite)
+    if sessions is not None:
+        results.append(sessions)
+    inscriptibles = _verifier_read_write_paths(root, ou.unite)
+    if inscriptibles is not None:
+        results.append(inscriptibles)
 
     # module jinja2
     if importlib.util.find_spec("jinja2") is not None:
