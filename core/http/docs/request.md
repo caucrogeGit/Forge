@@ -489,6 +489,16 @@ Ils sont repliables pour ne pas alourdir la lecture principale.
 
     Les attributs `params` et `body` conservent des listes de valeurs.
 
+    `headers` est un `HTTPMessage` sur les deux serveurs, celui de développement
+    comme le chemin WSGI de production (`CORE-WSGI-HEADERS-PARITY-001`).
+    Toute lecture y est insensible à la casse, et un en-tête absent rend `None`.
+
+    Une seule limite subsiste sous WSGI, imposée par le protocole : `environ` ne
+    conserve pas la casse d'origine des noms d'en-têtes, restitués en
+    `Title-Case`.
+    Cela ne concerne que l'affichage d'un nom par `keys()`, jamais la lecture
+    d'une valeur.
+
     Les accesseurs `query(...)` et `form(...)` renvoient seulement la première valeur, ce qui suffit pour la majorité des formulaires et des paramètres d'URL.
 
 ??? info "Inspection avec request.data"

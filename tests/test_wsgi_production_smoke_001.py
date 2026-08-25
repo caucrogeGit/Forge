@@ -26,7 +26,7 @@ from core.http.response import Response
 from core.http.router import Router
 from core.templating.manager import template_manager
 from core.app.wsgi import (
-    _WsgiHeaders,
+    _headers_from_environ,
     create_configured_wsgi_app,
     create_wsgi_app,
 )
@@ -247,7 +247,7 @@ class TestMinimalEntrypointWarnsAtBuild:
         assert _warning_records(caplog) == []
 
 
-# ── 9. Cohérence headers WSGI (_WsgiHeaders) ────────────────────────────────
+# ── 9. Cohérence headers WSGI ───────────────────────────────────────────────
 
 
 class TestWsgiHeadersAdapter:
@@ -257,7 +257,7 @@ class TestWsgiHeadersAdapter:
             "HTTP_AUTHORIZATION": "Bearer abc",
             "CONTENT_TYPE": "text/plain",
         }
-        headers = _WsgiHeaders(env)
+        headers = _headers_from_environ(env)
         # Insensible à la casse — interface compatible Request.headers.get
         assert headers.get("X-Real-IP") == "203.0.113.42"
         assert headers.get("x-real-ip") == "203.0.113.42"
@@ -265,8 +265,16 @@ class TestWsgiHeadersAdapter:
         assert headers.get("Content-Type") == "text/plain"
 
     def test_missing_header_returns_default(self):
-        headers = _WsgiHeaders({})
-        assert headers.get("X-Real-IP") == ""
+        """Contrat renversé par CORE-WSGI-HEADERS-PARITY-001.
+
+        Ce test figeait `""` pour un en-tête absent, là où le serveur de
+        développement rend `None`. C'est cet écart qui faisait rendre leur
+        fragment à onze contrôleurs d'une application déployée, et qui faisait
+        rendre `""` à `request.header("X-Absent", "repli")`.
+        """
+        headers = _headers_from_environ({})
+
+        assert headers.get("X-Real-IP") is None
         assert headers.get("X-Real-IP", "default") == "default"
 
 

@@ -54,6 +54,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from http import HTTPStatus
+from http.client import HTTPMessage
 from io import BytesIO
 from typing import Any, Iterable
 
@@ -105,35 +106,50 @@ _REASONS = {
 }
 
 
-class _WsgiHeaders:
-    """Vue insensible à la casse des headers HTTP extraits de `environ`.
+def _headers_from_environ(environ: dict[str, Any]) -> HTTPMessage:
+    """Construit les headers de la requête WSGI, du type qu'attend `Request`.
 
-    Contrat minimal partagé avec `http.client.HTTPMessage` (le type de
-    `request.headers` sur le serveur de dev) : `get`, `keys`, `items`.
-    `keys()`/`items()` sont requis par la convention d'inspection
-    (`request.data`, `Response.debug`) — leur absence faisait lever
-    `AttributeError` sur tout le chemin WSGI (CORE-WSGI-HEADERS-CONTRACT-001).
+    Ticket : CORE-WSGI-HEADERS-PARITY-001.
+
+    Le chemin WSGI portait ici une classe maison qui IMITAIT le contrat de
+    `http.client.HTTPMessage`, le type que le serveur de développement fournit.
+    Une imitation ne vaut que ce que son auteur a prévu, et il manquait dix
+    comportements, dont trois qui cassaient du code applicatif ordinaire :
+
+    - `headers.get("X-Absent")` rendait `""` là où `HTTPMessage` rend `None`.
+      L'écart traversait l'API publique : `request.header("X-Absent", "repli")`
+      rendait `""` en production et `"repli"` en développement, alors que les
+      `@overload` de `Request.header` promettent le défaut ;
+    - `"X-Header" in headers` levait `TypeError` en production et fonctionnait
+      en développement, faute de `__contains__` ;
+    - `headers["X-Header"]`, `len(...)` et l'itération levaient `TypeError`.
+
+    Ces défauts ne se voient qu'en production, sur du code qui marche en
+    développement. `CORE-WSGI-HEADERS-CONTRACT-001` avait déjà ajouté `keys()`
+    et `items()` après un `AttributeError` : c'était la première rustine, le
+    ticket 66 du terrain en demandait une deuxième.
+
+    La cause est retirée plutôt que le symptôme (règle A) : les deux serveurs
+    emploient désormais le MÊME type, et non deux qui se ressemblent.
+
+    Les valeurs sont posées une à une, sans jamais parser de texte : aucun
+    en-tête ne peut en injecter un autre par un saut de ligne.
+
+    Limite, imposée par WSGI et non par Forge : `environ` ne conserve pas la
+    casse d'origine des noms (`HTTP_HX_REQUEST` ne dit pas si le client a écrit
+    `HX-Request` ou `Hx-Request`). Les noms sont donc restitués en `Title-Case`.
+    Toute LECTURE reste insensible à la casse, des deux côtés ; seul l'affichage
+    d'un nom par `keys()` peut différer de ce que le client a envoyé.
     """
-
-    def __init__(self, environ: dict[str, Any]) -> None:
-        normalized: dict[str, str] = {}
-        if "CONTENT_TYPE" in environ:
-            normalized["content-type"] = environ["CONTENT_TYPE"]
-        if "CONTENT_LENGTH" in environ:
-            normalized["content-length"] = str(environ["CONTENT_LENGTH"])
-        for key, value in environ.items():
-            if key.startswith("HTTP_"):
-                normalized[key[5:].replace("_", "-").lower()] = value
-        self._headers = normalized
-
-    def get(self, name: str, default: str = "") -> str:
-        return self._headers.get(name.lower(), default)
-
-    def keys(self) -> list[str]:
-        return list(self._headers.keys())
-
-    def items(self) -> list[tuple[str, str]]:
-        return list(self._headers.items())
+    headers = HTTPMessage()
+    if "CONTENT_TYPE" in environ:
+        headers["Content-Type"] = environ["CONTENT_TYPE"]
+    if "CONTENT_LENGTH" in environ:
+        headers["Content-Length"] = str(environ["CONTENT_LENGTH"])
+    for key, value in environ.items():
+        if key.startswith("HTTP_"):
+            headers[key[5:].replace("_", "-").title()] = value
+    return headers
 
 
 class _WsgiHandlerStub:
@@ -148,7 +164,7 @@ class _WsgiHandlerStub:
         qs = environ.get("QUERY_STRING", "") or ""
         self.path = f"{path}?{qs}" if qs else path
         self.command = environ.get("REQUEST_METHOD", "GET")
-        self.headers = _WsgiHeaders(environ)
+        self.headers = _headers_from_environ(environ)
         # nosec B104 — valeur de repli pour l'adresse du CLIENT, lue dans
         # l'environnement WSGI. Aucune socket n'est ouverte ici.
         remote = environ.get("REMOTE_ADDR", "0.0.0.0") or "0.0.0.0"  # nosec B104
