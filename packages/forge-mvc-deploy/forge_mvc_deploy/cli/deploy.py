@@ -126,8 +126,17 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-# Adapter User à l'utilisateur système qui exécutera l'application
-User=www-data
+# Compte de service dedie, a creer avant d'activer l'unite :
+#     sudo useradd --system --no-create-home --shell /usr/sbin/nologin forge-app
+#     sudo chown forge-app: {project_dir}/env/prod
+#     sudo chmod 600 {project_dir}/env/prod
+#
+# `www-data` est le compte du serveur web, qui n'a aucune raison d'etre celui
+# de l'application : il ne possede pas le projet, et EnvironmentFile pointe un
+# fichier de secrets. Elargir les droits du fichier, ou ceux du projet entier,
+# est la sortie de secours evidente, et precisement celle qu'il ne faut pas
+# prendre.
+User=forge-app
 WorkingDirectory={project_dir}
 # Serveur WSGI de production : Gunicorn sert le callable `application` de wsgi.py.
 # Ajuster --workers selon le nombre de cœurs (règle simple : 2 × cœurs + 1).
@@ -182,22 +191,31 @@ Ce dossier contient les fichiers générés par `forge deploy:init`.
    ```
 2. Créer `env/prod` avec les variables de production (voir `docs/deployment/deployment.md`).
    En production derrière Nginx, Forge écoute en HTTP local (`APP_SSL_ENABLED=false`).
-3. Adapter `systemd/forge-app.service` : remplacer `User=www-data` si nécessaire
-   et ajuster `--workers` selon le nombre de cœurs (règle simple : 2 × cœurs + 1).
-4. Copier `nginx/forge-app.conf` dans `/etc/nginx/sites-available/`.
-5. Activer le site Nginx :
+3. Créer le compte de service et lui donner le fichier de secrets :
+   ```
+   sudo useradd --system --no-create-home --shell /usr/sbin/nologin forge-app
+   sudo chown forge-app: env/prod && sudo chmod 600 env/prod
+   ```
+   `env/prod` porte le mot de passe de la base. Il se pose en `600`, lisible du
+   seul compte qui exécute l'application. Ne pas élargir les droits du fichier,
+   ni ceux du projet, pour contourner un refus de démarrage.
+4. Adapter `systemd/forge-app.service` : ajuster `User=` si le compte porte un
+   autre nom, et `--workers` selon le nombre de cœurs (règle simple :
+   2 × cœurs + 1).
+5. Copier `nginx/forge-app.conf` dans `/etc/nginx/sites-available/`.
+6. Activer le site Nginx :
    ```
    sudo ln -s /etc/nginx/sites-available/forge-app.conf /etc/nginx/sites-enabled/
    sudo nginx -t && sudo systemctl reload nginx
    ```
-6. Copier `systemd/forge-app.service` dans `/etc/systemd/system/`.
-7. Activer le service :
+7. Copier `systemd/forge-app.service` dans `/etc/systemd/system/`.
+8. Activer le service :
    ```
    sudo systemctl daemon-reload
    sudo systemctl enable forge-app
    sudo systemctl start forge-app
    ```
-8. Vérifier : `forge deploy:check`
+9. Vérifier : `forge deploy:check`
 
 > Ces fichiers sont des modèles. Adaptez-les à votre infrastructure.
 """
@@ -548,6 +566,118 @@ def _verifier_locations_nginx(root: Path) -> "_Result | None":
         "ajouter le bloc dans deploy/nginx/forge-app.conf")
 
 
+#: Lit la valeur d'une cle d'unite systemd (`User=`, `EnvironmentFile=`).
+def _valeur_de_la_cle(texte: str, cle: str, section: str) -> "str | None":
+    """Valeur de `cle=` dans `section`, ou `None`. Voir `_section_de_la_cle`."""
+    courante: "str | None" = None
+    for ligne in texte.splitlines():
+        depouillee = ligne.strip()
+        entete = _SECTION_SYSTEMD.match(depouillee)
+        if entete is not None:
+            courante = entete.group(1)
+            continue
+        if depouillee.startswith("#") or depouillee.startswith(";"):
+            continue
+        nom, separateur, valeur = depouillee.partition("=")
+        if separateur and nom.strip() == cle and courante == section:
+            return valeur.strip()
+    return None
+
+
+def _peut_lire(chemin: Path, utilisateur: str) -> "bool | None":
+    """`utilisateur` peut-il lire `chemin` ? `None` si la question n'a pas de sens ici.
+
+    Rend `None` quand le compte n'existe pas sur cette machine, ou quand la
+    plateforme n'a pas de notion de proprietaire POSIX : le pre-vol se lance
+    souvent depuis un poste qui n'est pas la machine de production, et affirmer
+    un refus dans ce cas serait un faux diagnostic.
+    """
+    try:
+        import grp
+        import pwd
+    except ImportError:  # pragma: no cover — plateforme sans comptes POSIX
+        return None
+
+    try:
+        compte = pwd.getpwnam(utilisateur)
+    except KeyError:
+        return None
+
+    try:
+        etat = chemin.stat()
+    except OSError:
+        return None
+
+    mode = etat.st_mode
+    if compte.pw_uid == 0:
+        return True
+    if etat.st_uid == compte.pw_uid:
+        return bool(mode & 0o400)
+
+    groupes = {compte.pw_gid}
+    try:
+        groupes.update(g.gr_gid for g in grp.getgrall() if utilisateur in g.gr_mem)
+    except OSError:  # pragma: no cover — base de groupes illisible
+        pass
+    if etat.st_gid in groupes:
+        return bool(mode & 0o040)
+
+    return bool(mode & 0o004)
+
+
+def _verifier_lecture_env_prod(root: Path) -> "_Result | None":
+    """Le compte declare dans l'unite peut-il lire le fichier de secrets ?
+
+    DEPLOY-ENVFILE-READABLE-001. L'unite pointe `EnvironmentFile=env/prod`, qui
+    porte le mot de passe de la base. Un fichier de secrets se pose en `600`,
+    appartenant a celui qui deploie : le compte de service ne le lira pas, et
+    le service ne demarrera pas.
+
+    La sortie de secours evidente, elargir les droits du fichier ou ceux du
+    projet entier, est precisement celle qu'il ne faut pas prendre, et c'est
+    celle que prendra quelqu'un de presse un soir de mise en service. D'ou une
+    ERREUR, et un message qui nomme le geste juste.
+
+    Rend `None` des que la question n'est pas tranchable ici : unite absente,
+    pas d'`EnvironmentFile`, compte inconnu de cette machine. Le pre-vol se
+    lance souvent ailleurs qu'en production.
+    """
+    unite = root / "deploy" / "systemd" / "forge-app.service"
+    if not unite.is_file():
+        return None
+
+    try:
+        texte = unite.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+    utilisateur = _valeur_de_la_cle(texte, "User", "Service")
+    fichier = _valeur_de_la_cle(texte, "EnvironmentFile", "Service")
+    if not utilisateur or not fichier:
+        return None
+
+    chemin = Path(fichier.lstrip("-"))
+    if not chemin.is_absolute():
+        chemin = root / chemin
+    if not chemin.is_file():
+        # L'absence de env/prod est deja signalee par ailleurs.
+        return None
+
+    lisible = _peut_lire(chemin, utilisateur)
+    if lisible is None:
+        return _Result(
+            "warn", f"Lecture de {chemin.name} par {utilisateur}",
+            "compte inconnu de cette machine — vérifier depuis le serveur de production")
+    if lisible:
+        return _Result("ok", f"Lecture de {chemin.name} par {utilisateur}", "autorisée")
+
+    return _Result(
+        "error", f"Lecture de {chemin.name} par {utilisateur}",
+        f"refusée — le service ne démarrera pas ; donner le fichier au compte "
+        f"(chown {utilisateur}: {chemin} && chmod 600 {chemin}) plutôt "
+        f"qu'élargir les droits du fichier ou du projet")
+
+
 def _check_results(root: Path) -> list[_Result]:
     results: list[_Result] = []
 
@@ -666,6 +796,9 @@ def _check_results(root: Path) -> list[_Result]:
     statiques = _verifier_locations_nginx(root)
     if statiques is not None:
         results.append(statiques)
+    lecture = _verifier_lecture_env_prod(root)
+    if lecture is not None:
+        results.append(lecture)
 
     # module jinja2
     if importlib.util.find_spec("jinja2") is not None:
