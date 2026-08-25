@@ -61,11 +61,24 @@ def _systemd_service(project_dir: Path) -> str:
     # (DEPLOY-BACKEND-AGNOSTIC-001).
     backend = _backend_installe()
     service = SERVICES_SYSTEMD.get(backend or "", "")
-    apres = f"network.target {service}".strip() if service else "network.target"
+    # `network.target` ne dit pas que le reseau est CONFIGURE, seulement que la
+    # pile est montee. Une application qui ouvre une connexion a son demarrage
+    # veut `network-online.target`, et le `Wants=` qui va avec : sans lui, la
+    # cible n'est pas tiree et l'`After=` n'ordonne rien
+    # (DEPLOY-SYSTEMD-RESTART-LIMIT-001).
+    apres = f"network-online.target {service}".strip() if service else "network-online.target"
     return f"""\
 [Unit]
 Description=Forge Application
+Wants=network-online.target
 After={apres}
+# Sans cette cle, le defaut de systemd s'applique : cinq demarrages en dix
+# secondes, puis le service reste a terre. Avec RestartSec=5, deux minutes de
+# base indisponible transforment une coupure passagere en panne du lendemain
+# matin, ce que Restart=always pretend justement couvrir.
+# Elle vit dans [Unit], jamais dans [Service] : mal placee, systemd l'ignore
+# avec un simple avertissement au journal, et la garantie n'existe pas.
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple
@@ -329,6 +342,83 @@ def _verifier_unite_systemd(root: Path) -> _Result:
         f"éditer deploy/systemd/forge-app.service")
 
 
+#: Repere une en-tete de section d'unite systemd (`[Unit]`, `[Service]`...).
+_SECTION_SYSTEMD = re.compile(r"^\[([^\]]+)\]\s*$")
+
+
+def _section_de_la_cle(texte: str, cle: str) -> "str | None":
+    """Nom de la section ou `cle=` est declaree, ou `None` si elle est absente.
+
+    Lire l'unite comme un seul bloc de texte ne suffit pas : systemd rattache
+    chaque cle a sa section, et une cle hors de la sienne est ignoree avec un
+    simple avertissement au journal. Un controle qui cherche la chaine partout
+    valide donc une garantie qui n'existe pas.
+    """
+    courante: "str | None" = None
+    for ligne in texte.splitlines():
+        depouillee = ligne.strip()
+        entete = _SECTION_SYSTEMD.match(depouillee)
+        if entete is not None:
+            courante = entete.group(1)
+            continue
+        if depouillee.startswith("#") or depouillee.startswith(";"):
+            continue
+        nom, separateur, _ = depouillee.partition("=")
+        if separateur and nom.strip() == cle:
+            return courante
+    return None
+
+
+def _verifier_limite_redemarrage(root: Path) -> "_Result | None":
+    """`Restart=always` tient-il vraiment, ou renonce-t-il apres cinq essais ?
+
+    DEPLOY-SYSTEMD-RESTART-LIMIT-001. Le gabarit pose desormais
+    `StartLimitIntervalSec=0` dans `[Unit]`, mais `deploy:init` ecrit en
+    write-if-new (principe 9) : un projet provisionne avant ce correctif garde
+    son unite, et personne ne le lui dit.
+
+    Sans cette cle, le defaut de systemd s'applique : cinq demarrages en dix
+    secondes, puis le service reste a terre. Avec `RestartSec=5`, deux minutes
+    de base indisponible suffisent a transformer une coupure passagere en panne
+    du lendemain matin, soit exactement ce que `Restart=always` pretend couvrir.
+
+    Le piege dans le piege : la cle vit dans `[Unit]`. Posee dans `[Service]`,
+    systemd l'ignore et la garantie n'existe pas, alors que le fichier a
+    toutes les apparences d'etre correct.
+
+    Rend `None` quand l'unite est absente : son absence est deja signalee
+    ailleurs, et une ligne de plus sur un fichier qui n'existe pas brouille le
+    diagnostic. Un avertissement, jamais une erreur : l'unite appartient au
+    projet, Forge ne la reecrit pas.
+    """
+    unite = root / "deploy" / "systemd" / "forge-app.service"
+    if not unite.is_file():
+        return None
+
+    texte = unite.read_text(encoding="utf-8")
+    if _section_de_la_cle(texte, "Restart") is None:
+        # Sans `Restart=`, il n'y a aucune politique de redemarrage a plafonner.
+        return _Result("ok", "Redémarrage systemd", "sans Restart= — aucune limite à lever")
+
+    section = _section_de_la_cle(texte, "StartLimitIntervalSec")
+
+    if section is None:
+        return _Result(
+            "warn", "Redémarrage systemd",
+            "StartLimitIntervalSec absente — après cinq redémarrages en dix secondes, "
+            "systemd laisse le service à terre ; ajouter StartLimitIntervalSec=0 "
+            "dans la section [Unit] de deploy/systemd/forge-app.service")
+
+    if section != "Unit":
+        return _Result(
+            "warn", "Redémarrage systemd",
+            f"StartLimitIntervalSec déclarée dans [{section}] — systemd l'ignore hors de "
+            f"[Unit] et la garantie n'existe pas ; déplacer la clé dans [Unit] de "
+            f"deploy/systemd/forge-app.service")
+
+    return _Result("ok", "Redémarrage systemd", "StartLimitIntervalSec dans [Unit]")
+
+
 def _check_results(root: Path) -> list[_Result]:
     results: list[_Result] = []
 
@@ -441,6 +531,9 @@ def _check_results(root: Path) -> list[_Result]:
     # cette verification pose donc la meme question que lui.
     results.append(_verifier_backend_bdd())
     results.append(_verifier_unite_systemd(root))
+    limite = _verifier_limite_redemarrage(root)
+    if limite is not None:
+        results.append(limite)
 
     # module jinja2
     if importlib.util.find_spec("jinja2") is not None:

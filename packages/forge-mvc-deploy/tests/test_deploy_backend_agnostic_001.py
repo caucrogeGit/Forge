@@ -101,9 +101,9 @@ def test_un_backend_dont_le_pilote_manque_est_une_erreur(
 # ── L'unite systemd ──────────────────────────────────────────────────────────
 
 @pytest.mark.parametrize(("backend", "attendu"), [
-    ("mariadb", "After=network.target mariadb.service"),
-    ("postgres", "After=network.target postgresql.service"),
-    ("mssql", "After=network.target mssql-server.service"),
+    ("mariadb", "After=network-online.target mariadb.service"),
+    ("postgres", "After=network-online.target postgresql.service"),
+    ("mssql", "After=network-online.target mssql-server.service"),
 ])
 def test_l_unite_attend_le_service_du_backend(
     backend: str, attendu: str, monkeypatch: pytest.MonkeyPatch,
@@ -118,7 +118,7 @@ def test_sqlite_n_attend_aucun_service(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(deploy, "_backend_installe", lambda: "sqlite")
     unite = deploy._systemd_service(Path("/srv/app"))
 
-    assert "After=network.target\n" in unite
+    assert "After=network-online.target\n" in unite
     assert ".service" not in unite.split("[Service]")[0]
 
 
@@ -128,4 +128,4 @@ def test_un_backend_inconnu_n_invente_aucun_service(
     """Un backend tiers ne doit pas faire deviner un nom d'unite."""
     monkeypatch.setattr(deploy, "_backend_installe", lambda: "cockroach")
 
-    assert "After=network.target\n" in deploy._systemd_service(Path("/srv/app"))
+    assert "After=network-online.target\n" in deploy._systemd_service(Path("/srv/app"))
