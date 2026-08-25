@@ -2,6 +2,13 @@
 APP_NAME=Forge
 APP_ROUTES_MODULE=mvc.routes
 
+# Environnement servi par ce fichier.
+# config.py la lit et retombe sur « dev » quand elle est absente : un env/prod
+# qui l'oublie fait tourner la production en configuration de developpement,
+# ou la page d'erreur rend sa pile d'exception au visiteur.
+# env/prod DOIT donc declarer APP_ENV=prod.
+APP_ENV=dev
+
 # Upload
 # Le noyau ne garde que le plafond de corps multipart (ADR-032).
 # UPLOAD_ROOT et UPLOAD_ALLOWED_* sont lues par l'opt-in forge-mvc-files.

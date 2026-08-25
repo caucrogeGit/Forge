@@ -700,6 +700,38 @@ def _verifier_lecture_env_prod(root: Path) -> "_Result | None":
         f"qu'élargir les droits du fichier ou du projet")
 
 
+def _verifier_app_env_prod(cfg: dict[str, str], env_prod_existe: bool) -> "_Result | None":
+    """`env/prod` declare-t-il l'environnement qu'il sert ?
+
+    DEPLOY-ENV-PROD-APP-ENV-001. `config.py` lit `APP_ENV` dans
+    l'environnement et retombe sur `dev` quand elle est absente. Le gabarit
+    `env/example` ne la declare pas : un `env/prod` qui l'oublie fait donc
+    tourner la PRODUCTION en configuration de developpement.
+
+    Ce n'est pas un detail de confort. En `dev`, la page d'erreur du squelette
+    rend le type, le message et la pile de l'exception au visiteur.
+
+    Le point d'entree WSGI ne peut plus rattraper l'oubli : depuis
+    `SKELETON-PUBLIC-APPLICATION-001`, `app.py` ne pose plus rien a l'import,
+    justement pour ne pas decider a la place de l'exploitant. La declaration
+    doit donc etre la, et c'est une erreur si elle n'y est pas.
+    """
+    if not env_prod_existe:
+        return None
+
+    valeur = cfg.get("APP_ENV", "").strip()
+    if valeur == "prod":
+        return _Result("ok", "Variable APP_ENV", "prod")
+    if not valeur:
+        return _Result(
+            "error", "Variable APP_ENV",
+            "absente de env/prod — config.py retombe sur « dev », et la page "
+            "d'erreur rendrait sa pile d'exception au visiteur ; déclarer APP_ENV=prod")
+    return _Result(
+        "error", "Variable APP_ENV",
+        f"vaut « {valeur} » dans env/prod — déclarer APP_ENV=prod")
+
+
 def _check_results(root: Path) -> list[_Result]:
     results: list[_Result] = []
 
@@ -747,6 +779,9 @@ def _check_results(root: Path) -> list[_Result]:
                 results.append(_Result("error", "Variables DB", f"manquantes : {', '.join(missing)}"))
             else:
                 results.append(_Result("ok", "Variables DB", "DB_HOST, DB_NAME, DB_APP_LOGIN présentes"))
+            app_env = _verifier_app_env_prod(cfg, True)
+            if app_env is not None:
+                results.append(app_env)
             if cfg.get("UPLOAD_ROOT"):
                 results.append(_Result("ok", "Variable UPLOAD_ROOT", cfg["UPLOAD_ROOT"]))
             else:
