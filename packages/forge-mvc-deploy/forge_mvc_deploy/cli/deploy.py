@@ -31,7 +31,19 @@ class _Result(NamedTuple):
 
 # ── Templates ─────────────────────────────────────────────────────────────────
 
-def _nginx_conf(upload_max_mb: int) -> str:
+def _nginx_conf(upload_max_mb: int, project_dir: Path, upload_root: str) -> str:
+    """Configuration Nginx du projet, avec les portes que WSGI ne sert plus.
+
+    `/static/` et `/favicon.ico` vivent dans le `RequestHandler` de `app.py`,
+    donc AVANT le routage : le chemin WSGI ne les voit pas. Une application
+    deployee sans ces `location` demarre, repond 200, et sert des pages sans
+    feuille de style. La panne est longue a comprendre parce que tout parait
+    sain (DEPLOY-NGINX-STATIC-LOCATIONS-001).
+
+    `/media/` a la meme cause, et pas le meme remede : le servir ici
+    court-circuiterait la couche applicative. Le bloc est donc ecrit, commente,
+    et la question posee a celui qui deploie.
+    """
     client_max = upload_max_mb + 1
     return f"""\
 server {{
@@ -39,6 +51,38 @@ server {{
     server_name _;
 
     client_max_body_size {client_max}m;
+
+    # Sous WSGI, ces portes ne sont plus servies par l'application : elles
+    # vivent dans le serveur de developpement, avant le routage. Sans ces
+    # `location`, le site demarre et repond 200, mais sans aucune feuille de
+    # style.
+    location /static/ {{
+        alias {project_dir}/static/;
+        # Fichiers versionnes : le cache long est sans risque.
+        add_header Cache-Control "max-age=604800, immutable";
+        access_log off;
+    }}
+
+    location = /favicon.ico {{
+        alias {project_dir}/static/favicon.ico;
+        access_log off;
+        log_not_found off;
+    }}
+
+    # Les medias, eux, ne sont PAS decommentes par defaut, et c'est un choix.
+    #
+    # Servir /media/ ici rend public tout ce que contient UPLOAD_ROOT, et
+    # court-circuite definitivement la couche applicative : plus aucune route
+    # Forge ne peut decider qui a le droit de lire quoi. Une application qui
+    # distingue des fichiers publics de fichiers personnels (travaux d'eleves,
+    # pieces jointes, justificatifs) doit laisser ce bloc commente et servir
+    # ces fichiers par une route authentifiee.
+    #
+    # Ne decommenter que si TOUT le contenu de UPLOAD_ROOT est public :
+    #
+    # location /media/ {{
+    #     alias {upload_root}/;
+    # }}
 
     location / {{
         # Forge écoute en HTTP local en mode prod ; Nginx termine HTTPS côté public.
@@ -174,6 +218,25 @@ def _upload_max_mb(root: Path) -> int:
     return 5
 
 
+def _upload_root(root: Path) -> str:
+    """Emplacement des medias, tel que le lira l'opt-in `forge-mvc-files`.
+
+    Lu dans `env/prod` quand il existe, sinon le defaut de l'opt-in
+    (`storage/uploads`). Un chemin relatif est resolu sous la racine du projet :
+    l'application le resout depuis son `WorkingDirectory`, Nginx n'a pas de
+    repertoire courant et ne peut pas en faire autant.
+    """
+    valeur = ""
+    env_prod = root / "env" / "prod"
+    if env_prod.is_file():
+        try:
+            valeur = _parse_env_file(env_prod).get("UPLOAD_ROOT", "").strip()
+        except OSError:
+            valeur = ""
+    chemin = Path(valeur or "storage/uploads")
+    return str(chemin if chemin.is_absolute() else root / chemin)
+
+
 def _parse_env_file(path: Path) -> dict[str, str]:
     values: dict[str, str] = {}
     for line in path.read_text(encoding="utf-8").splitlines():
@@ -220,7 +283,8 @@ def cmd_deploy_init(root: Path | None = None) -> None:
     upload_mb = _upload_max_mb(root)
     files = {
         root / "wsgi.py": _wsgi_py(),
-        root / "deploy" / "nginx" / "forge-app.conf": _nginx_conf(upload_mb),
+        root / "deploy" / "nginx" / "forge-app.conf": _nginx_conf(
+            upload_mb, root, _upload_root(root)),
         root / "deploy" / "systemd" / "forge-app.service": _systemd_service(root),
         root / "deploy" / "README_DEPLOY.md": _readme_deploy(),
     }
@@ -419,6 +483,54 @@ def _verifier_limite_redemarrage(root: Path) -> "_Result | None":
     return _Result("ok", "Redémarrage systemd", "StartLimitIntervalSec dans [Unit]")
 
 
+#: Repere un bloc `location <chemin>` reellement declare, jamais commente.
+_LOCATION_NGINX = re.compile(r"^\s*location\s+[=~^*\s]*?(\S+)\s*\{", re.MULTILINE)
+
+
+def _verifier_locations_nginx(root: Path) -> "_Result | None":
+    """La configuration sert-elle ce que le chemin WSGI ne sert plus ?
+
+    DEPLOY-NGINX-STATIC-LOCATIONS-001. `/static/` vit dans le
+    `RequestHandler` de `app.py`, avant le routage : sous WSGI, il n'existe
+    plus. Une configuration qui n'a qu'un `location /` relaie tout vers
+    Gunicorn, et le site repond 200 en servant des pages sans feuille de style.
+
+    La panne est longue a comprendre precisement parce qu'elle n'a l'air de
+    rien : le service tourne, les journaux sont vides, les pages repondent.
+
+    `deploy:init` ecrit en write-if-new : les projets provisionnes avant ce
+    correctif gardent leur configuration. Un avertissement, jamais une erreur,
+    et jamais de reecriture (principe 9).
+
+    Rend `None` quand la configuration est absente : son absence est deja
+    signalee ailleurs.
+    """
+    conf = root / "deploy" / "nginx" / "forge-app.conf"
+    if not conf.is_file():
+        return None
+
+    try:
+        texte = conf.read_text(encoding="utf-8")
+    except OSError as exc:
+        return _Result("warn", "Nginx /static/", f"lecture impossible : {exc}")
+
+    # Les lignes commentees ne declarent rien : le gabarit livre justement un
+    # bloc /media/ commente, qu'il ne faut pas prendre pour une declaration.
+    actives = "\n".join(
+        ligne for ligne in texte.splitlines() if not ligne.strip().startswith("#")
+    )
+    chemins = {trouve.group(1) for trouve in _LOCATION_NGINX.finditer(actives)}
+
+    if any(chemin.startswith("/static") for chemin in chemins):
+        return _Result("ok", "Nginx /static/", "les fichiers statiques sont servis")
+
+    return _Result(
+        "warn", "Nginx /static/",
+        "aucun location /static/ — sous WSGI l'application ne sert plus les "
+        "fichiers statiques, les pages s'afficheront sans feuille de style ; "
+        "ajouter le bloc dans deploy/nginx/forge-app.conf")
+
+
 def _check_results(root: Path) -> list[_Result]:
     results: list[_Result] = []
 
@@ -534,6 +646,9 @@ def _check_results(root: Path) -> list[_Result]:
     limite = _verifier_limite_redemarrage(root)
     if limite is not None:
         results.append(limite)
+    statiques = _verifier_locations_nginx(root)
+    if statiques is not None:
+        results.append(statiques)
 
     # module jinja2
     if importlib.util.find_spec("jinja2") is not None:
