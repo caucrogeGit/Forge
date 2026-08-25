@@ -13,9 +13,13 @@ de tests), voir les sources canoniques — section 8.
 ## 1. Identité du projet
 
 Forge est un framework web Python **explicite, pédagogique, testable et durable**.
-Il conserve un runtime Python volontairement limité : MariaDB, python-dotenv,
-Jinja2, Argon2, jsonschema (PyOTP côté opt-in MFA ; Pillow côté opt-in images —
-ADR-018).
+Il conserve un runtime Python volontairement limité.
+
+**La liste exacte n'est pas ici** : elle vit dans `[project].dependencies` du
+`pyproject.toml` racine, et chaque opt-in déclare les siennes (section 8).
+Ce paragraphe l'énumérait, et cette énumération avait dérivé : un fichier refondu
+par version majeure ne peut pas porter une information qui change à chaque
+extraction.
 
 **Type** : framework MVC Python, distribué en plusieurs paquets PyPI :
 
@@ -161,6 +165,12 @@ Chaque ADR est dans `docs/adr/` et a **force décisionnelle**. À lire avant tou
 proposition qui le concerne. Un nouvel ADR est requis pour toute décision
 structurante.
 
+Ce tableau est un index de lecture, pas la source : elle est
+[`docs/adr/index.md`](docs/adr/index.md), qui porte le résumé complet de chaque
+décision. Un garde-fou refuse qu'il manque ici une décision qui existe là bas
+(`tests/meta/test_briefing_agent_a_jour_001.py`) : sept y avaient déjà
+manqué.
+
 | Numéro | Fichier | Sujet résumé |
 |---|---|---|
 | ADR-001 | `001-auth-strategy.md` | Stratégie d'authentification Forge |
@@ -249,6 +259,13 @@ structurante.
 | ADR-084 | `084-database-backend-support-tiers.md` | Niveaux de support des backends BDD pour la série 1.x |
 | ADR-085 | `085-canonical-route-wiring.md` | Câblage de routes canonique : fichier puis affichage |
 | ADR-086 | `086-entity-legacy-representation-elimination.md` | Élimination de la représentation legacy interne du moteur d'entités |
+| ADR-087 | `087-documentation-style-canonical.md` | Style de documentation canonique (voir section 2.1) |
+| ADR-088 | `088-json-api-response-contract.md` | Contrat unique des réponses d'API JSON |
+| ADR-089 | `089-auth-identity-contact-separation.md` | Séparer l'identité du contact dans l'authentification |
+| ADR-090 | `090-generated-file-contract-marker.md` | Empreinte de contrat dans les fichiers engendrés |
+| ADR-091 | `091-core-emits-auth-events.md` | Le cœur émet les événements d'authentification |
+| ADR-092 | `092-wsgi-entrypoint-wiring-parity.md` | Le chemin WSGI refuse de servir une application désarmée |
+| ADR-093 | `093-application-wiring-module.md` | Le câblage de l'application vit dans une source unique |
 
 Pour créer un nouvel ADR : `docs/adr/<numéro>-<sujet>.md`, suivre le format existant.
 
