@@ -823,7 +823,12 @@ def _check_results(root: Path) -> list[_Result]:
         results.append(_Result(
             "ok",
             "HTTP/HTTPS local",
-            "APP_ENV=prod désactive HTTPS par défaut ; Nginx termine TLS",
+            # Ne pas affirmer « APP_ENV=prod » ici : la variable n'est peut-etre
+            # pas declaree, et la ligne juste au dessus vient de le dire
+            # (DEPLOY-ENV-PROD-APP-ENV-001). Deux lignes qui se contredisent au
+            # moment le plus tendu ne valent pas mieux qu'aucune ligne.
+            "APP_SSL_ENABLED absente — en prod, HTTPS est désactivé par défaut ; "
+            "Nginx termine TLS",
         ))
     elif _truthy(ssl_raw):
         status = "warn" if nginx_expects_http else "ok"
