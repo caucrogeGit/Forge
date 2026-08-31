@@ -16,6 +16,8 @@ données de démo/test, pas un ``DROP``.
 """
 from __future__ import annotations
 
+from core.app.env import is_prod
+
 import re
 import sys
 from pathlib import Path
@@ -94,7 +96,7 @@ def purge_fixtures(root: Path, *, run: bool, force: bool, env: str) -> int:
         )
         return 0
 
-    if run and env == "prod" and not force:
+    if run and is_prod(env) and not force:
         print(
             f"Refus : purge de fixtures en environnement '{env}'. "
             "Ajoutez --force pour confirmer explicitement (ADR-074).",

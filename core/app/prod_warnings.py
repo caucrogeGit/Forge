@@ -15,11 +15,14 @@ charge du point d'entrée (`app.py`).
 """
 from __future__ import annotations
 
+from core.app.env import PROD, is_prod
+
 import logging
 from typing import Any
 
 
-PROD_ENV = "prod"
+#: Alias historique de `core.app.env.PROD`, conservé comme API publique.
+PROD_ENV = PROD
 
 _WARNING_MESSAGE = (
     "AVERTISSEMENT-PROD — Forge tourne en APP_ENV=prod avec stockage mémoire.\n"
@@ -48,7 +51,7 @@ def is_memory_session_store(store: Any) -> bool:
 
 def should_warn_memory_store_in_prod(app_env: str, session_store: Any) -> bool:
     """Vrai si l'environnement est `prod` et le session store est mémoire."""
-    if (app_env or "").strip().lower() != PROD_ENV:
+    if not is_prod(app_env):
         return False
     return is_memory_session_store(session_store)
 

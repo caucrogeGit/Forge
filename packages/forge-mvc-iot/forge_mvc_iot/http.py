@@ -40,6 +40,7 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
+from core.app.env import is_prod as _is_prod
 from core.forge import get as _forge_get
 from core.http.bearer import is_bearer_authorized
 from core.http.helpers import json_error
@@ -295,7 +296,7 @@ def register_iot_routes(
     # Sécuriser par défaut (principe 7) : l'API ouverte (sans token) est réservée
     # au développement. En production, l'exposer sans Bearer token serait une
     # fuite de données IoT — on refuse explicitement plutôt que d'exposer.
-    if config.api_token is None and _forge_get("app_env") == "prod":
+    if config.api_token is None and _is_prod(_forge_get("app_env")):
         raise RuntimeError(
             "API IoT ouverte interdite en production : définir FORGE_IOT_API_TOKEN "
             "pour exiger un Bearer token, ou n'enregistrer les routes IoT qu'en "

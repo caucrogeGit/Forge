@@ -23,6 +23,13 @@ from __future__ import annotations
 
 import logging
 import os
+
+from core.app.env import (
+    APP_ENV_VAR,
+    DEFAULT_APP_ENV,
+    normalize_app_env,
+    read_app_env,
+)
 import pathlib
 import traceback as _traceback
 from typing import Any
@@ -124,10 +131,10 @@ def log_runtime_error(exc: BaseException, request: "object | None" = None) -> No
     # n'est pas initialisée.
     try:
         import core.forge as forge
-        environment = forge.get("app_env")
+        environment = normalize_app_env(forge.get("app_env"))
     except Exception:
-        environment = os.environ.get("APP_ENV", "dev")
-    if environment != "dev":
+        environment = read_app_env()
+    if environment != DEFAULT_APP_ENV:
         return
 
     try:
@@ -174,15 +181,17 @@ def build_dev_error_context(exc: BaseException) -> dict[str, Any] | None:
     Doit être appelée depuis un bloc ``except`` actif pour que la trace
     (``traceback.format_exc()``) corresponde à l'exception courante.
     """
+    brut: object
     try:
         import core.forge as forge
-        environment = forge.get("app_env")
+        brut = forge.get("app_env")
     except Exception:
         # Boot incomplet : on ne se rabat PAS sur "dev" par défaut ici (contenu
         # exposé en HTTP), seul un APP_ENV=dev explicite autorise l'affichage.
-        environment = os.environ.get("APP_ENV")
+        # `normalize_app_env` rendrait "dev" pour None, d'où le test séparé.
+        brut = os.environ.get(APP_ENV_VAR)
 
-    if environment != "dev":
+    if brut is None or normalize_app_env(brut) != DEFAULT_APP_ENV:
         return None
 
     return {

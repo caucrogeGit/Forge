@@ -22,6 +22,8 @@ Hors périmètre (tickets suivants) :
 
 from __future__ import annotations
 
+from core.app.env import is_prod, read_app_env
+
 import os
 import subprocess
 import sys
@@ -53,7 +55,7 @@ def _parse_env(args: list[str]) -> str:
                 hint=f"valeurs acceptées : {', '.join(_VALID_ENVS)}.",
             )
         return candidate
-    return os.environ.get("APP_ENV", "dev")
+    return read_app_env()
 
 
 def _parse_reload(args: list[str]) -> bool:
@@ -130,7 +132,7 @@ def cmd_run(args: list[str]) -> None:
     root = Path.cwd().resolve()
     _check_project_root(root)
 
-    if env == "prod":
+    if is_prod(env):
         sys.stderr.write(_format_prod_refusal())
         sys.exit(1)
 

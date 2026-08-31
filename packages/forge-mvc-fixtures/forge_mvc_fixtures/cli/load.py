@@ -18,13 +18,13 @@ from __future__ import annotations
 
 import importlib.util
 import json
-import os
 import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
+from core.app.env import is_prod, read_app_env
 from core.database.sql_script import split_sql_statements as _split_sql_statements
 from forge_mvc_fixtures.factory import Fixture
 
@@ -97,8 +97,13 @@ class LoadUnit:
 
 
 def active_env() -> str:
-    """Nom de l'environnement actif (``APP_ENV``, défaut ``dev``)."""
-    return os.getenv("APP_ENV", "dev")
+    """Nom de l'environnement actif (``APP_ENV``, défaut ``dev``).
+
+    Normalisé par le cœur (ENV-APP-ENV-NORMALISATION-001) : la lecture brute
+    d'avant rendait ``APP_ENV=Prod`` différent de ``"prod"``, si bien que le
+    refus de ``--run`` en production ne se déclenchait pas.
+    """
+    return read_app_env()
 
 
 def collect_fixture_files(root: Path) -> list[Path]:
@@ -444,7 +449,7 @@ def load_fixtures(
         )
         return 0
 
-    if run and env == "prod" and not force:
+    if run and is_prod(env) and not force:
         print(
             f"Refus : chargement de fixtures en environnement '{env}'. "
             "Ajoutez --force pour confirmer explicitement (ADR-074).",

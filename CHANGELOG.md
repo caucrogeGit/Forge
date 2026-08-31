@@ -1,5 +1,29 @@
 # Changelog
 
+## [Non publié]
+
+### Corrigé
+
+- **La casse de `APP_ENV` désarmait deux gardes de sécurité (`ENV-APP-ENV-NORMALISATION-001`).**
+  Trois normalisations coexistaient pour la même variable : aucune, `.lower()` seul, et `.strip().lower()`.
+  Avec `APP_ENV=Prod`, une comparaison brute à `"prod"` est fausse, si bien que deux gardes cessaient de se déclencher sans rien dire.
+  L'API IoT s'enregistrait **sans jeton** en production, ce que `SEC-IOT-TOKEN-PROD-001` interdit, et `fixtures:load --run` acceptait de peupler la base de production sans `--force`, ce que l'ADR-074 interdit.
+  Les tests de ces deux gardes existaient et passaient : ils n'exerçaient que l'écriture `"prod"` en minuscules. Douze tests de comportement échouent sur le code d'avant et passent sur celui d'après.
+  `core.app.env` devient la seule lecture officielle, avec `normalize_app_env`, `read_app_env` et `is_prod`. Le module ne dépend que de la bibliothèque standard, pour rester importable au tout début du démarrage, y compris par la configuration du squelette.
+  Le cœur tolère désormais la variante quand le pré-vol `deploy:check`, lui, continue d'exiger la forme canonique : le premier ne doit jamais rater une production, le second impose une écriture unique. Ce partage de rôles est documenté plutôt que subi.
+  Le garde-fou `test_app_env_normalisation_001` refuse toute nouvelle lecture brute et toute comparaison non normalisée. Il travaille sur l'arbre syntaxique, parce qu'un `grep` sur « prod » remonte « produire » : c'est ce faux positif qui avait fait conclure à tort que `forge-mvc-fixtures` n'avait aucune garde.
+
+### Documentation
+
+- **Le back-office était décrit comme un paquet vide (`ADMIN-DOC-ETAT-REEL-001`).**
+  Le README, le docstring du paquet et le bandeau de la roadmap annonçaient tous les trois qu'aucun code n'existait, alors que `forge-mvc-admin` porte 1259 lignes et un back-office fonctionnel, et que la section 9 de cette même roadmap marquait ses dix-sept tickets « livré ».
+  Une affirmation de sécurité était de plus inversée : l'intégration RBAC y était décrite comme `fail-open` quand le code refuse l'accès si une permission est déclarée sans que `forge-mvc-rbac` soit installé.
+
+- **Le cycle rc8 des opt-ins est cadré (`ROADMAP-RC8-OPTINS-001`).**
+  Quatre-vingt-cinq tickets en six lots, dont l'ordre est une contrainte de dépendance.
+  Quinze améliorations demandées lors de la revue étaient déjà livrées, et sont consignées pour que la prochaine revue ne les redemande pas.
+
+
 
 ## [1.0.0-rc.7] - 2026-08-17
 

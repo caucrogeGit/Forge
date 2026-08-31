@@ -18,7 +18,7 @@ Tous les tickets listés ici sont à livrer avant le tag stable.
 Une revue des vingt-sept paquets a produit une liste d'améliorations par opt-in.
 Confrontée au dépôt, cette liste s'est révélée partiellement périmée.
 
-Quinze améliorations demandées étaient déjà livrées.
+Seize améliorations demandées étaient déjà livrées.
 Le cas le plus net est `forge-mvc-admin`, décrit comme un paquet vide alors qu'il porte 1259 lignes et dix fichiers de test.
 
 L'erreur ne venait pas de la revue mais du dépôt.
@@ -31,7 +31,7 @@ Ce cycle commence donc par rétablir la vérité avant d'ajouter quoi que ce soi
 
 ## 2. Ce qui était déjà livré
 
-Ces quinze points sont retirés du périmètre.
+Ces seize points sont retirés du périmètre.
 Ils sont consignés ici pour que la prochaine revue ne les redemande pas.
 
 | Opt-in | Amélioration demandée | Où elle vit déjà |
@@ -52,6 +52,7 @@ Ils sont consignés ici pour que la prochaine revue ne les redemande pas.
 | audit | Rétention configurable et purge | `purge_audit_before`, commande `audit:gc` |
 | stats | Agrégations SQL | `aggregate.py`, `get_stats_counts_sql` |
 | qrcode | Aide contrôleur | `QrCodeResponse.from_text` |
+| fixtures | Refus de charger en production sans `--force` | ADR-074, `load.py`, `purge.py` |
 
 ---
 
@@ -74,7 +75,8 @@ Ils passent avant tout ajout de confort.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `FIXTURES-APP-ENV-GUARD-001` | Refuser `fixtures:load` et `fixtures:purge` quand `APP_ENV` vaut `prod` |
+| ~~`FIXTURES-APP-ENV-GUARD-001`~~ | **Retiré, faux besoin.** La garde existait déjà (ADR-074). Remplacé par `ENV-APP-ENV-NORMALISATION-001`, qui corrige la vraie faille, la casse qui la désarmait |
+| `ENV-APP-ENV-NORMALISATION-001` | **Livré.** Lecture unique et normalisée de `APP_ENV` dans `core.app.env` |
 | `MFA-KEY-ROTATION-001` | Procédure de rotation de la clé Fernet, avec rechiffrement des secrets existants |
 | `MFA-SESSION-INVALIDATION-001` | Invalider les sessions ouvertes à l'activation d'un facteur |
 | `IOT-RETENTION-PURGE-001` | Rétention et purge des mesures, commande `iot:purge` |

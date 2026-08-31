@@ -168,14 +168,15 @@ class Response:
         """
         # Import paresseux : Response est importée tôt dans le boot ; éviter
         # d'introduire une dépendance circulaire avec core.forge.
+        from core.app.env import DEFAULT_APP_ENV, normalize_app_env
         from core.forge import get as _cfg
 
         try:
-            env = str(_cfg("app_env")).lower()
+            env = normalize_app_env(_cfg("app_env"))
         except KeyError:
-            env = "dev"
+            env = DEFAULT_APP_ENV
 
-        if env != "dev":
+        if env != DEFAULT_APP_ENV:
             return cls.text(
                 "Response.debug() est désactivé en production.",
                 status=404,

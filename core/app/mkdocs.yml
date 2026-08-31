@@ -7,5 +7,6 @@ nav:
       - Fabrique d'application (app_factory.py): app_factory.md
       - Callables WSGI (wsgi.py): wsgi.md
       - Serveur de dev (dev_server.py): dev_server.md
+      - Lecture de l'environnement (env.py): env.md
       - Avertissements de production (prod_warnings.py): prod_warnings.md
       - Chargeur de routes d'API (api_routes_loader.py): api_routes_loader.md

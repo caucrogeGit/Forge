@@ -24,11 +24,15 @@ Ce module ne produit aucun effet de bord à l'import :
 from dotenv import load_dotenv
 import os
 
+from core.app.env import is_prod, read_app_env
 from core.security.csp import nonce_enabled as _csp_nonce_enabled
 
 # ── Détection de l'environnement ───────────────────────────────────────────────
 
-APP_ENV = os.getenv("APP_ENV", "dev")
+# Normalisée par le cœur (ENV-APP-ENV-NORMALISATION-001) : « Prod » et
+# « prod » désignent le même environnement, et un blanc de bord ne doit pas
+# faire charger un fichier env/ inexistant en silence.
+APP_ENV = read_app_env()
 
 # ── Chargement des variables d'environnement ───────────────────────────────────
 
@@ -66,7 +70,7 @@ UPLOAD_MAX_SIZE   = int(os.getenv("UPLOAD_MAX_SIZE", 5 * 1024 * 1024))
 
 APP_HOST          = os.getenv("APP_HOST", "127.0.0.1")
 APP_PORT          = int(os.getenv("APP_PORT", 8000))
-_ssl_default      = "false" if APP_ENV == "prod" else "true"
+_ssl_default      = "false" if is_prod(APP_ENV) else "true"
 APP_SSL_ENABLED   = os.getenv("APP_SSL_ENABLED", _ssl_default).strip().lower() in {
     "1", "true", "yes", "on"
 }

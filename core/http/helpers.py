@@ -2,6 +2,7 @@
 import logging
 import os
 from typing import Any
+from core.app.env import DEFAULT_APP_ENV, normalize_app_env
 from core.forge import get as _cfg
 from core.http.response import Response
 from core.templating.errors import (
@@ -34,9 +35,9 @@ def _missing_template_response(
     d'erreur.
     """
     try:
-        env = str(_cfg("app_env")).lower()
+        env = normalize_app_env(_cfg("app_env"))
     except KeyError:
-        env = "dev"
+        env = DEFAULT_APP_ENV
 
     _logger.warning("template introuvable : %s (vues : %s)", template, views_dir)
 
@@ -49,7 +50,7 @@ def _missing_template_response(
             # utilisateur si l'écriture échoue.
             pass
 
-    if env == "dev":
+    if env == DEFAULT_APP_ENV:
         body = format_missing_template_dev(template, views_dir)
     else:
         body = format_missing_template_prod()

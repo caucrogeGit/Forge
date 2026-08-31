@@ -16,6 +16,8 @@ Ne contient ni I/O, ni gestion de processus, ni détection réseau.
 """
 from __future__ import annotations
 
+from core.app.env import is_prod
+
 
 def scheme_for(ssl_enabled: bool) -> str:
     """Retourne 'https' ou 'http' selon le drapeau SSL."""
@@ -123,10 +125,7 @@ def should_block_prod_public_host(app_env: str, app_host: str) -> bool:
     ET que `APP_HOST` est un hôte public dangereux. Tous les autres
     environnements (dev, test, staging, …) sont laissés intacts.
     """
-    return (
-        (app_env or "").strip().lower() == "prod"
-        and is_dangerous_public_host(app_host)
-    )
+    return is_prod(app_env) and is_dangerous_public_host(app_host)
 
 
 def format_port_in_use_message(host: str, port: int) -> str:
