@@ -2,22 +2,20 @@
 
 Opt-in Forge pour un **back-office applicatif** (Forge Admin).
 
-> **Statut : scaffold.**
-> Ce paquet est installable mais ne fournit pas encore de fonctionnalité.
-> Il pose le paquet et son contrat de version (ticket `ADMIN-OPTIN-PACKAGE-001`).
-> Le châssis d'administration, le registre de ressources et les vues seront
-> ajoutés par les tickets `ADMIN-*` suivants.
+> **Statut : livré, en beta.**
+> Le paquet fournit un back-office fonctionnel, adossé aux contrats Forge.
+> Les filtres de liste et les actions en masse restent à venir, suivis dans
+> `docs/roadmap/forge-rc8-optins-roadmap.md`.
 
 ## Positionnement
 
-Forge Admin sert l'application : il fournira une interface d'administration des
-entités d'un projet Forge, construite depuis les contrats Forge, explicite et
-modifiable.
+Forge Admin sert l'application.
+Il fournit une interface d'administration des entités d'un projet Forge,
+construite depuis les contrats Forge, explicite et modifiable.
 
-Forge Admin est un opt-in : il n'est jamais chargé automatiquement par Forge
-Core.
-
-Voir la roadmap de cadrage : `docs/roadmap/forge-admin-roadmap.md`.
+Forge Admin est un opt-in.
+Il n'est jamais chargé automatiquement par Forge Core, et ses routes ne sont
+branchées que par un appel explicite de l'application.
 
 ## Installation
 
@@ -25,8 +23,44 @@ Voir la roadmap de cadrage : `docs/roadmap/forge-admin-roadmap.md`.
 pip install --pre forge-mvc-admin
 ```
 
-## Contenu actuel
+## API publique
 
-- `__version__` : version du paquet, alignée sur la série Forge.
+| Nom | Rôle |
+|---|---|
+| `AdminResource` | Contrat d'une entité administrable, validé à la construction |
+| `AdminRegistry`, `registry` | Registre explicite des ressources exposées |
+| `AdminController` | Contrôleur HTTP du back-office |
+| `register_admin_routes` | Branchement explicite des routes sur un routeur Forge |
+| `AdminError`, `AdminResourceError`, `AdminRegistryError` | Erreurs du paquet |
 
-Aucune autre API publique n'est exposée à ce stade.
+## Ce que le back-office sert
+
+- Un tableau de bord listant les ressources déclarées.
+- Une liste paginée par ressource, triée par la colonne déclarée.
+- Une vue de détail.
+- La création, la modification et la suppression avec écran de confirmation.
+
+Les horodatages gérés de l'ADR-081 sont posés par le back-office lorsque la
+ressource déclare `timestamps=True`.
+
+## Sécurité
+
+Les routes ne sont pas publiques.
+Elles exigent une session authentifiée, vérifiée par l'`AuthMiddleware` et à
+nouveau par `@require_auth`, en défense en profondeur.
+
+Une permission RBAC peut être déclarée par route.
+Si une permission est déclarée alors que `forge-mvc-rbac` n'est pas installé,
+l'accès est refusé plutôt qu'accordé.
+
+## Commandes
+
+| Commande | Rôle |
+|---|---|
+| `forge admin:init` | Pose la configuration et les gabarits du back-office |
+| `forge admin:doctor` | Vérifie que les ressources déclarées existent réellement |
+
+## Documentation
+
+La documentation embarquée vit dans `docs/`.
+La roadmap de cadrage d'origine est `docs/roadmap/forge-admin-roadmap.md`.
