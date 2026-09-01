@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **Une notification peut être doublée par un autre canal (`NOTIF-MAIL-BRIDGE-001`).**
+  Une notification in-app n'est vue que si son destinataire revient sur le site. Pour une alerte qui compte, une facture impayée ou un incident, c'est trop tard, et l'opt-in n'offrait aucun moyen de doubler le canal.
+  Chaque application réécrivait la même chose à côté de `notify`, et l'y oubliait à un endroit sur trois : la notification partait, l'email non, et personne ne s'en apercevait avant la réclamation.
+  `notify` annonce désormais ce qu'il écrit, par `on_notification_created`. L'événement porte l'identifiant, le destinataire, le type et le complément de données, souvent nécessaire pour composer le message relayé.
+  Le paquet **annonce, il ne parle à personne** : il n'importe aucun autre opt-in, vérifié sur l'arbre syntaxique. Le motif documenté mène à `enqueue` et non à `mailer.send`, un envoi direct faisant attendre la requête qui a créé la notification.
+  Un relais ne peut pas annuler une notification : l'annonce suit l'écriture, et faire échouer `notify` après coup laisserait l'appelant croire qu'elle n'existe pas alors qu'elle s'affiche.
+
 - **Les statuts de workflow se lisent du contrat d'entité (`WORKFLOW-ENTITY-STATUS-001`).**
   Une application qui gère un cycle de vie déclarait sa liste de statuts **deux fois** : en `choices` du contrat, pour le formulaire et la base, et en Python pour le workflow.
   Rien ne gardait les deux identiques. Ajouter un statut au contrat sans toucher au workflow donne un choix que le formulaire propose et que la transition refuse ; le retirer donne une transition vers un statut que la base n'accepte plus. Dans les deux cas, la panne n'apparaît qu'à l'usage, sur un seul chemin.

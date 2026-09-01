@@ -139,7 +139,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     | Catégorie | Communication (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-    | API publique | `notify`, `get_notifications`, `unread_count`, `mark_read`, `mark_all_read`, `Notification` |
+    | API publique | `notify`, `get_notifications`, `unread_count`, `mark_read`, `mark_all_read`, `Notification`, `on_notification_created` |
     | Table SQL | `notifications` (`TABLE_NAME`) |
     | Limite de lecture | `MAX_LIMIT` = 1000 entrées |
     | Exception liée | `NotificationError` si destinataire/message vide ou limite invalide |
@@ -344,3 +344,57 @@ Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis �
 dans `mvc/migrations/` par `forge notifications:init` (chantier `OPTIN-DDL-DIALECTAL`).
 Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
 MariaDB, SQLite, PostgreSQL comme SQL Server.
+
+## Doubler une notification par un autre canal
+
+Une notification in-app n'est vue que si son destinataire revient sur le site.
+
+Pour une alerte qui compte, une facture impayée ou un incident, c'est trop tard, et l'opt-in n'offrait aucun moyen de doubler le canal (`NOTIF-MAIL-BRIDGE-001`).
+
+Chaque application réécrivait la même chose à côté de `notify`, et l'y oubliait à un endroit sur trois : la notification partait, l'email non, et personne ne s'en apercevait avant la réclamation.
+
+`notify` annonce désormais ce qu'il écrit.
+
+```python
+from forge_mvc_jobs import enqueue
+from forge_mvc_mail import MAIL_JOB_TASK, MailMessage, message_to_payload
+from forge_mvc_notifications import on_notification_created
+
+@on_notification_created
+def doubler_par_email(notification):
+    if notification.type != "alerte":
+        return
+    enqueue(MAIL_JOB_TASK, message_to_payload(MailMessage(
+        subject=f"Alerte : {notification.message}",
+        to=adresse_de(notification.recipient),
+        body_text=notification.message,
+    )))
+```
+
+| Champ | Ce qu'il porte |
+|---|---|
+| `notification_id` | l'identifiant écrit, pour retrouver la ligne |
+| `recipient` | le destinataire, tel que l'application le nomme |
+| `message`, `type` | le contenu et sa qualification |
+| `data` | le complément libre, souvent nécessaire pour composer le message |
+
+!!! info "Le paquet annonce, il ne parle à personne"
+    `forge-mvc-notifications` n'importe aucun autre opt-in, et un test le vérifie sur l'arbre syntaxique.
+
+    `forge-mvc-mail` et `forge-mvc-jobs` sont les destinataires évidents sans être imposés : une application peut relayer vers un SMS, une alerte d'exploitation, ou rien du tout.
+
+!!! warning "Un relais ne peut pas annuler une notification"
+    L'annonce suit l'écriture. Si un relais lève, l'exception est avalée et journalisée en avertissement.
+
+    La notification est déjà en base : faire échouer `notify` après coup laisserait l'appelant croire qu'elle n'existe pas, alors qu'elle s'affiche.
+    Les relais suivants sont appelés malgré tout.
+
+!!! info "Toutes les notifications ne méritent pas un email"
+    Le `type` sert précisément à filtrer.
+
+    Relayer chaque information doublerait le bruit, et le destinataire cesserait de lire les deux canaux.
+
+!!! info "Passer par la file plutôt qu'envoyer directement"
+    L'exemple mène à `enqueue` et non à `mailer.send`.
+
+    Un envoi direct ferait attendre la requête qui a créé la notification, et une panne du relais SMTP deviendrait une panne de l'action de l'utilisateur.

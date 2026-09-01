@@ -17,6 +17,11 @@ La table n'est PAS créée automatiquement : voir `forge notifications:init` pui
 """
 from __future__ import annotations
 
+from forge_mvc_notifications.relays import (
+    NotificationEvent,
+    notify_relays,
+)
+
 import json
 from dataclasses import dataclass
 from typing import Any
@@ -102,9 +107,19 @@ def notify(
         data_json = json.dumps(data or {})
     except (TypeError, ValueError) as exc:
         raise NotificationError(f"Données non sérialisables en JSON : {exc}") from exc
-    return (db if db is not None else _db_module()).insert(
+    identifiant = (db if db is not None else _db_module()).insert(
         _INSERT_SQL, (recipient, type, message, data_json)
     )
+    # Annoncé APRÈS l'écriture : un relais ne peut pas annuler une notification
+    # déjà enregistrée (NOTIF-MAIL-BRIDGE-001).
+    notify_relays(NotificationEvent(
+        notification_id=identifiant,
+        recipient=recipient,
+        message=message,
+        type=type,
+        data=dict(data or {}),
+    ))
+    return identifiant
 
 
 def get_notifications(

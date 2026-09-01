@@ -6,10 +6,18 @@ inscrit, note publiée, devoir à rendre) dans une table `notifications`, les li
 les marquer comme lues. API explicite `notify`/`get_notifications`/`mark_read`.
 
 Périmètre V1 : notifications in-app (lignes en base). La livraison hors
-application (email, push) reste applicative, par exemple en combinant ce paquet
-avec `forge-mvc-jobs` et `forge-mvc-mail`. La dépendance va de l'opt-in vers le
+application (email, push) reste applicative, et `on_notification_created`
+lui donne un point d'accroche : le paquet **annonce** ce qu'il écrit, sans
+parler à personne (NOTIF-MAIL-BRIDGE-001). La dépendance va de l'opt-in vers le
 cœur, jamais l'inverse.
 """
+from forge_mvc_notifications.relays import (
+    NotificationEvent,
+    NotificationRelay,
+    clear_notification_relays,
+    notification_relays,
+    on_notification_created,
+)
 from forge_mvc_notifications.errors import NotificationError
 from forge_mvc_notifications.store import (
     MAX_LIMIT,
@@ -25,6 +33,12 @@ from forge_mvc_notifications.store import (
 __version__ = "1.0.0rc7"
 
 __all__ = [
+    # Relais vers d'autres canaux (NOTIF-MAIL-BRIDGE-001)
+    "on_notification_created",
+    "clear_notification_relays",
+    "notification_relays",
+    "NotificationEvent",
+    "NotificationRelay",
     "NotificationError",
     "Notification",
     "TABLE_NAME",
