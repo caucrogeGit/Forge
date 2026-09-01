@@ -97,7 +97,7 @@ Ils passent avant tout ajout de confort.
 | `ENTITIES-UNIQUE-COMPOSITE-001` | **Livré.** Les index déclarés atteignent le SQL, contrainte nommée, doublon refusé sur serveurs réels |
 | `RBAC-INSTANCE-PERMISSIONS-001` | **Livré.** `has_instance_permission`, ordre global puis propriétaire, composition et non quatrième niveau |
 | `WORKFLOW-HOOKS-001` | **Livré.** `apply_transition`, veto par exception, `commit` fourni par l'application |
-| `DB-DOCTOR-001` | Commande `db:doctor`, version, droits, jeu de caractères |
+| `DB-DOCTOR-001` | **Livré.** Enrichit `forge doctor` plutôt que d'ouvrir `db:doctor` (principe 11) : version, encodage, base, compte |
 
 ---
 

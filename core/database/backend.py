@@ -395,6 +395,27 @@ class Dialect(Protocol):
         """
         ...
 
+    # ── Diagnostic serveur ───────────────────────────────────────────────────
+
+    def server_diagnostics_sql(self) -> "dict[str, str]":
+        """Requêtes de diagnostic du serveur, par libellé.
+
+        Chaque requête rend **une seule ligne, une seule colonne nommée
+        `value`**, ce qui permet au diagnostic de les exécuter sans rien savoir
+        du SGBD.
+
+        `forge doctor` ne disait que « connexion OK », et cela ne suffit pas :
+        une version trop ancienne, un jeu de caractères qui n'est pas de
+        l'UTF-8, ou une connexion établie sous un compte inattendu sont des
+        pannes à venir qu'aucune connexion réussie ne signale
+        (`DB-DOCTOR-001`).
+
+        Rendre un dictionnaire vide est permis : un backend qui ne sait rien
+        dire de son serveur reste correct, et le diagnostic se tait plutôt que
+        d'inventer.
+        """
+        return {}
+
     # ── Horodatage serveur (DML) ─────────────────────────────────────────────
 
     def now_expression(self) -> str:

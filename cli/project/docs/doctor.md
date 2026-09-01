@@ -9,7 +9,7 @@ Pour un contrôle strict orienté CI, voir `forge project:check`.
 
 `forge doctor` parcourt un ensemble de contrôles unitaires sur le projet courant et affiche un rapport synthétique.
 
-Elle vérifie la version de Python, la configuration d'environnement, la structure MVC, les entités, les migrations, l'i18n, les templates, le registre de modules, les dépendances de sécurité MFA et RBAC, les certificats TLS de développement, la présence de Node, une connexion base de données, et quelques garde-fous statiques de sécurité production.
+Elle vérifie la version de Python, la configuration d'environnement, la structure MVC, les entités, les migrations, l'i18n, les templates, le registre de modules, les dépendances de sécurité MFA et RBAC, les certificats TLS de développement, la présence de Node, une connexion base de données avec la version, l'encodage et le compte du serveur, et quelques garde-fous statiques de sécurité production.
 
 Chaque contrôle produit un statut : `ok`, `warn`, `fail` ou `skip`.
 La commande renvoie un code de sortie non nul seulement si au moins un contrôle est en `fail`.
@@ -74,6 +74,39 @@ sequenceDiagram
 | `has_failures` | `has_failures(results) -> bool` | indique si un contrôle est en `fail` |
 
 Contrôles unitaires : `check_python`, `check_env`, `check_mvc_structure`, `check_model_entities`, `check_migrations`, `check_i18n`, `check_templates`, `check_modules`, `check_mfa_dependency`, `check_rbac_dependency`, `check_ssl`, `check_node`, `check_db`, `check_prod_security`.
+
+## 4 bis. Ce que le contrôle de base rapporte
+
+`check_db` ne disait que « connexion OK », et cela ne suffit pas.
+
+Une version trop ancienne, un jeu de caractères qui n'est pas de l'UTF-8, ou une connexion établie sous un compte inattendu sont des pannes à venir qu'aucune connexion réussie ne signale (`DB-DOCTOR-001`).
+
+Le contrôle rapporte désormais ce que le serveur répond.
+
+Sur PostgreSQL, il rapporte la version du serveur, l'encodage `UTF8`, la base et le compte connecté.
+Sur SQL Server, la version, la collation, la base et le compte.
+
+| Backend | Ce que le contrôle ajoute |
+|---|---|
+| `postgres` | version, encodage, base, compte |
+| `mariadb` | version, encodage, collation, base, compte |
+| `mssql` | version, collation, base, compte |
+| `sqlite` | version du moteur, encodage du fichier |
+
+SQLite est un fichier, sans serveur ni compte : seules la version et l'encodage y ont un sens.
+
+Ce que chaque backend sait dire lui appartient, par `Dialect.server_diagnostics_sql`.
+Un backend qui ne déclare rien reste correct, et le diagnostic se tait plutôt que d'inventer.
+
+!!! info "Un diagnostic ne doit jamais faire échouer `doctor`"
+    Chaque requête est isolée, et celle qui échoue est simplement omise.
+
+    Le compte applicatif est volontairement en DML strict (ADR-033) : il peut légitimement se voir refuser une lecture de métadonnées, et ce refus n'est pas une panne du projet.
+
+!!! info "Pourquoi pas une commande `db:doctor`"
+    Le diagnostic de base vit dans `forge doctor`, qui le portait déjà.
+
+    Une commande séparée aurait donné deux façons de poser la même question, ce que le principe 11 refuse, et l'exploitant devrait deviner laquelle regarder.
 
 ## 5. Contextes d'utilisation
 

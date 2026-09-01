@@ -12,7 +12,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 _MIGRATION_RE = re.compile(r"^\d{14}_[A-Za-z0-9_]+\.sql$")
 _MFA_IMPORT_RE = re.compile(
@@ -210,6 +210,55 @@ def _database_is_configured(root: Path) -> bool:
     return bool(valeurs.get("DB_NAME")) and bool(valeurs.get("DB_APP_LOGIN"))
 
 
+def _server_diagnostics(backend: Any, connection: Any) -> str:
+    """Version, encodage et compte du serveur, en une ligne lisible.
+
+    « Connexion OK » ne suffit pas : une version trop ancienne, un jeu de
+    caractères qui n'est pas de l'UTF-8, ou une connexion établie sous un compte
+    inattendu sont des pannes à venir qu'aucune connexion réussie ne signale
+    (`DB-DOCTOR-001`).
+
+    Un diagnostic ne doit jamais faire échouer `doctor` : chaque requête est
+    isolée, et celle qui échoue est simplement omise. Le compte applicatif est
+    volontairement en DML strict (ADR-033), et peut donc légitimement se voir
+    refuser une lecture de métadonnées.
+    """
+    try:
+        requetes = backend.dialect.server_diagnostics_sql()
+    except Exception:  # noqa: BLE001 — backend qui ne sait rien dire
+        return ""
+    if not requetes:
+        return ""
+
+    morceaux: list[str] = []
+    for libelle, requete in requetes.items():
+        try:
+            curseur = connection.cursor()
+            try:
+                curseur.execute(requete)
+                ligne = curseur.fetchone()
+            finally:
+                curseur.close()
+        except Exception:  # noqa: BLE001 — droit refusé, ou requête inapplicable
+            continue
+        if not ligne:
+            continue
+        # Les pilotes rendent soit un tuple, soit un dictionnaire selon leur
+        # configuration : les deux formes sont acceptées.
+        if isinstance(ligne, dict):
+            brut = cast("dict[str, Any]", ligne).get("value")
+        else:
+            brut = ligne[0]
+        if brut is None:
+            continue
+        # `@@VERSION` de SQL Server tient sur plusieurs lignes : on garde la
+        # première, la suite décrivant le système d'exploitation.
+        valeur = str(brut).splitlines()[0].strip()
+        if valeur:
+            morceaux.append(f"{libelle} {valeur}")
+    return ", ".join(morceaux)
+
+
 def check_db(root: Path, _config: "ModuleType | None") -> CheckResult:
     """Vérifie la base via le backend actif (ADR-054/060), sans supposer de SGBD.
 
@@ -237,8 +286,12 @@ def check_db(root: Path, _config: "ModuleType | None") -> CheckResult:
     name = getattr(backend, "name", "?")
     try:
         conn = backend.get_connection()
-        backend.close_connection(conn)
-        return CheckResult("ok", "Base de données", f"connexion OK (backend {name})")
+        try:
+            details = _server_diagnostics(backend, conn)
+        finally:
+            backend.close_connection(conn)
+        suffixe = f" — {details}" if details else ""
+        return CheckResult("ok", "Base de données", f"connexion OK (backend {name}){suffixe}")
     except Exception as exc:  # noqa: BLE001 — connexion non établie
         # Un projet dont les accès sont renseignés a été configuré : une
         # connexion impossible n'y est plus « normale », c'est une panne. La

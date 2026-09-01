@@ -182,6 +182,14 @@ class MSSQLDialect:
             f"    CREATE INDEX {name} ON {table} ({column});"
         )
 
+    def server_diagnostics_sql(self) -> "dict[str, str]":
+        return {
+            "version": "SELECT @@VERSION AS value",
+            "collation": "SELECT CAST(SERVERPROPERTY('Collation') AS NVARCHAR(128)) AS value",
+            "base": "SELECT DB_NAME() AS value",
+            "compte": "SELECT CURRENT_USER AS value",
+        }
+
     def add_column_clause(self, table: str, definition: str) -> str:
         # SQL Server n'accepte pas le mot-cle COLUMN dans un ALTER TABLE ADD :
         # il y produit « Incorrect syntax near the keyword 'COLUMN' ».

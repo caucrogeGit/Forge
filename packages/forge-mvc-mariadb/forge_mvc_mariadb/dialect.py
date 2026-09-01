@@ -191,6 +191,15 @@ class MariaDBDialect:
     def create_index_sql(self, table: str, name: str, column: str) -> str:
         return f"CREATE INDEX {name} ON {table} ({column});"
 
+    def server_diagnostics_sql(self) -> "dict[str, str]":
+        return {
+            "version": "SELECT VERSION() AS value",
+            "encodage": "SELECT @@character_set_database AS value",
+            "collation": "SELECT @@collation_database AS value",
+            "base": "SELECT DATABASE() AS value",
+            "compte": "SELECT CURRENT_USER() AS value",
+        }
+
     def add_column_clause(self, table: str, definition: str) -> str:
         return f"ALTER TABLE {table} ADD COLUMN {definition};"
 

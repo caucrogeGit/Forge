@@ -159,6 +159,14 @@ class SQLiteDialect:
     def create_index_sql(self, table: str, name: str, column: str) -> str:
         return f"CREATE INDEX IF NOT EXISTS {name} ON {table} ({column});"
 
+    def server_diagnostics_sql(self) -> "dict[str, str]":
+        # SQLite est un fichier, sans serveur ni compte : seules la version du
+        # moteur et l'encodage du fichier ont un sens.
+        return {
+            "version": "SELECT sqlite_version() AS value",
+            "encodage": "SELECT * FROM pragma_encoding() AS value",
+        }
+
     def add_column_clause(self, table: str, definition: str) -> str:
         return f"ALTER TABLE {table} ADD COLUMN {definition};"
 

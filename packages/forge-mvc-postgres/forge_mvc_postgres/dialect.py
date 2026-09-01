@@ -171,6 +171,17 @@ class PostgreSQLDialect:
     def create_index_sql(self, table: str, name: str, column: str) -> str:
         return f"CREATE INDEX IF NOT EXISTS {name} ON {table} ({column});"
 
+    def server_diagnostics_sql(self) -> "dict[str, str]":
+        return {
+            "version": "SELECT version() AS value",
+            "encodage": (
+                "SELECT pg_encoding_to_char(encoding) AS value FROM pg_database "
+                "WHERE datname = current_database()"
+            ),
+            "base": "SELECT current_database() AS value",
+            "compte": "SELECT current_user AS value",
+        }
+
     def add_column_clause(self, table: str, definition: str) -> str:
         return f"ALTER TABLE {table} ADD COLUMN {definition};"
 

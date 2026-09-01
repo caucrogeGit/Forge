@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **Le diagnostic de base dit ce que le serveur répond (`DB-DOCTOR-001`).**
+  `forge doctor` ne rapportait que « connexion OK », et cela ne suffit pas : une version trop ancienne, un jeu de caractères qui n'est pas de l'UTF-8, ou une connexion établie sous un compte inattendu sont des pannes à venir qu'aucune connexion réussie ne signale.
+  Le contrôle rapporte désormais la version, l'encodage ou la collation, la base et le compte. Ce que chaque backend sait dire lui appartient, par `Dialect.server_diagnostics_sql` : un backend qui ne déclare rien reste correct, et le diagnostic se tait plutôt que d'inventer.
+  Chaque requête est isolée, et celle qui échoue est omise. Le compte applicatif est volontairement en DML strict (ADR-033) et peut légitimement se voir refuser une lecture de métadonnées : ce refus n'est pas une panne du projet, et un diagnostic ne doit jamais faire échouer `doctor`.
+  **Pas de commande `db:doctor`**, contrairement à ce que la roadmap proposait : `forge doctor` portait déjà ce contrôle, et une commande séparée aurait donné deux façons de poser la même question (principe 11).
+  Vérifié contre les serveurs, les requêtes étant propres à chaque SGBD : les comparer à des chaînes n'aurait rien prouvé.
+
 - **Les index déclarés au contrat atteignent enfin le SQL (`ENTITIES-UNIQUE-COMPOSITE-001`).**
   Le schéma d'entité **acceptait** une clé `indexes` avec un drapeau `unique`, `entity:validate` vérifiait que leurs champs existent, et le normaliseur les écartait ensuite, avec un commentaire disant que `build:model` ne les supportait pas encore.
   Une contrainte d'unicité composite passait donc la validation sans jamais atteindre la base. Ce n'est pas une fonctionnalité manquante mais une **garantie annoncée et non tenue**, ce qui est pire : l'application croyait ses doublons impossibles.
