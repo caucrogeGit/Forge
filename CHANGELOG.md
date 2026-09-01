@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **Une permission peut porter sur un objet précis (`RBAC-INSTANCE-PERMISSIONS-001`).**
+  Les trois gardes du paquet répondaient toutes à « cet utilisateur peut il modifier des articles ». Aucune ne répondait à « peut il modifier **cet** article, parce qu'il en est l'auteur ».
+  Chaque application réécrivait la condition à la main, et souvent de travers : oublier que le modérateur passe outre la propriété, ou vérifier la propriété avant la permission, donne un contrôle qui laisse passer ou qui bloque à tort.
+  `has_instance_permission` fixe l'ordre. Le droit global l'emporte **sans regarder la propriété**, c'est le sens de « n'importe lequel » ; le droit de propriétaire ne s'applique qu'ensuite. `is_owner` n'est pas appelée quand le droit manque de toute façon, ce qui évite une requête pour un utilisateur qui n'a aucun droit.
+  Forge ne sait pas ce qu'est un propriétaire, et ne le devine pas : déclarer `own_permission` sans `is_owner` est refusé, plutôt que de laisser un droit qui ne serait jamais accordé.
+  Ce n'est **pas un quatrième niveau** d'autorisation : la fonction n'a aucune source de permissions et compose au dessus de celle que l'appelant désigne. Un test le vérifie sur la source.
+
 - **Le back-office filtre, cherche et trie ses listes (`ADMIN-LIST-FILTERS-001`).**
   La liste affichait la table entière, page par page, sans autre choix que de tourner les pages. Passé quelques centaines de lignes, retrouver un enregistrement devenait impraticable, et le back-office avec lui.
   Une ressource déclare `filter_fields` et `search_fields`, **vides par défaut et jamais déduits** de `list_fields`. Un filtre porte sur une colonne nommée dans l'URL : accepter n'importe laquelle exposerait une colonne que la liste n'affiche pas, et une recherche sur une telle colonne permettrait d'en deviner le contenu caractère par caractère.

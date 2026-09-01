@@ -257,6 +257,15 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     | `has_contract_permission`, `get_contract_permissions`, `get_request_roles` | lecture du contrat |
     | `RbacContractError`, `RbacContractResult` | erreurs et résultat |
 
+    ### Permission portant sur une instance
+
+    | Élément | Rôle |
+    |---|---|
+    | `has_instance_permission(request, instance, *, can, any_permission=None, own_permission=None, is_owner=None) -> bool` | droit global, ou droit de propriétaire sur cet objet |
+    | `require_instance_permission(...)` | même contrôle, lève au lieu de rendre un booléen |
+    | `InstancePermissionDenied` | refus levé |
+    | `OwnershipCheck`, `PermissionCheck` | types des deux fonctions fournies par l'application |
+
     ### Modèle et Jinja
 
     | Élément | Rôle |
@@ -271,9 +280,59 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     | Protéger une route (défaut) | `@require_contract_permission("article.update")` |
     | Protéger selon l'utilisateur en base | `require_user_permission(...)` / `auth_user_can(...)` |
     | Garde bas niveau | `require_permission(...)` (permissions pré-chargées) |
+    | Autoriser l'auteur sur son propre contenu | `has_instance_permission(...)` |
     | Afficher un bouton conditionnel | `{% if can("article.update") %}` |
     | Décrire les droits | `mvc/security/rbac.json` |
     | Vérifier le contrat | `forge rbac:validate` / `forge rbac:audit` |
+
+??? note "9 bis. Autoriser sur un objet précis"
+
+    Les trois gardes répondent toutes à « cet utilisateur peut il modifier des articles ».
+    Aucune ne répondait à « peut il modifier **cet** article, parce qu'il en est l'auteur » (`RBAC-INSTANCE-PERMISSIONS-001`).
+
+    ```python
+    from forge_mvc_rbac import has_instance_permission
+
+    def est_auteur(request, article):
+        return article.auteur_id == get_authenticated_user_id(request)
+
+    autorise = has_instance_permission(
+        request, article,
+        can=lambda code: has_contract_permission(contrat, roles, code),
+        any_permission="article.edit.any",
+        own_permission="article.edit.own",
+        is_owner=est_auteur,
+    )
+    ```
+
+    L'ordre du contrôle est délibéré.
+
+    | Rang | Condition | Résultat |
+    |---|---|---|
+    | 1 | `any_permission` accordée | autorisé, **sans regarder la propriété** |
+    | 2 | `own_permission` accordée et `is_owner` vrai | autorisé |
+    | 3 | sinon | refusé |
+
+    !!! warning "Le droit global passe outre la propriété"
+        Un modérateur qui détient `article.edit.any` modifie l'article de n'importe qui.
+
+        Le lui refuser parce qu'il n'en est pas l'auteur serait un contresens, et c'est l'erreur que ce module évite en fixant l'ordre.
+
+    !!! info "La propriété n'est vérifiée qu'après la permission"
+        `is_owner` n'est pas appelée quand le droit manque de toute façon.
+
+        C'est un appel de moins, et souvent une requête de moins : vérifier la propriété d'abord ferait interroger la base pour un utilisateur qui n'a aucun droit.
+
+    !!! info "Forge ne sait pas ce qu'est un propriétaire"
+        C'est du métier, et l'application le dit par `is_owner`.
+
+        Un opt-in qui devinerait la propriété, en cherchant une colonne `user_id` par exemple, supposerait un schéma qu'il n'a pas choisi.
+        Déclarer `own_permission` sans `is_owner` est donc refusé, plutôt que de laisser un droit qui ne serait jamais accordé.
+
+    !!! info "Ce n'est pas un quatrième niveau"
+        La fonction n'a pas sa propre source de permissions : elle **compose** au dessus de celle que `can` désigne, et la voie par défaut reste le contrat RBAC.
+
+        Sans `own_permission` ni `is_owner`, elle se réduit à un contrôle global ordinaire.
 
 ??? note "10. Exemples d'utilisation"
 

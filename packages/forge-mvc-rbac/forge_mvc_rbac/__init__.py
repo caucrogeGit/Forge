@@ -16,6 +16,10 @@ trois contextes distincts) :
 
 Toutes échouent fermé (401/403). En cas de doute, utiliser
 ``require_contract_permission``.
+
+``has_instance_permission`` n'est pas un quatrième niveau : elle **compose**
+au dessus de celui que l'appelant choisit, pour répondre à « peut il agir sur
+CET objet » (RBAC-INSTANCE-PERMISSIONS-001).
 """
 
 from __future__ import annotations
@@ -32,6 +36,13 @@ from forge_mvc_rbac.contract import (
     require_contract_permission_for_request,
 )
 from forge_mvc_rbac.authorization import auth_user_can, require_user_permission
+from forge_mvc_rbac.instance import (
+    InstancePermissionDenied,
+    OwnershipCheck,
+    PermissionCheck,
+    has_instance_permission,
+    require_instance_permission,
+)
 from forge_mvc_rbac.prefix_guard import PrefixPermissionMiddleware
 from forge_mvc_rbac.jinja import (
     AuthJinjaUser,
@@ -98,6 +109,12 @@ __all__ = [
     "has_contract_permission",
     "require_contract_permission",
     "require_contract_permission_for_request",
+    # Permission portant sur une instance (RBAC-INSTANCE-PERMISSIONS-001)
+    "has_instance_permission",
+    "require_instance_permission",
+    "InstancePermissionDenied",
+    "OwnershipCheck",
+    "PermissionCheck",
     "contract_permission_required",
     "auth_user_can",
     "require_user_permission",
