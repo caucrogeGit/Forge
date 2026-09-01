@@ -87,18 +87,24 @@ class TestSchema:
         assert index.column_list == "queue, status, priority"
 
     def test_une_migration_ajoute_la_colonne_aux_projets_existants(self) -> None:
+        """Le paquet en compte plusieurs : celle de `priority` est visée par son nom."""
         ajouts = [d for _, d in MIGRATIONS if isinstance(d, AddColumn)]
-        assert len(ajouts) == 1
-        assert ajouts[0].column_name == "priority"
+        assert any(a.column_name == "priority" for a in ajouts)
 
     def test_l_index_composite_est_nomme_explicitement(self) -> None:
         """Rien dans la définition à jour ne dit lesquels existaient déjà."""
-        ajout = next(d for _, d in MIGRATIONS if isinstance(d, AddColumn))
+        ajout = next(
+            d for _, d in MIGRATIONS
+            if isinstance(d, AddColumn) and d.column_name == "priority"
+        )
         assert ajout.index_names == ("idx_jobs_priority",)
 
     def test_l_index_de_reservation_n_est_pas_recree(self) -> None:
         """`idx_jobs_claim` existe depuis la création : le recréer lèverait."""
-        ajout = next(d for _, d in MIGRATIONS if isinstance(d, AddColumn))
+        ajout = next(
+            d for _, d in MIGRATIONS
+            if isinstance(d, AddColumn) and d.column_name == "priority"
+        )
         assert ajout.index_names is not None
         assert "idx_jobs_claim" not in ajout.index_names
 

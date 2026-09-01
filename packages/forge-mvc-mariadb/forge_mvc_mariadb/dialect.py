@@ -200,6 +200,11 @@ class MariaDBDialect:
             "compte": "SELECT CURRENT_USER() AS value",
         }
 
+    def unique_nullable_index_sql(self, table: str, name: str, column: str) -> str:
+        # MariaDB accepte plusieurs NULL dans un index unique, et ne connaît pas
+        # les index partiels : la forme simple est la seule qui marche.
+        return f"CREATE UNIQUE INDEX {name} ON {table} ({column});"
+
     def add_column_clause(self, table: str, definition: str) -> str:
         return f"ALTER TABLE {table} ADD COLUMN {definition};"
 

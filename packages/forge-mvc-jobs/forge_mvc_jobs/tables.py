@@ -31,6 +31,13 @@ JOBS = TableDefinition(
         Column("available_at", "datetime", default_now=True),
         Column("last_error", "text", nullable=True),
         Column("claim_token", "string", length=64, nullable=True),
+        # Clé d'idempotence : deux mises en file de la même clé ne donnent
+        # qu'une tâche. Nullable, car la plupart des tâches n'en ont pas
+        # besoin, et SANS `unique=True` : une contrainte unique ordinaire
+        # n'accepte qu'un seul NULL sur SQL Server, ce qui rendrait la
+        # deuxième tâche sans clé impossible à enfiler. L'unicité passe par
+        # un index dialectal (JOBS-IDEMPOTENCY-KEY-001).
+        Column("idempotency_key", "string", length=191, nullable=True),
         Column("created_at", "datetime", default_now=True),
         Column("started_at", "datetime", nullable=True),
         Column("finished_at", "datetime", nullable=True),
@@ -54,5 +61,14 @@ MIGRATIONS: list[tuple[str, TableDefinition | AddColumn]] = [
     (
         "20260901110000_add_priority_to_jobs.sql",
         AddColumn(JOBS, "priority", index_names=("idx_jobs_priority",)),
+    ),
+    # `idempotency_key` suit le même chemin. Son index unique n'est pas déclaré
+    # ici : il est dialectal, et `jobs:init` l'ajoute après la colonne.
+    (
+        "20260901130000_add_idempotency_key_to_jobs.sql",
+        AddColumn(
+            JOBS, "idempotency_key",
+            unique_nullable_index="uq_jobs_idempotency_key",
+        ),
     ),
 ]

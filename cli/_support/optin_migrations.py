@@ -89,6 +89,7 @@ def _rendered_migrations(package: str) -> "list[tuple[str, bytes]] | None":
                 declaration.column_name,
                 backend.dialect,
                 declaration.index_names,
+                declaration.unique_nullable_index,
             )
         else:
             statements = render_create_table(declaration, backend.dialect)

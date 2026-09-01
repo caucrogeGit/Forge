@@ -172,7 +172,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     | Catégorie | Exploitation et outillage (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-    | API publique | `enqueue`, `process_one`, `drain`, `run_worker`, `pending_count`, `get_job`, `Job`, `JobHandler`, `PRIORITY_LOW`, `PRIORITY_NORMAL`, `PRIORITY_HIGH`, `status_counts`, `QueueStatus` |
+    | API publique | `enqueue`, `process_one`, `drain`, `run_worker`, `pending_count`, `get_job`, `Job`, `JobHandler`, `PRIORITY_LOW`, `PRIORITY_NORMAL`, `PRIORITY_HIGH`, `status_counts`, `QueueStatus`, `heartbeat` |
     | Table SQL | `jobs` (`TABLE_NAME`) |
     | Exception liée | `JobError` si la tâche est invalide |
     | Contrainte | runtime synchrone (WSGI), sans broker ni async |
@@ -468,3 +468,69 @@ Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis �
 dans `mvc/migrations/` par `forge jobs:init` (chantier `OPTIN-DDL-DIALECTAL`).
 Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
 MariaDB, SQLite, PostgreSQL comme SQL Server.
+
+## Ne pas faire deux fois
+
+### Clé d'idempotence
+
+Un utilisateur qui double-clique, un webhook rejoué, une requête relancée après un délai d'attente : la tâche partait deux fois, et l'email aussi (`JOBS-IDEMPOTENCY-KEY-001`).
+
+```python
+enqueue("envoyer_facture", {"id": 12}, idempotency_key=f"facture-{facture.id}")
+```
+
+Deux mises en file de la même clé ne donnent qu'une tâche, et la seconde rend l'identifiant de la première.
+Une clé vide vaut une absence de clé : la plupart des tâches n'ont pas besoin d'idempotence.
+
+!!! danger "Pourquoi la colonne n'a pas de contrainte `UNIQUE` ordinaire"
+    Une contrainte unique sur colonne nullable n'accepte **qu'un seul NULL sur SQL Server**, là où MariaDB, PostgreSQL et SQLite en acceptent autant qu'on veut.
+
+    La deuxième tâche **sans** clé y aurait donc été refusée, c'est-à-dire presque toutes : la file entière serait tombée sur ce backend.
+    L'unicité passe par un index dialectal, filtré sur SQL Server, mesuré contre les serveurs et non déduit.
+
+!!! info "La course est fermée par la base"
+    Deux appels simultanés ne peuvent pas insérer tous les deux.
+
+    Le perdant relit la ligne gagnante et rend son identifiant, sans lever : c'est le même motif que l'upsert de `forge-mvc-settings`.
+
+### Prolonger le bail d'une tâche longue
+
+Une tâche plus longue que le bail se faisait reprendre par `jobs:reclaim`, donc **exécutée une seconde fois** pendant que la première tournait encore (`JOBS-HEARTBEAT-001`).
+
+Le remède était d'allonger le bail pour tout le monde, au prix d'une reprise tardive des vraies pannes.
+
+```python
+def transcoder(payload, *, claim_token):
+    for etape in etapes:
+        traiter(etape)
+        heartbeat(claim_token)   # « je travaille encore »
+```
+
+`heartbeat` rend `False` quand le jeton ne désigne aucune tâche en cours.
+C'est une information utile : le travail est peut-être en train d'être refait ailleurs.
+
+!!! info "Seul l'ouvrier qui détient la tâche la prolonge"
+    La requête est gardée par `claim_token`.
+
+    Sans cette garde, n'importe qui pourrait retenir une tâche qu'il ne traite pas.
+
+## Composer avec les autres opt-ins
+
+La file est le point de passage de tout ce qui ne doit pas faire attendre une requête.
+
+| Besoin | Motif | Où il est décrit |
+|---|---|---|
+| Envoyer un email | `enqueue(MAIL_JOB_TASK, message_to_payload(...))` | référence de `forge-mvc-mail` |
+| Importer un gros fichier | `enqueue(IMPORT_JOB_TASK, import_payload(...))` | référence de `forge-mvc-import-export` |
+| Doubler une notification | `on_notification_created` puis `enqueue` | référence de `forge-mvc-notifications` |
+| Transcoder une vidéo | commande `video:process`, hors file | référence de `forge-mvc-video` |
+
+!!! info "Aucun de ces paquets ne connaît les autres"
+    Chacun fournit une sérialisation et un gestionnaire, ou un point d'accroche ; c'est l'application qui les met en présence.
+
+    Un opt-in qui importerait un autre opt-in créerait une dépendance que Forge refuse, et un test le vérifie sur l'arbre syntaxique de chaque module concerné.
+
+!!! warning "Une tâche qui échoue rejoue, une donnée invalide non"
+    Le gestionnaire lève sur ce qu'un réessai peut résoudre : relais injoignable, fichier illisible, importeur inconnu.
+
+    Il ne lève pas sur des lignes de CSV invalides, qu'un réessai ne corrigerait jamais et qui feraient rejouer la tâche jusqu'à épuisement de ses tentatives.

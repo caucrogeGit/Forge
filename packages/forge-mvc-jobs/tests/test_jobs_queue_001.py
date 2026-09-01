@@ -33,13 +33,15 @@ class FakeDb:
     def insert(self, sql: str, params: Any = ()) -> int:
         # `priority` suit la colonne ajoutée par JOBS-PRIORITY-001 : le double
         # reste fidèle au schéma, sans quoi il ne prouverait rien sur l'ordre.
-        queue, task, payload, max_attempts, priority, available_in = params
+        # `idempotency_key` suit la colonne ajoutée par JOBS-IDEMPOTENCY-KEY-001.
+        (queue, task, payload, max_attempts, priority,
+         idempotency_key, available_in) = params
         jid = self._next
         self._next += 1
         self.jobs[jid] = {
             "id": jid, "queue": queue, "task": task, "payload": payload,
             "status": "pending", "attempts": 0, "max_attempts": max_attempts,
-            "priority": priority,
+            "priority": priority, "idempotency_key": idempotency_key,
             "claim_token": None, "last_error": None, "available_in": available_in,
         }
         return jid
@@ -87,6 +89,13 @@ class FakeDb:
                 return None
             choisie = min(pretes, key=lambda job: (-job["priority"], job["id"]))
             return {"id": choisie["id"]}
+        if "idempotency_key = ?" in sql:
+            trouve = next(
+                (j for j in self.jobs.values()
+                 if j.get("idempotency_key") == params[0]),
+                None,
+            )
+            return {"id": trouve["id"]} if trouve else None
         if "claim_token=? AND status='running'" in sql:
             for jid in sorted(self.jobs):
                 job = self.jobs[jid]

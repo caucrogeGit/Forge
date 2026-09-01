@@ -167,9 +167,9 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `JOBS-IDEMPOTENCY-KEY-001` | Clé d'idempotence, contrainte et aide de mise en file |
-| `JOBS-HEARTBEAT-001` | Prolongation du bail pour les tâches longues |
-| `DOC-JOBS-COMPOSITION-001` | Documentation des branchements vers mail, video et notifications |
+| `JOBS-IDEMPOTENCY-KEY-001` | **Livré.** Index unique dialectal : SQL Server n'accepte qu'un seul NULL |
+| `JOBS-HEARTBEAT-001` | **Livré.** `heartbeat(claim_token)`, gardé par le jeton |
+| `DOC-JOBS-COMPOSITION-001` | **Livré.** Tableau des motifs, et ce qui doit faire échouer une tâche |
 
 ### 7.8 mail
 

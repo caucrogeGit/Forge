@@ -4,6 +4,18 @@
 
 ### Ajouté
 
+- **Une tâche ne part plus deux fois (`JOBS-IDEMPOTENCY-KEY-001`).**
+  Un utilisateur qui double-clique, un webhook rejoué, une requête relancée après un délai d'attente : la tâche partait deux fois, et l'email aussi. `enqueue(..., idempotency_key=...)` ne donne qu'une tâche, la seconde mise en file rendant l'identifiant de la première.
+  **Un piège dialectal évité, mesuré contre les serveurs.** Une contrainte `UNIQUE` ordinaire sur colonne nullable n'accepte qu'un seul `NULL` sur SQL Server, là où les trois autres en acceptent autant qu'on veut : la deuxième tâche **sans** clé y aurait été refusée, c'est-à-dire presque toutes, et la file entière serait tombée sur ce backend. `Dialect.unique_nullable_index_sql` porte la différence, filtrée sur SQL Server.
+  La course est fermée par la base : deux appels simultanés ne peuvent pas insérer tous les deux, et le perdant relit la ligne gagnante sans lever.
+
+- **Une tâche longue peut prolonger son bail (`JOBS-HEARTBEAT-001`).**
+  Une tâche plus longue que le bail se faisait reprendre par `jobs:reclaim`, donc **exécutée une seconde fois** pendant que la première tournait encore. Le remède était d'allonger le bail pour tout le monde, au prix d'une reprise tardive des vraies pannes.
+  `heartbeat(claim_token)` recale le bail, et rend `False` quand le jeton ne désigne aucune tâche en cours : le travail est peut-être en train d'être refait ailleurs. La requête est gardée par le jeton, sans quoi n'importe qui retiendrait une tâche qu'il ne traite pas.
+
+- **Les compositions de la file sont documentées (`DOC-JOBS-COMPOSITION-001`).**
+  Un tableau unique renvoie vers les motifs de `mail`, `import-export` et `notifications`, en rappelant qu'aucun de ces paquets ne connaît les autres, et ce qu'une tâche doit faire échouer ou non.
+
 - **Une notification porte un lien validé (`NOTIF-TARGET-URL-001`).**
   Le lien pouvait se ranger dans `data`, qui est libre, mais rien ne l'y validait alors qu'il finit dans un `href`. Une notification est écrite par l'application, et son contenu vient souvent d'une saisie.
   `target_url` est une colonne dédiée, validée **à l'écriture** : un schéma qui exécute du code au clic est refusé, y compris coupé par un blanc, certains navigateurs lisant `java<tabulation>script:` comme un schéma. Une URL protocole-relative l'est aussi, qui emmène sur un autre domaine tout en ressemblant à un chemin interne.

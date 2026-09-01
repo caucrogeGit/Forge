@@ -182,6 +182,10 @@ class PostgreSQLDialect:
             "compte": "SELECT current_user AS value",
         }
 
+    def unique_nullable_index_sql(self, table: str, name: str, column: str) -> str:
+        # PostgreSQL accepte plusieurs NULL dans un index unique.
+        return f"CREATE UNIQUE INDEX IF NOT EXISTS {name} ON {table} ({column});"
+
     def add_column_clause(self, table: str, definition: str) -> str:
         return f"ALTER TABLE {table} ADD COLUMN {definition};"
 

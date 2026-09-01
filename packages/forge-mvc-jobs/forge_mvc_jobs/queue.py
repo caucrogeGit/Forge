@@ -75,8 +75,8 @@ def _insert_sql() -> str:
     maintenant = _now()
     return (
         f"INSERT INTO {TABLE_NAME} "
-        "(queue, task, payload, max_attempts, priority, available_at) "
-        f"VALUES (?, ?, ?, ?, ?, {_dialect().interval_seconds_expression(maintenant)})"
+        "(queue, task, payload, max_attempts, priority, idempotency_key, available_at) "
+        f"VALUES (?, ?, ?, ?, ?, ?, {_dialect().interval_seconds_expression(maintenant)})"
     )
 
 
@@ -119,6 +119,25 @@ def _done_sql() -> str:
 def _fail_sql() -> str:
     return (f"UPDATE {TABLE_NAME} SET status='failed', last_error=?, "
             f"finished_at={_now()}, claim_token=NULL WHERE id=?")
+
+
+_SELECT_BY_IDEMPOTENCY_SQL = (
+    f"SELECT id FROM {TABLE_NAME} WHERE idempotency_key = ?"
+)
+
+
+def _heartbeat_sql() -> str:
+    """Repousse le bail d'une tâche en cours, sans changer son statut.
+
+    `started_at` est ce que `reclaim_stale` compare au bail : le repousser
+    revient à dire « je travaille encore ». La garde sur `claim_token` fait que
+    seul l'ouvrier qui détient la tâche peut la prolonger, sans quoi n'importe
+    qui pourrait retenir une tâche qu'il ne traite pas.
+    """
+    return (
+        f"UPDATE {TABLE_NAME} SET started_at={_now()} "
+        "WHERE claim_token=? AND status='running'"
+    )
 
 
 def _retry_sql() -> str:
@@ -250,6 +269,7 @@ def enqueue(
     max_attempts: int = 1,
     available_in: int = 0,
     priority: int = PRIORITY_NORMAL,
+    idempotency_key: "str | None" = None,
     db: Any = None,
 ) -> int:
     """Enfile une tâche `task` avec sa charge utile et renvoie son identifiant.
@@ -262,6 +282,12 @@ def enqueue(
     l'ancienneté départage à égalité (`PRIORITY_LOW`, `PRIORITY_NORMAL`,
     `PRIORITY_HIGH`). Une priorité ne fait passer personne devant une tâche
     déjà réservée : elle ordonne la file, elle n'interrompt rien.
+
+    `idempotency_key` empêche le doublon : deux mises en file de la même clé ne
+    donnent qu'une tâche, et la seconde rend l'identifiant de la première. Un
+    utilisateur qui double-clique, un webhook rejoué, une requête relancée après
+    un délai d'attente : autant de cas où la tâche partait deux fois
+    (`JOBS-IDEMPOTENCY-KEY-001`).
 
     Lève :class:`JobError` si `task` est vide, `max_attempts < 1`, si
     `priority` n'est pas un entier, ou si `payload` n'est pas sérialisable en
@@ -277,10 +303,29 @@ def enqueue(
         payload_json = json.dumps(payload or {})
     except (TypeError, ValueError) as exc:
         raise JobError(f"Charge utile non sérialisable en JSON : {exc}") from exc
-    return (db if db is not None else _db_module()).insert(
-        _insert_sql(),
-        (queue, task, payload_json, max_attempts, priority, available_in),
-    )
+    cle = (idempotency_key or "").strip() or None
+    database = db if db is not None else _db_module()
+
+    if cle is not None:
+        # La contrainte d'unicité ferme la course : deux appels simultanés ne
+        # peuvent pas insérer tous les deux, et le perdant relit la ligne
+        # gagnante. Vérifier d'abord évite l'exception dans le cas courant.
+        existante = database.fetch_one(_SELECT_BY_IDEMPOTENCY_SQL, (cle,))
+        if existante:
+            return int(existante["id"])
+
+    try:
+        return database.insert(
+            _insert_sql(),
+            (queue, task, payload_json, max_attempts, priority, cle, available_in),
+        )
+    except Exception:
+        if cle is None:
+            raise
+        existante = database.fetch_one(_SELECT_BY_IDEMPOTENCY_SQL, (cle,))
+        if existante:
+            return int(existante["id"])
+        raise
 
 
 def process_one(handlers: Mapping[str, JobHandler], *, queue: str = "default", db: Any = None) -> bool:
@@ -424,6 +469,28 @@ def reclaim_stale(
         )
     )
     return ReclaimResult(requeued=requeued, failed=failed)
+
+
+def heartbeat(claim_token: str, *, db: Any = None) -> bool:
+    """Prolonge le bail d'une tâche en cours. Vrai si elle a été prolongée.
+
+    Une tâche longue dépassait son bail et se faisait reprendre par
+    `reclaim_stale`, donc **exécutée une seconde fois** pendant que la première
+    tournait encore. Le remède était d'allonger le bail pour tout le monde, au
+    prix d'une reprise tardive des vraies pannes (`JOBS-HEARTBEAT-001`).
+
+    Un traitement long appelle `heartbeat` régulièrement, avec le jeton que
+    `process_one` lui a attribué : le bail se recale, et une tâche vraiment
+    abandonnée reste reprise vite.
+
+    Rend `False` quand le jeton ne désigne aucune tâche en cours, ce qui arrive
+    si elle a déjà été reprise. C'est une information utile à l'appelant : son
+    travail est peut être en train d'être refait ailleurs.
+    """
+    if not claim_token or not claim_token.strip():
+        return False
+    database = db if db is not None else _db_module()
+    return int(database.execute(_heartbeat_sql(), (claim_token,))) >= 1
 
 
 def pending_count(*, queue: str = "default", db: Any = None) -> int:

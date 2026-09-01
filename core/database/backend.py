@@ -239,6 +239,20 @@ class Dialect(Protocol):
         """Instruction CREATE INDEX autonome (si index non inline)."""
         ...
 
+    def unique_nullable_index_sql(self, table: str, name: str, column: str) -> str:
+        """Index unique tolérant plusieurs valeurs nulles.
+
+        Une contrainte `UNIQUE` ordinaire ne se comporte pas pareil partout.
+        MariaDB, PostgreSQL et SQLite acceptent autant de `NULL` qu'on veut ;
+        **SQL Server n'en accepte qu'un seul**, et refuse le second.
+
+        Sur une colonne facultative comme une clé d'idempotence, cela rendrait
+        la deuxième tâche sans clé impossible à enfiler, c'est à dire presque
+        toutes. Mesuré contre les serveurs, pas déduit
+        (`JOBS-IDEMPOTENCY-KEY-001`).
+        """
+        ...
+
     def add_column_clause(self, table: str, definition: str) -> str:
         """Instruction d'ajout d'une colonne à une table existante.
 

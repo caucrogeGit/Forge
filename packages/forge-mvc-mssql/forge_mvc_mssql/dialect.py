@@ -190,6 +190,16 @@ class MSSQLDialect:
             "compte": "SELECT CURRENT_USER AS value",
         }
 
+    def unique_nullable_index_sql(self, table: str, name: str, column: str) -> str:
+        # SQL Server n'accepte qu'UN SEUL NULL dans un index unique : sans le
+        # filtre, la deuxieme ligne sans valeur serait refusee.
+        return (
+            f"IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = '{name}' "
+            f"AND object_id = OBJECT_ID('{table}'))\n"
+            f"    CREATE UNIQUE INDEX {name} ON {table} ({column}) "
+            f"WHERE {column} IS NOT NULL;"
+        )
+
     def add_column_clause(self, table: str, definition: str) -> str:
         # SQL Server n'accepte pas le mot-cle COLUMN dans un ALTER TABLE ADD :
         # il y produit « Incorrect syntax near the keyword 'COLUMN' ».

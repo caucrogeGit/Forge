@@ -261,6 +261,11 @@ class AddColumn:
     table: TableDefinition
     column_name: str
     index_names: "tuple[str, ...] | None" = None
+    #: Nom d'un index unique **tolérant plusieurs valeurs nulles**, à créer avec
+    #: la colonne. Séparé de `index_names`, qui référence des index déclarés :
+    #: celui ci n'a pas de forme commune, SQL Server exigeant un filtre là où
+    #: les trois autres acceptent les nuls nativement.
+    unique_nullable_index: "str | None" = None
 
     def __post_init__(self) -> None:
         noms = [c.name for c in self.table.columns]
@@ -285,6 +290,7 @@ def render_add_column(
     column_name: str,
     dialect: Dialect,
     index_names: "tuple[str, ...] | None" = None,
+    unique_nullable_index: "str | None" = None,
 ) -> list[str]:
     """Rend l'ajout de `column_name` à `table`, en instructions séparées.
 
@@ -295,6 +301,10 @@ def render_add_column(
     `index_names` nomme les index à créer. Par défaut, ceux qui portent sur la
     seule colonne ajoutée. Un index **composite** doit être nommé, rien dans la
     définition à jour ne disant lesquels existaient déjà.
+
+    `unique_nullable_index` crée en plus un index unique qui tolère plusieurs
+    valeurs nulles, forme que le dialecte connaît seul : SQL Server exige un
+    filtre là où les trois autres acceptent les nuls nativement.
 
     La colonne ajoutée à une table qui contient déjà des lignes doit être
     acceptée par celles-ci, ce que seul un `NULL` autorisé garantit sur les
@@ -325,4 +335,8 @@ def render_add_column(
         dialect.create_index_sql(table.name, index.name, index.column_list)
         for index in vises
     ]
+    if unique_nullable_index:
+        statements.append(dialect.unique_nullable_index_sql(
+            table.name, unique_nullable_index, column_name
+        ))
     return statements
