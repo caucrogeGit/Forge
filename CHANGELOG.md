@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **Le pré-vol refuse un secret laissé à sa valeur d'amorçage (`DEPLOY-CHECK-SECRETS-001`).**
+  `deploy:check` vérifiait `DB_HOST`, `DB_NAME` et `DB_APP_LOGIN`, jamais les mots de passe ni les jetons. Un `DB_APP_PWD=change-me` recopié d'un exemple passait donc le contrôle, et la panne n'apparaissait qu'au premier accès à la base, en production, alors que le pré-vol existe précisément pour l'éviter.
+  Le repérage porte sur le **nom** de la variable et non sur une liste figée : un nom contenant `PASSWORD`, `PWD`, `SECRET` ou `TOKEN` porte un secret, et un opt-in ajouté demain est couvert sans que le pré-vol change. Les noms de chemin et de drapeau sont écartés, `SSL_KEYFILE` en tête, un contrôle qui crie à tort finissant désactivé.
+  Seul le nom de la variable fautive apparaît au rapport, jamais sa valeur : un rapport se colle dans un ticket, où un secret réel fuirait.
+  Forge refuse l'évidence, jamais la faiblesse. Mesurer l'entropie d'une chaîne demanderait des règles arbitraires que Forge n'impose pas.
+  La liste des valeurs d'amorçage était privée dans `forge-mvc-mfa`, et un opt-in ne peut pas dépendre d'un autre : elle vit désormais dans `core.security.secrets`, avec le repérage des noms sensibles.
+
 - **La table de mesures IoT peut être bornée (`IOT-RETENTION-GC-001`).**
   `iot_events` reçoit une ligne par mesure publiée et rien ne la bornait. Un capteur qui émet toutes les dix secondes y dépose plus de trois millions de lignes par an, et un site en compte rarement un seul : la table grossissait jusqu'à la panne de remplissage, alors que `sessions:gc`, `audit:gc` et `stats:gc` avaient posé le précédent.
   `forge iot:gc --days N` affiche les lignes visées et n'efface qu'avec `--run`. La rétention doit être dite, aucune valeur par défaut n'étant supposée à la place de l'exploitant.

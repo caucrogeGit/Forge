@@ -33,31 +33,17 @@ from __future__ import annotations
 
 import os
 
+from core.security.secrets import PLACEHOLDER_VALUES
+
 _PREFIX = "enc:"
 _ENV_KEY = "FORGE_MFA_SECRET_KEY"
 _ENV_PREVIOUS_KEYS = "FORGE_MFA_SECRET_KEY_PREVIOUS"
 
-# Valeurs placeholder évidentes à refuser explicitement. Ces chaînes
-# apparaissent souvent dans les `.env.example` ou les templates et ne
-# doivent JAMAIS atteindre la production. La comparaison est faite en
-# minuscules et sur la chaîne complète strippée.
-_PLACEHOLDER_KEYS: frozenset[str] = frozenset({
-    "change-me",
-    "changeme",
-    "change_me",
-    "default",
-    "secret",
-    "dev",
-    "development",
-    "test",
-    "testing",
-    "todo",
-    "to-do",
-    "placeholder",
-    "xxx",
-    "your-key-here",
-    "your_key_here",
-})
+# Les valeurs d'amorçage refusées vivent dans le cœur depuis
+# DEPLOY-CHECK-SECRETS-001 : le pré-vol de déploiement en avait besoin pour les
+# mots de passe de base et les jetons d'API, et un opt-in ne peut pas dépendre
+# d'un autre. La liste était ici, elle a remonté plutôt que d'être recopiée.
+_PLACEHOLDER_KEYS = PLACEHOLDER_VALUES
 
 
 class MfaSecretKeyMissing(Exception):

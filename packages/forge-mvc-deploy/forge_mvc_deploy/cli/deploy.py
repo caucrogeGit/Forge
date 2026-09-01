@@ -9,6 +9,8 @@ n'importe jamais ce module à l'exécution.
 
 from __future__ import annotations
 
+from core.security.secrets import is_sensitive_name, looks_like_placeholder
+
 import importlib.util
 import re
 import sys
@@ -801,6 +803,42 @@ def _magasin_partage_cable(root: Path) -> bool:
     )
 
 
+def _verifier_secrets_amorces(cfg: "dict[str, str]") -> "list[_Result]":
+    """Refuse les secrets de env/prod laissés à leur valeur d'amorçage.
+
+    Le pré-vol vérifiait DB_HOST, DB_NAME et DB_APP_LOGIN, jamais les mots de
+    passe ni les jetons. Un `DB_APP_PWD=change-me` recopié d'un exemple passait
+    donc le contrôle, et la panne n'apparaissait qu'au premier accès à la base,
+    en production (`DEPLOY-CHECK-SECRETS-001`).
+
+    Le repérage porte sur le NOM de la variable et non sur une liste figée, pour
+    qu'un opt-in ajouté demain soit couvert sans toucher à ce module. Un nom de
+    chemin comme `SSL_KEYFILE` est écarté : un contrôle qui crie à tort finit
+    désactivé.
+
+    Ne juge pas de la force d'un secret, seulement de son évidence. Imposer une
+    entropie demanderait des règles arbitraires que Forge n'impose pas.
+    """
+    resultats: list[_Result] = []
+    sensibles = sorted(nom for nom in cfg if is_sensitive_name(nom))
+
+    if not sensibles:
+        return resultats
+
+    fautives = [nom for nom in sensibles if looks_like_placeholder(cfg[nom])]
+    if fautives:
+        # La valeur n'est jamais rendue : le rapport peut être collé dans un
+        # ticket ou un journal, et un secret réel y fuirait.
+        resultats.append(_Result(
+            "error", "Secrets de env/prod",
+            f"{', '.join(fautives)} : valeur d'amorçage ou vide — poser un secret réel"))
+    saines = [nom for nom in sensibles if nom not in fautives]
+    if saines:
+        resultats.append(_Result(
+            "ok", "Secrets de env/prod", f"{len(saines)} renseigné(s) : {', '.join(saines)}"))
+    return resultats
+
+
 def _verifier_sessions_multi_travailleurs(root: Path, unite: Path) -> "_Result | None":
     """Plusieurs travailleurs avec un magasin de sessions en memoire ?
 
@@ -952,6 +990,7 @@ def _check_results(root: Path, artefacts: "Artefacts | None" = None) -> list[_Re
             app_env = _verifier_app_env_prod(cfg, True)
             if app_env is not None:
                 results.append(app_env)
+            results.extend(_verifier_secrets_amorces(cfg))
             if cfg.get("UPLOAD_ROOT"):
                 results.append(_Result("ok", "Variable UPLOAD_ROOT", cfg["UPLOAD_ROOT"]))
             else:

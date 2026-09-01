@@ -269,6 +269,40 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
 
         `deploy:check` le signale désormais. La correction reste manuelle, dans `deploy/systemd/forge-app.service`.
 
+??? note "9 bis. Secrets laissés à leur valeur d'amorçage"
+
+    `deploy:check` vérifiait `DB_HOST`, `DB_NAME` et `DB_APP_LOGIN`, jamais les mots de passe ni les jetons.
+
+    Un `DB_APP_PWD=change-me` recopié d'un exemple passait donc le contrôle.
+    La panne n'apparaissait qu'au premier accès à la base, en production, alors que le pré-vol existe précisément pour l'éviter (`DEPLOY-CHECK-SECRETS-001`).
+
+    Le pré-vol produit alors deux lignes, une par verdict.
+
+    | Verdict | Intitulé | Détail |
+    |---|---|---|
+    | `[ERREUR]` | Secrets de env/prod | `DB_APP_PWD` : valeur d'amorçage ou vide, poser un secret réel |
+    | `[OK]` | Secrets de env/prod | 1 renseigné(s) : `DB_ADMIN_PWD` |
+
+    La commande sort en échec, comme pour toute erreur du pré-vol.
+
+    !!! info "Le repérage porte sur le nom, pas sur une liste"
+        Une variable dont le nom contient `PASSWORD`, `PWD`, `SECRET` ou `TOKEN` est traitée comme un secret.
+        Un opt-in ajouté demain est donc couvert sans que le pré-vol change.
+
+        Les noms de chemin et de drapeau sont écartés, `SSL_KEYFILE` en tête.
+        Un contrôle qui crie à tort finit désactivé, et le pré-vol perdrait alors tout son intérêt.
+
+    !!! warning "La valeur n'est jamais affichée"
+        Seul le nom de la variable fautive apparaît dans le rapport.
+        Celui-ci peut être collé dans un ticket ou un journal, où un secret réel fuirait.
+
+    !!! info "Forge ne juge pas de la force d'un secret"
+        Le contrôle refuse l'évidence, `change-me`, `default`, `secret`, une valeur vide.
+        Il ne mesure pas l'entropie d'une chaîne, ce qui demanderait des règles arbitraires que Forge n'impose pas.
+
+        Un mot de passe faible mais non évident passe donc le pré-vol.
+        Le choix d'un secret reste celui de l'exploitant.
+
 ??? note "10. CLI-only et adaptation"
 
     `forge-mvc-deploy` n'a pas d'API runtime : il sert uniquement à préparer le déploiement.

@@ -81,7 +81,7 @@ Ils passent avant tout ajout de confort.
 | `SESSIONS-DELETE-FOR-USER-001` | **Livré.** `delete_for_user` au contrat et aux trois stores, plus `AddColumn` pour faire évoluer un schéma d'opt-in |
 | `MFA-SESSION-INVALIDATION-001` | **Livré.** `except_session_id` épargne la session courante, geste documenté et exercé |
 | `IOT-RETENTION-GC-001` | **Livré.** `iot:gc --days N`, nommé comme les trois autres purges et non `iot:purge` |
-| `DEPLOY-CHECK-SECRETS-001` | Refuser au pré-vol un secret laissé à sa valeur d'amorçage |
+| `DEPLOY-CHECK-SECRETS-001` | **Livré.** Repérage par nom de variable, valeur jamais affichée, liste partagée dans `core.security.secrets` |
 | `FILES-METADATA-TABLE-001` | Table des métadonnées de fichier, socle des quotas et de la purge |
 
 ---
