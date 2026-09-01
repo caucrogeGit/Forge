@@ -36,9 +36,12 @@ MAX_LIMIT = 1000
 
 
 _INSERT_SQL = (
-    f"INSERT INTO {TABLE_NAME} (recipient, type, message, data) VALUES (?, ?, ?, ?)"
+    f"INSERT INTO {TABLE_NAME} (recipient, type, message, data, target_url) "
+    "VALUES (?, ?, ?, ?, ?)"
 )
-_SELECT_COLUMNS = "id, recipient, type, message, data, read_at, created_at"
+_SELECT_COLUMNS = (
+    "id, recipient, type, message, data, target_url, read_at, created_at"
+)
 _UNREAD_COUNT_SQL = (
     f"SELECT COUNT(*) AS n FROM {TABLE_NAME} WHERE recipient = ? AND read_at IS NULL"
 )
@@ -76,6 +79,10 @@ class Notification:
     data: dict[str, Any]
     read: bool
     created_at: str
+    #: Lien vers ce que la notification annonce, validé à l'écriture.
+    #: `None` pour une notification sans lien, et pour celles écrites avant
+    #: `NOTIF-TARGET-URL-001`.
+    target_url: "str | None" = None
 
 
 def _db_module() -> Any:
@@ -84,12 +91,70 @@ def _db_module() -> Any:
     return db
 
 
+#: Schémas d'URL refusés dans un lien de notification.
+#:
+#: `javascript:` exécute du code au clic, `data:` et `vbscript:` aussi selon le
+#: navigateur : une notification est écrite par l'application, mais son contenu
+#: vient souvent d'une saisie, et le lien finit dans un `href`.
+_SCHEMAS_INTERDITS = ("javascript:", "data:", "vbscript:", "file:")
+
+
+def validate_target_url(url: "str | None") -> "str | None":
+    """Valide un lien de notification, ou rend `None` s'il est absent.
+
+    Accepte un chemin interne (`/factures/12`) ou une URL `http`/`https`.
+    Refuse tout le reste, et notamment les schémas qui exécutent du code au
+    clic : le lien finit dans un `href`, et une notification est souvent
+    composée à partir d'une saisie (`NOTIF-TARGET-URL-001`).
+
+    Refuse aussi une URL protocole-relative (`//ailleurs.test`), qui emmène sur
+    un autre domaine tout en ressemblant à un chemin interne.
+
+    Raises:
+        NotificationError: le lien est trop long, ou d'une forme refusée.
+    """
+    if url is None:
+        return None
+    lien = url.strip()
+    if not lien:
+        return None
+    if len(lien) > 500:
+        raise NotificationError(
+            f"Lien trop long : {len(lien)} caractères, 500 au plus."
+        )
+
+    minuscules = lien.lower()
+    for interdit in _SCHEMAS_INTERDITS:
+        # Comparaison sur la chaîne débarrassée de ses blancs internes : un
+        # « java\tscript: » est lu comme un schéma par certains navigateurs.
+        if "".join(minuscules.split()).startswith(interdit):
+            raise NotificationError(
+                f"Schéma de lien interdit : {lien!r}. "
+                "Un lien de notification est un chemin interne, ou une URL "
+                "http/https."
+            )
+
+    if lien.startswith("//"):
+        raise NotificationError(
+            f"Lien protocole-relatif refusé : {lien!r}. Il désigne un autre "
+            "domaine tout en ressemblant à un chemin interne."
+        )
+    if lien.startswith("/") or minuscules.startswith(("http://", "https://")):
+        return lien
+
+    raise NotificationError(
+        f"Lien invalide : {lien!r}. Attendu : un chemin interne commençant par "
+        "« / », ou une URL http/https."
+    )
+
+
 def notify(
     recipient: str,
     message: str,
     *,
     type: str = "info",
     data: dict[str, Any] | None = None,
+    target_url: str | None = None,
     db: Any = None,
 ) -> int:
     """Crée une notification pour `recipient` et renvoie son identifiant.
@@ -107,8 +172,9 @@ def notify(
         data_json = json.dumps(data or {})
     except (TypeError, ValueError) as exc:
         raise NotificationError(f"Données non sérialisables en JSON : {exc}") from exc
+    lien = validate_target_url(target_url)
     identifiant = (db if db is not None else _db_module()).insert(
-        _INSERT_SQL, (recipient, type, message, data_json)
+        _INSERT_SQL, (recipient, type, message, data_json, lien)
     )
     # Annoncé APRÈS l'écriture : un relais ne peut pas annuler une notification
     # déjà enregistrée (NOTIF-MAIL-BRIDGE-001).
@@ -127,6 +193,7 @@ def get_notifications(
     *,
     unread_only: bool = False,
     limit: int = 50,
+    before_id: int | None = None,
     db: Any = None,
 ) -> list[Notification]:
     """Renvoie les notifications de `recipient`, les plus récentes d'abord.
@@ -134,6 +201,15 @@ def get_notifications(
     `unread_only` ne renvoie que les non lues. `limit` est borné à
     :data:`MAX_LIMIT`. Lève :class:`NotificationError` si `limit` est négatif ou
     nul.
+
+    `before_id` ne rend que les notifications **antérieures** à cet identifiant,
+    ce qui pagine une liste sans jamais sauter ni répéter une ligne. Un `OFFSET`
+    le ferait : une notification arrivée entre deux pages décale tout ce qui
+    suit, si bien que la page 2 réafficherait la dernière ligne de la page 1 et
+    en cacherait une autre (`NOTIF-PAGINATION-001`).
+
+    Une liste de notifications est justement celle qui reçoit des écritures
+    pendant qu'on la parcourt.
     """
     if limit < 1:
         raise NotificationError(f"limit doit être >= 1. Reçu : {limit}.")
@@ -142,6 +218,11 @@ def get_notifications(
     params: list[object] = [recipient]
     if unread_only:
         where += " AND read_at IS NULL"
+    if before_id is not None:
+        # Le curseur porte sur la clé primaire : pas de liste blanche à
+        # consulter, et l'ordre `id DESC` en fait un « plus ancien que ».
+        where += " AND id < ?"
+        params.append(before_id)
     from core.database.backend import get_backend
 
     # La borne appartient au dialecte : T-SQL ne connaît pas LIMIT.
@@ -160,6 +241,9 @@ def get_notifications(
             data=json.loads(row["data"]),
             read=row["read_at"] is not None,
             created_at=str(row["created_at"]),
+            target_url=(
+                None if row.get("target_url") is None else str(row["target_url"])
+            ),
         )
         for row in rows
     ]

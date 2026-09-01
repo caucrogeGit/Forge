@@ -27,6 +27,7 @@ from forge_mvc_notifications.store import (
     mark_all_read,
     mark_read,
     notify,
+    validate_target_url,
     unread_count,
 )
 
@@ -39,6 +40,7 @@ __all__ = [
     "notification_relays",
     "NotificationEvent",
     "NotificationRelay",
+    "validate_target_url",
     "NotificationError",
     "Notification",
     "TABLE_NAME",

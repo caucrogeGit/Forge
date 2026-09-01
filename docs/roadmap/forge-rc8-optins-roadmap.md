@@ -183,8 +183,8 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `NOTIF-TARGET-URL-001` | Lien cible porté par la notification |
-| `NOTIF-PAGINATION-001` | Pagination de la liste |
+| `NOTIF-TARGET-URL-001` | **Livré.** Colonne dédiée validée à l'écriture, schémas exécutables refusés |
+| `NOTIF-PAGINATION-001` | **Livré.** Curseur `before_id`, jamais d'`OFFSET` |
 
 ### 7.10 files
 

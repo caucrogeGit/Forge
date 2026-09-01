@@ -28,12 +28,15 @@ class FakeDb:
         self._next = 1
 
     def insert(self, sql: str, params: Any = ()) -> int:
-        recipient, type_, message, data = params
+        # `target_url` suit la colonne ajoutée par NOTIF-TARGET-URL-001 : le
+        # double reste fidèle au schéma réel.
+        recipient, type_, message, data, target_url = params
         nid = self._next
         self._next += 1
         self.rows.append({
             "id": nid, "recipient": recipient, "type": type_, "message": message,
-            "data": data, "read_at": None, "created_at": "2026-06-26 12:00:00",
+            "data": data, "target_url": target_url, "read_at": None,
+            "created_at": "2026-06-26 12:00:00",
         })
         return nid
 
@@ -42,6 +45,11 @@ class FakeDb:
         rows = [r for r in self.rows if r["recipient"] == recipient]
         if "read_at IS NULL" in sql:
             rows = [r for r in rows if r["read_at"] is None]
+        if "id < ?" in sql:
+            # Curseur de pagination (NOTIF-PAGINATION-001) : avant-dernier
+            # paramètre, la borne de page restant le dernier.
+            avant = params[-2]
+            rows = [r for r in rows if r["id"] < avant]
         rows = sorted(rows, key=lambda r: r["id"], reverse=True)
         return rows[:limit]
 

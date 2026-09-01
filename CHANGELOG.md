@@ -4,6 +4,15 @@
 
 ### Ajouté
 
+- **Une notification porte un lien validé (`NOTIF-TARGET-URL-001`).**
+  Le lien pouvait se ranger dans `data`, qui est libre, mais rien ne l'y validait alors qu'il finit dans un `href`. Une notification est écrite par l'application, et son contenu vient souvent d'une saisie.
+  `target_url` est une colonne dédiée, validée **à l'écriture** : un schéma qui exécute du code au clic est refusé, y compris coupé par un blanc, certains navigateurs lisant `java<tabulation>script:` comme un schéma. Une URL protocole-relative l'est aussi, qui emmène sur un autre domaine tout en ressemblant à un chemin interne.
+  Le refus empêche l'écriture : la ligne ne doit pas exister, plutôt que d'être filtrée à chaque affichage.
+
+- **La liste des notifications se pagine sans sauter de ligne (`NOTIF-PAGINATION-001`).**
+  `before_id` remplace ce qu'un `OFFSET` aurait fait de travers : une notification arrivée entre deux pages décale tout ce qui suit, si bien que la page 2 réafficherait la dernière ligne de la page 1 et en cacherait une autre.
+  Une liste de notifications est justement celle qui reçoit des écritures pendant qu'on la parcourt.
+
 - **Tracer depuis un contrôleur prend l'acteur dans la requête (`AUDIT-ACTION-HELPER-001`).**
   `record_audit` demande l'acteur en paramètre, et la documentation le montrait écrit à la main. Dans un contrôleur il vient de la session, et chaque appel devait l'en extraire.
   L'oublier une fois donne une ligne sans acteur, c'est-à-dire un journal qui ne répond plus à « qui a fait cela ». Rien ne le signale : la ligne existe, elle est simplement inutile.

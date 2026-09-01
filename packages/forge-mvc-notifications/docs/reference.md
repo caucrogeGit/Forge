@@ -139,7 +139,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     | Catégorie | Communication (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-    | API publique | `notify`, `get_notifications`, `unread_count`, `mark_read`, `mark_all_read`, `Notification`, `on_notification_created` |
+    | API publique | `notify`, `get_notifications`, `unread_count`, `mark_read`, `mark_all_read`, `Notification`, `on_notification_created`, `validate_target_url` |
     | Table SQL | `notifications` (`TABLE_NAME`) |
     | Limite de lecture | `MAX_LIMIT` = 1000 entrées |
     | Exception liée | `NotificationError` si destinataire/message vide ou limite invalide |
@@ -398,3 +398,50 @@ def doubler_par_email(notification):
     L'exemple mène à `enqueue` et non à `mailer.send`.
 
     Un envoi direct ferait attendre la requête qui a créé la notification, et une panne du relais SMTP deviendrait une panne de l'action de l'utilisateur.
+
+## Lien cible et pagination
+
+### Le lien vers ce que la notification annonce
+
+Une notification annonce quelque chose, et l'utilisateur veut y aller.
+
+Le lien pouvait se ranger dans `data`, qui est libre, mais rien ne l'y validait alors qu'il finit dans un `href` (`NOTIF-TARGET-URL-001`).
+
+```python
+notify("roger", "Facture impayée", type="alerte", target_url="/factures/12")
+```
+
+| Forme | Acceptée |
+|---|---|
+| `/factures/12` | oui, chemin interne |
+| `https://exemple.test/a` | oui |
+| `javascript:alert(1)` | non |
+| `data:text/html,…` | non |
+| `//ailleurs.test` | non |
+| `factures/12` | non, chemin sans barre initiale |
+
+!!! danger "Le lien est validé à l'écriture, pas à l'affichage"
+    Une notification est écrite par l'application, mais son contenu vient souvent d'une saisie.
+
+    Un schéma qui exécute du code au clic est refusé, y compris coupé par un blanc : certains navigateurs lisent `java<tabulation>script:` comme un schéma.
+    Le refus empêche l'écriture : la ligne ne doit pas exister, plutôt que d'être filtrée à chaque affichage.
+
+!!! info "Une URL protocole-relative est refusée"
+    `//ailleurs.test/piege` emmène sur un autre domaine tout en ressemblant à un chemin interne.
+
+### Paginer la liste
+
+`before_id` ne rend que les notifications antérieures à cet identifiant.
+
+```python
+page1 = get_notifications("roger", limit=20)
+page2 = get_notifications("roger", limit=20, before_id=page1[-1].id)
+```
+
+!!! warning "Pourquoi un curseur et non un décalage"
+    Un `OFFSET` paginerait de travers.
+
+    Une notification arrivée entre deux pages décale tout ce qui suit : la page 2 réafficherait la dernière ligne de la page 1 et en cacherait une autre.
+    Une liste de notifications est justement celle qui reçoit des écritures pendant qu'on la parcourt.
+
+Le curseur se combine à `unread_only`, et l'ordre reste du plus récent au plus ancien, ce qui fait de `before_id` un « plus ancien que ».
