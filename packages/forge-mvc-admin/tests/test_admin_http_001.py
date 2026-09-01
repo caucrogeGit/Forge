@@ -145,7 +145,9 @@ def test_list_template_affiche_lignes_et_colonnes(tmp_path: Path):
             "pagination": {"page": 1, "nb_pages": 1, "has_prev": False, "has_next": False},
         },
     )
-    assert "<th>title</th>" in html
+    # L'en-tête porte un lien de tri depuis ADMIN-LIST-FILTERS-001 : c'est le
+    # nom de colonne qui compte, pas la forme exacte de la cellule.
+    assert "<th>" in html and "title" in html
     assert "Bonjour" in html and "Forge" in html
 
 

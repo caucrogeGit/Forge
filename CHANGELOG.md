@@ -4,6 +4,14 @@
 
 ### Ajouté
 
+- **Le back-office filtre, cherche et trie ses listes (`ADMIN-LIST-FILTERS-001`).**
+  La liste affichait la table entière, page par page, sans autre choix que de tourner les pages. Passé quelques centaines de lignes, retrouver un enregistrement devenait impraticable, et le back-office avec lui.
+  Une ressource déclare `filter_fields` et `search_fields`, **vides par défaut et jamais déduits** de `list_fields`. Un filtre porte sur une colonne nommée dans l'URL : accepter n'importe laquelle exposerait une colonne que la liste n'affiche pas, et une recherche sur une telle colonne permettrait d'en deviner le contenu caractère par caractère.
+  Les noms sont comparés à la liste déclarée, jamais à la seule forme d'un identifiant SQL ; une colonne inconnue rend `400`, la demande étant fautive et non le serveur. Les valeurs partent en paramètres liés, et le sens du tri est un booléen, aucune chaîne d'URL n'entrant dans la clause `ORDER BY`.
+  Les métacaractères `%` et `_` d'une recherche sont neutralisés avec un `ESCAPE '!'` déclaré, le backslash voyant son sens dépendre d'un réglage de serveur sur MariaDB.
+  **SQL Server refuse une colonne répétée dans un `ORDER BY`**, ce que les trois autres backends acceptent : le tri secondaire par clé primaire est donc omis quand le tri porte déjà sur elle. Défaut trouvé contre le serveur, pas déduit.
+  Les critères suivent la pagination, sans quoi tourner une page les perdrait.
+
 - **Une transition de workflow s'applique dans un ordre garanti (`WORKFLOW-HOOKS-001`).**
   Le paquet savait dire si une transition est **permise**, jamais l'appliquer. Chaque application réécrivait le même enchaînement à la main, et rien n'empêchait d'appeler l'action d'après quand celle d'avant avait refusé.
   `apply_transition` enchaîne la vérification, `before`, l'écriture puis `after`, chaque étape conditionnant la suivante. Un `before` qui lève **empêche** la transition, ce qui donne sa valeur au mécanisme : une règle métier peut refuser, et son refus est visible.

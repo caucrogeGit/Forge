@@ -314,3 +314,54 @@ Il expose les constructeurs `build_list_sql`, `build_count_sql`, `build_get_sql`
 - [Contrat de ressource](resources.md) : détail de `AdminResource`.
 - [Welcome-Admin](welcome/debutant/admin-welcome.md) : parcours d'apprentissage.
 - `docs/roadmap/forge-admin-roadmap.md` : trajectoire du back-office.
+
+## Filtrer, chercher et trier une liste
+
+La liste affichait la table entière, page par page, sans autre choix que de tourner les pages.
+Passé quelques centaines de lignes, retrouver un enregistrement devenait impraticable, et le back-office avec lui (`ADMIN-LIST-FILTERS-001`).
+
+Une ressource déclare ce qu'elle ouvre.
+
+```python
+AdminResource(
+    entity="Article", slug="articles", label="Article", plural_label="Articles",
+    list_fields=("titre", "statut"), form_fields=("titre", "statut"),
+    table="articles",
+    filter_fields=("statut",),
+    search_fields=("titre", "resume"),
+)
+```
+
+| Paramètre d'URL | Effet |
+|---|---|
+| `?statut=publie` | filtre d'égalité, si `statut` est dans `filter_fields` |
+| `?q=terme` | recherche `LIKE` sur tous les `search_fields` |
+| `?tri=titre` | tri sur une colonne de `list_fields` |
+| `?sens=desc` | inverse le tri |
+
+!!! danger "Rien n'est ouvert par défaut"
+    `filter_fields` et `search_fields` sont vides tant qu'ils ne sont pas déclarés, et ils ne sont **jamais déduits** de `list_fields`.
+
+    Un filtre porte sur une colonne nommée dans l'URL.
+    Accepter n'importe laquelle exposerait des colonnes que la liste n'affiche pas, un mot de passe haché par exemple, et une recherche sur une telle colonne permettrait d'en deviner le contenu caractère par caractère.
+
+!!! info "Les noms sont vérifiés, les valeurs sont liées"
+    Un nom de colonne venu de l'URL est comparé à la liste déclarée, jamais à la seule forme d'un identifiant SQL.
+    Une colonne inconnue rend `400`, la demande étant fautive et non le serveur.
+
+    Les valeurs partent en paramètres liés, quelles qu'elles soient.
+    Le tri, lui, ne prend aucune chaîne de l'URL dans sa clause : le sens est un booléen.
+
+!!! info "La recherche ne prend pas les jokers au mot"
+    Chercher `100%` ne ramène pas tout ce qui commence par `100`.
+
+    Les métacaractères `%` et `_` d'une saisie sont neutralisés, avec un `ESCAPE '!'` déclaré.
+    Le backslash serait piégeux, son sens dépendant d'un réglage de serveur sur MariaDB.
+
+!!! warning "Le tri secondaire n'est pas décoratif"
+    La liste trie aussi par clé primaire, sans quoi deux lignes de même valeur sortiraient dans un ordre que rien ne garantit, et une page paginée en montrerait une deux fois pendant qu'une autre disparaîtrait.
+
+    Il est omis quand le tri porte déjà sur la clé primaire : SQL Server refuse une colonne répétée dans un `ORDER BY`, là où les trois autres l'acceptent.
+
+Les critères suivent la pagination.
+Sans cela, tourner une page les perdrait et la liste repartirait entière.

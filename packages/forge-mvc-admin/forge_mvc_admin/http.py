@@ -14,13 +14,14 @@ middlewares.
 from __future__ import annotations
 
 import logging
+from urllib.parse import urlencode
 from typing import TYPE_CHECKING, Any
 
 from core.mvc.controller.base_controller import BaseController
 from core.mvc.view.pagination import Pagination
 from core.security.decorators import require_auth
 
-from forge_mvc_admin.exceptions import AdminRegistryError
+from forge_mvc_admin.exceptions import AdminRegistryError, AdminResourceError
 from forge_mvc_admin.query import (
     Execute,
     FetchAll,
@@ -48,6 +49,28 @@ __all__ = ["AdminController", "register_admin_routes"]
 
 # Nombre de lignes par page de liste.
 _PAGE_SIZE = 20
+
+
+def _criteria_query(
+    filters: "dict[str, str]",
+    search: "str | None",
+    sort: "str | None",
+    descending: bool,
+) -> str:
+    """Critères courants en chaîne de requête, `page` exclue.
+
+    Rend une chaîne vide quand rien n'est demandé, et commence par `&` sinon :
+    elle se colle derrière un `?page=N` déjà présent. L'encodage passe par
+    `urlencode`, un terme de recherche pouvant contenir `&` ou `=`.
+    """
+    couples: list[tuple[str, str]] = sorted(filters.items())
+    if search:
+        couples.append(("q", search))
+    if sort:
+        couples.append(("tri", sort))
+    if descending:
+        couples.append(("sens", "desc"))
+    return ("&" + urlencode(couples)) if couples else ""
 
 
 def _permission_guard(handler: Handler, permission: str | None) -> Handler:
@@ -152,10 +175,35 @@ class AdminController:
         except AdminRegistryError:
             return BaseController.not_found()
 
+        # Les critères viennent de l'URL : `query.py` les vérifie contre les
+        # champs déclarés par la ressource, et refuse tout le reste. Une
+        # demande invalide rend 400 plutôt que 500 : elle est fautive, pas
+        # cassée (ADMIN-LIST-FILTERS-001).
+        filters = {
+            champ: valeur
+            for champ in resource.filter_fields
+            if (valeur := request.query(champ)) not in (None, "")
+        }
+        search = request.query("q")
+        sort = request.query("tri")
+        descending = request.query("sens") == "desc"
+
         fetch_all, fetch_one = self._db()
-        total = count_rows(resource, fetch_one)
-        pagination = Pagination(request, total, _PAGE_SIZE)
-        rows = list_rows(resource, fetch_all, limit=pagination.limit, offset=pagination.offset)
+        try:
+            total = count_rows(resource, fetch_one, filters=filters, search=search)
+            pagination = Pagination(request, total, _PAGE_SIZE)
+            rows = list_rows(
+                resource, fetch_all,
+                limit=pagination.limit, offset=pagination.offset,
+                filters=filters, search=search, sort=sort, descending=descending,
+            )
+        except AdminResourceError as erreur:
+            # Import local : `Response` n'est importée qu'en TYPE_CHECKING en
+            # tête de module, motif déjà suivi par la garde de permission.
+            from core.http.response import Response
+
+            return Response.text(str(erreur), status=400)
+
         return BaseController.render(
             "admin/list.html",
             context={
@@ -163,6 +211,13 @@ class AdminController:
                 "columns": resource.list_fields,
                 "rows": rows,
                 "pagination": pagination.to_dict(),
+                "filters": filters,
+                "search": search or "",
+                "sort": sort or "",
+                "descending": descending,
+                # Les critères suivent la pagination : sans cela, tourner une
+                # page les perdrait, et la liste repartirait entière.
+                "criteria_query": _criteria_query(filters, search, sort, descending),
             },
             request=request,
         )

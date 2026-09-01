@@ -1,13 +1,48 @@
 {% extends "admin/layout.html" %}
 {% block title %}{{ resource.plural_label }}{% endblock %}
 {% block content %}
+  {# Valeurs de repli : le contrôleur les fournit toutes, mais un gabarit
+     surchargé ou un rendu partiel ne doit pas produire une 500. #}
+  {% set filters = filters | default({}) %}
+  {% set search = search | default('') %}
+  {% set sort = sort | default('') %}
+  {% set descending = descending | default(false) %}
+  {% set criteria_query = criteria_query | default('') %}
   <p><a href="/admin">← Tableau de bord</a></p>
   <h2>{{ resource.plural_label }}</h2>
+
+  {% if resource.search_fields or resource.filter_fields %}
+    <form method="get" action="/admin/{{ resource.slug }}">
+      {% if resource.search_fields %}
+        <label for="admin-q">Rechercher</label>
+        <input type="search" id="admin-q" name="q" value="{{ search }}">
+      {% endif %}
+      {% for champ in resource.filter_fields %}
+        <label for="admin-f-{{ champ }}">{{ champ }}</label>
+        <input type="text" id="admin-f-{{ champ }}" name="{{ champ }}" value="{{ filters.get(champ, '') }}">
+      {% endfor %}
+      {# Le tri suit le formulaire : sans ces champs, filtrer le remettrait à zéro. #}
+      {% if sort %}<input type="hidden" name="tri" value="{{ sort }}">{% endif %}
+      {% if descending %}<input type="hidden" name="sens" value="desc">{% endif %}
+      <button type="submit">Filtrer</button>
+      {% if search or filters %}
+        <a href="/admin/{{ resource.slug }}">Tout afficher</a>
+      {% endif %}
+    </form>
+  {% endif %}
+
   {% if rows %}
     <table>
       <thead>
         <tr>
-          {% for column in columns %}<th>{{ column }}</th>{% endfor %}
+          {% for column in columns %}
+            <th>
+              {# Trier sur la colonne déjà triée en inverse le sens. #}
+              <a href="/admin/{{ resource.slug }}?tri={{ column }}{% if column == sort and not descending %}&sens=desc{% endif %}{% for champ, valeur in filters.items() %}&{{ champ }}={{ valeur }}{% endfor %}{% if search %}&q={{ search }}{% endif %}">
+                {{ column }}{% if column == sort %}{{ ' ▼' if descending else ' ▲' }}{% endif %}
+              </a>
+            </th>
+          {% endfor %}
         </tr>
       </thead>
       <tbody>
@@ -19,11 +54,11 @@
       </tbody>
     </table>
     <nav>
-      {% if pagination.has_prev %}<a href="/admin/{{ resource.slug }}?page={{ pagination.prev_page }}">Précédent</a>{% endif %}
+      {% if pagination.has_prev %}<a href="/admin/{{ resource.slug }}?page={{ pagination.prev_page }}{{ criteria_query }}">Précédent</a>{% endif %}
       <span>Page {{ pagination.page }} / {{ pagination.nb_pages }}</span>
-      {% if pagination.has_next %}<a href="/admin/{{ resource.slug }}?page={{ pagination.next_page }}">Suivant</a>{% endif %}
+      {% if pagination.has_next %}<a href="/admin/{{ resource.slug }}?page={{ pagination.next_page }}{{ criteria_query }}">Suivant</a>{% endif %}
     </nav>
   {% else %}
-    <p>Aucune ligne.</p>
+    <p>{% if search or filters %}Aucune ligne ne correspond.{% else %}Aucune ligne.{% endif %}</p>
   {% endif %}
 {% endblock %}

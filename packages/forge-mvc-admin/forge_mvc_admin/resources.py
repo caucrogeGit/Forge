@@ -48,6 +48,10 @@ class AdminResource:
             défaut : le premier champ de ``list_fields`` est alors utilisé.
         pk : colonne de clé primaire (snake_case), utilisée par la vue détail
             (``WHERE <pk> = ?``). Défaut : ``"id"``.
+        filter_fields : champs acceptant un filtre d'égalité en liste. Vide par
+            défaut, la déclaration étant obligatoire.
+        search_fields : champs balayés par la recherche plein texte. Vide par
+            défaut, pour la même raison.
 
     Le contrat valide sa propre forme à la construction et lève
     `AdminResourceError` en cas d'incohérence. Il ne vérifie pas que l'entité, la
@@ -72,6 +76,18 @@ class AdminResource:
     #: quatre backends, et que modifier laissait `updated_at` figé
     #: (`ADMIN-MANAGED-TIMESTAMPS-001`).
     timestamps: bool = False
+    #: Champs sur lesquels la liste accepte un filtre d'égalité.
+    #:
+    #: Vide par défaut : un filtre porte sur une colonne nommée dans l'URL, et
+    #: accepter n'importe laquelle exposerait des colonnes que la liste
+    #: n'affiche pas, un mot de passe haché par exemple. La déclaration est donc
+    #: obligatoire, jamais déduite de `list_fields` (`ADMIN-LIST-FILTERS-001`).
+    filter_fields: tuple[str, ...] = ()
+    #: Champs balayés par la recherche plein texte, en `LIKE`.
+    #:
+    #: Vide par défaut, pour la même raison. Une recherche sur une colonne non
+    #: déclarée permettrait de deviner son contenu caractère par caractère.
+    search_fields: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not _ENTITY_RE.fullmatch(self.entity):
@@ -111,6 +127,12 @@ class AdminResource:
             raise AdminResourceError(
                 f"pk invalide : {self.pk!r} (snake_case attendu, ex. 'id')."
             )
+        # Filtre et recherche sont facultatifs, donc validés seulement s'ils
+        # sont déclarés : `_validate_fields` refuse une liste vide.
+        if self.filter_fields:
+            _validate_fields("filter_fields", self.filter_fields)
+        if self.search_fields:
+            _validate_fields("search_fields", self.search_fields)
 
 
 def _validate_fields(kind: str, names: tuple[str, ...]) -> None:

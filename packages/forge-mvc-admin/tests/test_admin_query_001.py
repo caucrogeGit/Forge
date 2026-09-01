@@ -49,7 +49,7 @@ def test_build_list_sql_tri_par_defaut_premier_champ():
     sql = build_list_sql(_resource())
     assert sql == (
         "SELECT title, published_at FROM articles "
-        "ORDER BY title ASC LIMIT ? OFFSET ?"
+        "ORDER BY title ASC, id ASC LIMIT ? OFFSET ?"
     )
 
 

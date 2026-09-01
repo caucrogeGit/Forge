@@ -93,7 +93,7 @@ Ils passent avant tout ajout de confort.
 | `I18N-LOCALE-DETECTION-001` | **Livré.** `detect_locale`, liste blanche obligatoire, négociation par facteurs de qualité |
 | `JOBS-PRIORITY-001` | **Livré.** `priority DESC, id`, niveaux nommés, `AddColumn` étendu aux index composites |
 | `JOBS-STATUS-CLI-001` | **Livré.** Compteurs par file, colonne « prêtes » distincte de « en attente », lecture seule |
-| `ADMIN-LIST-FILTERS-001` | Filtres, recherche et tri sur les listes du back-office |
+| `ADMIN-LIST-FILTERS-001` | **Livré.** Déclaration obligatoire, noms vérifiés en liste blanche, `ORDER BY` portable |
 | `ENTITIES-UNIQUE-COMPOSITE-001` | Contrainte d'unicité sur plusieurs colonnes, déclarée au contrat |
 | `RBAC-INSTANCE-PERMISSIONS-001` | Permission portant sur une instance, cas du propriétaire |
 | `WORKFLOW-HOOKS-001` | **Livré.** `apply_transition`, veto par exception, `commit` fourni par l'application |
