@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **Un gros fichier s'importe par la file de tâches (`IMPEXP-ASYNC-JOBS-001`).**
+  Importer pendant une requête HTTP la fait attendre autant qu'il y a de lignes. Dix mille lignes, dix mille insertions, et le navigateur abandonne avant la fin : l'utilisateur relance, l'import repart de zéro, et parfois double les lignes déjà écrites.
+  Le moteur prend des fonctions de conversion et d'insertion, que JSON ne transporte pas : la tâche porte donc un **nom d'importeur** et un **chemin**, et l'application enregistre ses importeurs des deux côtés.
+  `make_import_job_handler(root=...)` **borne les chemins acceptés**. Le chemin vient d'une file que plusieurs processus écrivent : sans racine, un `../../etc/passwd` serait lu et importé ligne à ligne dans la base.
+  Un fichier mal rempli **ne fait pas échouer la tâche** : réessayer ne corrigerait pas un CSV, et la tâche rejouerait jusqu'à épuisement de ses tentatives. Le gestionnaire ne lève que sur un importeur inconnu ou un fichier illisible.
+  `on_report` rend le rapport à l'application, avec le contexte de la tâche : sans lui, un import différé serait muet, et celui qui a déposé le fichier n'apprendrait jamais ce qui est passé.
+
 - **Le journal d'audit s'exporte en entier (`AUDIT-CSV-EXPORT-001`).**
   `get_audit_log` rend des `AuditEntry` quand un écrivain CSV attend des dictionnaires : les deux ne se composaient pas, et chaque application réinventait la conversion avec son propre ordre de colonnes.
   Surtout, il borne à **mille entrées en silence**. Un export demandé sur cent mille lignes en rendait mille sans rien dire : pour un journal qu'on exporte précisément parce qu'il fait foi, le fichier paraissait complet.

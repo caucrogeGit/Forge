@@ -26,10 +26,31 @@ from forge_mvc_import_export.engine import (
     import_rows,
 )
 from forge_mvc_import_export.errors import CsvImportError
+from forge_mvc_import_export.queueing import (
+    IMPORT_JOB_TASK,
+    ImporterNotFound,
+    ImportSourceError,
+    RegisteredImporter,
+    clear_importers,
+    import_payload,
+    make_import_job_handler,
+    register_importer,
+    registered_importers,
+)
 
 __version__ = "1.0.0rc7"
 
 __all__ = [
+    # Import différé par une file (IMPEXP-ASYNC-JOBS-001)
+    "IMPORT_JOB_TASK",
+    "register_importer",
+    "clear_importers",
+    "registered_importers",
+    "import_payload",
+    "make_import_job_handler",
+    "RegisteredImporter",
+    "ImporterNotFound",
+    "ImportSourceError",
     "CsvImportError",
     "FieldSpec",
     "RowError",

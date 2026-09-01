@@ -127,7 +127,7 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     | Catégorie | Données et modélisation (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` |
-    | API publique | `parse_csv`, `to_csv`, `import_rows`, `FieldSpec`, `ImportReport`, `RowError`, `coerce_int`, `coerce_float`, `coerce_bool` |
+    | API publique | `parse_csv`, `to_csv`, `import_rows`, `FieldSpec`, `ImportReport`, `RowError`, `coerce_int`, `coerce_float`, `coerce_bool`, `register_importer`, `make_import_job_handler` |
     | Objets | `FieldSpec` (validation), `ImportReport`, `RowError` |
     | Insertion | fonction fournie par l'application (le SQL vit dans le modèle) |
     | Exception | `CsvImportError` |
@@ -317,3 +317,66 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
 - [Export programmatique (csv_writer.py)](references/export.md) : `to_csv`.
 - [Erreurs (errors.py)](references/errors.md) : `CsvImportError`.
 - [Welcome-Import/Export](welcome/debutant/import-welcome.md) : parcours d'apprentissage.
+
+## Importer un gros fichier par la file de tâches
+
+Importer pendant une requête HTTP la fait attendre autant qu'il y a de lignes.
+
+Dix mille lignes, dix mille insertions, et le navigateur abandonne avant la fin.
+L'utilisateur relance, l'import repart de zéro, et parfois double les lignes déjà écrites (`IMPEXP-ASYNC-JOBS-001`).
+
+### Pourquoi la charge utile ne porte pas le travail
+
+Le moteur prend des `FieldSpec` avec leurs fonctions de conversion, et une fonction d'insertion.
+Rien de tout cela ne se sérialise en JSON, contrairement à un message d'email.
+
+La tâche transporte donc un **nom d'importeur** et un **chemin de fichier**, et l'application enregistre ses importeurs des deux côtés.
+
+```python
+# Au démarrage, des deux côtés : celui qui met en file et l'ouvrier.
+from forge_mvc_import_export import FieldSpec, coerce_int, register_importer
+
+register_importer(
+    "personnes",
+    specs=[FieldSpec("nom"), FieldSpec("age", coerce=coerce_int)],
+    insert=enregistrer_personne,
+    on_report=prevenir_le_deposant,
+)
+```
+
+```python
+# Côté requête, après le dépôt du fichier.
+from forge_mvc_import_export import IMPORT_JOB_TASK, import_payload
+from forge_mvc_jobs import enqueue
+
+enqueue(IMPORT_JOB_TASK, import_payload("personnes", chemin, auteur=utilisateur.id))
+```
+
+```python
+# Côté ouvrier.
+from forge_mvc_import_export import IMPORT_JOB_TASK, make_import_job_handler
+from forge_mvc_jobs import run_worker
+
+run_worker({IMPORT_JOB_TASK: make_import_job_handler(root="storage/imports")})
+```
+
+!!! danger "Bornez la racine des chemins"
+    `root` refuse tout fichier hors de l'arborescence indiquée.
+
+    Le chemin vient d'une charge utile, donc d'une file que plusieurs processus écrivent.
+    Sans racine, un `../../etc/passwd` serait lu et importé ligne à ligne dans la base.
+
+!!! warning "Un fichier mal rempli n'est pas une panne"
+    Le gestionnaire ne lève **pas** pour des lignes invalides.
+
+    Réessayer ne corrigerait pas un CSV, et faire échouer la tâche la ferait rejouer jusqu'à épuisement de ses tentatives.
+    Il lève en revanche sur un importeur inconnu ou un fichier illisible : une configuration à corriger, ou un dépôt qu'un réessai peut résoudre.
+
+!!! info "Le rapport revient à l'application"
+    `on_report` reçoit le rapport et le contexte de la tâche.
+
+    Sans lui, un import différé serait muet : celui qui a déposé le fichier n'apprendrait jamais combien de lignes sont passées, ni lesquelles ont été refusées.
+    Le contexte porte ce qu'il faut pour lui répondre, son identifiant par exemple.
+
+!!! info "Un nom déjà pris est refusé"
+    Écraser un importeur en silence ferait traiter un fichier par le mauvais, et écrire dans la mauvaise table.
