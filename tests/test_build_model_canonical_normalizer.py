@@ -399,17 +399,43 @@ class TestColumnForField:
 
 # ── Indexes ignorés ───────────────────────────────────────────────────────────
 
-class TestIndexesIgnored:
+class TestIndexesPortes:
+    """Les index étaient écartés ici, et n'atteignaient donc jamais le SQL.
+
+    Ce groupe figeait ce comportement, `test_indexes_not_in_output` vérifiant
+    leur absence. C'était le défaut, pas la règle : une contrainte d'unicité
+    composite passait la validation sans jamais contraindre quoi que ce soit
+    (`ENTITIES-UNIQUE-COMPOSITE-001`).
+    """
+
     def test_indexes_key_does_not_raise(self):
         entity = _entity(fields=[_field("slug", "string", max_length=100)])
         entity["indexes"] = [{"name": "idx_slug", "fields": ["slug"]}]
         result = _normalize(entity)
         assert result is not None
 
-    def test_indexes_not_in_output(self):
+    def test_indexes_in_output(self):
         entity = _entity(fields=[_field("slug", "string", max_length=100)])
         entity["indexes"] = [{"name": "idx_slug", "fields": ["slug"]}]
         result = _normalize(entity)
+        assert result["indexes"] == [
+            {"name": "idx_slug", "columns": ["Slug"], "unique": False}
+        ]
+
+    def test_unique_composite_est_porte(self):
+        entity = _entity(fields=[
+            _field("slug", "string", max_length=100),
+            _field("code", "string", max_length=20),
+        ])
+        entity["indexes"] = [
+            {"name": "uq_slug_code", "fields": ["slug", "code"], "unique": True}
+        ]
+        result = _normalize(entity)
+        assert result["indexes"][0]["unique"] is True
+        assert result["indexes"][0]["columns"] == ["Slug", "Code"]
+
+    def test_sans_index_la_cle_reste_absente(self):
+        result = _normalize(_entity(fields=[_field("slug", "string", max_length=100)]))
         assert "indexes" not in result
 
 

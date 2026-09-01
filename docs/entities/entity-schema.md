@@ -171,7 +171,10 @@ La version actuelle ne génère pas de restauration ni de vue « corbeille ».
 
 ## indexes
 
-`indexes` permet de déclarer des index MariaDB supplémentaires sur des champs existants de l'entité.
+`indexes` permet de déclarer des index et des contraintes d'unicité sur des champs existants de l'entité.
+
+Le SQL est rendu pour le backend installé, comme le reste de la table.
+Un index unique portant plusieurs champs devient une contrainte nommée, dans le `CREATE TABLE`.
 
 Chaque entrée d'index accepte :
 
@@ -196,6 +199,34 @@ Chaque entrée d'index accepte :
 ```
 
 La **cohérence**, vérifier que les champs de l'index existent bien dans `fields[]`, est vérifiée par `forge entity:validate`, pas par le JSON Schema seul.
+
+### Unicité sur plusieurs champs
+
+Un `unique` portant plusieurs champs exprime qu'aucune paire ne peut se répéter, chaque valeur restant libre séparément.
+
+```json
+"indexes": [
+  {
+    "name": "uq_inscription_eleve_session",
+    "fields": ["eleve_id", "session_id"],
+    "unique": true
+  }
+]
+```
+
+Un même élève peut donc s'inscrire à plusieurs sessions, et une session accueillir plusieurs élèves, mais jamais deux fois le même couple.
+
+!!! warning "Ces index n'atteignaient pas la base avant la rc8"
+    Le schéma les acceptait et `entity:validate` vérifiait leurs champs, mais le normaliseur les écartait avant la génération du SQL.
+
+    Une contrainte d'unicité composite passait donc la validation sans jamais contraindre quoi que ce soit, et l'application croyait ses doublons impossibles (`ENTITIES-UNIQUE-COMPOSITE-001`).
+
+    Un projet créé avant la rc8 doit **régénérer son SQL** puis appliquer la migration correspondante pour que la contrainte existe réellement.
+
+!!! info "Une contrainte, pas seulement un index"
+    Un `unique` produit une contrainte nommée dans le `CREATE TABLE`, pas un `CREATE INDEX UNIQUE`.
+
+    C'est ce que le contrat exprime, et le nom permet au serveur de désigner la contrainte violée dans son message d'erreur.
 
 ---
 

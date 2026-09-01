@@ -4,6 +4,14 @@
 
 ### Ajouté
 
+- **Les index déclarés au contrat atteignent enfin le SQL (`ENTITIES-UNIQUE-COMPOSITE-001`).**
+  Le schéma d'entité **acceptait** une clé `indexes` avec un drapeau `unique`, `entity:validate` vérifiait que leurs champs existent, et le normaliseur les écartait ensuite, avec un commentaire disant que `build:model` ne les supportait pas encore.
+  Une contrainte d'unicité composite passait donc la validation sans jamais atteindre la base. Ce n'est pas une fonctionnalité manquante mais une **garantie annoncée et non tenue**, ce qui est pire : l'application croyait ses doublons impossibles.
+  Le modèle canonique porte désormais les index, ramenés aux colonnes réelles, et le générateur les rend. Un `unique` multi-champs devient une contrainte nommée dans le `CREATE TABLE`, le nom permettant au serveur de désigner la contrainte violée.
+  Vérifié contre les serveurs : le doublon est refusé, le couple différent passe, et un index non unique ne contraint rien. Une comparaison de chaînes n'aurait rien prouvé, une contrainte pouvant être bien écrite et ne rien contraindre.
+  Un test figeait le défaut, vérifiant que les index étaient **absents** du modèle. Il vérifie maintenant l'inverse.
+  Un projet créé avant la rc8 doit régénérer son SQL et appliquer la migration pour que la contrainte existe réellement.
+
 - **Une permission peut porter sur un objet précis (`RBAC-INSTANCE-PERMISSIONS-001`).**
   Les trois gardes du paquet répondaient toutes à « cet utilisateur peut il modifier des articles ». Aucune ne répondait à « peut il modifier **cet** article, parce qu'il en est l'auteur ».
   Chaque application réécrivait la condition à la main, et souvent de travers : oublier que le modérateur passe outre la propriété, ou vérifier la propriété avant la permission, donne un contrôle qui laisse passer ou qui bloque à tort.

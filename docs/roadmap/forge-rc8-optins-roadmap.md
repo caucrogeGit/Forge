@@ -94,7 +94,7 @@ Ils passent avant tout ajout de confort.
 | `JOBS-PRIORITY-001` | **Livré.** `priority DESC, id`, niveaux nommés, `AddColumn` étendu aux index composites |
 | `JOBS-STATUS-CLI-001` | **Livré.** Compteurs par file, colonne « prêtes » distincte de « en attente », lecture seule |
 | `ADMIN-LIST-FILTERS-001` | **Livré.** Déclaration obligatoire, noms vérifiés en liste blanche, `ORDER BY` portable |
-| `ENTITIES-UNIQUE-COMPOSITE-001` | Contrainte d'unicité sur plusieurs colonnes, déclarée au contrat |
+| `ENTITIES-UNIQUE-COMPOSITE-001` | **Livré.** Les index déclarés atteignent le SQL, contrainte nommée, doublon refusé sur serveurs réels |
 | `RBAC-INSTANCE-PERMISSIONS-001` | **Livré.** `has_instance_permission`, ordre global puis propriétaire, composition et non quatrième niveau |
 | `WORKFLOW-HOOKS-001` | **Livré.** `apply_transition`, veto par exception, `commit` fourni par l'application |
 | `DB-DOCTOR-001` | Commande `db:doctor`, version, droits, jeu de caractères |

@@ -65,7 +65,12 @@ ALLOWED_CONSTRAINT_KEYS = {
     "max_value",
     "pattern",
 }
-ALLOWED_ROOT_KEYS = {"format_version", "entity", "table", "description", "fields", "media", "rbac"}
+#: `indexes` y figure depuis ENTITIES-UNIQUE-COMPOSITE-001 : le modèle
+#: canonique le porte désormais jusqu'au générateur, qui le rend en SQL.
+ALLOWED_ROOT_KEYS = {
+    "format_version", "entity", "table", "description", "fields",
+    "media", "rbac", "indexes",
+}
 ALLOWED_RBAC_ACTION_KEYS = {"index", "show", "create", "store", "edit", "update", "delete"}
 ALLOWED_MEDIA_FIELD_VALUES = {"image", "file"}
 ALLOWED_MEDIA_ENTRY_KEYS = {"name", "field", "role", "variants", "multiple", "required", "label"}
@@ -459,6 +464,31 @@ def _normalize_entity_data(
                     and action in ALLOWED_RBAC_ACTION_KEYS
                 }
             }
+
+    # Index et contraintes d'unicité, déjà ramenés aux colonnes réelles par le
+    # normaliseur canonique. Recopiés tels quels : les valider ici doublerait
+    # la validation sémantique, qui les vérifie contre les champs déclarés
+    # (ENTITIES-UNIQUE-COMPOSITE-001).
+    raw_indexes = data.get("indexes")
+    if isinstance(raw_indexes, list):
+        retenus: list[dict[str, Any]] = []
+        for brut in cast("list[Any]", raw_indexes):
+            if not isinstance(brut, dict):
+                continue
+            index = cast("dict[str, Any]", brut)
+            nom = index.get("name")
+            colonnes = index.get("columns")
+            if not isinstance(nom, str) or not isinstance(colonnes, list):
+                continue
+            liste = cast("list[Any]", colonnes)
+            if not liste:
+                continue
+            retenus.append({
+                "name": nom,
+                "columns": [str(colonne) for colonne in liste],
+                "unique": index.get("unique") is True,
+            })
+        normalized["indexes"] = retenus
 
     return normalized
 

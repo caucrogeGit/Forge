@@ -33,7 +33,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import cli._support.output as out
 from forge_mvc_entities.validation import (
@@ -560,9 +560,29 @@ def build_entity_sql(entity_definition: dict[str, Any]) -> str:
     if primary_key_column is not None and dialect.emits_separate_primary_key():
         body_lines.append(f"    PRIMARY KEY ({primary_key_column})")
 
+    # Index et contraintes d'unicité déclarés au contrat. Ils s'arrêtaient au
+    # normaliseur : le schéma les acceptait, la validation vérifiait leurs
+    # champs, et rien ne les rendait. Une unicité composite passait donc la
+    # validation sans jamais atteindre la base (ENTITIES-UNIQUE-COMPOSITE-001).
+    indexes = cast("list[dict[str, Any]]", entity_definition.get("indexes") or [])
+    apres: list[str] = []
+    for index in indexes:
+        nom = str(index["name"])
+        colonnes = [str(colonne) for colonne in cast("list[Any]", index["columns"])]
+        if index["unique"]:
+            # Une contrainte nommée, et non un index unique : c'est ce que le
+            # contrat exprime, et le dialecte sait la rendre.
+            body_lines.append("    " + dialect.named_unique(nom, colonnes))
+        elif dialect.inline_indexes():
+            body_lines.append("    " + dialect.index_clause(nom, ", ".join(colonnes)))
+        else:
+            apres.append(dialect.create_index_sql(table, nom, ", ".join(colonnes)))
+
     lines.append(",\n".join(body_lines))
     lines.append(")" + dialect.table_suffix() + ";")
-    return "\n".join(lines) + "\n"
+    # Les index non inline suivent la création : un CREATE TABLE ne les porte
+    # pas sur SQLite, PostgreSQL ni SQL Server.
+    return "\n".join(lines + apres) + "\n"
 
 
 def _python_default_literal(field: dict[str, Any]) -> str | None:

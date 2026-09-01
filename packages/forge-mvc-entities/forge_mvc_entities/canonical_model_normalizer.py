@@ -23,7 +23,7 @@ Limites documentées :
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from forge_mvc_entities.field_resolver import (
     CanonicalNormalizationError as CanonicalNormalizationError,
@@ -51,8 +51,13 @@ def normalize_canonical_entity_for_model_build(entity: dict[str, Any]) -> dict[s
     L'énumération des champs (id synthétique, champs métier, champs système)
     est déléguée à `field_resolver.resolve_entity_fields` (source unique,
     ADR-086). Ce module n'assure plus que l'assemblage racine (entity, table,
-    description). Les index (entity["indexes"]) sont ignorés — build:model ne
-    les supporte pas encore.
+    description, indexes).
+
+    Les index déclarés sont désormais portés. Ils s'arrêtaient ici : le schéma
+    JSON les acceptait, la validation sémantique vérifiait que leurs champs
+    existent, et plus rien ne les regardait. Une contrainte d'unicité composite
+    passait donc la validation sans jamais atteindre la base
+    (`ENTITIES-UNIQUE-COMPOSITE-001`).
     """
     result: dict[str, Any] = {
         "entity": entity.get("name", ""),
@@ -63,4 +68,51 @@ def normalize_canonical_entity_for_model_build(entity: dict[str, Any]) -> dict[s
     if description:
         result["description"] = description
 
+    indexes = _normalize_indexes(entity)
+    if indexes:
+        result["indexes"] = indexes
+
     return result
+
+
+def _normalize_indexes(entity: "dict[str, Any]") -> "list[dict[str, Any]]":
+    """Index déclarés, ramenés à la forme canonique et aux colonnes réelles.
+
+    Le contrat nomme des **champs**, la base connaît des **colonnes** : la
+    correspondance passe par les champs résolus, un champ pouvant porter un nom
+    de colonne différent du sien.
+
+    Un index dont un champ est inconnu est écarté silencieusement ici : c'est la
+    validation sémantique qui le signale, avec son chemin et son message, et le
+    faire lever ici doublerait l'erreur sans rien ajouter.
+    """
+    declares = entity.get("indexes")
+    if not isinstance(declares, list):
+        return []
+
+    colonne_par_champ = {
+        champ["name"]: champ["column"] for champ in resolve_entity_fields(entity)
+    }
+
+    normalises: list[dict[str, Any]] = []
+    for declare in cast("list[Any]", declares):
+        if not isinstance(declare, dict):
+            continue
+        index = cast("dict[str, Any]", declare)
+        nom = index.get("name")
+        champs = index.get("fields")
+        if not isinstance(nom, str) or not isinstance(champs, list):
+            continue
+        colonnes = [
+            colonne_par_champ[champ]
+            for champ in cast("list[Any]", champs)
+            if isinstance(champ, str) and champ in colonne_par_champ
+        ]
+        if len(colonnes) != len(cast("list[Any]", champs)):
+            continue
+        normalises.append({
+            "name": nom,
+            "columns": colonnes,
+            "unique": index.get("unique") is True,
+        })
+    return normalises
