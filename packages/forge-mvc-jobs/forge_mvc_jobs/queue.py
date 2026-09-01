@@ -432,6 +432,80 @@ def pending_count(*, queue: str = "default", db: Any = None) -> int:
     return int(row["n"]) if row else 0
 
 
+#: Statuts qu'une tâche peut porter, dans l'ordre où ils comptent pour qui
+#: surveille : ce qui reste à faire d'abord, ce qui est fini ensuite.
+JOB_STATUSES = ("pending", "running", "failed", "done")
+
+
+@dataclass(frozen=True)
+class QueueStatus:
+    """État d'une file, tel que `forge jobs:status` le rend.
+
+    `ready` compte les tâches en attente **et disponibles maintenant**.
+    `pending` inclut les tâches différées par `available_in` ou par un réessai :
+    une file de cent tâches toutes différées n'a rien à faire, et confondre les
+    deux ferait chercher un ouvrier en panne là où tout se déroule normalement.
+    """
+
+    queue: str
+    counts: dict[str, int]
+    ready: int
+
+    @property
+    def total(self) -> int:
+        return sum(self.counts.values())
+
+
+def _status_counts_sql(par_file: bool) -> str:
+    filtre = "WHERE queue=? " if par_file else ""
+    return (
+        f"SELECT queue, status, COUNT(*) AS n FROM {TABLE_NAME} "
+        f"{filtre}GROUP BY queue, status"
+    )
+
+
+def _ready_counts_sql(par_file: bool) -> str:
+    """Tâches en attente et disponibles maintenant, par file.
+
+    La borne temporelle vient du dialecte, jamais d'un `NOW()` écrit en dur :
+    l'audit `OPTIN-DML-DIALECT-001` a mesuré que ce raccourci rendait la DML
+    inutilisable ailleurs que sur MariaDB.
+    """
+    filtre = "AND queue=? " if par_file else ""
+    return (
+        f"SELECT queue, COUNT(*) AS n FROM {TABLE_NAME} "
+        f"WHERE status='pending' AND available_at <= {_now()} {filtre}"
+        "GROUP BY queue"
+    )
+
+
+def status_counts(*, queue: "str | None" = None, db: Any = None) -> list[QueueStatus]:
+    """État des files, triées par nom. Toutes les files si `queue` est absente.
+
+    Une file sans aucune tâche n'apparaît pas : elle n'existe que par ses
+    lignes, et en inventer une vide supposerait de connaître les files que
+    l'application compte utiliser.
+    """
+    database = db if db is not None else _db_module()
+    par_file = queue is not None
+    params: tuple[Any, ...] = (queue,) if par_file else ()
+
+    par_nom: dict[str, dict[str, int]] = {}
+    for ligne in database.fetch_all(_status_counts_sql(par_file), params):
+        nom = str(ligne["queue"])
+        par_nom.setdefault(nom, {})[str(ligne["status"])] = int(ligne["n"])
+
+    prets: dict[str, int] = {
+        str(ligne["queue"]): int(ligne["n"])
+        for ligne in database.fetch_all(_ready_counts_sql(par_file), params)
+    }
+
+    return [
+        QueueStatus(queue=nom, counts=counts, ready=prets.get(nom, 0))
+        for nom, counts in sorted(par_nom.items())
+    ]
+
+
 def get_job(job_id: int, *, db: Any = None) -> Job | None:
     """Renvoie l'état d'une tâche par son identifiant, ou `None` si absente."""
     row = (db if db is not None else _db_module()).fetch_one(_SELECT_JOB_SQL, (job_id,))

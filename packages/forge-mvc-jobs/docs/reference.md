@@ -130,6 +130,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     |---|---|---|
     | `jobs:init` | Crée la table `jobs` (DDL fournie). | `forge jobs:init` |
     | `jobs:reclaim` | Reprend les tâches orphelines d'un worker planté. | `forge jobs:reclaim --lease 1800` |
+    | `jobs:status` | Affiche l'état des files, lecture seule. | `forge jobs:status --queue mails` |
 
     !!! danger "Un worker qui meurt laisse sa tâche bloquée"
         Le worker réserve une tâche en la passant à `running`, puis rend son verdict.
@@ -171,7 +172,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     | Catégorie | Exploitation et outillage (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-    | API publique | `enqueue`, `process_one`, `drain`, `run_worker`, `pending_count`, `get_job`, `Job`, `JobHandler`, `PRIORITY_LOW`, `PRIORITY_NORMAL`, `PRIORITY_HIGH` |
+    | API publique | `enqueue`, `process_one`, `drain`, `run_worker`, `pending_count`, `get_job`, `Job`, `JobHandler`, `PRIORITY_LOW`, `PRIORITY_NORMAL`, `PRIORITY_HIGH`, `status_counts`, `QueueStatus` |
     | Table SQL | `jobs` (`TABLE_NAME`) |
     | Exception liée | `JobError` si la tâche est invalide |
     | Contrainte | runtime synchrone (WSGI), sans broker ni async |
@@ -288,6 +289,8 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     |---|---|---|
     | `enqueue` | `enqueue(task, payload=None, *, queue="default", max_attempts=1, available_in=0, priority=PRIORITY_NORMAL, db=None) -> int` | enfile une tâche, renvoie son id |
     | `PRIORITY_LOW`, `PRIORITY_NORMAL`, `PRIORITY_HIGH` | `-10`, `0`, `10` | niveaux nommés, le plus grand pris d'abord |
+    | `status_counts` | `status_counts(*, queue=None, db=None) -> list[QueueStatus]` | état des files, toutes par défaut |
+    | `QueueStatus` | `queue`, `counts`, `ready`, `total` | compteurs d'une file |
     | `process_one` | `process_one(handlers, *, queue="default", db=None) -> bool` | traite une tâche, `False` si file vide |
     | `drain` | `drain(handlers, *, queue="default", max_jobs=None, db=None) -> int` | traite jusqu'à vider la file, renvoie le nombre traité |
     | `run_worker` | `run_worker(handlers, *, queue="default", poll_interval=1.0, db=None, stop=None) -> None` | boucle de traitement (process worker) |
@@ -353,6 +356,45 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
 
         - côté requête : `enqueue` ;
         - côté worker : `drain` (cron) ou `run_worker` (persistant), avec vos `handlers`.
+
+??? note "10 ter. Voir l'état des files"
+
+    Le paquet n'offrait aucun moyen de voir sa file.
+    Un exploitant qui se demandait si le travail avançait devait interroger la base à la main, sans que rien ne lui dise quelle requête écrire : une file bloquée ressemblait exactement à une file vide (`JOBS-STATUS-CLI-001`).
+
+    ```bash
+    forge jobs:status                 # toutes les files
+    forge jobs:status --queue mails   # une seule
+    ```
+
+    | Colonne | Ce qu'elle compte |
+    |---|---|
+    | `PENDING` | tâches en attente, différées comprises |
+    | `RUNNING` | tâches réservées par un ouvrier |
+    | `FAILED` | tâches ayant épuisé leurs tentatives |
+    | `DONE` | tâches terminées |
+    | `PRÊTES` | tâches en attente **et** disponibles maintenant |
+
+    !!! warning "« En attente » ne veut pas dire « à faire maintenant »"
+        Une tâche `pending` peut être différée, par `available_in` ou par le délai croissant d'un réessai.
+
+        Confondre les deux ferait chercher un ouvrier en panne là où tout se déroule normalement.
+        La colonne `PRÊTES` existe pour cette raison, et c'est elle qu'il faut lire pour savoir s'il reste du travail immédiat.
+
+    !!! info "Lecture seule"
+        La commande ne relance ni ne reprend aucune tâche, et ne purge rien.
+
+        `forge jobs:reclaim` fait la reprise des orphelines.
+        Confondre les deux donnerait à une commande de diagnostic un effet de bord que personne n'attend, et un test vérifie sur la source qu'aucune écriture ne s'y trouve.
+
+    Le même état est lisible depuis le code, pour une page d'administration par exemple.
+
+    ```python
+    from forge_mvc_jobs import status_counts
+
+    for etat in status_counts():
+        print(etat.queue, etat.counts, etat.ready, etat.total)
+    ```
 
 ??? note "10 bis. Priorité des tâches"
 

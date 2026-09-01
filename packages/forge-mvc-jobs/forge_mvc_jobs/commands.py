@@ -13,4 +13,7 @@ from __future__ import annotations
 COMMANDS: dict[str, dict[str, str | bool]] = {
     "jobs:init": {"module": "forge_mvc_jobs.cli.init"},
     "jobs:reclaim": {"module": "forge_mvc_jobs.cli.reclaim", "config": True},
+    # jobs:status lit les compteurs de la table : connexion BDD requise,
+    # aucune ecriture (JOBS-STATUS-CLI-001).
+    "jobs:status": {"module": "forge_mvc_jobs.cli.status", "config": True},
 }

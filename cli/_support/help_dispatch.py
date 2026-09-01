@@ -158,6 +158,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "iot:gc":             "Purge les mesures IoT par âge (affiche ; --run exécute).",
     "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
     "jobs:reclaim":       "Reprend les tâches orphelines d'un worker planté.",
+    "jobs:status":        "Affiche l'état des files de tâches (lecture seule).",
     "mfa:init":           "Prépare le registre anti-rejeu TOTP partagé (forge-mvc-mfa, optionnel).",
     "notifications:init": "Prépare les notifications in-app (forge-mvc-notifications).",
     "rbac:init":          "Génère les migrations RBAC (roles, permissions, role_permissions) vers mvc/migrations/.",
@@ -314,6 +315,37 @@ Limites:
 Options:
   --days N      Rétention en jours (>= 1). À défaut : IOT_KEEP_DAYS.
   --run         Exécute la suppression au lieu de l'afficher.
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "jobs:status": """\
+Usage:
+  forge jobs:status [--queue NOM]
+
+Description:
+  Affiche l'état des files de tâches : nombre de tâches en attente, en
+  cours, en échec et terminées, par file.
+
+  La colonne PRÊTES ne compte que les tâches en attente ET disponibles
+  maintenant. Une tâche pending peut être différée, par available_in ou
+  par le délai croissant d'un réessai : confondre les deux ferait
+  chercher un ouvrier en panne là où tout se déroule normalement.
+
+Exemples:
+  forge jobs:status                 # toutes les files
+  forge jobs:status --queue mails   # une seule
+
+Prérequis:
+  - forge-mvc-jobs installé et sa migration appliquée ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - LECTURE SEULE : la commande ne relance ni ne reprend aucune tâche,
+    forge jobs:reclaim fait la reprise des orphelines ;
+  - une file sans aucune tâche n'apparaît pas, elle n'existe que par
+    ses lignes ;
+  - le détail d'un échec se lit dans la colonne last_error de la table.
+
+Options:
+  --queue NOM   N'affiche que cette file. À défaut : toutes.
   -h, --help    Affiche cette aide sans exécuter la commande.""",
     "audit:gc": """\
 Usage:

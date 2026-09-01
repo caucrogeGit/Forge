@@ -4,6 +4,12 @@
 
 ### Ajouté
 
+- **L'état des files de tâches est visible (`JOBS-STATUS-CLI-001`).**
+  Le paquet n'offrait aucun moyen de voir sa file. Un exploitant qui se demandait si le travail avançait devait interroger la base à la main, sans que rien ne lui dise quelle requête écrire : une file bloquée ressemblait exactement à une file vide.
+  `forge jobs:status` affiche les compteurs par file, et `status_counts` les rend au code, pour une page d'administration par exemple.
+  La colonne « prêtes » ne compte que les tâches en attente **et disponibles maintenant**. Une tâche `pending` peut être différée, par `available_in` ou par le délai croissant d'un réessai : confondre les deux ferait chercher un ouvrier en panne là où tout se déroule normalement.
+  La commande est en **lecture seule**, `jobs:reclaim` faisant la reprise. Un test le vérifie sur la source : confondre les deux donnerait à un diagnostic un effet de bord que personne n'attend.
+
 - **La file de tâches s'ordonne par priorité (`JOBS-PRIORITY-001`).**
   Elle prenait les tâches par ordre d'insertion, sans exception : une tâche urgente déposée derrière mille envois d'emails attendait mille envois, et rien ne permettait de la faire passer devant.
   `enqueue(..., priority=PRIORITY_HIGH)` ordonne la file en `priority DESC, id`. L'ancienneté départage à égalité, sans quoi deux tâches de même priorité se prendraient dans un ordre que rien ne garantit.

@@ -92,7 +92,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "deploy:init", "deploy:check",
     # Opt-ins applicatifs (ADR-052)
     "settings:init", "stats:init", "stats:gc", "audit:init", "audit:gc",
-    "jobs:init", "jobs:reclaim", "notifications:init",
+    "jobs:init", "jobs:reclaim", "jobs:status", "notifications:init",
     "sessions:init", "sessions:gc",
     # MFA : table du registre anti-rejeu partagé, optionnelle
     # (MFA-TOTP-REPLAY-SHARED-001). Le magasin par défaut n'a besoin d'aucune table.

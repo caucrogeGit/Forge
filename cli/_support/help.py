@@ -140,6 +140,7 @@ Opt-ins applicatifs
   audit:gc            Purge le journal d'audit par âge (affiche ; --run exécute).
   jobs:init           Prépare la file de tâches de fond (forge-mvc-jobs).
   jobs:reclaim        Reprend les tâches orphelines d'un worker planté.
+  jobs:status         Affiche l'état des files de tâches (lecture seule).
   mfa:init            Prépare le registre anti-rejeu TOTP partagé (forge-mvc-mfa, optionnel).
   notifications:init  Prépare les notifications in-app (forge-mvc-notifications).
   rbac:init           Génère les migrations RBAC (roles, permissions, role_permissions) vers mvc/migrations/.
