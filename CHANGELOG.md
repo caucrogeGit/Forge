@@ -4,6 +4,14 @@
 
 ### Ajouté
 
+- **Les paramètres s'éditent depuis un écran, sans casser leur type (`ADMIN-SETTINGS-UI-001`).**
+  Un paramètre porte une valeur **et** son type, que `set_setting` déduit de la première. Une page web ne reçoit que du texte, ce qui ouvrait trois pièges.
+  Brancher un CRUD générique sur la table ferait saisir `value_type` à la main : une incohérence, `value_type=int` sur une valeur `abc`, casse toute lecture ultérieure du paramètre.
+  Convertir avec `int(saisie)` lève une `ValueError` nue, donc une erreur cinq cents là où l'appelant attendait un refus de formulaire.
+  Surtout, une valeur booléenne se lisait `text == "1"` : taper **`oui` y enregistrait faux, en silence**. L'exploitant croyait avoir activé une option, et rien ne le détrompait. `parse_setting_value` accepte les écritures usuelles des deux côtés et refuse ce qu'elle ne reconnaît pas.
+  `describe_settings` rend la valeur typée **et** sa forme texte : ce que la page affiche, elle peut le renvoyer, là où un `True` produirait une saisie dépendante de la langue de Python.
+  `get_settings_with_types` rejoint l'API publique, `get_all_settings` perdant le type qu'un écran doit pourtant renvoyer.
+
 - **Un gros fichier s'importe par la file de tâches (`IMPEXP-ASYNC-JOBS-001`).**
   Importer pendant une requête HTTP la fait attendre autant qu'il y a de lignes. Dix mille lignes, dix mille insertions, et le navigateur abandonne avant la fin : l'utilisateur relance, l'import repart de zéro, et parfois double les lignes déjà écrites.
   Le moteur prend des fonctions de conversion et d'insertion, que JSON ne transporte pas : la tâche porte donc un **nom d'importeur** et un **chemin**, et l'application enregistre ses importeurs des deux côtés.

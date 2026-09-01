@@ -113,7 +113,7 @@ Chacun dépend d'un ticket du lot 2.
 | `RBAC-DENIAL-AUDIT-001` | audit | **Livré.** Les 3 gardes annoncent, observateurs isolés, aucune dépendance croisée |
 | `AUDIT-CSV-EXPORT-001` | import-export | **Livré.** Export non borné, curseur par identifiant, aucune dépendance croisée |
 | `NOTIF-MAIL-BRIDGE-001` | mail, jobs | **Livré.** `on_notification_created`, relais isolés, pont à trois paquets sans dépendance |
-| `ADMIN-SETTINGS-UI-001` | admin | Écran d'administration des paramètres |
+| `ADMIN-SETTINGS-UI-001` | admin | **Livré.** Conversion de saisie explicite, forme renvoyable, aucune dépendance au back-office |
 | `ADMIN-SESSIONS-VIEW-001` | admin | Écran des sessions actives |
 | `WORKFLOW-ENTITY-STATUS-001` | entities | **Livré.** Le contrat devient la source, champ nommé jamais deviné, aucune dépendance |
 

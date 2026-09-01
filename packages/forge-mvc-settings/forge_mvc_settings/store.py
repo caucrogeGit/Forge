@@ -153,6 +153,28 @@ def get_all_settings(*, db: Any = None) -> dict[str, SettingValue]:
     }
 
 
+def get_settings_with_types(
+    *, db: Any = None
+) -> "list[tuple[str, SettingValue, str]]":
+    """Tous les paramètres, avec leur valeur typée **et** leur type déclaré.
+
+    `get_all_settings` perd le type, qu'un écran d'édition doit pourtant
+    afficher et renvoyer : sans lui, une page réécrirait le paramètre en
+    devinant, et changerait son type au passage (`ADMIN-SETTINGS-UI-001`).
+
+    L'ordre est celui de la requête, trié par clé.
+    """
+    database = db if db is not None else _db_module()
+    return [
+        (
+            str(ligne["setting_key"]),
+            _coerce(ligne["setting_value"], ligne["value_type"]),
+            str(ligne["value_type"]),
+        )
+        for ligne in database.fetch_all(_SELECT_ALL_SQL, ())
+    ]
+
+
 def delete_setting(key: str, *, db: Any = None) -> bool:
     """Supprime le paramètre `key`. Renvoie `True` s'il existait."""
     _validate_key(key)

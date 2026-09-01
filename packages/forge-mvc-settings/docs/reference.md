@@ -138,7 +138,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     | Catégorie | Configuration (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-    | API publique | `get_setting`, `set_setting`, `get_all_settings`, `delete_setting` |
+    | API publique | `get_setting`, `set_setting`, `get_all_settings`, `delete_setting`, `parse_setting_value`, `describe_settings` |
     | Table SQL | `app_settings` (`TABLE_NAME`) |
     | Types supportés | `str`, `int`, `bool`, `float` (`SUPPORTED_TYPES`) |
     | Exception liée | `SettingsError` si la clé est invalide ou le type non supporté |
@@ -330,3 +330,54 @@ Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis �
 dans `mvc/migrations/` par `forge settings:init` (chantier `OPTIN-DDL-DIALECTAL`).
 Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
 MariaDB, SQLite, PostgreSQL comme SQL Server.
+
+## Éditer les paramètres depuis un écran
+
+Un paramètre porte une valeur **et** son type, et `set_setting` déduit le second de la première.
+Une page web, elle, ne reçoit que du texte (`ADMIN-SETTINGS-UI-001`).
+
+```python
+from forge_mvc_settings import describe_settings, parse_setting_value, set_setting
+
+# Affichage
+for ligne in describe_settings():
+    print(ligne.key, ligne.raw, ligne.value_type)
+
+# Enregistrement d'une saisie
+set_setting(cle, parse_setting_value(saisie, type_declare))
+```
+
+| Champ de `SettingRow` | Rôle |
+|---|---|
+| `key` | la clé du paramètre |
+| `value` | la valeur typée, pour l'affichage |
+| `value_type` | le type déclaré, à renvoyer avec la saisie |
+| `raw` | la forme texte, à mettre dans le champ de formulaire |
+
+!!! danger "Ne branchez pas un CRUD générique sur la table"
+    Il faudrait saisir `value_type` à la main et le tenir cohérent avec la valeur.
+
+    Une incohérence, `value_type=int` sur une valeur `abc`, casse toute lecture ultérieure du paramètre.
+
+!!! warning "Taper « oui » dans un booléen enregistrait faux"
+    La lecture interne compare à `"1"` : toute autre saisie valait faux, en silence.
+
+    L'exploitant croyait avoir activé une option, et rien ne le détrompait.
+    `parse_setting_value` accepte `1`, `true`, `vrai`, `oui`, `yes`, `on` et leurs contraires, et **refuse** ce qu'elle ne reconnaît pas.
+
+!!! info "Un refus, jamais une erreur cinq cents"
+    Convertir avec `int(saisie)` lève une `ValueError` nue.
+
+    `parse_setting_value` lève une `SettingsError`, que le contrôleur intercepte pour rendre un message de formulaire.
+
+!!! info "Ce que la page affiche, elle peut le renvoyer"
+    `raw` est fait pour aller dans un champ que l'utilisateur renverra tel quel.
+
+    Afficher `True` produirait une saisie dépendante de la langue de Python plutôt que du contrat, d'où `1` et `0` pour un booléen.
+
+!!! info "Aucune dépendance au back-office"
+    Ce module convertit et décrit ; la page appartient à l'application.
+
+    `forge-mvc-admin` n'est pas importé, et un projet sans back-office édite ses paramètres depuis sa propre interface avec les mêmes fonctions.
+
+Une valeur textuelle est conservée telle quelle, espaces de bord comprises : contrairement à un entier, elles peuvent être voulues.
