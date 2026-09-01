@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **Les refus d'accès peuvent être tracés (`RBAC-DENIAL-AUDIT-001`).**
+  Un refus rendait une 403 et rien de plus. Aucune trace nulle part, si bien qu'une énumération de droits, quelqu'un qui essaie une à une les routes protégées, ne laissait rien derrière elle. L'exploitant n'avait aucun moyen de la voir, ni même de savoir qu'un compte butait sur une permission mal attribuée.
+  Les **trois** gardes annoncent désormais leurs refus par `on_permission_denied`, et l'événement porte la permission, l'acteur, la route et la garde qui a refusé. Un visiteur anonyme est rapporté sans acteur, c'est souvent celui qu'on veut voir.
+  Le paquet **annonce, il ne journalise pas** : il n'importe aucun autre opt-in, et un test le vérifie sur l'arbre syntaxique. `forge-mvc-audit` est le destinataire évident sans être imposé.
+  Un observateur qui lève ne peut pas casser la réponse : l'exception est avalée et journalisée, les suivants sont appelés quand même. Transformer un 403 en 500 parce que la base d'audit est indisponible ferait d'un contrôle d'accès qui fonctionne une panne du site.
+  Seuls les refus sont annoncés : annoncer les succès noierait le signal.
+
 - **L'envoi d'email peut être confié à la file de tâches (`MAIL-QUEUE-VIA-JOBS-001`).**
   Envoyer un email pendant une requête HTTP la fait attendre le serveur SMTP. Une seconde de latence est courante, dix le sont aussi quand le relais est lent, et une panne du relais devient une panne du formulaire : l'utilisateur voit une erreur alors que son inscription est enregistrée.
   `message_to_payload` traduit un message en charge utile JSON, `make_mail_job_handler` rend le gestionnaire à enregistrer, et `MAIL_JOB_TASK` nomme la tâche une seule fois pour les deux côtés.

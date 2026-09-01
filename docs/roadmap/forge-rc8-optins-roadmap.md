@@ -110,7 +110,7 @@ Chacun dépend d'un ticket du lot 2.
 |---|---|---|
 | `MAIL-QUEUE-VIA-JOBS-001` | jobs | **Livré.** `MAIL_JOB_TASK`, sérialisation JSON, gestionnaire ; aucune dépendance croisée |
 | `IMPEXP-ASYNC-JOBS-001` | jobs | Import de gros fichiers par la file |
-| `RBAC-DENIAL-AUDIT-001` | audit | Consigner les refus d'accès |
+| `RBAC-DENIAL-AUDIT-001` | audit | **Livré.** Les 3 gardes annoncent, observateurs isolés, aucune dépendance croisée |
 | `AUDIT-CSV-EXPORT-001` | import-export | Export du journal en CSV |
 | `NOTIF-MAIL-BRIDGE-001` | mail, jobs | Relais documenté de la notification vers l'email |
 | `ADMIN-SETTINGS-UI-001` | admin | Écran d'administration des paramètres |

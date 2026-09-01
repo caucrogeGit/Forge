@@ -36,6 +36,14 @@ from forge_mvc_rbac.contract import (
     require_contract_permission_for_request,
 )
 from forge_mvc_rbac.authorization import auth_user_can, require_user_permission
+from forge_mvc_rbac.denials import (
+    DenialEvent,
+    DenialObserver,
+    clear_denial_observers,
+    denial_observers,
+    notify_permission_denied,
+    on_permission_denied,
+)
 from forge_mvc_rbac.instance import (
     InstancePermissionDenied,
     OwnershipCheck,
@@ -109,6 +117,13 @@ __all__ = [
     "has_contract_permission",
     "require_contract_permission",
     "require_contract_permission_for_request",
+    # Observation des refus d'accès (RBAC-DENIAL-AUDIT-001)
+    "on_permission_denied",
+    "clear_denial_observers",
+    "denial_observers",
+    "notify_permission_denied",
+    "DenialEvent",
+    "DenialObserver",
     # Permission portant sur une instance (RBAC-INSTANCE-PERMISSIONS-001)
     "has_instance_permission",
     "require_instance_permission",

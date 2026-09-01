@@ -266,6 +266,17 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     | `InstancePermissionDenied` | refus levé |
     | `OwnershipCheck`, `PermissionCheck` | types des deux fonctions fournies par l'application |
 
+    ### Observation des refus d'accès
+
+    | Élément | Rôle |
+    |---|---|
+    | `on_permission_denied(observer)` | enregistre un observateur, rend l'observateur |
+    | `DenialEvent` | `permission`, `actor`, `path`, `method`, `source` |
+    | `denial_observers()` | observateurs enregistrés, dans l'ordre |
+    | `clear_denial_observers()` | retire tous les observateurs, pour les tests |
+    | `notify_permission_denied(...)` | annonce un refus, appelée par les gardes |
+    | `DenialObserver` | type d'un observateur |
+
     ### Modèle et Jinja
 
     | Élément | Rôle |
@@ -281,9 +292,59 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     | Protéger selon l'utilisateur en base | `require_user_permission(...)` / `auth_user_can(...)` |
     | Garde bas niveau | `require_permission(...)` (permissions pré-chargées) |
     | Autoriser l'auteur sur son propre contenu | `has_instance_permission(...)` |
+    | Tracer les tentatives refusées | `on_permission_denied(...)` |
     | Afficher un bouton conditionnel | `{% if can("article.update") %}` |
     | Décrire les droits | `mvc/security/rbac.json` |
     | Vérifier le contrat | `forge rbac:validate` / `forge rbac:audit` |
+
+??? note "9 ter. Tracer les refus d'accès"
+
+    Un refus rendait une 403 et rien de plus.
+
+    Aucune trace nulle part, si bien qu'une énumération de droits, quelqu'un qui essaie une à une les routes protégées, ne laissait rien derrière elle.
+    L'exploitant n'avait aucun moyen de la voir, ni même de savoir qu'un compte butait sur une permission mal attribuée (`RBAC-DENIAL-AUDIT-001`).
+
+    Les trois gardes annoncent désormais leurs refus, et l'application décide de ce qu'elle en fait.
+
+    ```python
+    from forge_mvc_audit import record_audit
+    from forge_mvc_rbac import on_permission_denied
+
+    on_permission_denied(lambda refus: record_audit(
+        "acces.refuse",
+        actor=refus.actor,
+        target_type="permission",
+        target_id=refus.permission,
+    ))
+    ```
+
+    | Champ | Ce qu'il porte |
+    |---|---|
+    | `permission` | la permission qui manquait |
+    | `actor` | l'utilisateur, ou `None` s'il n'est pas authentifié |
+    | `path`, `method` | la route visée, quand la requête les porte |
+    | `source` | la garde qui a refusé, `contract`, `request-permissions` ou `prefix-guard` |
+
+    !!! info "Le paquet annonce, il ne journalise pas"
+        `forge-mvc-rbac` n'importe aucun autre opt-in, et un test le vérifie sur l'arbre syntaxique.
+
+        `forge-mvc-audit` est le destinataire évident, sans être imposé : une application peut préférer son propre journal, une métrique, ou une alerte.
+
+    !!! warning "Un observateur ne peut pas casser une réponse"
+        Si l'observateur lève, l'exception est avalée et journalisée en avertissement.
+
+        Transformer un 403 en 500 parce que la base d'audit est indisponible ferait d'un contrôle d'accès qui fonctionne une panne du site.
+        Les observateurs suivants sont appelés malgré tout.
+
+    !!! info "Seuls les refus sont annoncés"
+        Une permission accordée ne produit rien.
+
+        Annoncer les succès noierait le signal : c'est la tentative refusée qui se remarque, et c'est elle qu'on cherche après coup.
+
+    !!! info "Un visiteur anonyme est rapporté sans acteur"
+        `actor` vaut `None` quand personne n'est authentifié.
+
+        C'est souvent celui qu'on veut voir : quelqu'un qui touche une route protégée sans être connecté.
 
 ??? note "9 bis. Autoriser sur un objet précis"
 

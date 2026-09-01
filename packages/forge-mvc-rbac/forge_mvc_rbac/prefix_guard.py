@@ -23,6 +23,8 @@ Usage (couche app) ::
 """
 from __future__ import annotations
 
+from forge_mvc_rbac.denials import notify_permission_denied
+
 from collections.abc import Callable, Mapping
 from pathlib import Path
 
@@ -81,6 +83,9 @@ class PrefixPermissionMiddleware:
             roles = get_request_roles(request)
             if has_contract_permission(result, roles, permission):
                 return None
+            notify_permission_denied(
+                permission, request=request, source="prefix-guard"
+            )
             return self._denied()
         return None
 

@@ -13,6 +13,8 @@ Comportement :
 
 from __future__ import annotations
 
+from forge_mvc_rbac.denials import notify_permission_denied
+
 import functools
 import json
 from collections.abc import Callable, Iterable
@@ -251,6 +253,9 @@ def require_contract_permission(
     """
     if has_contract_permission(result, roles, permission):
         return None
+    # Sans cette annonce, un refus ne laissait aucune trace et une énumération
+    # de droits passait inaperçue (RBAC-DENIAL-AUDIT-001).
+    notify_permission_denied(permission, source="contract")
     return Response(403, body=f"Permission required: {permission}".encode())
 
 
@@ -355,7 +360,12 @@ def require_contract_permission_for_request(
     """
     result = load_rbac_contract(project_root)
     roles = get_request_roles(request)
-    return require_contract_permission(result, roles, permission)
+    if has_contract_permission(result, roles, permission):
+        return None
+    # Annoncé ici plutôt que délégué : c'est le seul niveau qui connaît la
+    # requête, donc l'acteur et le chemin visé.
+    notify_permission_denied(permission, request=request, source="contract")
+    return Response(403, body=f"Permission required: {permission}".encode())
 
 
 def contract_permission_required(

@@ -209,6 +209,11 @@ def require_permission(permission_code: str):
         @functools.wraps(func)
         def wrapper(request: Any, *args: Any, **kwargs: Any) -> Any:
             if not has_permission(request, normalized):
+                from forge_mvc_rbac.denials import notify_permission_denied
+
+                notify_permission_denied(
+                    normalized, request=request, source="request-permissions"
+                )
                 return Response(403, body=f"Permission required: {normalized}".encode())
             return func(request, *args, **kwargs)
         return wrapper
