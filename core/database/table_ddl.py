@@ -293,7 +293,7 @@ def render_add_column(
         )
 
     statements = [
-        f"ALTER TABLE {table.name} ADD COLUMN {_column_line(colonne, dialect)};"
+        dialect.add_column_clause(table.name, _column_line(colonne, dialect))
     ]
     statements += [
         dialect.create_index_sql(table.name, index.name, index.column_list)

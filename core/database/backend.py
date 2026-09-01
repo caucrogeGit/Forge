@@ -239,6 +239,18 @@ class Dialect(Protocol):
         """Instruction CREATE INDEX autonome (si index non inline)."""
         ...
 
+    def add_column_clause(self, table: str, definition: str) -> str:
+        """Instruction d'ajout d'une colonne à une table existante.
+
+        `definition` porte le nom, le type et la nullabilité déjà rendus.
+
+        La clause n'est pas la même partout : SQL Server écrit `ADD`, là où les
+        trois autres écrivent `ADD COLUMN`. Le mot-clé y est une erreur de
+        syntaxe, refusée par le serveur, ce qu'aucune comparaison de chaînes ne
+        montre (`SESSIONS-DELETE-FOR-USER-001`).
+        """
+        ...
+
     def introspect_columns(
         self, connection: Any, table: str, database: str
     ) -> "list[tuple[str, str, bool, bool]]":

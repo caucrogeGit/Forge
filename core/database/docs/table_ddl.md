@@ -64,6 +64,42 @@ Avec `on_update_now=True`, la mise à jour automatique est ajoutée **là où le
 
 `ON DELETE RESTRICT` est normalisé en `NO ACTION` : SQL Server ne connaît pas `RESTRICT`, alors que `NO ACTION` est compris par les quatre backends et a la même sémantique pratique.
 
+## Ajouter une colonne à une table déjà provisionnée
+
+`render_create_table` ne suffit pas quand la table existe déjà chez l'exploitant.
+Sa migration de création ne se rejoue pas, son empreinte étant enregistrée, si bien qu'un opt-in ne pouvait pas faire évoluer son schéma sans casser les projets en place.
+
+`render_add_column(table, column_name, dialect)` rend l'ajout, et `AddColumn` le déclare dans la liste `MIGRATIONS` d'un paquet.
+
+```python
+from core.database.table_ddl import AddColumn
+
+MIGRATIONS = [
+    ("20260710130000_create_forge_sessions.sql", FORGE_SESSIONS),
+    ("20260901090000_add_user_id_to_forge_sessions.sql", AddColumn(FORGE_SESSIONS, "user_id")),
+]
+```
+
+`table` porte la définition **à jour**, colonne comprise, pour qu'une seule description reste la source.
+
+!!! warning "La colonne doit accepter NULL, ou porter un défaut"
+    Les lignes déjà présentes doivent pouvoir la satisfaire.
+
+    Une colonne `NOT NULL` sans défaut est refusée au rendu, plutôt que de faire échouer la migration chez l'exploitant.
+
+!!! info "Les index sont toujours rendus séparément"
+    Un `ALTER TABLE` ne porte pas d'index, y compris sur les dialectes qui les inlinent dans un `CREATE TABLE`.
+
+    Seuls les index de la colonne ajoutée sont rendus.
+    Rendre les autres créerait un doublon, que MariaDB refuse et que PostgreSQL et SQL Server ignorent en silence.
+
+!!! danger "SQL Server n'écrit pas `ADD COLUMN`"
+    Sa syntaxe est `ALTER TABLE t ADD colonne type`, sans le mot-clé.
+    Celui-ci y produit « Incorrect syntax near the keyword 'COLUMN' », et l'instruction est refusée par le serveur.
+
+    La clause vient donc du contrat `Dialect`, via `add_column_clause`.
+    Le défaut n'est apparu qu'en jouant la migration contre un vrai serveur : une comparaison de chaînes ne montre jamais qu'une instruction bien formée est refusée.
+
 ## Ce que ce module ne fait pas
 
 Il rend des **tables d'infrastructure**, livrées figées par un paquet.
@@ -73,6 +109,8 @@ Les deux rendus partagent le contrat `Dialect` mais pas leur entrée.
 Les confondre reviendrait à faire dépendre tous les opt-ins du moteur d'entités.
 
 ## Garde-fou
+
+`tests/db/test_add_column_migration_real_server_001.py` joue l'ajout de colonne contre les trois serveurs, création puis migration, avec une ligne écrite avant.
 
 `tests/meta/test_optin_ddl_portability_ratchet_001.py` est un **cliquet** : la liste des fichiers SQL encore non portables ne peut que diminuer.
 Un paquet neuf qui livrerait du SQL propre à MariaDB fait échouer la suite, et un fichier corrigé mais laissé dans la liste la fait échouer aussi.

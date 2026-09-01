@@ -159,6 +159,9 @@ class SQLiteDialect:
     def create_index_sql(self, table: str, name: str, column: str) -> str:
         return f"CREATE INDEX IF NOT EXISTS {name} ON {table} ({column});"
 
+    def add_column_clause(self, table: str, definition: str) -> str:
+        return f"ALTER TABLE {table} ADD COLUMN {definition};"
+
     def foreign_key_checks_ddl(self, *, enabled: bool) -> "list[str]":
         """Report des contraintes, seul levier utilisable là où il sert (ADR-077).
 

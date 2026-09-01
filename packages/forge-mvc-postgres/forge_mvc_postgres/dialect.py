@@ -171,6 +171,9 @@ class PostgreSQLDialect:
     def create_index_sql(self, table: str, name: str, column: str) -> str:
         return f"CREATE INDEX IF NOT EXISTS {name} ON {table} ({column});"
 
+    def add_column_clause(self, table: str, definition: str) -> str:
+        return f"ALTER TABLE {table} ADD COLUMN {definition};"
+
     def foreign_key_checks_ddl(self, *, enabled: bool) -> "list[str]":
         # PostgreSQL n'a pas d'interrupteur FK ; session_replication_role =
         # replica court-circuite les triggers (dont les contraintes FK). Exige un

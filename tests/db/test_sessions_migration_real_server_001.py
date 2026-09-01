@@ -38,7 +38,15 @@ def _rendered_statements(table_name: str) -> list[str]:
     table = replace(
         FORGE_SESSIONS,
         name=table_name,
-        indexes=[replace(index, name=f"{table_name}_expire") for index in FORGE_SESSIONS.indexes],
+        # Un nom par index, et non un nom pour tous : la table en porte deux
+        # depuis SESSIONS-DELETE-FOR-USER-001, et les nommer pareil crée un
+        # doublon. MariaDB le refuse, PostgreSQL et SQL Server l'ignorent en
+        # silence par leur `IF NOT EXISTS`, si bien que le test y passait en
+        # ne créant qu'un index sur deux.
+        indexes=[
+            replace(index, name=f"{table_name}_idx{numero}")
+            for numero, index in enumerate(FORGE_SESSIONS.indexes)
+        ],
     )
     return render_create_table(table, get_backend().dialect)
 

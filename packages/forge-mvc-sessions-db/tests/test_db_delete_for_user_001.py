@@ -68,7 +68,10 @@ class TestMigrationPortable:
         instructions = render_add_column(FORGE_SESSIONS, "user_id", _dialecte(backend))
 
         assert instructions, f"aucune instruction rendue pour {backend}"
-        assert instructions[0].startswith("ALTER TABLE forge_sessions ADD COLUMN user_id")
+        # La clause vient du dialecte : SQL Server écrit `ADD`, les trois autres
+        # `ADD COLUMN`, le mot-clé y étant une erreur de syntaxe.
+        assert instructions[0].startswith("ALTER TABLE forge_sessions ADD")
+        assert "user_id" in instructions[0]
         assert instructions[0].rstrip().endswith(";")
 
     @pytest.mark.parametrize("backend", BACKENDS)

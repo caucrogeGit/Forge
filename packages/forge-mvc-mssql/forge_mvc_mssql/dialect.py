@@ -182,6 +182,11 @@ class MSSQLDialect:
             f"    CREATE INDEX {name} ON {table} ({column});"
         )
 
+    def add_column_clause(self, table: str, definition: str) -> str:
+        # SQL Server n'accepte pas le mot-cle COLUMN dans un ALTER TABLE ADD :
+        # il y produit « Incorrect syntax near the keyword 'COLUMN' ».
+        return f"ALTER TABLE {table} ADD {definition};"
+
     def foreign_key_checks_ddl(self, *, enabled: bool) -> "list[str]":
         # SQL Server ne désactive les contraintes que table par table
         # (ALTER TABLE ... NOCHECK CONSTRAINT), sans levier de session : pas de

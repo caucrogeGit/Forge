@@ -4,6 +4,11 @@
 
 ### Ajouté
 
+- **L'ajout de colonne était refusé par SQL Server (`SESSIONS-DELETE-FOR-USER-001`, suite).**
+  `render_add_column` écrivait `ALTER TABLE t ADD COLUMN`, forme correcte sur trois backends et **erreur de syntaxe sur SQL Server**, qui n'accepte pas le mot-clé. La clause vient désormais du contrat `Dialect`, via `add_column_clause`.
+  Le rendu était vérifié par comparaison de chaînes, ce qui ne montre jamais qu'une instruction bien formée est refusée par le serveur. `tests/db/test_add_column_migration_real_server_001.py` joue le scénario réel sur les trois serveurs : table créée sans la colonne, ligne écrite, migration appliquée, ligne d'avant préservée.
+  Les trois tests d'intégration des migrations de session nommaient par ailleurs **tous** les index d'une table pareillement, ce qui passait tant qu'elle n'en portait qu'un. MariaDB a refusé le doublon ; PostgreSQL et SQL Server l'ignoraient en silence par leur `IF NOT EXISTS`, et y passaient en ne créant qu'un index sur deux.
+
 - **Le pré-vol refuse un secret laissé à sa valeur d'amorçage (`DEPLOY-CHECK-SECRETS-001`).**
   `deploy:check` vérifiait `DB_HOST`, `DB_NAME` et `DB_APP_LOGIN`, jamais les mots de passe ni les jetons. Un `DB_APP_PWD=change-me` recopié d'un exemple passait donc le contrôle, et la panne n'apparaissait qu'au premier accès à la base, en production, alors que le pré-vol existe précisément pour l'éviter.
   Le repérage porte sur le **nom** de la variable et non sur une liste figée : un nom contenant `PASSWORD`, `PWD`, `SECRET` ou `TOKEN` porte un secret, et un opt-in ajouté demain est couvert sans que le pré-vol change. Les noms de chemin et de drapeau sont écartés, `SSL_KEYFILE` en tête, un contrôle qui crie à tort finissant désactivé.

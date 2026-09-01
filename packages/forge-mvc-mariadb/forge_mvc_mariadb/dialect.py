@@ -191,6 +191,9 @@ class MariaDBDialect:
     def create_index_sql(self, table: str, name: str, column: str) -> str:
         return f"CREATE INDEX {name} ON {table} ({column});"
 
+    def add_column_clause(self, table: str, definition: str) -> str:
+        return f"ALTER TABLE {table} ADD COLUMN {definition};"
+
     def foreign_key_checks_ddl(self, *, enabled: bool) -> "list[str]":
         # Levier de session MariaDB (ADR-077).
         return [f"SET FOREIGN_KEY_CHECKS = {1 if enabled else 0}"]
