@@ -259,7 +259,7 @@ Chacun dépend d'un ticket du lot 2.
 | Ticket | Responsabilité unique |
 |---|---|
 | `AUDIT-FILTERS-001` | **Livré.** Les 4 filtres d'égalité existaient ; période ajoutée, date de fin incluant la journée |
-| `AUDIT-ACTION-HELPER-001` | Aide unique de consignation d'une action |
+| `AUDIT-ACTION-HELPER-001` | **Livré.** `record_request_audit`, acteur pris en session, jamais bloquant |
 
 ### 7.19 stats
 

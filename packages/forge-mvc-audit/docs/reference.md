@@ -161,7 +161,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     | Catégorie | Sécurité et accès (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-    | API publique | `record_audit`, `get_audit_log`, `AuditEntry`, `iter_audit_rows` |
+    | API publique | `record_audit`, `get_audit_log`, `AuditEntry`, `iter_audit_rows`, `record_request_audit` |
     | Table SQL | `audit_log` (`TABLE_NAME`) |
     | Limite de lecture | `MAX_LIMIT` = 1000 entrées |
     | Exception liée | `AuditError` si l'action est vide ou la limite invalide |
@@ -457,3 +457,35 @@ Les deux bornes sont **incluses**, et se combinent aux filtres d'égalité.
     C'est ce qui la rend portable sur les quatre backends sans effort, motif dont l'audit `OPTIN-DML-DIALECT-001` a mesuré le coût inverse.
 
 Un champ de formulaire laissé vide ne borne rien : la chaîne vide est traitée comme une absence de filtre, pas comme une date invalide.
+
+## Tracer depuis un contrôleur
+
+`record_audit` demande l'acteur en paramètre, et l'exemple ci-dessus l'écrit à la main.
+
+Dans un contrôleur il vient de la session, et chaque appel devait l'en extraire.
+L'oublier une fois donne une ligne sans acteur, c'est-à-dire un journal qui ne répond plus à « qui a fait cela » (`AUDIT-ACTION-HELPER-001`).
+
+Rien ne le signale : la ligne existe, elle est simplement inutile.
+
+```python
+from forge_mvc_audit import record_request_audit
+
+def update(self, request):
+    ...
+    record_request_audit(
+        request, "note.modifiee",
+        target_type="note", target_id=note.id, details="12 vers 14",
+    )
+```
+
+!!! info "Un acteur absent est une information"
+    L'acteur vaut `None` quand personne n'est authentifié.
+
+    Une action déclenchée par un visiteur anonyme ou par une tâche de fond n'a pas d'auteur, et inventer « system » masquerait la différence entre les deux.
+
+!!! warning "Le journal ne fait jamais échouer l'action qu'il trace"
+    Une session illisible ou un cœur indisponible donnent un acteur absent, jamais une exception.
+
+    Un journal qui interrompt l'opération qu'il devait enregistrer serait pire que l'absence de journal.
+
+Le reste du contrat est celui de `record_audit` : mêmes champs de cible, même refus d'une action vide, même identifiant rendu.

@@ -135,6 +135,62 @@ def _borne_periode(
     return f"{texte} 23:59:59" if fin_de_journee else f"{texte} 00:00:00"
 
 
+def record_request_audit(
+    request: Any,
+    action: str,
+    *,
+    target_type: str | None = None,
+    target_id: str | int | None = None,
+    details: str | None = None,
+    db: Any = None,
+) -> int:
+    """Enregistre une action en prenant l'acteur dans la requête.
+
+    `record_audit` demande l'acteur en paramètre, et la documentation le
+    montrait écrit à la main. Dans un contrôleur il vient de la session, et
+    chaque appel devait l'en extraire : l'oublier une fois donne une ligne sans
+    acteur, c'est à dire un journal qui ne répond plus à « qui a fait cela »
+    (`AUDIT-ACTION-HELPER-001`).
+
+    L'acteur reste `None` quand personne n'est authentifié. C'est une
+    information, pas un manque : une action déclenchée par un visiteur anonyme
+    ou par une tâche de fond n'a pas d'auteur, et inventer « system » masquerait
+    la différence.
+
+    Raises:
+        AuditError: `action` est vide, comme pour `record_audit`.
+    """
+    return record_audit(
+        action,
+        actor=_acteur_de_la_requete(request),
+        target_type=target_type,
+        target_id=target_id,
+        details=details,
+        db=db,
+    )
+
+
+def _acteur_de_la_requete(request: Any) -> "str | None":
+    """Identifiant de l'utilisateur authentifié, en texte, ou `None`.
+
+    Rendu en texte parce que la colonne l'est : l'identité applicative peut être
+    un entier comme un login, et la colonne doit rester la même.
+
+    Une session absente ou un cœur indisponible rendent `None` plutôt que de
+    lever : un journal qui fait échouer l'action qu'il trace serait pire que
+    l'absence de journal.
+    """
+    if request is None:
+        return None
+    try:
+        from core.auth.session import get_authenticated_user_id
+
+        identifiant = get_authenticated_user_id(request)
+    except Exception:  # noqa: BLE001 — session absente, ou cœur indisponible
+        return None
+    return None if identifiant is None else str(identifiant)
+
+
 def get_audit_log(
     *,
     limit: int = 100,

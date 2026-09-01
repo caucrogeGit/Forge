@@ -4,6 +4,12 @@
 
 ### Ajouté
 
+- **Tracer depuis un contrôleur prend l'acteur dans la requête (`AUDIT-ACTION-HELPER-001`).**
+  `record_audit` demande l'acteur en paramètre, et la documentation le montrait écrit à la main. Dans un contrôleur il vient de la session, et chaque appel devait l'en extraire.
+  L'oublier une fois donne une ligne sans acteur, c'est-à-dire un journal qui ne répond plus à « qui a fait cela ». Rien ne le signale : la ligne existe, elle est simplement inutile.
+  `record_request_audit` fait cette extraction. L'acteur reste `None` quand personne n'est authentifié, ce qui est une **information** et non un manque : une action de visiteur anonyme ou de tâche de fond n'a pas d'auteur, et inventer « system » masquerait la différence.
+  Une session illisible donne un acteur absent, jamais une exception : un journal qui interrompt l'opération qu'il devait enregistrer serait pire que l'absence de journal.
+
 - **Un journal d'audit se borne à une période (`AUDIT-FILTERS-001`).**
   Quatre filtres d'égalité existaient déjà, par acteur, action et cible. La question qu'on pose le plus souvent à un journal n'avait aucune réponse : « que s'est-il passé entre telle date et telle autre ».
   `since` et `until` bornent la lecture **et** l'export, et acceptent un `datetime`, un horodatage ou une date seule, un champ de formulaire ne rendant que du texte.

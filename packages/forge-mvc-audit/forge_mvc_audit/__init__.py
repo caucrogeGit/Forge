@@ -25,12 +25,14 @@ from forge_mvc_audit.store import (
     get_audit_log,
     purge_audit_before,
     record_audit,
+    record_request_audit,
 )
 
 __version__ = "1.0.0rc7"
 
 __all__ = [
     # Export du journal (AUDIT-CSV-EXPORT-001)
+    "record_request_audit",
     "iter_audit_rows",
     "entry_to_row",
     "AUDIT_EXPORT_COLUMNS",
