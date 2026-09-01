@@ -10,6 +10,12 @@ ADR-008 (Forge fournit la table et le helper, la décision de tracer reste
 applicative). La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 """
 from forge_mvc_audit.errors import AuditError
+from forge_mvc_audit.export import (
+    AUDIT_EXPORT_COLUMNS,
+    DEFAULT_BATCH_SIZE,
+    entry_to_row,
+    iter_audit_rows,
+)
 from forge_mvc_audit.store import (
     MAX_LIMIT,
     TABLE_NAME,
@@ -24,6 +30,11 @@ from forge_mvc_audit.store import (
 __version__ = "1.0.0rc7"
 
 __all__ = [
+    # Export du journal (AUDIT-CSV-EXPORT-001)
+    "iter_audit_rows",
+    "entry_to_row",
+    "AUDIT_EXPORT_COLUMNS",
+    "DEFAULT_BATCH_SIZE",
     "AuditError",
     "AuditEntry",
     "TABLE_NAME",

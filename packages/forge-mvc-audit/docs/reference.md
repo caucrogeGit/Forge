@@ -161,7 +161,7 @@ Le cœur de Forge ignore tout de l'audit applicatif : ce paquet fournit la table
     | Catégorie | Sécurité et accès (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-    | API publique | `record_audit`, `get_audit_log`, `AuditEntry` |
+    | API publique | `record_audit`, `get_audit_log`, `AuditEntry`, `iter_audit_rows` |
     | Table SQL | `audit_log` (`TABLE_NAME`) |
     | Limite de lecture | `MAX_LIMIT` = 1000 entrées |
     | Exception liée | `AuditError` si l'action est vide ou la limite invalide |
@@ -366,3 +366,52 @@ Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis �
 dans `mvc/migrations/` par `forge audit:init` (chantier `OPTIN-DDL-DIALECTAL`).
 Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
 MariaDB, SQLite, PostgreSQL comme SQL Server.
+
+## Exporter le journal
+
+Un journal se lit à l'écran et s'exporte pour rendre des comptes.
+
+`get_audit_log` rend des `AuditEntry`, quand un écrivain CSV attend des dictionnaires : les deux ne se composaient pas.
+Surtout, il borne à mille entrées **en silence** : un export demandé sur cent mille lignes en rendait mille sans rien dire (`AUDIT-CSV-EXPORT-001`).
+
+Pour un journal qu'on exporte précisément parce qu'il fait foi, c'est le pire des défauts : le fichier paraît complet.
+
+```python
+from forge_mvc_audit import AUDIT_EXPORT_COLUMNS, iter_audit_rows
+from forge_mvc_import_export import to_csv
+
+lignes = list(iter_audit_rows(actor="roger"))
+contenu = to_csv(lignes, list(AUDIT_EXPORT_COLUMNS))
+```
+
+| Colonne | Contenu |
+|---|---|
+| `id` | identifiant de l'entrée |
+| `created_at` | horodatage |
+| `actor` | auteur de l'action |
+| `action` | l'action tracée |
+| `target_type`, `target_id` | l'objet visé |
+| `details` | complément libre |
+
+!!! warning "L'export n'est pas borné, la lecture l'est"
+    `get_audit_log` garde sa limite, qui protège un affichage.
+
+    `iter_audit_rows` avance tant qu'il reste des entrées : un export doit être complet ou ne pas exister.
+
+!!! info "L'avance se fait par identifiant, jamais par décalage"
+    Un `OFFSET` sur une table qui reçoit des écritures pendant l'export sauterait ou répéterait des lignes.
+
+    C'est exactement ce qu'un journal ne peut pas se permettre, et un test vérifie qu'aucune entrée n'est répétée.
+
+!!! info "Le module rend des lignes, il n'écrit aucun fichier"
+    `forge-mvc-import-export` les écrit, et aucun des deux paquets n'importe l'autre.
+
+    Une application qui préfère du JSON ou un tableur passe les mêmes lignes à son propre écrivain.
+
+!!! info "Les cellules restent inertes pour un tableur"
+    `to_csv` neutralise déjà une cellule commençant par `=`, `+`, `-` ou `@`, qui redeviendrait une formule vive à l'ouverture.
+
+    L'export d'audit en hérite sans rien réécrire, et un test le vérifie sur un cas réel.
+
+Une valeur absente devient une chaîne vide et non `None`.
+Dans un fichier destiné à être relu par un humain, `None` s'écrirait tel quel et se lirait comme une donnée.

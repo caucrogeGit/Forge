@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **Le journal d'audit s'exporte en entier (`AUDIT-CSV-EXPORT-001`).**
+  `get_audit_log` rend des `AuditEntry` quand un écrivain CSV attend des dictionnaires : les deux ne se composaient pas, et chaque application réinventait la conversion avec son propre ordre de colonnes.
+  Surtout, il borne à **mille entrées en silence**. Un export demandé sur cent mille lignes en rendait mille sans rien dire : pour un journal qu'on exporte précisément parce qu'il fait foi, le fichier paraissait complet.
+  `iter_audit_rows` parcourt tout le journal par lots, et l'avance se fait **par identifiant, jamais par décalage** : un `OFFSET` sur une table qui reçoit des écritures pendant l'export sauterait ou répéterait des lignes, ce qu'un journal ne peut pas se permettre.
+  `get_audit_log` garde sa limite, qui protège un affichage, et gagne un paramètre `before_id` pour le curseur.
+  Le module rend des lignes et n'écrit aucun fichier : `forge-mvc-import-export` les écrit, aucun des deux n'importe l'autre, et les cellules héritent de la neutralisation des formules déjà en place.
+
 - **Une notification peut être doublée par un autre canal (`NOTIF-MAIL-BRIDGE-001`).**
   Une notification in-app n'est vue que si son destinataire revient sur le site. Pour une alerte qui compte, une facture impayée ou un incident, c'est trop tard, et l'opt-in n'offrait aucun moyen de doubler le canal.
   Chaque application réécrivait la même chose à côté de `notify`, et l'y oubliait à un endroit sur trois : la notification partait, l'email non, et personne ne s'en apercevait avant la réclamation.

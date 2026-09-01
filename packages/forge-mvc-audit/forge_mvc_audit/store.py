@@ -98,6 +98,7 @@ def get_audit_log(
     action: str | None = None,
     target_type: str | None = None,
     target_id: str | int | None = None,
+    before_id: int | None = None,
     db: Any = None,
 ) -> list[AuditEntry]:
     """Renvoie les entrées d'audit les plus récentes, filtrables.
@@ -105,6 +106,11 @@ def get_audit_log(
     `limit` est borné à :data:`MAX_LIMIT`. Les filtres fournis (non ``None``)
     sont combinés en ``AND`` sur des colonnes en liste blanche. Lève
     :class:`AuditError` si `limit` est négatif ou nul.
+
+    `before_id` ne rend que les entrées **antérieures** à cet identifiant, ce
+    qui permet de parcourir tout le journal par lots successifs. Un `OFFSET`
+    sauterait ou répéterait des lignes sur une table qui reçoit des écritures
+    pendant le parcours (`AUDIT-CSV-EXPORT-001`).
     """
     if limit < 1:
         raise AuditError(f"limit doit être >= 1. Reçu : {limit}.")
@@ -127,6 +133,12 @@ def get_audit_log(
             raise AuditError(f"Filtre interdit : {column}")
         clauses.append(f"{column} = ?")
         params.append(value)
+
+    if before_id is not None:
+        # Le curseur n'est pas un filtre de colonne : il porte sur la clé
+        # primaire et n'a pas à passer par la liste blanche.
+        clauses.append("id < ?")
+        params.append(before_id)
 
     where = (" WHERE " + " AND ".join(clauses)) if clauses else ""
     from core.database.backend import get_backend
