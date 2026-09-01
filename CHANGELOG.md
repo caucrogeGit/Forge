@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **La file de tâches s'ordonne par priorité (`JOBS-PRIORITY-001`).**
+  Elle prenait les tâches par ordre d'insertion, sans exception : une tâche urgente déposée derrière mille envois d'emails attendait mille envois, et rien ne permettait de la faire passer devant.
+  `enqueue(..., priority=PRIORITY_HIGH)` ordonne la file en `priority DESC, id`. L'ancienneté départage à égalité, sans quoi deux tâches de même priorité se prendraient dans un ordre que rien ne garantit.
+  Un entier plutôt qu'une énumération fermée : le défaut `0` rend « normales » les tâches déjà en file sans migration de données, et une application peut nuancer entre deux niveaux.
+  La priorité **ordonne, elle n'interrompt pas** : une tâche déjà réservée va au bout, la file n'ayant aucun moyen d'arrêter un gestionnaire en cours.
+  Premier usage de l'`AddColumn` de l'ADR-094, qui a révélé une limite : il ne rendait que les index d'une seule colonne. `AddColumn` accepte désormais `index_names` pour un index composite, et refuse un nom d'index inconnu plutôt que de produire une migration silencieusement incomplète.
+
 - **`forge-mvc-i18n` sait d'où vient la locale (`I18N-LOCALE-DETECTION-001`).**
   Le paquet annonçait « locale et fallback » sans savoir d'où venait la locale : `trans()` retombait sur une valeur **globale** de configuration, la même pour tous les visiteurs. Une application multilingue devait écrire sa propre détection, ce que la documentation ne disait pas.
   `detect_locale` suit un ordre explicite, du plus intentionnel au plus supposé : le choix en session, l'en-tête `Accept-Language`, puis le défaut. `parse_accept_language` respecte les facteurs de qualité de la RFC 9110, `q=0` valant refus.

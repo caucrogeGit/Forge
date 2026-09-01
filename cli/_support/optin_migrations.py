@@ -85,7 +85,10 @@ def _rendered_migrations(package: str) -> "list[tuple[str, bytes]] | None":
         # casser les projets existants.
         if isinstance(declaration, AddColumn):
             statements = render_add_column(
-                declaration.table, declaration.column_name, backend.dialect
+                declaration.table,
+                declaration.column_name,
+                backend.dialect,
+                declaration.index_names,
             )
         else:
             statements = render_create_table(declaration, backend.dialect)

@@ -171,7 +171,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     | Catégorie | Exploitation et outillage (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-    | API publique | `enqueue`, `process_one`, `drain`, `run_worker`, `pending_count`, `get_job`, `Job`, `JobHandler` |
+    | API publique | `enqueue`, `process_one`, `drain`, `run_worker`, `pending_count`, `get_job`, `Job`, `JobHandler`, `PRIORITY_LOW`, `PRIORITY_NORMAL`, `PRIORITY_HIGH` |
     | Table SQL | `jobs` (`TABLE_NAME`) |
     | Exception liée | `JobError` si la tâche est invalide |
     | Contrainte | runtime synchrone (WSGI), sans broker ni async |
@@ -195,7 +195,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
 
         class jobs {
             <<module>>
-            +enqueue(task, payload, queue, max_attempts, available_in, db) int
+            +enqueue(task, payload, queue, max_attempts, available_in, priority, db) int
             +process_one(handlers, queue, db) bool
             +drain(handlers, queue, max_jobs, db) int
             +run_worker(handlers, queue, poll_interval, db, stop) None
@@ -286,7 +286,8 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
 
     | Élément | Signature | Rôle |
     |---|---|---|
-    | `enqueue` | `enqueue(task, payload=None, *, queue="default", max_attempts=1, available_in=0, db=None) -> int` | enfile une tâche, renvoie son id |
+    | `enqueue` | `enqueue(task, payload=None, *, queue="default", max_attempts=1, available_in=0, priority=PRIORITY_NORMAL, db=None) -> int` | enfile une tâche, renvoie son id |
+    | `PRIORITY_LOW`, `PRIORITY_NORMAL`, `PRIORITY_HIGH` | `-10`, `0`, `10` | niveaux nommés, le plus grand pris d'abord |
     | `process_one` | `process_one(handlers, *, queue="default", db=None) -> bool` | traite une tâche, `False` si file vide |
     | `drain` | `drain(handlers, *, queue="default", max_jobs=None, db=None) -> int` | traite jusqu'à vider la file, renvoie le nombre traité |
     | `run_worker` | `run_worker(handlers, *, queue="default", poll_interval=1.0, db=None, stop=None) -> None` | boucle de traitement (process worker) |
@@ -352,6 +353,42 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
 
         - côté requête : `enqueue` ;
         - côté worker : `drain` (cron) ou `run_worker` (persistant), avec vos `handlers`.
+
+??? note "10 bis. Priorité des tâches"
+
+    La file prenait les tâches par ordre d'insertion, sans exception.
+    Une tâche urgente déposée derrière mille envois d'emails attendait mille envois, et rien ne permettait de la faire passer devant (`JOBS-PRIORITY-001`).
+
+    ```python
+    from forge_mvc_jobs import PRIORITY_HIGH, PRIORITY_LOW, enqueue
+
+    enqueue("envoyer_alerte", {"id": 42}, priority=PRIORITY_HIGH)
+    enqueue("nettoyer_cache", priority=PRIORITY_LOW)
+    enqueue("envoyer_facture", {"id": 7})            # normale, par défaut
+    ```
+
+    L'ordre de prise est `priority DESC, id`.
+    La plus prioritaire d'abord, et l'ancienneté départage à égalité : sans ce second critère, deux tâches de même priorité se prendraient dans un ordre que rien ne garantit.
+
+    !!! info "Un entier, pas une énumération fermée"
+        `PRIORITY_LOW`, `PRIORITY_NORMAL` et `PRIORITY_HIGH` valent `-10`, `0` et `10`.
+
+        Le défaut `0` rend « normales » les tâches déjà en file, sans migration de données.
+        Une application peut nuancer entre deux niveaux, Forge n'ayant pas à trancher pour elle.
+
+    !!! warning "La priorité ordonne, elle n'interrompt pas"
+        Une tâche déjà réservée par un ouvrier va au bout, quelle que soit la priorité de ce qui arrive ensuite.
+
+        Il n'y a pas de préemption : la file n'a aucun moyen d'arrêter un gestionnaire en cours, et prétendre le contraire serait mentir sur ce que le paquet fait.
+
+    !!! info "Un projet existant applique une migration"
+        La colonne est ajoutée par sa propre migration, la création ne se rejouant pas.
+
+        ```bash
+        forge jobs:init && forge migration:apply
+        ```
+
+        L'index `idx_jobs_priority` couvre le filtre `queue, status` du choix de la prochaine tâche.
 
 ??? note "11. Ré-essais, files et injection"
 

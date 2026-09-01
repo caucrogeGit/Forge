@@ -91,7 +91,7 @@ Ils passent avant tout ajout de confort.
 | Ticket | Responsabilité unique |
 |---|---|
 | `I18N-LOCALE-DETECTION-001` | **Livré.** `detect_locale`, liste blanche obligatoire, négociation par facteurs de qualité |
-| `JOBS-PRIORITY-001` | Colonne de priorité et ordre de prise en compte |
+| `JOBS-PRIORITY-001` | **Livré.** `priority DESC, id`, niveaux nommés, `AddColumn` étendu aux index composites |
 | `JOBS-STATUS-CLI-001` | Commande `jobs:status`, files en attente, en cours et en échec |
 | `ADMIN-LIST-FILTERS-001` | Filtres, recherche et tri sur les listes du back-office |
 | `ENTITIES-UNIQUE-COMPOSITE-001` | Contrainte d'unicité sur plusieurs colonnes, déclarée au contrat |

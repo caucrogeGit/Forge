@@ -9,7 +9,7 @@ désormais cette description pour le backend installé et écrit le SQL dans
 """
 from __future__ import annotations
 
-from core.database.table_ddl import Column, Index, TableDefinition
+from core.database.table_ddl import AddColumn, Column, Index, TableDefinition
 
 __all__ = ["JOBS", "MIGRATIONS"]
 
@@ -18,6 +18,11 @@ JOBS = TableDefinition(
     columns=[
         Column("id", "identity"),
         Column("queue", "string", length=191, default="default"),
+        # Priorité de prise en compte (JOBS-PRIORITY-001). Entier plutôt
+        # qu'énumération : le défaut 0 rend « normales » les tâches déjà en
+        # file, sans migration de données, et une application peut nuancer
+        # entre deux niveaux sans que Forge ait à trancher pour elle.
+        Column("priority", "integer", default=0),
         Column("task", "string", length=191),
         Column("payload", "text"),
         Column("status", "string", length=16, default="pending"),
@@ -31,10 +36,23 @@ JOBS = TableDefinition(
         Column("finished_at", "datetime", nullable=True),
     ],
     primary_key=["id"],
-    indexes=[Index("idx_jobs_claim", ("queue", "status", "available_at"))],
+    indexes=[
+        Index("idx_jobs_claim", ("queue", "status", "available_at")),
+        # Le choix de la prochaine tâche filtre puis trie par priorité :
+        # sans cet index, une file chargée trierait en mémoire.
+        Index("idx_jobs_priority", ("queue", "status", "priority")),
+    ],
 )
 
 #: Migrations livrées par le paquet : (nom de fichier, table décrite).
-MIGRATIONS: list[tuple[str, TableDefinition]] = [
+MIGRATIONS: list[tuple[str, TableDefinition | AddColumn]] = [
     ("20260626140000_create_jobs.sql", JOBS),
+    # Les projets provisionnés avant JOBS-PRIORITY-001 ont la table sans
+    # `priority`. La migration de création ne se rejoue pas, son empreinte
+    # étant enregistrée : l'ajout passe donc par sa propre migration.
+    # L'index est composite, donc nommé : rien ne dit lesquels existaient déjà.
+    (
+        "20260901110000_add_priority_to_jobs.sql",
+        AddColumn(JOBS, "priority", index_names=("idx_jobs_priority",)),
+    ),
 ]

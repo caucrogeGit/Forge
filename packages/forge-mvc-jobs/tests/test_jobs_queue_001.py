@@ -31,12 +31,15 @@ class FakeDb:
         self._next = 1
 
     def insert(self, sql: str, params: Any = ()) -> int:
-        queue, task, payload, max_attempts, available_in = params
+        # `priority` suit la colonne ajoutée par JOBS-PRIORITY-001 : le double
+        # reste fidèle au schéma, sans quoi il ne prouverait rien sur l'ordre.
+        queue, task, payload, max_attempts, priority, available_in = params
         jid = self._next
         self._next += 1
         self.jobs[jid] = {
             "id": jid, "queue": queue, "task": task, "payload": payload,
             "status": "pending", "attempts": 0, "max_attempts": max_attempts,
+            "priority": priority,
             "claim_token": None, "last_error": None, "available_in": available_in,
         }
         return jid
@@ -73,12 +76,17 @@ class FakeDb:
     def fetch_one(self, sql: str, params: Any = ()) -> dict[str, Any] | None:
         if sql.startswith("SELECT id FROM"):  # candidate à réserver
             queue = params[0]
-            for jid in sorted(self.jobs):
-                job = self.jobs[jid]
-                if (job["queue"] == queue and job["status"] == "pending"
-                        and job["available_in"] <= 0):
-                    return {"id": jid}
-            return None
+            # ORDER BY priority DESC, id : la plus prioritaire d'abord, et
+            # l'ancienneté départage à égalité.
+            pretes = [
+                job for job in self.jobs.values()
+                if job["queue"] == queue and job["status"] == "pending"
+                and job["available_in"] <= 0
+            ]
+            if not pretes:
+                return None
+            choisie = min(pretes, key=lambda job: (-job["priority"], job["id"]))
+            return {"id": choisie["id"]}
         if "claim_token=? AND status='running'" in sql:
             for jid in sorted(self.jobs):
                 job = self.jobs[jid]

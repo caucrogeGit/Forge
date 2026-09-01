@@ -74,8 +74,9 @@ def _now() -> str:
 def _insert_sql() -> str:
     maintenant = _now()
     return (
-        f"INSERT INTO {TABLE_NAME} (queue, task, payload, max_attempts, available_at) "
-        f"VALUES (?, ?, ?, ?, {_dialect().interval_seconds_expression(maintenant)})"
+        f"INSERT INTO {TABLE_NAME} "
+        "(queue, task, payload, max_attempts, priority, available_at) "
+        f"VALUES (?, ?, ?, ?, ?, {_dialect().interval_seconds_expression(maintenant)})"
     )
 
 
@@ -92,7 +93,7 @@ def _candidate_sql() -> str:
     return (
         f"SELECT id FROM {TABLE_NAME} "
         f"WHERE queue=? AND status='pending' AND available_at <= {_now()} "
-        f"ORDER BY id {_dialect().limit_clause()}"
+        f"ORDER BY priority DESC, id {_dialect().limit_clause()}"
     )
 
 
@@ -133,6 +134,19 @@ def _retry_sql() -> str:
             f"started_at=NULL, available_at={_dialect().interval_seconds_expression(_now())} "
             "WHERE id=?")
 
+
+#: Priorités nommées (JOBS-PRIORITY-001).
+#:
+#: Un entier, et non une énumération fermée : le défaut 0 rend « normales » les
+#: tâches déjà en file sans migration de données, et une application peut
+#: nuancer entre deux niveaux sans que Forge ait à trancher pour elle.
+#:
+#: Plus grand vaut plus prioritaire, et l'ancienneté départage à égalité : sans
+#: ce second critère, deux tâches de même priorité se prendraient dans un ordre
+#: que rien ne garantit.
+PRIORITY_LOW = -10
+PRIORITY_NORMAL = 0
+PRIORITY_HIGH = 10
 
 #: Délai de base du réessai, en secondes.
 BACKOFF_BASE_SECONDS = 10
@@ -235,26 +249,37 @@ def enqueue(
     queue: str = "default",
     max_attempts: int = 1,
     available_in: int = 0,
+    priority: int = PRIORITY_NORMAL,
     db: Any = None,
 ) -> int:
     """Enfile une tâche `task` avec sa charge utile et renvoie son identifiant.
 
     `payload` est sérialisé en JSON. `max_attempts` borne les tentatives (une
     tâche qui échoue est re-mise en file tant que `attempts < max_attempts`).
-    `available_in` retarde la disponibilité de N secondes (0 = immédiat). Lève
-    :class:`JobError` si `task` est vide, `max_attempts < 1`, ou si `payload`
-    n'est pas sérialisable en JSON.
+    `available_in` retarde la disponibilité de N secondes (0 = immédiat).
+
+    `priority` décide de l'ordre de prise en compte, le plus grand d'abord, et
+    l'ancienneté départage à égalité (`PRIORITY_LOW`, `PRIORITY_NORMAL`,
+    `PRIORITY_HIGH`). Une priorité ne fait passer personne devant une tâche
+    déjà réservée : elle ordonne la file, elle n'interrompt rien.
+
+    Lève :class:`JobError` si `task` est vide, `max_attempts < 1`, si
+    `priority` n'est pas un entier, ou si `payload` n'est pas sérialisable en
+    JSON.
     """
     if not task or not task.strip():
         raise JobError("Le nom de tâche ne peut pas être vide.")
     if max_attempts < 1:
         raise JobError(f"max_attempts doit être >= 1. Reçu : {max_attempts}.")
+    if not isinstance(priority, int) or isinstance(priority, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
+        raise JobError(f"priority doit être un entier. Reçu : {priority!r}.")
     try:
         payload_json = json.dumps(payload or {})
     except (TypeError, ValueError) as exc:
         raise JobError(f"Charge utile non sérialisable en JSON : {exc}") from exc
     return (db if db is not None else _db_module()).insert(
-        _insert_sql(), (queue, task, payload_json, max_attempts, available_in)
+        _insert_sql(),
+        (queue, task, payload_json, max_attempts, priority, available_in),
     )
 
 

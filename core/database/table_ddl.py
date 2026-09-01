@@ -251,10 +251,16 @@ class AddColumn:
 
     `table` porte la définition **à jour**, colonne comprise, pour qu'une seule
     description reste la source, et `column_name` désigne celle à ajouter.
+
+    `index_names` nomme les index à créer avec la colonne. Par défaut, ceux qui
+    portent sur elle seule. Un index **composite** doit être nommé
+    explicitement : rien dans la définition à jour ne dit lesquels existaient
+    déjà, et en deviner un le recréerait en double.
     """
 
     table: TableDefinition
     column_name: str
+    index_names: "tuple[str, ...] | None" = None
 
     def __post_init__(self) -> None:
         noms = [c.name for c in self.table.columns]
@@ -263,17 +269,32 @@ class AddColumn:
                 f"colonne {self.column_name!r} absente de la définition de "
                 f"{self.table.name!r} (colonnes : {', '.join(noms)})"
             )
+        if self.index_names is None:
+            return
+        connus = {index.name for index in self.table.indexes}
+        inconnus = [nom for nom in self.index_names if nom not in connus]
+        if inconnus:
+            raise ValueError(
+                f"index inconnus de {self.table.name!r} : {', '.join(inconnus)} "
+                f"(déclarés : {', '.join(sorted(connus)) or 'aucun'})"
+            )
 
 
 def render_add_column(
-    table: TableDefinition, column_name: str, dialect: Dialect
+    table: TableDefinition,
+    column_name: str,
+    dialect: Dialect,
+    index_names: "tuple[str, ...] | None" = None,
 ) -> list[str]:
     """Rend l'ajout de `column_name` à `table`, en instructions séparées.
 
-    Retourne l'`ALTER TABLE ... ADD COLUMN`, puis les `CREATE INDEX` de la
-    table qui portent sur cette seule colonne. Les index sont toujours rendus
-    séparément, y compris sur les dialectes qui les inlinent dans un
-    `CREATE TABLE` : un `ALTER` ne les porte pas.
+    Retourne l'ajout de colonne, puis les `CREATE INDEX` demandés. Les index
+    sont toujours rendus séparément, y compris sur les dialectes qui les
+    inlinent dans un `CREATE TABLE` : un `ALTER` ne les porte pas.
+
+    `index_names` nomme les index à créer. Par défaut, ceux qui portent sur la
+    seule colonne ajoutée. Un index **composite** doit être nommé, rien dans la
+    définition à jour ne disant lesquels existaient déjà.
 
     La colonne ajoutée à une table qui contient déjà des lignes doit être
     acceptée par celles-ci, ce que seul un `NULL` autorisé garantit sur les
@@ -295,9 +316,13 @@ def render_add_column(
     statements = [
         dialect.add_column_clause(table.name, _column_line(colonne, dialect))
     ]
+    if index_names is None:
+        vises = [i for i in table.indexes if i.column_list == column_name]
+    else:
+        demandes = set(index_names)
+        vises = [i for i in table.indexes if i.name in demandes]
     statements += [
         dialect.create_index_sql(table.name, index.name, index.column_list)
-        for index in table.indexes
-        if index.column_list == column_name
+        for index in vises
     ]
     return statements
