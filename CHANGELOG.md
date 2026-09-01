@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **Les statuts de workflow se lisent du contrat d'entité (`WORKFLOW-ENTITY-STATUS-001`).**
+  Une application qui gère un cycle de vie déclarait sa liste de statuts **deux fois** : en `choices` du contrat, pour le formulaire et la base, et en Python pour le workflow.
+  Rien ne gardait les deux identiques. Ajouter un statut au contrat sans toucher au workflow donne un choix que le formulaire propose et que la transition refuse ; le retirer donne une transition vers un statut que la base n'accepte plus. Dans les deux cas, la panne n'apparaît qu'à l'usage, sur un seul chemin.
+  `statuses_from_entity_field` fait du contrat la source, et `validate_transitions` refuse alors toute transition vers un statut non déclaré, au chargement et non à l'usage.
+  Le champ est **nommé, jamais deviné** : une convention de nommage se tromperait sur une entité qui porte deux statuts, publication et paiement par exemple. Le début et la fin du cycle se déclarent aussi, un contrat disant les valeurs permises et jamais laquelle commence.
+  Aucune dépendance vers `forge-mvc-entities` : un contrat est un dictionnaire JSON documenté, et un test le vérifie sur l'arbre syntaxique.
+
 - **Les refus d'accès peuvent être tracés (`RBAC-DENIAL-AUDIT-001`).**
   Un refus rendait une 403 et rien de plus. Aucune trace nulle part, si bien qu'une énumération de droits, quelqu'un qui essaie une à une les routes protégées, ne laissait rien derrière elle. L'exploitant n'avait aucun moyen de la voir, ni même de savoir qu'un compte butait sur une permission mal attribuée.
   Les **trois** gardes annoncent désormais leurs refus par `on_permission_denied`, et l'événement porte la permission, l'acteur, la route et la garde qui a refusé. Un visiteur anonyme est rapporté sans acteur, c'est souvent celui qu'on veut voir.

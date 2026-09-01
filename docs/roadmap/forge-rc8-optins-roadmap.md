@@ -115,7 +115,7 @@ Chacun dépend d'un ticket du lot 2.
 | `NOTIF-MAIL-BRIDGE-001` | mail, jobs | Relais documenté de la notification vers l'email |
 | `ADMIN-SETTINGS-UI-001` | admin | Écran d'administration des paramètres |
 | `ADMIN-SESSIONS-VIEW-001` | admin | Écran des sessions actives |
-| `WORKFLOW-ENTITY-STATUS-001` | entities | Reconnaissance du champ de statut des contrats |
+| `WORKFLOW-ENTITY-STATUS-001` | entities | **Livré.** Le contrat devient la source, champ nommé jamais deviné, aucune dépendance |
 
 ---
 

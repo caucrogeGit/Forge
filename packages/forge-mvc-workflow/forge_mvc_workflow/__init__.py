@@ -11,6 +11,12 @@ l'application, seule a savoir ou son statut est range.
 
 from __future__ import annotations
 
+from forge_mvc_workflow.entities import (
+    EntityStatusError,
+    status_values,
+    statuses_from_choices,
+    statuses_from_entity_field,
+)
 from forge_mvc_workflow.hooks import (
     TransitionCommit,
     TransitionEvent,
@@ -45,6 +51,11 @@ from forge_mvc_workflow.transitions import (
 __version__ = "1.0.0rc7"
 
 __all__ = [
+    # Statuts lus du contrat d'entité (WORKFLOW-ENTITY-STATUS-001)
+    "statuses_from_entity_field",
+    "statuses_from_choices",
+    "status_values",
+    "EntityStatusError",
     # Application d'une transition (WORKFLOW-HOOKS-001)
     "apply_transition",
     "TransitionEvent",

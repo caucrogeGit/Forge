@@ -130,7 +130,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     | Catégorie | Données et modélisation (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` |
-    | API publique | `WorkflowStatus`, `WorkflowTransition`, `make_status`, `make_transition`, `can_transition`, `get_available_transitions`, `apply_transition`, `TransitionEvent`, helpers Jinja |
+    | API publique | `WorkflowStatus`, `WorkflowTransition`, `make_status`, `make_transition`, `can_transition`, `get_available_transitions`, `apply_transition`, `TransitionEvent`, `statuses_from_entity_field`, helpers Jinja |
     | Persistance | aucune table imposée : l'application stocke le statut courant |
     | Helpers Jinja | `workflow_status_badge`, `workflow_status_label`, `workflow_status_color` |
     | Exceptions | `WorkflowStatusError`, `WorkflowTransitionError` |
@@ -243,6 +243,10 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     | `can_transition` | `can_transition(transitions, from_name, to_name) -> bool` | transition autorisée ? |
     | `apply_transition` | `apply_transition(transitions, from_status, to_status, *, before=None, commit=None, after=None, context=None) -> str` | applique dans un ordre garanti, rend le statut atteint |
     | `TransitionEvent` | `from_status`, `to_status`, `context` | ce que reçoivent les points d'accroche |
+    | `statuses_from_entity_field` | `statuses_from_entity_field(entity, field_name, *, initial=None, final=None) -> list[WorkflowStatus]` | statuts lus des `choices` d'un contrat d'entité |
+    | `statuses_from_choices` | `statuses_from_choices(choices, *, initial=None, final=None) -> list[WorkflowStatus]` | même conversion, depuis les choix seuls |
+    | `status_values` | `status_values(statuses) -> list[str]` | noms des statuts, pour comparer deux sources |
+    | `EntityStatusError` | exception | champ absent, ou choix inexploitable |
     | `get_available_transitions` | `get_available_transitions(transitions, from_name) -> list[WorkflowTransition]` | transitions possibles depuis un statut |
     | `find_status` | `find_status(...) -> WorkflowStatus` | retrouve un statut par nom |
     | `validate_statuses`, `validate_transitions` | fonctions | valident un jeu de statuts/transitions |
@@ -258,9 +262,52 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     | Autoriser un changement | `can_transition(...)` |
     | Appliquer un changement | `apply_transition(...)` |
     | Refuser selon une règle métier | lever depuis `before` |
+    | Éviter de déclarer les statuts deux fois | `statuses_from_entity_field(...)` |
     | Proposer les suites possibles | `get_available_transitions(...)` |
     | Valider la configuration | `validate_statuses` / `validate_transitions` |
     | Afficher un badge | `workflow_status_badge(...)` (Jinja) |
+
+??? note "9 ter. Prendre les statuts du contrat d'entité"
+
+    Une application qui gère un cycle de vie déclarait sa liste de statuts **deux fois**.
+
+    Une fois en `choices` du contrat d'entité, pour que le formulaire propose un choix et que la base accepte la valeur.
+    Une autre fois en Python, en `make_status`, pour que le workflow connaisse ses transitions.
+
+    Rien ne gardait les deux identiques (`WORKFLOW-ENTITY-STATUS-001`).
+    Ajouter un statut au contrat sans toucher au workflow donne un choix que le formulaire propose et que la transition refuse.
+    Le retirer donne une transition vers un statut que la base n'accepte plus.
+    Dans les deux cas, la panne n'apparaît qu'à l'usage, et sur un seul chemin.
+
+    ```python
+    import json
+    from forge_mvc_workflow import make_transition, statuses_from_entity_field, validate_transitions
+
+    contrat = json.loads(Path("mvc/entities/article.json").read_text(encoding="utf-8"))
+
+    STATUSES = statuses_from_entity_field(
+        contrat, "statut", initial="draft", final=("archived",)
+    )
+    TRANSITIONS = validate_transitions(
+        [make_transition("draft", "published"), make_transition("published", "archived")],
+        STATUSES,
+    )
+    ```
+
+    `validate_transitions` refuse alors toute transition vers un statut que le contrat ne déclare pas, au chargement et non à l'usage.
+
+    !!! info "Le champ est nommé, jamais deviné"
+        Repérer « le champ qui ressemble à un statut » supposerait une convention de nommage que Forge n'impose pas, et se tromperait sur une entité qui en porte deux, un statut de publication et un état de paiement par exemple.
+
+    !!! warning "Le début et la fin du cycle se déclarent"
+        Un contrat d'entité dit quelles valeurs sont permises, jamais laquelle commence un cycle ni lesquelles le terminent.
+
+        `initial` et `final` sont donc explicites, et une valeur absente des choix est refusée : une faute de frappe y produirait sinon un cycle sans début, que rien ne signalerait.
+
+    !!! info "Aucune dépendance vers le moteur d'entités"
+        Un contrat est un dictionnaire JSON dont la forme est documentée.
+
+        Le lire ne demande pas d'importer `forge-mvc-entities`, et ce module ne le fait pas : un projet qui décrit ses entités autrement peut lui passer la même structure.
 
 ??? note "9 bis. Appliquer une transition"
 
