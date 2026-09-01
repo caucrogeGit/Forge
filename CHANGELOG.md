@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **Un journal d'audit se borne à une période (`AUDIT-FILTERS-001`).**
+  Quatre filtres d'égalité existaient déjà, par acteur, action et cible. La question qu'on pose le plus souvent à un journal n'avait aucune réponse : « que s'est-il passé entre telle date et telle autre ».
+  `since` et `until` bornent la lecture **et** l'export, et acceptent un `datetime`, un horodatage ou une date seule, un champ de formulaire ne rendant que du texte.
+  Une date de fin **inclut la journée entière**. C'est le piège le plus courant d'un filtre de période, et il est silencieux : à minuit, `until="2026-03-05"` exclurait toute la journée du 5, que l'utilisateur qui l'a saisie attend incluse.
+  Une période inversée est refusée plutôt que de rendre zéro entrée : un résultat vide sans motif ferait chercher un défaut ailleurs, dans les droits ou dans l'écriture du journal.
+  Les bornes partent en paramètres liés, jamais en expression SQL de date.
+
 - **Les sessions d'un compte sont visibles, sans être compromises (`ADMIN-SESSIONS-VIEW-001`).**
   Révoquer était possible, voir ne l'était pas : l'exploitant déconnectait à l'aveugle, sans savoir combien de sessions étaient ouvertes ni depuis quand.
   `list_for_user` rejoint le contrat et les trois stores. `DbSessionStore` filtre l'expiration **en SQL** : une session expirée que la purge n'a pas encore retirée n'a pas à s'afficher comme active.

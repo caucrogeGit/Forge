@@ -415,3 +415,45 @@ contenu = to_csv(lignes, list(AUDIT_EXPORT_COLUMNS))
 
 Une valeur absente devient une chaîne vide et non `None`.
 Dans un fichier destiné à être relu par un humain, `None` s'écrirait tel quel et se lirait comme une donnée.
+
+## Borner un journal à une période
+
+Quatre filtres d'égalité existaient déjà, par acteur, action et cible.
+
+La question qu'on pose le plus souvent à un journal n'avait aucune réponse : « que s'est-il passé entre telle date et telle autre » (`AUDIT-FILTERS-001`).
+
+```python
+from forge_mvc_audit import get_audit_log, iter_audit_rows
+
+# Lecture, à l'écran
+get_audit_log(actor="roger", since="2026-03-01", until="2026-03-05")
+
+# Export, même bornage
+iter_audit_rows(since="2026-03-01", until="2026-03-05")
+```
+
+Les deux bornes sont **incluses**, et se combinent aux filtres d'égalité.
+
+| Forme acceptée | Exemple |
+|---|---|
+| `datetime` | `datetime(2026, 3, 1, 14, 30)` |
+| horodatage | `"2026-03-01 14:30:00"` |
+| date seule | `"2026-03-01"` |
+
+!!! warning "Une date de fin inclut la journée entière"
+    `until="2026-03-05"` couvre jusqu'à `23:59:59`, et non jusqu'à minuit.
+
+    C'est le piège le plus courant d'un filtre de période, et il est silencieux : à minuit, la journée du 5 serait exclue alors que l'utilisateur qui a saisi cette date l'attend incluse.
+    Une date de début vaut en revanche minuit, ce qui inclut la journée aussi.
+
+!!! info "Une période inversée est refusée"
+    `since` postérieur à `until` lève, plutôt que de rendre zéro entrée.
+
+    Un résultat vide sans motif ferait chercher un défaut ailleurs, dans les droits ou dans l'écriture du journal.
+
+!!! info "Les bornes partent en paramètres liés"
+    Aucune expression SQL de date n'entre dans la requête.
+
+    C'est ce qui la rend portable sur les quatre backends sans effort, motif dont l'audit `OPTIN-DML-DIALECT-001` a mesuré le coût inverse.
+
+Un champ de formulaire laissé vide ne borne rien : la chaîne vide est traitée comme une absence de filtre, pas comme une date invalide.

@@ -91,6 +91,50 @@ def record_audit(
     )
 
 
+#: Format d'une date seule, tel qu'un champ de formulaire la rend.
+_DATE_FMT = "%Y-%m-%d"
+
+
+def _borne_periode(
+    valeur: "datetime | str | None", nom: str, *, fin_de_journee: bool = False
+) -> "str | None":
+    """Borne de période, rendue au format des horodatages du journal.
+
+    Accepte un `datetime` ou une chaîne : une page web reçoit du texte, un
+    script manipule des dates, et refuser l'un des deux obligerait l'appelant à
+    convertir dans un format qu'il n'a pas à connaître.
+
+    Une **date seule** est complétée. Au début de journée pour `since`, à la fin
+    pour `until` : sans cela, `until="2026-03-05"` vaudrait minuit et exclurait
+    toute la journée du 5, alors que l'utilisateur qui l'a saisie l'attend
+    incluse. C'est le piège le plus courant d'un filtre de période, et il est
+    silencieux.
+    """
+    if valeur is None:
+        return None
+    if isinstance(valeur, datetime):
+        return valeur.strftime(_DATETIME_FMT)
+
+    texte = str(valeur).strip()
+    if not texte:
+        return None
+    try:
+        datetime.strptime(texte, _DATETIME_FMT)
+    except ValueError:
+        pass
+    else:
+        return texte
+
+    try:
+        datetime.strptime(texte, _DATE_FMT)
+    except ValueError as exc:
+        raise AuditError(
+            f"{nom} illisible : {valeur!r}. Attendu : un datetime, une date "
+            "« 2026-09-01 », ou un horodatage « 2026-09-01 14:30:00 »."
+        ) from exc
+    return f"{texte} 23:59:59" if fin_de_journee else f"{texte} 00:00:00"
+
+
 def get_audit_log(
     *,
     limit: int = 100,
@@ -99,6 +143,8 @@ def get_audit_log(
     target_type: str | None = None,
     target_id: str | int | None = None,
     before_id: int | None = None,
+    since: "datetime | str | None" = None,
+    until: "datetime | str | None" = None,
     db: Any = None,
 ) -> list[AuditEntry]:
     """Renvoie les entrées d'audit les plus récentes, filtrables.
@@ -111,6 +157,12 @@ def get_audit_log(
     qui permet de parcourir tout le journal par lots successifs. Un `OFFSET`
     sauterait ou répéterait des lignes sur une table qui reçoit des écritures
     pendant le parcours (`AUDIT-CSV-EXPORT-001`).
+
+    `since` et `until` bornent la période, incluses toutes les deux. C'est la
+    question que l'on pose le plus souvent à un journal, « que s'est il passé
+    entre telle date et telle autre », et elle n'avait aucune réponse
+    (`AUDIT-FILTERS-001`). Les bornes partent en **paramètres liés**, jamais en
+    expression SQL de date : aucun dialecte n'entre alors dans la requête.
     """
     if limit < 1:
         raise AuditError(f"limit doit être >= 1. Reçu : {limit}.")
@@ -133,6 +185,20 @@ def get_audit_log(
             raise AuditError(f"Filtre interdit : {column}")
         clauses.append(f"{column} = ?")
         params.append(value)
+
+    borne_debut = _borne_periode(since, "since")
+    borne_fin = _borne_periode(until, "until", fin_de_journee=True)
+    if borne_debut is not None and borne_fin is not None and borne_debut > borne_fin:
+        raise AuditError(
+            f"période vide : since={borne_debut} est postérieur à until={borne_fin}. "
+            "Une période inversée rendrait zéro entrée sans dire pourquoi."
+        )
+    if borne_debut is not None:
+        clauses.append("created_at >= ?")
+        params.append(borne_debut)
+    if borne_fin is not None:
+        clauses.append("created_at <= ?")
+        params.append(borne_fin)
 
     if before_id is not None:
         # Le curseur n'est pas un filtre de colonne : il porte sur la clé

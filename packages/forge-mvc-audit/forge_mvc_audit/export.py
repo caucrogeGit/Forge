@@ -63,6 +63,8 @@ def iter_audit_rows(
     action: "str | None" = None,
     target_type: "str | None" = None,
     target_id: "str | int | None" = None,
+    since: "Any | None" = None,
+    until: "Any | None" = None,
     batch_size: int = DEFAULT_BATCH_SIZE,
     db: Any = None,
 ) -> "Iterator[dict[str, Any]]":
@@ -76,6 +78,10 @@ def iter_audit_rows(
     `OFFSET` sur une table qui reçoit des écritures pendant l'export sauterait
     ou répéterait des lignes, ce qui est exactement ce qu'un journal ne peut pas
     se permettre.
+
+    `since` et `until` bornent la période, comme pour la lecture : exporter un
+    journal entier quand on cherche une semaine est le cas le plus courant, et
+    le plus coûteux.
 
     Raises:
         AuditError: `batch_size` est nul ou négatif, ce qui ferait un parcours
@@ -94,6 +100,8 @@ def iter_audit_rows(
             action=action,
             target_type=target_type,
             target_id=target_id,
+            since=since,
+            until=until,
             before_id=avant,
             db=db,
         )
