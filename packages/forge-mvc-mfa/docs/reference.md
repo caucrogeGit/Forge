@@ -316,6 +316,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     |---|---|
     | Vérifier la clé au démarrage | `validate_mfa_secret_key_config()` |
     | Enrôler un utilisateur | `create_totp_factor` + `totp_provisioning_uri` + `confirm_totp_factor` |
+    | Fermer les sessions ouvertes à l'activation | `store.delete_for_user(...)` du cœur |
     | Exiger le 2e facteur au login | `start_mfa_challenge` + `verify_mfa_challenge` |
     | Protéger une action sensible | `require_recent_mfa(...)` |
     | Fournir un secours | `create_recovery_codes` / `consume_recovery_code` |
@@ -356,7 +357,42 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         - revalider avant le sensible ;
         - récupérer via codes à usage unique.
 
-??? note "11. Sécurité des secrets"
+??? note "11. Fermer les sessions ouvertes à l'activation"
+
+    Activer un second facteur ne protège rien tant que les sessions ouvertes **avant** l'activation restent valides.
+    Un accès obtenu avec le seul mot de passe survivrait au renforcement, ce qui vide le geste de son sens.
+
+    Le cœur fournit la primitive, et l'application l'appelle après avoir enregistré le facteur confirmé.
+
+    ```python
+    from core.sessions.access import get_session_id
+    from core.sessions.manager import get_session_store
+    from forge_mvc_mfa import confirm_totp_factor
+
+    actif = confirm_totp_factor(facteur, code_saisi)
+    if actif is None:
+        return rendre_erreur("Code invalide.")
+
+    enregistrer_facteur(actif)
+
+    # Les autres sessions tombent, celle qui vient d'activer est épargnée.
+    get_session_store().delete_for_user(
+        actif.user_id, except_session_id=get_session_id(request)
+    )
+    ```
+
+    !!! warning "Épargner la session courante n'est pas facultatif"
+        Sans `except_session_id`, l'utilisateur qui vient d'activer son facteur est déconnecté par son propre geste.
+        Cela ne protège de rien, et transforme un renforcement en panne apparente.
+
+    !!! info "Pourquoi l'opt-in ne le fait pas lui-même"
+        `confirm_totp_factor` est une fonction pure.
+        Elle ne touche ni la base ni les sessions, et rend un nouveau facteur sans modifier l'original.
+
+        L'appel reste donc explicite, à l'endroit où l'application enregistre le facteur.
+        Forge refuse la magie cachée (principe 3), et un opt-in qui fermerait des sessions à l'insu de l'appelant en serait.
+
+??? note "12. Sécurité des secrets"
 
     Le secret TOTP est chiffré au repos avec Fernet (`cryptography`) et la clé `FORGE_MFA_SECRET_KEY` ; il n'est jamais stocké en clair.
 
@@ -372,7 +408,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
         Ces protections sont actives par défaut.
 
-??? note "12. Politique de stockage des secrets MFA"
+??? note "13. Politique de stockage des secrets MFA"
 
     ### Statut actuel
 
@@ -466,7 +502,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     | `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement applicatif du secret TOTP (Fernet) | livré |
     | `MFA-PYPI-READY-001` | Requalification Alpha (Pre-Alpha → Alpha) | livré |
 
-??? note "13. Faire tourner la clé de chiffrement"
+??? note "14. Faire tourner la clé de chiffrement"
 
     Changer `FORGE_MFA_SECRET_KEY` sans précaution rend tous les secrets TOTP illisibles au même instant.
     Chaque porteur d'un facteur perd alors son second facteur, et une mesure d'hygiène devient une panne d'authentification.

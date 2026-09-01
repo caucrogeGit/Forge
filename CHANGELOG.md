@@ -4,6 +4,11 @@
 
 ### Ajouté
 
+- **Activer un second facteur ferme les sessions ouvertes (`MFA-SESSION-INVALIDATION-001`).**
+  Activer le MFA ne protégeait rien tant que les sessions ouvertes avant l'activation restaient valides : un accès obtenu avec le seul mot de passe survivait au renforcement.
+  `delete_for_user` accepte `except_session_id`, qui épargne la session depuis laquelle le geste est fait. Sans lui, l'utilisateur qui vient d'activer son facteur serait déconnecté par son propre geste, ce qui ne protège de rien.
+  L'opt-in ne ferme aucune session lui-même. `confirm_totp_factor` est une fonction pure, et un opt-in qui fermerait des sessions à l'insu de l'appelant serait de la magie cachée (principe 3). La référence de l'opt-in donne le geste à copier, et un test exerce ce code exact pour que la documentation ne puisse pas décrire un parcours qui ne marche pas.
+
 - **Le cœur sait révoquer toutes les sessions d'un compte (`SESSIONS-DELETE-FOR-USER-001`).**
   Le contrat `SessionStore` n'avait que `delete(session_id)`. Rien ne permettait de fermer les sessions déjà ouvertes d'un utilisateur, alors que trois événements l'exigent : l'activation d'un second facteur, le changement de mot de passe et la déconnexion à distance.
   Une session ouverte leur survivait, donc un accès obtenu avant l'événement restait valide après.

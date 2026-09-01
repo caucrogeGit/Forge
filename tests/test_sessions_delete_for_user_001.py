@@ -62,6 +62,34 @@ class TestRevocation:
         assert store.delete_for_user(None) == 0
         assert store.get(anonyme) is not None
 
+    def test_une_session_peut_etre_epargnee(self, store: SessionStore) -> None:
+        """Celui qui révoque ne doit pas se déconnecter lui-même."""
+        courante = store.create({CLE_UTILISATEUR: 7})
+        autre = store.create({CLE_UTILISATEUR: 7})
+
+        assert store.delete_for_user(7, except_session_id=courante) == 1
+        assert store.get(courante) is not None
+        assert store.get(autre) is None
+
+    def test_epargner_une_session_inconnue_ne_change_rien(
+        self, store: SessionStore
+    ) -> None:
+        premiere = store.create({CLE_UTILISATEUR: 7})
+
+        assert store.delete_for_user(7, except_session_id="inexistante") == 1
+        assert store.get(premiere) is None
+
+    def test_epargner_la_session_d_un_autre_compte_ne_la_protege_pas_du_reste(
+        self, store: SessionStore
+    ) -> None:
+        """`except_session_id` épargne une session, il ne cible pas un compte."""
+        voisine = store.create({CLE_UTILISATEUR: 9})
+        cible = store.create({CLE_UTILISATEUR: 7})
+
+        assert store.delete_for_user(7, except_session_id=voisine) == 1
+        assert store.get(cible) is None
+        assert store.get(voisine) is not None
+
     def test_la_revocation_est_idempotente(self, store: SessionStore) -> None:
         store.create({CLE_UTILISATEUR: 7})
 

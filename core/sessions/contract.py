@@ -32,13 +32,20 @@ class SessionStore(Protocol):
         """Remplace intégralement les données d'une session existante (sans merge)."""
         ...
 
-    def delete_for_user(self, user_id: object) -> int:
-        """Supprime toutes les sessions de `user_id`. Retourne le nombre supprimé.
+    def delete_for_user(
+        self, user_id: object, *, except_session_id: str | None = None
+    ) -> int:
+        """Supprime les sessions de `user_id`. Retourne le nombre supprimé.
 
         Sert à révoquer l'accès d'un compte d'un seul geste : activation d'un
         second facteur, changement de mot de passe, déconnexion à distance.
         Sans cette primitive, une session ouverte survivait à ces événements
         (`SESSIONS-DELETE-FOR-USER-001`).
+
+        `except_session_id` épargne une session, celle depuis laquelle le geste
+        est fait. Sans elle, activer un second facteur déconnecterait celui qui
+        vient de l'activer, ce qui ne protège de rien
+        (`MFA-SESSION-INVALIDATION-001`).
 
         L'identité est celle posée par `login_user`, sous la clé
         `SESSION_KEY_AUTH_USER_ID`. Une session anonyme n'est jamais touchée.

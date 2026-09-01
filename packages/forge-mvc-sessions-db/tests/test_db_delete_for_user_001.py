@@ -124,6 +124,21 @@ class TestRevocation:
         assert sql.startswith("DELETE FROM forge_sessions WHERE user_id =")
         assert params == ("7",)
 
+    def test_epargner_une_session_ajoute_la_garde_a_la_requete(self) -> None:
+        """La session épargnée est écartée en SQL, pas après coup en Python."""
+        from forge_mvc_sessions_db import store as module
+
+        appels: list[tuple[str, tuple[object, ...]]] = []
+        instance = module.DbSessionStore(
+            fetch_one=lambda sql, params: None,
+            execute=lambda sql, params=(): (appels.append((sql, params)), 2)[1],
+        )
+
+        assert instance.delete_for_user(7, except_session_id="abc") == 2
+        sql, params = appels[0]
+        assert "session_id <> ?" in sql
+        assert params == ("7", "abc")
+
     def test_identite_absente_ne_touche_pas_la_base(self) -> None:
         from forge_mvc_sessions_db import store as module
 
@@ -176,3 +191,30 @@ class TestRevocationBoutEnBout:
         assert store.get(cible) is None
         assert store.get(voisine) is not None
         assert store.get(anonyme) is not None
+
+    def test_la_session_epargnee_survit(self) -> None:
+        from forge_mvc_sessions_db.store import DbSessionStore
+
+        import importlib.util
+        import sys
+
+        chemin = Path(__file__).with_name("test_db_store_001.py")
+        spec = importlib.util.spec_from_file_location("_db_store_double_bis", chemin)
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["_db_store_double_bis"] = module
+        spec.loader.exec_module(module)
+
+        faux = module._FakeDB()
+        store = DbSessionStore(fetch_one=faux.fetch_one, execute=faux.execute)
+
+        courante, autre = store.create(), store.create()
+        for sid in (courante, autre):
+            donnees = store.get(sid)
+            assert donnees is not None
+            donnees[CLE_UTILISATEUR] = 7
+            store.set(sid, donnees)
+
+        assert store.delete_for_user(7, except_session_id=courante) == 1
+        assert store.get(courante) is not None
+        assert store.get(autre) is None

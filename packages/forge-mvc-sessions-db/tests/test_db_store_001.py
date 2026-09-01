@@ -94,7 +94,12 @@ class _FakeDB:
                 del self.rows[k]
             return len(expired)
         if s.startswith("DELETE") and "WHERE user_id" in sql:
-            vises = [k for k, v in self.rows.items() if v.get("user_id") == params[0]]
+            # `session_id <> ?` épargne la session courante (MFA-SESSION-INVALIDATION-001).
+            epargnee = params[1] if "session_id <> ?" in sql else None
+            vises = [
+                k for k, v in self.rows.items()
+                if v.get("user_id") == params[0] and k != epargnee
+            ]
             for k in vises:
                 del self.rows[k]
             return len(vises)

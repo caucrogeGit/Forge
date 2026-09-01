@@ -146,17 +146,22 @@ class FileSessionStore:
         with self._lock:
             self._path(session_id).unlink(missing_ok=True)
 
-    def delete_for_user(self, user_id: object) -> int:
-        """Supprime toutes les sessions de `user_id`. Retourne le nombre supprimé.
+    def delete_for_user(
+        self, user_id: object, *, except_session_id: str | None = None
+    ) -> int:
+        """Supprime les sessions de `user_id`. Retourne le nombre supprimé.
 
         Balaie le répertoire : ce store n'a pas d'index, et une révocation reste
         un événement rare au regard des lectures.
         """
         if user_id is None:
             return 0
+        epargne = None if except_session_id is None else f"{except_session_id}.json"
         supprimes = 0
         with self._lock:
             for chemin in self._dir.glob("*.json"):
+                if chemin.name == epargne:
+                    continue
                 try:
                     brut: object = json.loads(chemin.read_text(encoding="utf-8"))
                 except (OSError, json.JSONDecodeError, ValueError):

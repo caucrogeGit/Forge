@@ -59,7 +59,11 @@ def store(request, tmp_path):
             return 0
         if s.startswith("DELETE"):
             if "USER_ID = ?" in s:  # révocation par compte
-                vises = [k for k, v in _db.items() if v.get("user_id") == params[0]]
+                epargnee = params[1] if "SESSION_ID <> ?" in s else None
+                vises = [
+                    k for k, v in _db.items()
+                    if v.get("user_id") == params[0] and k != epargnee
+                ]
                 for k in vises:
                     del _db[k]
                 return len(vises)

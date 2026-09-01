@@ -47,7 +47,7 @@ classDiagram
         +set(session_id, data) None
         +replace(session_id, data) None
         +delete(session_id) None
-        +delete_for_user(user_id) int
+        +delete_for_user(user_id, except_session_id) int
         +regenerate(session_id) str
         +authenticate(session_id, user_data, ttl_seconds) str | None
         +touch_expiry(session_id, ttl_seconds) bool
@@ -80,7 +80,7 @@ classDiagram
 | `set` | `set(self, session_id: str, data: dict[str, Any]) -> None` | met à jour (merge) les données d'une session existante |
 | `replace` | `replace(self, session_id: str, data: dict[str, Any]) -> None` | remplace intégralement les données, sans merge |
 | `delete` | `delete(self, session_id: str) -> None` | supprime la session |
-| `delete_for_user` | `delete_for_user(self, user_id: object) -> int` | supprime toutes les sessions du compte, et retourne leur nombre |
+| `delete_for_user` | `delete_for_user(self, user_id: object, *, except_session_id: str | None = None) -> int` | supprime les sessions du compte, sauf celle épargnée, et retourne leur nombre |
 | `regenerate` | `regenerate(self, session_id: str) -> str` | crée un nouvel identifiant en conservant les données |
 | `authenticate` | `authenticate(self, session_id: str, user_data: dict[str, Any], ttl_seconds: int) -> str | None` | rotation atomique : nouvel identifiant, écriture utilisateur, nouveau jeton CSRF ; `None` si la session n'existe pas |
 | `touch_expiry` | `touch_expiry(self, session_id: str, ttl_seconds: int) -> bool` | repousse l'expiration ; `False` si la session n'existe pas |
@@ -98,6 +98,9 @@ classDiagram
 
     Les stores mémoire et fichier balaient, leur volume étant borné par une seule instance.
     `DbSessionStore` interroge une colonne `user_id` indexée, sa table pouvant être grande et partagée entre processus.
+
+    `except_session_id` épargne une session, celle depuis laquelle le geste est fait.
+    Sans elle, activer un second facteur déconnecterait celui qui vient de l'activer, ce qui ne protège de rien.
 
 !!! danger "Ajouter une méthode au contrat est une rupture"
     `SessionStore` est `@runtime_checkable` : un store auquel il manque une méthode n'est plus reconnu par `isinstance`, et `forge.configure` le refuse.

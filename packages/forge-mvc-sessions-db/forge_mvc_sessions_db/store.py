@@ -75,6 +75,9 @@ _SQL_DELETE = "DELETE FROM forge_sessions WHERE session_id = ?"
 _SQL_DELETE_VERSIONED = "DELETE FROM forge_sessions WHERE session_id = ? AND version = ?"
 _SQL_CLEANUP = "DELETE FROM forge_sessions WHERE expire_at < ?"
 _SQL_DELETE_FOR_USER = "DELETE FROM forge_sessions WHERE user_id = ?"
+_SQL_DELETE_FOR_USER_EXCEPT = (
+    "DELETE FROM forge_sessions WHERE user_id = ? AND session_id <> ?"
+)
 
 _DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
 
@@ -239,8 +242,10 @@ class DbSessionStore:
             return
         self._execute(_SQL_DELETE, (session_id,))
 
-    def delete_for_user(self, user_id: object) -> int:
-        """Supprime toutes les sessions de `user_id`. Retourne le nombre supprimé.
+    def delete_for_user(
+        self, user_id: object, *, except_session_id: "str | None" = None
+    ) -> int:
+        """Supprime les sessions de `user_id`. Retourne le nombre supprimé.
 
         Une seule requête, sur la colonne indexée `user_id` : contrairement aux
         stores mémoire et fichier, ce store est partagé entre processus et sa
@@ -251,7 +256,11 @@ class DbSessionStore:
         """
         if user_id is None:
             return 0
-        return self._execute(_SQL_DELETE_FOR_USER, (str(user_id),))
+        if except_session_id is None:
+            return self._execute(_SQL_DELETE_FOR_USER, (str(user_id),))
+        return self._execute(
+            _SQL_DELETE_FOR_USER_EXCEPT, (str(user_id), except_session_id)
+        )
 
     def regenerate(self, session_id: str) -> str:
         """Crée un nouveau session_id en préservant les données — protège contre la fixation."""
