@@ -82,7 +82,7 @@ Ils passent avant tout ajout de confort.
 | `MFA-SESSION-INVALIDATION-001` | **Livré.** `except_session_id` épargne la session courante, geste documenté et exercé |
 | `IOT-RETENTION-GC-001` | **Livré.** `iot:gc --days N`, nommé comme les trois autres purges et non `iot:purge` |
 | `DEPLOY-CHECK-SECRETS-001` | **Livré.** Repérage par nom de variable, valeur jamais affichée, liste partagée dans `core.security.secrets` |
-| `FILES-METADATA-TABLE-001` | Table des métadonnées de fichier, socle des quotas et de la purge |
+| `FILES-METADATA-TABLE-001` | **Livré.** Table `forge_files` et registre explicite, ADR-094 amendant l'ADR-020 |
 
 ---
 

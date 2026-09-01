@@ -17,4 +17,7 @@ _UPLOAD: dict[str, str | bool] = {
 COMMANDS: dict[str, dict[str, str | bool]] = {
     "upload:init": _UPLOAD,
     "media:init": _UPLOAD,
+    # files:init écrit la migration du registre (ADR-094). Il n'ouvre aucune
+    # connexion : il rend du SQL et l'écrit dans mvc/migrations/.
+    "files:init": {"module": "forge_mvc_files.cli_init"},
 }

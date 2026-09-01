@@ -87,7 +87,7 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Internationalisation
     "i18n:init", "i18n:check",
     # Médias et JavaScript
-    "upload:init", "media:init", "images:init", "js:init",
+    "upload:init", "media:init", "images:init", "js:init", "files:init",
     # Déploiement
     "deploy:init", "deploy:check",
     # Opt-ins applicatifs (ADR-052)

@@ -143,6 +143,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # Médias et JavaScript
     "upload:init":      "Configure les uploads de fichiers (dossiers storage/uploads).",
     "media:init":       "Configure les médias : upload:init plus les variantes d'image.",
+    "files:init":         "Écrit la migration du registre de fichiers (forge-mvc-files, ADR-094).",
     "images:init":      "Copie la migration Images vers mvc/migrations/ (idempotent, sans appliquer).",
     "js:init":          "Installe htmx, alpine ou les deux.",
     # Déploiement
@@ -505,6 +506,38 @@ Limites:
   - lancer ensuite forge migration:apply pour appliquer les migrations ;
   - la table pivot user_roles relève de forge auth:init, pas de cette
     commande.
+
+Options:
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "files:init": """\
+Usage:
+  forge files:init
+
+Description:
+  Prépare la migration SQL du registre de fichiers de l'opt-in
+  forge-mvc-files (table forge_files) dans mvc/migrations/, sans
+  exécuter de SQL (ADR-071).
+
+  Le registre garde trace de ce que le paquet a écrit : chemin, nom
+  d'origine, type MIME, taille et propriétaire déclaré par
+  l'application. Il est le socle des quotas et de la purge des
+  fichiers orphelins (ADR-094).
+
+  Le SQL est RENDU pour le backend de base de données installé.
+
+Effets (write-if-new — aucun fichier existant n'est écrasé) :
+  - écrit la migration rendue dans mvc/migrations/.
+
+Prérequis:
+  - forge-mvc-files installé ;
+  - un backend BDD installé (un seul par projet, ADR-054) ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - n'exécute aucun SQL et n'ouvre aucune connexion ;
+  - lancer ensuite forge migration:apply pour appliquer la migration ;
+  - l'inscription au registre reste EXPLICITE : écrire un fichier
+    n'inscrit rien de soi même, l'application appelle record_file.
 
 Options:
   -h, --help    Affiche cette aide sans exécuter la commande.""",

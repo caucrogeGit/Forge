@@ -129,6 +129,7 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
     |---|---|---|
     | `upload:init` | Initialise les dossiers de stockage d'upload. | `forge upload:init` |
     | `media:init` | Initialise les dossiers de stockage média. | `forge media:init` |
+    | `files:init` | Écrit la migration du registre de fichiers. | `forge files:init` |
 
 ??? note "6. Vue d'ensemble rapide"
 
@@ -139,7 +140,8 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
     | Catégorie | Médias et fichiers (ADR-055) |
     | Couche | opt-in (brique optionnelle), socle des médias |
     | Dépend de | `forge-mvc` (validation et exceptions restent au cœur) |
-    | API publique | `save_upload`, `SavedUpload`, `serve_media_file`, `delete_upload`, `delete_media_file`, primitives de stockage, rate-limit |
+    | API publique | `save_upload`, `SavedUpload`, `serve_media_file`, `delete_upload`, `delete_media_file`, primitives de stockage, rate-limit, registre (`record_file`, `owner_usage_bytes`) |
+    | Table SQL | `forge_files`, optionnelle (ADR-094) |
     | Objet renvoyé | `SavedUpload` (métadonnées du fichier écrit) |
     | Service HTTP | `serve_media_file` (streaming, HTTP Range) |
     | Racine de stockage | variable d'environnement `UPLOAD_ROOT` (défaut `storage/uploads`) |
@@ -277,6 +279,69 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
     | Sécuriser un nom de fichier | `secure_filename(name)` |
     | Limiter les uploads abusifs | `is_upload_rate_limited(...)` |
     | Gérer un upload refusé | intercepter `UploadError` |
+    | Inscrire un fichier écrit | `record_file(path, original_name, size_bytes, ...)` |
+    | Calculer un quota | `owner_usage_bytes(kind, id)` |
+    | Repérer des orphelins | `list_all_paths()` |
+
+??? note "9 bis. Le registre des fichiers écrits"
+
+    Le paquet écrivait des fichiers sans garder trace de ce qu'il avait écrit.
+
+    Sans registre, aucun quota n'est calculable, aucun orphelin n'est repérable, et le nom d'origine ne survit pas au mode UUID, qui l'efface du chemin par sécurité.
+    L'ADR-094 amende l'ADR-020 sur ce seul point.
+
+    ```bash
+    forge files:init          # écrit la migration
+    forge migration:apply     # l'applique
+    ```
+
+    L'inscription est **explicite**, comme l'écriture.
+
+    ```python
+    from forge_mvc_files import record_file, save_upload
+
+    enregistre = save_upload(fichier, category="documents")
+    record_file(
+        enregistre.path,
+        enregistre.original_name,
+        enregistre.size,
+        mime_type=enregistre.mime_type,
+        owner_kind="user",
+        owner_id=utilisateur.id,
+    )
+    ```
+
+    Le quota se calcule ensuite sur le registre.
+
+    ```python
+    from forge_mvc_files import owner_usage_bytes
+
+    if owner_usage_bytes("user", utilisateur.id) + enregistre.size > PLAFOND:
+        return refuser("Quota dépassé.")
+    ```
+
+    !!! info "Écrire un fichier n'inscrit rien de soi même"
+        `save_upload` ne touche pas au registre, et un test le vérifie sur la source.
+
+        Un opt-in qui écrirait en base à l'insu de son appelant serait de la magie cachée, que le principe 3 refuse.
+        Le paquet reste donc utilisable **sans base**, pour qui ne veut que des primitives de stockage.
+
+    !!! info "Le propriétaire est libre"
+        `owner_kind` et `owner_id` forment un couple que l'application remplit comme elle l'entend.
+
+        `forge-mvc-files` ne sait pas ce qu'est un utilisateur, et ne cherche pas à le savoir.
+        Les deux vont de pair : fournir l'un sans l'autre est refusé, car un identifiant sans nature ne désigne personne.
+
+    !!! warning "Le registre ne touche jamais au disque"
+        `forget_file` retire une ligne, il ne supprime aucun fichier.
+
+        L'appelant décide de l'ordre entre le disque et le registre, et reste seul à connaître sa racine de stockage.
+
+    !!! info "Deux tables décrivent des fichiers"
+        `forge-mvc-images` porte une table `media`, avec le rôle, la position et le texte alternatif dont une galerie a besoin.
+
+        Le registre ne porte aucune de ces colonnes : il dit ce que le stockage sait, jamais une notion métier.
+        Le doublon partiel est assumé le temps de la série 1.x, la convergence appartenant à un ticket post-1.0.
 
 ??? note "10. Exemples d'utilisation"
 

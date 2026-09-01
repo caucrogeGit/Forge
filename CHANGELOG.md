@@ -4,6 +4,14 @@
 
 ### Ajouté
 
+- **`forge-mvc-files` tient un registre de ce qu'il écrit (`FILES-METADATA-TABLE-001`, ADR-094).**
+  Le paquet écrivait des fichiers sans en garder trace, l'ADR-020 ayant exclu tout état de son périmètre. Une conséquence n'avait pas été mesurée : sans registre, aucun quota n'est calculable, aucun orphelin repérable, et le nom d'origine ne survit pas au mode UUID, qui l'efface du chemin par sécurité.
+  L'état existait pourtant déjà, dans la table `media` de `forge-mvc-images`, où rien n'est propre à l'image : un projet ne stockant que des PDF aurait dû installer Pillow pour disposer d'une table.
+  La table `forge_files` porte ce que le **stockage** sait, jamais une notion métier. Le rôle, la position et le texte alternatif restent à `media`, où une galerie en a besoin. Le propriétaire est un couple libre, une nature et un identifiant, que l'application remplit comme elle l'entend.
+  L'inscription est **explicite** : écrire un fichier n'inscrit rien de soi même, et un test le vérifie sur la source de `save_upload`. Le paquet reste utilisable sans base pour qui ne veut que des primitives.
+  `forge files:init` écrit la migration. Le registre est exercé contre les serveurs réels, création, quota, agrégation et contrainte d'unicité comprises.
+  L'ADR-094 amende l'ADR-020 sur ce seul point, tout le reste de son hors périmètre tenant.
+
 - **L'ajout de colonne était refusé par SQL Server (`SESSIONS-DELETE-FOR-USER-001`, suite).**
   `render_add_column` écrivait `ALTER TABLE t ADD COLUMN`, forme correcte sur trois backends et **erreur de syntaxe sur SQL Server**, qui n'accepte pas le mot-clé. La clause vient désormais du contrat `Dialect`, via `add_column_clause`.
   Le rendu était vérifié par comparaison de chaînes, ce qui ne montre jamais qu'une instruction bien formée est refusée par le serveur. `tests/db/test_add_column_migration_real_server_001.py` joue le scénario réel sur les trois serveurs : table créée sans la colonne, ligne écrite, migration appliquée, ligne d'avant préservée.

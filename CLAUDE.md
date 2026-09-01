@@ -266,6 +266,7 @@ manqué.
 | ADR-091 | `091-core-emits-auth-events.md` | Le cœur émet les événements d'authentification |
 | ADR-092 | `092-wsgi-entrypoint-wiring-parity.md` | Le chemin WSGI refuse de servir une application désarmée |
 | ADR-093 | `093-application-wiring-module.md` | Le câblage de l'application vit dans une source unique |
+| ADR-094 | `094-files-metadata-registry.md` | Un registre de fichiers dans `forge-mvc-files` |
 
 Pour créer un nouvel ADR : `docs/adr/<numéro>-<sujet>.md`, suivre le format existant.
 

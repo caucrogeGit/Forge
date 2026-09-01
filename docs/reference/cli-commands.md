@@ -149,6 +149,7 @@ Choix du moteur (SQLite, MariaDB, PostgreSQL, SQL Server) : [Bases de données](
 |---|---|---|
 | `forge upload:init` | prépare le stockage des uploads (opt-in files) | [uploads](../cli-assets/uploads.md) |
 | `forge media:init` | prépare le stockage des médias (alias cœur d'`upload:init`) | [uploads](../cli-assets/uploads.md) |
+| `forge files:init` | écrit la migration du registre de fichiers `forge_files` vers `mvc/migrations/` puis `forge migration:apply` (opt-in files, ADR-094) | opt-in `forge-mvc-files` |
 | `forge images:init` | copie la migration de la table `media` vers `mvc/migrations/` puis `forge migration:apply` (opt-in images) | opt-in `forge-mvc-images` |
 | `forge js:init` | installe HTMX / Alpine.js | [front](../cli-assets/front.md) |
 | `forge i18n:init` | initialise les catalogues d'i18n (opt-in i18n) | [i18n](../cli-assets/i18n.md) |

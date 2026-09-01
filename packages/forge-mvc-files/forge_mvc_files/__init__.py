@@ -12,6 +12,11 @@ reste dans le core (``core.forms.upload_validation`` / ``upload_exceptions``),
 réutilisée ici : le core ne peut pas dépendre d'un opt-in (ADR-004). Le core
 expose des **shims transitoires** (``core/uploads``) supprimés au ticket
 ``CORE-DROP-UPLOADS-001``. Voir ``docs/adr/019-upload-extraction.md``.
+
+Depuis l'ADR-094, le paquet tient aussi un **registre** de ce qu'il a écrit
+(``forge_files``), socle des quotas et de la purge des orphelins. Le registre
+est **explicite** : écrire un fichier n'inscrit rien de soi même, et le paquet
+reste utilisable sans base pour qui ne veut que des primitives de stockage.
 """
 
 from __future__ import annotations
@@ -34,6 +39,16 @@ from forge_mvc_files.manager import (
     save_upload,
     serve_media_file,
     upload_root,
+)
+from forge_mvc_files.registry import (
+    FileRegistryError,
+    forget_file,
+    get_file_record,
+    list_all_paths,
+    list_paths_for_owner,
+    owner_file_count,
+    owner_usage_bytes,
+    record_file,
 )
 from forge_mvc_files.rate_limit import (
     is_upload_rate_limited,
@@ -73,4 +88,13 @@ __all__ = [
     # Rate-limit d'upload
     "is_upload_rate_limited",
     "record_upload_attempt",
+    # Registre des fichiers écrits (ADR-094)
+    "record_file",
+    "forget_file",
+    "get_file_record",
+    "owner_usage_bytes",
+    "owner_file_count",
+    "list_paths_for_owner",
+    "list_all_paths",
+    "FileRegistryError",
 ]
