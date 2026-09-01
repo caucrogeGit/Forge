@@ -275,6 +275,9 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     | `generate_totp_secret() -> str` | génère un secret TOTP |
     | `encrypt_totp_secret` / `decrypt_totp_secret` | chiffre/déchiffre le secret (Fernet) |
     | `validate_mfa_secret_key_config() -> None` | vérifie `FORGE_MFA_SECRET_KEY` au démarrage |
+    | `rotate_totp_secret(stored) -> str` | rechiffre un secret avec la clé courante |
+    | `uses_current_key(stored) -> bool` | dit si un secret dépend encore d'une clé retirée |
+    | `previous_keys() -> list[str]` | clés retirées déclarées, dans l'ordre |
 
     ### Enrôlement TOTP
 
@@ -369,53 +372,6 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
         Ces protections sont actives par défaut.
 
-    !!! danger "Par défaut, l'anti-rejeu vaut par processus, pas par application"
-        Le registre des codes déjà utilisés vit en mémoire du processus.
-        Derrière un serveur à plusieurs workers, gunicorn typiquement, chaque worker a le sien.
-        Un même code TOTP peut donc être accepté une fois par worker, soit jusqu'à autant de fois qu'il y a de workers.
-
-        La fenêtre est courte, un code TOTP vivant trente secondes, et l'attaquant doit déjà détenir le code.
-        Le rate-limit du challenge borne par ailleurs le nombre de tentatives.
-        Le risque réel est donc le rejeu d'un code intercepté, pas la découverte d'un code.
-
-        Trois remèdes, au choix de l'exploitant.
-
-        - Servir l'authentification par un seul worker, ce qui suffit à beaucoup d'applications.
-        - Installer le registre partagé livré par Forge, voir le paragraphe suivant.
-        - Porter le registre dans un magasin partagé de votre cru, en écrivant une classe conforme au protocole `TotpReplayStore`.
-
-        Le registre n'est pas non plus persisté : un redémarrage l'oublie, avec la même fenêtre de moins de trente secondes.
-
-    !!! tip "Partager le registre entre tous les processus"
-        Forge livre `DbTotpReplayStore`, adossé au backend BDD du projet, donc commun à tous les workers.
-        Il ne s'active pas tout seul, l'application le pose au démarrage en une ligne visible.
-
-        ```python
-        from forge_mvc_mfa import set_replay_store
-        from forge_mvc_mfa.replay_store_db import DbTotpReplayStore
-
-        set_replay_store(DbTotpReplayStore())
-        ```
-
-        La table se provisionne comme celle de tout opt-in adossé à la base.
-
-        ```bash
-        forge mfa:init          # écrit la migration dans mvc/migrations/, sans l'exécuter
-        forge migration:apply   # après relecture
-        ```
-
-        Cette table n'est requise que si vous installez ce registre.
-        Un projet qui garde le défaut n'a aucune table à créer, `forge-mvc-mfa` restant une bibliothèque sans persistance.
-
-        Le coût est d'une écriture par validation de code.
-        En contrepartie la garantie devient exacte, y compris entre processus, et elle n'exige ni Redis ni aucune dépendance nouvelle.
-
-    !!! note "Persistance applicative"
-        Forge fournit les helpers et les contrats (`AuthMfaFactor`, codes) ; l'application choisit la persistance (table, schéma), cohérent avec ADR-008.
-
-    !!! note "Indépendance du cœur"
-        Le cœur de Forge ne dépend pas de `forge-mvc-mfa` : la dépendance va de l'opt-in vers le cœur.
-
 ??? note "12. Politique de stockage des secrets MFA"
 
     ### Statut actuel
@@ -509,6 +465,105 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     | `MFA-SECRET-STORAGE-POLICY-001` | Documenter la politique de stockage | livré |
     | `SEC-MFA-SECRET-ENCRYPTION-001` | Chiffrement applicatif du secret TOTP (Fernet) | livré |
     | `MFA-PYPI-READY-001` | Requalification Alpha (Pre-Alpha → Alpha) | livré |
+
+??? note "13. Faire tourner la clé de chiffrement"
+
+    Changer `FORGE_MFA_SECRET_KEY` sans précaution rend tous les secrets TOTP illisibles au même instant.
+    Chaque porteur d'un facteur perd alors son second facteur, et une mesure d'hygiène devient une panne d'authentification.
+
+    `FORGE_MFA_SECRET_KEY_PREVIOUS` déclare les clés retirées, séparées par des virgules.
+    Elles servent uniquement au déchiffrement, le chiffrement utilisant toujours la clé courante.
+
+    **La procédure en quatre temps.**
+
+    1. Générer la nouvelle clé, sans encore la poser.
+
+        ```bash
+        python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+        ```
+
+    2. Poser la nouvelle clé comme clé courante, et l'ancienne comme clé retirée.
+
+        ```bash
+        FORGE_MFA_SECRET_KEY=<nouvelle>
+        FORGE_MFA_SECRET_KEY_PREVIOUS=<ancienne>
+        ```
+
+        À ce stade tout fonctionne, les anciens secrets restent lisibles et les nouveaux sont chiffrés avec la nouvelle clé.
+
+    3. Rechiffrer les secrets existants, au rythme voulu.
+
+        ```python
+        from forge_mvc_mfa import rotate_totp_secret, uses_current_key
+
+        for facteur in mes_facteurs_totp():
+            if uses_current_key(facteur.totp_secret):
+                continue
+            enregistrer(facteur.id, rotate_totp_secret(facteur.totp_secret))
+        ```
+
+    4. Retirer `FORGE_MFA_SECRET_KEY_PREVIOUS` une fois qu'aucun secret ne dépend plus de l'ancienne clé.
+
+    !!! info "Pourquoi Forge ne balaie pas la base lui-même"
+        La table des facteurs appartient à l'application, et Forge n'en connaît ni le nom ni les colonnes.
+        Le paquet fournit la primitive de rechiffrement, l'application décide où elle s'applique.
+
+        C'est le principe 1, qui sépare le framework de l'application métier.
+
+    !!! warning "Le secret en clair ne transite jamais"
+        `rotate_totp_secret` travaille de jeton chiffré à jeton chiffré, via `MultiFernet.rotate`.
+        Le secret TOTP n'est ni rendu à l'appelant ni journalisé pendant la rotation.
+
+    !!! danger "Une clé retirée reste un secret"
+        Tant que `FORGE_MFA_SECRET_KEY_PREVIOUS` est renseignée, sa valeur déchiffre des secrets réels.
+        Elle se protège comme la clé courante, et se retire dès la fin du rechiffrement.
+
+    !!! danger "Par défaut, l'anti-rejeu vaut par processus, pas par application"
+        Le registre des codes déjà utilisés vit en mémoire du processus.
+        Derrière un serveur à plusieurs workers, gunicorn typiquement, chaque worker a le sien.
+        Un même code TOTP peut donc être accepté une fois par worker, soit jusqu'à autant de fois qu'il y a de workers.
+
+        La fenêtre est courte, un code TOTP vivant trente secondes, et l'attaquant doit déjà détenir le code.
+        Le rate-limit du challenge borne par ailleurs le nombre de tentatives.
+        Le risque réel est donc le rejeu d'un code intercepté, pas la découverte d'un code.
+
+        Trois remèdes, au choix de l'exploitant.
+
+        - Servir l'authentification par un seul worker, ce qui suffit à beaucoup d'applications.
+        - Installer le registre partagé livré par Forge, voir le paragraphe suivant.
+        - Porter le registre dans un magasin partagé de votre cru, en écrivant une classe conforme au protocole `TotpReplayStore`.
+
+        Le registre n'est pas non plus persisté : un redémarrage l'oublie, avec la même fenêtre de moins de trente secondes.
+
+    !!! tip "Partager le registre entre tous les processus"
+        Forge livre `DbTotpReplayStore`, adossé au backend BDD du projet, donc commun à tous les workers.
+        Il ne s'active pas tout seul, l'application le pose au démarrage en une ligne visible.
+
+        ```python
+        from forge_mvc_mfa import set_replay_store
+        from forge_mvc_mfa.replay_store_db import DbTotpReplayStore
+
+        set_replay_store(DbTotpReplayStore())
+        ```
+
+        La table se provisionne comme celle de tout opt-in adossé à la base.
+
+        ```bash
+        forge mfa:init          # écrit la migration dans mvc/migrations/, sans l'exécuter
+        forge migration:apply   # après relecture
+        ```
+
+        Cette table n'est requise que si vous installez ce registre.
+        Un projet qui garde le défaut n'a aucune table à créer, `forge-mvc-mfa` restant une bibliothèque sans persistance.
+
+        Le coût est d'une écriture par validation de code.
+        En contrepartie la garantie devient exacte, y compris entre processus, et elle n'exige ni Redis ni aucune dépendance nouvelle.
+
+    !!! note "Persistance applicative"
+        Forge fournit les helpers et les contrats (`AuthMfaFactor`, codes) ; l'application choisit la persistance (table, schéma), cohérent avec ADR-008.
+
+    !!! note "Indépendance du cœur"
+        Le cœur de Forge ne dépend pas de `forge-mvc-mfa` : la dépendance va de l'opt-in vers le cœur.
 
 ## Voir aussi
 

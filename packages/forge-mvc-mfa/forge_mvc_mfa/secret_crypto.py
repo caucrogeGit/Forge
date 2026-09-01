@@ -13,6 +13,18 @@ premier chiffrement). MFA reste opt-in : installer le package ne force
 pas la validation — c'est l'application qui choisit de l'appeler quand
 elle active MFA.
 
+Rotation de clé — MFA-KEY-ROTATION-001
+--------------------------------------
+``FORGE_MFA_SECRET_KEY_PREVIOUS`` liste les clés retirées, séparées par des
+virgules. Elles servent **uniquement au déchiffrement** : le chiffrement utilise
+toujours ``FORGE_MFA_SECRET_KEY``. Une rotation ne casse donc aucun facteur
+existant, et l'application rechiffre à son rythme avec
+``rotate_totp_secret()``.
+
+Forge ne balaie pas la base lui-même : la table des facteurs appartient à
+l'application (voir ``tables.py``), et Forge ne peut pas en présumer le nom.
+Il fournit la primitive, l'application décide où elle s'applique.
+
 Les erreurs ne révèlent jamais la valeur de la clé en clair, même
 partiellement.
 """
@@ -23,6 +35,7 @@ import os
 
 _PREFIX = "enc:"
 _ENV_KEY = "FORGE_MFA_SECRET_KEY"
+_ENV_PREVIOUS_KEYS = "FORGE_MFA_SECRET_KEY_PREVIOUS"
 
 # Valeurs placeholder évidentes à refuser explicitement. Ces chaînes
 # apparaissent souvent dans les `.env.example` ou les templates et ne
@@ -158,6 +171,109 @@ def _get_fernet():
         ) from None
 
 
+def _build_fernet(key: str, *, source: str):
+    """Construit un Fernet depuis une clé, en refusant les valeurs douteuses.
+
+    `source` nomme la variable d'environnement d'origine, pour que le message
+    dise laquelle des deux est en cause sans jamais montrer sa valeur.
+    """
+    from cryptography.fernet import Fernet
+
+    stripped = key.strip()
+    if stripped.lower() in _PLACEHOLDER_KEYS:
+        raise MfaSecretKeyPlaceholder(
+            f"{source} contient une valeur placeholder évidente. "
+            + _generation_hint()
+        )
+    try:
+        return Fernet(stripped.encode())
+    except Exception:
+        # Masque le message d'origine pour ne pas fuir la valeur de la clé.
+        raise MfaSecretInvalidKey(
+            f"{source} contient une clé Fernet invalide. " + _generation_hint()
+        ) from None
+
+
+def previous_keys() -> list[str]:
+    """Clés retirées encore acceptées au déchiffrement, dans l'ordre déclaré.
+
+    Lues depuis ``FORGE_MFA_SECRET_KEY_PREVIOUS``, séparées par des virgules.
+    Les entrées vides sont ignorées, pour qu'une virgule finale ou un retour à
+    la ligne dans un fichier ``env/`` ne fasse pas échouer le démarrage.
+    """
+    raw = os.environ.get(_ENV_PREVIOUS_KEYS)
+    if not raw or not raw.strip():
+        return []
+    return [part.strip() for part in raw.split(",") if part.strip()]
+
+
+def _get_decryptor():
+    """Fernet acceptant la clé courante **et** les clés retirées.
+
+    L'ordre compte : la clé courante d'abord, si bien qu'un rechiffrement par
+    ``MultiFernet.rotate`` produit toujours un jeton lisible par elle seule.
+    """
+    from cryptography.fernet import MultiFernet
+
+    fernets = [_get_fernet()]
+    fernets.extend(
+        _build_fernet(key, source=_ENV_PREVIOUS_KEYS) for key in previous_keys()
+    )
+    return MultiFernet(fernets)
+
+
+def uses_current_key(stored: str) -> bool:
+    """Vrai si `stored` est déchiffrable par la clé courante seule.
+
+    Sert à repérer ce qui reste à rechiffrer après une rotation, sans avoir à
+    tenter l'écriture. Un secret non chiffré rend `False` plutôt que de lever :
+    l'appelant balaie une table et veut un tri, pas une interruption.
+    """
+    if not isinstance(stored, str) or not stored.startswith(_PREFIX):  # pyright: ignore[reportUnnecessaryIsInstance]
+        return False
+    try:
+        _get_fernet().decrypt(stored[len(_PREFIX):].encode())
+    except Exception:
+        return False
+    return True
+
+
+def rotate_totp_secret(stored: str) -> str:
+    """Rechiffre un secret stocké avec la clé courante.
+
+    Accepte un secret chiffré par la clé courante ou par l'une des clés
+    retirées, et rend une valeur préfixée ``enc:`` lisible par la seule clé
+    courante. L'appelant écrit le résultat dans **sa** table.
+
+    Le secret en clair n'est jamais rendu ni journalisé : le rechiffrement
+    passe par ``MultiFernet.rotate``, qui travaille de jeton à jeton.
+
+    Raises:
+        MfaSecretNotEncrypted: la valeur stockée n'est pas préfixée.
+        MfaSecretInvalidKey: aucune clé connue ne déchiffre la valeur.
+    """
+    if not isinstance(stored, str) or not stored:  # pyright: ignore[reportUnnecessaryIsInstance]
+        raise ValueError("stored doit être une chaîne non vide")
+    if not stored.startswith(_PREFIX):
+        raise MfaSecretNotEncrypted(
+            "Le secret TOTP stocké n'est pas chiffré (préfixe 'enc:' absent). "
+            "Migrer le secret avec encrypt_totp_secret() avant utilisation. "
+            "Voir SEC-MFA-SECRET-ENCRYPTION-001."
+        )
+    payload = stored[len(_PREFIX):]
+    try:
+        rotated = _get_decryptor().rotate(payload.encode()).decode()
+    except (MfaSecretKeyMissing, MfaSecretKeyPlaceholder, MfaSecretInvalidKey):
+        raise
+    except Exception as exc:
+        raise MfaSecretInvalidKey(
+            "Impossible de rechiffrer le secret TOTP : aucune clé connue ne le "
+            f"déchiffre. Déclarer l'ancienne clé dans {_ENV_PREVIOUS_KEYS} le "
+            "temps de la rotation."
+        ) from exc
+    return f"{_PREFIX}{rotated}"
+
+
 def encrypt_totp_secret(raw: str) -> str:
     """Chiffre un secret TOTP brut. Retourne la valeur préfixée "enc:..."."""
     if not isinstance(raw, str) or not raw:  # pyright: ignore[reportUnnecessaryIsInstance]
@@ -178,9 +294,11 @@ def decrypt_totp_secret(stored: str) -> str:
             "Voir SEC-MFA-SECRET-ENCRYPTION-001."
         )
     payload = stored[len(_PREFIX):]
-    fernet = _get_fernet()
+    # Accepte la clé courante et les clés retirées : une rotation ne doit pas
+    # fermer la connexion des porteurs de facteur (MFA-KEY-ROTATION-001).
+    decryptor = _get_decryptor()
     try:
-        return fernet.decrypt(payload.encode()).decode()
+        return decryptor.decrypt(payload.encode()).decode()
     except Exception as exc:
         raise MfaSecretInvalidKey(
             "Impossible de déchiffrer le secret TOTP."

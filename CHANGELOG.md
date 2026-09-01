@@ -2,6 +2,16 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **La clé de chiffrement MFA peut tourner sans fermer les comptes (`MFA-KEY-ROTATION-001`).**
+  `FORGE_MFA_SECRET_KEY` n'avait aucune procédure de rotation : la changer rendait tous les secrets TOTP illisibles au même instant, si bien que chaque porteur d'un facteur perdait son second facteur d'un coup.
+  La seule issue était de désactiver le MFA de tout le monde, ce qui transforme une mesure d'hygiène en panne d'authentification.
+  `FORGE_MFA_SECRET_KEY_PREVIOUS` déclare les clés retirées, séparées par des virgules, acceptées **au déchiffrement seulement**. Le chiffrement utilise toujours la clé courante, et plusieurs rotations rapprochées restent lisibles.
+  `rotate_totp_secret` rechiffre un secret et `uses_current_key` dit ce qu'il reste à traiter, ce qui permet de balayer une table sans tout réécrire. Le rechiffrement passe par `MultiFernet.rotate`, de jeton à jeton : le secret en clair ne transite ni ne se journalise.
+  Forge ne balaie pas la base lui-même, la table des facteurs appartenant à l'application dont il ne connaît ni le nom ni les colonnes (principe 1). Il fournit la primitive, l'application décide où elle s'applique.
+  Les clés retirées sont validées comme la clé courante, placeholders refusés, et aucun message ne révèle leur valeur. Sans la variable, le comportement est inchangé.
+
 ### Corrigé
 
 - **La casse de `APP_ENV` désarmait deux gardes de sécurité (`ENV-APP-ENV-NORMALISATION-001`).**

@@ -77,7 +77,7 @@ Ils passent avant tout ajout de confort.
 |---|---|
 | ~~`FIXTURES-APP-ENV-GUARD-001`~~ | **Retiré, faux besoin.** La garde existait déjà (ADR-074). Remplacé par `ENV-APP-ENV-NORMALISATION-001`, qui corrige la vraie faille, la casse qui la désarmait |
 | `ENV-APP-ENV-NORMALISATION-001` | **Livré.** Lecture unique et normalisée de `APP_ENV` dans `core.app.env` |
-| `MFA-KEY-ROTATION-001` | Procédure de rotation de la clé Fernet, avec rechiffrement des secrets existants |
+| `MFA-KEY-ROTATION-001` | **Livré.** `FORGE_MFA_SECRET_KEY_PREVIOUS`, `rotate_totp_secret`, `uses_current_key` |
 | `MFA-SESSION-INVALIDATION-001` | Invalider les sessions ouvertes à l'activation d'un facteur |
 | `IOT-RETENTION-PURGE-001` | Rétention et purge des mesures, commande `iot:purge` |
 | `DEPLOY-CHECK-SECRETS-001` | Refuser au pré-vol un secret laissé à sa valeur d'amorçage |

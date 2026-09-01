@@ -11,6 +11,9 @@ from forge_mvc_mfa.secret_crypto import (
     MfaSecretNotEncrypted,
     decrypt_totp_secret,
     encrypt_totp_secret,
+    previous_keys,
+    rotate_totp_secret,
+    uses_current_key,
     validate_mfa_secret_key_config,
 )
 from forge_mvc_mfa.mfa import (
@@ -140,6 +143,9 @@ __all__ = [
     "is_valid_recovery_code_record",
     # secret_crypto
     "encrypt_totp_secret",
+    "rotate_totp_secret",
+    "uses_current_key",
+    "previous_keys",
     "decrypt_totp_secret",
     "validate_mfa_secret_key_config",
     "MfaSecretKeyMissing",

@@ -52,6 +52,36 @@ FORGE_MFA_SECRET_KEY=<clé générée ci-dessus>
 un gestionnaire de secrets (Vault, AWS Secrets Manager, etc.) ou les
 variables d'environnement du runtime de production.
 
+### Rotation de la clé — `FORGE_MFA_SECRET_KEY_PREVIOUS`
+
+Changer la clé sans précaution rend tous les secrets TOTP illisibles au même
+instant, et chaque porteur d'un facteur perd son second facteur.
+
+`FORGE_MFA_SECRET_KEY_PREVIOUS` déclare les clés retirées, séparées par des
+virgules. Elles servent uniquement au déchiffrement, le chiffrement utilisant
+toujours la clé courante.
+
+```
+FORGE_MFA_SECRET_KEY=<nouvelle clé>
+FORGE_MFA_SECRET_KEY_PREVIOUS=<ancienne clé>
+```
+
+Les secrets existants se rechiffrent ensuite au rythme voulu, puis la variable
+se retire :
+
+```python
+from forge_mvc_mfa import rotate_totp_secret, uses_current_key
+
+for facteur in mes_facteurs_totp():
+    if not uses_current_key(facteur.totp_secret):
+        enregistrer(facteur.id, rotate_totp_secret(facteur.totp_secret))
+```
+
+Forge ne balaie pas la base lui-même : la table des facteurs appartient à
+l'application, dont Forge ne connaît ni le nom ni les colonnes. Une clé retirée
+reste un secret tant qu'elle est déclarée. Voir `MFA-KEY-ROTATION-001` et la
+procédure complète dans la référence de l'opt-in.
+
 ### Validation au démarrage
 
 Pour échouer **tôt** en production plutôt qu'à la première opération
