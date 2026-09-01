@@ -108,7 +108,7 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Dépend de | Responsabilité unique |
 |---|---|---|
-| `MAIL-QUEUE-VIA-JOBS-001` | jobs | Envoi différé par la file, motif officiel documenté |
+| `MAIL-QUEUE-VIA-JOBS-001` | jobs | **Livré.** `MAIL_JOB_TASK`, sérialisation JSON, gestionnaire ; aucune dépendance croisée |
 | `IMPEXP-ASYNC-JOBS-001` | jobs | Import de gros fichiers par la file |
 | `RBAC-DENIAL-AUDIT-001` | audit | Consigner les refus d'accès |
 | `AUDIT-CSV-EXPORT-001` | import-export | Export du journal en CSV |

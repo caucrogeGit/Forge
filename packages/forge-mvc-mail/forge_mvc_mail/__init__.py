@@ -15,6 +15,13 @@ from forge_mvc_mail.exceptions import (
 )
 from forge_mvc_mail.mailer import Mailer
 from forge_mvc_mail.message import MailMessage
+from forge_mvc_mail.queueing import (
+    MAIL_JOB_TASK,
+    MailPayloadError,
+    make_mail_job_handler,
+    message_from_payload,
+    message_to_payload,
+)
 from forge_mvc_mail.templates import MailTemplateRenderer
 from forge_mvc_mail.transports import (
     BaseTransport,
@@ -27,6 +34,12 @@ from forge_mvc_mail.transports import (
 )
 
 __all__ = [
+    # Envoi différé par une file (MAIL-QUEUE-VIA-JOBS-001)
+    "MAIL_JOB_TASK",
+    "MailPayloadError",
+    "message_to_payload",
+    "message_from_payload",
+    "make_mail_job_handler",
     "BaseTransport",
     "ConsoleTransport",
     "FakeTransport",

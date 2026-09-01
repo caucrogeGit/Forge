@@ -148,7 +148,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     | Catégorie | Communication (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` (Jinja pour les gabarits) |
-    | API publique | `Mailer`, `MailMessage`, transports, `MailTemplateRenderer`, `MailConfig`, `MailLogger` |
+    | API publique | `Mailer`, `MailMessage`, transports, `MailTemplateRenderer`, `MailConfig`, `MailLogger`, `message_to_payload`, `make_mail_job_handler` |
     | Transports | `console`, `log` (défaut dev), `smtp`, `fake`, `null` |
     | Configuration | `MAIL_*` (`MailConfig`) |
     | Commandes | `mail:init`, `mail:test`, `mail:render`, `mail:doctor`, `mail:logs` |
@@ -304,6 +304,62 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     | `log` | Écrit un fichier `.eml` dans `storage/mail/`. **Défaut en développement.** |
     | `smtp` | Connexion SMTP réelle via `smtplib`. À n'utiliser qu'avec un vrai serveur. |
 
+
+??? note "10 bis. Différer l'envoi par la file de tâches"
+
+    Envoyer un email pendant une requête HTTP la fait attendre le serveur SMTP.
+
+    Une seconde de latence est courante, dix le sont aussi quand le relais est lent, et une panne du relais devient une panne du formulaire : l'utilisateur voit une erreur alors que son inscription est enregistrée (`MAIL-QUEUE-VIA-JOBS-001`).
+
+    Le module `queueing` fournit de quoi confier l'envoi à `forge-mvc-jobs`.
+
+    | Élément | Rôle |
+    |---|---|
+    | `MAIL_JOB_TASK` | nom de tâche, nommé une fois pour les deux côtés |
+    | `message_to_payload(message, ...)` | traduit un message en charge utile JSON |
+    | `message_from_payload(payload)` | reconstruit le message côté ouvrier |
+    | `make_mail_job_handler(mailer=None)` | rend le gestionnaire à enregistrer |
+    | `MailPayloadError` | charge utile inexploitable |
+
+    Côté requête, on met en file au lieu d'envoyer.
+
+    ```python
+    from forge_mvc_jobs import enqueue
+    from forge_mvc_mail import MAIL_JOB_TASK, message_to_payload
+
+    enqueue(MAIL_JOB_TASK, message_to_payload(message, message_type="bienvenue"))
+    ```
+
+    Côté ouvrier, on enregistre le gestionnaire.
+
+    ```python
+    from forge_mvc_jobs import run_worker
+    from forge_mvc_mail import MAIL_JOB_TASK, make_mail_job_handler
+
+    run_worker({MAIL_JOB_TASK: make_mail_job_handler()})
+    ```
+
+    !!! info "Les deux opt-ins ne se connaissent pas"
+        `forge-mvc-mail` n'importe jamais `forge_mvc_jobs`, et l'inverse est vrai aussi.
+
+        Ce module traduit un message et rend un gestionnaire ; c'est l'application qui met les deux en présence, et elle seule décide d'installer les deux paquets.
+        Un test le vérifie sur l'arbre syntaxique du module, le docstring montrant justement l'exemple d'import.
+
+    !!! warning "Le gestionnaire lève quand l'envoi échoue"
+        C'est ce qui déclenche le réessai de la file.
+
+        Rendre `None` en silence ferait marquer la tâche comme réussie, et l'email ne partirait jamais.
+        Un envoi **sauté** par `NullTransport` n'est pas un échec : réessayer sans fin un envoi que personne ne veut serait absurde.
+
+    !!! info "Le message est validé à la mise en file"
+        Un sujet vide ou une adresse forgée est refusé dans la requête, là où l'utilisateur le voit.
+
+        Différer l'erreur jusqu'à l'ouvrier la rendrait invisible, et la tâche échouerait sans que personne ne sache pourquoi.
+
+    !!! info "Le journal des envois suit"
+        `message_type`, `related_entity` et `related_id` sont transportés avec le message.
+
+        Sans eux, différer un envoi rendrait `mail_log` muet, alors que c'est précisément quand l'envoi est asynchrone qu'on a besoin de sa trace.
 
 ??? note "11. Envoi par code"
 

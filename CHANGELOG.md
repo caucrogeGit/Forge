@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **L'envoi d'email peut être confié à la file de tâches (`MAIL-QUEUE-VIA-JOBS-001`).**
+  Envoyer un email pendant une requête HTTP la fait attendre le serveur SMTP. Une seconde de latence est courante, dix le sont aussi quand le relais est lent, et une panne du relais devient une panne du formulaire : l'utilisateur voit une erreur alors que son inscription est enregistrée.
+  `message_to_payload` traduit un message en charge utile JSON, `make_mail_job_handler` rend le gestionnaire à enregistrer, et `MAIL_JOB_TASK` nomme la tâche une seule fois pour les deux côtés.
+  **Les deux opt-ins ne se connaissent pas** : `forge-mvc-mail` n'importe jamais `forge_mvc_jobs`, et l'application seule les met en présence. Un test le vérifie sur l'arbre syntaxique, le docstring du module montrant justement l'exemple d'import qu'une lecture de texte prendrait pour un vrai.
+  Le gestionnaire **lève** quand l'envoi échoue, ce qui déclenche le réessai : rendre `None` ferait marquer la tâche réussie et l'email ne partirait jamais. Un envoi sauté par `NullTransport` n'est pas un échec.
+  Le message est validé **à la mise en file**, là où l'utilisateur voit l'erreur, et les champs de journalisation suivent : sans eux, différer un envoi rendrait `mail_log` muet.
+
 - **Le diagnostic de base dit ce que le serveur répond (`DB-DOCTOR-001`).**
   `forge doctor` ne rapportait que « connexion OK », et cela ne suffit pas : une version trop ancienne, un jeu de caractères qui n'est pas de l'UTF-8, ou une connexion établie sous un compte inattendu sont des pannes à venir qu'aucune connexion réussie ne signale.
   Le contrôle rapporte désormais la version, l'encodage ou la collation, la base et le compte. Ce que chaque backend sait dire lui appartient, par `Dialect.server_diagnostics_sql` : un backend qui ne déclare rien reste correct, et le diagnostic se tait plutôt que d'inventer.
