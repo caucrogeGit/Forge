@@ -4,6 +4,16 @@
 
 ### Ajouté
 
+- **La table de mesures IoT peut être bornée (`IOT-RETENTION-GC-001`).**
+  `iot_events` reçoit une ligne par mesure publiée et rien ne la bornait. Un capteur qui émet toutes les dix secondes y dépose plus de trois millions de lignes par an, et un site en compte rarement un seul : la table grossissait jusqu'à la panne de remplissage, alors que `sessions:gc`, `audit:gc` et `stats:gc` avaient posé le précédent.
+  `forge iot:gc --days N` affiche les lignes visées et n'efface qu'avec `--run`. La rétention doit être dite, aucune valeur par défaut n'étant supposée à la place de l'exploitant.
+  La commande s'appelle `iot:gc` et non `iot:purge` : trois opt-ins nommaient déjà ce geste ainsi, avec la même option `--days`, et une quatrième forme aurait donné deux façons de dire la même chose (principe 11).
+  La purge est indexée, `idx_iot_events_received_at` portant déjà sur la colonne filtrée. Aucune migration n'est requise.
+
+- **Le calcul de la borne de rétention est partagé (`IOT-RETENTION-GC-001`).**
+  Il était écrit deux fois à l'identique, dans `forge-mvc-audit` et `forge-mvc-stats`, et le troisième opt-in allait en produire une copie de plus. `core.database.retention` le porte désormais seul, et les deux paquets l'enveloppent pour garder leur type d'erreur public.
+  Il emploie `utc_now()`, ce qui a rendu leurs deux exemptions au garde-fou des horodatages conscients sans objet. Elles ont disparu avec leur cause.
+
 - **Activer un second facteur ferme les sessions ouvertes (`MFA-SESSION-INVALIDATION-001`).**
   Activer le MFA ne protégeait rien tant que les sessions ouvertes avant l'activation restaient valides : un accès obtenu avec le seul mot de passe survivait au renforcement.
   `delete_for_user` accepte `except_session_id`, qui épargne la session depuis laquelle le geste est fait. Sans lui, l'utilisateur qui vient d'activer son facteur serait déconnecté par son propre geste, ce qui ne protège de rien.

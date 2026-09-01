@@ -20,8 +20,11 @@ mesuré, voir l'audit `OPTIN-DML-DIALECT-001`.
 from __future__ import annotations
 
 from collections.abc import Callable
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import Any
+
+from core.database.retention import DATETIME_FMT as _DATETIME_FMT
+from core.database.retention import cutoff_for_days as _cutoff_for_days
 
 from forge_mvc_stats.tables import STATS_EVENTS_TABLE
 
@@ -40,8 +43,8 @@ class StatsRetentionError(ValueError):
     """Rétention invalide, ou borne inexploitable."""
 
 
-#: Format d'horodatage des bornes, commun à Forge.
-DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
+#: Format d'horodatage des bornes, commun à Forge. Alias du cœur.
+DATETIME_FMT = _DATETIME_FMT
 
 
 def cutoff_for_days(keep_days: int, *, now: datetime | None = None) -> str:
@@ -51,15 +54,13 @@ def cutoff_for_days(keep_days: int, *, now: datetime | None = None) -> str:
     rétention nulle ou négative viderait la table entière, ce qui ne peut pas
     être le résultat d'une étourderie de frappe.
     """
-    if not isinstance(keep_days, int) or isinstance(keep_days, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
-        raise StatsRetentionError(f"keep_days doit être un entier. Reçu : {keep_days!r}.")
-    if keep_days < 1:
-        raise StatsRetentionError(
-            f"keep_days doit être >= 1. Reçu : {keep_days}. "
-            "Une rétention nulle ou négative viderait toute la table d'événements."
-        )
-    instant = now if now is not None else datetime.now(timezone.utc)
-    return (instant - timedelta(days=keep_days)).strftime(DATETIME_FMT)
+    # Le calcul vit dans le cœur (`IOT-RETENTION-GC-001`) : il était écrit à
+    # l'identique ici et dans `forge-mvc-audit`. `StatsRetentionError` reste le
+    # type public de ce paquet, d'où l'enveloppe.
+    try:
+        return _cutoff_for_days(keep_days, now=now, quoi="toute la table d'événements")
+    except ValueError as exc:
+        raise StatsRetentionError(str(exc)) from exc
 
 
 def get_stats_count_before_sql() -> str:

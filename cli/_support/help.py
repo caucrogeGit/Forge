@@ -90,6 +90,7 @@ IoT (module opt-in forge-mvc-iot)
   iot:init            Copie la migration IoT du package vers mvc/migrations/ (idempotent, sans appliquer).
   iot:simulate        Publie des mesures MQTT factices conformes au contrat (sans capteur).
   iot:listen          Écoute le broker MQTT et insère les mesures reçues dans iot_events.
+  iot:gc              Purge les mesures iot_events antérieures à une rétention (--days N, --run).
 
 Vidéo (module opt-in forge-mvc-video)
   video:doctor        Diagnostic statique du module vidéo (package, config, ffmpeg/ffprobe).

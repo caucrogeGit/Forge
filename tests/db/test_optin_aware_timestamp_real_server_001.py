@@ -60,8 +60,9 @@ _NE_PERSISTENT_PAS = {
 #: Ces modules rendent une chaîne via `strftime` : le pilote ne peut rien
 #: convertir, et la forme consciente y est sans effet.
 _RENDENT_UNE_CHAINE = {
-    "packages/forge-mvc-audit/forge_mvc_audit/store.py": "borne de rétention formatée en chaîne",
-    "packages/forge-mvc-stats/forge_mvc_stats/retention.py": "borne de rétention formatée en chaîne",
+    # Les bornes de rétention d'audit et de stats ne figurent plus ici : leur
+    # calcul vit dans `core.database.retention`, qui emploie `utc_now()`
+    # (IOT-RETENTION-GC-001). L'exemption a disparu avec sa cause.
     "packages/forge-mvc-sessions-db/forge_mvc_sessions_db/store.py": "expiration formatée en chaîne",
     "packages/forge-mvc-entities/forge_mvc_entities/migrations.py": "horodatage de nom de fichier de migration",
 }

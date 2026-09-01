@@ -131,6 +131,52 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | `iot:init` | Copie la migration IoT vers `mvc/migrations/`. | `forge iot:init` |
     | `iot:simulate` | Publie des mesures MQTT factices (sans capteur). | `forge iot:simulate` |
     | `iot:listen` | Écoute le broker et insère dans `iot_events`. | `forge iot:listen` |
+    | `iot:gc` | Purge les mesures antérieures à une rétention. | `forge iot:gc --days 90 --run` |
+
+??? note "5 bis. Borner la table de mesures"
+
+    `iot_events` reçoit une ligne par mesure publiée, et rien ne la bornait avant `IOT-RETENTION-GC-001`.
+
+    Un capteur qui émet toutes les dix secondes y dépose plus de trois millions de lignes par an.
+    Un site en compte rarement un seul, et la table grossissait donc jusqu'à la panne de remplissage.
+
+    ```bash
+    forge iot:gc --days 90          # affiche ce qui serait supprimé
+    forge iot:gc --days 90 --run    # supprime
+    ```
+
+    La rétention peut aussi venir de la variable d'environnement `IOT_KEEP_DAYS`.
+    L'option `--days` l'emporte sur elle, une valeur tapée disant une intention plus précise qu'une valeur héritée du déploiement.
+
+    !!! warning "La rétention doit être dite"
+        Aucune valeur par défaut n'est supposée à la place de l'exploitant, dont les obligations de conservation ne regardent pas Forge.
+        Sans `--days` ni `IOT_KEEP_DAYS`, la commande refuse et explique.
+
+        Une rétention nulle ou négative est refusée : elle viderait toute la table, ce qui ne peut pas être le résultat d'une étourderie de frappe.
+
+    !!! info "Elle affiche avant d'effacer"
+        Une mesure est un enregistrement délibéré, souvent conservé pour un historique ou une obligation, et aucune date ne dit d'elle-même qu'elle a cessé de valoir.
+
+        La commande montre donc le nombre de lignes visées, et n'efface qu'avec `--run`.
+        Aucune archive n'est produite avant suppression : un exploitant tenu de conserver ses mesures doit les exporter lui-même, en amont.
+
+    Le module `storage/retention.py` porte le SQL et le calcul de la borne.
+
+    | Élément | Rôle |
+    |---|---|
+    | `cutoff_for_days(keep_days)` | borne de rétention, en UTC |
+    | `get_iot_count_before_sql()` | SQL du comptage, sans rien supprimer |
+    | `get_iot_purge_sql()` | SQL de la suppression |
+    | `IotRetentionError` | rétention invalide |
+
+    Comme le reste du paquet, ce module n'accède jamais à la base de lui-même.
+    Il rend du SQL et calcule des paramètres, la commande faisant la jonction.
+
+    !!! info "Forge ne planifie rien"
+        La commande est le point d'entrée à déclencher depuis cron ou un minuteur systemd, comme `sessions:gc`, `audit:gc` et `stats:gc`.
+
+        La purge est indexée, `idx_iot_events_received_at` portant déjà sur la colonne filtrée.
+        Aucune migration n'est requise.
 
 ??? note "6. Vue d'ensemble rapide"
 
@@ -144,7 +190,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     | API publique | `register_iot_routes`, `load_iot_config`, `MqttSubscriber`, `IotEventRepository` |
     | Table SQL | `iot_events` |
     | Configuration | MQTT via `load_iot_config` (`IotConfig`) |
-    | Commandes | `iot:doctor`, `iot:init`, `iot:simulate`, `iot:listen` |
+    | Commandes | `iot:doctor`, `iot:init`, `iot:simulate`, `iot:listen`, `iot:gc` |
     | Exposition | API HTTP JSON (`register_iot_routes`) |
     | Installation | `pip install --pre forge-mvc-iot` |
 

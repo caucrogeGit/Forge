@@ -154,6 +154,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "stats:gc":           "Purge les événements statistiques par âge (affiche ; --run exécute).",
     "audit:init":         "Prépare le journal d'audit applicatif (forge-mvc-audit).",
     "audit:gc":           "Purge le journal d'audit par âge (affiche ; --run exécute).",
+    "iot:gc":             "Purge les mesures IoT par âge (affiche ; --run exécute).",
     "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
     "jobs:reclaim":       "Reprend les tâches orphelines d'un worker planté.",
     "mfa:init":           "Prépare le registre anti-rejeu TOTP partagé (forge-mvc-mfa, optionnel).",
@@ -275,6 +276,42 @@ Limites:
 
 Options:
   --days N      Rétention en jours (>= 1). À défaut : STATS_KEEP_DAYS.
+  --run         Exécute la suppression au lieu de l'afficher.
+  -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "iot:gc": """\
+Usage:
+  forge iot:gc --days N [--run]
+
+Description:
+  Purge la table de mesures IoT (iot_events) de ses lignes antérieures
+  à N jours. AFFICHE le nombre de lignes visées par défaut ; --run supprime.
+
+  Un capteur qui émet toutes les dix secondes dépose plus de trois millions
+  de lignes par an, et un site en compte rarement un seul. Sans purge, la
+  table grossit jusqu'à la panne de remplissage.
+
+  La rétention doit être dite : aucune valeur par défaut n'est supposée.
+  Elle vient de --days N, ou à défaut de la variable IOT_KEEP_DAYS.
+  L'option l'emporte sur la variable.
+
+Exemples:
+  forge iot:gc --days 90          # affiche ce qui serait supprimé
+  forge iot:gc --days 90 --run    # supprime
+
+Prérequis:
+  - forge-mvc-iot installé et sa migration appliquée ;
+  - être à la racine d'un projet Forge (dossier mvc/).
+
+Limites:
+  - aucune archive n'est produite avant suppression, exportez en amont
+    si votre obligation de conservation l'exige ;
+  - suppression en une instruction : sur une très grosse table, le verrou
+    peut être long ;
+  - Forge ne fournit pas d'ordonnanceur, branchez la commande sur cron
+    ou un minuteur systemd.
+
+Options:
+  --days N      Rétention en jours (>= 1). À défaut : IOT_KEEP_DAYS.
   --run         Exécute la suppression au lieu de l'afficher.
   -h, --help    Affiche cette aide sans exécuter la commande.""",
     "audit:gc": """\

@@ -16,7 +16,9 @@ doit avoir été appliquée (voir `forge audit:init` puis `forge migration:apply
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
+
+from core.database.retention import cutoff_for_days as _cutoff_for_days
 from typing import Any
 
 from forge_mvc_audit.errors import AuditError
@@ -163,15 +165,13 @@ def cutoff_for_days(keep_days: int, *, now: datetime | None = None) -> str:
     nulle ou négative viderait la table entière, ce qui ne peut pas être le
     résultat d'une étourderie de frappe.
     """
-    if not isinstance(keep_days, int) or isinstance(keep_days, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
-        raise AuditError(f"keep_days doit être un entier. Reçu : {keep_days!r}.")
-    if keep_days < 1:
-        raise AuditError(
-            f"keep_days doit être >= 1. Reçu : {keep_days}. "
-            "Une rétention nulle ou négative viderait tout le journal."
-        )
-    instant = now if now is not None else datetime.now(timezone.utc)
-    return (instant - timedelta(days=keep_days)).strftime(_DATETIME_FMT)
+    # Le calcul vit dans le cœur (`IOT-RETENTION-GC-001`) : il était écrit à
+    # l'identique ici et dans `forge-mvc-stats`. `AuditError` reste le type
+    # public de ce paquet, d'où l'enveloppe.
+    try:
+        return _cutoff_for_days(keep_days, now=now, quoi="tout le journal")
+    except ValueError as exc:
+        raise AuditError(str(exc)) from exc
 
 
 def count_audit_before(cutoff: str, *, db: Any = None) -> int:
