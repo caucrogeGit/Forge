@@ -31,6 +31,7 @@ import json
 import re
 import secrets
 
+from core.sessions.contract import HANDLE_LENGTH, SessionSummary
 from core.sessions.keys import SESSION_KEY_AUTH_USER_ID
 import time
 from datetime import datetime, timezone
@@ -50,6 +51,7 @@ _SESSION_ID_RE = re.compile(r"^[0-9a-f]{64}$")
 # Signatures des accesseurs DB injectables (tests) et de leurs défauts.
 _FetchOne = Callable[[str, "tuple[Any, ...]"], "dict[str, Any] | None"]
 _Execute = Callable[[str, "tuple[Any, ...]"], int]
+_FetchAll = Callable[[str, "tuple[Any, ...]"], "list[dict[str, Any]]"]
 
 # ── Requêtes SQL (portables : horodatages passés en paramètres, garde de version) ─
 
@@ -74,12 +76,35 @@ _SQL_UPDATE_EXPIRY = (
 _SQL_DELETE = "DELETE FROM forge_sessions WHERE session_id = ?"
 _SQL_DELETE_VERSIONED = "DELETE FROM forge_sessions WHERE session_id = ? AND version = ?"
 _SQL_CLEANUP = "DELETE FROM forge_sessions WHERE expire_at < ?"
+_SQL_LIST_FOR_USER = (
+    "SELECT session_id, created_at, expire_at FROM forge_sessions "
+    "WHERE user_id = ? AND expire_at > ? ORDER BY expire_at DESC"
+)
 _SQL_DELETE_FOR_USER = "DELETE FROM forge_sessions WHERE user_id = ?"
 _SQL_DELETE_FOR_USER_EXCEPT = (
     "DELETE FROM forge_sessions WHERE user_id = ? AND session_id <> ?"
 )
 
 _DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
+
+
+def _horodatage(valeur: object) -> "float | None":
+    """Date de base en horodatage Unix, ou `None`.
+
+    Les pilotes rendent un `datetime` ou une chaîne selon le backend : les deux
+    formes sont acceptées, et une valeur illisible rend `None` plutôt que de
+    faire échouer l'affichage d'une liste de sessions.
+    """
+    if valeur is None:
+        return None
+    if isinstance(valeur, (int, float)):
+        return float(valeur)
+    if isinstance(valeur, datetime):
+        return valeur.timestamp()
+    try:
+        return datetime.strptime(str(valeur), _DATETIME_FMT).timestamp()
+    except ValueError:
+        return None
 
 
 def _user_id_of(session: "dict[str, Any]") -> "str | None":
@@ -99,6 +124,12 @@ def _user_id_of(session: "dict[str, Any]") -> "str | None":
 def _default_fetch_one(sql: str, params: "tuple[Any, ...]") -> "dict[str, Any] | None":
     from core.database.db import fetch_one
     return fetch_one(sql, params)
+
+
+def _default_fetch_all(sql: str, params: "tuple[Any, ...]") -> "list[dict[str, Any]]":
+    from core.database.db import fetch_all
+
+    return fetch_all(sql, list(params))
 
 
 def _default_execute(sql: str, params: "tuple[Any, ...]" = ()) -> int:
@@ -136,9 +167,13 @@ class DbSessionStore:
         fetch_one: _FetchOne | None = None,
         execute: _Execute | None = None,
         ttl: int = DEFAULT_SESSION_TTL,
+        fetch_all: "_FetchAll | None" = None,
     ) -> None:
         self._fetch_one = fetch_one or _default_fetch_one
         self._execute = execute or _default_execute
+        # Ajouté en dernier, et nommé : les appels existants passent leurs
+        # accesseurs par position (ADMIN-SESSIONS-VIEW-001).
+        self._fetch_all = fetch_all or _default_fetch_all
         self._ttl = ttl
 
     # ── helpers ─────────────────────────────────────────────────────────────
@@ -241,6 +276,31 @@ class DbSessionStore:
         if not self._valid(session_id):
             return
         self._execute(_SQL_DELETE, (session_id,))
+
+    def list_for_user(
+        self, user_id: object, *, current_session_id: "str | None" = None
+    ) -> "list[SessionSummary]":
+        """Résumés des sessions **non expirées** de `user_id`, la plus récente d'abord.
+
+        Le filtre d'expiration est en SQL, pas en Python : une session expirée
+        que la purge n'a pas encore retirée n'a pas à s'afficher comme active.
+
+        Aucun identifiant n'est rendu : voir `SessionSummary`. L'identifiant
+        sert ici à calculer le préfixe et à repérer la session courante, il ne
+        sort pas de la méthode.
+        """
+        if user_id is None:
+            return []
+        lignes = self._fetch_all(_SQL_LIST_FOR_USER, (str(user_id), _now_str()))
+        return [
+            SessionSummary(
+                handle=str(ligne["session_id"])[:HANDLE_LENGTH],
+                created_at=_horodatage(ligne.get("created_at")),
+                expires_at=_horodatage(ligne.get("expire_at")),
+                is_current=str(ligne["session_id"]) == current_session_id,
+            )
+            for ligne in lignes
+        ]
 
     def delete_for_user(
         self, user_id: object, *, except_session_id: "str | None" = None

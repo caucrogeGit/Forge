@@ -322,7 +322,10 @@ class TestDonneesSensiblesAbsentes:
         sid = create_session()
         nouveau_sid = authenticate_session(sid, _UTILISATEUR)
         session = get_session(nouveau_sid)
-        expected_top = {"authenticated", "user", "csrf_token", "expires_at"}
+        # `created_at` rejoint les champs prévus (ADMIN-SESSIONS-VIEW-001) :
+        # un écran de sessions n'a que les dates pour distinguer deux lignes.
+        # Ce n'est pas une donnée sensible, et l'ajouter ici est délibéré.
+        expected_top = {"authenticated", "user", "csrf_token", "expires_at", "created_at"}
         assert set(session.keys()) <= expected_top | {"_auth_mfa_user_id", "_auth_mfa_started_at"}
 
     def test_utilisateur_session_ne_contient_que_champs_prevus(self):

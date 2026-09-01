@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **Les sessions d'un compte sont visibles, sans être compromises (`ADMIN-SESSIONS-VIEW-001`).**
+  Révoquer était possible, voir ne l'était pas : l'exploitant déconnectait à l'aveugle, sans savoir combien de sessions étaient ouvertes ni depuis quand.
+  `list_for_user` rejoint le contrat et les trois stores. `DbSessionStore` filtre l'expiration **en SQL** : une session expirée que la purge n'a pas encore retirée n'a pas à s'afficher comme active.
+  Un résumé **ne porte jamais l'identifiant de session**, qui est le jeton d'authentification lui même : l'afficher donnerait à qui lit la page le pouvoir d'usurper la session, et un écran d'administration est lu par quelqu'un d'autre que son titulaire. `SessionSummary` expose un préfixe de huit caractères, assez pour distinguer deux lignes, trop court pour servir de jeton, et qui **ne permet pas de révoquer**.
+  Ni adresse ni navigateur : Forge ne les enregistre pas, et prétendre le contraire dans un écran serait mentir. Les sessions gagnent en revanche une date de création, ajoutée délibérément aux champs prévus du garde-fou de durcissement.
+  `DbSessionStore` accepte un accesseur `fetch_all`, nommé et posé en dernier pour ne pas déplacer les paramètres positionnels existants.
+
 - **Les paramètres s'éditent depuis un écran, sans casser leur type (`ADMIN-SETTINGS-UI-001`).**
   Un paramètre porte une valeur **et** son type, que `set_setting` déduit de la première. Une page web ne reçoit que du texte, ce qui ouvrait trois pièges.
   Brancher un CRUD générique sur la table ferait saisir `value_type` à la main : une incohérence, `value_type=int` sur une valeur `abc`, casse toute lecture ultérieure du paramètre.

@@ -3,6 +3,11 @@
 
 from __future__ import annotations
 
+from core.sessions.contract import (
+    HANDLE_LENGTH,
+    SessionSummary,
+    summary_timestamp,
+)
 from core.sessions.keys import SESSION_KEY_AUTH_USER_ID
 
 import secrets
@@ -35,6 +40,9 @@ class MemorySessionStore:
                 "user": None,
                 "csrf_token": secrets.token_hex(16),
                 "expires_at": time.time() + self._ttl,
+                # Date de création : un écran de sessions n'a que les dates
+                # pour distinguer deux lignes (ADMIN-SESSIONS-VIEW-001).
+                "created_at": time.time(),
             }
             self._cleanup()
         return session_id
@@ -79,6 +87,33 @@ class MemorySessionStore:
         """Supprime la session."""
         with self._lock:
             self._sessions.pop(session_id, None)
+
+    def list_for_user(
+        self, user_id: object, *, current_session_id: "str | None" = None
+    ) -> "list[SessionSummary]":
+        """Résumés des sessions de `user_id`, la plus récente d'abord.
+
+        Aucun identifiant n'est rendu : voir `SessionSummary`.
+        """
+        if user_id is None:
+            return []
+        with self._lock:
+            trouvees = [
+                (sid, session) for sid, session in self._sessions.items()
+                if session.get(SESSION_KEY_AUTH_USER_ID) == user_id
+            ]
+        resumes = [
+            SessionSummary(
+                handle=sid[:HANDLE_LENGTH],
+                created_at=summary_timestamp(session.get("created_at")),
+                expires_at=summary_timestamp(session.get("expires_at")),
+                is_current=sid == current_session_id,
+            )
+            for sid, session in trouvees
+        ]
+        # La plus récente d'abord : une liste dans l'ordre d'un dictionnaire
+        # changerait d'un rafraîchissement à l'autre.
+        return sorted(resumes, key=lambda r: r.expires_at or 0.0, reverse=True)
 
     def delete_for_user(
         self, user_id: object, *, except_session_id: str | None = None

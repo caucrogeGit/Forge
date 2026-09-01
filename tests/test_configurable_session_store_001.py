@@ -46,6 +46,26 @@ class FakeSessionStore:
         self.calls.append("delete")
         self._data.pop(session_id, None)
 
+    def list_for_user(
+        self, user_id: object, *, current_session_id: "str | None" = None
+    ) -> list:
+        """Résumés des sessions du compte (ADMIN-SESSIONS-VIEW-001).
+
+        Le contrat est `runtime_checkable` : un store auquel il manque une
+        méthode n'est plus reconnu, et `forge.configure` le refuse.
+        """
+        from core.sessions.contract import HANDLE_LENGTH, SessionSummary
+
+        self.calls.append("list_for_user")
+        return [
+            SessionSummary(
+                handle=sid[:HANDLE_LENGTH],
+                is_current=sid == current_session_id,
+            )
+            for sid, data in self._data.items()
+            if data.get("_auth_user_id") == user_id
+        ]
+
     def delete_for_user(self, user_id: object) -> int:
         """Révocation par compte (SESSIONS-DELETE-FOR-USER-001).
 

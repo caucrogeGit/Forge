@@ -17,6 +17,11 @@ import time
 from pathlib import Path
 from typing import Any, cast
 
+from core.sessions.contract import (
+    HANDLE_LENGTH,
+    SessionSummary,
+    summary_timestamp,
+)
 from core.sessions.keys import SESSION_KEY_AUTH_USER_ID
 from core.sessions.memory_store import SESSION_TTL
 
@@ -98,6 +103,9 @@ class FileSessionStore:
             "user": None,
             "csrf_token": secrets.token_hex(16),
             "expires_at": time.time() + self._ttl,
+            # Date de création : un écran de sessions n'a que les dates pour
+            # distinguer deux lignes (ADMIN-SESSIONS-VIEW-001).
+            "created_at": time.time(),
         }
         with self._lock:
             self._save(session_id, session)
@@ -145,6 +153,36 @@ class FileSessionStore:
             return
         with self._lock:
             self._path(session_id).unlink(missing_ok=True)
+
+    def list_for_user(
+        self, user_id: object, *, current_session_id: "str | None" = None
+    ) -> "list[SessionSummary]":
+        """Résumés des sessions de `user_id`, la plus récente d'abord.
+
+        Aucun identifiant n'est rendu : voir `SessionSummary`.
+        """
+        if user_id is None:
+            return []
+        resumes: list[SessionSummary] = []
+        with self._lock:
+            for chemin in self._dir.glob("*.json"):
+                try:
+                    brut: object = json.loads(chemin.read_text(encoding="utf-8"))
+                except (OSError, json.JSONDecodeError, ValueError):
+                    continue
+                if not isinstance(brut, dict):
+                    continue
+                donnees = cast("dict[str, Any]", brut)
+                if donnees.get(SESSION_KEY_AUTH_USER_ID) != user_id:
+                    continue
+                identifiant = chemin.stem
+                resumes.append(SessionSummary(
+                    handle=identifiant[:HANDLE_LENGTH],
+                    created_at=summary_timestamp(donnees.get("created_at")),
+                    expires_at=summary_timestamp(donnees.get("expires_at")),
+                    is_current=identifiant == current_session_id,
+                ))
+        return sorted(resumes, key=lambda r: r.expires_at or 0.0, reverse=True)
 
     def delete_for_user(
         self, user_id: object, *, except_session_id: str | None = None

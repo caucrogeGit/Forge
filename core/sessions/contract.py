@@ -3,7 +3,42 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Protocol, runtime_checkable
+
+
+#: Longueur du préfixe montré à l'écran. Assez pour distinguer deux lignes,
+#: trop court pour servir de jeton.
+HANDLE_LENGTH = 8
+
+
+def summary_timestamp(value: object) -> "float | None":
+    """Horodatage en nombre, ou `None` si la session ne le porte pas.
+
+    Une session créée avant `ADMIN-SESSIONS-VIEW-001` n'a pas de date de
+    création : rendre `None` le dit, là où un zéro se lirait comme 1970.
+    """
+    return float(value) if isinstance(value, (int, float)) else None
+
+
+@dataclass(frozen=True)
+class SessionSummary:
+    """Ce qu'un écran peut montrer d'une session, sans rien compromettre.
+
+    `handle` est un préfixe court de l'identifiant, assez pour distinguer deux
+    lignes à l'œil, trop court pour servir de jeton. Il ne permet **pas** de
+    révoquer : la révocation se fait par compte, ou par la session elle même
+    quand son titulaire la connaît déjà par son cookie.
+
+    `created_at` et `expires_at` sont des horodatages Unix, tels que les stores
+    les gardent. Ni adresse ni navigateur : Forge ne les enregistre pas, et
+    prétendre le contraire dans un écran serait mentir.
+    """
+
+    handle: str
+    created_at: "float | None" = None
+    expires_at: "float | None" = None
+    is_current: bool = False
 
 
 @runtime_checkable
@@ -30,6 +65,20 @@ class SessionStore(Protocol):
 
     def replace(self, session_id: str, data: dict[str, Any]) -> None:
         """Remplace intégralement les données d'une session existante (sans merge)."""
+        ...
+
+    def list_for_user(self, user_id: object) -> "list[SessionSummary]":
+        """Résumés des sessions ouvertes de `user_id`, la plus récente d'abord.
+
+        Sert un écran « mes sessions » ou « sessions actives » : sans lui,
+        révoquer était possible mais voir ne l'était pas, et l'exploitant
+        déconnectait à l'aveugle (`ADMIN-SESSIONS-VIEW-001`).
+
+        Un résumé **ne porte jamais l'identifiant de session**. Cet identifiant
+        est le jeton d'authentification lui même : l'afficher donnerait à qui
+        lit la page le pouvoir d'usurper la session, et un écran d'administration
+        est justement lu par quelqu'un d'autre que son titulaire.
+        """
         ...
 
     def delete_for_user(

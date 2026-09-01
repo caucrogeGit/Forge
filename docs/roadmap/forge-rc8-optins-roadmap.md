@@ -114,7 +114,7 @@ Chacun dépend d'un ticket du lot 2.
 | `AUDIT-CSV-EXPORT-001` | import-export | **Livré.** Export non borné, curseur par identifiant, aucune dépendance croisée |
 | `NOTIF-MAIL-BRIDGE-001` | mail, jobs | **Livré.** `on_notification_created`, relais isolés, pont à trois paquets sans dépendance |
 | `ADMIN-SETTINGS-UI-001` | admin | **Livré.** Conversion de saisie explicite, forme renvoyable, aucune dépendance au back-office |
-| `ADMIN-SESSIONS-VIEW-001` | admin | Écran des sessions actives |
+| `ADMIN-SESSIONS-VIEW-001` | admin | **Livré.** `list_for_user` sur les 3 stores, résumé sans jeton, préfixe non révocable |
 | `WORKFLOW-ENTITY-STATUS-001` | entities | **Livré.** Le contrat devient la source, champ nommé jamais deviné, aucune dépendance |
 
 ---

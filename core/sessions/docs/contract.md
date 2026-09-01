@@ -23,7 +23,7 @@ Une application peut écrire son propre backend en implémentant les mêmes mét
 | Couche | Sessions |
 | Rôle | définir l'interface commune des backends de session |
 | Nature | `typing.Protocol`, `@runtime_checkable` |
-| API publique | `create`, `get`, `set`, `replace`, `delete`, `delete_for_user`, `regenerate`, `authenticate`, `touch_expiry`, `set_flash`, `get_flash` |
+| API publique | `create`, `get`, `set`, `replace`, `delete`, `delete_for_user`, `list_for_user`, `regenerate`, `authenticate`, `touch_expiry`, `set_flash`, `get_flash` |
 | Implémentations fournies | `MemorySessionStore`, `FileSessionStore`, `DbSessionStore` |
 | Choisi par | `core.sessions.manager` |
 
@@ -48,6 +48,7 @@ classDiagram
         +replace(session_id, data) None
         +delete(session_id) None
         +delete_for_user(user_id, except_session_id) int
+        +list_for_user(user_id, current_session_id) list~SessionSummary~
         +regenerate(session_id) str
         +authenticate(session_id, user_data, ttl_seconds) str | None
         +touch_expiry(session_id, ttl_seconds) bool
@@ -81,6 +82,7 @@ classDiagram
 | `replace` | `replace(self, session_id: str, data: dict[str, Any]) -> None` | remplace intégralement les données, sans merge |
 | `delete` | `delete(self, session_id: str) -> None` | supprime la session |
 | `delete_for_user` | `delete_for_user(self, user_id: object, *, except_session_id: str | None = None) -> int` | supprime les sessions du compte, sauf celle épargnée, et retourne leur nombre |
+| `list_for_user` | `list_for_user(self, user_id: object, *, current_session_id: str | None = None) -> list[SessionSummary]` | résumés des sessions du compte, la plus récente d'abord |
 | `regenerate` | `regenerate(self, session_id: str) -> str` | crée un nouvel identifiant en conservant les données |
 | `authenticate` | `authenticate(self, session_id: str, user_data: dict[str, Any], ttl_seconds: int) -> str | None` | rotation atomique : nouvel identifiant, écriture utilisateur, nouveau jeton CSRF ; `None` si la session n'existe pas |
 | `touch_expiry` | `touch_expiry(self, session_id: str, ttl_seconds: int) -> bool` | repousse l'expiration ; `False` si la session n'existe pas |
@@ -101,6 +103,19 @@ classDiagram
 
     `except_session_id` épargne une session, celle depuis laquelle le geste est fait.
     Sans elle, activer un second facteur déconnecterait celui qui vient de l'activer, ce qui ne protège de rien.
+
+!!! danger "Un résumé ne porte jamais l'identifiant de session"
+    `SessionSummary` expose `handle`, un préfixe de huit caractères, et jamais l'identifiant complet.
+
+    Cet identifiant **est** le jeton d'authentification : l'afficher donnerait à qui lit la page le pouvoir d'usurper la session, et un écran d'administration est justement lu par quelqu'un d'autre que son titulaire.
+
+    Le préfixe sert à distinguer deux lignes à l'œil, pas à désigner une session : il ne permet pas de révoquer.
+    La révocation passe par `delete_for_user`, ou par `delete` quand le titulaire connaît déjà son identifiant par son cookie.
+
+!!! info "Ni adresse ni navigateur"
+    Un résumé porte le préfixe, les deux dates et un drapeau « session courante ».
+
+    Forge n'enregistre ni l'adresse IP ni l'agent utilisateur : les afficher demanderait de les stocker, ce qui est une décision d'application, pas un défaut à combler en silence.
 
 !!! danger "Ajouter une méthode au contrat est une rupture"
     `SessionStore` est `@runtime_checkable` : un store auquel il manque une méthode n'est plus reconnu par `isinstance`, et `forge.configure` le refuse.
