@@ -132,7 +132,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | Catégorie | Internationalisation (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` |
-    | API publique | `trans`, `load_catalog`, `get_default_locale`, `set_default_locale`, `get_fallback_locale`, `set_fallback_locale`, `clear_translation_cache` |
+    | API publique | `trans`, `load_catalog`, `get_default_locale`, `set_default_locale`, `get_fallback_locale`, `set_fallback_locale`, `clear_translation_cache`, `detect_locale`, `available_locales`, `parse_accept_language`, `negotiate_locale` |
     | Catalogues | `translations/<locale>.json` |
     | Configuration | `i18n_default_locale`, `i18n_fallback_locale` (cœur) |
     | Helper Jinja | `trans()` exposé aux templates (ADR-046) |
@@ -238,6 +238,11 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | `get_fallback_locale` | `get_fallback_locale() -> str \| None` | locale de repli |
     | `set_fallback_locale` | `set_fallback_locale(locale) -> None` | fixe la locale de repli |
     | `clear_translation_cache` | `clear_translation_cache() -> None` | vide le cache des catalogues |
+    | `detect_locale` | `detect_locale(*, session_locale=None, accept_language=None, available=None, default=None) -> str \| None` | locale active, session puis en-tête puis défaut |
+    | `available_locales` | `available_locales(translations_dir="translations") -> list[str]` | locales ayant un catalogue, liste blanche de la négociation |
+    | `parse_accept_language` | `parse_accept_language(header) -> list[str]` | locales de l'en-tête, triées par facteur de qualité |
+    | `negotiate_locale` | `negotiate_locale(voulues, disponibles) -> str \| None` | première voulue qu'on sait servir |
+    | `SESSION_KEY_LOCALE` | constante | clé de session portant le choix de l'utilisateur |
     | `I18nError`, `TranslationCatalogError` | exceptions | erreurs (locale invalide, catalogue illisible) |
 
 ??? note "9. Contextes d'utilisation"
@@ -251,6 +256,57 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     | Définir le repli | `set_fallback_locale("en")` |
     | Vérifier les manques | `forge i18n:check` |
     | Recharger après édition | `clear_translation_cache()` |
+    | Savoir quelle langue servir | `detect_locale(...)` |
+    | Connaître les langues servables | `available_locales()` |
+
+??? note "9 bis. D'où vient la locale active"
+
+    Le paquet annonçait « locale et fallback » sans savoir d'où venait la locale.
+    `trans()` retombait sur une valeur **globale**, la même pour tous les visiteurs, et une application multilingue devait écrire sa propre détection (`I18N-LOCALE-DETECTION-001`).
+
+    L'ordre va du plus intentionnel au plus supposé.
+
+    | Rang | Source | Pourquoi ce rang |
+    |---|---|---|
+    | 1 | Choix en session | un geste de l'utilisateur, explicite |
+    | 2 | En-tête `Accept-Language` | une préférence du navigateur |
+    | 3 | Locale par défaut | la configuration de l'application |
+
+    ```python
+    from forge_mvc_i18n import SESSION_KEY_LOCALE, available_locales, detect_locale, trans
+
+    locale = detect_locale(
+        session_locale=session.get(SESSION_KEY_LOCALE),
+        accept_language=request.header("Accept-Language"),
+        available=available_locales(),
+        default="fr",
+    )
+    titre = trans("page.title", locale)
+    ```
+
+    Pour enregistrer un choix, l'application écrit la clé en session.
+
+    ```python
+    session[SESSION_KEY_LOCALE] = "en"
+    ```
+
+    !!! warning "La liste blanche n'est pas facultative"
+        `available` borne les deux premières sources, qui viennent du client.
+
+        Sans elle, elles sont refusées et le défaut est rendu.
+        Un `Accept-Language` forgé ferait sinon chercher un catalogue arbitraire, et cet en-tête n'est pas de confiance.
+
+    !!! info "Une région retombe sur sa base, jamais l'inverse"
+        `fr-FR` est servi par `fr` quand seul `fr` a un catalogue : un navigateur annonce presque toujours une région, et exiger l'exactitude ne servirait jamais personne.
+
+        `fr` ne choisit pas `fr-CA` pour autant.
+        Servir une variante régionale que personne n'a demandée serait une supposition, pas une négociation.
+
+    !!! info "Rien ne se détecte tout seul"
+        `trans()` ne change pas de comportement, et l'application appelle `detect_locale` puis passe le résultat.
+
+        Un helper qui lirait la requête à l'insu de l'appelant serait de la magie cachée, que le principe 3 refuse.
+        Les fonctions prennent des valeurs simples, jamais une requête HTTP, et se testent sans monter de serveur.
 
 ??? note "10. Exemples d'utilisation"
 

@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **`forge-mvc-i18n` sait d'où vient la locale (`I18N-LOCALE-DETECTION-001`).**
+  Le paquet annonçait « locale et fallback » sans savoir d'où venait la locale : `trans()` retombait sur une valeur **globale** de configuration, la même pour tous les visiteurs. Une application multilingue devait écrire sa propre détection, ce que la documentation ne disait pas.
+  `detect_locale` suit un ordre explicite, du plus intentionnel au plus supposé : le choix en session, l'en-tête `Accept-Language`, puis le défaut. `parse_accept_language` respecte les facteurs de qualité de la RFC 9110, `q=0` valant refus.
+  `available_locales` sert de liste blanche aux deux sources clientes : sans elle, elles sont refusées et le défaut est rendu, un en-tête forgé ferait sinon chercher un catalogue arbitraire.
+  Une variante régionale retombe sur sa base, `fr-FR` étant servi par `fr`, mais jamais l'inverse : servir `fr-CA` à qui demande `fr` serait une supposition, pas une négociation.
+  Rien ne se détecte tout seul. `trans()` ne change pas de comportement, et les fonctions prennent des valeurs simples, jamais une requête HTTP, ce qui les rend testables sans monter de serveur.
+
 - **`forge-mvc-files` tient un registre de ce qu'il écrit (`FILES-METADATA-TABLE-001`, ADR-094).**
   Le paquet écrivait des fichiers sans en garder trace, l'ADR-020 ayant exclu tout état de son périmètre. Une conséquence n'avait pas été mesurée : sans registre, aucun quota n'est calculable, aucun orphelin repérable, et le nom d'origine ne survit pas au mode UUID, qui l'efface du chemin par sécurité.
   L'état existait pourtant déjà, dans la table `media` de `forge-mvc-images`, où rien n'est propre à l'image : un projet ne stockant que des PDF aurait dû installer Pillow pour disposer d'une table.

@@ -5,7 +5,18 @@ Traduction par catalogues JSON (`translations/<locale>.json`), locale par défau
 et locale de fallback configurables via le noyau (`i18n_default_locale`,
 `i18n_fallback_locale`), cache des catalogues, et helper `trans()` exposé aux
 templates Jinja par le renderer du noyau quand ce paquet est installé.
+
+Depuis `I18N-LOCALE-DETECTION-001`, le paquet sait aussi **d'où vient** la
+locale : session, puis `Accept-Language`, puis défaut. La détection reste
+explicite, `trans()` ne changeant pas de comportement de lui même.
 """
+from forge_mvc_i18n.detection import (
+    SESSION_KEY_LOCALE,
+    available_locales,
+    detect_locale,
+    negotiate_locale,
+    parse_accept_language,
+)
 from forge_mvc_i18n.exceptions import I18nError, TranslationCatalogError
 from forge_mvc_i18n.translator import (
     clear_translation_cache,
@@ -29,4 +40,10 @@ __all__ = [
     "load_catalog",
     "trans",
     "clear_translation_cache",
+    # Détection de la locale active (I18N-LOCALE-DETECTION-001)
+    "detect_locale",
+    "available_locales",
+    "parse_accept_language",
+    "negotiate_locale",
+    "SESSION_KEY_LOCALE",
 ]
