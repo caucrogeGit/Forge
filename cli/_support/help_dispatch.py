@@ -1730,11 +1730,16 @@ Limites:
 
     "mail:test": """\
 Usage:
-  forge mail:test --to <adresse>
+  forge mail:test --to <adresse> [--dry-run]
 
 Description:
   Construit et expédie un message de test via le transport mail configuré
   pour le projet (smtp, log ou null).
+
+  Le diagnostic précède l'envoi : transport, MAIL_ENABLED, expéditeur et
+  serveur sont affichés avant toute tentative. Un « non envoyé » annoncé
+  après coup se lit comme un échec, alors que c'est souvent une
+  configuration voulue.
 
 Arguments:
   --to <adresse>    Destinataire du mail de test (obligatoire).
@@ -1753,11 +1758,14 @@ Selon la configuration:
   - MAIL_TRANSPORT=smtp + MAIL_ENABLED=true → ENVOI RÉEL via SMTP.
 
 Options:
+  --dry-run     Montre le message qui partirait, sans rien envoyer.
+                Vérifier sa configuration ne devrait pas commencer par
+                écrire à quelqu'un, ni exiger un relais joignable.
   -h, --help    Affiche cette aide sans exécuter la commande.
 
 Limites:
   - peut envoyer un mail réel selon la config (vérifier au préalable
-    avec forge mail:doctor) ;
+    avec forge mail:doctor, ou avec --dry-run) ;
   - ne valide pas le contenu envoyé, ne consulte pas mail_log
     (voir forge mail:logs) ;
   - ne crée ni template ni dossier (voir forge mail:init).""",

@@ -175,9 +175,9 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `MAIL-ATTACHMENTS-001` | Pièces jointes simples |
-| `MAIL-TEST-GUIDED-001` | `mail:test` guidé, essai à blanc et destinataire de test |
-| `MAIL-LAYOUTS-001` | Gabarits d'email réutilisables |
+| `MAIL-ATTACHMENTS-001` | **Livré.** Message immuable, nom de fichier assaini, type jamais deviné faux |
+| `MAIL-TEST-GUIDED-001` | **Livré.** `--dry-run`, diagnostic avant l'envoi |
+| `MAIL-LAYOUTS-001` | **Livré.** Faux besoin : l'héritage Jinja marchait déjà ; capacité figée par des tests et documentée |
 
 ### 7.9 notifications
 

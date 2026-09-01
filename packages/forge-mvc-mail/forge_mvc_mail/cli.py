@@ -142,13 +142,36 @@ def cmd_mail_init(args: list[str], root: Path | None = None) -> None:
 
 # ── mail:test ─────────────────────────────────────────────────────────────────
 
+_AIDE_MAIL_TEST = (
+    "Usage :\n"
+    "  forge mail:test --to adresse@example.com          # envoie\n"
+    "  forge mail:test --to adresse@example.com --dry-run # montre sans envoyer"
+)
+
+
+def _serveur_lisible(config: Any) -> str:
+    """Hôte et port du relais, ou une mention explicite quand il n'y en a pas.
+
+    Un transport console ou nul n'a pas de serveur : afficher « None:0 » ferait
+    chercher une configuration absente qui n'a pas lieu d'être.
+    """
+    hote = getattr(config, "host", "") or ""
+    if not hote:
+        return "(aucun, transport local)"
+    return f"{hote}:{getattr(config, 'port', '')}"
+
+
 def cmd_mail_test(args: list[str], root: Path | None = None) -> None:
     if "--to" not in args:
-        sys.exit("Usage : forge mail:test --to adresse@example.com")
+        sys.exit(_AIDE_MAIL_TEST)
     idx = args.index("--to")
-    if idx + 1 >= len(args):
-        sys.exit("Usage : forge mail:test --to adresse@example.com")
+    if idx + 1 >= len(args) or args[idx + 1].startswith("--"):
+        sys.exit(_AIDE_MAIL_TEST)
     to = args[idx + 1]
+    # Essai à blanc : montrer ce qui partirait, sans toucher au relais. Tester
+    # sa configuration ne devrait pas commencer par envoyer un message à
+    # quelqu'un, ni dépendre d'un serveur joignable (MAIL-TEST-GUIDED-001).
+    a_blanc = "--dry-run" in args
 
     root = root or Path.cwd()
     _load_env_and_configure_forge(root)
@@ -166,6 +189,15 @@ def cmd_mail_test(args: list[str], root: Path | None = None) -> None:
 
     print(out.info(f"Transport    : {transport.name}"))
     print(out.info(f"MAIL_ENABLED : {config.enabled}"))
+    print(out.info(f"Expéditeur   : {config.from_email or '(MAIL_FROM absent)'}"))
+    print(out.info(f"Serveur      : {_serveur_lisible(config)}"))
+    if not config.enabled:
+        # Dit avant l'envoi, pas après : un « non envoyé » qui arrive à la fin
+        # se lit comme un échec, alors que c'est une configuration voulue.
+        print(out.warn(
+            "MAIL_ENABLED=false : rien ne partira. "
+            "Posez MAIL_ENABLED=true dans env/dev pour activer l'envoi."
+        ))
 
     msg = MailMessage(
         subject=f"Test Forge — {datetime.now().strftime('%Y-%m-%d %H:%M')}",
@@ -181,6 +213,15 @@ def cmd_mail_test(args: list[str], root: Path | None = None) -> None:
             f"<p>Destinataire : {to}</p>"
         ),
     )
+
+    if a_blanc:
+        print(out.ok("Essai à blanc : rien n'a été envoyé."))
+        print(out.info(f"Sujet        : {msg.subject}"))
+        print(out.info(f"Destinataire : {', '.join(msg.to_addresses)}"))
+        print(out.info("Corps texte  :"))
+        for ligne in (msg.body_text or "").splitlines():
+            print(out.info(f"  {ligne}"))
+        return
 
     try:
         result = mailer.send(msg)

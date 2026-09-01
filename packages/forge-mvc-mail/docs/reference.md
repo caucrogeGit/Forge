@@ -148,7 +148,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     | Catégorie | Communication (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` (Jinja pour les gabarits) |
-    | API publique | `Mailer`, `MailMessage`, transports, `MailTemplateRenderer`, `MailConfig`, `MailLogger`, `message_to_payload`, `make_mail_job_handler` |
+    | API publique | `Mailer`, `MailMessage`, transports, `MailTemplateRenderer`, `MailConfig`, `MailLogger`, `message_to_payload`, `make_mail_job_handler`, `Attachment` |
     | Transports | `console`, `log` (défaut dev), `smtp`, `fake`, `null` |
     | Configuration | `MAIL_*` (`MailConfig`) |
     | Commandes | `mail:init`, `mail:test`, `mail:render`, `mail:doctor`, `mail:logs` |
@@ -459,3 +459,79 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
 - [Rendu de gabarits (templates.py)](references/templates.md) : `MailTemplateRenderer`.
 - [Journal des envois (log.py)](references/log.md) et [Erreurs (exceptions.py)](references/exceptions.md).
 - [Welcome-Mail](welcome/debutant/mail-welcome.md) : parcours d'apprentissage.
+
+## Pièces jointes
+
+Une facture, un export, un justificatif : un email en porte souvent un.
+
+```python
+message = MailMessage(subject="Facture", to=client.email, body_text="Ci-joint.")
+message = message.with_attachment("facture.pdf", pdf_bytes)
+mailer.send(message)
+```
+
+!!! info "Le message n'est pas modifié, un nouveau est rendu"
+    `with_attachment` rend un message augmenté plutôt que de changer celui qu'on lui donne.
+
+    Un message mis en file puis complété ailleurs partirait sinon dans deux états selon l'ordre des appels.
+
+!!! danger "Le nom de fichier est assaini"
+    Il voyage dans un en-tête MIME et s'affiche chez le destinataire, et vient souvent d'un fichier déposé par un utilisateur.
+
+    Un chemin est réduit à son dernier segment, `../../etc/passwd` devenant `passwd`, et un saut de ligne est retiré : il couperait l'en-tête en deux.
+
+!!! info "Un type inconnu vaut mieux qu'un type faux"
+    Le type MIME est deviné du nom, et retombe sur `application/octet-stream`.
+
+    Un type erroné serait suivi par le client mail pour ouvrir le fichier.
+    Il peut être déclaré explicitement, et une forme malformée est refusée.
+
+La taille est bornée à dix mégaoctets. Un relais refuserait au delà, et un message refusé après coup est plus difficile à diagnostiquer qu'un refus à la construction.
+
+## Gabarits réutilisables
+
+Un en-tête et un pied de page réécrits dans chaque gabarit sont oubliés quelque part le jour où l'adresse change.
+
+L'héritage Jinja fonctionne depuis toujours, le moteur montant un chargeur sur le dossier des gabarits.
+Rien ne le disait, et rien ne le figeait : c'est ce que corrige `MAIL-LAYOUTS-001`.
+
+```html
+<!-- layout_html.html -->
+<header>Mon École</header>
+{% block corps %}{% endblock %}
+<footer>Ne pas répondre à ce message.</footer>
+```
+
+```html
+<!-- bienvenue_html.html -->
+{% extends "layout_html.html" %}
+{% block corps %}<p>Bonjour {{ prenom }}</p>{% endblock %}
+```
+
+Le corps texte a le sien, `layout_text.txt` : donner un layout à l'un sans l'autre rendrait les deux versions du message incohérentes.
+
+!!! info "Un layout n'est pas un gabarit de message"
+    Il n'a ni sujet ni corps propre, et le rendre directement échoue.
+
+    Seuls les trios `<nom>_subject.txt`, `<nom>_text.txt` et `<nom>_html.html` sont des messages.
+
+!!! warning "L'échappement reste actif"
+    Hériter n'ouvre pas d'injection : une variable de contexte est échappée dans le corps HTML comme avant.
+
+## Vérifier sa configuration sans écrire à personne
+
+`mail:test` envoyait toujours. Vérifier sa configuration commençait donc par écrire à quelqu'un, et exigeait un relais joignable (`MAIL-TEST-GUIDED-001`).
+
+```bash
+forge mail:test --to vous@exemple.com --dry-run   # montre ce qui partirait
+forge mail:test --to vous@exemple.com             # envoie
+```
+
+Le diagnostic précède désormais l'envoi : transport, `MAIL_ENABLED`, expéditeur et serveur.
+
+!!! info "Un « non envoyé » annoncé après coup se lit comme un échec"
+    `MAIL_ENABLED=false` est signalé **avant** la tentative, avec la façon de l'activer.
+
+    C'est une configuration voulue, pas une panne, et l'ordre de l'affichage le dit.
+
+Un transport local affiche « aucun serveur » plutôt que `None:0`, qui ferait chercher une configuration absente.

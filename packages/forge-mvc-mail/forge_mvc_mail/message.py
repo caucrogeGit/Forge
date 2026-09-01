@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import mimetypes
 from dataclasses import dataclass, field
 from email.message import EmailMessage
 from typing import Iterable
@@ -56,6 +57,76 @@ def _normalize_addresses(
     return [_check_no_injection(a, field_name) for a in cleaned]
 
 
+#: Taille maximale d'une pièce jointe, en octets.
+#:
+#: Un relais SMTP refuse en général au delà de vingt-cinq mégaoctets, et un
+#: message refusé après coup est plus difficile à diagnostiquer qu'un refus à
+#: la construction.
+MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024
+
+
+@dataclass(frozen=True)
+class Attachment:
+    """Une pièce jointe, nommée et typée.
+
+    Le nom de fichier voyage dans un en-tête MIME et s'affiche chez le
+    destinataire : il est assaini, un séparateur de chemin ou un saut de ligne
+    n'ayant rien à y faire (`MAIL-ATTACHMENTS-001`).
+    """
+
+    filename: str
+    content: bytes
+    mime_type: "str | None" = None
+
+    def __post_init__(self) -> None:
+        nom = str(self.filename).strip()
+        if not nom:
+            raise MailValidationError("Le nom de la pièce jointe ne peut pas être vide.")
+        # Un nom de fichier ne contient jamais de chemin : `../../x` chez le
+        # destinataire, ou un saut de ligne qui coupe l'en-tête MIME.
+        nettoye = nom.replace("\\", "/").split("/")[-1]
+        nettoye = "".join(c for c in nettoye if c.isprintable() and c not in "\r\n")
+        nettoye = nettoye.strip()
+        if not nettoye or nettoye in {".", ".."}:
+            raise MailValidationError(
+                f"Nom de pièce jointe invalide : {self.filename!r}."
+            )
+        object.__setattr__(self, "filename", nettoye)
+
+        if not isinstance(self.content, (bytes, bytearray)):  # pyright: ignore[reportUnnecessaryIsInstance]
+            raise MailValidationError(
+                f"Le contenu de {nettoye!r} doit être des octets, "
+                f"reçu {type(self.content).__name__}."
+            )
+        if len(self.content) > MAX_ATTACHMENT_BYTES:
+            raise MailValidationError(
+                f"Pièce jointe {nettoye!r} trop volumineuse : "
+                f"{len(self.content)} octets, {MAX_ATTACHMENT_BYTES} au plus."
+            )
+        object.__setattr__(self, "content", bytes(self.content))
+
+        if self.mime_type is not None:
+            declare = str(self.mime_type).strip()
+            if declare.count("/") != 1 or not all(declare.partition("/")[::2]):
+                raise MailValidationError(
+                    f"Type MIME invalide pour {nettoye!r} : {self.mime_type!r}."
+                )
+            object.__setattr__(self, "mime_type", declare)
+
+    @property
+    def resolved_mime_type(self) -> str:
+        """Type MIME déclaré, deviné du nom, ou générique.
+
+        `application/octet-stream` en dernier recours : un type inconnu vaut
+        mieux qu'un type faux, qu'un client mail suivrait pour ouvrir le
+        fichier.
+        """
+        if self.mime_type:
+            return self.mime_type
+        devine, _ = mimetypes.guess_type(self.filename)
+        return devine or "application/octet-stream"
+
+
 @dataclass
 class MailMessage:
     subject: str
@@ -70,6 +141,10 @@ class MailMessage:
     cc_addresses: list[str] = field(init=False, repr=False)
     bcc_addresses: list[str] = field(init=False, repr=False)
     reply_to_addresses: list[str] = field(init=False, repr=False)
+    #: Pièces jointes, ajoutées par `with_attachment`.
+    attachments: "list[Attachment]" = field(
+        init=False, repr=False, default_factory=list["Attachment"]
+    )
 
     def __post_init__(self) -> None:
         subject = str(self.subject).strip()
@@ -101,6 +176,38 @@ class MailMessage:
         """Destinataires SMTP réels : to + cc + bcc (bcc exclu des headers)."""
         return [*self.to_addresses, *self.cc_addresses, *self.bcc_addresses]
 
+    def with_attachment(
+        self,
+        filename: str,
+        content: bytes,
+        *,
+        mime_type: "str | None" = None,
+    ) -> "MailMessage":
+        """Rend un message identique, augmenté d'une pièce jointe.
+
+        Le message est **immuable** en pratique : cette méthode en rend un
+        nouveau plutôt que de modifier celui qu'on lui donne. Un message mis en
+        file puis complété ailleurs partirait sinon dans deux états selon
+        l'ordre des appels.
+
+        `mime_type` est deviné du nom quand il est absent, et retombe sur
+        `application/octet-stream` : un type inconnu vaut mieux qu'un type faux,
+        qu'un client mail suivrait pour ouvrir le fichier.
+        """
+        piece = Attachment(filename=filename, content=content, mime_type=mime_type)
+        nouveau = MailMessage(
+            subject=self.subject,
+            to=list(self.to_addresses),
+            body_text=self.body_text,
+            body_html=self.body_html,
+            from_email=self.from_email,
+            cc=list(self.cc_addresses) or None,
+            bcc=list(self.bcc_addresses) or None,
+            reply_to=list(self.reply_to_addresses) or None,
+        )
+        object.__setattr__(nouveau, "attachments", [*self.attachments, piece])
+        return nouveau
+
     def as_email_message(self, from_email: str) -> EmailMessage:
         msg = EmailMessage()
         msg["Subject"] = self.subject
@@ -118,5 +225,14 @@ class MailMessage:
             msg.set_content(self.body_text)
         else:
             msg.set_content(self.body_html, subtype="html")
+
+        for piece in self.attachments:
+            principal, _, sous_type = piece.resolved_mime_type.partition("/")
+            msg.add_attachment(
+                piece.content,
+                maintype=principal,
+                subtype=sous_type,
+                filename=piece.filename,
+            )
 
         return msg

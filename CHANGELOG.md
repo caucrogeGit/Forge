@@ -4,6 +4,19 @@
 
 ### Ajouté
 
+- **Un email peut porter une pièce jointe (`MAIL-ATTACHMENTS-001`).**
+  Une facture, un export, un justificatif : le paquet ne savait pas en joindre. `with_attachment` rend un message **augmenté** plutôt que de modifier celui qu'on lui donne, un message mis en file puis complété ailleurs partant sinon dans deux états.
+  Le nom de fichier est assaini : il voyage dans un en-tête MIME, s'affiche chez le destinataire, et vient souvent d'un fichier déposé par un utilisateur. Un chemin est réduit à son dernier segment, et un saut de ligne retiré, qui couperait l'en-tête en deux.
+  Le type MIME est deviné du nom et retombe sur `application/octet-stream` : un type faux serait suivi par le client mail pour ouvrir le fichier. La taille est bornée, un refus à la construction se diagnostiquant mieux qu'un refus du relais après coup.
+
+- **`mail:test` peut vérifier sans écrire à personne (`MAIL-TEST-GUIDED-001`).**
+  La commande envoyait toujours : vérifier sa configuration commençait par écrire à quelqu'un, et exigeait un relais joignable. `--dry-run` montre le message qui partirait.
+  Le diagnostic **précède** l'envoi, transport, `MAIL_ENABLED`, expéditeur et serveur : un « non envoyé » annoncé après coup se lit comme un échec, alors que c'est une configuration voulue. Un transport local affiche « aucun serveur » plutôt que `None:0`.
+
+- **Les gabarits d'email peuvent partager un en-tête (`MAIL-LAYOUTS-001`).**
+  **Faux besoin fonctionnel** : l'héritage Jinja marchait depuis toujours, le moteur montant un chargeur sur le dossier des gabarits. Rien ne le disait, et rien ne le figeait.
+  Le ticket livre donc des tests qui verrouillent la capacité, qu'une refonte du renderer pourrait retirer en silence, et la documentation qui manquait. Un en-tête réécrit dans chaque gabarit est oublié quelque part le jour où l'adresse change.
+
 - **Une tâche ne part plus deux fois (`JOBS-IDEMPOTENCY-KEY-001`).**
   Un utilisateur qui double-clique, un webhook rejoué, une requête relancée après un délai d'attente : la tâche partait deux fois, et l'email aussi. `enqueue(..., idempotency_key=...)` ne donne qu'une tâche, la seconde mise en file rendant l'identifiant de la première.
   **Un piège dialectal évité, mesuré contre les serveurs.** Une contrainte `UNIQUE` ordinaire sur colonne nullable n'accepte qu'un seul `NULL` sur SQL Server, là où les trois autres en acceptent autant qu'on veut : la deuxième tâche **sans** clé y aurait été refusée, c'est-à-dire presque toutes, et la file entière serait tombée sur ce backend. `Dialect.unique_nullable_index_sql` porte la différence, filtrée sur SQL Server.
