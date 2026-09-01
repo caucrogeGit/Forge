@@ -130,7 +130,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     | Catégorie | Données et modélisation (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` |
-    | API publique | `WorkflowStatus`, `WorkflowTransition`, `make_status`, `make_transition`, `can_transition`, `get_available_transitions`, helpers Jinja |
+    | API publique | `WorkflowStatus`, `WorkflowTransition`, `make_status`, `make_transition`, `can_transition`, `get_available_transitions`, `apply_transition`, `TransitionEvent`, helpers Jinja |
     | Persistance | aucune table imposée : l'application stocke le statut courant |
     | Helpers Jinja | `workflow_status_badge`, `workflow_status_label`, `workflow_status_color` |
     | Exceptions | `WorkflowStatusError`, `WorkflowTransitionError` |
@@ -241,6 +241,8 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     | `make_status` | `make_status(name, label="", color="", is_initial=False, is_final=False) -> WorkflowStatus` | déclare un statut |
     | `make_transition` | `make_transition(from_status, to_status) -> WorkflowTransition` | déclare une transition |
     | `can_transition` | `can_transition(transitions, from_name, to_name) -> bool` | transition autorisée ? |
+    | `apply_transition` | `apply_transition(transitions, from_status, to_status, *, before=None, commit=None, after=None, context=None) -> str` | applique dans un ordre garanti, rend le statut atteint |
+    | `TransitionEvent` | `from_status`, `to_status`, `context` | ce que reçoivent les points d'accroche |
     | `get_available_transitions` | `get_available_transitions(transitions, from_name) -> list[WorkflowTransition]` | transitions possibles depuis un statut |
     | `find_status` | `find_status(...) -> WorkflowStatus` | retrouve un statut par nom |
     | `validate_statuses`, `validate_transitions` | fonctions | valident un jeu de statuts/transitions |
@@ -254,9 +256,64 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     |---|---|
     | Déclarer le cycle de vie | `make_status` + `make_transition` |
     | Autoriser un changement | `can_transition(...)` |
+    | Appliquer un changement | `apply_transition(...)` |
+    | Refuser selon une règle métier | lever depuis `before` |
     | Proposer les suites possibles | `get_available_transitions(...)` |
     | Valider la configuration | `validate_statuses` / `validate_transitions` |
     | Afficher un badge | `workflow_status_badge(...)` (Jinja) |
+
+??? note "9 bis. Appliquer une transition"
+
+    Le paquet savait dire si une transition est **permise**, jamais l'appliquer.
+    Chaque application réécrivait le même enchaînement à la main, et rien n'empêchait d'appeler l'action d'après quand celle d'avant avait refusé (`WORKFLOW-HOOKS-001`).
+
+    ```python
+    from forge_mvc_workflow import apply_transition
+
+    def publier(article, auteur):
+        def verifier(evenement):
+            if not article.resume:
+                raise ValueError("Un article publié doit avoir un résumé.")
+
+        def ecrire(evenement):
+            article.status = evenement.to_status
+            enregistrer(article)
+
+        def prevenir(evenement):
+            notifier_abonnes(article)
+
+        return apply_transition(
+            TRANSITIONS, article.status, "published",
+            before=verifier, commit=ecrire, after=prevenir,
+            context={"auteur": auteur},
+        )
+    ```
+
+    L'ordre est garanti, et chaque étape conditionne la suivante.
+
+    | Rang | Étape | Si elle lève |
+    |---|---|---|
+    | 1 | Vérification de la transition | rien d'autre n'est appelé |
+    | 2 | `before` | ni l'écriture ni `after` n'ont lieu |
+    | 3 | `commit` | `after` n'a pas lieu |
+    | 4 | `after` | l'écriture reste faite |
+
+    !!! info "Un refus se lève, il ne se rend pas"
+        Un point d'accroche ne rend rien : pour refuser, il lève.
+
+        Un booléen de retour obligerait Forge à inventer un message d'erreur à la place de la règle métier, alors que l'exception porte déjà le sien.
+        Elle remonte telle quelle, sans enveloppe : un message maquillé ferait perdre la cause.
+
+    !!! warning "`after` ne défait rien"
+        Une exception levée après l'écriture ne l'annule pas.
+
+        L'avaler cacherait un état déjà changé, ce qui est pire que de la laisser remonter.
+        Une opération qui doit pouvoir être annulée appartient à une transaction, que l'application ouvre autour de son `commit`.
+
+    !!! info "Le paquet ne persiste rien"
+        `commit` est fourni par l'application, seule à savoir où son statut est rangé.
+
+        Sans lui, `after` suit immédiatement `before` : le paquet n'a alors aucun moyen de savoir si l'écriture a eu lieu, et le dire vaut mieux que de laisser croire à une garantie qui n'existe pas.
 
 ??? note "10. Exemples d'utilisation"
 

@@ -96,7 +96,7 @@ Ils passent avant tout ajout de confort.
 | `ADMIN-LIST-FILTERS-001` | Filtres, recherche et tri sur les listes du back-office |
 | `ENTITIES-UNIQUE-COMPOSITE-001` | Contrainte d'unicité sur plusieurs colonnes, déclarée au contrat |
 | `RBAC-INSTANCE-PERMISSIONS-001` | Permission portant sur une instance, cas du propriétaire |
-| `WORKFLOW-HOOKS-001` | Points d'accroche explicites avant et après transition |
+| `WORKFLOW-HOOKS-001` | **Livré.** `apply_transition`, veto par exception, `commit` fourni par l'application |
 | `DB-DOCTOR-001` | Commande `db:doctor`, version, droits, jeu de caractères |
 
 ---

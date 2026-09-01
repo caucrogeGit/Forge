@@ -4,6 +4,12 @@
 
 ### Ajouté
 
+- **Une transition de workflow s'applique dans un ordre garanti (`WORKFLOW-HOOKS-001`).**
+  Le paquet savait dire si une transition est **permise**, jamais l'appliquer. Chaque application réécrivait le même enchaînement à la main, et rien n'empêchait d'appeler l'action d'après quand celle d'avant avait refusé.
+  `apply_transition` enchaîne la vérification, `before`, l'écriture puis `after`, chaque étape conditionnant la suivante. Un `before` qui lève **empêche** la transition, ce qui donne sa valeur au mécanisme : une règle métier peut refuser, et son refus est visible.
+  Un point d'accroche ne rend rien, il lève pour refuser : un booléen obligerait Forge à inventer un message d'erreur à la place de la règle métier. L'exception remonte telle quelle, sans enveloppe.
+  `after` ne défait rien, et c'est dit : l'avaler cacherait un état déjà changé. Le paquet ne persiste toujours rien, `commit` étant fourni par l'application, seule à savoir où son statut est rangé.
+
 - **L'état des files de tâches est visible (`JOBS-STATUS-CLI-001`).**
   Le paquet n'offrait aucun moyen de voir sa file. Un exploitant qui se demandait si le travail avançait devait interroger la base à la main, sans que rien ne lui dise quelle requête écrire : une file bloquée ressemblait exactement à une file vide.
   `forge jobs:status` affiche les compteurs par file, et `status_counts` les rend au code, pour une page d'administration par exemple.
