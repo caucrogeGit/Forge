@@ -4,6 +4,26 @@
 
 ### Ajouté
 
+- **Le cœur sait révoquer toutes les sessions d'un compte (`SESSIONS-DELETE-FOR-USER-001`).**
+  Le contrat `SessionStore` n'avait que `delete(session_id)`. Rien ne permettait de fermer les sessions déjà ouvertes d'un utilisateur, alors que trois événements l'exigent : l'activation d'un second facteur, le changement de mot de passe et la déconnexion à distance.
+  Une session ouverte leur survivait, donc un accès obtenu avant l'événement restait valide après.
+  `delete_for_user(user_id)` rejoint le contrat et les trois stores livrés. Les stores mémoire et fichier balaient, leur volume étant borné par une seule instance ; `DbSessionStore` interroge une colonne `user_id` indexée, sa table pouvant être grande et partagée entre processus.
+  L'identité comparée est celle que `login_user` pose. Une session anonyme n'est jamais touchée, et `None` ne révoque rien plutôt que de tout révoquer.
+
+- **Un opt-in peut faire évoluer son schéma (`SESSIONS-DELETE-FOR-USER-001`).**
+  Le mécanisme de migration des opt-ins (ADR-071) ne savait rendre que des `CREATE TABLE`, si bien qu'aucun opt-in ne pouvait ajouter une colonne sans casser les projets déjà provisionnés, dont la migration de création ne se rejoue pas.
+  `AddColumn` et `render_add_column` rejoignent `core.database.table_ddl`, et `MIGRATIONS` accepte les deux formes. La composition d'une colonne est factorisée, si bien qu'un `ALTER` décrit une colonne exactement comme un `CREATE`.
+  Une colonne `NOT NULL` sans défaut est refusée au rendu, les lignes existantes ne pouvant pas la satisfaire. Les index de la colonne ajoutée sont toujours rendus séparément, y compris sur les dialectes qui les inlinent dans un `CREATE TABLE`.
+  Rendu vérifié sur les quatre backends. Débloque au moins trois autres tickets rc8 qui ajoutent une colonne à une table existante.
+
+### Rupture
+
+- **`SessionStore` gagne une méthode (`SESSIONS-DELETE-FOR-USER-001`).**
+  Le contrat est `@runtime_checkable` : un store auquel il manque `delete_for_user` n'est plus reconnu par `isinstance`, et `forge.configure` le refuse.
+  Un store tiers écrit avant ce ticket doit l'implémenter pour rester accepté. C'est délibéré, un store qui ne sait pas révoquer ne remplissant pas le contrat de sécurité attendu (principe 10).
+  La clé d'identité de session, jusqu'ici dupliquée en dur dans `core/security/session.py`, vit désormais dans `core.sessions.keys`. `core.auth.session.AUTH_USER_ID_SESSION_KEY` en reste l'alias public.
+
+
 - **La clé de chiffrement MFA peut tourner sans fermer les comptes (`MFA-KEY-ROTATION-001`).**
   `FORGE_MFA_SECRET_KEY` n'avait aucune procédure de rotation : la changer rendait tous les secrets TOTP illisibles au même instant, si bien que chaque porteur d'un facteur perdait son second facteur d'un coup.
   La seule issue était de désactiver le MFA de tout le monde, ce qui transforme une mesure d'hygiène en panne d'authentification.

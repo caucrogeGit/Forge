@@ -69,10 +69,22 @@ class TestLegacyBridgeCanonical:
             "core/security/session.py doit contenir le commentaire de pont de compatibilité"
         )
 
-    def test_canonical_key_literal_present(self):
-        """core/security/session.py référence la clé canonique _auth_user_id."""
-        assert "_auth_user_id" in _security_text(), (
-            "core/security/session.py doit référencer '_auth_user_id' pour le pont canonique"
+    def test_canonical_key_present(self):
+        """core/security/session.py lit la clé canonique du pont.
+
+        Le test exigeait auparavant le **littéral** `_auth_user_id`, moyen alors
+        retenu pour éviter d'importer `core.auth.session`. La clé vit désormais
+        dans `core.sessions.keys`, module sans dépendance, ce qui atteint la
+        même fin sans dupliquer la chaîne (SESSIONS-DELETE-FOR-USER-001).
+
+        Ce qui compte est la fin, vérifiée ici et par
+        `test_no_import_core_auth_session` : la même clé, et aucun cycle.
+        """
+        from core.sessions.keys import SESSION_KEY_AUTH_USER_ID
+
+        assert SESSION_KEY_AUTH_USER_ID == "_auth_user_id"
+        assert "SESSION_KEY_AUTH_USER_ID" in _security_text(), (
+            "core/security/session.py doit lire la clé canonique du pont"
         )
 
     def test_no_import_core_auth_session(self):

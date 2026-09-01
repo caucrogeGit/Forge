@@ -30,6 +30,8 @@ from __future__ import annotations
 import json
 import re
 import secrets
+
+from core.sessions.keys import SESSION_KEY_AUTH_USER_ID
 import time
 from datetime import datetime, timezone
 from typing import Any, Callable, cast
@@ -53,25 +55,40 @@ _Execute = Callable[[str, "tuple[Any, ...]"], int]
 
 _SQL_INSERT = (
     "INSERT INTO forge_sessions"
-    " (session_id, data, expire_at, version, created_at, updated_at)"
-    " VALUES (?, ?, ?, 0, ?, ?)"
+    " (session_id, data, user_id, expire_at, version, created_at, updated_at)"
+    " VALUES (?, ?, ?, ?, 0, ?, ?)"
 )
 _SQL_SELECT = (
     "SELECT data, version FROM forge_sessions WHERE session_id = ? AND expire_at > ?"
 )
 _SQL_UPDATE = (
-    "UPDATE forge_sessions SET data = ?, updated_at = ?, version = version + 1"
+    "UPDATE forge_sessions SET data = ?, user_id = ?, updated_at = ?,"
+    " version = version + 1"
     " WHERE session_id = ? AND version = ?"
 )
 _SQL_UPDATE_EXPIRY = (
-    "UPDATE forge_sessions SET data = ?, expire_at = ?, updated_at = ?, version = version + 1"
+    "UPDATE forge_sessions SET data = ?, user_id = ?, expire_at = ?, updated_at = ?,"
+    " version = version + 1"
     " WHERE session_id = ? AND version = ?"
 )
 _SQL_DELETE = "DELETE FROM forge_sessions WHERE session_id = ?"
 _SQL_DELETE_VERSIONED = "DELETE FROM forge_sessions WHERE session_id = ? AND version = ?"
 _SQL_CLEANUP = "DELETE FROM forge_sessions WHERE expire_at < ?"
+_SQL_DELETE_FOR_USER = "DELETE FROM forge_sessions WHERE user_id = ?"
 
 _DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
+
+
+def _user_id_of(session: "dict[str, Any]") -> "str | None":
+    """Identité authentifiée d'une session, rendue en texte, ou `None`.
+
+    Recopiée dans la colonne `user_id` à chaque écriture pour que la révocation
+    soit une requête indexée (SESSIONS-DELETE-FOR-USER-001). Le rendu en texte
+    est délibéré : l'identité applicative peut être un entier comme une chaîne,
+    et la colonne doit rester la même sur les quatre backends.
+    """
+    value = session.get(SESSION_KEY_AUTH_USER_ID)
+    return None if value is None else str(value)
 
 
 # ── Accesseurs DB par défaut (lazy — pas de connexion à l'import) ─────────────
@@ -165,7 +182,10 @@ class DbSessionStore:
             "expires_at": expires_at,
         }
         now = _now_str()
-        self._execute(_SQL_INSERT, (session_id, json.dumps(session), _dt(expires_at), now, now))
+        self._execute(
+            _SQL_INSERT,
+            (session_id, json.dumps(session), _user_id_of(session), _dt(expires_at), now, now),
+        )
         return session_id
 
     def get(self, session_id: str) -> dict[str, Any] | None:
@@ -185,7 +205,10 @@ class DbSessionStore:
                 return
             existing, version = loaded
             existing.update(data)
-            rc = self._execute(_SQL_UPDATE, (json.dumps(existing), _now_str(), session_id, version))
+            rc = self._execute(
+                _SQL_UPDATE,
+                (json.dumps(existing), _user_id_of(existing), _now_str(), session_id, version),
+            )
             if rc >= 1:
                 return
         raise self._conflict_error("set")
@@ -202,7 +225,10 @@ class DbSessionStore:
             if loaded is None:
                 return
             _, version = loaded
-            rc = self._execute(_SQL_UPDATE, (json.dumps(data), _now_str(), session_id, version))
+            rc = self._execute(
+                _SQL_UPDATE,
+                (json.dumps(data), _user_id_of(data), _now_str(), session_id, version),
+            )
             if rc >= 1:
                 return
         raise self._conflict_error("replace")
@@ -212,6 +238,20 @@ class DbSessionStore:
         if not self._valid(session_id):
             return
         self._execute(_SQL_DELETE, (session_id,))
+
+    def delete_for_user(self, user_id: object) -> int:
+        """Supprime toutes les sessions de `user_id`. Retourne le nombre supprimé.
+
+        Une seule requête, sur la colonne indexée `user_id` : contrairement aux
+        stores mémoire et fichier, ce store est partagé entre processus et sa
+        table peut être grande, si bien qu'un balayage se dégraderait avec le
+        trafic.
+
+        L'identité est comparée en texte, comme elle est écrite.
+        """
+        if user_id is None:
+            return 0
+        return self._execute(_SQL_DELETE_FOR_USER, (str(user_id),))
 
     def regenerate(self, session_id: str) -> str:
         """Crée un nouveau session_id en préservant les données — protège contre la fixation."""
@@ -230,7 +270,10 @@ class DbSessionStore:
             expires_at = time.time() + self._ttl
             existing["expires_at"] = expires_at
             now = _now_str()
-            self._execute(_SQL_INSERT, (nouveau_id, json.dumps(existing), _dt(expires_at), now, now))
+            self._execute(
+                _SQL_INSERT,
+                (nouveau_id, json.dumps(existing), _user_id_of(existing), _dt(expires_at), now, now),
+            )
             return nouveau_id
         raise self._conflict_error("regenerate")
 
@@ -256,7 +299,10 @@ class DbSessionStore:
                 "expires_at": expires_at,
             }
             now = _now_str()
-            self._execute(_SQL_INSERT, (nouveau_id, json.dumps(new_session), _dt(expires_at), now, now))
+            self._execute(
+                _SQL_INSERT,
+                (nouveau_id, json.dumps(new_session), _user_id_of(new_session), _dt(expires_at), now, now),
+            )
             return nouveau_id
         raise self._conflict_error("authenticate")
 
@@ -273,7 +319,7 @@ class DbSessionStore:
             data["expires_at"] = expires_at
             rc = self._execute(
                 _SQL_UPDATE_EXPIRY,
-                (json.dumps(data), _dt(expires_at), _now_str(), session_id, version),
+                (json.dumps(data), _user_id_of(data), _dt(expires_at), _now_str(), session_id, version),
             )
             if rc >= 1:
                 return True
@@ -289,7 +335,10 @@ class DbSessionStore:
                 return False
             data, version = loaded
             data["flash"] = {"message": message, "level": level}
-            rc = self._execute(_SQL_UPDATE, (json.dumps(data), _now_str(), session_id, version))
+            rc = self._execute(
+                _SQL_UPDATE,
+                (json.dumps(data), _user_id_of(data), _now_str(), session_id, version),
+            )
             if rc >= 1:
                 return True
         raise self._conflict_error("set_flash")
@@ -313,7 +362,10 @@ class DbSessionStore:
             if flash is None:
                 return None
             remaining = {key: value for key, value in data.items() if key != "flash"}
-            rc = self._execute(_SQL_UPDATE, (json.dumps(remaining), _now_str(), session_id, version))
+            rc = self._execute(
+                _SQL_UPDATE,
+                (json.dumps(remaining), _user_id_of(remaining), _now_str(), session_id, version),
+            )
             if rc >= 1:
                 return cast("dict[str, Any]", flash)
             # rc == 0 : lecture concurrente gagnante, on recharge (flash déjà parti).

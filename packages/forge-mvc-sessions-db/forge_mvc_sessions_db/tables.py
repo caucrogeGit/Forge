@@ -18,7 +18,7 @@ La colonne `version` sert la concurrence optimiste du store, sous la garde
 """
 from __future__ import annotations
 
-from core.database.table_ddl import Column, Index, TableDefinition
+from core.database.table_ddl import AddColumn, Column, Index, TableDefinition
 
 __all__ = ["FORGE_SESSIONS", "MIGRATIONS"]
 
@@ -27,18 +27,35 @@ FORGE_SESSIONS = TableDefinition(
     columns=[
         Column("session_id", "char", length=64),
         Column("data", "text"),
+        # Identité authentifiée, recopiée de la session à chaque écriture pour
+        # que la révocation soit une requête indexée et non un balayage
+        # (SESSIONS-DELETE-FOR-USER-001). Nullable : une session anonyme n'a
+        # pas d'utilisateur, et les lignes existantes doivent rester valides.
+        # `string` et non `identity_ref` : l'identité applicative peut être un
+        # entier comme une chaîne, et l'index doit rester portable.
+        Column("user_id", "string", length=191, nullable=True),
         Column("expire_at", "datetime"),
         Column("version", "integer", default=0),
         Column("created_at", "datetime"),
         Column("updated_at", "datetime"),
     ],
     primary_key=["session_id"],
-    indexes=[Index("idx_forge_sessions_expire_at", "expire_at")],
+    indexes=[
+        Index("idx_forge_sessions_expire_at", "expire_at"),
+        Index("idx_forge_sessions_user_id", "user_id"),
+    ],
 )
 
 #: Migrations livrées par le paquet : (nom de fichier, table décrite).
 #: Le nom conserve l'horodatage d'origine, pour que les projets déjà
 #: provisionnés reconnaissent la même migration.
-MIGRATIONS: list[tuple[str, TableDefinition]] = [
+MIGRATIONS: list[tuple[str, TableDefinition | AddColumn]] = [
     ("20260710130000_create_forge_sessions.sql", FORGE_SESSIONS),
+    # Les projets provisionnés avant SESSIONS-DELETE-FOR-USER-001 ont la table
+    # sans `user_id`. La migration précédente ne se rejoue pas, son empreinte
+    # étant déjà enregistrée : l'ajout passe donc par sa propre migration.
+    (
+        "20260901090000_add_user_id_to_forge_sessions.sql",
+        AddColumn(FORGE_SESSIONS, "user_id"),
+    ),
 ]

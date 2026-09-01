@@ -23,7 +23,7 @@ Une application peut écrire son propre backend en implémentant les mêmes mét
 | Couche | Sessions |
 | Rôle | définir l'interface commune des backends de session |
 | Nature | `typing.Protocol`, `@runtime_checkable` |
-| API publique | `create`, `get`, `set`, `replace`, `delete`, `regenerate`, `authenticate`, `touch_expiry`, `set_flash`, `get_flash` |
+| API publique | `create`, `get`, `set`, `replace`, `delete`, `delete_for_user`, `regenerate`, `authenticate`, `touch_expiry`, `set_flash`, `get_flash` |
 | Implémentations fournies | `MemorySessionStore`, `FileSessionStore`, `DbSessionStore` |
 | Choisi par | `core.sessions.manager` |
 
@@ -47,6 +47,7 @@ classDiagram
         +set(session_id, data) None
         +replace(session_id, data) None
         +delete(session_id) None
+        +delete_for_user(user_id) int
         +regenerate(session_id) str
         +authenticate(session_id, user_data, ttl_seconds) str | None
         +touch_expiry(session_id, ttl_seconds) bool
@@ -79,11 +80,30 @@ classDiagram
 | `set` | `set(self, session_id: str, data: dict[str, Any]) -> None` | met à jour (merge) les données d'une session existante |
 | `replace` | `replace(self, session_id: str, data: dict[str, Any]) -> None` | remplace intégralement les données, sans merge |
 | `delete` | `delete(self, session_id: str) -> None` | supprime la session |
+| `delete_for_user` | `delete_for_user(self, user_id: object) -> int` | supprime toutes les sessions du compte, et retourne leur nombre |
 | `regenerate` | `regenerate(self, session_id: str) -> str` | crée un nouvel identifiant en conservant les données |
 | `authenticate` | `authenticate(self, session_id: str, user_data: dict[str, Any], ttl_seconds: int) -> str | None` | rotation atomique : nouvel identifiant, écriture utilisateur, nouveau jeton CSRF ; `None` si la session n'existe pas |
 | `touch_expiry` | `touch_expiry(self, session_id: str, ttl_seconds: int) -> bool` | repousse l'expiration ; `False` si la session n'existe pas |
 | `set_flash` | `set_flash(self, session_id: str, message: str, level: str = "success") -> bool` | stocke un message flash ; `False` si la session n'existe pas |
 | `get_flash` | `get_flash(self, session_id: str) -> dict[str, Any] | None` | lit et supprime atomiquement le message flash ; `None` si absent |
+
+!!! warning "Révoquer les sessions d'un compte"
+    `delete_for_user` ferme toutes les sessions déjà ouvertes d'un utilisateur.
+
+    Trois événements l'exigent, et aucun ne pouvait être servi avant `SESSIONS-DELETE-FOR-USER-001` : l'activation d'un second facteur, le changement de mot de passe et la déconnexion à distance.
+    Une session ouverte leur survivait, donc un accès obtenu avant l'événement restait valide après.
+
+    L'identité comparée est celle que `login_user` pose, sous `SESSION_KEY_AUTH_USER_ID`.
+    Une session anonyme n'est jamais touchée, et `None` ne révoque rien plutôt que de tout révoquer.
+
+    Les stores mémoire et fichier balaient, leur volume étant borné par une seule instance.
+    `DbSessionStore` interroge une colonne `user_id` indexée, sa table pouvant être grande et partagée entre processus.
+
+!!! danger "Ajouter une méthode au contrat est une rupture"
+    `SessionStore` est `@runtime_checkable` : un store auquel il manque une méthode n'est plus reconnu par `isinstance`, et `forge.configure` le refuse.
+
+    Un store tiers écrit avant ce ticket doit donc implémenter `delete_for_user` pour rester accepté.
+    C'est délibéré, un store qui ne sait pas révoquer ne remplissant pas le contrat de sécurité attendu (principe 10).
 
 !!! note "Différence entre `set` et `replace`"
     `set` fusionne `data` dans la session existante : les clés non fournies sont conservées.

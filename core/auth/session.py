@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from core.sessions.keys import SESSION_KEY_AUTH_USER_ID
+
 import logging
 from collections.abc import Callable
 from functools import wraps
@@ -20,7 +22,8 @@ from core.http.response import Response
 
 logger = logging.getLogger(__name__)
 
-AUTH_USER_ID_SESSION_KEY = "_auth_user_id"
+#: Alias public historique de `core.sessions.keys.SESSION_KEY_AUTH_USER_ID`.
+AUTH_USER_ID_SESSION_KEY = SESSION_KEY_AUTH_USER_ID
 
 
 def authenticate_user(

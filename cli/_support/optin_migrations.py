@@ -16,8 +16,10 @@ Deux sources de migration cohabitent le temps du chantier
 `OPTIN-DDL-DIALECTAL` :
 
 - **rendu dialectal** (cible) : le paquet expose un module ``tables`` avec une
-  liste ``MIGRATIONS`` de ``(nom de fichier, TableDefinition)``. Le SQL est
-  rendu pour le backend actif via ``core.database.table_ddl`` ;
+  liste ``MIGRATIONS`` de ``(nom de fichier, déclaration)``, où une déclaration
+  est une ``TableDefinition`` à créer ou un ``AddColumn`` à ajouter à une table
+  déjà provisionnée. Le SQL est rendu pour le backend actif via
+  ``core.database.table_ddl`` ;
 - **fichier figé** (héritage) : le paquet livre des ``.sql`` sous
   ``<package>/migrations/``, copiés tels quels. L'audit
   ``OPTIN-DDL-DIALECT-AUDIT-001`` a mesuré que ces fichiers ne s'exécutent que
@@ -72,12 +74,21 @@ def _rendered_migrations(package: str) -> "list[tuple[str, bytes]] | None":
         return None
 
     from core.database.backend import get_backend
-    from core.database.table_ddl import render_create_table
+    from core.database.table_ddl import AddColumn, render_add_column, render_create_table
 
     backend = get_backend()
     out: list[tuple[str, bytes]] = []
-    for filename, table in declarations:
-        statements = render_create_table(table, backend.dialect)
+    for filename, declaration in declarations:
+        # Une déclaration est soit une table à créer, soit une colonne à ajouter
+        # à une table déjà provisionnée (SESSIONS-DELETE-FOR-USER-001). Sans le
+        # second cas, un opt-in ne pouvait pas faire évoluer son schéma sans
+        # casser les projets existants.
+        if isinstance(declaration, AddColumn):
+            statements = render_add_column(
+                declaration.table, declaration.column_name, backend.dialect
+            )
+        else:
+            statements = render_create_table(declaration, backend.dialect)
         body = _rendered_header(package, filename, backend.name) + "\n".join(statements) + "\n"
         out.append((filename, body.encode("utf-8")))
     return out

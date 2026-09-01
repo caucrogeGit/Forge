@@ -46,6 +46,21 @@ class FakeSessionStore:
         self.calls.append("delete")
         self._data.pop(session_id, None)
 
+    def delete_for_user(self, user_id: object) -> int:
+        """Révocation par compte (SESSIONS-DELETE-FOR-USER-001).
+
+        Le contrat est `runtime_checkable` : un store auquel il manque une
+        méthode n'est plus reconnu, et `forge.configure` le refuse.
+        """
+        self.calls.append("delete_for_user")
+        vises = [
+            sid for sid, data in self._data.items()
+            if data.get("_auth_user_id") == user_id
+        ]
+        for sid in vises:
+            self._data.pop(sid, None)
+        return len(vises)
+
     def regenerate(self, session_id: str) -> str:
         self.calls.append("regenerate")
         return session_id

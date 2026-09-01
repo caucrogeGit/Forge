@@ -13,7 +13,12 @@ from core.sessions.access import (
     get_session as get_session,
     get_session_id as get_session_id,
 )
-from core.sessions.keys import SESSION_KEY_AUTHENTICATED, SESSION_KEY_USER, session_get
+from core.sessions.keys import (
+    SESSION_KEY_AUTH_USER_ID,
+    SESSION_KEY_AUTHENTICATED,
+    SESSION_KEY_USER,
+    session_get,
+)
 from core.sessions.manager import get_session_store as _get_store
 
 if TYPE_CHECKING:
@@ -118,8 +123,7 @@ def is_authenticated(request: Request) -> bool:
         return True
 
     # Pont de compatibilité : session canonique créée par login_user()
-    _CANONICAL_KEY = "_auth_user_id"  # core.auth.session.AUTH_USER_ID_SESSION_KEY
-    user_id = session.get(_CANONICAL_KEY)
+    user_id = session.get(SESSION_KEY_AUTH_USER_ID)
     if isinstance(user_id, int) and not isinstance(user_id, bool) and user_id > 0:
         _get_store().touch_expiry(session_id, SESSION_DURATION)
         return True

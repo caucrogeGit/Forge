@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from core.sessions.keys import SESSION_KEY_AUTH_USER_ID
+
 import secrets
 import threading
 import time
@@ -77,6 +79,23 @@ class MemorySessionStore:
         """Supprime la session."""
         with self._lock:
             self._sessions.pop(session_id, None)
+
+    def delete_for_user(self, user_id: object) -> int:
+        """Supprime toutes les sessions de `user_id`. Retourne le nombre supprimé.
+
+        Le balayage est acceptable ici : ce store est mono-processus et son
+        volume est borné par le trafic d'une seule instance.
+        """
+        if user_id is None:
+            return 0
+        with self._lock:
+            vises = [
+                sid for sid, session in self._sessions.items()
+                if session.get(SESSION_KEY_AUTH_USER_ID) == user_id
+            ]
+            for sid in vises:
+                self._sessions.pop(sid, None)
+        return len(vises)
 
     def regenerate(self, session_id: str) -> str:
         """Crée un nouveau session_id en préservant les données — protège contre la fixation."""

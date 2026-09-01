@@ -35,6 +35,8 @@ __all__ = [
     "ForeignKey",
     "TableDefinition",
     "render_create_table",
+    "render_add_column",
+    "AddColumn",
     "column_sql_type",
     "NO_DEFAULT",
 ]
@@ -165,24 +167,30 @@ def column_sql_type(column: Column, dialect: Dialect) -> str:
     return _column_sql_type(column, dialect)
 
 
+def _column_line(column: Column, dialect: Dialect) -> str:
+    """Compose la déclaration d'une colonne, nom et type compris.
+
+    Partagée par `render_create_table` et `render_add_column`, pour qu'une
+    colonne ajoutée par `ALTER` soit décrite exactement comme si elle avait été
+    créée avec la table.
+    """
+    if column.type == "identity":
+        # La forme exacte dépend du dialecte (AUTO_INCREMENT séparé,
+        # BIGSERIAL, IDENTITY(1,1), PK portée par la colonne sur SQLite).
+        return dialect.auto_increment_column_ddl(column.name, dialect.identity_type())
+    parts = [column.name, _column_sql_type(column, dialect)]
+    parts.append("NULL" if column.nullable else "NOT NULL")
+    if column.default_now:
+        parts.append(dialect.timestamp_default_clause(on_update=column.on_update_now))
+    elif column.default is not NO_DEFAULT:
+        parts.append(f"DEFAULT {dialect.render_literal(column.default)}")
+    if column.unique and dialect.unique_is_column_constraint():
+        parts.append("UNIQUE")
+    return " ".join(parts)
+
+
 def _column_lines(table: TableDefinition, dialect: Dialect) -> list[str]:
-    lines: list[str] = []
-    for column in table.columns:
-        if column.type == "identity":
-            # La forme exacte dépend du dialecte (AUTO_INCREMENT séparé,
-            # BIGSERIAL, IDENTITY(1,1), PK portée par la colonne sur SQLite).
-            lines.append(dialect.auto_increment_column_ddl(column.name, dialect.identity_type()))
-            continue
-        parts = [column.name, _column_sql_type(column, dialect)]
-        parts.append("NULL" if column.nullable else "NOT NULL")
-        if column.default_now:
-            parts.append(dialect.timestamp_default_clause(on_update=column.on_update_now))
-        elif column.default is not NO_DEFAULT:
-            parts.append(f"DEFAULT {dialect.render_literal(column.default)}")
-        if column.unique and dialect.unique_is_column_constraint():
-            parts.append("UNIQUE")
-        lines.append(" ".join(parts))
-    return lines
+    return [_column_line(column, dialect) for column in table.columns]
 
 
 def render_create_table(table: TableDefinition, dialect: Dialect) -> list[str]:
@@ -229,4 +237,67 @@ def render_create_table(table: TableDefinition, dialect: Dialect) -> list[str]:
             dialect.create_index_sql(table.name, index.name, index.column_list)
             for index in table.indexes
         ]
+    return statements
+
+
+@dataclass(frozen=True)
+class AddColumn:
+    """Ajout d'une colonne à une table déjà provisionnée.
+
+    Le mécanisme de migration des opt-ins (ADR-071) ne savait rendre que des
+    `CREATE TABLE`, si bien qu'aucun opt-in ne pouvait faire évoluer son schéma
+    sans casser les projets déjà provisionnés
+    (`SESSIONS-DELETE-FOR-USER-001`).
+
+    `table` porte la définition **à jour**, colonne comprise, pour qu'une seule
+    description reste la source, et `column_name` désigne celle à ajouter.
+    """
+
+    table: TableDefinition
+    column_name: str
+
+    def __post_init__(self) -> None:
+        noms = [c.name for c in self.table.columns]
+        if self.column_name not in noms:
+            raise ValueError(
+                f"colonne {self.column_name!r} absente de la définition de "
+                f"{self.table.name!r} (colonnes : {', '.join(noms)})"
+            )
+
+
+def render_add_column(
+    table: TableDefinition, column_name: str, dialect: Dialect
+) -> list[str]:
+    """Rend l'ajout de `column_name` à `table`, en instructions séparées.
+
+    Retourne l'`ALTER TABLE ... ADD COLUMN`, puis les `CREATE INDEX` de la
+    table qui portent sur cette seule colonne. Les index sont toujours rendus
+    séparément, y compris sur les dialectes qui les inlinent dans un
+    `CREATE TABLE` : un `ALTER` ne les porte pas.
+
+    La colonne ajoutée à une table qui contient déjà des lignes doit être
+    acceptée par celles-ci, ce que seul un `NULL` autorisé garantit sur les
+    quatre backends. Une colonne `NOT NULL` sans défaut est donc refusée ici,
+    plutôt que de faire échouer la migration chez l'exploitant.
+    """
+    colonne = next((c for c in table.columns if c.name == column_name), None)
+    if colonne is None:
+        raise ValueError(
+            f"colonne {column_name!r} absente de la définition de {table.name!r}"
+        )
+    if not colonne.nullable and colonne.default is NO_DEFAULT and not colonne.default_now:
+        raise ValueError(
+            f"colonne {column_name!r} NOT NULL et sans défaut : les lignes "
+            f"existantes de {table.name!r} ne pourraient pas la satisfaire. "
+            "Déclarer nullable=True, ou un défaut."
+        )
+
+    statements = [
+        f"ALTER TABLE {table.name} ADD COLUMN {_column_line(colonne, dialect)};"
+    ]
+    statements += [
+        dialect.create_index_sql(table.name, index.name, index.column_list)
+        for index in table.indexes
+        if index.column_list == column_name
+    ]
     return statements

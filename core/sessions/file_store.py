@@ -17,6 +17,7 @@ import time
 from pathlib import Path
 from typing import Any, cast
 
+from core.sessions.keys import SESSION_KEY_AUTH_USER_ID
 from core.sessions.memory_store import SESSION_TTL
 
 # Filtre strict : exactement 64 hex minuscules — aucun chemin traversal possible.
@@ -144,6 +145,31 @@ class FileSessionStore:
             return
         with self._lock:
             self._path(session_id).unlink(missing_ok=True)
+
+    def delete_for_user(self, user_id: object) -> int:
+        """Supprime toutes les sessions de `user_id`. Retourne le nombre supprimé.
+
+        Balaie le répertoire : ce store n'a pas d'index, et une révocation reste
+        un événement rare au regard des lectures.
+        """
+        if user_id is None:
+            return 0
+        supprimes = 0
+        with self._lock:
+            for chemin in self._dir.glob("*.json"):
+                try:
+                    brut: object = json.loads(chemin.read_text(encoding="utf-8"))
+                except (OSError, json.JSONDecodeError, ValueError):
+                    # Un fichier illisible n'appartient à personne : le laisser
+                    # à `cleanup_expired`, dont c'est le rôle.
+                    continue
+                if not isinstance(brut, dict):
+                    continue
+                donnees = cast("dict[str, Any]", brut)
+                if donnees.get(SESSION_KEY_AUTH_USER_ID) == user_id:
+                    chemin.unlink(missing_ok=True)
+                    supprimes += 1
+        return supprimes
 
     def regenerate(self, session_id: str) -> str:
         """Crée un nouveau session_id en préservant les données — protège contre la fixation."""

@@ -13,6 +13,15 @@ SESSION_KEY_AUTHENTICATED = "authenticated"
 SESSION_KEY_USER = "user"
 SESSION_KEY_EXPIRES_AT = "expires_at"
 
+#: Identifiant de l'utilisateur authentifie, pose par `login_user` (ADR-010).
+#:
+#: Definie ici et non dans `core.auth.session` pour que les stores de session
+#: puissent la lire sans importer la couche d'authentification, ce qui creerait
+#: un cycle. `core.auth.session.AUTH_USER_ID_SESSION_KEY` en reste l'alias
+#: public, et `core.security.session` la dupliquait en dur
+#: (SESSIONS-DELETE-FOR-USER-001).
+SESSION_KEY_AUTH_USER_ID = "_auth_user_id"
+
 _LEGACY = {
     SESSION_KEY_AUTHENTICATED: "authentifie",
     SESSION_KEY_USER: "utilisateur",

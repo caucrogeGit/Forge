@@ -38,7 +38,10 @@ class _FakeDB:
     """
 
     def __init__(self):
-        # {session_id: {"data": json_str, "expire_ts": float, "version": int}}
+        # {session_id: {"data": json_str, "user_id": str|None,
+        #               "expire_ts": float, "version": int}}
+        # `user_id` suit la colonne indexée ajoutée par
+        # SESSIONS-DELETE-FOR-USER-001 : le double reste fidèle au schéma réel.
         self.rows: dict[str, dict] = {}
 
     def fetch_one(self, sql: str, params: tuple) -> dict | None:
@@ -54,23 +57,33 @@ class _FakeDB:
     def execute(self, sql: str, params: tuple = ()) -> int:
         s = sql.strip()
         if s.startswith("INSERT"):
-            sid, data_json, expire_dt = params[0], params[1], params[2]
-            self.rows[sid] = {"data": data_json, "expire_ts": _ts(expire_dt), "version": 0}
+            # sid, data, user_id, expire, created, updated
+            sid, data_json, user_id, expire_dt = params[0], params[1], params[2], params[3]
+            self.rows[sid] = {
+                "data": data_json,
+                "user_id": user_id,
+                "expire_ts": _ts(expire_dt),
+                "version": 0,
+            }
             return 1
         if s.startswith("UPDATE"):
-            if "expire_at = ?" in sql:  # data, expire, updated, sid, version
-                data_json, expire_dt, sid, exp_ver = params[0], params[1], params[3], params[4]
+            if "expire_at = ?" in sql:  # data, user_id, expire, updated, sid, version
+                data_json, user_id, expire_dt = params[0], params[1], params[2]
+                sid, exp_ver = params[4], params[5]
                 row = self.rows.get(sid)
                 if row is not None and row["version"] == exp_ver:
                     row["data"] = data_json
+                    row["user_id"] = user_id
                     row["expire_ts"] = _ts(expire_dt)
                     row["version"] += 1
                     return 1
                 return 0
-            data_json, sid, exp_ver = params[0], params[2], params[3]  # data, updated, sid, version
+            # data, user_id, updated, sid, version
+            data_json, user_id, sid, exp_ver = params[0], params[1], params[3], params[4]
             row = self.rows.get(sid)
             if row is not None and row["version"] == exp_ver:
                 row["data"] = data_json
+                row["user_id"] = user_id
                 row["version"] += 1
                 return 1
             return 0
@@ -80,6 +93,11 @@ class _FakeDB:
             for k in expired:
                 del self.rows[k]
             return len(expired)
+        if s.startswith("DELETE") and "WHERE user_id" in sql:
+            vises = [k for k, v in self.rows.items() if v.get("user_id") == params[0]]
+            for k in vises:
+                del self.rows[k]
+            return len(vises)
         if s.startswith("DELETE") and "WHERE session_id" in sql:
             sid = params[0]
             if "version = ?" in sql:  # DELETE gardé par version
