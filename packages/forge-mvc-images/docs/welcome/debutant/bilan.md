@@ -7,7 +7,7 @@ Ce niveau découvre le module opt-in `forge-mvc-images` : ce qu'il accepte, comm
 
 | Palier | Compétence acquise |
 |--------|--------------------|
-| 1 : [Welcome Images](images-welcome.md) | Vérifier le module et inspecter ses capacités (`ALLOWED_IMAGE_EXTENSIONS`, `IMAGE_VARIANT_SIZES`). |
+| 1 : [Welcome Images](images-welcome.md) | Vérifier le module et inspecter ses capacités (`ALLOWED_IMAGE_EXTENSIONS`, `variant_presets`). |
 | 2 : [Téléverser une image](image-upload.md) | Vérifier le contenu avant d'écrire et générer les variantes via `save_image_upload`. |
 | 3 : [Miniatures et variantes](image-variants.md) | Dériver les chemins des variantes (`image_variant_relative_paths`) et leurs URL (`media_url`). |
 

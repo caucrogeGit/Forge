@@ -199,11 +199,11 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `IMAGES-PRESETS-DECLARATIFS-001` | Variantes déclarées par configuration et non en dur |
-| `IMAGES-FOCAL-CROP-001` | Recadrage autour d'un point d'intérêt |
-| `IMAGES-ORPHAN-VARIANTS-001` | Nettoyage des variantes sans original |
-| `IMAGES-ENTITY-FIELD-001` | Intégration au champ image des contrats d'entité |
-| `IMAGES-LIMITS-CONFIG-001` | Limites de dimensions et de poids explicites en configuration |
+| `IMAGES-PRESETS-DECLARATIFS-001` | **Livré.** `IMAGE_VARIANTS`, lus à chaque appel, nom réservé et doublon refusés |
+| `IMAGES-FOCAL-CROP-001` | **Livré.** Fenêtre recalée dans l'image, aucun pixel inventé |
+| `IMAGES-ORPHAN-VARIANTS-001` | **Livré.** Deux catégories, sans base ; `images:orphans` affiche puis supprime |
+| `IMAGES-ENTITY-FIELD-001` | **Livré.** `variants` accepte une liste ; nom non déclaré refusé à la génération |
+| `IMAGES-LIMITS-CONFIG-001` | **Livré.** Largeur, hauteur et poids ; valeur illisible refusée |
 
 ### 7.12 video
 

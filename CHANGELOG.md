@@ -4,6 +4,40 @@
 
 ### Ajouté
 
+- **Les variantes d'image se déclarent, au lieu de vivre en dur (`IMAGES-PRESETS-DECLARATIFS-001`).**
+  `medium` et `thumbnail` vivaient dans une constante de module accordée à la main avec deux dictionnaires littéraux : ajouter une taille demandait d'éditer le paquet en trois endroits. L'ADR-018 avait relevé la conséquence sans la corriger, « non extensible sans éditer le code ».
+  `IMAGE_VARIANTS=thumbnail:300x300,banniere:1920x1080:crop` déclare les préréglages, et `variant_presets()` les **relit à chaque appel**. La constante était un instantané pris au chargement du module, aveugle à toute configuration posée ensuite : c'était la cause, elle est retirée.
+  Le nom devient un dossier sur le disque, donc il est validé. `original` est **réservé**, il désigne le fichier source et une variante de ce nom l'écraserait. Un préréglage déclaré deux fois est refusé, garder la dernière déclaration en silence produisant une taille que personne n'a lue.
+  Sans déclaration, les deux préréglages historiques s'appliquent : un projet existant ne change pas de comportement.
+
+- **Une variante peut être rognée autour d'un point d'intérêt (`IMAGES-FOCAL-CROP-001`).**
+  Une variante en mode `crop` remplit exactement sa boîte, ce qu'un rognage centré fait mal : sur une photo de groupe cadrée large le centre tombe entre deux personnes, et une bannière taillée dans un portrait coupe la tête.
+  Le point est exprimé en fractions, donc valable quelles que soient les dimensions. Une valeur hors de l'intervalle est **ramenée** dedans plutôt que refusée, un clic au bord d'une interface donnant facilement `1.0001` et un téléversement ne devant pas échouer pour un arrondi.
+  **La fenêtre est recalée dans l'image.** Un point proche d'un bord donnerait une fenêtre à cheval sur le vide, que Pillow comblerait par du noir.
+  **Forge n'invente pas de pixels.** Si la source est plus petite que la boîte, la variante garde le rapport demandé à la taille disponible ; agrandir produirait une image floue se faisant passer pour la taille déclarée. Forge ne détecte pas non plus le point d'intérêt, la saillance demandant un modèle et une surveillance que le paquet n'a pas à porter.
+
+- **Les variantes que plus rien ne sert se voient avant de se supprimer (`IMAGES-ORPHAN-VARIANTS-001`).**
+  Deux situations laissent des fichiers derrière elles, et la seconde naît des préréglages déclarables : une variante dont l'original a disparu, et une variante d'un préréglage retiré de `IMAGE_VARIANTS`, dont le dossier garde tout ce qu'il a produit.
+  `forge images:orphans` les nomme, affiche par défaut et supprime sur `--delete` (charte §7). Le rapport dit les préréglages en vigueur, sans quoi « préréglage retiré » ne se vérifie pas.
+  **Aucune base n'est consultée**, contrairement à `files:orphans` : une variante est orpheline si son original manque sur le disque, ce qui se lit du disque seul, et le garde-fou du registre vide n'a donc pas lieu d'être. La reconnaissance d'un dossier de variantes repose sur la présence d'un fichier homonyme au niveau du dessus, ce qui écarte les dossiers applicatifs.
+
+- **Une entité choisit les variantes dont elle a besoin (`IMAGES-ENTITY-FIELD-001`).**
+  Un contrat pouvait dire `variants: true` ou `false`, toutes ou aucune. Une fois les préréglages déclarables ce booléen ne suffit plus : un avatar n'a pas besoin d'une bannière de 1920 sur 1080, dont la génération coûte à chaque envoi.
+  `"variants": ["thumbnail"]` nomme les préréglages voulus. Le contrat vérifie la forme de la liste et non l'existence des noms, ceux ci vivant dans la configuration de `forge-mvc-images` qu'un opt-in ne peut pas importer depuis un autre.
+  **Un nom non déclaré lève à la génération.** L'ignorer laisserait l'entité réclamer une déclinaison inexistante, et la page finirait avec une image cassée sans que rien n'ait signalé la cause.
+  Le dictionnaire de retour ne porte que l'original et ce qui a été **produit** : rendre le chemin d'une variante non générée ferait stocker à l'appelant une adresse qui ne répond pas.
+
+- **Les dimensions et le poids d'une image se bornent (`IMAGES-LIMITS-CONFIG-001`).**
+  Le paquet portait une seule limite, la surface en pixels, pensée contre la bombe de décompression. Elle laisse passer une image de 12000 sur 2000, qui tient sous les 24 mégapixels et qui est pourtant impossible à afficher, coûteuse à redimensionner et volumineuse à servir.
+  `IMAGE_MAX_WIDTH`, `IMAGE_MAX_HEIGHT` et `IMAGE_MAX_BYTES` complètent la garde de surface, qui reste en place parce qu'elle protégeait contre autre chose. Le poids est distinct d'`upload_max_size` : une application peut accepter un PDF de 20 Mo et refuser une photo de 5 Mo.
+  Une valeur illisible **lève**, comme pour le quota de `forge-mvc-files`, et le message dit que retirer la variable est la façon de ne pas borner. Les dimensions sont contrôlées sur l'en-tête avant tout décodage, et le poids avant même l'ouverture.
+
+### Modifié
+
+- **`IMAGE_VARIANT_SIZES` a disparu de l'API publique de `forge-mvc-images`** (`IMAGES-PRESETS-DECLARATIFS-001`).
+  Le symbole était la cause du défaut, un instantané figé à l'import : le garder en le dérivant aurait laissé la même surprise. `variant_presets()` le remplace partout, y compris dans les parcours d'accueil, qui affichent désormais ce que le projet produit vraiment plutôt qu'un couple de valeurs écrit d'avance.
+  Conformément à la convention pré-1.0, la rupture se fait sans alias déprécié. L'ADR-018 conserve son texte, et note que la conséquence qu'il avait relevée est levée.
+
 - **Un compte ne peut plus remplir le disque un fichier valide à la fois (`FILES-QUOTA-001`).**
   Chaque envoi passait la taille maximale, et rien ne regardait la somme. Le registre de l'ADR-094 la connaissait, personne ne la lisait.
   Le quota porte sur le couple propriétaire, une nature et un identifiant : `user` et `article` ne se règlent donc pas ensemble, ce qui est le sens de « par utilisateur et par ressource ». `FILES_QUOTA_USER_BYTES` l'emporte sur `FILES_QUOTA_BYTES`, et sans aucune des deux rien n'est borné.

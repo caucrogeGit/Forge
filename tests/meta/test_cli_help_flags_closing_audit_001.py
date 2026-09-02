@@ -90,6 +90,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "upload:init", "media:init", "images:init", "js:init", "files:init",
     # files:orphans rapproche le disque et le registre (FILES-ORPHAN-PURGE-001).
     "files:orphans",
+    # images:orphans nettoie les variantes (IMAGES-ORPHAN-VARIANTS-001).
+    "images:orphans",
     # Déploiement
     "deploy:init", "deploy:check",
     # Opt-ins applicatifs (ADR-052)

@@ -73,6 +73,8 @@ ALLOWED_ROOT_KEYS = {
 }
 ALLOWED_RBAC_ACTION_KEYS = {"index", "show", "create", "store", "edit", "update", "delete"}
 ALLOWED_MEDIA_FIELD_VALUES = {"image", "file"}
+#: Nom de prereglage de variante : il devient un segment de chemin sur disque.
+_VARIANT_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
 ALLOWED_MEDIA_ENTRY_KEYS = {"name", "field", "role", "variants", "multiple", "required", "label"}
 SQL_RESERVED_WORDS = {
     "add",
@@ -660,8 +662,43 @@ def _validate_media_consistency(media: list[Any], issues: list[EntityDefinitionI
         path = f"media[{index}]"
 
         field_val = entry.get("field")
-        if entry.get("variants") is True and field_val != "image":
-            _add_issue(issues, f"{path}.variants", "variants=true n'est autorise qu'avec field='image'")
+        # IMAGES-ENTITY-FIELD-001 : `variants` accepte un booleen ou une liste
+        # de noms de prereglages. Le contrat dit lesquels il lui faut, plutot
+        # que de les prendre tous ou aucun.
+        #
+        # La forme seule est verifiee ici. L'existence d'un prereglage se lit
+        # dans la configuration de `forge-mvc-images`, qu'un opt-in ne peut pas
+        # importer depuis un autre : `generate_image_variants` leve a la
+        # generation si le nom n'est pas declare.
+        variants_val = entry.get("variants")
+        if variants_val is not None and variants_val is not False:
+            if field_val != "image":
+                _add_issue(
+                    issues, f"{path}.variants",
+                    "variants n'est autorise qu'avec field='image'",
+                )
+            elif isinstance(variants_val, list):
+                noms = cast("list[Any]", variants_val)
+                if not noms:
+                    _add_issue(
+                        issues, f"{path}.variants",
+                        "liste vide : ecrire false pour ne generer aucune variante",
+                    )
+                for nom in noms:
+                    if not isinstance(nom, str) or not _VARIANT_NAME_RE.fullmatch(nom):
+                        _add_issue(
+                            issues, f"{path}.variants",
+                            f"nom de prereglage invalide : {nom!r}",
+                        )
+                if len(set(map(str, noms))) != len(noms):
+                    _add_issue(
+                        issues, f"{path}.variants", "un prereglage est repete",
+                    )
+            elif variants_val is not True:
+                _add_issue(
+                    issues, f"{path}.variants",
+                    "doit etre un booleen ou une liste de noms de prereglages",
+                )
 
         name = entry.get("name")
         if isinstance(name, str) and name.strip():

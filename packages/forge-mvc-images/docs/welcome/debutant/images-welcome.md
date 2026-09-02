@@ -14,7 +14,7 @@
 
 Objectif : premier contact avec le module **opt-in** `forge-mvc-images` et ce qu'il sait traiter.
 
-**Ce que vous allez apprendre :** vérifier que le module Images répond, et **inspecter ses capacités** : les formats d'image autorisés (`ALLOWED_IMAGE_EXTENSIONS`) et les tailles des variantes générées (`IMAGE_VARIANT_SIZES`).
+**Ce que vous allez apprendre :** vérifier que le module Images répond, et **inspecter ses capacités** : les formats d'image autorisés (`ALLOWED_IMAGE_EXTENSIONS`) et les déclinaisons que le module produit (`variant_presets()`).
 Aucune base de données, aucun fichier : on découvre simplement comment Forge Images est branché.
 
 Premier palier du **niveau débutant** de la progression images (vue d'ensemble des starters).
@@ -28,7 +28,7 @@ Premier palier du **niveau débutant** de la progression images (vue d'ensemble 
 ## Ce que ce starter montre
 
 - une route texte de **premier contact** (`GET /images-welcome`) ;
-- la lecture des constantes du module (`ALLOWED_IMAGE_EXTENSIONS`, `ALLOWED_IMAGE_MIME_TYPES`, `IMAGE_VARIANT_SIZES`) ;
+- la lecture des capacités du module (`ALLOWED_IMAGE_EXTENSIONS`, `ALLOWED_IMAGE_MIME_TYPES`, `variant_presets()`) ;
 - la sérialisation JSON de ces capacités (`GET /images-welcome/inspect`).
 
 Aucune écriture, aucune base de données.
@@ -38,7 +38,7 @@ Aucune écriture, aucune base de données.
 | Classe / fonction | Rôle dans ce starter | Référence |
 |-------------------|----------------------|-----------|
 | `forge_mvc_images.ALLOWED_IMAGE_EXTENSIONS` | Formats d'image acceptés à l'upload. | Médias |
-| `forge_mvc_images.IMAGE_VARIANT_SIZES` | Tailles des variantes générées (`medium`, `thumbnail`). | Médias |
+| `forge_mvc_images.variant_presets` | Préréglages de variantes applicables, lus de la configuration. | Médias |
 | `Response.text` / `Response.json` | Renvoyer du texte puis du JSON. | Response |
 
 ## Tester
@@ -61,7 +61,7 @@ from core.mvc.controller.base_controller import BaseController
 from forge_mvc_images import (
     ALLOWED_IMAGE_EXTENSIONS,
     ALLOWED_IMAGE_MIME_TYPES,
-    IMAGE_VARIANT_SIZES,
+    variant_presets,
 )
 
 
@@ -70,9 +70,10 @@ def _capabilities() -> dict:
     return {
         "allowed_extensions": sorted(ALLOWED_IMAGE_EXTENSIONS),
         "allowed_mime_types": sorted(ALLOWED_IMAGE_MIME_TYPES),
-        "variant_sizes": {
-            name: list(size) for name, size in IMAGE_VARIANT_SIZES.items()
-        },
+        "variants": [
+            {"name": p.name, "size": list(p.size), "mode": p.mode}
+            for p in variant_presets()
+        ],
     }
 
 
@@ -92,7 +93,9 @@ class ImagesWelcomeController(BaseController):
 
 - Les constantes `ALLOWED_IMAGE_*` sont la **liste blanche** du module : tout ce qui n'y figure pas est refusé à l'upload.
   On les expose ici pour découvrir ce que Forge Images accepte.
-- `IMAGE_VARIANT_SIZES` décrit les déclinaisons que le module génère automatiquement à l'upload : `medium` (1280×1280) et `thumbnail` (300×300).
+- `variant_presets()` décrit les déclinaisons que le module génère à l'upload.
+  Sans configuration, ce sont `medium` (1280×1280) et `thumbnail` (300×300) ; la variable `IMAGE_VARIANTS` les remplace.
+  L'appel **relit** la configuration à chaque fois, de sorte que la page dit toujours ce que le projet produit vraiment.
 - Les `frozenset` sont triés (`sorted(...)`) pour une sortie JSON stable.
 
 ## La route

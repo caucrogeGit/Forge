@@ -138,7 +138,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     | Traitement | `save_image_upload`, `save_image`, `generate_image_variants`, `verify_image_content` |
     | Couche médias | `create_media_record`, `attach_media_to_entity`, `list_media_for_entity`, `get_media_gallery`, `get_cover_media` |
     | Objet renvoyé | `MediaRecord` (association fichier média / entité) |
-    | Variantes | `IMAGE_VARIANT_SIZES` (miniature, medium) |
+    | Variantes | `variant_presets()`, déclarées par `IMAGE_VARIANTS` |
     | Formats autorisés | `ALLOWED_IMAGE_EXTENSIONS`, `ALLOWED_IMAGE_MIME_TYPES` |
     | Décision d'architecture | ADR-018 (remplace `forge-mvc-media`) |
     | Installation | `pip install --pre forge-mvc-images` |
@@ -248,11 +248,14 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
 
     | Élément | Signature | Rôle |
     |---|---|---|
-    | `save_image_upload` | `save_image_upload(file, category="images", *, variants=True) -> SavedUpload` | vérifie, écrit, génère les variantes |
+    | `save_image_upload` | `save_image_upload(file, category="images", *, variants=True, focal=None) -> SavedUpload` | vérifie, écrit, génère les variantes |
     | `save_image` | `save_image(file, *, category="images", entity_name=None, entity_id=None, usage="main", position=0, is_main=True) -> MediaRecord` | enregistre une image liée à une entité |
-    | `generate_image_variants` | `generate_image_variants(path, *, root=None) -> dict[str, str]` | génère miniature et medium |
+    | `generate_image_variants` | `generate_image_variants(path, *, root=None, focal=None, presets=None) -> dict[str, str]` | génère les variantes déclarées |
     | `verify_image_content` | `verify_image_content(data) -> None` | garde anti-bombe, lève si non-image |
-    | constantes | `ALLOWED_IMAGE_EXTENSIONS`, `ALLOWED_IMAGE_MIME_TYPES`, `IMAGE_VARIANT_SIZES` | formats et tailles |
+    | constantes | `ALLOWED_IMAGE_EXTENSIONS`, `ALLOWED_IMAGE_MIME_TYPES` | formats autorisés |
+    | `variant_presets` | `variant_presets() -> tuple[VariantPreset, ...]` | préréglages applicables, lus de la configuration |
+    | `image_limits` | `image_limits() -> ImageLimits` | bornes de dimensions et de poids |
+    | `find_orphan_variants` | `find_orphan_variants(*, root=None) -> VariantOrphanReport` | variantes que plus rien ne sert |
 
     ### Couche médias applicative
 
@@ -314,7 +317,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
 
     `verify_image_content` confirme que les octets sont une vraie image avant toute écriture, et protège contre les bombes de décompression.
 
-    Les variantes (miniature, medium) sont définies par `IMAGE_VARIANT_SIZES` ; l'original est conservé tel quel.
+    Les variantes sont déclarées par `IMAGE_VARIANTS` et lues par `variant_presets()` ; l'original est conservé tel quel.
 
     !!! warning "Le MIME annoncé ne suffit pas"
         Un fichier non-image peut se présenter avec une extension et un `Content-Type` d'image.
@@ -330,6 +333,164 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
         L'écriture disque, le service (HTTP Range) et l'anti-traversal viennent de `forge-mvc-files`.
 
         `forge-mvc-images` ajoute le traitement (Pillow) et la couche applicative.
+
+??? note "12. Déclarer ses variantes"
+
+    Les deux variantes du paquet, `medium` et `thumbnail`, vivaient dans une constante de module accordée à la main avec deux dictionnaires littéraux (`presets.py`).
+
+    Ajouter une taille demandait donc d'éditer le paquet en trois endroits, et l'ADR-018 avait relevé la conséquence sans la corriger : « non extensible sans éditer le code » (`IMAGES-PRESETS-DECLARATIFS-001`).
+
+    ```bash
+    IMAGE_VARIANTS=thumbnail:300x300,medium:1280x1280,banniere:1920x1080:crop
+    ```
+
+    Chaque entrée porte un nom, des dimensions, et un mode facultatif.
+
+    | Mode | Effet |
+    |---|---|
+    | `fit` (défaut) | l'image tient dans la boîte, son rapport est conservé |
+    | `crop` | la boîte est remplie exactement, le débord est rogné |
+
+    Sans déclaration, les deux préréglages historiques s'appliquent : un projet existant ne change pas de comportement.
+
+    ```python
+    from forge_mvc_images import preset_by_name, preset_names, variant_presets
+
+    variant_presets()          # (VariantPreset('thumbnail', 300, 300, 'fit'), ...)
+    preset_names()             # ('thumbnail', 'medium', 'banniere')
+    preset_by_name("banniere") # VariantPreset(..., mode='crop')
+    ```
+
+    !!! info "Les préréglages sont lus, jamais figés"
+        `variant_presets()` relit la configuration à chaque appel.
+
+        La constante précédente était un instantané pris au chargement du module, aveugle à toute variable posée ensuite.
+
+    !!! danger "Le nom devient un dossier sur le disque"
+        Un nom hors de `[a-z0-9_-]` est refusé, et `original` est **réservé** : il désigne le fichier source, et une variante portant ce nom l'écraserait.
+
+        Un préréglage déclaré deux fois est refusé lui aussi. Garder la dernière déclaration en silence produirait une taille que personne n'a lue.
+
+    !!! warning "Retirer un préréglage laisse ses fichiers"
+        Les images déjà produites restent sur le disque, et rien ne les régénérera.
+
+        `forge images:orphans` les nomme, voir la section 14.
+
+??? note "13. Rogner autour d'un point d'intérêt"
+
+    Une variante en mode `crop` remplit exactement sa boîte, ce qu'un rognage centré fait mal (`IMAGES-FOCAL-CROP-001`).
+
+    Sur une photo de groupe cadrée large, le centre géométrique tombe souvent entre deux personnes, et une bannière de 1920 sur 1080 taillée dans un portrait vertical coupe la tête.
+
+    ```python
+    from forge_mvc_images import FocalPoint, save_image_upload
+
+    depot = save_image_upload(
+        request.files["photo"],
+        focal=FocalPoint(x=0.5, y=0.15),   # le sujet est en haut
+    )
+    ```
+
+    Le point est exprimé en fractions de la largeur et de la hauteur, de sorte qu'il reste valable quelles que soient les dimensions de la source et de la cible. `FocalPoint(0.5, 0.5)` est le centre, et c'est ce qui s'applique par défaut.
+
+    !!! info "Forge ne détecte aucun point d'intérêt"
+        La détection de visages ou de saillance demande un modèle, donc une dépendance lourde et des résultats à surveiller.
+
+        Le point est une donnée de l'application, posée par la personne qui téléverse ou par un service qu'elle choisit. Le stocker à côté du média est le motif habituel.
+
+    !!! info "Forge n'invente pas de pixels"
+        Si la source est plus petite que la boîte demandée, la variante garde le rapport de la boîte mais reste à la taille disponible.
+
+        Agrandir produirait une image floue en se faisant passer pour la taille déclarée. Un portrait de 800 sur 1200 donne ainsi une bannière de 800 sur 450, au bon rapport.
+
+    !!! warning "La fenêtre est ramenée dans l'image"
+        Un point proche d'un bord donnerait une fenêtre à cheval sur le vide, que Pillow comblerait par du noir.
+
+        `crop_box` recale la fenêtre pour qu'elle tienne dans la source, le point restant au plus près de son centre.
+
+??? note "14. Nettoyer les variantes inutiles"
+
+    Deux situations laissent des fichiers que plus rien ne sert, et la seconde n'existait pas avant que les préréglages deviennent déclarables (`IMAGES-ORPHAN-VARIANTS-001`).
+
+    ```bash
+    forge images:orphans                        # affiche seulement
+    forge images:orphans --delete                # applique
+    forge images:orphans --only prereglage-retire
+    ```
+
+    | Situation | Cause habituelle |
+    |---|---|
+    | Variante sans original | image supprimée sans passer par `delete_media` |
+    | Variante d'un préréglage retiré | `IMAGE_VARIANTS` ne déclare plus ce nom |
+
+    !!! info "Aucune base n'est consultée"
+        Une variante est orpheline si son original n'est pas sur le disque, ce qui se lit du disque seul.
+
+        Contrairement à `files:orphans`, aucun registre n'est nécessaire, et le garde-fou du registre vide n'a donc pas lieu d'être ici.
+
+    !!! warning "Un dossier applicatif peut ressembler à un dossier de variantes"
+        La reconnaissance repose sur la forme `parent/nom/photo.jpg` en face de `parent/photo.jpg`.
+
+        Un dossier portant par hasard un nom de préréglage et contenant un fichier homonyme de son voisin du dessus serait pris pour un dossier de variantes. C'est précisément pourquoi la commande affiche avant de supprimer.
+
+    !!! info "La commande ne régénère rien"
+        Reproduire une variante manquante demanderait de décider quand, et une purge qui écrit serait deux gestes sous un seul nom.
+
+    Un orphelin cumulant les deux motifs n'apparaît qu'une fois, dans la catégorie la plus grave.
+
+??? note "15. Borner les dimensions et le poids"
+
+    Le paquet portait une seule limite, la surface en pixels, pensée contre la bombe de décompression (`IMAGES-LIMITS-CONFIG-001`).
+
+    Elle laisse passer une image de 12000 sur 2000, qui tient sous les 24 mégapixels et qui est pourtant impossible à afficher, coûteuse à redimensionner et volumineuse à servir.
+
+    | Variable | Ce qu'elle borne |
+    |---|---|
+    | `IMAGE_MAX_WIDTH` | largeur en pixels |
+    | `IMAGE_MAX_HEIGHT` | hauteur en pixels |
+    | `IMAGE_MAX_BYTES` | poids du fichier image |
+    | `UPLOAD_MAX_IMAGE_PIXELS` | surface, garde anti bombe, déjà présente |
+
+    Sans déclaration, aucune des trois nouvelles n'est appliquée. Le contrôle de surface reste en place, il protégeait contre autre chose.
+
+    !!! danger "Une valeur illisible interrompt"
+        `IMAGE_MAX_WIDTH=5MB` **lève** au lieu d'être ignoré, comme le quota de `forge-mvc-files`.
+
+        Retomber en silence sur « aucune limite » à cause d'une faute de frappe irait exactement dans le mauvais sens. Pour ne pas borner, retirez la variable.
+
+    !!! info "Le poids d'une image se borne à part"
+        `IMAGE_MAX_BYTES` est distinct d'`upload_max_size`, qui borne **tout** envoi.
+
+        Une application peut accepter un PDF de 20 Mo et refuser une photo de 5 Mo, les deux n'ayant ni le même usage ni le même coût de traitement.
+
+    Les dimensions sont contrôlées sur l'en-tête, avant tout décodage, et le poids avant même l'ouverture du fichier.
+
+??? note "16. Choisir les variantes depuis un contrat d'entité"
+
+    Une entité déclarant un média pouvait dire `variants: true` ou `variants: false`, c'est à dire toutes ou aucune (`IMAGES-ENTITY-FIELD-001`).
+
+    Une fois les préréglages déclarables, ce booléen ne suffit plus : un avatar n'a pas besoin de la bannière de 1920 sur 1080, dont la génération coûte à chaque envoi.
+
+    ```json
+    {
+      "media": [
+        {"name": "avatar", "field": "image", "role": "avatar",
+         "variants": ["thumbnail"]}
+      ]
+    }
+    ```
+
+    Le contrat vérifie la **forme** de la liste, pas l'existence des préréglages : ceux ci vivent dans la configuration de `forge-mvc-images`, qu'un opt-in ne peut pas importer depuis un autre.
+
+    !!! danger "Un nom non déclaré lève à la génération"
+        `generate_image_variants(presets=["hero"])` refuse si `hero` n'est pas dans `IMAGE_VARIANTS`.
+
+        L'ignorer laisserait l'entité réclamer une déclinaison inexistante, et la page finirait avec une image cassée sans que rien n'ait signalé la cause.
+
+    !!! info "Seules les variantes produites sont rendues"
+        Le dictionnaire de retour ne porte que l'original et ce qui a été généré.
+
+        Rendre le chemin d'une variante non produite ferait stocker à l'appelant une adresse qui ne répond pas.
 
 ## Voir aussi
 

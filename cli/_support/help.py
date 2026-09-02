@@ -127,6 +127,7 @@ Médias et JavaScript
   files:init          Écrit la migration du registre de fichiers (forge-mvc-files, ADR-094).
   files:orphans       Rapproche le dossier d'upload et le registre (affiche ; --delete supprime).
   images:init         Copie la migration Images du package vers mvc/migrations/ (idempotent, sans appliquer).
+  images:orphans      Liste les variantes sans original ou d'un préréglage retiré (--delete supprime).
   js:init             Installe htmx, alpine ou les deux.
 
 Déploiement

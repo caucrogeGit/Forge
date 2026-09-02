@@ -7,7 +7,7 @@ suppression sèche, pas d'alias). Il deviendra l'unique propriétaire de :
 - le **traitement d'image** (déplacé du core par ``IMAGES-MOVE-PROCESSING-001``) :
   ``save_image``, génération de variantes/miniatures, ``verify_image_content``,
   garde anti-bombe de décompression, constantes ``ALLOWED_IMAGE_*`` /
-  ``IMAGE_VARIANT_SIZES``, ``MediaRecord``. **Pillow** est une dépendance de
+  ``variant_presets``, ``MediaRecord``. **Pillow** est une dépendance de
   ce module, retirée du core ;
 - la **couche médias applicative** (déplacée de ``forge-mvc-media`` par
   ``IMAGES-MOVE-APPLICATIVE-001``) : repository SQL, galerie, couverture,
@@ -23,10 +23,28 @@ Voir ``docs/adr/018-image-module-extraction.md``.
 
 __version__ = "1.0.0rc7"
 
+from forge_mvc_images.focal import FocalPoint, crop_box, crop_to_focal
+from forge_mvc_images.limits import (
+    ImageLimits,
+    ImageLimitsError,
+    check_dimensions,
+    check_weight,
+    image_limits,
+)
+from forge_mvc_images.presets import (
+    DEFAULT_PRESETS,
+    MODE_CROP,
+    MODE_FIT,
+    ImagePresetError,
+    VariantPreset,
+    parse_presets,
+    preset_by_name,
+    preset_names,
+    variant_presets,
+)
 from forge_mvc_images.processing import (
     ALLOWED_IMAGE_EXTENSIONS,
     ALLOWED_IMAGE_MIME_TYPES,
-    IMAGE_VARIANT_SIZES,
     MediaRecord,
     generate_image_variants,
     image_variant_paths,
@@ -55,7 +73,26 @@ __all__ = [
     # Traitement d'image (IMAGES-MOVE-PROCESSING-001)
     "ALLOWED_IMAGE_EXTENSIONS",
     "ALLOWED_IMAGE_MIME_TYPES",
-    "IMAGE_VARIANT_SIZES",
+    # Préréglages déclarés (IMAGES-PRESETS-DECLARATIFS-001)
+    "VariantPreset",
+    "variant_presets",
+    "preset_by_name",
+    "preset_names",
+    "parse_presets",
+    "DEFAULT_PRESETS",
+    "MODE_FIT",
+    "MODE_CROP",
+    "ImagePresetError",
+    # Rognage autour d'un point d'intérêt (IMAGES-FOCAL-CROP-001)
+    "FocalPoint",
+    "crop_box",
+    "crop_to_focal",
+    # Limites déclarées (IMAGES-LIMITS-CONFIG-001)
+    "ImageLimits",
+    "image_limits",
+    "check_dimensions",
+    "check_weight",
+    "ImageLimitsError",
     "MediaRecord",
     "generate_image_variants",
     "image_variant_paths",

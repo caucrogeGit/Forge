@@ -32,10 +32,16 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 CORE_DIR = PROJECT_ROOT / "core"
 CORE_UPLOADS = CORE_DIR / "uploads"
 
+# `IMAGE_VARIANT_SIZES` a disparu de cette liste avec
+# `IMAGES-PRESETS-DECLARATIFS-001`. La constante était un instantané figé à
+# l'import, aveugle à toute configuration posée ensuite, et l'ADR-018 avait
+# relevé la conséquence : « non extensible sans éditer le code ». Ce que ce
+# garde-fou vérifie reste la même fin, que le traitement d'image vive dans
+# l'opt-in et non dans le cœur ; `variant_presets` prend la place du symbole.
 PROCESSING_API = (
     "ALLOWED_IMAGE_EXTENSIONS",
     "ALLOWED_IMAGE_MIME_TYPES",
-    "IMAGE_VARIANT_SIZES",
+    "variant_presets",
     "MediaRecord",
     "generate_image_variants",
     "image_variant_paths",

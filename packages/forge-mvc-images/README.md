@@ -14,7 +14,7 @@ API publique stable :
 - **Traitement** : `save_image`, `save_image_upload`, `generate_image_variants`,
   `image_variant_paths`, `image_variant_relative_paths`, `verify_image_content`,
   plus les constantes `ALLOWED_IMAGE_EXTENSIONS`, `ALLOWED_IMAGE_MIME_TYPES`,
-  `IMAGE_VARIANT_SIZES`.
+  `variant_presets()`, déclarés par `IMAGE_VARIANTS`.
 - **Couche applicative médias** : `MediaRecord`, `create_media_record`,
   `get_media_record`, `delete_media`, `delete_media_record`,
   `attach_media_to_entity`, `list_media_for_entity`, `get_media_gallery`,

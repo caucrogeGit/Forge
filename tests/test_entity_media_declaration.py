@@ -160,7 +160,7 @@ class TestMediaBooleans:
 
     def test_variants_true_file_refuse(self):
         entity = _base_entity(media=[_media_entry(field="file", role="doc", variants=True)])
-        with pytest.raises(EntityDefinitionError, match="variants=true n'est autorise"):
+        with pytest.raises(EntityDefinitionError, match="variants n'est autorise"):
             validate_entity_definition(entity, source="test.json")
 
     def test_variants_non_booleen_refuse(self):

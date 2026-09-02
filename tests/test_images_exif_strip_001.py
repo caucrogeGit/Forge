@@ -15,6 +15,7 @@ pytest.importorskip("forge_mvc_images")
 
 from PIL import Image
 
+from forge_mvc_images.presets import VariantPreset
 from forge_mvc_images.processing import _write_resized_image
 
 _ORIENTATION_TAG = 0x0112
@@ -36,7 +37,7 @@ def test_la_variante_ne_conserve_pas_l_exif(tmp_path: Path) -> None:
     target = tmp_path / "variante.jpg"
 
     with Image.open(source) as image:
-        _write_resized_image(image, target, (50, 50))
+        _write_resized_image(image, target, VariantPreset("t", 50, 50))
 
     with Image.open(target) as variant:
         exif = variant.getexif()
@@ -52,7 +53,7 @@ def test_l_orientation_est_appliquee(tmp_path: Path) -> None:
     target = tmp_path / "variante.jpg"
 
     with Image.open(source) as image:
-        _write_resized_image(image, target, (500, 500))
+        _write_resized_image(image, target, VariantPreset("t", 500, 500))
 
     with Image.open(target) as variant:
         assert variant.height > variant.width

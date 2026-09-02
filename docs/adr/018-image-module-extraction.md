@@ -62,6 +62,9 @@ Conformément à la **convention pré-1.0** (pas d'utilisateurs externes), le re
 
 - **Deux variantes en dur** : `medium` (1280×1280 max), `thumbnail` (300×300 max), + `original` conservé.
   `IMAGE_VARIANT_SIZES` non extensible sans éditer le code.
+  Conséquence **levée** par `IMAGES-PRESETS-DECLARATIFS-001` (cycle rc8) :
+  les préréglages se déclarent dans `IMAGE_VARIANTS` et sont lus par
+  `variant_presets()`, la constante ayant disparu.
 - **Redimensionnement** : ratio préservé, réduction seule (jamais d'agrandissement), rééchantillonnage LANCZOS.
 - **Formats** : `jpg, jpeg, png, webp` ; la variante garde le format de l'original.
 - **Rangement** : `<dossier>/medium/…`, `<dossier>/thumbnail/…`.

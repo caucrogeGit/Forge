@@ -146,6 +146,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "files:init":       "Écrit la migration du registre de fichiers (forge-mvc-files, ADR-094).",
     "files:orphans":    "Rapproche le dossier d'upload et le registre (affiche ; --delete supprime).",
     "images:init":      "Copie la migration Images vers mvc/migrations/ (idempotent, sans appliquer).",
+    "images:orphans":   "Liste les variantes sans original ou d'un préréglage retiré (--delete supprime).",
     "js:init":          "Installe htmx, alpine ou les deux.",
     # Déploiement
     "deploy:init":      "Initialise la configuration de déploiement.",
@@ -348,6 +349,35 @@ Limites :
   Un fichier plus récent que --min-age n'est jamais candidat : entre
   l'écriture et l'inscription il s'écoule un instant, et une purge qui
   tourne dans cet intervalle supprimerait un dépôt en cours.
+""",
+    "images:orphans": """\
+Usage :
+  forge images:orphans [--delete] [--only TYPE] [--root CHEMIN]
+
+Description :
+  Balaye la racine d'upload et nomme les variantes que plus rien ne sert :
+  celles dont l'image originale a disparu, et celles produites par un
+  préréglage qui n'est plus déclaré dans IMAGE_VARIANTS.
+
+Effets :
+  Sans --delete, affiche seulement. Rien n'est touché.
+  Avec --delete, supprime les variantes listées.
+
+Prérequis :
+  L'opt-in forge-mvc-images installé. Aucune connexion à la base : une
+  variante est orpheline si son original manque sur le disque.
+
+Options :
+  --delete        applique la purge au lieu de l'afficher
+  --only TYPE     « sans-original » ou « prereglage-retire »
+  --root CHEMIN   racine d'upload à inspecter
+
+Limites :
+  Un dossier applicatif portant par hasard le nom d'un préréglage et
+  contenant un fichier homonyme de son voisin du dessus serait pris pour
+  un dossier de variantes. Le mode affichage sert précisément à le voir.
+  La commande ne régénère rien : reproduire une variante manquante
+  demanderait de décider quand, et serait un second geste.
 """,
     "jobs:status": """\
 Usage:

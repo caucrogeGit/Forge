@@ -38,7 +38,8 @@ print(saved.variants)   # {"medium": "...", "thumbnail": "..."}
 | `image_variant_paths(path, *, root=None)` | les chemins **physiques** des variantes |
 | `image_variant_relative_paths(path)` | les chemins **media relatifs** des variantes |
 
-Les tailles sont fixées par la constante `IMAGE_VARIANT_SIZES`.
+Les tailles viennent des préréglages déclarés, lus par `variant_presets()`.
+Sans déclaration, ce sont `medium` (1280×1280) et `thumbnail` (300×300).
 Les formats acceptés sont décrits par `ALLOWED_IMAGE_EXTENSIONS` et `ALLOWED_IMAGE_MIME_TYPES`.
 
 ## 5. L'enregistrement (`MediaRecord`)

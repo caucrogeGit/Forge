@@ -32,9 +32,13 @@ def _media_upload_call(mfield: str, var: str, variants: object) -> str:
     le chemin image-aware de l'opt-in (`save_image_upload`, vérification de
     contenu + variantes) ; les autres fichiers utilisent le `save_upload`
     **générique** du core.
+
+    IMAGES-ENTITY-FIELD-001 : `variants` peut être une liste de noms de
+    préréglages. Elle est rendue en littéral Python, `repr` donnant la même
+    forme pour un booléen et pour une liste de chaînes.
     """
     if mfield == "image":
-        return f'save_image_upload({var}, "images", variants={variants})'
+        return f'save_image_upload({var}, "images", variants={variants!r})'
     return f'save_upload({var}, "documents")'
 from forge_mvc_entities.crud.relations_loader import (
     _unique_choice_relations,

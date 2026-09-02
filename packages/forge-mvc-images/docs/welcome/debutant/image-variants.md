@@ -26,7 +26,7 @@ Aucune base de données.
 |-------------------|----------------------|-----------|
 | `forge_mvc_images.image_variant_relative_paths` | Dériver les chemins relatifs des variantes. | Médias |
 | `forge_mvc_images.media_url` | Construire l'URL publique `/media/...`. | Médias |
-| `forge_mvc_images.IMAGE_VARIANT_SIZES` | Tailles max de chaque variante. | Médias |
+| `forge_mvc_images.variant_presets` | Préréglages de variantes, lus de la configuration. | Médias |
 | `request.query(...)` | Lire le chemin d'image à inspecter. | Request |
 
 ## Tester
@@ -47,7 +47,7 @@ from core.http.response import Response
 from core.mvc.controller.base_controller import BaseController
 
 from forge_mvc_images import (
-    IMAGE_VARIANT_SIZES,
+    variant_presets,
     image_variant_relative_paths,
     media_url,
 )
@@ -61,7 +61,7 @@ def _variants_view(path: str) -> dict:
     relative = image_variant_relative_paths(path)
     return {
         "path": path,
-        "sizes": {name: list(size) for name, size in IMAGE_VARIANT_SIZES.items()},
+        "sizes": {p.name: list(p.size) for p in variant_presets()},
         "variants": {
             name: {"relative_path": rel, "url": media_url(rel)}
             for name, rel in relative.items()

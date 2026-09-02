@@ -152,6 +152,7 @@ Choix du moteur (SQLite, MariaDB, PostgreSQL, SQL Server) : [Bases de données](
 | `forge files:init` | écrit la migration du registre de fichiers `forge_files` vers `mvc/migrations/` puis `forge migration:apply` (opt-in files, ADR-094) | opt-in `forge-mvc-files` |
 | `forge files:orphans` | rapproche le dossier d'upload et le registre, affiche seulement ; `--delete` supprime les fichiers non inscrits et les inscriptions sans fichier | opt-in `forge-mvc-files` |
 | `forge images:init` | copie la migration de la table `media` vers `mvc/migrations/` puis `forge migration:apply` (opt-in images) | opt-in `forge-mvc-images` |
+| `forge images:orphans` | liste les variantes sans original ou issues d'un préréglage retiré, affiche seulement ; `--delete` supprime | opt-in `forge-mvc-images` |
 | `forge js:init` | installe HTMX / Alpine.js | [front](../cli-assets/front.md) |
 | `forge i18n:init` | initialise les catalogues d'i18n (opt-in i18n) | [i18n](../cli-assets/i18n.md) |
 | `forge i18n:check` | vérifie les catalogues d'i18n | [i18n](../cli-assets/i18n.md) |
