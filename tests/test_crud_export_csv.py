@@ -18,6 +18,33 @@ ROADMAP = pathlib.Path("docs/roadmap/forge-roadmap.md")
 # Helpers
 # ---------------------------------------------------------------------------
 
+def _corps(source: str, entete: str) -> str:
+    """Corps complet de la fonction ou méthode commençant par `entete`.
+
+    Les tests découpaient un nombre **fixe** de caractères après le début de la
+    fonction (`source[idx: idx + 300]`). C'est un moyen, pas une fin : ajouter
+    une docstring ou un commentaire au code engendré poussait le contenu hors
+    de la fenêtre, et sept tests échouaient sans qu'aucun comportement n'ait
+    changé (`IMPEXP-FILTERED-EXPORT-001`).
+
+    L'extraction s'arrête à la prochaine définition de même indentation, ce qui
+    ne dépend plus de la longueur du texte.
+    """
+    debut = source.find(entete)
+    assert debut != -1, f"définition introuvable : {entete!r}"
+    indentation = len(source[:debut].split("\n")[-1])
+    lignes = source[debut:].split("\n")
+    corps = [lignes[0]]
+    for ligne in lignes[1:]:
+        nue = ligne.lstrip()
+        if nue.startswith(("def ", "class ", "@")) and (
+            len(ligne) - len(nue)
+        ) <= indentation:
+            break
+        corps.append(ligne)
+    return "\n".join(corps)
+
+
 def _entity_simple():
     return {
         "entity": "Article",
@@ -147,26 +174,22 @@ class TestModele:
 
     def test_find_for_export_reutilise_paginated(self):
         m = _model()
-        idx = m.find("def find_articles_for_export")
-        bloc = m[idx: idx + 300]
+        bloc = _corps(m, "def find_articles_for_export")
         assert "find_articles_paginated" in bloc
 
     def test_find_for_export_offset_zero(self):
         m = _model()
-        idx = m.find("def find_articles_for_export")
-        bloc = m[idx: idx + 300]
+        bloc = _corps(m, "def find_articles_for_export")
         assert "offset=0" in bloc
 
     def test_find_for_export_utilise_export_limit(self):
         m = _model()
-        idx = m.find("def find_articles_for_export")
-        bloc = m[idx: idx + 300]
+        bloc = _corps(m, "def find_articles_for_export")
         assert "_EXPORT_LIMIT" in bloc
 
     def test_find_for_export_accept_q_sort_direction_filters(self):
         m = _model()
-        idx = m.find("def find_articles_for_export")
-        signature = m[idx: idx + 200]
+        signature = _corps(m, "def find_articles_for_export")
         assert "q: str | None" in signature
         assert "sort: str | None" in signature
         assert "direction: str" in signature
@@ -281,85 +304,73 @@ class TestExportCsvMethode:
 
     def test_export_csv_appelle_find_for_export(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 800]
+        bloc = _corps(c, "def export_csv")
         assert "find_articles_for_export" in bloc
 
     def test_export_csv_utilise_csv_writer(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 800]
+        bloc = _corps(c, "def export_csv")
         assert "csv.writer" in bloc
 
     def test_export_csv_quote_all(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 800]
+        bloc = _corps(c, "def export_csv")
         assert "QUOTE_ALL" in bloc
 
     def test_export_csv_encode_utf8(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 800]
+        bloc = _corps(c, "def export_csv")
         assert 'encode("utf-8")' in bloc or "encode('utf-8')" in bloc
 
     def test_export_csv_retourne_response(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        # Fenêtre étendue pour absorber l'annotation `-> Response:` qui
-        # rallonge la signature (DX-TYPED-SKELETONS-001).
-        bloc = c[idx: idx + 1000]
+        # La fenêtre avait déjà été « étendue » une fois pour absorber une
+        # annotation de signature. C'était le signe que le moyen ne tenait pas :
+        # `_corps` extrait la méthode entière, et ne demandera plus d'extension.
+        bloc = _corps(c, "def export_csv")
         assert "return Response" in bloc
 
     def test_export_csv_content_type_csv(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 1000]
+        bloc = _corps(c, "def export_csv")
         assert "text/csv" in bloc
 
     def test_export_csv_content_disposition(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 1000]
+        bloc = _corps(c, "def export_csv")
         assert "Content-Disposition" in bloc
         assert "attachment" in bloc
 
     def test_export_csv_filename(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 1000]
+        bloc = _corps(c, "def export_csv")
         assert "articles.csv" in bloc
 
     def test_export_csv_cache_control_no_store(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 1200]
+        bloc = _corps(c, "def export_csv")
         assert "Cache-Control" in bloc
         assert "no-store" in bloc
 
     def test_export_csv_applique_csv_escape(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 1200]
+        bloc = _corps(c, "def export_csv")
         assert "escape_csv_field(" in bloc
 
     def test_export_csv_utilise_csv_cols(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 1200]
+        bloc = _corps(c, "def export_csv")
         assert "_CSV_COLS" in bloc
 
     def test_export_csv_ecrit_entetes(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 1200]
+        bloc = _corps(c, "def export_csv")
         assert "writerow" in bloc
         assert "header" in bloc
 
     def test_export_csv_itere_rows(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 1200]
+        bloc = _corps(c, "def export_csv")
         assert "for row in rows" in bloc
 
 
@@ -370,20 +381,17 @@ class TestExportCsvMethode:
 class TestExportCsvValidation:
     def test_export_csv_valide_sort_whitelist(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 600]
+        bloc = _corps(c, "def export_csv")
         assert "sort not in" in bloc
 
     def test_export_csv_valide_direction(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 600]
+        bloc = _corps(c, "def export_csv")
         assert '"asc"' in bloc and '"desc"' in bloc
 
     def test_export_csv_accepte_q(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 400]
+        bloc = _corps(c, "def export_csv")
         assert '"q"' in bloc
 
 
@@ -394,22 +402,19 @@ class TestExportCsvValidation:
 class TestExportCsvFiltres:
     def test_export_csv_avec_filtre_texte(self):
         c = build_controller(_entity_with_filter())
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 800]
+        bloc = _corps(c, "def export_csv")
         assert "statut_f" in bloc
         assert "_filters" in bloc
 
     def test_export_csv_avec_filtre_relation(self):
         c = build_controller(_entity_with_relation(), relations=[_rel_client()])
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 800]
+        bloc = _corps(c, "def export_csv")
         assert "client_id_f" in bloc
         assert "int(" in bloc
 
     def test_export_csv_sans_filtres_pas_de_filters_param(self):
         c = _ctrl()
-        idx = c.find("def export_csv")
-        bloc = c[idx: idx + 800]
+        bloc = _corps(c, "def export_csv")
         # sans filter fields, filters ne doit pas passer un dict non vide
         assert "_filters" not in bloc or "or None" in bloc
 

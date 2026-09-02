@@ -233,10 +233,10 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `IMPEXP-COLUMN-MAPPING-001` | Correspondance de colonnes déclarée au contrat |
-| `IMPEXP-ERROR-REPORT-001` | Rapport d'erreurs téléchargeable |
-| `IMPEXP-FILTERED-EXPORT-001` | Export respectant les filtres de la liste |
-| `IMPEXP-JSONL-001` | Second format, une ligne par enregistrement |
+| `IMPEXP-COLUMN-MAPPING-001` | **Livré.** `source` déclaré ; colonne absente = 1 erreur, plus 10 000 |
+| `IMPEXP-ERROR-REPORT-001` | **Livré.** CSV échappé, ligne tableur et valeur refusée |
+| `IMPEXP-FILTERED-EXPORT-001` | **Livré. Faux besoin** : les filtres passaient déjà. La **troncature silencieuse** corrigée |
+| `IMPEXP-JSONL-001` | **Livré.** Types préservés, clé absente à `null`, lecture stricte par défaut |
 
 ### 7.16 fixtures
 

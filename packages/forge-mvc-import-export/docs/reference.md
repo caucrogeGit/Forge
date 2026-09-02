@@ -310,6 +310,136 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-import-export` : la dépendance va de l'opt-in vers le cœur.
 
+??? note "12. Faire correspondre les colonnes d'un fichier réel"
+
+    `FieldSpec.name` servait à la fois de clé de l'enregistrement et de nom de colonne CSV (`IMPEXP-COLUMN-MAPPING-001`).
+
+    Un export tableur dont l'en-tête dit « Adresse e-mail » ne pouvait donc pas alimenter le champ `email` : il fallait renommer les colonnes à la main avant chaque import.
+
+    ```python
+    from forge_mvc_import_export import FieldSpec, resolve_headers
+
+    specs = [
+        FieldSpec("email", source=["Adresse e-mail", "Courriel", "email"]),
+        FieldSpec("nom", source="Nom de famille"),
+        FieldSpec("note", required=False),
+    ]
+    ```
+
+    Plusieurs en-têtes peuvent être acceptés, essayés dans l'ordre.
+
+    !!! danger "Une colonne absente donne UNE erreur, plus dix mille"
+        C'est le défaut le plus coûteux que ce ticket corrige.
+
+        `row.get(spec.name, "")` rendait une chaîne vide pour une colonne qui n'existait pas, et chaque ligne produisait « valeur requise manquante ». Un fichier de dix mille lignes rendait dix mille erreurs pour un seul en-tête mal orthographié, et la vraie cause restait introuvable au milieu.
+
+        Les en-têtes sont désormais rapprochés **une fois**, avant d'examiner la moindre ligne. `ImportReport.rejected_before_reading` dit que le fichier n'a pas été parcouru : l'utilisateur doit corriger son en-tête, pas ses données.
+
+    !!! warning "Rien n'est rapproché par ressemblance"
+        Ni la casse ni les accents ne sont normalisés : « Email » et « email » sont deux en-têtes différents tant qu'un `source` ne dit pas qu'ils désignent le même champ.
+
+        Rapprocher « Prix HT » de `prix_ttc` parce que les deux contiennent « prix » ferait importer la mauvaise colonne sans que rien ne le signale, et le principe 3 refuse ce genre de service rendu.
+
+        Les espaces de bordure sont en revanche tolérées : un export tableur en pose souvent, et ce n'est pas une intention.
+
+    `HeaderMapping.unused_headers` nomme les colonnes du fichier que personne ne réclame. Elles ne sont pas une erreur, mais les voir aide à repérer une correspondance oubliée.
+
+??? note "13. Rendre le rapport d'erreurs téléchargeable"
+
+    `ImportReport` portait une liste exploitable en Python et inutilisable par la personne qui a déposé le fichier (`IMPEXP-ERROR-REPORT-001`).
+
+    Un import de deux mille lignes avec quarante erreurs ne pouvait se corriger qu'en lisant un écran, une erreur à la fois, sans jamais voir la ligne fautive.
+
+    ```python
+    from forge_mvc_import_export import errors_to_csv, report_filename
+
+    rapport = import_rows(lignes, specs, inserer)
+    if not rapport.ok:
+        return Response(
+            200,
+            errors_to_csv(rapport, lignes).encode("utf-8"),
+            "text/csv; charset=utf-8",
+            headers={"Content-Disposition":
+                     f'attachment; filename="{report_filename(depot.filename)}"'},
+        )
+    ```
+
+    | Colonne | Ce qu'elle donne |
+    |---|---|
+    | `ligne` | index de la ligne de données |
+    | `ligne_tableur` | numéro affiché par un tableur, en-tête compris |
+    | `colonne` | champ en cause, vide pour une erreur d'insertion |
+    | `probleme` | le message |
+    | `valeur_refusee` | la valeur d'origine, tronquée si démesurée |
+
+    !!! info "Deux numérotations, et c'est voulu"
+        La ligne 1 des données est la ligne 2 du fichier, l'en-tête occupant la première.
+
+        Ne donner que l'une des deux fait chercher au mauvais endroit, d'où les deux colonnes.
+
+    !!! danger "Le rapport est lui même échappé"
+        Il contient des données venues du fichier déposé, donc d'un utilisateur.
+
+        Sans échappement, une cellule commençant par `=` redeviendrait une formule vive à l'ouverture du rapport, et le rapport d'erreurs deviendrait le vecteur.
+
+    `report_filename` assainit le nom du fichier déposé : il voyage dans un en-tête `Content-Disposition`, où un saut de ligne couperait l'en-tête en deux.
+
+    Un rapport sans erreur rend l'en-tête seul, jamais une chaîne vide : un fichier vide se lit comme un téléchargement raté.
+
+??? note "14. Un second format, JSONL"
+
+    Le CSV a deux limites que rien ne contourne (`IMPEXP-JSONL-001`) : il ne porte aucun type, tout y étant du texte, et il ne sait pas représenter une valeur imbriquée.
+
+    Un export destiné à un autre programme y perd la différence entre le nombre `1`, le texte `"1"` et le booléen `true`.
+
+    ```python
+    from forge_mvc_import_export import parse_jsonl, to_jsonl
+
+    to_jsonl(lignes, ["id", "nom", "actif"])
+    parse_jsonl(contenu)
+    ```
+
+    !!! info "JSONL, et non JSON"
+        Un tableau JSON impose de tout charger avant de lire le premier enregistrement, et de tout garder en mémoire pour en écrire un de plus.
+
+        Une ligne fautive n'empêche pas non plus de lire les autres, alors qu'une virgule manquante rend un tableau JSON entièrement illisible.
+
+    !!! info "Une clé absente est écrite à `null`, jamais omise"
+        Un consommateur qui lit un flux a besoin que toutes les lignes aient la même forme.
+
+        Donner `columns` ordonne et restreint les clés : un ordre variable ferait apparaître des différences là où les données sont identiques.
+
+    !!! warning "Le mode tolérant perd des données en silence"
+        `parse_jsonl(..., strict=False)` ignore une ligne illisible.
+
+        Cela n'a de sens que pour récupérer ce qui est lisible d'un fichier abîmé. En mode strict, une ligne fautive lève en nommant son numéro.
+
+    Le module ne convertit pas entre CSV et JSONL. Les deux se lisent en lignes de dictionnaires, et l'appelant passe de l'un à l'autre en changeant la fonction qu'il appelle : un convertisseur donnerait deux façons de faire la même chose.
+
+??? note "15. L'export CRUD ne tronque plus en silence"
+
+    L'export de la liste générée par `make:crud` **respectait déjà** recherche, tri et filtres (`IMPEXP-FILTERED-EXPORT-001`). Ce n'était donc pas le manque.
+
+    Le manque était ailleurs, et plus grave : `_EXPORT_LIMIT` valait mille, et rien ne le disait.
+
+    !!! danger "Un utilisateur qui filtrait trois mille lignes en recevait mille"
+        Le fichier était impossible à distinguer d'un export complet, jusqu'à ce que quelqu'un compte les lignes.
+
+        Pour un export destiné à un contrôle ou à une reprise de données, c'est une perte silencieuse.
+
+    La fonction d'export demande désormais **une ligne de plus** que le plafond, seule façon de savoir qu'il en restait sans payer un `COUNT` sur la même requête, et rend un drapeau.
+
+    | Où la troncature se voit | Pour qui |
+    |---|---|
+    | nom du fichier, suffixé `-TRONQUE` | la personne qui télécharge |
+    | en-tête `X-Forge-Export-Truncated` | un client programmatique |
+    | en-tête `X-Forge-Export-Limit` | pour savoir où le plafond est posé |
+
+    !!! warning "Le CRUD doit être régénéré"
+        Le correctif vit dans le générateur. Un contrôleur déjà engendré garde l'ancien comportement jusqu'à un nouveau `forge make:crud`.
+
+    `_EXPORT_LIMIT` reste dans le modèle engendré, donc modifiable par l'application : le bon plafond dépend de la taille des lignes et de la mémoire du serveur, ce n'est pas une constante du framework.
+
 ## Voir aussi
 
 - [Lecture CSV (csv_reader.py)](references/csv.md) : `parse_csv`.

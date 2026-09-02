@@ -16,8 +16,22 @@ l'application. La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 """
 from forge_mvc_import_export.csv_reader import parse_csv
 from forge_mvc_import_export.csv_writer import to_csv
+from forge_mvc_import_export.jsonl import (
+    JSONL_MIME_TYPE,
+    JsonlError,
+    parse_jsonl,
+    to_jsonl,
+)
+from forge_mvc_import_export.report import (
+    REPORT_COLUMNS,
+    errors_to_csv,
+    errors_to_rows,
+    report_filename,
+)
 from forge_mvc_import_export.engine import (
     FieldSpec,
+    HeaderMapping,
+    resolve_headers,
     ImportReport,
     RowError,
     coerce_bool,
@@ -53,6 +67,19 @@ __all__ = [
     "ImportSourceError",
     "CsvImportError",
     "FieldSpec",
+    # Correspondance de colonnes déclarée (IMPEXP-COLUMN-MAPPING-001)
+    "HeaderMapping",
+    "resolve_headers",
+    # Rapport d'erreurs téléchargeable (IMPEXP-ERROR-REPORT-001)
+    "errors_to_csv",
+    "errors_to_rows",
+    "report_filename",
+    "REPORT_COLUMNS",
+    # Format JSONL (IMPEXP-JSONL-001)
+    "to_jsonl",
+    "parse_jsonl",
+    "JsonlError",
+    "JSONL_MIME_TYPE",
     "RowError",
     "ImportReport",
     "parse_csv",

@@ -120,11 +120,11 @@ def _render_export_csv(ctx: _ControllerContext) -> list[str]:
                     f'            _filters["{fname}"] = {fname}_f',
                 ]
         export_csv_lines.append(
-            f"        rows = find_{plural}_for_export(q=q or None, sort=sort or None, direction=direction, filters=_filters or None)"
+            f"        rows, truncated = find_{plural}_for_export(q=q or None, sort=sort or None, direction=direction, filters=_filters or None)"
         )
     else:
         export_csv_lines.append(
-            f"        rows = find_{plural}_for_export(q=q or None, sort=sort or None, direction=direction)"
+            f"        rows, truncated = find_{plural}_for_export(q=q or None, sort=sort or None, direction=direction)"
         )
     export_csv_lines += [
         "        output = io.StringIO()",
@@ -133,14 +133,22 @@ def _render_export_csv(ctx: _ControllerContext) -> list[str]:
         "        for row in rows:",
         '            writer.writerow([escape_csv_field(str(row.get(key) or "")) for _, key in _CSV_COLS])',
         '        content = output.getvalue().encode("utf-8")',
+        "        # IMPEXP-FILTERED-EXPORT-001 : une troncature doit se voir. Le",
+        "        # nom du fichier la porte, parce que c'est ce que l'utilisateur",
+        "        # lit ; l'en-tête la porte aussi, pour un client programmatique.",
+        f'        _nom = "{plural}-TRONQUE.csv" if truncated else "{plural}.csv"',
+        "        _entetes = {",
+        '            "Content-Disposition": f\'attachment; filename="{_nom}"\',',
+        '            "Cache-Control": "no-store",',
+        "        }",
+        "        if truncated:",
+        '            _entetes["X-Forge-Export-Truncated"] = "1"',
+        '            _entetes["X-Forge-Export-Limit"] = str(_EXPORT_LIMIT)',
         "        return Response(",
         "            200,",
         "            content,",
         '            "text/csv; charset=utf-8",',
-        "            headers={",
-        f'                "Content-Disposition": \'attachment; filename="{plural}.csv"\',',
-        '                "Cache-Control": "no-store",',
-        "            },",
+        "            headers=_entetes,",
         "        )",
         "",
     ]

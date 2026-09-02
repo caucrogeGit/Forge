@@ -4,6 +4,30 @@
 
 ### Ajouté
 
+- **Une colonne absente donne une erreur, et non dix mille (`IMPEXP-COLUMN-MAPPING-001`).**
+  `FieldSpec.name` servait à la fois de clé d'enregistrement et de nom de colonne CSV : un export tableur dont l'en-tête dit « Adresse e-mail » ne pouvait pas alimenter le champ `email`, et il fallait renommer les colonnes à la main avant chaque import. `source` déclare le ou les en-têtes acceptés, essayés dans l'ordre.
+  **Le défaut le plus coûteux était ailleurs.** Une colonne absente n'était pas détectée : `row.get(nom, "")` rendait une chaîne vide, et chaque ligne produisait « valeur requise manquante ». Un fichier de dix mille lignes rendait dix mille erreurs pour un seul en-tête mal orthographié, et la vraie cause restait introuvable au milieu. Les en-têtes sont maintenant rapprochés une fois, avant d'examiner la moindre ligne.
+  **Rien n'est rapproché par ressemblance.** Ni la casse ni les accents ne sont normalisés : rapprocher « Prix HT » de `prix_ttc` parce que les deux contiennent « prix » ferait importer la mauvaise colonne sans le signaler. Les espaces de bordure sont en revanche tolérées, un export tableur en posant souvent sans intention.
+
+- **Le rapport d'erreurs se télécharge (`IMPEXP-ERROR-REPORT-001`).**
+  `ImportReport` portait une liste exploitable en Python et inutilisable par la personne qui a déposé le fichier. Un import de deux mille lignes avec quarante erreurs ne se corrigeait qu'en lisant un écran, une erreur à la fois, sans jamais voir la ligne fautive.
+  Le rapport CSV porte la ligne, **le numéro affiché par un tableur** (la ligne 1 des données est la ligne 2 du fichier, et ne donner que l'une des deux fait chercher au mauvais endroit), la colonne, le message et la valeur refusée.
+  **Le rapport est lui même échappé** : il contient des données venues du fichier déposé, et sans échappement une cellule commençant par `=` redeviendrait une formule vive à son ouverture. Le rapport d'erreurs deviendrait le vecteur.
+
+- **Un second format, JSONL (`IMPEXP-JSONL-001`).**
+  Le CSV ne porte aucun type et ne sait pas représenter une valeur imbriquée : un export destiné à un autre programme y perd la différence entre le nombre `1`, le texte `"1"` et le booléen `true`.
+  JSONL plutôt que JSON : un tableau impose de tout charger avant de lire le premier enregistrement, et une virgule manquante le rend entièrement illisible, là où une ligne fautive en JSONL n'empêche pas de lire les autres.
+  Une clé absente est écrite à `null` et jamais omise, un consommateur de flux ayant besoin que toutes les lignes aient la même forme. La lecture est stricte par défaut ; le mode tolérant existe pour récupérer ce qui est lisible d'un fichier abîmé, et perd des données en silence, ce que la documentation dit.
+
+### Corrigé
+
+- **L'export CSV du CRUD ne tronque plus en silence (`IMPEXP-FILTERED-EXPORT-001`).**
+  **Faux besoin mesuré** : l'export respectait déjà recherche, tri et filtres de la liste. Le manque était ailleurs, et bien plus grave.
+  `_EXPORT_LIMIT` valait mille, et **rien ne le disait**. Un utilisateur qui filtrait trois mille lignes en recevait mille, dans un fichier impossible à distinguer d'un export complet jusqu'à ce que quelqu'un compte. Pour un export destiné à un contrôle ou à une reprise de données, c'est une perte silencieuse.
+  La fonction d'export demande désormais une ligne de plus que le plafond, seule façon de savoir qu'il en restait sans payer un `COUNT` sur la même requête. La troncature se voit dans le **nom du fichier**, suffixé `-TRONQUE`, ce que la personne lit, et dans les en-têtes `X-Forge-Export-Truncated` et `X-Forge-Export-Limit`, pour un client programmatique.
+  Le correctif vit dans le générateur : un contrôleur déjà engendré garde l'ancien comportement jusqu'à un nouveau `forge make:crud`.
+  Sept tests de `test_crud_export_csv.py` découpaient un **nombre fixe de caractères** après le début de la fonction engendrée, et l'un avait déjà vu sa fenêtre « étendue » une fois. Ils extraient maintenant la fonction entière, et ne demanderont plus d'extension.
+
 - **L'API IoT ne donne plus tous les sites à qui en veut un (`IOT-DEVICE-AUTH-001`).**
   Elle était protégée par **un** jeton, `FORGE_IOT_API_TOKEN`, qui ouvrait toutes les mesures de tous les sites. Un prestataire chargé des capteurs d'un bâtiment recevait ce jeton, et lisait par là les mesures des autres, sans qu'aucun mécanisme ne l'en empêche ni ne le signale.
   Un jeton porte désormais une portée, globale, un site, ou un seul équipement d'un site. `forge iot:token` les crée, les liste et les révoque. Le filtrage a lieu **en SQL** : rapatrier les mesures des autres sites pour les écarter ensuite les aurait fait passer par un processus qui n'y a pas droit.
