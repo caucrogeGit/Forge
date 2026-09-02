@@ -362,6 +362,84 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     !!! note "Indépendance du cœur"
         Le cœur ne dépend pas de `forge-mvc-i18n` ; il l'expose seulement s'il est présent (mécanisme de loader, ADR-046).
 
+??? note "12. Voir les clés manquantes avant l'utilisateur"
+
+    `trans()` rend la clé elle même quand la traduction manque, et c'est le bon comportement : une page ne doit pas casser pour une traduction absente (`I18N-MISSING-KEYS-DEV-001`).
+
+    Mais **rien ne le signalait**. On ajoute `{{ trans("panier_vide") }}` dans une page, on oublie de l'ajouter au catalogue, et la page affiche « panier_vide » à l'utilisateur.
+
+    ```python
+    from forge_mvc_i18n import clear_missing_keys, missing_keys
+
+    missing_keys()        # (("fr", "panier_vide"), ...)
+    ```
+
+    !!! info "Hors production seulement"
+        Journaliser chaque clé manquante à chaque requête noierait le journal, et une traduction absente n'est pas un incident d'exploitation.
+
+        C'est un défaut à corriger au développement, et c'est là qu'il doit se voir. En production, la clé est rendue en silence, comme avant.
+
+    !!! info "Une clé n'est signalée qu'une fois"
+        La même clé manquante sur mille requêtes est un seul défaut.
+
+        L'accumuler mille fois ferait grossir la mémoire d'un processus de développement sans rien apprendre de plus.
+
+    !!! warning "Le signalement ne lève jamais"
+        Une page qui casse parce qu'il manque une traduction serait un remède pire que le mal, y compris en développement, où elle empêcherait de voir le reste de la page.
+
+    `missing_keys()` sert aussi à un test qui refuse de livrer avec des traductions manquantes.
+
+??? note "13. Lister les clés employées dans les gabarits"
+
+    `i18n:check` compare deux catalogues entre eux : il dit quelle clé du français manque à l'anglais (`I18N-EXTRACT-CLI-001`).
+
+    Il ne peut rien dire d'une clé employée dans un gabarit et absente **des deux**, puisqu'il ne lit que les catalogues. C'est pourtant le cas le plus fréquent.
+
+    ```bash
+    forge i18n:extract
+    forge i18n:extract --locale en
+    ```
+
+    La commande balaye `mvc/views/`, relève les appels à `trans()` et les compare au catalogue. Une clé employée et absente fait échouer la commande ; une clé du catalogue non trouvée dans les gabarits est signalée sans être une erreur, puisqu'elle peut servir à un appel calculé.
+
+    !!! warning "Seules les clés littérales sont extraites"
+        `trans(variable)` et `trans("prefixe_" ~ suffixe)` ne peuvent pas être lus : la clé n'existe qu'à l'exécution.
+
+        Ces appels sont **comptés et rapportés** à part, et la sortie annonce alors que la liste est un minorant. Le prétendre exhaustive donnerait une fausse assurance.
+
+    L'extraction elle même vit dans l'opt-in (`extract.py`, `extract_from_directory`, `extract_from_text`, `ExtractionResult`), qui seul connaît la forme des appels. La commande l'importe paresseusement : le cœur ne dépend pas d'un opt-in (ADR-004).
+
+??? note "14. Singulier et pluriel"
+
+    `trans()` rend une chaîne unique par clé (`I18N-PLURALS-001`). Afficher « 1 articles », ou écrire deux clés avec un `if` dans chaque gabarit, sont les deux contournements qu'on rencontre, et aucun ne tient quand une troisième langue arrive.
+
+    ```json
+    {"articles": {"one": "{n} article", "other": "{n} articles"}}
+    ```
+
+    ```python
+    from forge_mvc_i18n import plural_form, select_plural
+
+    select_plural(catalogue["articles"], compte, "fr").format(n=compte)
+    ```
+
+    Une clé dont la valeur est une chaîne reste une clé ordinaire : le format existant continue de fonctionner sans changement.
+
+    !!! danger "Forge implémente deux formes, CLDR en définit six"
+        `one` et `other`, avec une règle par famille de langues. C'est exact pour le français, l'anglais et la plupart des langues d'Europe occidentale.
+
+        C'est **faux** pour le russe, l'arabe, le polonais et le gallois, et `plural_form` **lève** pour ces langues plutôt que de rendre une forme qu'elle sait fausse.
+
+        Ce n'est pas un choix par facilité : une implémentation partielle de CLDR donnerait l'impression de couvrir une langue qu'elle massacre. Une application qui doit traduire vers l'une d'elles emploie une bibliothèque d'internationalisation complète.
+
+    !!! info "Le français met zéro au singulier"
+        « 0 article » en français, « 0 articles » en anglais.
+
+        La règle dépend de la langue et jamais de la région : le français de Belgique et celui de France comptent pareil.
+
+    !!! warning "Une forme absente du catalogue lève"
+        Retomber sur l'autre forme afficherait « 3 article » sans que rien ne le signale.
+
 ## Voir aussi
 
 - [Traduction (translator.py)](references/translator.md) : détail de `trans` et des locales.

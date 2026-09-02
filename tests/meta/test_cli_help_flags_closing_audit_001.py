@@ -89,9 +89,11 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     # Documentation
     "docs:pdf",
     # Internationalisation
-    "i18n:init", "i18n:check",
+    "i18n:init", "i18n:check", "i18n:extract",
     # Médias et JavaScript
     "upload:init", "media:init", "images:init", "js:init", "files:init",
+    # qrcode:make produit un fichier QR Code (QRCODE-CLI-001).
+    "qrcode:make",
     # files:orphans rapproche le disque et le registre (FILES-ORPHAN-PURGE-001).
     "files:orphans",
     # images:orphans nettoie les variantes (IMAGES-ORPHAN-VARIANTS-001).

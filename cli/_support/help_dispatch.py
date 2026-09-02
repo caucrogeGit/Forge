@@ -141,6 +141,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # Internationalisation
     "i18n:init":        "Initialise les fichiers de traduction.",
     "i18n:check":       "Vérifie la complétude des traductions.",
+    "i18n:extract":     "Liste les clés employées dans les gabarits et celles qui manquent au catalogue.",
     # Médias et JavaScript
     "upload:init":      "Configure les uploads de fichiers (dossiers storage/uploads).",
     "media:init":       "Configure les médias : upload:init plus les variantes d'image.",
@@ -149,6 +150,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "images:init":      "Copie la migration Images vers mvc/migrations/ (idempotent, sans appliquer).",
     "images:orphans":   "Liste les variantes sans original ou d'un préréglage retiré (--delete supprime).",
     "js:init":          "Installe htmx, alpine ou les deux.",
+    "qrcode:make":      "Produit un QR Code PNG ou SVG dans un fichier (affiche ; --out écrit).",
     # Déploiement
     "deploy:init":      "Initialise la configuration de déploiement.",
     "deploy:check":     "Vérifie la configuration de déploiement.",
@@ -463,6 +465,64 @@ Limites :
   est refusée sans --force.
   Forge ne devine pas quelles colonnes masquer : relisez avant de
   versionner.
+""",
+    "qrcode:make": """\
+Usage :
+  forge qrcode:make "TEXTE" [--out FICHIER] [--format png|svg]
+                    [--error l|m|q|h] [--scale N] [--border N]
+
+Description :
+  Produit un QR Code depuis un texte ou une URL. Le paquet savait déjà
+  en servir un en HTTP ; produire un fichier demandait un script à
+  usage unique.
+
+Effets :
+  Sans --out, affiche seulement la taille et les réglages retenus.
+  Avec, écrit le fichier, et refuse s'il existe déjà.
+
+Prérequis :
+  L'opt-in forge-mvc-qrcode installé.
+
+Options :
+  --out FICHIER    chemin de sortie ; le format se déduit de l'extension
+  --format png|svg format explicite, s'il n'y a pas d'extension
+  --error l|m|q|h  correction d'erreur (défaut m, soit 15 % de perte)
+  --scale N        taille d'un module, en pixels (défaut 4)
+  --border N       marge silencieuse, en modules (défaut 4)
+
+Limites :
+  Un fichier existant n'est jamais écrasé : deux QR Codes se ressemblent
+  à l'œil, et l'ancien serait perdu sans que rien ne le signale.
+  Une extension qui contredit --format est refusée : un SVG nommé .png
+  est servi avec le mauvais type et refusé par un imprimeur.
+""",
+    "i18n:extract": """\
+Usage :
+  forge i18n:extract [--locale fr]
+
+Description :
+  Balaye mvc/views/ à la recherche des appels à trans() et compare les
+  clés trouvées au catalogue de la locale.
+
+  i18n:check compare deux catalogues entre eux : il ne peut rien dire
+  d'une clé employée dans un gabarit et absente des deux.
+
+Effets :
+  Lecture seule. Rien n'est écrit.
+
+Prérequis :
+  L'opt-in forge-mvc-i18n installé.
+
+Options :
+  --locale CODE   catalogue de comparaison (défaut fr)
+
+Limites :
+  Seuls les appels dont la clé est un littéral sont extraits.
+  trans(variable) et trans("prefixe_" ~ suffixe) sont comptés et
+  rapportés à part : la liste est alors un minorant, ce que la sortie
+  dit plutôt que de la laisser passer pour exhaustive.
+  Une clé du catalogue non trouvée dans les gabarits est signalée sans
+  être une erreur : elle peut servir à un appel calculé.
 """,
     "jobs:status": """\
 Usage:

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from functools import lru_cache
 from pathlib import Path
@@ -98,4 +99,63 @@ def trans(
             if value is not None:
                 return value
 
+    # I18N-MISSING-KEYS-DEV-001 : la clé est rendue telle quelle, ce qui reste
+    # le bon comportement (une page ne doit pas casser pour une traduction
+    # absente). Mais RIEN ne le signalait, et « panier_vide » s'affichait à
+    # l'utilisateur sans que personne ne s'en aperçoive avant lui.
+    _report_missing_key(key, locale)
     return key
+
+
+# ---------------------------------------------------------------------------
+# Clés manquantes (I18N-MISSING-KEYS-DEV-001)
+# ---------------------------------------------------------------------------
+
+logger = logging.getLogger("forge.i18n")
+
+#: Clés rendues telles quelles faute de traduction, hors production.
+#:
+#: Un ensemble et non une liste : la même clé manquante sur mille requêtes est
+#: un seul défaut, et l'accumuler mille fois ferait grossir la mémoire d'un
+#: processus de développement sans rien apprendre de plus.
+_missing: "set[tuple[str, str]]" = set()
+
+
+def _report_missing_key(key: str, locale: str) -> None:
+    """Signale une clé absente, hors production seulement.
+
+    En production, le silence est délibéré : journaliser chaque clé manquante
+    à chaque requête noierait le journal, et une traduction absente n'est pas
+    un incident d'exploitation. C'est un défaut à corriger au développement,
+    et c'est là qu'il doit se voir.
+
+    Le signalement ne lève **jamais**. Une page qui casse parce qu'il manque
+    une traduction serait un remède pire que le mal, y compris en
+    développement, où elle empêcherait de voir le reste de la page.
+    """
+    from core.app.env import is_prod, read_app_env
+
+    if is_prod(read_app_env()):
+        return
+    marqueur = (locale, key)
+    if marqueur in _missing:
+        return
+    _missing.add(marqueur)
+    logger.warning(
+        "Forge i18n : clé absente du catalogue %r, la clé est affichée telle "
+        "quelle : %r", locale, key,
+    )
+
+
+def missing_keys() -> "tuple[tuple[str, str], ...]":
+    """Clés manquantes rencontrées, en couples `(locale, clé)`, triées.
+
+    Vide en production, où rien n'est collecté. Sert à un écran de diagnostic
+    ou à un test qui refuse de livrer avec des traductions manquantes.
+    """
+    return tuple(sorted(_missing))
+
+
+def clear_missing_keys() -> None:
+    """Vide le registre. Utile aux tests, et entre deux campagnes."""
+    _missing.clear()

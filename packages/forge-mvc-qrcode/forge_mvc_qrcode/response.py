@@ -26,15 +26,29 @@ class QrCodeResponse:
         fmt: str = "png",
         scale: int = 4,
         border: int = 4,
+        error: str = "m",
         headers: "dict[str, str] | None" = None,
     ) -> Response:
         """Construit une réponse servant le QR Code de `text`.
 
         `fmt` vaut ``"png"`` (défaut, ``Content-Type: image/png``) ou ``"svg"``
-        (``Content-Type: image/svg+xml``). Lève :class:`QrCodeError` si le texte
-        est vide ou si le format est inconnu.
+        (``Content-Type: image/svg+xml``).
+
+        `error` est le niveau de correction d'erreur, ``l``, ``m``, ``q`` ou
+        ``h`` (`QRCODE-ERROR-LEVEL-001`). Il existait sur `QrCode.from_text`
+        mais **cette fabrique ne le transmettait pas**, si bien qu'un
+        contrôleur, c'est à dire le chemin documenté pour servir un QR Code, ne
+        pouvait pas le choisir.
+
+        Ce n'est pas un réglage de confort : un code imprimé sur une étiquette
+        ou une affiche, susceptible d'être rayé ou partiellement couvert,
+        demande ``h``, qui tolère 30 % de perte. En ``m``, le défaut, qui en
+        tolère 15 %, il devient illisible.
+
+        Lève :class:`QrCodeError` si le texte est vide, si le format est
+        inconnu, ou si le niveau de correction ne l'est pas.
         """
-        qr = QrCode.from_text(text)
+        qr = QrCode.from_text(text, error=error)
         if fmt == "png":
             return Response(200, qr.to_png(scale=scale, border=border), PNG_MIME, headers=headers or {})
         if fmt == "svg":

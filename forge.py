@@ -536,7 +536,10 @@ CORE_COMMANDS: dict[str, _CoreRunner] = {
     "make:public-contact": _delegate(lambda a: public_contact_main(a)),
     # make:relation, entity:*, sync:entity : moteur d'entités (ADR-070), via entry point.
     "js:init": _delegate(lambda a: front_main(a), full=True),
-    **_group(("i18n:init", "i18n:check"), _delegate(lambda a: i18n_main(a), full=True)),
+    **_group(
+        ("i18n:init", "i18n:check", "i18n:extract"),
+        _delegate(lambda a: i18n_main(a), full=True),
+    ),
     **_group(_AUTH_COMMANDS, _delegate(lambda a: auth_main(a), full=True)),
     "agents:init": _lazy("cli.agents.cli", exit_rc=True),
     "skeleton:upgrade": _lazy("cli.commands.skeleton_upgrade", exit_rc=True),

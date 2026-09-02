@@ -122,6 +122,7 @@ Documentation
 Internationalisation
   i18n:init           Initialise les fichiers de traduction.
   i18n:check          Vérifie la complétude des traductions.
+  i18n:extract        Liste les clés employées dans les gabarits et celles qui manquent au catalogue.
 
 Médias et JavaScript
   upload:init         Configure les uploads de fichiers.
@@ -131,6 +132,7 @@ Médias et JavaScript
   images:init         Copie la migration Images du package vers mvc/migrations/ (idempotent, sans appliquer).
   images:orphans      Liste les variantes sans original ou d'un préréglage retiré (--delete supprime).
   js:init             Installe htmx, alpine ou les deux.
+  qrcode:make         Produit un QR Code PNG ou SVG dans un fichier (affiche ; --out écrit).
 
 Déploiement
   deploy:init         Initialise la configuration de déploiement.

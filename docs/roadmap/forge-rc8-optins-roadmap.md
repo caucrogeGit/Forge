@@ -273,16 +273,16 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `QRCODE-CLI-001` | Commande `qrcode:make` |
-| `QRCODE-ERROR-LEVEL-001` | Niveau de correction d'erreur exposé à l'appelant |
+| `QRCODE-CLI-001` | **Livré.** Affiche puis écrit ; n'écrase jamais, refuse une extension contradictoire |
+| `QRCODE-ERROR-LEVEL-001` | **Livré.** Il existait sur le générateur, la réponse HTTP ne le transmettait pas |
 
 ### 7.21 i18n
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `I18N-EXTRACT-CLI-001` | Commande `i18n:extract` sur les gabarits |
-| `I18N-MISSING-KEYS-DEV-001` | Signalement des clés manquantes hors production |
-| `I18N-PLURALS-001` | Règle de pluriel minimale |
+| `I18N-EXTRACT-CLI-001` | **Livré.** Le cas que `i18n:check` ne peut pas voir ; clé calculée comptée à part |
+| `I18N-MISSING-KEYS-DEV-001` | **Livré.** Journal et registre hors prod, une fois par clé, sans jamais lever |
+| `I18N-PLURALS-001` | **Livré.** Deux formes ; les langues qui en demandent plus **lèvent** au lieu de mentir |
 
 ### 7.22 deploy
 

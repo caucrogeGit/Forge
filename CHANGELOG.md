@@ -4,6 +4,33 @@
 
 ### Ajouté
 
+- **`forge qrcode:make` produit un fichier (`QRCODE-CLI-001`).**
+  Le paquet savait produire un QR Code depuis Python et le servir en HTTP. Produire un fichier, pour une affiche ou une étiquette, demandait un script à usage unique.
+  Affiche par défaut, écrit sur `--out` (charte §7). **Un fichier existant n'est jamais écrasé** : deux QR Codes se ressemblent à l'œil, ce sont deux carrés noirs et blancs, et l'ancien serait perdu sans que rien ne le signale jusqu'à ce qu'un scan mène au mauvais endroit.
+  Une extension qui contredit `--format` est refusée : un SVG nommé `.png` est servi avec le mauvais type et refusé par un imprimeur. Le niveau de correction par défaut est rappelé à l'écriture, au moment où l'information sert.
+
+- **Les clés de traduction employées se listent (`I18N-EXTRACT-CLI-001`).**
+  `i18n:check` compare deux catalogues entre eux : il dit quelle clé du français manque à l'anglais, et ne peut rien dire d'une clé employée dans un gabarit et absente **des deux**. C'est pourtant le cas le plus fréquent.
+  `forge i18n:extract` balaye `mvc/views/` et compare au catalogue. **Seules les clés littérales sont extraites** : `trans(variable)` n'existe qu'à l'exécution. Ces appels sont comptés et rapportés à part, et la sortie annonce alors que la liste est un minorant, plutôt que de la laisser passer pour exhaustive.
+  L'extraction vit dans l'opt-in, qui seul connaît la forme des appels ; la commande l'importe paresseusement, le cœur ne dépendant pas d'un opt-in (ADR-004).
+
+- **Une clé de traduction manquante se voit avant l'utilisateur (`I18N-MISSING-KEYS-DEV-001`).**
+  `trans()` rend la clé elle même, ce qui reste le bon comportement : une page ne doit pas casser pour une traduction absente. Mais rien ne le signalait, et « panier_vide » s'affichait à l'utilisateur sans que personne ne s'en aperçoive avant lui.
+  La clé est désormais journalisée et collectée **hors production seulement** : journaliser chaque clé manquante à chaque requête noierait le journal, et une traduction absente n'est pas un incident d'exploitation. Une clé n'est signalée qu'une fois, la même sur mille requêtes étant un seul défaut.
+  Le signalement ne **lève jamais** : une page qui casse pour une traduction absente serait un remède pire que le mal, y compris en développement, où elle empêcherait de voir le reste de la page.
+
+- **Singulier et pluriel, à deux formes assumées (`I18N-PLURALS-001`).**
+  `trans()` rendait une chaîne unique par clé, d'où « 1 articles », ou deux clés avec un `if` dans chaque gabarit. Un catalogue peut maintenant porter `{"one": ..., "other": ...}`, et une clé dont la valeur est une chaîne reste une clé ordinaire.
+  **Forge implémente deux formes, CLDR en définit six.** C'est exact pour le français, l'anglais et la plupart des langues d'Europe occidentale, et faux pour le russe, l'arabe, le polonais et le gallois : `plural_form` **lève** pour ces langues plutôt que de rendre une forme qu'elle sait fausse. Une implémentation partielle donnerait l'impression de couvrir une langue qu'elle massacre.
+  Le français met zéro au singulier, l'anglais non, et la règle dépend de la langue jamais de la région. Une forme absente du catalogue lève, retomber sur l'autre afficherait « 3 article » sans que rien ne le signale.
+
+### Corrigé
+
+- **La réponse HTTP transmet enfin le niveau de correction d'erreur (`QRCODE-ERROR-LEVEL-001`).**
+  Le niveau existait sur `QrCode.from_text`, mais `QrCodeResponse.from_text` appelait `from_text(text)` tout court : un contrôleur, c'est à dire le chemin documenté pour servir un QR Code, ne pouvait pas le choisir.
+  Ce n'est pas un réglage de confort. Un code imprimé sur une étiquette ou une affiche, susceptible d'être rayé ou partiellement couvert, demande `h`, qui tolère 30 % de perte ; en `m`, le défaut, qui en tolère 15 %, il devient illisible, et la panne se découvre sur le terrain une fois les étiquettes collées.
+  `ERROR_LEVELS` est exporté, une application ne pouvant sinon connaître les valeurs valides sans lire la source du paquet.
+
 - **Compter des visiteurs sans garder d'adresse (`STATS-IP-ANONYMISATION-001`).**
   `forge-mvc-stats` ne stockait **aucune** adresse : sa table n'a pas de colonne pour cela, et ce n'est pas un oubli mais son périmètre, il compte des événements et n'enquête pas.
   `metadata` est pourtant libre, et rien n'empêchait d'y écrire `{"ip": request.remote_addr}`. C'est le geste naturel de qui veut compter des visiteurs uniques, et il transforme une table de statistiques en fichier de données personnelles, soumis à conservation limitée et à droit d'accès, sans que personne ne l'ait décidé.

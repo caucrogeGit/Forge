@@ -307,6 +307,61 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
 
         L'opt-in s'appuie sur `segno` (pur Python) et sur la classe `Response` du cœur, sans rien lui imposer.
 
+??? note "12. Choisir le niveau de correction d'erreur"
+
+    Le niveau existait sur `QrCode.from_text`, mais `QrCodeResponse.from_text` **ne le transmettait pas** (`QRCODE-ERROR-LEVEL-001`).
+
+    Un contrôleur, c'est à dire le chemin documenté pour servir un QR Code, ne pouvait donc pas le choisir.
+
+    ```python
+    from forge_mvc_qrcode import QrCodeResponse
+
+    return QrCodeResponse.from_text(url, error="h")
+    ```
+
+    | Niveau | Perte tolérée | Pour quoi |
+    |---|---|---|
+    | `l` | 7 % | écran, code lu de près |
+    | `m` | 15 % | défaut |
+    | `q` | 25 % | impression courante |
+    | `h` | 30 % | étiquette, affiche, extérieur |
+
+    !!! warning "Ce n'est pas un réglage de confort"
+        Un code imprimé sur une étiquette ou une affiche, susceptible d'être rayé ou partiellement couvert, demande `h`.
+
+        En `m`, il devient illisible dès qu'un coin manque, et la panne se découvre sur le terrain, une fois les étiquettes collées.
+
+    Un niveau plus élevé produit un code plus dense, donc plus grand à surface égale : c'est le prix de la robustesse, et il se voit à la taille du fichier.
+
+    `ERROR_LEVELS` est exporté : une application peut découvrir les valeurs valides sans lire la source du paquet.
+
+??? note "13. Produire un fichier en ligne de commande"
+
+    Le paquet savait produire un QR Code depuis du code Python et le servir en HTTP. Produire un fichier, pour une affiche, une étiquette ou une documentation, demandait d'écrire un script à usage unique (`QRCODE-CLI-001`).
+
+    ```bash
+    forge qrcode:make "https://forgemvc.com"
+    forge qrcode:make "https://forgemvc.com" --out docs/qr.png --error h
+    forge qrcode:make "https://forgemvc.com" --out docs/qr.svg --scale 8
+    ```
+
+    Sans `--out`, la commande affiche seulement la taille et les réglages retenus (charte §7).
+
+    !!! danger "Un fichier existant n'est jamais écrasé"
+        Deux QR Codes se ressemblent à l'œil : ce sont deux carrés noirs et blancs.
+
+        Régénéré avec un autre contenu sous le même nom, l'ancien serait perdu sans que rien ne le signale, et personne ne s'en apercevrait avant qu'un scan mène au mauvais endroit.
+
+    !!! warning "L'extension et le format doivent s'accorder"
+        `--format svg --out code.png` est **refusé**.
+
+        Un fichier SVG nommé `.png` est servi avec le mauvais type par un serveur web, et refusé par un imprimeur. Sans `--format`, le format se déduit de l'extension.
+
+    !!! info "Le niveau par défaut est rappelé"
+        Un fichier écrit sans `--error` explicite affiche un rappel : `m` tolère 15 % de perte, `h` en tolère 30 %.
+
+        C'est le moment où l'information sert, pas trois semaines plus tard.
+
 ## Voir aussi
 
 - [La génération (generator.py)](references/generator.md) : détail de `QrCode`.

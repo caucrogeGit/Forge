@@ -18,6 +18,19 @@ from forge_mvc_i18n.detection import (
     parse_accept_language,
 )
 from forge_mvc_i18n.exceptions import I18nError, TranslationCatalogError
+from forge_mvc_i18n.extract import (
+    ExtractionResult,
+    extract_from_directory,
+    extract_from_text,
+)
+from forge_mvc_i18n.plurals import (
+    PLURAL_FORMS,
+    UNSUPPORTED_LANGUAGES,
+    PluralError,
+    language_of,
+    plural_form,
+    select_plural,
+)
 from forge_mvc_i18n.translator import (
     clear_translation_cache,
     get_default_locale,
@@ -25,6 +38,8 @@ from forge_mvc_i18n.translator import (
     load_catalog,
     set_default_locale,
     set_fallback_locale,
+    clear_missing_keys,
+    missing_keys,
     trans,
 )
 
@@ -39,6 +54,20 @@ __all__ = [
     "set_fallback_locale",
     "load_catalog",
     "trans",
+    # Clés manquantes signalées hors production (I18N-MISSING-KEYS-DEV-001)
+    "missing_keys",
+    "clear_missing_keys",
+    # Règle de pluriel minimale (I18N-PLURALS-001)
+    "plural_form",
+    "select_plural",
+    "language_of",
+    "PLURAL_FORMS",
+    "UNSUPPORTED_LANGUAGES",
+    "PluralError",
+    # Extraction des clés employées (I18N-EXTRACT-CLI-001)
+    "extract_from_directory",
+    "extract_from_text",
+    "ExtractionResult",
     "clear_translation_cache",
     # Détection de la locale active (I18N-LOCALE-DETECTION-001)
     "detect_locale",

@@ -128,12 +128,113 @@ def cmd_i18n_check(args: list[str], root: Path | None = None) -> int:
     return 0 if all_ok else 1
 
 
+def cmd_i18n_extract(args: list[str], root: Path | None = None) -> int:
+    """`forge i18n:extract` — clés employées dans les gabarits (I18N-EXTRACT-CLI-001).
+
+    `i18n:check` compare deux catalogues entre eux : il dit quelle clé du
+    français manque à l'anglais. Il ne peut rien dire d'une clé employée dans
+    un gabarit et absente **des deux**, puisqu'il ne lit que les catalogues.
+
+    C'est pourtant le cas le plus fréquent : on ajoute `trans("panier_vide")`
+    dans une page, on oublie de l'ajouter au catalogue, et la page affiche
+    « panier_vide » à l'utilisateur.
+
+    La logique d'extraction vit dans l'opt-in, qui seul connaît la forme des
+    appels à `trans()`. Elle est importée paresseusement, comme
+    `cli.assets.uploads` le fait pour `forge-mvc-files` : le cœur ne dépend pas
+    d'un opt-in (ADR-004).
+    """
+    try:
+        from forge_mvc_i18n.extract import extract_from_directory
+    except ImportError:
+        print(
+            "[ERREUR] i18n:extract requiert l'opt-in forge-mvc-i18n "
+            "(pip install forge-mvc-i18n)."
+        )
+        return 2
+
+    base = root or Path.cwd()
+    dossier = base / "mvc" / "views"
+    locale = _extract_locale(args)
+
+    resultat = extract_from_directory(dossier)
+    print(
+        f"[INFO] {resultat.files_scanned} fichier(s) balayé(s) dans "
+        f"{dossier}, {len(resultat.keys)} clé(s) trouvée(s)."
+    )
+    if not resultat.is_complete:
+        print(
+            f"[ATTENTION] {resultat.dynamic_calls} appel(s) à clé calculée, "
+            "que le balayage ne peut pas nommer. La liste ci-dessous est donc "
+            "un minorant."
+        )
+
+    catalogue = _load_catalog_keys(base, locale)
+    if catalogue is None:
+        print(f"[INFO] Aucun catalogue pour la locale « {locale} ».")
+        for cle in resultat.keys:
+            print(f"    {cle}")
+        return 0
+
+    manquantes = [cle for cle in resultat.keys if cle not in catalogue]
+    inutilisees = sorted(catalogue - set(resultat.keys))
+
+    if manquantes:
+        print(f"[ERREUR] {len(manquantes)} clé(s) employée(s) et absente(s) du catalogue :")
+        for cle in manquantes:
+            print(f"    {cle}")
+    else:
+        print(f"[OK] Toutes les clés employées sont dans le catalogue « {locale} ».")
+
+    if inutilisees:
+        # Signalé sans être une erreur : une clé peut servir à un appel calculé,
+        # ou à un gabarit qui n'est pas sous mvc/views.
+        print(f"[INFO] {len(inutilisees)} clé(s) du catalogue non trouvée(s) dans les gabarits :")
+        for cle in inutilisees[:20]:
+            print(f"    {cle}")
+        if len(inutilisees) > 20:
+            print(f"    et {len(inutilisees) - 20} autres")
+
+    return 1 if manquantes else 0
+
+
+def _extract_locale(args: list[str]) -> str:
+    """Locale demandée par `--locale`, défaut `fr`."""
+    for index, argument in enumerate(args):
+        if argument.startswith("--locale="):
+            return argument.partition("=")[2].strip() or "fr"
+        if argument == "--locale" and index + 1 < len(args):
+            return args[index + 1].strip() or "fr"
+    return "fr"
+
+
+def _load_catalog_keys(root: Path, locale: str) -> "set[str] | None":
+    """Clés du catalogue d'une locale, ou `None` s'il est absent ou illisible."""
+    chemin = root / "translations" / f"{locale}.json"
+    if not chemin.is_file():
+        return None
+    try:
+        donnees = json.loads(chemin.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    if not isinstance(donnees, dict):
+        return None
+    # `json.loads` rend un objet non typé : la vue typée évite que les clés
+    # remontent en `Unknown` jusqu'à `str()`.
+    catalogue = cast("dict[str, Any]", donnees)
+    return {str(cle) for cle in catalogue}
+
+
 def main(args: list[str]) -> None:
     command = args[0] if args else ""
     if command == "i18n:init":
         cmd_i18n_init(args)
     elif command == "i18n:check":
         result = cmd_i18n_check(args)
+        if result != 0:
+            sys.exit(result)
+    elif command == "i18n:extract":
+        result = cmd_i18n_extract(args)
         if result != 0:
             sys.exit(result)
     else:

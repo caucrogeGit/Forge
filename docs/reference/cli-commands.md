@@ -154,8 +154,10 @@ Choix du moteur (SQLite, MariaDB, PostgreSQL, SQL Server) : [Bases de données](
 | `forge images:init` | copie la migration de la table `media` vers `mvc/migrations/` puis `forge migration:apply` (opt-in images) | opt-in `forge-mvc-images` |
 | `forge images:orphans` | liste les variantes sans original ou issues d'un préréglage retiré, affiche seulement ; `--delete` supprime | opt-in `forge-mvc-images` |
 | `forge js:init` | installe HTMX / Alpine.js | [front](../cli-assets/front.md) |
+| `forge qrcode:make` | produit un QR Code PNG ou SVG ; affiche seulement, `--out` écrit et n'écrase jamais | opt-in `forge-mvc-qrcode` |
 | `forge i18n:init` | initialise les catalogues d'i18n (opt-in i18n) | [i18n](../cli-assets/i18n.md) |
 | `forge i18n:check` | vérifie les catalogues d'i18n | [i18n](../cli-assets/i18n.md) |
+| `forge i18n:extract` | liste les clés employées dans les gabarits et celles qui manquent au catalogue (lecture seule) | [i18n](../cli-assets/i18n.md) |
 
 ## Schémas, documentation, agent IA
 
