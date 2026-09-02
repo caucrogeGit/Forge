@@ -4,6 +4,25 @@
 
 ### Ajouté
 
+- **L'API IoT ne donne plus tous les sites à qui en veut un (`IOT-DEVICE-AUTH-001`).**
+  Elle était protégée par **un** jeton, `FORGE_IOT_API_TOKEN`, qui ouvrait toutes les mesures de tous les sites. Un prestataire chargé des capteurs d'un bâtiment recevait ce jeton, et lisait par là les mesures des autres, sans qu'aucun mécanisme ne l'en empêche ni ne le signale.
+  Un jeton porte désormais une portée, globale, un site, ou un seul équipement d'un site. `forge iot:token` les crée, les liste et les révoque. Le filtrage a lieu **en SQL** : rapatrier les mesures des autres sites pour les écarter ensuite les aurait fait passer par un processus qui n'y a pas droit.
+  **Le registre s'active en le passant à `register_iot_routes`, jamais d'office.** Le monter par défaut exigerait un jeton là où l'API était ouverte, et casserait sans le dire les déploiements existants. `FORGE_IOT_API_TOKEN` garde la portée globale, le retirer étant une rupture d'API publique que la règle C refuse.
+  Le jeton n'est **affiché qu'une fois** et n'est stocké que par son empreinte. Un simple SHA-256 y suffit, sans sel ni étirement : le jeton est engendré avec 256 bits d'entropie, contrairement à un mot de passe humain, et il n'existe donc ni dictionnaire ni table arc-en-ciel à lui opposer. La révocation pose une date et ne supprime pas la ligne.
+  Un refus de portée est un **403**, pas un 401 : un 401 ferait croire au porteur que son jeton est faux, et il le remplacerait au lieu d'en demander un dont la portée convient.
+
+- **Les relevés répondent enfin à la question qu'on leur pose (`IOT-AGGREGATES-001`).**
+  Le paquet rendait les mesures brutes et les comptait. « Quelle a été la température moyenne de la semaine, et jusqu'où est elle montée » n'avait aucune réponse, et l'application devait rapatrier toutes les mesures pour les additionner en Python, ce qui devient impraticable dès qu'un capteur relève chaque minute.
+  Deux routes et deux fonctions rendent moyenne, minimum, maximum et effectif sur une fenêtre, par site ou par équipement, en `AVG`/`MIN`/`MAX` standard écrits une fois pour les quatre backends.
+  **Une fenêtre vide ne rend pas zéro** : « le capteur n'a rien envoyé » et « le capteur a relevé zéro » sont deux faits différents, que confondre fausserait toute moyenne. Le comptage porte sur `value` et non sur `*`, une mesure sans valeur ne devant pas gonfler l'effectif d'une moyenne qu'elle n'alimente pas.
+  PostgreSQL rend `AVG` en `Decimal` là où MariaDB rend un flottant : la valeur est normalisée, sans quoi la même requête donnerait deux types selon le backend et la sérialisation JSON échouerait sur l'un des deux.
+
+- **Un contrôle d'accès applicatif peut se brancher sur la lecture (`IOT-RBAC-READ-001`).**
+  Le jeton dit ce qu'un porteur peut lire ; il ne dit rien de qui le porte ni de ce que cette personne a le droit de faire.
+  **Une prise, et non une dépendance à `forge-mvc-rbac`** : aucun opt-in n'importe un autre, et un paquet IoT qui dépendrait du RBAC obligerait à installer le RBAC pour recevoir des mesures MQTT. Un test le vérifie par `ast`.
+  **Une vérification qui échoue refuse la lecture.** Un contrôle qui lève ou qui rend autre chose qu'un booléen ne dit pas que l'accès est permis, il ne dit rien ; traiter ce silence comme une autorisation ouvrirait tout le jour où le service de permissions tombe. L'incident est journalisé pour l'exploitant.
+  Plusieurs contrôles cohabitent, tous doivent accepter, et le premier refus arrête la série. Sans contrôle branché, rien ne change : le paquet n'invente pas une politique que personne n'a demandée. La liste des actions est fermée, de sorte qu'un contrôle branché sache exactement ce qu'il peut recevoir.
+
 - **Les métadonnées d'un fichier audio sont enfin lisibles (`AUDIO-ID3-001`).**
   `ffprobe` les rendait déjà, le paquet les jetait : le sondage lisait la durée, le codec et le débit, et laissait tomber le titre, l'artiste et l'album. Une application devait rappeler `ffprobe` elle même pour afficher le nom d'un morceau qu'elle venait de recevoir. `probe_audio(...).tags` les porte, et n'est jamais `None`.
   **Le vrai sujet du ticket est le nettoyage.** Une étiquette vient du fichier envoyé, elle est écrite par qui l'a produit, et elle finit affichée dans une page. Les caractères de contrôle sont retirés, y compris `U+2028` que `str.strip` laisse passer et qui casse une chaîne JavaScript ; la longueur est bornée, rien n'empêchant un titre d'un mégaoctet ; et rien n'est interprété, l'échappement appartenant au gabarit.

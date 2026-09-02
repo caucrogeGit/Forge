@@ -25,4 +25,6 @@ COMMANDS: dict[str, dict[str, str | bool]] = {
     "iot:listen": {"module": "forge_mvc_iot.cli.listen", "config": True},
     # iot:gc compte puis supprime dans `iot_events` : connexion BDD requise.
     "iot:gc": {"module": "forge_mvc_iot.cli.gc", "config": True},
+    # iot:token écrit et lit la table des jetons : connexion BDD requise.
+    "iot:token": {"module": "forge_mvc_iot.cli.token", "config": True},
 }

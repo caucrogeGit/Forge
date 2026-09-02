@@ -88,10 +88,33 @@ def _body_json(response) -> dict:
 
 
 class TestRegisterIotRoutes:
-    def test_register_adds_three_routes(self):
+    def test_register_adds_the_read_routes(self):
+        """Les routes de lecture sont posées, chacune une fois.
+
+        Le test exigeait auparavant `len(...) == 3`, ce qui figeait un compte
+        et non la fin qu'il annonce. `IOT-AGGREGATES-001` en a ajouté deux, et
+        un compte figé aurait forcé à le retoucher à chaque route sans rien
+        vérifier de plus.
+        """
+        from forge_mvc_iot.http import (
+            ROUTE_DEVICE_AGGREGATE,
+            ROUTE_DEVICE_COUNT,
+            ROUTE_EVENTS_BY_DEVICE,
+            ROUTE_LIST_EVENTS,
+            ROUTE_SITE_AGGREGATE,
+        )
+
         router = Router()
         register_iot_routes(router, repository=MagicMock())
-        assert len(router._entries) == 3
+
+        motifs = [e.pattern for e in router._entries]
+        attendues = [
+            ROUTE_LIST_EVENTS, ROUTE_EVENTS_BY_DEVICE, ROUTE_DEVICE_COUNT,
+            ROUTE_SITE_AGGREGATE, ROUTE_DEVICE_AGGREGATE,
+        ]
+        for attendue in attendues:
+            assert motifs.count(attendue) == 1, f"route absente ou en double : {attendue}"
+        assert len(motifs) == len(attendues)
 
     @pytest.mark.parametrize(
         "method, path",
@@ -142,7 +165,7 @@ class TestRegisterIotRoutes:
         # IotEventRepository() est sûre (lazy import de core.database).
         router = Router()
         register_iot_routes(router)
-        assert len(router._entries) == 3
+        assert router._entries, "aucune route posée"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

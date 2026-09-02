@@ -360,6 +360,121 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-iot` : la dépendance va de l'opt-in vers le cœur.
 
+??? note "12. Jetons par site ou par équipement"
+
+    L'API de lecture était protégée par **un** jeton, `FORGE_IOT_API_TOKEN`, qui donnait accès à toutes les mesures de tous les sites (`IOT-DEVICE-AUTH-001`).
+
+    Un prestataire chargé des capteurs d'un bâtiment recevait ce jeton, et lisait par là les mesures des autres bâtiments, sans qu'aucun mécanisme ne l'en empêche ni ne le signale.
+
+    | Portée | Ce qu'elle ouvre |
+    |---|---|
+    | globale | toutes les mesures, tous les sites |
+    | site | toutes les mesures d'un site |
+    | équipement | les mesures d'un seul équipement d'un site |
+
+    ```bash
+    forge iot:init && forge migration:apply
+    forge iot:token create --site batimentA --label "prestataire CVC"
+    forge iot:token list
+    forge iot:token revoke 3
+    ```
+
+    !!! danger "Le registre s'active en le passant, jamais d'office"
+        ```python
+        from forge_mvc_iot import IotTokenRepository, register_iot_routes
+
+        register_iot_routes(router, token_repository=IotTokenRepository())
+        ```
+
+        Le monter par défaut exigerait un jeton là où l'API était ouverte, et casserait sans le dire les déploiements existants. Le principe 3 veut que ce changement soit demandé, pas deviné.
+
+        Sans registre, le comportement est exactement celui d'avant : le jeton d'environnement suffit, et son absence laisse l'API ouverte, ce que `register_iot_routes` refuse déjà en production.
+
+    !!! warning "`FORGE_IOT_API_TOKEN` garde la portée globale"
+        Le retirer serait une rupture d'API publique hors release majeure, que la règle C de la charte refuse.
+
+        Préférez un jeton de site pour tout ce qui n'a pas besoin de tout voir.
+
+    !!! info "Le jeton n'est affiché qu'une fois"
+        Seule son empreinte SHA-256 est stockée. Le perdre oblige à en créer un autre, ce qui est le prix à payer pour qu'aucun secret ne dorme en clair dans la base.
+
+        Un simple SHA-256 suffit ici, sans sel ni étirement : le jeton est engendré par Forge avec 256 bits d'entropie, contrairement à un mot de passe choisi par un humain, et il n'existe donc ni dictionnaire ni table arc-en-ciel à lui opposer. C'est la pratique établie pour les jetons d'API, et elle diffère de celle des mots de passe pour cette raison précise.
+
+    !!! info "Un refus de portée est un 403, pas un 401"
+        Un 401 ferait croire au porteur que son jeton est faux, et il le remplacerait au lieu d'en demander un dont la portée convient.
+
+    Le filtrage a lieu **en SQL**. Rapatrier les mesures des autres sites pour les écarter ensuite les aurait fait passer par un processus qui n'y a pas droit.
+
+    La révocation pose une date et ne supprime pas la ligne : savoir qu'un jeton a existé, et quand il a cessé de valoir, fait partie de ce qu'un exploitant doit pouvoir retrouver.
+
+??? note "13. Moyenne, minimum et maximum sur une fenêtre"
+
+    Le paquet rendait les mesures brutes et les comptait. La question qu'on pose à des relevés de capteurs n'avait aucune réponse (`IOT-AGGREGATES-001`) : « quelle a été la température moyenne de la semaine, et jusqu'où est elle montée ».
+
+    L'application devait rapatrier toutes les mesures pour les additionner en Python, ce qui charge en mémoire ce que la base sait faire sans rien déplacer, et devient impraticable dès qu'un capteur relève chaque minute.
+
+    ```
+    GET /api/iot/sites/batimentA/aggregate/temperature?hours=168
+    GET /api/iot/devices/batimentA/capteur-01/aggregate/temperature
+    ```
+
+    ```python
+    from forge_mvc_iot import aggregate_for_device
+
+    agregat = aggregate_for_device("batimentA", "capteur-01", "temperature", hours=24)
+    agregat.average, agregat.minimum, agregat.maximum, agregat.count
+    ```
+
+    !!! warning "Une fenêtre vide ne rend pas zéro"
+        `count` vaut zéro et les trois autres valent `None`.
+
+        « Le capteur n'a rien envoyé » et « le capteur a relevé zéro » sont deux faits différents, que confondre fausserait toute moyenne.
+
+    !!! info "La moyenne d'un site pèse par mesure, pas par équipement"
+        C'est le comportement d'un `AVG` SQL : un capteur qui relève dix fois plus souvent pèse dix fois plus.
+
+        Le dire vaut mieux que de le laisser supposer.
+
+    !!! info "Ce que le module ne fait pas"
+        Il ne **regroupe pas par intervalle**. Une série par tranches de cinq minutes demande des fonctions de fenêtrage que les quatre backends n'écrivent pas de la même façon, et le principe 5 veut du SQL visible plutôt qu'un générateur masquant quatre dialectes.
+
+        Il n'**interpole** rien non plus.
+
+    Le comptage porte sur `value` et non sur `*` : une mesure sans valeur ne doit pas gonfler l'effectif d'une moyenne qu'elle n'alimente pas. La fenêtre est bornée à un an, au delà la question relevant d'un export.
+
+    PostgreSQL rend `AVG` en `Decimal`, MariaDB en flottant : la valeur est ramenée en flottant, sans quoi la même requête donnerait deux types selon le backend et la sérialisation JSON échouerait sur l'un des deux.
+
+??? note "14. Brancher un contrôle d'accès applicatif"
+
+    Le jeton dit **ce qu'un porteur peut lire**. Il ne dit rien de **qui** le porte, ni de ce que cette personne a le droit de faire dans l'application (`IOT-RBAC-READ-001`).
+
+    Une console interne où un opérateur consulte les relevés a besoin des deux.
+
+    ```python
+    from forge_mvc_iot import ACTION_READ_EVENTS, register_iot_permission_check
+
+    def controle(request, scope, action):
+        return has_permission(request, "iot.read")   # votre RBAC
+
+    register_iot_permission_check(controle)
+    ```
+
+    !!! info "Une prise, et non une dépendance à `forge-mvc-rbac`"
+        Aucun opt-in Forge n'importe un autre opt-in, et un garde-fou le vérifie.
+
+        Un paquet IoT qui dépendrait du RBAC obligerait à installer le RBAC pour recevoir des mesures MQTT, ce que le principe 8 refuse.
+
+    !!! danger "Une vérification qui échoue refuse la lecture"
+        Un contrôle qui lève, ou qui rend autre chose qu'un booléen, ne dit **pas** que l'accès est permis, il ne dit rien.
+
+        Traiter ce silence comme une autorisation est la faute classique de ce genre de branchement : le jour où le service de permissions tombe, tout s'ouvre, et rien ne le signale. L'incident est journalisé pour l'exploitant.
+
+    Plusieurs contrôles peuvent cohabiter : tous doivent accepter, et le premier refus arrête la série. Une politique d'accès s'ajoute, elle ne se remplace pas.
+
+    Sans contrôle branché, seule la portée du jeton s'applique : le paquet n'invente pas une politique que personne n'a demandée.
+
+    La liste des actions est **fermée**, `iot.read_events` et `iot.read_aggregates` : un contrôle branché sait ainsi exactement ce qu'il peut recevoir, et une action inconnue lève au lieu de passer.
+
 ## Voir aussi
 
 - [Configuration (config.py)](references/config.md) : `IotConfig`, MQTT.

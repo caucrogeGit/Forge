@@ -70,12 +70,18 @@ class TestResourcesIteration:
         """
         from core.database.backend import get_backend
         from core.database.table_ddl import render_create_table
-        from forge_mvc_iot.tables import IOT_EVENTS
+        from forge_mvc_iot.tables import MIGRATIONS
 
+        # Chaque ressource est rapprochee de SA declaration. Le test comparait
+        # toutes les ressources au DDL de `iot_events`, ce qui ne tenait que
+        # tant qu'il n'y en avait qu'une (IOT-DEVICE-AUTH-001 en a ajoute une).
         items = dict(iter_iot_migration_resources())
-        rendered = chr(10).join(render_create_table(IOT_EVENTS, get_backend().dialect))
-        for _name, content in items.items():
-            assert rendered in content.decode("utf-8")
+        dialect = get_backend().dialect
+
+        assert set(items) == {fichier for fichier, _ in MIGRATIONS}
+        for fichier, table in MIGRATIONS:
+            rendered = chr(10).join(render_create_table(table, dialect))
+            assert rendered in items[fichier].decode("utf-8")
 
 
 # ── Cas normal — copie ─────────────────────────────────────────────────────
@@ -176,10 +182,17 @@ class TestNoSilentOverwrite:
         # suggestion forge migration:apply reste pertinente seulement
         # si on a au moins une migration identique ou nouvellement
         # copiée. Ici, ni l'un ni l'autre → pas de suggestion.
+        from forge_mvc_iot.tables import MIGRATIONS
+
         _make_forge_project(tmp_path)
         migrations = tmp_path / "mvc" / "migrations"
         migrations.mkdir(parents=True, exist_ok=True)
-        (migrations / EXPECTED_FILENAME).write_bytes(b"-- different\n")
+        # TOUTES les migrations doivent différer : le test n'en écrivait qu'une
+        # et supposait qu'il n'y en avait pas d'autre. Depuis
+        # IOT-DEVICE-AUTH-001 la seconde était copiée, donc la suggestion
+        # restait pertinente et le test échouait à bon droit.
+        for fichier, _ in MIGRATIONS:
+            (migrations / fichier).write_bytes(b"-- different\n")
 
         init_iot_migrations(tmp_path)
         out = capsys.readouterr().out

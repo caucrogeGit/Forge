@@ -68,6 +68,29 @@ def _limit_clause() -> str:
     return get_backend().dialect.limit_clause()
 
 
+def select_iot_events_scoped_sql(*, site: bool, device: bool) -> str:
+    """`SELECT` récent, borné à un site ou à un équipement.
+
+    Sert au jeton de portée (`IOT-DEVICE-AUTH-001`) : la liste générale ne doit
+    rendre à un porteur que ce que son jeton ouvre. Filtrer après la lecture
+    aurait rapatrié les mesures des autres sites avant de les jeter, ce qui les
+    aurait fait passer par le processus qui n'y a pas droit.
+    """
+    conditions: list[str] = []
+    if site:
+        conditions.append("site = ?")
+    if device:
+        conditions.append("device_id = ?")
+    ou = f"WHERE {' AND '.join(conditions)} " if conditions else ""
+    return (
+        f"SELECT {_READ_COLUMNS_SQL} "
+        f"FROM {TABLE_NAME} "
+        f"{ou}"
+        "ORDER BY received_at DESC"
+        f"{_limit_clause()}"
+    )
+
+
 def select_iot_events_recent_sql() -> str:
     """`SELECT ... FROM iot_events ORDER BY received_at DESC` + borne du dialecte.
 
@@ -204,6 +227,34 @@ class IotEventRepository:
         """
         checked = _validate_limit(limit)
         rows = self._db.fetch_all(select_iot_events_recent_sql(), (checked,))
+        return [_row_to_event_dict(row) for row in rows]
+
+    def list_recent_scoped(
+        self,
+        *,
+        site: "str | None" = None,
+        device_id: "str | None" = None,
+        limit: int = DEFAULT_LIMIT,
+    ) -> list[dict[str, object]]:
+        """Événements récents, bornés à un site ou à un équipement.
+
+        Sans borne, se comporte comme `list_recent`. Le filtrage a lieu **en
+        SQL** : rapatrier les mesures des autres sites pour les écarter ensuite
+        les aurait fait passer par un processus qui n'y a pas droit.
+        """
+        checked = _validate_limit(limit)
+        params: list[object] = []
+        if site is not None:
+            params.append(site)
+        if device_id is not None:
+            params.append(device_id)
+        params.append(checked)
+        rows = self._db.fetch_all(
+            select_iot_events_scoped_sql(
+                site=site is not None, device=device_id is not None
+            ),
+            tuple(params),
+        )
         return [_row_to_event_dict(row) for row in rows]
 
     def find_by_device(

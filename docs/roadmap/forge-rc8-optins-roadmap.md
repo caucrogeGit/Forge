@@ -225,9 +225,9 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `IOT-DEVICE-AUTH-001` | Authentification par équipement ou par site |
-| `IOT-AGGREGATES-001` | Moyenne, minimum et maximum sur une fenêtre |
-| `IOT-RBAC-READ-001` | Contrôle d'accès optionnel sur l'API de lecture |
+| `IOT-DEVICE-AUTH-001` | **Livré.** Le jeton unique ouvrait TOUS les sites ; portées, empreintes, révocation |
+| `IOT-AGGREGATES-001` | **Livré.** En SQL, fenêtre vide distincte d'une moyenne nulle |
+| `IOT-RBAC-READ-001` | **Livré.** Prise, pas dépendance ; une vérification en panne refuse |
 
 ### 7.15 import-export
 

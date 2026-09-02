@@ -42,10 +42,21 @@ from typing import Any
 
 from core.app.env import is_prod as _is_prod
 from core.forge import get as _forge_get
-from core.http.bearer import is_bearer_authorized
+from core.http.bearer import extract_bearer_token, is_bearer_authorized
 from core.http.helpers import json_error
 from core.http.response import Response
 
+from forge_mvc_iot.access import (
+    ACTION_READ_AGGREGATES,
+    ACTION_READ_EVENTS,
+    is_read_allowed,
+)
+from forge_mvc_iot.aggregates import (
+    IotAggregateError,
+    aggregate_for_device,
+    aggregate_for_site,
+)
+from forge_mvc_iot.tokens import GLOBAL_SCOPE, IotScope, IotTokenRepository
 from forge_mvc_iot.config import IotConfig, load_iot_config
 from forge_mvc_iot.storage.repository import (
     DEFAULT_LIMIT,
@@ -59,15 +70,23 @@ __all__ = [
     "ROUTE_LIST_EVENTS",
     "ROUTE_EVENTS_BY_DEVICE",
     "ROUTE_DEVICE_COUNT",
+    "ROUTE_SITE_AGGREGATE",
+    "ROUTE_DEVICE_AGGREGATE",
 ]
 
 logger = logging.getLogger(__name__)
 
 # ── Constantes de route ─────────────────────────────────────────────────────
 
+#: Fenêtre d'agrégat par défaut, en heures.
+DEFAULT_WINDOW_HOURS = 24
+
 ROUTE_LIST_EVENTS = "/api/iot/events"
 ROUTE_EVENTS_BY_DEVICE = "/api/iot/events/{site}/{device_id}"
 ROUTE_DEVICE_COUNT = "/api/iot/devices/{site}/{device_id}/count"
+#: Agrégats sur une fenêtre (IOT-AGGREGATES-001).
+ROUTE_SITE_AGGREGATE = "/api/iot/sites/{site}/aggregate/{kind}"
+ROUTE_DEVICE_AGGREGATE = "/api/iot/devices/{site}/{device_id}/aggregate/{kind}"
 
 # Codes d'erreur HTTP exposés dans le JSON — taxonomie stable.
 ERROR_INVALID_LIMIT = "invalid_limit"
@@ -171,6 +190,16 @@ def _internal_error_response() -> Response:
     return json_error(ERROR_INTERNAL, 500)
 
 
+def _forbidden_response() -> Response:
+    """Le jeton est valide mais n'ouvre pas ce qui est demandé.
+
+    Distinct du 401 : renvoyer 401 ferait croire au porteur que son jeton est
+    faux, et il le remplacerait au lieu d'en demander un dont la portée
+    convient. Le 403 ne dit pas davantage ce qui existe.
+    """
+    return json_error("forbidden", 403)
+
+
 def _unauthorized_response() -> Response:
     # Réponse sobre : on n'indique jamais si c'est le header, le schéma ou
     # le token qui est en cause, et on ne renvoie évidemment pas le token.
@@ -192,19 +221,73 @@ class IotHttpController:
         repository: IotEventRepository,
         *,
         api_token: str | None = None,
+        token_repository: "IotTokenRepository | None" = None,
     ) -> None:
         self._repo = repository
         self._api_token = api_token
+        self._tokens = token_repository
+
+    def _scope(self, request: Any) -> "IotScope | None":
+        """Portée du porteur, ou `None` s'il n'est pas autorisé.
+
+        **Sans registre de jetons, le comportement est celui d'avant
+        `IOT-DEVICE-AUTH-001`** : le jeton d'environnement suffit, et son
+        absence laisse l'API ouverte, ce que `register_iot_routes` refuse déjà
+        en production.
+
+        Le registre s'active en le passant à `register_iot_routes`. Il n'est
+        pas monté d'office : le monter exigerait un jeton là où l'API était
+        ouverte, et casserait sans le dire les déploiements existants. Le
+        principe 3 veut que ce changement soit demandé, pas deviné.
+
+        Une fois le registre actif, l'ordre est le suivant. Le jeton
+        d'environnement, s'il est défini, donne la portée **globale** : le
+        retirer serait une rupture d'API publique. Sinon le jeton présenté est
+        cherché dans la table, et donne la portée qu'il déclare.
+        """
+        if self._api_token is not None and is_bearer_authorized(request, self._api_token):
+            return GLOBAL_SCOPE
+
+        if self._tokens is None:
+            # Chemin historique : ouvert si aucun jeton n'est configuré.
+            if self._api_token is None:
+                return GLOBAL_SCOPE
+            return None
+
+        presente = extract_bearer_token(request)
+        if not presente:
+            return None
+        try:
+            return self._tokens.resolve(presente)
+        except Exception:
+            logger.exception("Forge IoT — erreur DB sur la résolution du jeton")
+            return None
 
     def list_events(self, request: Any) -> Response:
-        if not is_bearer_authorized(request, self._api_token):
+        portee = self._scope(request)
+        if portee is None:
             return _unauthorized_response()
+        if not is_read_allowed(request, portee, ACTION_READ_EVENTS):
+            return _forbidden_response()
         try:
             limit = _parse_limit(request)
         except _BadLimit as exc:
             return _bad_limit_response(exc)
         try:
-            events = self._repo.list_recent(limit=limit)
+            if portee.is_global:
+                # Chemin inchangé pour une portée globale. Un dépôt fourni par
+                # l'application et écrit avant `IOT-DEVICE-AUTH-001` n'expose
+                # pas `list_recent_scoped` : lui imposer la nouvelle méthode
+                # serait une rupture d'API publique hors release majeure, que
+                # la règle C de la charte refuse.
+                events = self._repo.list_recent(limit=limit)
+            else:
+                # Le filtre est posé en SQL : rapatrier les mesures des autres
+                # sites pour les écarter ensuite les ferait passer par un
+                # processus qui n'y a pas droit.
+                events = self._repo.list_recent_scoped(
+                    site=portee.site, device_id=portee.device_id, limit=limit
+                )
         except Exception:
             logger.exception("Forge IoT — erreur DB sur list_recent")
             return _internal_error_response()
@@ -213,10 +296,15 @@ class IotHttpController:
         )
 
     def find_by_device(self, request: Any) -> Response:
-        if not is_bearer_authorized(request, self._api_token):
+        portee = self._scope(request)
+        if portee is None:
             return _unauthorized_response()
         site = request.route("site")
         device_id = request.route("device_id")
+        if not portee.allows(site, device_id):
+            return _forbidden_response()
+        if not is_read_allowed(request, portee, ACTION_READ_EVENTS):
+            return _forbidden_response()
         try:
             limit = _parse_limit(request)
         except _BadLimit as exc:
@@ -234,10 +322,15 @@ class IotHttpController:
         )
 
     def count_by_device(self, request: Any) -> Response:
-        if not is_bearer_authorized(request, self._api_token):
+        portee = self._scope(request)
+        if portee is None:
             return _unauthorized_response()
         site = request.route("site")
         device_id = request.route("device_id")
+        if not portee.allows(site, device_id):
+            return _forbidden_response()
+        if not is_read_allowed(request, portee, ACTION_READ_EVENTS):
+            return _forbidden_response()
         try:
             count = self._repo.count_by_device(site, device_id)
         except Exception:
@@ -251,6 +344,50 @@ class IotHttpController:
         )
 
 
+    def _aggregate(self, request: Any, *, by_device: bool) -> Response:
+        """Agrégat sur une fenêtre, pour un site ou un équipement."""
+        portee = self._scope(request)
+        if portee is None:
+            return _unauthorized_response()
+        site = request.route("site")
+        device_id = request.route("device_id") if by_device else None
+        if not portee.allows(site, device_id):
+            return _forbidden_response()
+        if not is_read_allowed(request, portee, ACTION_READ_AGGREGATES):
+            return _forbidden_response()
+
+        kind = request.route("kind")
+        brut = request.query("hours", None) if hasattr(request, "query") else None
+        try:
+            heures = int(str(brut)) if brut not in (None, "") else DEFAULT_WINDOW_HOURS
+        except (TypeError, ValueError):
+            return json_error("invalid_hours", 400)
+
+        try:
+            if by_device:
+                agregat = aggregate_for_device(site, device_id or "", kind, hours=heures)
+            else:
+                agregat = aggregate_for_site(site, kind, hours=heures)
+        except IotAggregateError as exc:
+            return json_error(str(exc), 400)
+        except Exception:
+            logger.exception("Forge IoT — erreur DB sur l'agrégat")
+            return _internal_error_response()
+
+        charge: dict[str, Any] = {
+            "site": site, "kind": kind, "hours": heures, **agregat.as_dict(),
+        }
+        if by_device:
+            charge["device_id"] = device_id
+        return Response.json(charge)
+
+    def site_aggregate(self, request: Any) -> Response:
+        return self._aggregate(request, by_device=False)
+
+    def device_aggregate(self, request: Any) -> Response:
+        return self._aggregate(request, by_device=True)
+
+
 # ── Point d'entrée public ───────────────────────────────────────────────────
 
 
@@ -259,6 +396,7 @@ def register_iot_routes(
     *,
     repository: IotEventRepository | None = None,
     config: IotConfig | None = None,
+    token_repository: "IotTokenRepository | None" = None,
 ) -> None:
     """Enregistre les routes Forge IoT sur un ``Router`` Forge.
 
@@ -303,7 +441,16 @@ def register_iot_routes(
             "environnement de développement (le mode ouvert est local/pédagogique)."
         )
 
-    controller = IotHttpController(repository, api_token=config.api_token)
+    # IOT-DEVICE-AUTH-001 : le registre de jetons s'active en le passant ici,
+    # jamais d'office. Le monter par défaut exigerait un jeton là où l'API
+    # était ouverte, et casserait sans le dire les déploiements existants.
+    #
+    #     register_iot_routes(router, token_repository=IotTokenRepository())
+    #
+    # Un projet qui ne le passe pas garde exactement le comportement d'avant.
+    controller = IotHttpController(
+        repository, api_token=config.api_token, token_repository=token_repository
+    )
 
     router.add(
         "GET", ROUTE_LIST_EVENTS, controller.list_events,
@@ -318,5 +465,15 @@ def register_iot_routes(
     router.add(
         "GET", ROUTE_DEVICE_COUNT, controller.count_by_device,
         name="iot_devices_count",
+        public=True, csrf=False, api=True,
+    )
+    router.add(
+        "GET", ROUTE_SITE_AGGREGATE, controller.site_aggregate,
+        name="iot_site_aggregate",
+        public=True, csrf=False, api=True,
+    )
+    router.add(
+        "GET", ROUTE_DEVICE_AGGREGATE, controller.device_aggregate,
+        name="iot_device_aggregate",
         public=True, csrf=False, api=True,
     )

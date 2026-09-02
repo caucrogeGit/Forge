@@ -72,6 +72,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "mail:init", "mail:test", "mail:render", "mail:doctor", "mail:logs",
     # IoT (module opt-in forge-mvc-iot)
     "iot:doctor", "iot:init", "iot:simulate", "iot:listen", "iot:gc",
+    # iot:token gère les jetons de portée (IOT-DEVICE-AUTH-001).
+    "iot:token",
     # Vidéo (module opt-in forge-mvc-video)
     "video:doctor", "video:init", "video:upload", "video:process", "video:cleanup",
     # Audio (module opt-in forge-mvc-audio)

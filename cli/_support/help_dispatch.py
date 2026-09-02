@@ -159,6 +159,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "audit:init":         "Prépare le journal d'audit applicatif (forge-mvc-audit).",
     "audit:gc":           "Purge le journal d'audit par âge (affiche ; --run exécute).",
     "iot:gc":             "Purge les mesures IoT par âge (affiche ; --run exécute).",
+    "iot:token":        "Crée, liste et révoque les jetons de lecture IoT (portée par site ou équipement).",
     "jobs:init":          "Prépare la file de tâches de fond (forge-mvc-jobs).",
     "jobs:reclaim":       "Reprend les tâches orphelines d'un worker planté.",
     "jobs:status":        "Affiche l'état des files de tâches (lecture seule).",
@@ -405,6 +406,33 @@ Limites :
   plus proche, à quelques dixièmes de seconde près.
   La sortie ne peut pas être la source : ffmpeg lit et écrit en même
   temps, et le fichier serait tronqué.
+""",
+    "iot:token": """\
+Usage :
+  forge iot:token create [--site SITE] [--device ID] [--label TEXTE]
+  forge iot:token list
+  forge iot:token revoke ID
+
+Description :
+  Gère les jetons de lecture de l'API IoT. Un jeton porte une portée :
+  globale, un site, ou un seul équipement d'un site.
+
+Effets :
+  create écrit une ligne et AFFICHE le jeton une seule fois.
+  revoke pose une date de révocation ; la ligne est conservée.
+
+Prérequis :
+  forge iot:init puis forge migration:apply, pour la table iot_api_tokens.
+
+Options :
+  --site SITE     borne le jeton à un site
+  --device ID     borne le jeton à un équipement (exige --site)
+  --label TEXTE   à quoi sert ce jeton, pour savoir lequel révoquer
+
+Limites :
+  Le jeton n'est jamais stocké en clair et n'est affiché qu'à sa
+  création : le perdre oblige à en créer un autre.
+  FORGE_IOT_API_TOKEN garde la portée globale, tous sites confondus.
 """,
     "jobs:status": """\
 Usage:

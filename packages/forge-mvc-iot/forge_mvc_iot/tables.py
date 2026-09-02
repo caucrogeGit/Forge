@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from core.database.table_ddl import Column, Index, TableDefinition
 
-__all__ = ["IOT_EVENTS", "MIGRATIONS"]
+__all__ = ["IOT_EVENTS", "IOT_API_TOKENS", "MIGRATIONS"]
 
 IOT_EVENTS = TableDefinition(
     name="iot_events",
@@ -38,7 +38,35 @@ IOT_EVENTS = TableDefinition(
     ],
 )
 
+# IOT-DEVICE-AUTH-001 : jetons d'accès par site ou par équipement. L'API de
+# lecture n'avait qu'un jeton d'environnement, qui ouvrait TOUS les sites : un
+# prestataire chargé des capteurs d'un bâtiment lisait par là les mesures des
+# autres.
+IOT_API_TOKENS = TableDefinition(
+    name="iot_api_tokens",
+    columns=[
+        Column("id", "identity"),
+        # Empreinte SHA-256 hexadécimale. Le jeton n'est JAMAIS stocké en clair
+        # et n'est affiché qu'une fois, à sa création.
+        Column("token_hash", "char", length=64, unique=True),
+        # `NULL` désigne la portée globale, tous sites confondus.
+        Column("site", "string", length=64, nullable=True),
+        # `NULL` avec un site désigne le site entier.
+        Column("device_id", "string", length=64, nullable=True),
+        # À quoi sert ce jeton, pour que l'exploitant sache lequel révoquer.
+        Column("label", "string", length=120, nullable=True),
+        Column("created_at", "datetime"),
+        # Révocation par date et non par suppression : savoir qu'un jeton a
+        # existé, et quand il a cessé de valoir, fait partie de ce qu'un
+        # exploitant doit pouvoir retrouver.
+        Column("revoked_at", "datetime", nullable=True),
+    ],
+    primary_key=["id"],
+    indexes=[Index("idx_iot_api_tokens_site", ("site", "device_id"))],
+)
+
 #: Migrations livrées par le paquet : (nom de fichier, table décrite).
 MIGRATIONS: list[tuple[str, TableDefinition]] = [
     ("20260528120000_create_iot_events.sql", IOT_EVENTS),
+    ("20260902110000_create_iot_api_tokens.sql", IOT_API_TOKENS),
 ]

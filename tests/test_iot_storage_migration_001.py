@@ -63,10 +63,20 @@ class TestMigrationFile:
         assert not MIGRATIONS_DIR.exists(), "plus de .sql fige (OPTIN-DDL-IOT-001)"
         assert MIGRATIONS[0][0] == EXPECTED_FILENAME
 
-    def test_une_seule_migration_iot_events(self):
-        from forge_mvc_iot.tables import MIGRATIONS
+    def test_iot_events_est_declaree_une_fois(self):
+        """Le test exigeait `len(MIGRATIONS) == 1`, ce qui figeait un compte.
 
-        assert len(MIGRATIONS) == 1
+        `IOT-DEVICE-AUTH-001` a ajouté `iot_api_tokens`. Ce qui compte est que
+        chaque table soit décrite une fois et une seule : deux migrations pour
+        la même table s'appliqueraient deux fois.
+        """
+        from forge_mvc_iot.tables import IOT_EVENTS, MIGRATIONS
+
+        noms = [table.name for _, table in MIGRATIONS]
+
+        assert noms.count(IOT_EVENTS.name) == 1
+        assert len(noms) == len(set(noms))
+        assert len({fichier for fichier, _ in MIGRATIONS}) == len(MIGRATIONS)
 
 
 # ── DDL — squelette ────────────────────────────────────────────────────────
