@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from core.database.table_ddl import Column, Index, TableDefinition, UniqueConstraint
 
-__all__ = ["VIDEOS", "MIGRATIONS"]
+__all__ = ["VIDEOS", "VIDEO_SUBTITLES", "MIGRATIONS"]
 
 VIDEOS = TableDefinition(
     name="videos",
@@ -41,7 +41,39 @@ VIDEOS = TableDefinition(
     indexes=[Index("idx_videos_status", "status")],
 )
 
+# VIDEO-SUBTITLES-001 : une table plutôt qu'une colonne `subtitles_path`.
+# Une vidéo porte souvent plusieurs pistes, une par langue, et une colonne
+# unique aurait forcé à en choisir une ou à sérialiser une liste dans du texte,
+# ce que le principe 5 refuse (le SQL doit rester lisible et interrogeable).
+VIDEO_SUBTITLES = TableDefinition(
+    name="video_subtitles",
+    columns=[
+        Column("id", "identity"),
+        Column("video_id", "integer"),
+        # Étiquette de langue BCP 47, « fr », « en-GB ». Bornée court : elle
+        # part dans l'attribut srclang d'une balise track.
+        Column("lang", "string", length=35),
+        # Ce que le lecteur affiche dans son menu de pistes.
+        Column("label", "string", length=120, nullable=True),
+        Column("path", "string", length=500),
+        # Piste proposée par défaut par le lecteur. Une seule par vidéo, ce que
+        # l'application fait respecter : la base ne peut pas exprimer
+        # « au plus un vrai par video_id » de façon portable sur les quatre
+        # backends, un index partiel n'existant pas partout.
+        Column("is_default", "boolean", default=False),
+        Column("created_at", "datetime", default_now=True),
+    ],
+    primary_key=["id"],
+    unique_constraints=[
+        # Deux pistes de même langue pour une vidéo désigneraient la même entrée
+        # dans le menu du lecteur.
+        UniqueConstraint("uq_video_subtitles_lang", ("video_id", "lang")),
+    ],
+    indexes=[Index("idx_video_subtitles_video", "video_id")],
+)
+
 #: Migrations livrées par le paquet : (nom de fichier, table décrite).
 MIGRATIONS: list[tuple[str, TableDefinition]] = [
     ("20260601120000_create_videos.sql", VIDEOS),
+    ("20260902100000_create_video_subtitles.sql", VIDEO_SUBTITLES),
 ]

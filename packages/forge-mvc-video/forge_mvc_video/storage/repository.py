@@ -28,6 +28,7 @@ __all__ = [
     "VALID_STATUSES",
     "DbAdapter",
     "VideoRepository",
+    "SUBTITLES_TABLE",
 ]
 
 TABLE = "videos"
@@ -70,6 +71,34 @@ _MARK_READY_SQL = (
 )
 _DELETE_SQL = "DELETE FROM videos WHERE id = ?"
 _SELECT_ALL_PATHS_SQL = "SELECT original_path, mp4_path, poster_path FROM videos"
+
+# VIDEO-QUOTA-001 : totaux de la vidéothèque. `COALESCE` parce qu'une table
+# vide rend NULL et non zéro sur les quatre backends, et qu'un NULL propagé
+# ferait passer le premier envoi pour un dépassement.
+_SELECT_TOTALS_SQL = (
+    "SELECT COUNT(*) AS videos, "
+    "COALESCE(SUM(size_bytes), 0) AS total_bytes, "
+    "COALESCE(SUM(duration_seconds), 0) AS total_duration "
+    "FROM videos"
+)
+
+# VIDEO-SUBTITLES-001
+SUBTITLES_TABLE = "video_subtitles"
+_INSERT_SUBTITLE_SQL = (
+    "INSERT INTO video_subtitles (video_id, lang, label, path, is_default, created_at) "
+    "VALUES (?, ?, ?, ?, ?, ?)"
+)
+_SELECT_SUBTITLES_SQL = (
+    "SELECT id, video_id, lang, label, path, is_default, created_at "
+    "FROM video_subtitles WHERE video_id = ? ORDER BY lang"
+)
+_SELECT_SUBTITLE_SQL = (
+    "SELECT id, video_id, lang, label, path, is_default, created_at "
+    "FROM video_subtitles WHERE video_id = ? AND lang = ?"
+)
+_DELETE_SUBTITLE_SQL = "DELETE FROM video_subtitles WHERE video_id = ? AND lang = ?"
+_DELETE_SUBTITLES_SQL = "DELETE FROM video_subtitles WHERE video_id = ?"
+_CLEAR_DEFAULT_SQL = "UPDATE video_subtitles SET is_default = ? WHERE video_id = ?"
 
 
 def _limit_clause() -> str:
@@ -203,6 +232,60 @@ class VideoRepository:
     def delete(self, video_id: int) -> None:
         """Supprime une ligne ``videos`` (utilisé par ``video:cleanup``)."""
         self._db.execute(_DELETE_SQL, (int(video_id),))
+
+    def totals(self) -> "dict[str, int]":
+        """Nombre de vidéos, octets et secondes cumulés (`VIDEO-QUOTA-001`).
+
+        La durée n'est connue qu'après le sondage : une vidéo envoyée mais pas
+        encore traitée compte pour zéro seconde, et pour sa taille entière.
+        """
+        row = self._db.fetch_one(_SELECT_TOTALS_SQL, ())
+        if row is None:
+            return {"videos": 0, "total_bytes": 0, "total_duration": 0}
+        return {
+            "videos": int(row.get("videos") or 0),
+            "total_bytes": int(row.get("total_bytes") or 0),
+            "total_duration": int(row.get("total_duration") or 0),
+        }
+
+    # --- Sous-titres (VIDEO-SUBTITLES-001) ---------------------------------
+
+    def add_subtitle(
+        self,
+        video_id: int,
+        *,
+        lang: str,
+        path: str,
+        label: "str | None" = None,
+        is_default: bool = False,
+        now: "datetime | None" = None,
+    ) -> int:
+        """Enregistre une piste. Une seule peut être la piste par défaut.
+
+        Poser une nouvelle piste par défaut retire le drapeau des autres : deux
+        pistes par défaut laisseraient le lecteur en choisir une, et laquelle
+        dépendrait du navigateur.
+        """
+        moment = now or _utcnow()
+        if is_default:
+            self._db.execute(_CLEAR_DEFAULT_SQL, (False, video_id))
+        return self._db.insert(
+            _INSERT_SUBTITLE_SQL,
+            (video_id, lang, label, path, is_default, moment),
+        )
+
+    def list_subtitles(self, video_id: int) -> "list[dict[str, Any]]":
+        return self._db.fetch_all(_SELECT_SUBTITLES_SQL, (video_id,))
+
+    def get_subtitle(self, video_id: int, lang: str) -> "dict[str, Any] | None":
+        return self._db.fetch_one(_SELECT_SUBTITLE_SQL, (video_id, lang))
+
+    def delete_subtitle(self, video_id: int, lang: str) -> None:
+        self._db.execute(_DELETE_SUBTITLE_SQL, (video_id, lang))
+
+    def delete_subtitles(self, video_id: int) -> None:
+        """Retire toutes les pistes d'une vidéo, à sa suppression."""
+        self._db.execute(_DELETE_SUBTITLES_SQL, (video_id,))
 
     def all_relpaths(self) -> set[str]:
         """Tous les chemins relatifs référencés (original/mp4/poster).

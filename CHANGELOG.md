@@ -4,6 +4,30 @@
 
 ### Ajouté
 
+- **L'état de traitement d'une vidéo est enfin montrable (`VIDEO-STATUS-UI-001`).**
+  Le paquet enregistrait quatre états sans donner de quoi les afficher : après l'envoi, la page ne savait pas dire où en était le transcodage, et chaque application réécrivait sa correspondance vers un libellé français. `describe_video_status` la fournit, et `GET /videos/{uuid}/status` la rend en JSON pour rafraîchir une page sans la recharger.
+  **La sortie d'erreur de ffmpeg ne sort jamais.** `error_message` porte le message de ffmpeg, qui contient les chemins absolus des fichiers du serveur : un gabarit qui affiche « la raison de l'échec » publierait l'arborescence.
+  `VideoStatusView` sépare `public_message`, destiné à l'écran, de `technical_detail`, destiné au journal, et `as_public_dict()` ne peut pas rendre le second. La séparation est portée par le type et non par une consigne de documentation : un gabarit ne peut pas afficher par accident un champ qui n'est pas là.
+  Un état inconnu ou une ligne absente ne lèvent pas. Une exception ici remplacerait une page dégradée par une page d'erreur, ce qui est pire pour la personne qui regarde.
+
+- **La vidéothèque entière peut être plafonnée (`VIDEO-QUOTA-001`).**
+  Les limites **par fichier** existaient déjà et fonctionnaient, taille à l'entrée et durée au sondage. Leur **somme** n'était bornée par rien : cinq cents vidéos d'une heure et de 999 Mo passent chacune le contrôle, et remplissent le disque de cinq cents gigaoctets.
+  `FORGE_VIDEO_MAX_TOTAL_MB` et `FORGE_VIDEO_MAX_TOTAL_DURATION_SECONDS` bornent les cumuls. Sans elles rien n'est plafonné, et la base n'est pas même interrogée : un déploiement sans quota ne paye pas une requête par envoi.
+  **La durée se vérifie au traitement, pas à l'envoi**, puisqu'elle n'est connue qu'après le sondage. Un dépassement fait échouer le traitement et laisse le fichier source. Sonder avant d'écrire demanderait un fichier temporaire et un appel `ffprobe` de plus par envoi, pour déplacer le problème sans le résoudre. La documentation le dit plutôt que de le laisser découvrir.
+
+- **Une vidéo peut porter des sous-titres (`VIDEO-SUBTITLES-001`).**
+  Sans eux, une vidéo est inaccessible aux personnes sourdes ou malentendantes, illisible dans un environnement bruyant, et introuvable par une recherche textuelle.
+  Une **table** plutôt qu'une colonne : une vidéo porte souvent plusieurs pistes, une par langue, et une colonne unique aurait forcé à en choisir une ou à sérialiser une liste dans du texte, ce que le principe 5 refuse.
+  **WebVTT seul**, le seul format que la balise `track` lit nativement. En accepter d'autres demanderait de convertir à la volée ou de faire porter la conversion au navigateur, qui ne sait pas la faire ; le principe 11 veut une seule façon officielle.
+  **Ce qui n'est pas du WebVTT est refusé à l'entrée**, sur la signature que la spécification exige. Sans ce contrôle, n'importe quel fichier serait stocké et servi depuis le domaine de l'application sous un nom rassurant. Le refuser à l'écriture vaut mieux que de le filtrer à chaque lecture.
+  Le chemin est bâti depuis l'UUID et l'étiquette de langue, tous deux validés : le nom du fichier envoyé n'y entre pas, et aucune traversée n'est possible. L'étiquette est normalisée en minuscules, `FR` et `fr` créant sinon deux pistes que le lecteur afficherait deux fois. La piste est servie avec la règle d'accès de la vidéo, une piste disant ce que la vidéo raconte.
+
+### Modifié
+
+- **Une valeur de configuration vidéo illisible lève, au lieu de retomber sur le défaut** (`VIDEO-QUOTA-001`).
+  `FORGE_VIDEO_MAX_DURATION_SECONDS=7200x` donnait 3600 en silence : les vidéos de deux heures étaient refusées, et rien n'expliquait pourquoi. Le paquet suit désormais `forge-mvc-files` et `forge-mvc-images`, une limite mal écrite se signalant au démarrage.
+  Un test verrouillait le comportement inverse, c'est à dire le défaut lui même ; il a été réaligné sur la règle, et non retiré.
+
 - **Les variantes d'image se déclarent, au lieu de vivre en dur (`IMAGES-PRESETS-DECLARATIFS-001`).**
   `medium` et `thumbnail` vivaient dans une constante de module accordée à la main avec deux dictionnaires littéraux : ajouter une taille demandait d'éditer le paquet en trois endroits. L'ADR-018 avait relevé la conséquence sans la corriger, « non extensible sans éditer le code ».
   `IMAGE_VARIANTS=thumbnail:300x300,banniere:1920x1080:crop` déclare les préréglages, et `variant_presets()` les **relit à chaque appel**. La constante était un instantané pris au chargement du module, aveugle à toute configuration posée ensuite : c'était la cause, elle est retirée.

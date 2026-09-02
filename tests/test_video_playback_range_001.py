@@ -71,8 +71,13 @@ def test_register_adds_playback_route(tmp_path):
         router, repository=FakeRepo(None),
         config=VideoConfig(storage_root=str(tmp_path)),
     )
-    assert len(router.routes) == 1
-    r = router.routes[0]
+    # Le test exigeait auparavant `len(router.routes) == 1`, ce qui figeait un
+    # compte et non la fin qu'il annonce : que la route de lecture soit posée
+    # avec les bons attributs. Le paquet en enregistre trois depuis
+    # VIDEO-STATUS-UI-001 et VIDEO-SUBTITLES-001.
+    lecture = [r for r in router.routes if r["pattern"] == ROUTE_PLAYBACK]
+    assert len(lecture) == 1, "la route de lecture doit être posée une fois"
+    r = lecture[0]
     assert r["method"] == "GET"
     assert r["pattern"] == ROUTE_PLAYBACK == "/videos/{uuid}"
     assert r["public"] is True and r["csrf"] is False and r["api"] is False

@@ -317,6 +317,102 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-video` : la dépendance va de l'opt-in vers le cœur.
 
+??? note "12. Montrer l'état de traitement"
+
+    Une vidéo passe par quatre états, `uploaded`, `processing`, `ready` et `failed`.
+
+    Le paquet les enregistrait sans jamais donner de quoi les montrer (`VIDEO-STATUS-UI-001`) : après l'envoi, la page ne savait pas dire où en était le transcodage, et chaque application réécrivait sa table de correspondance vers un libellé français.
+
+    ```python
+    from forge_mvc_video import describe_video_status
+
+    vue = describe_video_status(repository.get_by_uuid(uuid))
+    vue.label            # « Transcodage en cours »
+    vue.is_pending       # faut il redemander l'état ?
+    vue.public_message   # ce que le visiteur peut lire
+    ```
+
+    La route `GET /videos/{uuid}/status` rend la même chose en JSON, de quoi rafraîchir une page sans la recharger. Elle suit la règle d'accès de la lecture : protégée par le même jeton, ou ouverte comme elle.
+
+    !!! danger "La sortie d'erreur de ffmpeg ne sort jamais"
+        `error_message` porte le message de ffmpeg, qui contient les **chemins absolus** des fichiers d'entrée et de sortie.
+
+        Le rendre à un visiteur publierait l'arborescence du serveur, et un gabarit qui affiche « la raison de l'échec » le fait sans y penser.
+
+        `VideoStatusView` sépare donc `public_message`, destiné à l'écran, de `technical_detail`, destiné au journal. `as_public_dict()` ne peut pas rendre le second : la séparation est portée par le type, non par une consigne, et un gabarit ne peut pas afficher par accident un champ qui n'est pas là.
+
+    !!! info "Un état inconnu ne lève pas"
+        Une ligne absente ou un état que le paquet ne connaît pas donnent « État inconnu ».
+
+        Une exception ici remplacerait une page dégradée par une page d'erreur, ce qui est pire pour la personne qui regarde.
+
+??? note "13. Plafonner la vidéothèque entière"
+
+    Le paquet bornait déjà **un** fichier, par sa taille (`FORGE_VIDEO_MAX_UPLOAD_MB`) et par sa durée (`FORGE_VIDEO_MAX_DURATION_SECONDS`). Ces deux contrôles existaient et fonctionnaient.
+
+    Rien ne bornait leur **somme** (`VIDEO-QUOTA-001`) : cinq cents vidéos d'une heure et de 999 Mo passent chacune le contrôle, et remplissent le disque de cinq cents gigaoctets.
+
+    | Variable | Ce qu'elle borne |
+    |---|---|
+    | `FORGE_VIDEO_MAX_UPLOAD_MB` | un fichier, déjà présente |
+    | `FORGE_VIDEO_MAX_DURATION_SECONDS` | un fichier, déjà présente |
+    | `FORGE_VIDEO_MAX_TOTAL_MB` | la somme des tailles |
+    | `FORGE_VIDEO_MAX_TOTAL_DURATION_SECONDS` | la somme des durées |
+
+    Sans les deux dernières, rien n'est cumulé, et la base n'est même pas interrogée : un déploiement sans quota ne paye pas une requête par envoi.
+
+    !!! warning "La durée se vérifie au traitement, pas à l'envoi"
+        La taille est connue avant d'écrire, la durée seulement après le sondage.
+
+        Un dépassement fait donc échouer le traitement et laisse le fichier source, que l'application supprime si elle le souhaite. Sonder avant d'écrire demanderait un fichier temporaire et un appel à `ffprobe` de plus par envoi, pour déplacer le problème sans le résoudre.
+
+    !!! danger "Une valeur de configuration illisible lève"
+        `FORGE_VIDEO_MAX_DURATION_SECONDS=7200x` **interrompt** le chargement de la configuration.
+
+        Elle retombait auparavant sur le défaut en silence : les vidéos de deux heures étaient refusées, et rien n'expliquait pourquoi. Le paquet suit maintenant `forge-mvc-files` et `forge-mvc-images`.
+
+    `library_totals()` rend l'état courant sans rien refuser, de quoi afficher une jauge. Les restants valent `None` quand aucun plafond n'est déclaré, jamais zéro, qui voudrait dire le contraire.
+
+??? note "14. Associer des sous-titres"
+
+    Une vidéo sans sous-titres est inaccessible aux personnes sourdes ou malentendantes, illisible dans un environnement bruyant, et introuvable par une recherche textuelle (`VIDEO-SUBTITLES-001`).
+
+    ```python
+    from forge_mvc_video import store_subtitle
+
+    chemin = store_subtitle(donnees, video["uuid"], "fr", storage_root=config.storage_root)
+    repository.add_subtitle(video["id"], lang="fr", path=chemin,
+                            label="Français", is_default=True)
+    ```
+
+    ```html
+    <video controls src="/videos/{{ uuid }}">
+      <track kind="subtitles" srclang="fr" label="Français" default
+             src="/videos/{{ uuid }}/subtitles/fr">
+    </video>
+    ```
+
+    !!! info "Un seul format, WebVTT"
+        C'est le seul que la balise `<track>` lit nativement, sans script ni conversion.
+
+        En accepter d'autres, SRT ou ASS, demanderait de convertir à la volée ou de faire porter la conversion au navigateur, qui ne sait pas la faire. Le principe 11 veut une seule façon officielle.
+
+    !!! danger "Ce qui n'est pas du WebVTT est refusé à l'entrée"
+        Le contrôle porte sur la signature `WEBVTT`, que la spécification exige en tête de fichier.
+
+        Sans lui, n'importe quel fichier pourrait être stocké et servi depuis le domaine de l'application sous un nom rassurant. Le refuser à l'écriture vaut mieux que de le filtrer à chaque lecture : la ligne ne doit pas exister.
+
+    !!! info "Le chemin ne prend rien de l'utilisateur"
+        Il est bâti depuis l'UUID de la vidéo et l'étiquette de langue, tous deux validés.
+
+        Le nom du fichier envoyé n'entre pas dans le chemin, et aucune traversée n'est donc possible.
+
+    L'étiquette de langue est normalisée en minuscules : `FR` et `fr` créeraient sinon deux pistes que la contrainte d'unicité laisserait passer et que le lecteur afficherait deux fois. Poser une nouvelle piste par défaut retire le drapeau des autres, deux pistes par défaut laissant le navigateur choisir.
+
+    La piste est servie avec la même règle d'accès que la vidéo : une piste dit ce que la vidéo raconte, la protéger moins n'aurait pas de sens.
+
+    Ajouter la table demande `forge video:init` puis `forge migration:apply`, comme la table `videos`.
+
 ## Voir aussi
 
 - [Configuration (config.py)](references/config.md) : contrat `FORGE_VIDEO_*`.

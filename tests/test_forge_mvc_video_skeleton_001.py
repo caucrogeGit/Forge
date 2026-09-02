@@ -62,16 +62,29 @@ def test_config_defauts():
 
 
 def test_config_override_et_valeurs_invalides():
-    from forge_mvc_video.config import load_video_config
+    """Une valeur illisible LÈVE, elle ne retombe plus sur le défaut.
+
+    Ce test verrouillait le comportement inverse, qui était un défaut :
+    `FORGE_VIDEO_MAX_DURATION_SECONDS=abc` donnait 3600 en silence, les vidéos
+    de plus d'une heure étaient refusées, et rien n'expliquait pourquoi.
+
+    `VIDEO-QUOTA-001` aligne le paquet sur `forge-mvc-files` et
+    `forge-mvc-images` : une limite mal écrite se signale au démarrage.
+    """
+    import pytest
+
+    from forge_mvc_video.config import VideoConfigError, load_video_config
 
     cfg = load_video_config({
         "FORGE_VIDEO_FFMPEG_BIN": "/usr/bin/ffmpeg",
         "FORGE_VIDEO_MAX_UPLOAD_MB": "250",
-        "FORGE_VIDEO_MAX_DURATION_SECONDS": "abc",  # invalide → défaut
     })
     assert cfg.ffmpeg_bin == "/usr/bin/ffmpeg"
     assert cfg.max_upload_mb == 250
     assert cfg.max_duration_seconds == 3600
+
+    with pytest.raises(VideoConfigError, match="FORGE_VIDEO_MAX_DURATION_SECONDS"):
+        load_video_config({"FORGE_VIDEO_MAX_DURATION_SECONDS": "abc"})
 
 
 # ---------------------------------------------------------------------------

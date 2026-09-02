@@ -209,9 +209,9 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `VIDEO-STATUS-UI-001` | Restitution de l'état de traitement dans l'interface |
-| `VIDEO-QUOTA-001` | Quota de durée et de taille |
-| `VIDEO-SUBTITLES-001` | Fichier de sous-titres associé |
+| `VIDEO-STATUS-UI-001` | **Livré.** Vue d'état, route JSON ; la sortie ffmpeg ne sort jamais |
+| `VIDEO-QUOTA-001` | **Livré.** Les limites par fichier existaient ; les plafonds **cumulés** manquaient |
+| `VIDEO-SUBTITLES-001` | **Livré.** Table dédiée, WebVTT seul, signature vérifiée à l'entrée |
 
 ### 7.13 audio
 

@@ -30,13 +30,26 @@ from core.http.helpers import json_error
 from core.http.response import Response
 
 from forge_mvc_video.config import VideoConfig, load_video_config
+from forge_mvc_video.status import describe_video_status
+from forge_mvc_video.subtitles import VTT_MIME_TYPE, SubtitleError, normalize_lang
 from forge_mvc_video.storage.repository import VideoRepository
 
-__all__ = ["VideoHttpController", "register_video_routes", "ROUTE_PLAYBACK"]
+__all__ = [
+    "VideoHttpController",
+    "register_video_routes",
+    "ROUTE_PLAYBACK",
+    "ROUTE_STATUS",
+    "ROUTE_SUBTITLE",
+]
 
 logger = logging.getLogger(__name__)
 
 ROUTE_PLAYBACK = "/videos/{uuid}"
+#: État de traitement, de quoi rafraîchir une page après un envoi
+#: (VIDEO-STATUS-UI-001).
+ROUTE_STATUS = "/videos/{uuid}/status"
+#: Piste de sous-titres WebVTT (VIDEO-SUBTITLES-001).
+ROUTE_SUBTITLE = "/videos/{uuid}/subtitles/{lang}"
 
 
 
@@ -92,6 +105,84 @@ class VideoHttpController:
         return Response.file(path, request)
 
 
+    def status(self, request: Any) -> Response:
+        """État de traitement, en JSON (`VIDEO-STATUS-UI-001`).
+
+        La réponse ne porte **jamais** `error_message` : la sortie d'erreur de
+        ffmpeg contient les chemins absolus des fichiers du serveur, et une
+        page qui affiche « la raison de l'échec » publierait l'arborescence.
+        `VideoStatusView.as_public_dict` ne peut pas le rendre par construction.
+        """
+        if not is_bearer_authorized(request, self._api_token):
+            return json_error("unauthorized", 401)
+
+        uuid = request.route("uuid")
+        try:
+            row = self._repo.get_by_uuid(uuid)
+        except Exception:
+            logger.exception("Forge Video — erreur DB sur get_by_uuid")
+            return json_error("internal_server_error", 500)
+
+        if row is None:
+            return json_error("not_found", 404)
+
+        vue = describe_video_status(row)
+        if vue.is_failed and vue.technical_detail:
+            # Le détail va au journal de l'exploitant, jamais dans la réponse.
+            logger.warning(
+                "Forge Video — traitement en échec pour %s : %s",
+                uuid, vue.technical_detail,
+            )
+        return Response.json({"data": vue.as_public_dict()})
+
+    def subtitle(self, request: Any) -> Response:
+        """Sert une piste WebVTT.
+
+        Même règle d'accès que la lecture : une piste dit ce que la vidéo
+        raconte, la protéger moins que la vidéo n'aurait pas de sens.
+        """
+        if not is_bearer_authorized(request, self._api_token):
+            return json_error("unauthorized", 401)
+
+        uuid = request.route("uuid")
+        try:
+            lang = normalize_lang(request.route("lang"))
+        except SubtitleError:
+            return json_error("not_found", 404)
+
+        try:
+            row = self._repo.get_by_uuid(uuid)
+            if row is None:
+                return json_error("not_found", 404)
+            piste = self._repo.get_subtitle(int(row["id"]), lang)
+        except Exception:
+            logger.exception("Forge Video — erreur DB sur get_subtitle")
+            return json_error("internal_server_error", 500)
+
+        if piste is None:
+            return json_error("not_found", 404)
+
+        rel = str(piste.get("path") or "")
+        if not rel:
+            return json_error("not_available", 409)
+
+        # Même défense en profondeur que la lecture : le chemin vient de la
+        # base, jamais de l'URL, et on revalide qu'il reste sous storage_root.
+        storage_root = Path(self._config.storage_root).resolve()
+        path = (storage_root / rel).resolve()
+        if not path.is_relative_to(storage_root):
+            logger.warning(
+                "Forge Video — chemin de sous-titres hors storage_root : %s", rel
+            )
+            return json_error("not_found", 404)
+        if not path.is_file():
+            return json_error("file_missing", 404)
+
+        return Response(
+            200, path.read_bytes(), VTT_MIME_TYPE
+        )
+
+
 def register_video_routes(
     router: Any,
     *,
@@ -113,6 +204,16 @@ def register_video_routes(
     router.add(
         "GET", ROUTE_PLAYBACK, controller.stream,
         name="video_stream",
+        public=True, csrf=False, api=False,
+    )
+    router.add(
+        "GET", ROUTE_STATUS, controller.status,
+        name="video_status",
+        public=True, csrf=False, api=True,
+    )
+    router.add(
+        "GET", ROUTE_SUBTITLE, controller.subtitle,
+        name="video_subtitle",
         public=True, csrf=False, api=False,
     )
     return router

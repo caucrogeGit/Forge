@@ -18,6 +18,7 @@ from typing import Any
 from uuid import uuid4
 
 from forge_mvc_video.config import VideoConfig, load_video_config
+from forge_mvc_video.quota import check_size_quota
 from forge_mvc_video.storage.files import (
     ALLOWED_EXTENSIONS,
     safe_extension,
@@ -59,6 +60,11 @@ def ingest_video(
             f"vidéo trop volumineuse : {size} octets > {max_bytes} "
             f"(FORGE_VIDEO_MAX_UPLOAD_MB={cfg.max_upload_mb})"
         )
+
+    # VIDEO-QUOTA-001 : le plafond cumulé se vérifie AVANT d'écrire. Après
+    # coup il faudrait supprimer un fichier déjà posé, et un incident entre les
+    # deux gestes laisserait une trace sur le disque.
+    check_size_quota(size, repository=repo, config=cfg)
 
     ext = safe_extension(filename)
     if ext not in ALLOWED_EXTENSIONS:

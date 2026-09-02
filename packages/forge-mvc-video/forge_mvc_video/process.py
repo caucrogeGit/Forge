@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from forge_mvc_video.config import VideoConfig, load_video_config
+from forge_mvc_video.quota import VideoQuotaError, check_duration_quota
 from forge_mvc_video.probe import VideoMetadata, VideoProbeError, probe_video
 from forge_mvc_video.storage.files import mp4_relpath, poster_relpath
 from forge_mvc_video.storage.repository import VideoRepository
@@ -110,6 +111,13 @@ def process_video(
     repo.update_status(video_id, "processing", now=moment)
     try:
         meta = probe(original_abs)
+        # VIDEO-QUOTA-001 : la durée n'est connue qu'ici, après le sondage. Le
+        # plafond cumulé se vérifie donc au traitement, la vidéo étant déjà
+        # stockée. Sonder avant d'écrire demanderait un fichier temporaire et un
+        # appel ffprobe de plus par envoi, pour déplacer le problème.
+        check_duration_quota(
+            int(meta.duration_seconds or 0), repository=repo, config=cfg
+        )
         repo.update_metadata(
             video_id,
             duration_seconds=meta.duration_seconds,
@@ -133,7 +141,7 @@ def process_video(
             "mp4_path": mp4_rel,
             "poster_path": poster_rel,
         }
-    except (VideoProbeError, FfmpegError, OSError) as exc:
+    except (VideoProbeError, FfmpegError, VideoQuotaError, OSError) as exc:
         for partial in (mp4_abs, poster_abs):
             try:
                 if partial.exists():
