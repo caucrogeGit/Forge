@@ -138,7 +138,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     | Catégorie | Configuration (ADR-055) |
     | Couche | opt-in (brique optionnelle) |
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
-    | API publique | `get_setting`, `set_setting`, `get_all_settings`, `delete_setting`, `parse_setting_value`, `describe_settings` |
+    | API publique | `get_setting`, `set_setting`, `get_all_settings`, `delete_setting`, `parse_setting_value`, `describe_settings`, `set_user_setting`, `enable_settings_cache` |
     | Table SQL | `app_settings` (`TABLE_NAME`) |
     | Types supportés | `str`, `int`, `bool`, `float` (`SUPPORTED_TYPES`) |
     | Exception liée | `SettingsError` si la clé est invalide ou le type non supporté |
@@ -381,3 +381,81 @@ set_setting(cle, parse_setting_value(saisie, type_declare))
     `forge-mvc-admin` n'est pas importé, et un projet sans back-office édite ses paramètres depuis sa propre interface avec les mêmes fonctions.
 
 Une valeur textuelle est conservée telle quelle, espaces de bord comprises : contrairement à un entier, elles peuvent être voulues.
+
+## Paramètres par utilisateur
+
+Un réglage personnel, thème ou langue, n'avait pas de place : la clé primaire porte la seule clé du paramètre.
+
+Le ranger sous une clé composée marchait, mais rien n'empêchait la collision : une clé globale `user.42.theme` et la préférence de l'utilisateur 42 auraient désigné la même ligne, et l'une aurait écrasé l'autre en silence (`SETTINGS-PER-USER-001`).
+
+```python
+from forge_mvc_settings import get_user_setting, get_user_settings, set_user_setting
+
+set_user_setting(utilisateur.id, "theme", "sombre")
+get_user_setting(utilisateur.id, "theme", "clair")   # « clair » si absent
+get_user_settings(utilisateur.id)                     # {"theme": "sombre"}
+```
+
+!!! danger "Le préfixe `user.` est réservé"
+    `set_setting("user.42.theme", ...)` est **refusé**, et le message indique la bonne porte.
+
+    Sans cette réserve, une clé globale et une préférence personnelle pourraient désigner la même ligne.
+
+!!! info "Les deux espaces restent séparés"
+    `get_all_settings` ne rend que les paramètres globaux.
+
+    Les mêler ferait grossir la configuration de l'application au rythme de ses comptes, et un écran de réglages afficherait les préférences de tout le monde.
+
+!!! warning "Un réglage personnel ne retombe pas sur le global"
+    `get_user_setting` rend le défaut que vous lui donnez, jamais le paramètre global de même nom.
+
+    Sinon « cet utilisateur n'a pas de préférence » et « sa préférence vaut le défaut de l'application » ne se distinguent plus, et l'appelant ne peut plus dire lequel il lit.
+    Le repli, s'il le veut, est une ligne de son code.
+
+L'identifiant ne peut pas contenir de point, séparateur d'espace de noms : deux utilisateurs pourraient sinon viser la même clé.
+
+## Cache mémoire
+
+Un paramètre est lu à chaque requête, parfois plusieurs fois, et change une fois par mois.
+
+```python
+from forge_mvc_settings import clear_settings_cache, enable_settings_cache
+
+enable_settings_cache()          # au démarrage de l'application
+clear_settings_cache()           # après une écriture faite hors du paquet
+```
+
+!!! info "Éteint par défaut"
+    Un cache change ce qu'une lecture garantit : sans lui, `get_setting` rend toujours la valeur en base ; avec lui, la dernière valeur vue.
+
+    Le principe 3 refuse qu'un comportement change dans le dos de l'appelant : l'application l'active, et sait ce qu'elle achète.
+
+!!! info "L'invalidation est explicite, jamais par expiration"
+    Une expiration ferait cohabiter deux valeurs pendant un délai que personne n'a choisi.
+
+    Écrire par ce paquet invalide l'entrée. Une écriture faite ailleurs, par une migration ou à la main, demande un `clear_settings_cache()` que l'exploitant décide.
+
+!!! warning "Le cache vit dans le processus"
+    Ce n'est pas un cache partagé : un déploiement à plusieurs travailleurs en a un par travailleur.
+
+    Deux d'entre eux peuvent donc voir des valeurs différentes entre l'écriture et l'invalidation.
+
+## Ce que les paramètres ne doivent pas contenir
+
+**Aucun secret.** Ni mot de passe, ni jeton d'API, ni clé de chiffrement (`DOC-SETTINGS-NO-SECRETS-001`).
+
+Un paramètre est en clair dans une table applicative, lisible par toute personne ayant accès à la base ou à une sauvegarde, et affiché tel quel par un écran d'administration.
+
+| Ce qui va ici | Ce qui n'y va pas |
+|---|---|
+| nom de l'établissement, thème, langue par défaut | mot de passe SMTP |
+| taille maximale d'un dépôt, nombre de places | jeton d'API d'un service tiers |
+| adresse de contact affichée | clé de chiffrement MFA |
+
+Les secrets vivent dans l'environnement, `env/prod` ignoré par git ou les variables du service.
+`forge deploy:check` refuse d'ailleurs un secret laissé à sa valeur d'amorçage, contrôle qui ne regarde que l'environnement.
+
+!!! info "Pourquoi Forge ne chiffre pas cette table"
+    Chiffrer déplacerait le problème sans le résoudre : la clé de déchiffrement devrait vivre quelque part, et cet endroit serait l'environnement.
+
+    Autant y mettre le secret directement, ce qui est plus simple et plus facile à auditer.

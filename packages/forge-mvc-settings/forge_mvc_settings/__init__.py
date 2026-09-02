@@ -10,6 +10,12 @@ d'établissement, durée d'une session, mode maintenance, options pédagogiques)
 La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 """
 from forge_mvc_settings.errors import SettingsError
+from forge_mvc_settings.cache import (
+    clear_settings_cache,
+    disable_settings_cache,
+    enable_settings_cache,
+    settings_cache_enabled,
+)
 from forge_mvc_settings.admin_view import (
     FALSE_INPUTS,
     TRUE_INPUTS,
@@ -18,6 +24,12 @@ from forge_mvc_settings.admin_view import (
     parse_setting_value,
 )
 from forge_mvc_settings.store import (
+    USER_SCOPE_PREFIX,
+    delete_user_setting,
+    get_user_setting,
+    get_user_settings,
+    set_user_setting,
+    user_setting_key,
     get_settings_with_types,
     SUPPORTED_TYPES,
     TABLE_NAME,
@@ -31,6 +43,18 @@ __version__ = "1.0.0rc7"
 
 __all__ = [
     # Édition depuis un écran (ADMIN-SETTINGS-UI-001)
+    # Cache mémoire (SETTINGS-CACHE-001)
+    "enable_settings_cache",
+    "disable_settings_cache",
+    "settings_cache_enabled",
+    "clear_settings_cache",
+    # Paramètres par utilisateur (SETTINGS-PER-USER-001)
+    "set_user_setting",
+    "get_user_setting",
+    "get_user_settings",
+    "delete_user_setting",
+    "user_setting_key",
+    "USER_SCOPE_PREFIX",
     "parse_setting_value",
     "get_settings_with_types",
     "describe_settings",

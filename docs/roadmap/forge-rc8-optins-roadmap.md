@@ -250,9 +250,9 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `SETTINGS-PER-USER-001` | Paramètres par utilisateur, derrière un drapeau |
-| `SETTINGS-CACHE-001` | Cache mémoire à invalidation explicite |
-| `DOC-SETTINGS-NO-SECRETS-001` | Refus documenté d'y placer des secrets |
+| `SETTINGS-PER-USER-001` | **Livré.** Préfixe `user.` réservé, collision refusée, pas de repli sur le global |
+| `SETTINGS-CACHE-001` | **Livré.** Éteint par défaut, invalidation explicite, absence mise en cache |
+| `DOC-SETTINGS-NO-SECRETS-001` | **Livré.** Limite tracée, et pourquoi chiffrer la table ne résoudrait rien |
 
 ### 7.18 audit
 

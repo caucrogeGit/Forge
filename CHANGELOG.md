@@ -4,6 +4,24 @@
 
 ### Ajouté
 
+- **Un réglage personnel a sa place, sans collision possible (`SETTINGS-PER-USER-001`).**
+  Le thème ou la langue d'un utilisateur n'avaient pas où se ranger, la clé primaire portant la seule clé du paramètre. Une clé composée `user.42.theme` marchait, mais rien n'empêchait la collision : un paramètre global du même nom aurait désigné la même ligne, et l'un aurait écrasé l'autre en silence.
+  Le préfixe `user.` est donc **réservé**, et `set_setting` le refuse en nommant la bonne porte. L'identifiant ne peut pas contenir de point, séparateur d'espace de noms, deux utilisateurs pouvant sinon viser la même clé.
+  `get_all_settings` ne rend que les paramètres globaux : les mêler ferait grossir la configuration de l'application au rythme de ses comptes, et un écran de réglages afficherait les préférences de tout le monde.
+  Un réglage absent **ne retombe pas** sur le paramètre global de même nom. Sinon « cet utilisateur n'a pas de préférence » et « sa préférence vaut le défaut de l'application » ne se distinguent plus, et l'appelant ne peut plus dire lequel il lit ; le repli, s'il le veut, est une ligne de son code.
+
+- **Les paramètres peuvent être servis de mémoire (`SETTINGS-CACHE-001`).**
+  Un paramètre est lu à chaque requête, parfois plusieurs fois, et change une fois par mois. Chaque lecture faisait pourtant un aller-retour vers la base.
+  Le cache est **éteint par défaut** : il change ce qu'une lecture garantit, la dernière valeur vue au lieu de la valeur en base, et le principe 3 refuse qu'un comportement change dans le dos de l'appelant.
+  L'invalidation est explicite, jamais par expiration, qui ferait cohabiter deux valeurs pendant un délai que personne n'a choisi. Une écriture passant par le paquet invalide son entrée ; une écriture faite ailleurs, par une migration, demande un `clear_settings_cache` que l'exploitant décide.
+  Une absence est mise en cache comme une valeur, sans quoi un paramètre non posé serait relu à chaque fois, et c'est le cas fréquent. Activer le cache le vide, son contenu pouvant dater d'avant des écritures faites entre temps.
+  Ce n'est pas un cache partagé : un déploiement à plusieurs travailleurs en a un par travailleur, ce que la documentation dit plutôt que de le laisser découvrir.
+
+- **Un paramètre n'est pas un endroit pour un secret (`DOC-SETTINGS-NO-SECRETS-001`).**
+  Rien ne le disait, et la table s'y prête : un mot de passe SMTP ou un jeton d'API y aurait tenu. Il y serait en clair, lisible par qui accède à la base ou à une sauvegarde, et affiché tel quel par l'écran d'administration.
+  La documentation trace la limite avec un tableau de ce qui va ici et de ce qui n'y va pas, et dit où vivent les secrets, l'environnement, que `deploy:check` contrôle déjà.
+  Elle explique aussi pourquoi Forge ne chiffre pas cette table : la clé de déchiffrement devrait vivre dans l'environnement, autant y mettre le secret directement, ce qui est plus simple et plus facile à auditer.
+
 - **Un email peut porter une pièce jointe (`MAIL-ATTACHMENTS-001`).**
   Une facture, un export, un justificatif : le paquet ne savait pas en joindre. `with_attachment` rend un message **augmenté** plutôt que de modifier celui qu'on lui donne, un message mis en file puis complété ailleurs partant sinon dans deux états.
   Le nom de fichier est assaini : il voyage dans un en-tête MIME, s'affiche chez le destinataire, et vient souvent d'un fichier déposé par un utilisateur. Un chemin est réduit à son dernier segment, et un saut de ligne retiré, qui couperait l'en-tête en deux.

@@ -66,12 +66,52 @@ def _db_module() -> Any:
     return db
 
 
-def _validate_key(key: object) -> None:
+#: Préfixe réservé aux paramètres d'un utilisateur.
+#:
+#: Réservé, et non seulement conventionnel : sans cela, une clé globale
+#: `user.42.theme` et le paramètre de l'utilisateur 42 désigneraient la même
+#: ligne, et l'un écraserait l'autre en silence (`SETTINGS-PER-USER-001`).
+USER_SCOPE_PREFIX = "user."
+
+
+def _validate_key(key: object, *, allow_user_scope: bool = False) -> None:
     if not isinstance(key, str) or not _KEY_RE.fullmatch(key):
         raise SettingsError(
             f"Clé de paramètre invalide : {key!r}. Attendu : une lettre suivie de "
             "lettres, chiffres, '_' ou '.' (191 caractères au plus)."
         )
+    if not allow_user_scope and key.startswith(USER_SCOPE_PREFIX):
+        raise SettingsError(
+            f"Clé réservée : {key!r} commence par « {USER_SCOPE_PREFIX} », "
+            "espace des paramètres par utilisateur. Employez "
+            "set_user_setting(utilisateur, clé) pour ceux là."
+        )
+
+
+def user_setting_key(user_id: object, key: str) -> str:
+    """Compose la clé d'un paramètre appartenant à un utilisateur.
+
+    L'identifiant est rendu en texte et intercalé : `user.42.theme`. Il ne peut
+    pas contenir de point, sans quoi deux utilisateurs pourraient viser la même
+    clé, l'un se glissant dans l'espace de l'autre.
+
+    Raises:
+        SettingsError: identifiant vide, contenant un point, ou clé composée
+            dépassant la longueur permise. Un identifiant long réduit l'espace
+            restant, et une clé tronquée en silence viserait une autre ligne.
+    """
+    identifiant = "" if user_id is None else str(user_id).strip()
+    if not identifiant:
+        raise SettingsError("L'identifiant d'utilisateur ne peut pas être vide.")
+    if "." in identifiant:
+        raise SettingsError(
+            f"Identifiant d'utilisateur invalide : {identifiant!r}. Le point est "
+            "le séparateur d'espace de noms, il ne peut pas y figurer."
+        )
+    _validate_key(key)
+    composee = f"{USER_SCOPE_PREFIX}{identifiant}.{key}"
+    _validate_key(composee, allow_user_scope=True)
+    return composee
 
 
 def _serialize(value: object) -> tuple[str, str]:
@@ -101,6 +141,45 @@ def _coerce(raw: Any, value_type: Any) -> SettingValue:
     return text
 
 
+def set_user_setting(
+    user_id: object, key: str, value: SettingValue, *, db: Any = None
+) -> None:
+    """Écrit un paramètre appartenant à `user_id`."""
+    _set_setting_raw(user_setting_key(user_id, key), value, db=db)
+
+
+def get_user_setting(
+    user_id: object, key: str, default: SettingValue | None = None, *, db: Any = None
+) -> "SettingValue | None":
+    """Lit un paramètre de `user_id`, ou `default`.
+
+    Ne retombe **pas** sur le paramètre global de même nom : un réglage
+    personnel absent et un réglage personnel identique au défaut de
+    l'application ne se distinguent alors plus, et l'appelant ne peut plus dire
+    lequel il lit. Le repli, s'il le veut, est une ligne de son code.
+    """
+    return get_setting(user_setting_key(user_id, key), default, db=db)
+
+
+def delete_user_setting(user_id: object, key: str, *, db: Any = None) -> bool:
+    """Supprime un paramètre de `user_id`. Vrai s'il existait."""
+    return delete_setting(user_setting_key(user_id, key), db=db)
+
+
+def get_user_settings(user_id: object, *, db: Any = None) -> "dict[str, SettingValue]":
+    """Paramètres de `user_id`, clés **sans** le préfixe d'espace de noms.
+
+    L'appelant a demandé les réglages d'un utilisateur : les lui rendre
+    préfixés l'obligerait à retirer lui même ce qu'il vient de fournir.
+    """
+    prefixe = f"{USER_SCOPE_PREFIX}{str(user_id).strip()}."
+    return {
+        cle[len(prefixe):]: valeur
+        for cle, valeur in _all_settings_raw(db=db).items()
+        if cle.startswith(prefixe)
+    }
+
+
 def set_setting(key: str, value: SettingValue, *, db: Any = None) -> None:
     """Crée ou met à jour le paramètre `key` avec `value` (upsert).
 
@@ -108,6 +187,18 @@ def set_setting(key: str, value: SettingValue, *, db: Any = None) -> None:
     :class:`SettingsError` si la clé est invalide ou le type non supporté.
     """
     _validate_key(key)
+    _set_setting_raw(key, value, db=db)
+
+
+def _set_setting_raw(key: str, value: SettingValue, *, db: Any = None) -> None:
+    """Écriture sans contrôle d'espace de noms, partagée par les deux portes.
+
+    `set_setting` refuse le préfixe réservé, `set_user_setting` le compose :
+    revalider ici ferait refuser ce que la seconde vient d'écrire.
+    """
+    from forge_mvc_settings.cache import cache_invalidate
+
+    cache_invalidate(key)
     serialized, value_type = _serialize(value)
     database = db if db is not None else _db_module()
     # Écrire puis insérer si rien n'a été touché (OPTIN-DML-DIALECT-001).
@@ -137,15 +228,36 @@ def get_setting(
     Renvoie `default` si le paramètre n'existe pas. Lève
     :class:`SettingsError` si la clé est invalide.
     """
-    _validate_key(key)
+    _validate_key(key, allow_user_scope=True)
+    from forge_mvc_settings.cache import cache_get, cache_put
+
+    trouve, en_cache = cache_get(key)
+    if trouve:
+        return default if en_cache is None else en_cache
+
     row = (db if db is not None else _db_module()).fetch_one(_SELECT_ONE_SQL, (key,))
-    if row is None:
-        return default
-    return _coerce(row["setting_value"], row["value_type"])
+    valeur = None if row is None else _coerce(row["setting_value"], row["value_type"])
+    cache_put(key, valeur)
+    return default if valeur is None else valeur
 
 
 def get_all_settings(*, db: Any = None) -> dict[str, SettingValue]:
-    """Renvoie tous les paramètres, recoercés, triés par clé."""
+    """Renvoie les paramètres **globaux**, recoercés, triés par clé.
+
+    Les paramètres appartenant à un utilisateur en sont exclus : les mêler
+    ferait grossir la configuration de l'application au rythme de ses comptes,
+    et un écran de réglages afficherait les préférences de tout le monde.
+    Employer `get_user_settings` pour ceux d'un utilisateur.
+    """
+    return {
+        cle: valeur
+        for cle, valeur in _all_settings_raw(db=db).items()
+        if not cle.startswith(USER_SCOPE_PREFIX)
+    }
+
+
+def _all_settings_raw(*, db: Any = None) -> dict[str, SettingValue]:
+    """Tous les paramètres, espace utilisateur compris."""
     rows = (db if db is not None else _db_module()).fetch_all(_SELECT_ALL_SQL)
     return {
         str(row["setting_key"]): _coerce(row["setting_value"], row["value_type"])
@@ -177,5 +289,8 @@ def get_settings_with_types(
 
 def delete_setting(key: str, *, db: Any = None) -> bool:
     """Supprime le paramètre `key`. Renvoie `True` s'il existait."""
-    _validate_key(key)
+    _validate_key(key, allow_user_scope=True)
+    from forge_mvc_settings.cache import cache_invalidate
+
+    cache_invalidate(key)
     return (db if db is not None else _db_module()).execute(_DELETE_SQL, (key,)) > 0
