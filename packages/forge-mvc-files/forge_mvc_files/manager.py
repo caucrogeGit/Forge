@@ -16,6 +16,7 @@ from core.http.response import Response
 from core.forms.upload_exceptions import UploadStorageError
 from core.forms.upload_validation import validate_magic_bytes, validate_upload_metadata
 from forge_mvc_files import storage
+from forge_mvc_files.scan import scan_upload
 
 
 @dataclass(frozen=True)
@@ -110,6 +111,10 @@ def save_upload(file: object, category: str = "documents") -> SavedUpload:
     néanmoins appliqué (générique, sécurité) — pour les types à signature connue
     (image/PDF), le contenu doit correspondre à l'extension déclarée. C'est un
     contrôle d'intégrité par premiers octets, pas un décodage d'image.
+
+    FILES-SCAN-HOOK-001 : les analyseurs branchés par l'application sont
+    consultés **avant** l'écriture. Aucun n'est fourni par le paquet, et sans
+    enregistrement rien ne change.
     """
     if file is None:
         raise UploadStorageError("Aucun fichier reçu.")
@@ -129,6 +134,11 @@ def save_upload(file: object, category: str = "documents") -> SavedUpload:
     validate_magic_bytes(data, extension)
     # validate_upload_metadata lève si le nom est absent : filename est ici un str.
     safe_name = cast("str", filename)
+    # FILES-SCAN-HOOK-001 : l'analyse branchée par l'application passe ici, avant
+    # toute écriture. Un fichier analysé après avoir touché le disque y est déjà,
+    # et une sauvegarde ou un indexeur peut l'avoir vu entre temps. Sans
+    # analyseur branché, cet appel ne fait rien.
+    scan_upload(data, safe_name)
     root = upload_root()
     saved_path = storage.save_bytes(
         data,

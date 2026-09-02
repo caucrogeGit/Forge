@@ -143,7 +143,8 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # Médias et JavaScript
     "upload:init":      "Configure les uploads de fichiers (dossiers storage/uploads).",
     "media:init":       "Configure les médias : upload:init plus les variantes d'image.",
-    "files:init":         "Écrit la migration du registre de fichiers (forge-mvc-files, ADR-094).",
+    "files:init":       "Écrit la migration du registre de fichiers (forge-mvc-files, ADR-094).",
+    "files:orphans":    "Rapproche le dossier d'upload et le registre (affiche ; --delete supprime).",
     "images:init":      "Copie la migration Images vers mvc/migrations/ (idempotent, sans appliquer).",
     "js:init":          "Installe htmx, alpine ou les deux.",
     # Déploiement
@@ -316,6 +317,38 @@ Options:
   --days N      Rétention en jours (>= 1). À défaut : IOT_KEEP_DAYS.
   --run         Exécute la suppression au lieu de l'afficher.
   -h, --help    Affiche cette aide sans exécuter la commande.""",
+    "files:orphans": """\
+Usage :
+  forge files:orphans [--delete] [--min-age SECONDES] [--root CHEMIN]
+
+Description :
+  Rapproche le dossier d'upload et le registre des fichiers (ADR-094), et
+  nomme les deux sortes d'orphelins : le fichier présent sur le disque
+  qu'aucune ligne n'inscrit, et l'inscription dont le fichier a disparu.
+
+Effets :
+  Sans --delete, affiche seulement. Rien n'est touché.
+  Avec --delete, supprime les fichiers non inscrits et retire les
+  inscriptions sans fichier.
+
+Prérequis :
+  L'opt-in forge-mvc-files installé, sa migration appliquée, et une
+  application qui inscrit ce qu'elle écrit (record_file).
+
+Options :
+  --delete              applique la purge au lieu de l'afficher
+  --min-age SECONDES    âge minimal d'un candidat (défaut 86400, un jour)
+  --root CHEMIN         racine d'upload à inspecter
+  --allow-empty-registry  inspecte malgré un registre vide (refusé avec --delete)
+
+Limites :
+  Un registre vide interrompt la commande : l'inscription est explicite,
+  et une application qui n'appelle jamais record_file verrait la totalité
+  de ses uploads déclarée orpheline.
+  Un fichier plus récent que --min-age n'est jamais candidat : entre
+  l'écriture et l'inscription il s'écoule un instant, et une purge qui
+  tourne dans cet intervalle supprimerait un dépôt en cours.
+""",
     "jobs:status": """\
 Usage:
   forge jobs:status [--queue NOM]

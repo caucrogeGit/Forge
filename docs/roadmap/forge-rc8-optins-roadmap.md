@@ -190,10 +190,10 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `FILES-QUOTA-001` | Quota par utilisateur et par ressource |
-| `FILES-SCAN-HOOK-001` | Interface d'analyse antivirus, mise en oeuvre hors du paquet |
-| `FILES-ORPHAN-PURGE-001` | Purge des fichiers sans référence |
-| `DOC-FILES-XACCEL-001` | Envoi délégué au serveur frontal, documenté comme motif de production |
+| `FILES-QUOTA-001` | **Livré.** Par couple propriétaire, valeur d'env illisible refusée, fenêtre de concurrence documentée |
+| `FILES-SCAN-HOOK-001` | **Livré.** Consultée avant écriture, une panne refuse le dépôt au lieu de le laisser passer |
+| `FILES-ORPHAN-PURGE-001` | **Livré.** Deux sortes d'orphelins, registre vide et fichier récent interrompent |
+| `DOC-FILES-XACCEL-001` | **Livré.** Motif documenté, `internal;` posé comme la moitié qui protège |
 
 ### 7.11 images
 

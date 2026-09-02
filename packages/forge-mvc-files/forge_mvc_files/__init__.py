@@ -50,9 +50,37 @@ from forge_mvc_files.registry import (
     owner_usage_bytes,
     record_file,
 )
+from forge_mvc_files.orphans import (
+    DEFAULT_MIN_AGE_SECONDS,
+    OrphanPurgeRefused,
+    OrphanReport,
+    PurgeResult,
+    find_orphans,
+    purge_orphans,
+)
+from forge_mvc_files.quota import (
+    FilesQuotaError,
+    Quota,
+    QuotaExceededError,
+    QuotaUsage,
+    check_quota,
+    quota_for,
+    quota_usage,
+)
 from forge_mvc_files.rate_limit import (
     is_upload_rate_limited,
     record_upload_attempt,
+)
+from forge_mvc_files.scan import (
+    FileScanner,
+    ScannerUnavailableError,
+    ScanVerdict,
+    UploadRejectedByScanError,
+    clear_file_scanners,
+    register_file_scanner,
+    registered_scanners,
+    scan_upload,
+    unregister_file_scanner,
 )
 from forge_mvc_files.storage import (
     delete_file,
@@ -97,4 +125,29 @@ __all__ = [
     "list_paths_for_owner",
     "list_all_paths",
     "FileRegistryError",
+    # Quota par propriétaire (FILES-QUOTA-001)
+    "Quota",
+    "QuotaUsage",
+    "quota_for",
+    "quota_usage",
+    "check_quota",
+    "QuotaExceededError",
+    "FilesQuotaError",
+    # Prise d'analyse avant écriture (FILES-SCAN-HOOK-001)
+    "ScanVerdict",
+    "FileScanner",
+    "register_file_scanner",
+    "unregister_file_scanner",
+    "registered_scanners",
+    "clear_file_scanners",
+    "scan_upload",
+    "UploadRejectedByScanError",
+    "ScannerUnavailableError",
+    # Rapprochement disque / registre (FILES-ORPHAN-PURGE-001)
+    "find_orphans",
+    "purge_orphans",
+    "OrphanReport",
+    "PurgeResult",
+    "OrphanPurgeRefused",
+    "DEFAULT_MIN_AGE_SECONDS",
 ]

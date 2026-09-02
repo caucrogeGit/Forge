@@ -125,6 +125,7 @@ Médias et JavaScript
   upload:init         Configure les uploads de fichiers.
   media:init          Configure les médias.
   files:init          Écrit la migration du registre de fichiers (forge-mvc-files, ADR-094).
+  files:orphans       Rapproche le dossier d'upload et le registre (affiche ; --delete supprime).
   images:init         Copie la migration Images du package vers mvc/migrations/ (idempotent, sans appliquer).
   js:init             Installe htmx, alpine ou les deux.
 

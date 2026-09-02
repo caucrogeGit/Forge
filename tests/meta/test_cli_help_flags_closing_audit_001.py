@@ -88,6 +88,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "i18n:init", "i18n:check",
     # Médias et JavaScript
     "upload:init", "media:init", "images:init", "js:init", "files:init",
+    # files:orphans rapproche le disque et le registre (FILES-ORPHAN-PURGE-001).
+    "files:orphans",
     # Déploiement
     "deploy:init", "deploy:check",
     # Opt-ins applicatifs (ADR-052)

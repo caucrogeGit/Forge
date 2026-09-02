@@ -405,6 +405,177 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
 
         Seul `upload_max_size` reste une config du cœur (ADR-032) ; le reste est lu par l'opt-in depuis l'environnement.
 
+??? note "12. Quota de stockage par propriétaire"
+
+    Un compte pouvait remplir le disque un fichier valide à la fois : chaque envoi passait la taille maximale, et rien ne regardait la somme (`FILES-QUOTA-001`).
+
+    Le quota s'appuie sur le registre de l'ADR-094, et porte sur le couple propriétaire. Deux natures ont donc deux quotas, ce qui est le sens de « par utilisateur et par ressource ».
+
+    ```python
+    from forge_mvc_files import QuotaExceededError, check_quota, record_file, save_upload
+
+    try:
+        check_quota("user", utilisateur.id, request.content_length or 0)
+    except QuotaExceededError as exc:
+        return self.render("upload.html", {"erreur": str(exc)})
+
+    depot = save_upload(request.files["fichier"])
+    record_file(depot.path, depot.original_name, depot.size,
+                owner_kind="user", owner_id=utilisateur.id)
+    ```
+
+    Le contrôle passe **avant** l'écriture. Après coup, il faudrait supprimer un fichier déjà posé, et un incident entre les deux gestes laisserait une trace sur le disque.
+
+    La longueur du corps de la requête convient comme taille entrante, et surestime un peu, l'enveloppe multipart y étant comptée. Pour un quota, l'erreur va dans le bon sens.
+
+    | Variable | Effet |
+    |---|---|
+    | `FILES_QUOTA_BYTES` | octets autorisés, toutes natures confondues |
+    | `FILES_QUOTA_FILES` | nombre de fichiers autorisés |
+    | `FILES_QUOTA_USER_BYTES` | octets autorisés pour la nature `user`, prioritaire |
+    | `FILES_QUOTA_USER_FILES` | nombre de fichiers pour la nature `user` |
+
+    Sans aucune de ces variables, rien n'est borné : le paquet ne limite pas ce que l'exploitant n'a pas demandé.
+
+    !!! danger "Une valeur illisible lève, elle n'est pas ignorée"
+        `FILES_QUOTA_BYTES=50MB` **interrompt** la lecture du quota.
+
+        Les suffixes ne sont pas lus, il faut écrire `52428800`. Retomber en silence sur « aucune limite » à cause d'une faute de frappe irait exactement dans le mauvais sens, et personne ne le verrait avant que le disque soit plein.
+
+    !!! warning "Ce n'est pas une borne infranchissable"
+        Le contrôle lit la somme inscrite, puis l'appelant écrit. Deux envois simultanés du même compte peuvent passer tous les deux.
+
+        Le dépassement est alors borné par `upload_max_size` et par le nombre de requêtes concurrentes, jamais illimité. Fermer cette fenêtre demanderait de sérialiser les envois d'un même compte, pour une garantie que personne n'a demandée.
+
+        La borne dure contre l'épuisement du disque reste la taille maximale d'un envoi, appliquée avant toute lecture du corps.
+
+    `quota_usage` rend l'état courant sans rien refuser, de quoi afficher une jauge. `remaining_bytes` vaut `None` quand le quota est sans limite, et jamais un nombre négatif : un quota abaissé après coup laisse des propriétaires au dessus.
+
+??? note "13. Brancher une analyse antivirus"
+
+    Forge valide l'extension, le type MIME, la taille et les premiers octets. Aucun de ces contrôles ne dit si le contenu est malveillant : un PDF porteur d'une charge active a l'extension, le type et la signature d'un PDF.
+
+    Le paquet ne fournit **aucune analyse**, et n'en fournira pas (`FILES-SCAN-HOOK-001`). Un moteur antivirus est un service à installer, à tenir à jour et à surveiller. L'embarquer ferait de `forge-mvc-files` une usine métier, et donnerait au projet une base de signatures périmée le jour de sa publication.
+
+    Le paquet fournit la prise.
+
+    ```python
+    from forge_mvc_files import ScanVerdict, register_file_scanner
+
+    def analyse_clamav(data: bytes, nom: str) -> ScanVerdict:
+        rapport = mon_client_clamd.instream(data)      # à vous
+        if rapport.is_infected:
+            return ScanVerdict.infected(rapport.signature)
+        return ScanVerdict.clean()
+
+    register_file_scanner(analyse_clamav)              # au démarrage
+    ```
+
+    Une fois branché, l'analyseur est consulté par `save_upload` à chaque dépôt, comme un middleware inscrit tourne à chaque requête. Sans enregistrement, rien ne change et rien ne coûte.
+
+    !!! danger "Une analyse qui échoue refuse le dépôt"
+        C'est la règle qui fait tout l'intérêt de la prise.
+
+        Un analyseur qui lève, qui expire ou qui rend autre chose qu'un `ScanVerdict` ne dit **pas** que le fichier est sain, il ne dit rien. Traiter ce silence comme un feu vert est la faute classique de ce genre de branchement : le jour où le service antivirus tombe, tout passe, et rien ne le signale.
+
+        Forge lève alors `ScannerUnavailableError`, distincte de `UploadRejectedByScanError`. La première est une **panne** à réparer, la seconde un avis rendu sur un fichier. Les confondre dans les journaux ferait chercher un problème de fichier là où le service est à terre.
+
+    !!! info "L'analyse précède l'écriture"
+        Un fichier analysé après avoir touché le disque y est déjà, et l'y laisser quelques millisecondes suffit à ce qu'une sauvegarde ou un indexeur le voie.
+
+    !!! warning "Le délai d'attente vous appartient"
+        L'analyseur est appelé pendant la requête, et une analyse qui traîne la retient.
+
+        Borner cette durée appartient à l'implémentation, qui seule sait parler à son moteur.
+
+    Les deux exceptions descendent d'`UploadError` : une application qui entoure déjà `save_upload` d'un `except UploadError` traite les refus sans changer une ligne.
+
+??? note "14. Purger les fichiers sans référence"
+
+    Un fichier déposé puis détaché de l'entité qui le portait reste sur le disque. Personne ne le sert, personne ne le supprime, et il compte dans la sauvegarde.
+
+    ```bash
+    forge files:orphans                      # affiche seulement
+    forge files:orphans --delete             # applique
+    forge files:orphans --min-age 604800     # candidats vieux d'une semaine
+    ```
+
+    Deux orphelins existent, et ils n'appellent pas le même geste.
+
+    | Situation | Ce que la purge fait |
+    |---|---|
+    | Sur disque, aucune inscription | supprime le fichier |
+    | Inscrit, fichier disparu | retire la ligne du registre |
+
+    !!! danger "Un registre vide interrompt la commande"
+        L'inscription au registre est **explicite** (ADR-094) : une application qui n'appelle jamais `record_file` a un registre vide et des fichiers parfaitement vivants.
+
+        Sans ce refus, la première exécution de la purge effacerait la totalité des uploads du projet. C'est le scénario qui coûte le plus cher, et il est atteint par la commande la plus banale.
+
+        `--allow-empty-registry` lève le refus pour **inspecter**, et reste interdit avec `--delete`.
+
+    !!! warning "Un fichier récent n'est jamais candidat"
+        Entre l'écriture et l'inscription il s'écoule un instant, davantage si l'application inscrit après avoir validé un formulaire.
+
+        Une purge qui tourne dans cet intervalle supprimerait un fichier que son propriétaire est en train de déposer. L'âge minimal par défaut est d'un jour, largement au delà de toute fenêtre plausible.
+
+    Le rapport dit toujours ce qu'il a **écarté**, pas seulement ce qu'il a trouvé. Un exploitant qui ne voit pas son fichier dans la liste doit pouvoir savoir s'il a été jugé sain ou seulement jugé trop récent.
+
+    En Python, `find_orphans` rend le rapport et `purge_orphans` l'applique. Séparer les deux permet de regarder avant, et garantit qu'un fichier déposé entre les deux gestes n'entre pas dans la fournée.
+
+??? note "15. Déléguer l'envoi au serveur frontal"
+
+    `serve_media_file` sert le fichier depuis Python, en streaming, avec le support des requêtes `Range`. C'est correct, et c'est ce qu'il faut tant que le volume reste modeste.
+
+    Un travailleur reste toutefois occupé pendant tout l'envoi. Sur un fichier de 200 Mo et une connexion lente, un travailleur Gunicorn est immobilisé plusieurs minutes pour recopier des octets, travail que nginx fait mieux et sans processus Python.
+
+    Le motif de production consiste à laisser le contrôleur **décider**, et le serveur frontal **envoyer** (`DOC-FILES-XACCEL-001`).
+
+    ```nginx
+    location /protected/ {
+        internal;
+        alias /srv/monapp/storage/uploads/;
+    }
+    ```
+
+    ```python
+    from core.http.response import Response
+
+    class DocumentController(Controller):
+        def download(self, request):
+            document = self.repo.find(request.route("id"))
+            if not self.peut_lire(request, document):
+                return Response(403, b"Interdit", "text/plain; charset=utf-8")
+
+            reponse = Response(200, b"", "application/pdf")
+            reponse.headers["X-Accel-Redirect"] = f"/protected/{document.path}"
+            reponse.headers["Content-Disposition"] = 'attachment; filename="rapport.pdf"'
+            return reponse
+    ```
+
+    Le contrôle d'accès reste en Python, où il doit être. Seul l'envoi est délégué.
+
+    !!! danger "Sans `internal;`, la délégation est une faille"
+        C'est le seul point de cette section qui ne se rattrape pas.
+
+        `internal;` interdit à nginx de servir cette `location` sur une requête venue de l'extérieur : elle n'est atteignable que par un en-tête émis par l'application. Sans cette directive, `https://exemple.fr/protected/documents/paie.pdf` répond directement, et le contrôle d'accès du contrôleur ne sert plus à rien.
+
+        La délégation devient alors **pire** que le service par Python, puisqu'elle publie l'intégralité du dossier d'upload.
+
+        Vérifiez la directive avant de déployer, puis demandez une URL protégée sans être authentifié.
+
+    !!! warning "Le chemin part d'une donnée en base"
+        `document.path` vient du registre ou de votre table, et un chemin porteur de `..` sortirait de l'`alias`.
+
+        Passez le chemin par `normalize_media_path`, qui refuse la traversée, avant de le poser dans l'en-tête.
+
+    !!! info "Pourquoi Forge ne fournit pas d'assistant"
+        La moitié qui protège est la directive `internal;`, dans une configuration que Forge ne lit pas et n'écrit pas.
+
+        Un assistant `accel_redirect_response()` laisserait croire que l'appeler suffit, alors qu'il ne garantit rien sans la configuration correspondante. Trois lignes explicites dans un contrôleur montrent exactement ce qui part, et n'endorment personne.
+
+    Apache et lighttpd suivent le même motif sous le nom `X-Sendfile`, avec un chemin absolu au lieu d'une `location`. Le nom de l'en-tête et la forme du chemin changent, la règle ne change pas.
+
 ## Voir aussi
 
 - [Upload générique (manager.py)](references/manager.md) : détail de `save_upload` / `serve_media_file`.

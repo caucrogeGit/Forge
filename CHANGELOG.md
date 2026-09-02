@@ -4,6 +4,32 @@
 
 ### Ajouté
 
+- **Un compte ne peut plus remplir le disque un fichier valide à la fois (`FILES-QUOTA-001`).**
+  Chaque envoi passait la taille maximale, et rien ne regardait la somme. Le registre de l'ADR-094 la connaissait, personne ne la lisait.
+  Le quota porte sur le couple propriétaire, une nature et un identifiant : `user` et `article` ne se règlent donc pas ensemble, ce qui est le sens de « par utilisateur et par ressource ». `FILES_QUOTA_USER_BYTES` l'emporte sur `FILES_QUOTA_BYTES`, et sans aucune des deux rien n'est borné.
+  **Une valeur d'environnement illisible lève au lieu d'être ignorée.** `FILES_QUOTA_BYTES=50MB` interrompt la lecture. Retomber en silence sur « aucune limite » à cause d'une faute de frappe irait exactement dans le mauvais sens, et personne ne le verrait avant que le disque soit plein. Le message nomme la variable et donne la valeur en octets.
+  **Ce n'est pas une borne infranchissable, et la documentation le dit.** Le contrôle lit la somme puis l'appelant écrit : deux envois simultanés peuvent passer tous les deux, le dépassement restant borné par `upload_max_size`. Fermer cette fenêtre demanderait de sérialiser les envois d'un même compte, pour une garantie que personne n'a demandée.
+  `QuotaExceededError` descend d'`UploadError` : une application qui entoure déjà `save_upload` d'un `except UploadError` traite le refus sans changer une ligne.
+
+- **Une analyse antivirus peut se brancher, et sa panne ne vaut pas feu vert (`FILES-SCAN-HOOK-001`).**
+  Forge valide l'extension, le type MIME, la taille et les premiers octets. Aucun de ces contrôles ne dit si le contenu est malveillant, un PDF porteur d'une charge active ayant l'extension, le type et la signature d'un PDF.
+  Le paquet ne fournit aucune analyse et n'en fournira pas, un moteur antivirus étant un service à installer et à tenir à jour, dont la base de signatures serait périmée le jour de la publication. Il fournit la prise : `register_file_scanner` branche l'analyseur, `save_upload` le consulte.
+  **L'analyse précède l'écriture.** Un fichier analysé après avoir touché le disque y est déjà, et l'y laisser quelques millisecondes suffit à ce qu'une sauvegarde ou un indexeur le voie. Un test vérifie qu'un refus ne laisse rien sur le disque.
+  **Un analyseur qui lève, qui expire ou qui rend autre chose qu'un verdict refuse le dépôt.** C'est la faute classique de ce genre de branchement : traiter le silence comme un feu vert, et voir tout passer le jour où le service antivirus tombe, sans un signal. `ScannerUnavailableError` reste distincte de `UploadRejectedByScanError`, l'une étant une panne à réparer et l'autre un avis rendu sur un fichier.
+  Le motif technique du refus ne parvient jamais au déposant : le nom d'une signature dit ce qui est détecté, donc ce qui ne l'est pas.
+
+- **Les fichiers sans référence se voient avant de se supprimer (`FILES-ORPHAN-PURGE-001`).**
+  Un fichier détaché de l'entité qui le portait reste sur le disque, servi par personne et compté dans la sauvegarde. `forge files:orphans` rapproche le dossier d'upload et le registre, et nomme les deux sortes d'orphelins, le fichier que rien n'inscrit et l'inscription dont le fichier a disparu.
+  **Un registre vide interrompt la commande.** L'inscription est explicite (ADR-094) : une application qui n'appelle jamais `record_file` a un registre vide et des fichiers parfaitement vivants. Sans ce refus, la première exécution effacerait la totalité des uploads du projet, et c'est le scénario le plus coûteux atteint par la commande la plus banale.
+  **Un fichier récent n'est jamais candidat.** Entre l'écriture et l'inscription il s'écoule un instant, davantage si l'application inscrit après validation d'un formulaire ; une purge qui tourne dans cet intervalle supprimerait un dépôt en cours. Le seuil par défaut est d'un jour.
+  La commande affiche seulement, `--delete` applique (charte §7). `find_orphans` rend le rapport et `purge_orphans` l'applique tel quel, de sorte qu'un fichier déposé entre les deux gestes n'entre pas dans la fournée. Le rapport dit ce qu'il a écarté, une absence de la liste ne devant pas se lire comme « jugé sain ».
+
+- **L'envoi d'un gros fichier peut être délégué au serveur frontal (`DOC-FILES-XACCEL-001`).**
+  `serve_media_file` sert depuis Python, ce qui immobilise un travailleur pendant tout l'envoi : sur 200 Mo et une connexion lente, un travailleur Gunicorn recopie des octets pendant plusieurs minutes.
+  Le motif est documenté : le contrôleur décide, `X-Accel-Redirect` fait envoyer nginx, et le contrôle d'accès reste en Python.
+  **La moitié qui protège est la directive `internal;`.** Sans elle, le dossier d'upload répond directement par URL, le contrôle du contrôleur ne sert plus à rien, et la délégation devient pire que le service par Python.
+  C'est pourquoi Forge ne livre pas d'assistant : il vivrait dans le paquet alors que la garantie vit dans une configuration que Forge ne lit pas, et laisserait croire que l'appeler suffit.
+
 - **Un réglage personnel a sa place, sans collision possible (`SETTINGS-PER-USER-001`).**
   Le thème ou la langue d'un utilisateur n'avaient pas où se ranger, la clé primaire portant la seule clé du paramètre. Une clé composée `user.42.theme` marchait, mais rien n'empêchait la collision : un paramètre global du même nom aurait désigné la même ligne, et l'un aurait écrasé l'autre en silence.
   Le préfixe `user.` est donc **réservé**, et `set_setting` le refuse en nommant la bonne porte. L'identifiant ne peut pas contenir de point, séparateur d'espace de noms, deux utilisateurs pouvant sinon viser la même clé.

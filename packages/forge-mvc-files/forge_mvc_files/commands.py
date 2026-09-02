@@ -20,4 +20,7 @@ COMMANDS: dict[str, dict[str, str | bool]] = {
     # files:init écrit la migration du registre (ADR-094). Il n'ouvre aucune
     # connexion : il rend du SQL et l'écrit dans mvc/migrations/.
     "files:init": {"module": "forge_mvc_files.cli_init"},
+    # files:orphans rapproche le disque et le registre. Affiche par défaut,
+    # ne supprime que sur --delete (charte §7).
+    "files:orphans": {"module": "forge_mvc_files.cli_orphans", "config": True},
 }
