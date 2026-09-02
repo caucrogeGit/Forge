@@ -27,6 +27,7 @@ __all__ = [
     "ENV_API_TOKEN",
     "AudioConfig",
     "load_audio_config",
+    "AudioConfigError",
 ]
 
 DEFAULT_FFMPEG_BIN = "ffmpeg"
@@ -58,15 +59,36 @@ class AudioConfig:
     api_token: str | None = None
 
 
+class AudioConfigError(ValueError):
+    """Valeur de configuration illisible."""
+
+
 def _int(source: Mapping[str, str], key: str, default: int) -> int:
+    """Entier positif lu dans l'environnement.
+
+    Une valeur illisible **lève** depuis `AUDIO-DOCTOR-HARMONISE-001`. Elle
+    retombait sur le défaut en silence, exactement comme le faisait
+    `forge-mvc-video` avant `VIDEO-QUOTA-001` :
+    `FORGE_AUDIO_MAX_DURATION_SECONDS=7200x` donnait 7200, les fichiers plus
+    longs étaient refusés, et rien ne l'expliquait.
+
+    L'harmonisation des deux paquets média porte d'abord sur ce que fait le
+    code, pas seulement sur ce qu'affiche `doctor`.
+    """
     raw = source.get(key)
     if raw is None or str(raw).strip() == "":
         return default
     try:
         value = int(str(raw).strip())
     except ValueError:
-        return default
-    return value if value > 0 else default
+        raise AudioConfigError(
+            f"{key} doit être un entier. Reçu : {str(raw).strip()!r}."
+        ) from None
+    if value <= 0:
+        raise AudioConfigError(
+            f"{key} doit être strictement positif. Reçu : {value}."
+        )
+    return value
 
 
 def load_audio_config(source: Mapping[str, str] | None = None) -> AudioConfig:

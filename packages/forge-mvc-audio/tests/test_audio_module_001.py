@@ -54,9 +54,25 @@ def test_config_from_env():
     assert cfg.api_token == "secret"
 
 
-def test_config_invalid_int_falls_back():
-    assert load_audio_config({"FORGE_AUDIO_MAX_UPLOAD_MB": "abc"}).max_upload_mb == 200
-    assert load_audio_config({"FORGE_AUDIO_MAX_UPLOAD_MB": "-5"}).max_upload_mb == 200
+def test_config_invalid_int_leve():
+    """Une valeur illisible LÈVE, elle ne retombe plus sur le défaut.
+
+    Ce test verrouillait le comportement inverse, qui était un défaut :
+    `FORGE_AUDIO_MAX_UPLOAD_MB=abc` donnait 200 en silence, les fichiers plus
+    lourds étaient refusés, et rien ne l'expliquait.
+
+    `AUDIO-DOCTOR-HARMONISE-001` aligne l'audio sur la vidéo, qui a fait le
+    même chemin avec `VIDEO-QUOTA-001`, et sur `forge-mvc-files`.
+    """
+    import pytest
+
+    from forge_mvc_audio.config import AudioConfigError
+
+    assert load_audio_config({}).max_upload_mb == 200
+
+    for mauvais in ("abc", "-5", "0"):
+        with pytest.raises(AudioConfigError):
+            load_audio_config({"FORGE_AUDIO_MAX_UPLOAD_MB": mauvais})
 
 
 # ── Storage ──────────────────────────────────────────────────────────────────

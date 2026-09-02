@@ -4,6 +4,31 @@
 
 ### Ajouté
 
+- **Les métadonnées d'un fichier audio sont enfin lisibles (`AUDIO-ID3-001`).**
+  `ffprobe` les rendait déjà, le paquet les jetait : le sondage lisait la durée, le codec et le débit, et laissait tomber le titre, l'artiste et l'album. Une application devait rappeler `ffprobe` elle même pour afficher le nom d'un morceau qu'elle venait de recevoir. `probe_audio(...).tags` les porte, et n'est jamais `None`.
+  **Le vrai sujet du ticket est le nettoyage.** Une étiquette vient du fichier envoyé, elle est écrite par qui l'a produit, et elle finit affichée dans une page. Les caractères de contrôle sont retirés, y compris `U+2028` que `str.strip` laisse passer et qui casse une chaîne JavaScript ; la longueur est bornée, rien n'empêchant un titre d'un mégaoctet ; et rien n'est interprété, l'échappement appartenant au gabarit.
+  Les noms d'étiquettes varient selon le conteneur, ID3 disant `tit2` là où Vorbis dit `TITLE` : les clés sont cherchées en minuscules, par ordre de préférence, et un conteneur sans bloc de format voit ses étiquettes lues sur le flux. Une année implausible ou un « piste 5 sur 2 » sont écartés, afficher une valeur manifestement fausse valant moins que ne rien afficher.
+  Le module ne réécrit jamais les étiquettes d'un fichier : lire et écrire sont deux gestes.
+
+- **Un fichier audio peut être découpé (`AUDIO-TRIM-001`).**
+  Extraire un extrait, retirer un silence de tête, produire un aperçu : le paquet transcodait un fichier entier et ne savait pas en prendre un morceau. Il fallait rappeler `ffmpeg` à la main, donc réécrire le durcissement des arguments et la gestion du délai.
+  `forge audio:trim source.wav extrait.mp3 --from 1:30 --to 2:00`. Les trois écritures d'un instant sont acceptées, `90`, `1:30` et `0:01:30.5`.
+  **La sortie ne peut pas être la source** : une découpe sur place n'existe pas côté `ffmpeg`, qui lit et écrit en même temps, et le fichier serait tronqué à zéro. La comparaison porte sur le chemin résolu, `a.mp3` et `./a.mp3` désignant le même fichier. **Un fichier de sortie existant n'est pas écrasé** sans `--force`, mode « Forge génère » de la charte.
+  Un intervalle vide ou renversé est refusé plutôt que joué, `ffmpeg` écrivant sinon un fichier de zéro seconde sans se plaindre. `-ss` est placé avant `-i`, ce qui fait sauter directement à l'instant demandé au lieu de décoder tout ce qui précède, et change une découpe de plusieurs minutes en une opération immédiate sur un long fichier.
+
+- **Les deux diagnostics média ne peuvent plus diverger (`AUDIO-DOCTOR-HARMONISE-001`).**
+  **Faux besoin mesuré** : `audio:doctor` et `video:doctor` étaient déjà alignés, même dataclass de résultat, mêmes statuts, mêmes contrôles. Le ticket livre donc le garde-fou qui manquait, qui exige l'égalité stricte des deux surfaces à un contrôle près, la migration que l'audio n'a pas puisqu'il est sans état.
+  La comparaison a en revanche fait apparaître une divergence réelle ailleurs, corrigée ici.
+
+### Modifié
+
+- **Une valeur de configuration audio illisible lève, au lieu de retomber sur le défaut** (`AUDIO-DOCTOR-HARMONISE-001`).
+  `FORGE_AUDIO_MAX_UPLOAD_MB=abc` donnait 200 en silence : les fichiers plus lourds étaient refusés, et rien ne l'expliquait. Les quatre paquets qui bornent quelque chose se comportent désormais pareil, `files`, `images`, `video` et `audio`.
+  Un test verrouillait le comportement inverse, c'est à dire le défaut ; il a été réaligné sur la règle.
+
+- **`safe_path_arg` et `default_ffmpeg_runner` deviennent publics dans `forge-mvc-audio.transcode`.**
+  La découpe construit sa propre ligne de commande et doit appliquer le même durcissement d'arguments. En garder une seconde copie privée les aurait fait diverger le jour où l'une serait corrigée.
+
 - **L'état de traitement d'une vidéo est enfin montrable (`VIDEO-STATUS-UI-001`).**
   Le paquet enregistrait quatre états sans donner de quoi les afficher : après l'envoi, la page ne savait pas dire où en était le transcodage, et chaque application réécrivait sa correspondance vers un libellé français. `describe_video_status` la fournit, et `GET /videos/{uuid}/status` la rend en JSON pour rafraîchir une page sans la recharger.
   **La sortie d'erreur de ffmpeg ne sort jamais.** `error_message` porte le message de ffmpeg, qui contient les chemins absolus des fichiers du serveur : un gabarit qui affiche « la raison de l'échec » publierait l'arborescence.

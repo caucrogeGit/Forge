@@ -27,6 +27,14 @@ __version__ = "1.0.0rc7"
 from forge_mvc_audio.config import AudioConfig, load_audio_config
 from forge_mvc_audio.http import register_audio_routes
 from forge_mvc_audio.ingest import AudioIngestError, ingest_audio
+from forge_mvc_audio.tags import AudioTags, clean_tag_value, parse_tags
+from forge_mvc_audio.trim import (
+    AudioTrimError,
+    build_trim_command,
+    format_timecode,
+    parse_timecode,
+    trim_audio,
+)
 from forge_mvc_audio.probe import AudioMetadata, AudioProbeError, probe_audio
 from forge_mvc_audio.transcode import FfmpegError, transcode_to_mp3
 
@@ -34,6 +42,16 @@ __all__ = [
     "AudioConfig",
     "AudioIngestError",
     "AudioMetadata",
+    # Étiquettes du fichier (AUDIO-ID3-001)
+    "AudioTags",
+    "parse_tags",
+    "clean_tag_value",
+    # Découpe par début et fin (AUDIO-TRIM-001)
+    "trim_audio",
+    "parse_timecode",
+    "format_timecode",
+    "build_trim_command",
+    "AudioTrimError",
     "AudioProbeError",
     "FfmpegError",
     "ingest_audio",

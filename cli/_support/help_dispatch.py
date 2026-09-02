@@ -125,6 +125,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "video:cleanup":    "Purge vidéos failed / fichiers orphelins (dry-run par défaut, --apply).",
     # Audio
     "audio:doctor":     "Diagnostic du module audio (package, config, présence ffmpeg/ffprobe).",
+    "audio:trim":       "Découpe un fichier audio entre deux instants (ne touche pas la source).",
     # Admin
     "admin:init":       "Prépare la structure mvc/admin/ du back-office (write-if-new, sans écrasement).",
     "admin:doctor":     "Vérifie la cohérence des ressources admin avec les contrats d'entité (lecture seule).",
@@ -378,6 +379,32 @@ Limites :
   un dossier de variantes. Le mode affichage sert précisément à le voir.
   La commande ne régénère rien : reproduire une variante manquante
   demanderait de décider quand, et serait un second geste.
+""",
+    "audio:trim": """\
+Usage :
+  forge audio:trim SOURCE SORTIE [--from INSTANT] [--to INSTANT]
+
+Description :
+  Extrait un morceau d'un fichier audio. La source n'est jamais modifiée.
+
+Effets :
+  Écrit SORTIE. Refuse d'écraser un fichier existant sans --force.
+
+Prérequis :
+  L'opt-in forge-mvc-audio installé et ffmpeg dans le PATH.
+
+Options :
+  --from INSTANT   début, « 90 », « 1:30 » ou « 0:01:30.5 » (défaut 0)
+  --to INSTANT     fin ; sans elle, la découpe va jusqu'au bout
+  --reencode       bornes exactes, au prix d'un transcodage complet
+  --force          écrase le fichier de sortie s'il existe
+
+Limites :
+  Sans --reencode les flux sont copiés tels quels : la découpe est
+  instantanée et sans perte, mais les bornes se calent sur l'image clé la
+  plus proche, à quelques dixièmes de seconde près.
+  La sortie ne peut pas être la source : ffmpeg lit et écrit en même
+  temps, et le fichier serait tronqué.
 """,
     "jobs:status": """\
 Usage:

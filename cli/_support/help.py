@@ -101,6 +101,7 @@ Vidéo (module opt-in forge-mvc-video)
 
 Audio (module opt-in forge-mvc-audio)
   audio:doctor        Diagnostic statique du module audio (package, config, ffmpeg/ffprobe).
+  audio:trim          Découpe un fichier audio entre deux instants (ne touche pas la source).
 
 Admin (module opt-in forge-mvc-admin)
   admin:init          Prépare la structure mvc/admin/ du back-office (write-if-new, sans écrasement).

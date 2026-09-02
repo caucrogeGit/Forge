@@ -217,9 +217,9 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `AUDIO-ID3-001` | Exposition des métadonnées du fichier |
-| `AUDIO-TRIM-001` | Découpe par début et fin en ligne de commande |
-| `AUDIO-DOCTOR-HARMONISE-001` | Messages de `audio:doctor` alignés sur `video:doctor` |
+| `AUDIO-ID3-001` | **Livré.** ffprobe les rendait déjà ; nettoyées, elles viennent du fichier envoyé |
+| `AUDIO-TRIM-001` | **Livré.** `audio:trim` ; ni la source ni une sortie existante ne sont écrasées |
+| `AUDIO-DOCTOR-HARMONISE-001` | **Livré. Faux besoin** : déjà alignés. Garde-fou posé, et la vraie divergence corrigée (config) |
 
 ### 7.14 iot
 

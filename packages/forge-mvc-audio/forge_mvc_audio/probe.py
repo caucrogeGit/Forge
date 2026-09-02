@@ -16,10 +16,12 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, cast
 
 from forge_mvc_audio.config import AudioConfig, load_audio_config
+
+from forge_mvc_audio.tags import AudioTags, parse_tags
 
 __all__ = ["AudioMetadata", "AudioProbeError", "probe_audio", "parse_probe_json"]
 
@@ -41,6 +43,10 @@ class AudioMetadata:
     sample_rate_hz: int | None
     channels: int | None
     container: str | None
+    # AUDIO-ID3-001 : ffprobe rendait déjà ces étiquettes, le paquet les jetait.
+    # Jamais `None` : un fichier sans étiquette donne un `AudioTags` vide, de
+    # sorte qu'un appelant n'ait pas à tester avant de lire.
+    tags: AudioTags = field(default_factory=AudioTags)
 
 
 def _default_runner(ffprobe_bin: str, path: str) -> str:
@@ -122,6 +128,7 @@ def parse_probe_json(payload: str | dict[str, Any]) -> AudioMetadata:
         sample_rate_hz=_int_or_none(audio.get("sample_rate")),
         channels=_int_or_none(audio.get("channels")),
         container=fmt.get("format_name"),
+        tags=parse_tags(data),
     )
 
 

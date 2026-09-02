@@ -25,6 +25,9 @@ __all__ = [
     "FfmpegError",
     "DEFAULT_TRANSCODE_TIMEOUT",
     "build_transcode_command",
+    "safe_path_arg",
+    "default_ffmpeg_runner",
+    "FfmpegRunner",
     "transcode_to_mp3",
 ]
 
@@ -38,9 +41,14 @@ class FfmpegError(Exception):
     """ffmpeg a échoué, est absent, ou a dépassé le délai."""
 
 
-def _safe_path_arg(path: str) -> str:
+def safe_path_arg(path: str) -> str:
     """Empêche qu'un chemin commençant par ``-`` soit lu comme une option ffmpeg
-    (MEDIA-FFMPEG-ARG-HARDENING-001). Neutre pour les chemins uuid/absolus."""
+    (MEDIA-FFMPEG-ARG-HARDENING-001). Neutre pour les chemins uuid/absolus.
+
+    Publique depuis ``AUDIO-TRIM-001`` : la découpe construit sa propre ligne de
+    commande et doit appliquer le même durcissement. En dupliquer une seconde
+    copie ferait diverger les deux le jour où l'une serait corrigée.
+    """
     return f"./{path}" if path.startswith("-") else path
 
 
@@ -51,15 +59,16 @@ def build_transcode_command(
     return [
         ffmpeg_bin,
         "-y",
-        "-i", _safe_path_arg(input_path),
+        "-i", safe_path_arg(input_path),
         "-vn",
         "-c:a", "libmp3lame", "-b:a", f"{bitrate_kbps}k", "-ac", "2",
         "-map_metadata", "-1",
-        _safe_path_arg(output_path),
+        safe_path_arg(output_path),
     ]
 
 
-def _default_ffmpeg_runner(cmd: list[str], timeout: int) -> tuple[int, str]:
+def default_ffmpeg_runner(cmd: list[str], timeout: int) -> tuple[int, str]:
+    """Exécution par défaut de ffmpeg. Publique pour la même raison."""
     import subprocess
 
     try:
@@ -86,6 +95,6 @@ def transcode_to_mp3(
     cmd = build_transcode_command(
         ffmpeg_bin, input_path, output_path, bitrate_kbps=bitrate_kbps
     )
-    code, stderr = (runner or _default_ffmpeg_runner)(cmd, timeout)
+    code, stderr = (runner or default_ffmpeg_runner)(cmd, timeout)
     if code != 0:
         raise FfmpegError(f"ffmpeg a échoué (code {code}) : {stderr.strip()}")

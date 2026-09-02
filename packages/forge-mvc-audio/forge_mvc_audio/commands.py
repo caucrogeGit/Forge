@@ -8,4 +8,7 @@ from __future__ import annotations
 
 COMMANDS: dict[str, dict[str, str | bool]] = {
     "audio:doctor": {"module": "forge_mvc_audio.cli.doctor"},
+    # audio:trim découpe un fichier sans toucher à la source. Le paquet est
+    # sans état : aucune connexion, donc pas de `config: True`.
+    "audio:trim": {"module": "forge_mvc_audio.cli.trim"},
 }

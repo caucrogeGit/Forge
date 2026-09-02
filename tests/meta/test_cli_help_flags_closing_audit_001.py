@@ -76,6 +76,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "video:doctor", "video:init", "video:upload", "video:process", "video:cleanup",
     # Audio (module opt-in forge-mvc-audio)
     "audio:doctor",
+    # audio:trim découpe un fichier audio (AUDIO-TRIM-001).
+    "audio:trim",
     # Admin (module opt-in forge-mvc-admin)
     "admin:init",
     "admin:doctor",

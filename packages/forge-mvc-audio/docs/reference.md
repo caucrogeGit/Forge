@@ -316,6 +316,95 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-audio` : la dépendance va de l'opt-in vers le cœur.
 
+??? note "12. Lire les métadonnées d'un fichier"
+
+    `ffprobe` rendait déjà ces étiquettes, le paquet les jetait (`AUDIO-ID3-001`) : le sondage lisait la durée, le codec et le débit, et laissait tomber le titre, l'artiste et l'album.
+
+    Une application devait donc rappeler `ffprobe` elle même pour afficher le nom d'un morceau qu'elle venait de recevoir.
+
+    ```python
+    from forge_mvc_audio import probe_audio
+
+    meta = probe_audio(chemin)
+    meta.duration_seconds        # déjà présent
+    meta.tags.title              # « Le Sacre du printemps »
+    meta.tags.display_title      # « Stravinsky - Le Sacre du printemps »
+    meta.tags.year               # 2019
+    meta.tags.track_number       # 3, sur meta.tags.track_total
+    ```
+
+    `meta.tags` n'est jamais `None` : un fichier sans étiquette donne un objet vide, de sorte qu'un appelant n'ait pas à tester avant de lire. C'est d'ailleurs le cas courant d'un enregistrement brut, ou d'un fichier transcodé par le paquet, qui pose `-map_metadata -1`.
+
+    !!! danger "Une étiquette vient du fichier envoyé"
+        Elle est écrite par qui a produit le fichier, ou par qui l'a modifié avant de l'envoyer, et elle finit affichée dans une page.
+
+        Trois précautions sont donc appliquées ici plutôt que laissées à l'appelant, qui les oublierait une fois sur deux. Les caractères de contrôle sont retirés, y compris `U+2028` que `str.strip` laisse passer et qui casse une chaîne JavaScript. La longueur est bornée à 300 caractères, rien n'empêchant un titre d'un mégaoctet. Et rien n'est interprété.
+
+    !!! warning "L'échappement reste au gabarit"
+        Le module ne décode aucune entité et n'échappe rien.
+
+        Le faire ici et dans le gabarit afficherait `&amp;amp;`, et Jinja échappe déjà.
+
+    !!! info "Les noms d'étiquettes varient selon le conteneur"
+        ID3 dit `tit2`, Vorbis dit `TITLE`, et la casse change d'un outil à l'autre.
+
+        Les clés sont donc cherchées en minuscules, par ordre de préférence. Un conteneur sans bloc de format, comme le WAV, voit ses étiquettes lues sur le flux audio.
+
+    Une année implausible ou un « piste 5 sur 2 » sont écartés : afficher une valeur manifestement fausse vaut moins que ne rien afficher.
+
+    Le module ne **réécrit** jamais les étiquettes d'un fichier. Les lire et les écrire sont deux gestes, et le second appartiendrait à un autre ticket.
+
+??? note "13. Découper un fichier"
+
+    Extraire un extrait, retirer un silence de tête, produire un aperçu de trente secondes : le paquet savait transcoder un fichier entier, pas en prendre un morceau (`AUDIO-TRIM-001`).
+
+    ```bash
+    forge audio:trim source.wav extrait.mp3 --from 1:30 --to 2:00
+    forge audio:trim source.wav apercu.mp3 --to 30 --reencode
+    ```
+
+    Les trois écritures d'un instant sont acceptées, `90`, `1:30` et `0:01:30.5`, parce que les trois se rencontrent et que refuser l'une d'elles n'apporterait rien.
+
+    ```python
+    from forge_mvc_audio import trim_audio
+
+    trim_audio("source.wav", "extrait.mp3", start=90, end=120)
+    ```
+
+    !!! danger "La sortie ne peut pas être la source"
+        Une découpe sur place n'existe pas côté `ffmpeg`, qui lit et écrit en même temps : le fichier serait tronqué à zéro et le travail perdu.
+
+        La comparaison porte sur le chemin résolu, `a.mp3` et `./a.mp3` désignant le même fichier.
+
+    !!! warning "Un fichier de sortie existant n'est pas écrasé"
+        C'est le mode « Forge génère » de la charte, write-if-new.
+
+        Un extrait produit deux fois avec des bornes différentes doit dire lequel gagne, d'où `--force`.
+
+    !!! info "Sans réencodage, les bornes sont approchées"
+        Les flux sont copiés tels quels : la découpe est instantanée et sans perte, mais elle se cale sur l'image clé la plus proche, à quelques dixièmes de seconde près.
+
+        `--reencode` rend les bornes exactes, au prix d'un transcodage complet.
+
+    Un intervalle vide ou renversé est refusé plutôt que joué : `ffmpeg` écrirait un fichier de zéro seconde sans se plaindre.
+
+    L'option `-ss` est placée **avant** `-i`, ce qui fait sauter `ffmpeg` directement à l'instant demandé au lieu de décoder tout ce qui précède. Sur un long fichier, cela change une découpe de plusieurs minutes en une opération immédiate.
+
+??? note "14. Alignement avec le module vidéo"
+
+    `audio:doctor` et `video:doctor` étaient **déjà** alignés quand ce ticket a été ouvert : même dataclass de résultat, mêmes statuts minuscules, mêmes contrôles (`AUDIO-DOCTOR-HARMONISE-001`).
+
+    Le ticket livre donc ce qui manquait vraiment, un garde-fou qui refuse que les deux surfaces divergent, à un contrôle près : la migration, que l'audio n'a pas puisqu'il est sans état.
+
+    La comparaison a en revanche fait apparaître une divergence réelle, ailleurs.
+
+    !!! danger "Une valeur de configuration illisible lève désormais"
+        `FORGE_AUDIO_MAX_DURATION_SECONDS=7200x` retombait sur le défaut en silence : les fichiers plus longs étaient refusés, et rien ne l'expliquait.
+
+        Le paquet suit maintenant `forge-mvc-video`, `forge-mvc-files` et `forge-mvc-images` : une limite mal écrite se signale au démarrage. Pour ne pas borner, retirez la variable.
+
+    L'harmonisation de deux paquets porte d'abord sur ce que fait leur code, pas seulement sur ce qu'affiche leur diagnostic.
+
 ## Voir aussi
 
 - [Configuration (config.py)](references/config.md) : contrat `AudioConfig`.
