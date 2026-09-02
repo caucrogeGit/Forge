@@ -388,6 +388,94 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
         En `APP_ENV=prod`, `fixtures:load --run` et `fixtures:purge --run` sont refusés sans `--force`.
         Gardez les fixtures pour `dev` et `test` ; en production, le référentiel permanent passe par une migration de seed.
 
+??? note "14. Jeux de fixtures nommés"
+
+    `mvc/fixtures/` était plat : tous les fichiers se chargeaient ensemble (`FIXTURES-SCENARIOS-001`).
+
+    Un projet qui voulait un jeu de démonstration riche **et** un jeu de test minimal devait commenter des fichiers ou les déplacer à la main entre deux exécutions.
+
+    ```
+    mvc/fixtures/
+        01_roles.sql            <- jeu commun, toujours chargé
+        demo/10_articles.sql    <- forge fixtures:load --scenario demo
+        test/10_articles.sql    <- forge fixtures:load --scenario test
+    ```
+
+    Le jeu commun est chargé **d'abord**, puis celui du scénario : un scénario complète une base partagée au lieu de la réécrire. Sans `--scenario`, seul le jeu commun est chargé, ce qui est le comportement d'avant ce ticket.
+
+    !!! danger "Un scénario inconnu est une erreur, jamais un chargement vide"
+        C'est le point qui compte.
+
+        `--scenario dmo`, faute de frappe pour `demo`, chargerait zéro fichier et annoncerait un succès : l'exploitant croirait ses données en place, et chercherait ailleurs pourquoi son application est vide.
+
+        Le message liste les scénarios présents. Un dossier de scénario vide est refusé pour la même raison.
+
+    !!! info "Trois noms suggérés, aucun imposé"
+        `demo`, `test` et `minimal` couvrent les besoins courants et la documentation les emploie.
+
+        Ce ne sont que des noms de dossiers : Forge n'en connaît aucun et n'en réserve aucun. Imposer une liste fermée obligerait à un ticket pour chaque projet ayant un quatrième besoin.
+
+    Le nom devient un dossier sur le disque : il est validé, et une valeur comme `../etc` est refusée.
+
+??? note "15. L'ordre des clés étrangères, durci"
+
+    Le tri topologique existait, et se rabattait **en silence** sur l'ordre alphabétique dans trois cas (`FIXTURES-FK-ORDER-ROBUST-001`) : `relations.json` absent, cycle dans le graphe, ou table sans entité déclarée.
+
+    !!! danger "Le repli était raisonnable, le silence ne l'était pas"
+        Le chargement échouait alors sur une violation de clé étrangère, et rien ne reliait cette erreur à l'ordre qui l'avait causée.
+
+        L'exploitant cherchait dans ses données un défaut qui était dans son graphe.
+
+        `fixtures:load` affiche désormais ce qu'il n'a pas pu déduire, **avant** de charger, et le cycle est nommé : « cycle entre Article, Auteur » se corrige, « ordre non déduit » ne se corrige pas.
+
+    !!! warning "Un fichier peut écrire dans plusieurs tables"
+        L'ordre ne regardait que le **premier** `INSERT INTO` de chaque fichier.
+
+        Un fichier insérant dans `articles` puis `commentaires` était classé comme s'il ne touchait qu'`articles`, et pouvait passer avant celui dont `commentaires` dépend. Toutes les tables écrites sont maintenant lues, et le fichier est classé après la plus tardive de leurs dépendances.
+
+    !!! info "Une table qui se référence elle même est signalée"
+        Une hiérarchie `parent_id` demande que l'ordre soit respecté **ligne à ligne** dans le fichier.
+
+        Aucun classement de fichiers ne peut le garantir, et le dire vaut mieux que de laisser découvrir.
+
+    `relations.json` absent et `relations.json` illisible donnent deux messages différents : le premier est une situation normale dans un projet sans relation, le second est un défaut à corriger.
+
+??? note "16. Partir de l'état courant plutôt que d'une page blanche"
+
+    Écrire des fixtures à la main coûte cher et vieillit mal : une colonne ajoutée au contrat, et tous les `INSERT` sont à reprendre (`FIXTURES-SNAPSHOT-001`).
+
+    La base contient pourtant déjà un jeu de données cohérent, celui avec lequel on travaille.
+
+    ```bash
+    forge fixtures:snapshot articles --limit 20 --order-by id
+    forge fixtures:snapshot articles --out mvc/fixtures/demo/10_articles.sql
+    ```
+
+    !!! danger "La sortie vient d'une base réelle"
+        Sur un environnement de recette alimenté depuis la production, ces données sont celles de personnes, et le fichier produit finit dans un dépôt Git, où il ne s'efface plus.
+
+        L'exécution en `APP_ENV=prod` est **refusée** sans `--force`, comme `fixtures:load --run` (ADR-074). L'en-tête du fichier le rappelle : un fichier de fixtures est relu des mois plus tard, souvent par quelqu'un d'autre, et rien dans un `INSERT` ne dit d'où il vient.
+
+    !!! info "Forge ne devine pas quelles colonnes masquer"
+        Il ne sait pas lesquelles portent une donnée personnelle, et prétendre le deviner donnerait une fausse assurance.
+
+        C'est précisément pourquoi la sortie est **affichée** par défaut : vous relisez avant d'écrire. Un fichier existant n'est jamais écrasé (charte §9).
+
+    !!! warning "Une fixture est une amorce, pas une sauvegarde"
+        Le plafond vaut 50 lignes par défaut et 1000 au maximum.
+
+        Une ligne de plus que le plafond est lue, pour savoir qu'il en restait et le dire dans le fichier, plutôt que de rendre un instantané tronqué qui ressemble à un instantané complet.
+
+    Les valeurs sont rendues par `Dialect.render_literal` (ADR-075), réservé aux artefacts relus par un humain avant d'être joués. Le nom de table et le tri sont validés plutôt qu'échappés, aucun backend n'acceptant un nom de table en paramètre lié.
+
+    ### API Python des trois tickets
+
+    | Module | Symboles | Rôle |
+    |---|---|---|
+    | `scenarios.py` | `select_scenario_files`, `available_scenarios`, `ScenarioSelection`, `ScenarioError`, `fixtures_root` | jeux nommés |
+    | `ordering.py` | `plan_fixture_order`, `FixtureOrderPlan`, `tables_written_by`, `fk_dependencies`, `topological_order` | ordre et diagnostic |
+    | `snapshot.py` | `snapshot_table`, `render_snapshot`, `render_insert`, `TableSnapshot`, `SnapshotError` | instantané |
+
 ## Voir aussi
 
 - [Référence par module (cli/, factory)](references/cli.md) : détail des fonctions et de la classe `Factory`.

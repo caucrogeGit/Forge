@@ -110,6 +110,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "rbac:init",
     # Fixtures (ADR-074, ADR-076)
     "fixtures:load", "fixtures:purge", "fixtures:generate", "fixtures:make-factory",
+    # fixtures:snapshot rend l'état courant en fixtures (FIXTURES-SNAPSHOT-001).
+    "fixtures:snapshot",
 })
 
 

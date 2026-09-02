@@ -170,6 +170,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "sessions:gc":        "Purge les sessions expirées (à brancher sur cron/systemd).",
     "fixtures:load":         "Charge les fixtures mvc/fixtures/*.sql (affiche ; --run exécute).",
     "fixtures:purge":        "Vide les tables ciblées par les fixtures (affiche ; --run exécute).",
+    "fixtures:snapshot": "Rend l'état courant d'une table en fixtures (affiche ; --out écrit).",
     "fixtures:generate":     "Génère un .sql depuis une factory (forge-mvc-fixtures, Faker).",
     "fixtures:make-factory": "Échafaude une factory depuis le contrat d'entité (scaffold riche).",
 }
@@ -433,6 +434,35 @@ Limites :
   Le jeton n'est jamais stocké en clair et n'est affiché qu'à sa
   création : le perdre oblige à en créer un autre.
   FORGE_IOT_API_TOKEN garde la portée globale, tous sites confondus.
+""",
+    "fixtures:snapshot": """\
+Usage :
+  forge fixtures:snapshot TABLE [--limit N] [--order-by COL] [--out CHEMIN]
+
+Description :
+  Lit une table et rend ses lignes en INSERT relisibles, à ranger dans
+  mvc/fixtures/. Écrire des fixtures à la main coûte cher et vieillit
+  mal ; la base contient déjà un jeu cohérent.
+
+Effets :
+  Sans --out, affiche seulement. Avec, écrit le fichier, et refuse s'il
+  existe déjà (charte §9).
+
+Prérequis :
+  L'opt-in forge-mvc-fixtures installé et une base accessible.
+
+Options :
+  --limit N        plafond de lignes (défaut 50, maximum 1000)
+  --order-by COL   colonne de tri, pour un instantané reproductible
+  --out CHEMIN     écrit le fichier au lieu de l'afficher
+  --force          autorise l'exécution en APP_ENV=prod
+
+Limites :
+  La sortie vient d'une base RÉELLE et peut contenir des données
+  personnelles. Elle est affichée d'abord, et l'exécution en production
+  est refusée sans --force.
+  Forge ne devine pas quelles colonnes masquer : relisez avant de
+  versionner.
 """,
     "jobs:status": """\
 Usage:

@@ -184,6 +184,7 @@ Choix du moteur (SQLite, MariaDB, PostgreSQL, SQL Server) : [Bases de données](
 |---|---|---|
 | `forge fixtures:load` | charge les fixtures `mvc/fixtures/*.sql` (affiche ; `--run` exécute) | opt-in `forge-mvc-fixtures` |
 | `forge fixtures:purge` | vide les tables ciblées par les fixtures (affiche ; `--run` exécute) | opt-in `forge-mvc-fixtures` |
+| `forge fixtures:snapshot` | rend l'état courant d'une table en `INSERT` relisibles ; affiche seulement, `--out` écrit et n'écrase jamais | opt-in `forge-mvc-fixtures` |
 | `forge fixtures:generate` | génère un `.sql` depuis une factory (Faker) | opt-in `forge-mvc-fixtures` |
 | `forge fixtures:make-factory` | échafaude une factory depuis le contrat d'entité | opt-in `forge-mvc-fixtures` |
 

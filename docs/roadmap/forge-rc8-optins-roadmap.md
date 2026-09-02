@@ -242,9 +242,9 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `FIXTURES-SCENARIOS-001` | Jeux nommés, démonstration, test et minimal |
-| `FIXTURES-SNAPSHOT-001` | Export de l'état courant vers des fabriques |
-| `FIXTURES-FK-ORDER-ROBUST-001` | Ordre des clés étrangères durci |
+| `FIXTURES-SCENARIOS-001` | **Livré.** Sous-dossiers ; un nom inconnu lève au lieu de charger zéro |
+| `FIXTURES-SNAPSHOT-001` | **Livré.** Affiche d'abord, refuse en prod, plafond bas, en-tête qui prévient |
+| `FIXTURES-FK-ORDER-ROBUST-001` | **Livré.** Toutes les tables d'un fichier ; le repli est dit, plus silencieux |
 
 ### 7.17 settings
 

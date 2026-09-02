@@ -154,6 +154,7 @@ Opt-ins applicatifs
 Fixtures (démo/test)
   fixtures:load          Charge les fixtures mvc/fixtures/*.sql (affiche ; --run exécute).
   fixtures:purge         Vide les tables ciblées par les fixtures (affiche ; --run exécute).
+  fixtures:snapshot   Rend l'état courant d'une table en fixtures (affiche ; --out écrit).
   fixtures:generate      Génère un .sql depuis une factory (Faker, forge-mvc-fixtures).
   fixtures:make-factory  Échafaude une factory depuis le contrat d'entité (scaffold riche).
 

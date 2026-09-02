@@ -4,6 +4,26 @@
 
 ### Ajouté
 
+- **Les fixtures se rangent en jeux nommés (`FIXTURES-SCENARIOS-001`).**
+  `mvc/fixtures/` était plat : tous les fichiers se chargeaient ensemble, et un projet voulant un jeu de démonstration riche **et** un jeu de test minimal devait commenter des fichiers ou les déplacer à la main entre deux exécutions.
+  Un sous-dossier par jeu, `forge fixtures:load --scenario demo`. Le jeu commun est chargé d'abord, puis celui du scénario : un scénario complète une base partagée au lieu de la réécrire. Sans `--scenario`, rien ne change.
+  **Un scénario inconnu est une erreur, jamais un chargement vide.** `--scenario dmo`, faute de frappe pour `demo`, chargerait zéro fichier et annoncerait un succès : l'exploitant croirait ses données en place, et chercherait ailleurs pourquoi son application est vide. Le message liste les scénarios présents, et un dossier vide est refusé pour la même raison.
+  `demo`, `test` et `minimal` sont **suggérés**, jamais imposés : ce ne sont que des noms de dossiers, et une liste fermée obligerait à un ticket pour chaque projet ayant un quatrième besoin.
+
+- **Une fixture peut partir de l'état courant (`FIXTURES-SNAPSHOT-001`).**
+  Écrire des fixtures à la main coûte cher et vieillit mal : une colonne ajoutée au contrat, et tous les `INSERT` sont à reprendre. `forge fixtures:snapshot articles` rend l'état d'une table en `INSERT` relisibles.
+  **La sortie vient d'une base réelle.** Sur un environnement de recette alimenté depuis la production, ces données sont celles de personnes, et le fichier finit dans un dépôt Git où il ne s'efface plus. L'exécution en `APP_ENV=prod` est refusée sans `--force`, la sortie est **affichée** par défaut, un fichier existant n'est jamais écrasé, et l'en-tête du fichier rappelle d'où il vient.
+  Forge ne devine **pas** quelles colonnes masquer : il ne sait pas lesquelles portent une donnée personnelle, et prétendre le deviner donnerait une fausse assurance. C'est pourquoi la relecture précède l'écriture.
+  Le plafond vaut 50 lignes, 1000 au maximum : une fixture est une amorce, pas une sauvegarde. Une ligne de plus est lue pour savoir qu'il en restait et le dire, plutôt que de rendre un instantané tronqué qui ressemble à un instantané complet.
+
+### Corrigé
+
+- **L'ordre des fixtures ne se rabat plus en silence (`FIXTURES-FK-ORDER-ROBUST-001`).**
+  Le tri topologique existait, et se rabattait sur l'ordre alphabétique sans rien dire dans trois cas : `relations.json` absent, cycle dans le graphe, table sans entité déclarée.
+  Le repli est raisonnable, le **silence** ne l'était pas : le chargement échouait ensuite sur une violation de clé étrangère, et rien ne reliait cette erreur à l'ordre qui l'avait causée. L'exploitant cherchait dans ses données un défaut qui était dans son graphe. `fixtures:load` affiche maintenant ce qu'il n'a pas pu déduire, avant de charger, et nomme le cycle : « cycle entre Article, Auteur » se corrige, « ordre non déduit » ne se corrige pas.
+  **Un fichier peut écrire dans plusieurs tables**, et l'ordre ne regardait que le premier `INSERT INTO`. Un fichier insérant dans `articles` puis `commentaires` était classé comme s'il ne touchait qu'`articles`, et pouvait passer avant celui dont `commentaires` dépend. Toutes les tables écrites sont lues, et le fichier classé après la plus tardive de leurs dépendances.
+  Une table se référençant elle même est signalée : l'ordre doit y être respecté ligne à ligne dans le fichier, ce qu'aucun classement de fichiers ne peut garantir.
+
 - **Une colonne absente donne une erreur, et non dix mille (`IMPEXP-COLUMN-MAPPING-001`).**
   `FieldSpec.name` servait à la fois de clé d'enregistrement et de nom de colonne CSV : un export tableur dont l'en-tête dit « Adresse e-mail » ne pouvait pas alimenter le champ `email`, et il fallait renommer les colonnes à la main avant chaque import. `source` déclare le ou les en-têtes acceptés, essayés dans l'ordre.
   **Le défaut le plus coûteux était ailleurs.** Une colonne absente n'était pas détectée : `row.get(nom, "")` rendait une chaîne vide, et chaque ligne produisait « valeur requise manquante ». Un fichier de dix mille lignes rendait dix mille erreurs pour un seul en-tête mal orthographié, et la vraie cause restait introuvable au milieu. Les en-têtes sont maintenant rapprochés une fois, avant d'examiner la moindre ligne.

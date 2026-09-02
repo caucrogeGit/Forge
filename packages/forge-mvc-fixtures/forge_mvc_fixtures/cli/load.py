@@ -25,6 +25,12 @@ from pathlib import Path
 from typing import Any, cast
 
 from core.app.env import is_prod, read_app_env
+from forge_mvc_fixtures.ordering import FixtureOrderPlan, plan_fixture_order
+from forge_mvc_fixtures.scenarios import (
+    ScenarioError,
+    available_scenarios,
+    select_scenario_files,
+)
 from core.database.sql_script import split_sql_statements as _split_sql_statements
 from forge_mvc_fixtures.factory import Fixture
 
@@ -38,6 +44,7 @@ __all__ = [
     "collect_fixture_files",
     "collect_callable_fixtures",
     "order_fixture_files",
+    "fixture_order_plan",
     "order_load_units",
     "split_sql_statements",
     "load_fixtures",
@@ -106,12 +113,18 @@ def active_env() -> str:
     return read_app_env()
 
 
-def collect_fixture_files(root: Path) -> list[Path]:
-    """Fichiers ``mvc/fixtures/*.sql`` du projet, triés par nom."""
-    fixtures_dir = root / "mvc" / "fixtures"
-    if not fixtures_dir.is_dir():
-        return []
-    return sorted(fixtures_dir.glob("*.sql"), key=lambda path: path.name)
+def collect_fixture_files(root: Path, scenario: "str | None" = None) -> list[Path]:
+    """Fichiers ``.sql`` à charger : le jeu commun, puis celui du scénario.
+
+    Sans `scenario`, seul ``mvc/fixtures/*.sql`` est retenu, comportement
+    d'avant `FIXTURES-SCENARIOS-001`. Avec, ``mvc/fixtures/<scenario>/*.sql``
+    s'y ajoute : un scénario complète une base partagée au lieu de la réécrire.
+
+    Raises:
+        ScenarioError: scénario inconnu. Charger zéro fichier en annonçant un
+            succès ferait croire les données en place.
+    """
+    return list(select_scenario_files(root, scenario, pattern="*.sql").files)
 
 
 def _table_of_file(path: Path) -> str | None:
@@ -201,31 +214,20 @@ def _topological_order(deps: dict[str, set[str]]) -> list[str] | None:
 def order_fixture_files(root: Path, files: list[Path]) -> list[Path]:
     """Ordonne les fichiers pour respecter les dépendances de clés étrangères (F44).
 
-    Tri topologique du graphe déduit de ``relations.json`` : une entité est
-    chargée après celles qu'elle référence. Repli sur l'ordre par nom de fichier
-    si ``relations.json`` est absent, si une table est inconnue, ou en cas de
-    cycle (le préfixe numérique ``01_`` reste un ordre déclaratif de secours).
+    Délègue à `forge_mvc_fixtures.ordering`, qui a durci deux points
+    (`FIXTURES-FK-ORDER-ROBUST-001`) : toutes les tables écrites par un fichier
+    sont lues, et non plus seulement la première, et le repli sur l'ordre
+    alphabétique est **dit** au lieu d'être silencieux.
+
+    Cette fonction conserve sa signature, qui est publique. Pour obtenir le
+    diagnostic, appeler `plan_fixture_order`.
     """
-    by_name = sorted(files, key=lambda path: path.name)
-    deps = _fk_dependencies(root)
-    if deps is None:
-        return by_name
-    topo = _topological_order(deps)
-    if topo is None:
-        return by_name
-    rank = {entity: index for index, entity in enumerate(topo)}
+    return list(plan_fixture_order(root, files, _entity_tables(root)).files)
 
-    tables = _entity_tables(root)
-    table_to_entity = {table: entity for entity, table in tables.items()}
-    unknown_rank = len(topo)
 
-    def sort_key(path: Path) -> tuple[int, str]:
-        table = _table_of_file(path)
-        entity = table_to_entity.get(table) if table else None
-        return (rank.get(entity, unknown_rank) if entity else unknown_rank, path.name)
-
-    return sorted(by_name, key=sort_key)
-
+def fixture_order_plan(root: Path, files: list[Path]) -> FixtureOrderPlan:
+    """Ordre **et** diagnostic. Ce que `fixtures:load` affiche."""
+    return plan_fixture_order(root, files, _entity_tables(root))
 
 def _load_fixture_class(path: Path) -> "type[Fixture] | None":
     """Importe le module ``.py`` et renvoie sa sous-classe de ``Fixture`` (ADR-078).
@@ -424,7 +426,13 @@ split_sql_statements = _split_sql_statements
 
 
 def load_fixtures(
-    root: Path, *, run: bool, force: bool, env: str, no_fk_checks: bool = False
+    root: Path,
+    *,
+    run: bool,
+    force: bool,
+    env: str,
+    no_fk_checks: bool = False,
+    scenario: "str | None" = None,
 ) -> int:
     """Affiche (et, si ``run``, exécute) les fixtures du projet.
 
@@ -441,7 +449,16 @@ def load_fixtures(
         print(f"Erreur : {exc}", file=sys.stderr)
         return 2
 
-    units = order_load_units(root, collect_fixture_files(root), callables)
+    # FIXTURES-SCENARIOS-001 : un scénario inconnu est une erreur. Charger zéro
+    # fichier en annonçant un succès ferait croire les données en place, et
+    # l'exploitant chercherait ailleurs pourquoi son application est vide.
+    try:
+        fichiers = collect_fixture_files(root, scenario)
+    except ScenarioError as exc:
+        print(f"Erreur : {exc}", file=sys.stderr)
+        return 2
+
+    units = order_load_units(root, fichiers, callables)
     if not units:
         print(
             "Aucune fixture à charger. "
@@ -457,7 +474,20 @@ def load_fixtures(
         )
         return 2
 
-    print(f"Fixtures pour l'environnement '{env}' ({len(units)} unité(s)) :\n")
+    # FIXTURES-FK-ORDER-ROBUST-001 : ce que l'ordre n'a pas pu déduire est dit
+    # AVANT le chargement. Sans cela, une violation de clé étrangère survenait
+    # plus loin sans que rien ne la relie à l'ordre qui l'avait causée, et
+    # l'exploitant cherchait dans ses données un défaut qui était dans son
+    # graphe.
+    plan = fixture_order_plan(root, fichiers)
+    for avertissement in plan.warnings:
+        print(f"[ATTENTION] {avertissement}\n")
+
+    portee = f", scénario '{scenario}'" if scenario else ""
+    print(
+        f"Fixtures pour l'environnement '{env}'{portee} "
+        f"({len(units)} unité(s)) :\n"
+    )
     for unit in units:
         label = "fixture Python" if unit.kind == "callable" else "SQL"
         print(f"-- {unit.path.name} ({label})")
@@ -567,6 +597,30 @@ def main(args: list[str] | None = None) -> int:
     run = "--run" in argv
     force = "--force" in argv
     no_fk_checks = "--no-fk-checks" in argv
+
+    scenario: str | None = None
+    for index, argument in enumerate(argv):
+        if argument.startswith("--scenario="):
+            scenario = argument.partition("=")[2]
+            break
+        if argument == "--scenario":
+            if index + 1 >= len(argv):
+                print(
+                    "Erreur : l'option --scenario attend un nom.",
+                    file=sys.stderr,
+                )
+                connus = available_scenarios(Path.cwd())
+                if connus:
+                    print(f"Scénarios présents : {', '.join(connus)}.", file=sys.stderr)
+                return 2
+            scenario = argv[index + 1]
+            break
+
     return load_fixtures(
-        Path.cwd(), run=run, force=force, env=active_env(), no_fk_checks=no_fk_checks
+        Path.cwd(),
+        run=run,
+        force=force,
+        env=active_env(),
+        no_fk_checks=no_fk_checks,
+        scenario=scenario,
     )
