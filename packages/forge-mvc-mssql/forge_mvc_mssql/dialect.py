@@ -245,6 +245,11 @@ class MSSQLDialect:
         """
         return "SYSUTCDATETIME()"
 
+    def date_expression(self, column: str) -> str:
+        """`CAST(... AS DATE)` de T-SQL. `CONVERT` ferait la même chose avec une
+        syntaxe propre au moteur."""
+        return f"CAST({column} AS DATE)"
+
     def interval_seconds_expression(self, base: str) -> str:
         return f"DATEADD(second, ?, {base})"
 

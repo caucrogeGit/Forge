@@ -227,6 +227,14 @@ class SQLiteDialect:
         """`CURRENT_TIMESTAMP`, la même valeur que la clause DEFAULT."""
         return "CURRENT_TIMESTAMP"
 
+    def date_expression(self, column: str) -> str:
+        """`date()` de SQLite, qui rend une chaîne « AAAA-MM-JJ ».
+
+        SQLite n'a pas de type date : la valeur rendue est du texte, ce que le
+        contrat annonce pour que l'appelant ne suppose pas un objet date.
+        """
+        return f"date({column})"
+
     def interval_seconds_expression(self, base: str) -> str:
         # `datetime()` veut un modificateur textuel : on le compose, le
         # marqueur ne pouvant pas vivre dans un littéral.

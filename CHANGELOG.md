@@ -4,6 +4,30 @@
 
 ### Ajouté
 
+- **Compter des visiteurs sans garder d'adresse (`STATS-IP-ANONYMISATION-001`).**
+  `forge-mvc-stats` ne stockait **aucune** adresse : sa table n'a pas de colonne pour cela, et ce n'est pas un oubli mais son périmètre, il compte des événements et n'enquête pas.
+  `metadata` est pourtant libre, et rien n'empêchait d'y écrire `{"ip": request.remote_addr}`. C'est le geste naturel de qui veut compter des visiteurs uniques, et il transforme une table de statistiques en fichier de données personnelles, soumis à conservation limitée et à droit d'accès, sans que personne ne l'ait décidé.
+  **Une adresse brute est désormais refusée à l'écriture**, la ligne ne devant pas exister plutôt qu'être filtrée à chaque lecture. Le contrôle porte sur la **clé** et non sur la valeur : « 1.2.3.4 » est une adresse IPv4 valide et un numéro de version tout aussi valable, et refuser cette forme casserait des métadonnées légitimes.
+  `visitor_hash` répond au besoin réel sans rien garder : une empreinte salée valable une journée, identique pour deux visites du même visiteur le même jour, différente le lendemain. Un secret vide est refusé, sans lui l'espace des adresses IPv4 se parcourant en quelques secondes. `anonymize_ip` tronque quand une granularité géographique est vraiment nécessaire, et la documentation dit qu'elle ne rend **pas** une donnée anonyme.
+  Le message de refus oriente vers `forge-mvc-audit` pour qui doit conserver une adresse à des fins de sécurité : ce n'est pas une statistique.
+
+- **Une vue de page ne se compte pas comme une action (`STATS-EVENT-KIND-001`).**
+  `category` est la taxonomie libre de l'application. Le type est orthogonal : mille pages vues valent moins qu'une commande passée, et les mélanger sous un même total donne un chiffre que personne ne peut interpréter.
+  Le vocabulaire est **fermé**, `page_view` et `action` : un troisième type inventé par une application rendrait le champ incomparable d'un projet à l'autre, ce qui est exactement ce qu'il doit permettre. Le défaut est `action`, valeur qui décrit correctement les événements déjà en base, posés par des appels délibérés.
+  La colonne arrive par une **migration additive** : une table déjà créée ne se recrée pas, et c'est la seule façon de la faire évoluer sans perdre les événements enregistrés.
+
+- **Les statistiques s'agrègent enfin par jour (`DOC-STATS-AGGREGATES-001`).**
+  L'agrégation ne connaissait que `name` et `category`. Grouper par journée demandait de rapatrier tous les horodatages pour les tronquer en Python, ce que la base fait sans rien déplacer.
+  `Dialect.date_expression` porte la différence, aucun des quatre backends n'écrivant la troncature d'un horodatage de la même façon. La valeur rendue change aussi de type selon le backend, ce que le contrat annonce plutôt que de le laisser découvrir.
+  **Une série temporelle se trie par le temps**, là où les autres dimensions se trient du plus fréquent au moins fréquent : trier une courbe par total décroissant la rendrait illisible.
+  La liste des dimensions reste une liste blanche, `group_by` finissant dans un `GROUP BY` où aucun backend n'accepte de paramètre lié. Un `kind` inconnu lève de même, un filtre qui rend zéro sans motif faisant chercher un défaut ailleurs.
+
+### Modifié
+
+- **Un garde-fou cherchait une sous-chaîne là où il visait des noms exacts.**
+  `test_stats_generic_events_001` interdisait `"PAGE_VIEW = "` dans `events.py`, moyen qui a fini par déborder sa fin : `KIND_PAGE_VIEW` contient cette sous-chaîne sans être une constante de nom d'événement, les deux vivant sur des axes différents. La lecture se fait maintenant par `ast` sur les affectations de premier niveau.
+  Deux tests figeaient par ailleurs le nombre de colonnes et le nombre de paramètres d'insertion. Le second vérifie désormais l'égalité entre marqueurs et valeurs, qui est ce qui compte : un décalage fait échouer l'insertion sur les quatre backends.
+
 - **Les fixtures se rangent en jeux nommés (`FIXTURES-SCENARIOS-001`).**
   `mvc/fixtures/` était plat : tous les fichiers se chargeaient ensemble, et un projet voulant un jeu de démonstration riche **et** un jeu de test minimal devait commenter des fichiers ou les déplacer à la main entre deux exécutions.
   Un sous-dossier par jeu, `forge fixtures:load --scenario demo`. Le jeu commun est chargé d'abord, puis celui du scénario : un scénario complète une base partagée au lieu de la réécrire. Sans `--scenario`, rien ne change.

@@ -77,9 +77,33 @@ class TestHelperAbsent:
         assert "_KNOWN_EVENT_NAMES" not in events_file
 
     def test_source_events_ne_contient_pas_constantes(self):
-        events_file = Path("packages/forge-mvc-stats/forge_mvc_stats/events.py").read_text()
+        """Aucune des six constantes de nom d'événement n'est redéfinie.
+
+        Le test cherchait la **sous-chaîne** `"PAGE_VIEW = "`. C'est un moyen,
+        et il a fini par déborder sa fin : `STATS-EVENT-KIND-001` a introduit
+        `KIND_PAGE_VIEW`, qui contient cette sous-chaîne sans être une
+        constante de nom d'événement. Les deux vivent sur des axes différents,
+        le nom est libre et propre à l'application, le type est fermé et
+        comparable d'un projet à l'autre.
+
+        La lecture se fait donc par `ast` sur les affectations de premier
+        niveau, ce qui vise exactement ce que le ticket avait retiré.
+        """
+        import ast
+
+        source = Path("packages/forge-mvc-stats/forge_mvc_stats/events.py").read_text()
+        arbre = ast.parse(source)
+        definies = {
+            cible.id
+            for noeud in arbre.body
+            if isinstance(noeud, (ast.Assign, ast.AnnAssign))
+            for cible in (
+                noeud.targets if isinstance(noeud, ast.Assign) else [noeud.target]
+            )
+            if isinstance(cible, ast.Name)
+        }
         for name in REMOVED_CONSTANTS:
-            assert f'{name} = ' not in events_file, (
+            assert name not in definies, (
                 f"La constante {name} ne doit plus être définie dans events.py"
             )
 

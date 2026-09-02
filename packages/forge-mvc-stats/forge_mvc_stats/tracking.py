@@ -11,8 +11,8 @@ from .schema import STATS_EVENTS_TABLE
 
 _INSERT_SQL = (
     f"INSERT INTO {STATS_EVENTS_TABLE}"
-    " (name, label, category, metadata)"
-    " VALUES (?, ?, ?, ?)"
+    " (name, label, category, metadata, kind)"
+    " VALUES (?, ?, ?, ?, ?)"
 )
 
 
@@ -30,7 +30,7 @@ def _serialize_metadata(metadata: dict[str, Any]) -> str:
         ) from exc
 
 
-def prepare_track_event_values(event: StatsEvent) -> tuple[str, str, str, str]:
+def prepare_track_event_values(event: StatsEvent) -> tuple[str, str, str, str, str]:
     """Return the SQL parameter tuple for a StatsEvent."""
     if not isinstance(event, StatsEvent):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise StatsEventError(
@@ -41,6 +41,7 @@ def prepare_track_event_values(event: StatsEvent) -> tuple[str, str, str, str]:
         event.label,
         event.category,
         _serialize_metadata(event.metadata),
+        event.kind,
     )
 
 

@@ -261,6 +261,10 @@ class MariaDBDialect:
         """
         return "UTC_TIMESTAMP"
 
+    def date_expression(self, column: str) -> str:
+        """`DATE()` de MariaDB, qui rend un type DATE natif."""
+        return f"DATE({column})"
+
     def interval_seconds_expression(self, base: str) -> str:
         return f"{base} + INTERVAL ? SECOND"
 

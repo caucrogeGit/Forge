@@ -85,7 +85,10 @@ def test_prepare_accepte_stats_event_valide():
     e = make_event("page_view", label="Vue", category="traffic", metadata={"path": "/home"})
     values = prepare_track_event_values(e)
     assert isinstance(values, tuple)
-    assert len(values) == 4
+    # + kind (STATS-EVENT-KIND-001). Le compte est vérifié contre le nombre de
+    # marqueurs du SQL plutôt que contre un nombre écrit à la main : c'est leur
+    # égalité qui compte, un décalage faisant échouer l'insertion.
+    assert len(values) == get_track_event_sql().count("?")
 
 
 def test_prepare_values_contient_name():
@@ -177,7 +180,7 @@ def test_track_event_appelle_executeur_sql():
     sql, params = calls[0]
     assert "INSERT INTO forge_stats_events" in sql
     assert isinstance(params, tuple)
-    assert len(params) == 4
+    assert len(params) == sql.count("?")
 
 
 def test_track_event_retourne_evenement_valide():

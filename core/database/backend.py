@@ -471,6 +471,25 @@ class Dialect(Protocol):
         """
         ...
 
+    def date_expression(self, column: str) -> str:
+        """Expression rendant la **date seule** d'une colonne d'horodatage.
+
+        Sert aux agrégats par jour (`DOC-STATS-AGGREGATES-001`) : sans elle,
+        grouper des événements par journée demande de rapatrier tous les
+        horodatages pour les tronquer en Python, ce que la base fait sans rien
+        déplacer.
+
+            MariaDB      DATE({column})
+            PostgreSQL   CAST({column} AS DATE)
+            SQL Server   CAST({column} AS DATE)
+            SQLite       date({column})
+
+        La valeur rendue est comparable et groupable. Son **type** varie selon
+        le backend, date native ici, chaîne là : l'appelant la rend en texte
+        avant de l'afficher plutôt que de supposer l'un des deux.
+        """
+        ...
+
     def pagination_param_order(self) -> "tuple[str, str]":
         """Ordre des deux paramètres de `pagination_clause()`.
 

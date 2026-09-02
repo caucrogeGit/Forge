@@ -18,7 +18,19 @@ from .schema import STATS_EVENTS_TABLE
 
 # Dimensions de regroupement autorisées → colonne SQL réelle (liste blanche).
 # group_by ne provient jamais directement de l'entrée : il est résolu ici.
-_GROUP_BY_COLUMNS = {"name": "name", "category": "category"}
+#
+# `day` et `kind` s'y sont ajoutés (`DOC-STATS-AGGREGATES-001`,
+# `STATS-EVENT-KIND-001`). Grouper par journée demandait auparavant de
+# rapatrier tous les horodatages pour les tronquer en Python, ce que la base
+# fait sans rien déplacer.
+_GROUP_BY_COLUMNS = {
+    "name": "name",
+    "category": "category",
+    "kind": "kind",
+}
+
+#: Dimensions dont l'expression SQL dépend du backend, résolues à l'exécution.
+_GROUP_BY_DIALECTAL = {"day"}
 
 
 class StatsAggregateError(ValueError):
@@ -26,9 +38,19 @@ class StatsAggregateError(ValueError):
 
 
 def _resolve_group_by(group_by: str) -> str:
+    """Expression SQL de la dimension demandée, depuis une liste blanche.
+
+    `day` n'est pas une colonne : c'est une expression rendue par le dialecte,
+    aucun des quatre backends n'écrivant la troncature d'un horodatage de la
+    même façon (`DATE()`, `date()`, `CAST(... AS DATE)`).
+    """
+    if group_by in _GROUP_BY_DIALECTAL:
+        from core.database.backend import get_backend
+
+        return get_backend().dialect.date_expression("created_at")
     column = _GROUP_BY_COLUMNS.get(group_by)
     if column is None:
-        autorisees = ", ".join(sorted(_GROUP_BY_COLUMNS))
+        autorisees = ", ".join(sorted(set(_GROUP_BY_COLUMNS) | _GROUP_BY_DIALECTAL))
         raise StatsAggregateError(
             f"group_by invalide : {group_by!r}. Valeurs autorisées : {autorisees}."
         )
@@ -40,6 +62,7 @@ def get_stats_counts_sql(
     name: str | None = None,
     category: str | None = None,
     since: str | None = None,
+    kind: str | None = None,
 ) -> str:
     """Return the COUNT(*) GROUP BY SQL for the given (whitelisted) dimension."""
     column = _resolve_group_by(group_by)
@@ -54,8 +77,16 @@ def get_stats_counts_sql(
         parts.append(" AND category = ?")
     if since is not None:
         parts.append(" AND created_at >= ?")
+    if kind is not None:
+        parts.append(" AND kind = ?")
     parts.append(f" GROUP BY {column}")
-    parts.append(" ORDER BY total DESC, bucket ASC")
+    # Une série temporelle se lit dans l'ordre du temps. Trier une courbe par
+    # total décroissant la rendrait illisible, et c'est le tri par défaut des
+    # autres dimensions, où il classe du plus fréquent au moins fréquent.
+    if group_by == "day":
+        parts.append(f" ORDER BY {column} ASC")
+    else:
+        parts.append(" ORDER BY total DESC, bucket ASC")
     return "".join(parts)
 
 
@@ -64,6 +95,7 @@ def prepare_stats_counts_params(
     name: str | None = None,
     category: str | None = None,
     since: str | None = None,
+    kind: str | None = None,
 ) -> tuple[Any, ...]:
     """Return the bound-parameter tuple matching `get_stats_counts_sql`."""
     _resolve_group_by(group_by)  # rejette une dimension invalide aussi côté params
@@ -84,6 +116,19 @@ def prepare_stats_counts_params(
                 "since doit être une chaîne non vide (timestamp ISO)."
             )
         params.append(since.strip())
+    if kind is not None:
+        # Le vocabulaire est fermé : un type inventé ne rendrait aucune ligne,
+        # et un filtre qui rend zéro sans motif fait chercher un défaut
+        # ailleurs, dans les données ou dans l'écriture des événements.
+        from forge_mvc_stats.events import EVENT_KINDS
+
+        valeur = str(kind).strip().lower()
+        if valeur not in EVENT_KINDS:
+            raise StatsAggregateError(
+                f"kind invalide : {kind!r}. Valeurs autorisées : "
+                f"{', '.join(sorted(EVENT_KINDS))}."
+            )
+        params.append(valeur)
     return tuple(params)
 
 

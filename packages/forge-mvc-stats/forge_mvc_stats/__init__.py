@@ -17,7 +17,18 @@ from forge_mvc_stats.aggregate import (
     normalize_stats_count_row,
     prepare_stats_counts_params,
 )
+from forge_mvc_stats.privacy import (
+    ADDRESS_KEYS,
+    StatsPrivacyError,
+    anonymize_ip,
+    assert_no_raw_address,
+    looks_like_address_key,
+    visitor_hash,
+)
 from forge_mvc_stats.events import (
+    EVENT_KINDS,
+    KIND_ACTION,
+    KIND_PAGE_VIEW,
     StatsEvent,
     StatsEventError,
     make_event,
@@ -48,6 +59,17 @@ __version__ = "1.0.0rc7"
 
 __all__ = [
     "StatsEvent",
+    # Type d'événement (STATS-EVENT-KIND-001)
+    "EVENT_KINDS",
+    "KIND_PAGE_VIEW",
+    "KIND_ACTION",
+    # Adresses et visiteurs (STATS-IP-ANONYMISATION-001)
+    "anonymize_ip",
+    "visitor_hash",
+    "assert_no_raw_address",
+    "looks_like_address_key",
+    "ADDRESS_KEYS",
+    "StatsPrivacyError",
     "StatsEventError",
     "normalize_event_name",
     "validate_event_name",

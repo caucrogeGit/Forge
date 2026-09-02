@@ -244,6 +244,11 @@ class PostgreSQLDialect:
         """
         return "(now() AT TIME ZONE 'utc')"
 
+    def date_expression(self, column: str) -> str:
+        """`CAST(... AS DATE)`, préféré à `::date` pour rester du SQL standard
+        lisible par quelqu'un qui ne connaît pas PostgreSQL."""
+        return f"CAST({column} AS DATE)"
+
     def interval_seconds_expression(self, base: str) -> str:
         # `? * INTERVAL '1 second'` plutôt que `INTERVAL '? seconds'` : un
         # marqueur ne peut pas vivre à l'intérieur d'un littéral d'intervalle.

@@ -12,6 +12,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from forge_mvc_stats.privacy import assert_no_raw_address
+
 
 _VALID_NAME_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 _SAFE_NORMALIZE_RE = re.compile(r"[\s\-]+")
@@ -22,12 +24,33 @@ class StatsEventError(ValueError):
     pass
 
 
+#: Consultation passive d'une page. Alimente le trafic.
+KIND_PAGE_VIEW = "page_view"
+#: Geste délibéré d'un utilisateur. Alimente la conversion.
+KIND_ACTION = "action"
+
+#: Vocabulaire **fermé** des types d'événement (`STATS-EVENT-KIND-001`).
+#:
+#: `category` est la taxonomie de l'application, « blog » ou « boutique », et
+#: elle est libre. Le type est orthogonal et fermé : une vue de page et une
+#: action métier ne se comptent pas, ne se comparent pas et ne se lisent pas
+#: pareil, et mille pages vues valent moins qu'une commande passée. Les
+#: mélanger sous un même total donne un chiffre que personne ne peut
+#: interpréter.
+#:
+#: Fermé parce qu'un troisième type inventé par une application le rendrait
+#: incomparable d'un projet à l'autre, ce qui est exactement ce que le champ
+#: doit permettre.
+EVENT_KINDS = frozenset({KIND_PAGE_VIEW, KIND_ACTION})
+
+
 @dataclass(frozen=True)
 class StatsEvent:
     name: str
     label: str = ""
     category: str = "general"
     metadata: dict[str, Any] = field(default_factory=dict[str, Any])
+    kind: str = KIND_ACTION
 
     def __post_init__(self) -> None:
         validated_name = validate_event_name(self.name)
@@ -42,6 +65,17 @@ class StatsEvent:
             raise StatsEventError(
                 f"metadata doit être un dictionnaire, reçu : {type(self.metadata).__name__}."
             )
+        kind = (self.kind or "").strip().lower()
+        if kind not in EVENT_KINDS:
+            raise StatsEventError(
+                f"kind invalide : {self.kind!r}. Valeurs autorisées : "
+                f"{', '.join(sorted(EVENT_KINDS))}."
+            )
+        object.__setattr__(self, "kind", kind)
+        # STATS-IP-ANONYMISATION-001 : une adresse brute est refusée A
+        # L'ECRITURE. La ligne ne doit pas exister, plutôt qu'être filtrée à
+        # chaque lecture.
+        assert_no_raw_address(self.metadata)
 
 
 def normalize_event_name(value: str) -> str:

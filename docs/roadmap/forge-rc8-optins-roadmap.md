@@ -265,9 +265,9 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `STATS-IP-ANONYMISATION-001` | Anonymisation optionnelle de l'adresse |
-| `STATS-EVENT-KIND-001` | Distinction entre vue de page et action métier |
-| `DOC-STATS-AGGREGATES-001` | Documentation des agrégations par jour et par page |
+| `STATS-IP-ANONYMISATION-001` | **Livré.** Aucune adresse n'était stockée ; `metadata` était la porte, elle est fermée |
+| `STATS-EVENT-KIND-001` | **Livré.** Vocabulaire fermé, colonne `kind`, migration additive |
+| `DOC-STATS-AGGREGATES-001` | **Livré.** L'agrégation par jour n'existait pas ; `Dialect.date_expression` la porte |
 
 ### 7.20 qrcode
 

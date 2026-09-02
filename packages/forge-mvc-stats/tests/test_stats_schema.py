@@ -43,8 +43,15 @@ def test_columns_contient_created_at():
     assert "created_at" in STATS_EVENTS_COLUMNS
 
 
-def test_columns_contient_exactement_les_six_colonnes_attendues():
-    expected = {"id", "name", "label", "category", "metadata", "created_at"}
+def test_columns_contient_exactement_les_colonnes_attendues():
+    """`kind` s'y est ajoutée (`STATS-EVENT-KIND-001`).
+
+    L'égalité stricte reste délibérée : une colonne ajoutée sans que la liste
+    la déclare ferait diverger la table et ce que le paquet croit y trouver.
+    """
+    expected = {
+        "id", "name", "label", "category", "metadata", "kind", "created_at",
+    }
     assert set(STATS_EVENTS_COLUMNS) == expected
 
 
@@ -151,7 +158,7 @@ def test_api_schema_importable():
     )
     assert STATS_EVENTS_TABLE == "forge_stats_events"
     assert callable(get_stats_events_schema_sql)
-    assert len(STATS_EVENTS_COLUMNS) == 6
+    assert len(STATS_EVENTS_COLUMNS) == 7  # + kind (STATS-EVENT-KIND-001)
 
 
 # ---------------------------------------------------------------------------

@@ -362,6 +362,105 @@ Aucun cookie visiteur, aucune IP.
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-stats` : la dépendance va de l'opt-in vers le cœur.
 
+??? note "12. Adresses IP et compte de visiteurs"
+
+    `forge-mvc-stats` ne stocke **aucune** adresse : sa table porte un nom, un libellé, une catégorie et des métadonnées libres (`STATS-IP-ANONYMISATION-001`).
+
+    Ce n'est pas un oubli, c'est son périmètre : il compte des événements, il n'enquête pas.
+
+    Le champ `metadata` est pourtant libre, et rien n'empêchait d'y écrire `{"ip": request.remote_addr}`. C'est le geste naturel de qui veut compter des visiteurs uniques, et il transforme une table de statistiques en fichier de données personnelles, soumis à conservation limitée et à droit d'accès, sans que personne ne l'ait décidé.
+
+    ```python
+    from forge_mvc_stats import StatsEvent, visitor_hash
+
+    StatsEvent(
+        name="page_vue",
+        kind="page_view",
+        metadata={"visiteur": visitor_hash(adresse, config.SECRET_KEY)},
+    )
+    ```
+
+    !!! danger "Une adresse brute est refusée à l'écriture"
+        `StatsEvent(metadata={"ip": "203.0.113.42"})` **lève**.
+
+        Le refus a lieu à l'écriture : la ligne ne doit pas exister, plutôt qu'être filtrée à chaque lecture. Le message nomme les deux solutions, et rappelle que conserver une adresse à des fins de sécurité relève de `forge-mvc-audit`, pas des statistiques.
+
+    !!! info "Le contrôle porte sur la clé, pas sur la valeur"
+        « 1.2.3.4 » est une adresse IPv4 valide **et** un numéro de version tout aussi valable.
+
+        Refuser toutes les valeurs de cette forme casserait des métadonnées légitimes. Seule une valeur d'adresse rangée sous une clé qui la nomme, `ip`, `remote_addr`, `client_ip`, est refusée.
+
+    | Fonction | Ce qu'elle garde |
+    |---|---|
+    | `visitor_hash` | rien : une empreinte salée, valable une journée |
+    | `anonymize_ip` | l'adresse amputée de sa partie identifiante |
+
+    !!! warning "`anonymize_ip` ne rend pas une donnée anonyme"
+        Le résultat reste rattachable à un petit ensemble d'abonnés, et sur un réseau peu peuplé il désigne parfois une seule personne.
+
+        Pour compter des visiteurs, `visitor_hash` est meilleur sur tous les plans : deux visites du même visiteur le même jour donnent la même empreinte, le lendemain non, et rien ne permet de remonter à l'adresse.
+
+    !!! danger "Le secret de `visitor_hash` doit être un vrai secret"
+        Sans lui, l'espace des adresses IPv4 se parcourt en entier en quelques secondes, et l'empreinte ne protège plus rien.
+
+        Un secret vide est refusé.
+
+??? note "13. Vue de page ou action métier"
+
+    `category` est la taxonomie de l'application, « blog » ou « boutique », et elle est libre (`STATS-EVENT-KIND-001`).
+
+    Le type d'événement est orthogonal : une consultation passive et un geste délibéré ne se comptent pas, ne se comparent pas et ne se lisent pas pareil. Mille pages vues valent moins qu'une commande passée, et les mélanger sous un même total donne un chiffre que personne ne peut interpréter.
+
+    ```python
+    StatsEvent(name="page_accueil", kind="page_view")
+    StatsEvent(name="commande_passee", kind="action")     # défaut
+    ```
+
+    !!! info "Le vocabulaire est fermé, et c'est voulu"
+        `page_view` et `action`, rien d'autre.
+
+        Un troisième type inventé par une application rendrait le champ incomparable d'un projet à l'autre, ce qui est exactement ce qu'il doit permettre. Pour une distinction propre au métier, `category` est là, et elle est libre.
+
+    !!! info "Le défaut est `action`"
+        Les événements déjà en base ont été posés par des appels délibérés de l'application, jamais par un suivi de page : c'est la valeur qui les décrit correctement.
+
+    La colonne arrive par une **migration additive**, `ALTER TABLE`. Une table déjà créée ne se recrée pas, et c'est la seule façon de la faire évoluer sans perdre les événements enregistrés. Appliquez `forge stats:init` puis `forge migration:apply`.
+
+??? note "14. Agréger par jour, par page et par type"
+
+    `count_stats_events` agrégeait par `name` et par `category` seulement (`DOC-STATS-AGGREGATES-001`).
+
+    Grouper par journée demandait de rapatrier tous les horodatages pour les tronquer en Python, ce que la base fait sans rien déplacer.
+
+    | Dimension | Ce qu'elle répond |
+    |---|---|
+    | `name` | quelles pages, ou quelles actions, reviennent le plus |
+    | `category` | quelle partie de l'application est sollicitée |
+    | `kind` | combien de consultations, combien de gestes |
+    | `day` | comment cela évolue dans le temps |
+
+    ```python
+    count_stats_events(fetch_all, group_by="day", since="2026-01-01")
+    count_stats_events(fetch_all, group_by="name", kind="page_view")
+    ```
+
+    !!! info "`day` n'est pas une colonne"
+        C'est une expression rendue par le dialecte : aucun des quatre backends n'écrit la troncature d'un horodatage de la même façon, `DATE()`, `date()` ou `CAST(... AS DATE)`.
+
+        Le type de la valeur rendue varie donc aussi, date native ici, chaîne là : rendez la en texte avant de l'afficher plutôt que de supposer l'un des deux.
+
+    !!! warning "Une série temporelle se trie par le temps"
+        Les autres dimensions se trient du plus fréquent au moins fréquent, ce qui est ce qu'on leur demande.
+
+        Trier une courbe par total décroissant la rendrait illisible : `day` se trie donc par date croissante.
+
+    !!! danger "La liste des dimensions est une liste blanche"
+        `group_by` finit dans un `GROUP BY`, où aucun backend n'accepte de paramètre lié.
+
+        C'est la liste blanche qui empêche une injection, et non un échappement. Un `kind` inconnu lève de même, un filtre qui rend zéro sans motif faisant chercher un défaut ailleurs, dans les données ou dans l'écriture des événements.
+
+    Les fonctions vivent dans `aggregate.py` (`get_stats_counts_sql`, `prepare_stats_counts_params`, `count_stats_events`) et l'anonymisation dans `privacy.py` (`anonymize_ip`, `visitor_hash`, `assert_no_raw_address`, `looks_like_address_key`).
+
 ## Voir aussi
 
 - [Événements (events.py)](references/events.md) : `StatsEvent`, validation des noms.
