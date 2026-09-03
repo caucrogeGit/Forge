@@ -27,6 +27,13 @@ embarquée dans `mvc/migrations/` ; `forge migration:apply` l'applique (ADR-071)
 
 from __future__ import annotations
 
+from forge_mvc_sessions_db.ttl import (
+    KIND_ANONYMOUS,
+    KIND_AUTHENTICATED,
+    normalize_kind,
+    ttl_for,
+)
+
 import json
 import re
 import secrets
@@ -57,8 +64,8 @@ _FetchAll = Callable[[str, "tuple[Any, ...]"], "list[dict[str, Any]]"]
 
 _SQL_INSERT = (
     "INSERT INTO forge_sessions"
-    " (session_id, data, user_id, expire_at, version, created_at, updated_at)"
-    " VALUES (?, ?, ?, ?, 0, ?, ?)"
+    " (session_id, data, user_id, kind, expire_at, version, created_at, updated_at)"
+    " VALUES (?, ?, ?, ?, ?, 0, ?, ?)"
 )
 _SQL_SELECT = (
     "SELECT data, version FROM forge_sessions WHERE session_id = ? AND expire_at > ?"
@@ -208,10 +215,23 @@ class DbSessionStore:
 
     # ── API publique ─────────────────────────────────────────────────────────
 
-    def create(self, data: dict[str, Any] | None = None) -> str:
-        """Crée une session avec la structure Forge standard et retourne son identifiant."""
+    def create(
+        self, data: dict[str, Any] | None = None, *, kind: str = KIND_ANONYMOUS
+    ) -> str:
+        """Crée une session et retourne son identifiant.
+
+        `kind` décide de la durée de vie (`SESSIONS-TTL-PER-KIND-001`). Une
+        session créée sans être authentifiée est anonyme, et n'a pas à vivre
+        aussi longtemps qu'une session d'utilisateur connecté.
+
+        Le `ttl` passé au constructeur reste prioritaire quand il diffère du
+        défaut historique : un projet qui l'avait réglé à la main garde son
+        réglage, le retirer sous ses pieds serait une rupture silencieuse.
+        """
+        nature = normalize_kind(kind)
         session_id = secrets.token_hex(32)
-        expires_at = time.time() + self._ttl
+        duree = self._ttl if self._ttl != DEFAULT_SESSION_TTL else ttl_for(nature)
+        expires_at = time.time() + duree
         session = {
             **(data or {}),
             "authenticated": False,
@@ -222,7 +242,10 @@ class DbSessionStore:
         now = _now_str()
         self._execute(
             _SQL_INSERT,
-            (session_id, json.dumps(session), _user_id_of(session), _dt(expires_at), now, now),
+            (
+                session_id, json.dumps(session), _user_id_of(session), nature,
+                _dt(expires_at), now, now,
+            ),
         )
         return session_id
 
@@ -341,7 +364,10 @@ class DbSessionStore:
             now = _now_str()
             self._execute(
                 _SQL_INSERT,
-                (nouveau_id, json.dumps(existing), _user_id_of(existing), _dt(expires_at), now, now),
+                (
+                    nouveau_id, json.dumps(existing), _user_id_of(existing),
+                    KIND_ANONYMOUS, _dt(expires_at), now, now,
+                ),
             )
             return nouveau_id
         raise self._conflict_error("regenerate")
@@ -370,7 +396,10 @@ class DbSessionStore:
             now = _now_str()
             self._execute(
                 _SQL_INSERT,
-                (nouveau_id, json.dumps(new_session), _user_id_of(new_session), _dt(expires_at), now, now),
+                (
+                    nouveau_id, json.dumps(new_session), _user_id_of(new_session),
+                    KIND_AUTHENTICATED, _dt(expires_at), now, now,
+                ),
             )
             return nouveau_id
         raise self._conflict_error("authenticate")

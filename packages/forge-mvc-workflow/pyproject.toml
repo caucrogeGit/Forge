@@ -25,6 +25,9 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 
+[project.entry-points."forge_mvc.commands"]
+forge_mvc_workflow = "forge_mvc_workflow.commands:COMMANDS"
+
 [project.urls]
 Homepage = "https://github.com/caucrogeGit/Forge"
 Repository = "https://github.com/caucrogeGit/Forge"

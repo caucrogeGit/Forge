@@ -313,6 +313,121 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
         Le store suppose la table `forge_sessions` présente.
         Elle n'est pas créée automatiquement : lancez `forge sessions:init` puis `forge migration:apply`.
 
+??? note "12. Une durée de vie par nature de session"
+
+    Le store portait **une** durée pour tout le monde (`SESSIONS-TTL-PER-KIND-001`). Les trois natures de session n'ont pourtant ni le même risque ni le même usage.
+
+    | Nature | Ce qu'elle porte | Ce qu'une fuite coûte |
+    |---|---|---|
+    | `anonymous` | un jeton CSRF, un panier | presque rien |
+    | `authenticated` | une identité | l'accès au compte |
+    | `remembered` | une identité, sur des semaines | l'accès au compte, longtemps |
+
+    Une durée unique force un arbitrage perdant. Réglée court, elle déconnecte les utilisateurs authentifiés toutes les heures. Réglée long, elle laisse traîner des sessions anonymes par milliers, que la purge doit balayer et qui occupent la table pour un jeton CSRF.
+
+    ```bash
+    SESSION_TTL_ANONYMOUS=7200
+    SESSION_TTL_AUTHENTICATED=3600
+    SESSION_TTL_REMEMBERED=2592000
+    ```
+
+    !!! info "Le vocabulaire est fermé"
+        Une quatrième nature inventée par une application rendrait la métrique et la purge incomparables d'un projet à l'autre, ce qui est ce que ce champ doit permettre.
+
+    !!! danger "Une valeur illisible lève"
+        Comme pour les quotas de `forge-mvc-files` et les limites de `forge-mvc-images`.
+
+        Retomber en silence sur le défaut donnerait une durée que personne n'a écrite, et une session qui expire trop tôt se diagnostique très mal.
+
+    !!! warning "Un `ttl` passé au constructeur reste prioritaire"
+        Un projet qui l'avait réglé à la main garde son réglage : le retirer sous ses pieds serait une rupture silencieuse.
+
+    La colonne `kind` arrive par une **migration additive**. Les projets déjà provisionnés ne rejouent pas la création de la table, son empreinte étant enregistrée.
+
+??? note "13. Compter les sessions actives"
+
+    `sessions:gc` dit combien de sessions il a purgées. Personne ne pouvait dire combien il en reste, ni comment ce nombre évolue (`SESSIONS-ACTIVE-METRIC-001`).
+
+    C'est pourtant la première chose qu'on veut savoir d'un magasin adossé à la base : une table qui grossit sans fin signale une purge qui ne tourne pas, et une chute brutale signale une déconnexion de masse.
+
+    ```python
+    from forge_mvc_sessions_db import session_metrics
+
+    mesures = session_metrics()
+    mesures.active, mesures.expired, mesures.by_kind
+    mesures.purge_backlog_ratio        # au delà de 0.5, la purge est en retard
+    ```
+
+    !!! info "Le filtre est en SQL"
+        Compter toutes les lignes puis écarter les expirées en Python rapatrierait une table entière pour en rendre un nombre.
+
+    !!! warning "Une session expirée n'est pas active"
+        Elle occupe la table sans plus servir à personne, même si la purge ne l'a pas encore retirée.
+
+        La compter ferait passer un retard de purge pour de la fréquentation, ce qui est le contraire de ce que la métrique doit montrer.
+
+    Les trois natures figurent **toujours** dans `by_kind`, à zéro le cas échéant : une clé absente et une valeur nulle se lisent différemment dans un tableau de bord, et l'absence ferait croire à une métrique cassée.
+
+??? note "14. Faire tourner la purge, avec systemd"
+
+    `sessions:gc` doit tourner régulièrement (`SESSIONS-GC-TIMER-DOC-001`). Forge ne fournit **pas** de planificateur : c'est le rôle du système, et en embarquer un ferait de Forge un ordonnanceur, ce que le principe 8 refuse.
+
+    Deux fichiers, dans `/etc/systemd/system/`.
+
+    ```ini
+    # forge-sessions-gc.service
+    [Unit]
+    Description=Purge des sessions Forge expirées
+    After=network.target
+
+    [Service]
+    Type=oneshot
+    User=monapp
+    WorkingDirectory=/srv/monapp
+    EnvironmentFile=/srv/monapp/env/prod
+    ExecStart=/srv/monapp/.venv/bin/forge sessions:gc
+    ```
+
+    ```ini
+    # forge-sessions-gc.timer
+    [Unit]
+    Description=Purge horaire des sessions Forge
+
+    [Timer]
+    OnCalendar=hourly
+    Persistent=true
+    RandomizedDelaySec=300
+
+    [Install]
+    WantedBy=timers.target
+    ```
+
+    ```bash
+    sudo systemctl enable --now forge-sessions-gc.timer
+    systemctl list-timers forge-sessions-gc.timer
+    journalctl -u forge-sessions-gc.service --since today
+    ```
+
+    !!! info "`Persistent=true` rattrape les exécutions manquées"
+        Un serveur éteint pendant la nuit ne saute pas trois purges : la première au redémarrage les remplace.
+
+        Sans lui, un serveur redémarré chaque matin ne purgerait jamais ce qui a expiré la nuit.
+
+    !!! info "`RandomizedDelaySec` évite la synchronisation"
+        Plusieurs applications purgeant à la même minute frappent la base ensemble.
+
+        Cinq minutes de dispersion suffisent à étaler la charge.
+
+    !!! warning "Le minuteur, pas le service"
+        `systemctl enable` porte sur le `.timer`. Activer le `.service` le ferait tourner une fois au démarrage, puis plus jamais.
+
+    !!! danger "`EnvironmentFile` porte les identifiants de base"
+        Le fichier doit appartenir au compte de service et n'être lisible que par lui, `chmod 600`.
+
+        `sessions:gc` se connecte à la base, et un `env/prod` lisible par tous rend les identifiants applicatifs lisibles par tous.
+
+    La fréquence dépend de la durée de vie la plus courte : purger toutes les heures des sessions anonymes de deux heures laisse la table à deux fois sa taille utile, ce qui est raisonnable. `session_metrics().purge_backlog_ratio` le vérifie.
+
 ## Voir aussi
 
 - [Le store (store.py)](references/store.md) : `DbSessionStore` et ses méthodes.

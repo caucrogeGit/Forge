@@ -102,6 +102,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "deploy:init", "deploy:check",
     # Opt-ins applicatifs (ADR-052)
     "settings:init", "stats:init", "stats:gc", "audit:init", "audit:gc",
+    # workflow:init écrit la migration de l'historique (WORKFLOW-HISTORY-001).
+    "workflow:init",
     "jobs:init", "jobs:reclaim", "jobs:status", "notifications:init",
     "sessions:init", "sessions:gc",
     # MFA : table du registre anti-rejeu partagé, optionnelle

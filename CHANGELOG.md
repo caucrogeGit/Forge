@@ -4,6 +4,30 @@
 
 ### Ajouté
 
+- **Le workflow garde trace de ses transitions (`WORKFLOW-HISTORY-001`).**
+  Le paquet appliquait les transitions sans en garder trace : on savait dans quel état une entité se trouve, jamais comment elle y est arrivée, ni quand, ni par qui. « Qui a validé cette commande, et à quelle date » n'avait aucune réponse, et chaque application réinventait sa table.
+  **L'enregistrement est explicite, et dans la transaction de l'appelant.** Écrire depuis le paquet imposerait une connexion à un module qui n'en avait pas besoin, et surtout séparerait l'historique de l'écriture qu'il décrit : une transaction annulée laisserait une ligne pour une transition qui n'a pas eu lieu.
+  Un acteur absent est une **information** : une transition automatique n'a pas d'auteur, et inventer « system » masquerait la différence. Aucune clé étrangère vers l'entité, le paquet ne sachant pas ce qu'est une entité de l'application, et un historique devant survivre à la suppression de son sujet, c'est justement alors qu'on veut savoir qui avait validé.
+  `forge workflow:init` livre la migration. Les transitions et les conditions fonctionnent sans cette table.
+
+- **Une transition peut être conditionnée (`WORKFLOW-CONDITIONS-001`).**
+  `can_transition` répond à une seule question, celle de la déclaration. Elle ne peut rien dire de « cette commande a t elle au moins une ligne », qui est pourtant la vraie condition. L'application vérifiait donc avant d'appeler, chacune à sa façon, et deux chemins menant au même état s'oubliaient l'un l'autre.
+  **Une condition dit pourquoi elle refuse.** Rendre `False` laisserait l'utilisateur devant « transition impossible », message qui n'indique rien à corriger ; elle rend `None` ou un motif, qui remonte jusqu'à l'écran.
+  **Une condition qui échoue refuse la transition.** Traiter son silence comme une autorisation ferait tout passer le jour où le service qu'elle interroge tombe. `check_conditions` ne lève jamais et sert à afficher ce qui bloque, `ensure_conditions` sert à refuser.
+
+- **Chaque nature de session a sa durée de vie (`SESSIONS-TTL-PER-KIND-001`).**
+  Le store portait une durée pour tout le monde, ce qui force un arbitrage perdant : réglée court, elle déconnecte les authentifiés toutes les heures ; réglée long, elle laisse traîner des sessions anonymes par milliers, occupant la table pour un jeton CSRF.
+  Trois natures fermées, `anonymous`, `authenticated` et `remembered` : une quatrième inventée par une application rendrait la métrique et la purge incomparables d'un projet à l'autre. Une valeur d'environnement illisible **lève**, comme pour les autres paquets qui bornent quelque chose. Un `ttl` passé au constructeur reste prioritaire, le retirer sous les pieds d'un projet étant une rupture silencieuse.
+
+- **Le nombre de sessions actives se mesure (`SESSIONS-ACTIVE-METRIC-001`).**
+  `sessions:gc` disait combien il avait purgé ; personne ne pouvait dire combien il en restait. Une table qui grossit sans fin signale une purge qui ne tourne pas, et une chute brutale une déconnexion de masse.
+  Le filtre est **en SQL** : compter toutes les lignes puis écarter les expirées en Python rapatrierait une table entière pour rendre un nombre. Une session expirée n'est **pas** active, même si la purge ne l'a pas encore retirée : la compter ferait passer un retard de purge pour de la fréquentation.
+  Les trois natures figurent toujours dans la répartition, à zéro le cas échéant, une clé absente se lisant comme une métrique cassée.
+
+- **La purge des sessions a sa minuterie documentée (`SESSIONS-GC-TIMER-DOC-001`).**
+  Deux unités systemd complètes. Forge ne fournit pas de planificateur, c'est le rôle du système, et en embarquer un ferait de Forge un ordonnanceur.
+  La documentation nomme les trois pièges : `Persistent=true` rattrape les exécutions manquées, sans quoi un serveur redémarré chaque matin ne purgerait jamais ce qui a expiré la nuit ; `RandomizedDelaySec` évite que plusieurs applications frappent la base à la même minute ; et c'est le `.timer` qu'on active, activer le `.service` le ferait tourner une fois au démarrage puis plus jamais.
+
 - **Un client de test qui passe par le vrai chemin WSGI (`TESTING-CLIENT-001`).**
   `FakeRequest` permet d'appeler un contrôleur directement, ce qui est utile et insuffisant : rien n'y passe par le routeur, ni par les middlewares, ni par la construction d'une `Request` depuis un environnement WSGI. Un test qui appelle `Controller.show(fake_request)` ne prouve rien du CSRF, de l'authentification, ni même de l'existence de la route.
   `ForgeTestClient` construit un environnement WSGI et appelle le callable rendu par `create_wsgi_app`, c'est à dire **exactement ce que Gunicorn appelle**. Un client qui reconstruirait sa propre boucle serait un jumeau : il passerait là où la production échoue, et Forge a déjà payé cette erreur une fois, avec un serveur de développement qui répondait là où Gunicorn rendait 404.

@@ -30,6 +30,29 @@ def _ts(dt_str: str) -> float:
     return datetime.strptime(dt_str, _FMT).replace(tzinfo=timezone.utc).timestamp()
 
 
+def _params_par_colonne(sql: str, params: tuple) -> dict:
+    """Associe les paramètres d'un INSERT aux colonnes que le SQL déclare.
+
+    Les colonnes littérales (`version` posée à `0`) ne consomment pas de
+    marqueur : le rapprochement suit les `?`, dans l'ordre.
+    """
+    debut = sql.index("(") + 1
+    colonnes = [c.strip() for c in sql[debut: sql.index(")", debut)].split(",")]
+    valeurs_sql = sql[sql.upper().index("VALUES"):]
+    debut_v = valeurs_sql.index("(") + 1
+    jetons = [j.strip() for j in valeurs_sql[debut_v: valeurs_sql.index(")", debut_v)].split(",")]
+
+    associe: dict = {}
+    index = 0
+    for colonne, jeton in zip(colonnes, jetons):
+        if jeton == "?":
+            associe[colonne] = params[index]
+            index += 1
+        else:
+            associe[colonne] = jeton
+    return associe
+
+
 class _FakeDB:
     """Simule fetch_one / execute pour DbSessionStore, sans base réelle.
 
@@ -57,12 +80,19 @@ class _FakeDB:
     def execute(self, sql: str, params: tuple = ()) -> int:
         s = sql.strip()
         if s.startswith("INSERT"):
-            # sid, data, user_id, expire, created, updated
-            sid, data_json, user_id, expire_dt = params[0], params[1], params[2], params[3]
+            # Les positions sont lues DANS le SQL, pas écrites à la main.
+            # Elles l'étaient, et l'ajout de la colonne `kind`
+            # (SESSIONS-TTL-PER-KIND-001) a fait lire une nature de session là
+            # où le double attendait une date. Un vrai pilote lit l'ordre de la
+            # requête ; le double le fait maintenant aussi, et une prochaine
+            # colonne ne le cassera plus.
+            valeurs = _params_par_colonne(sql, params)
+            sid = valeurs["session_id"]
             self.rows[sid] = {
-                "data": data_json,
-                "user_id": user_id,
-                "expire_ts": _ts(expire_dt),
+                "data": valeurs["data"],
+                "user_id": valeurs["user_id"],
+                "kind": valeurs.get("kind"),
+                "expire_ts": _ts(valeurs["expire_at"]),
                 "version": 0,
             }
             return 1

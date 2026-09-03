@@ -34,6 +34,13 @@ FORGE_SESSIONS = TableDefinition(
         # `string` et non `identity_ref` : l'identité applicative peut être un
         # entier comme une chaîne, et l'index doit rester portable.
         Column("user_id", "string", length=191, nullable=True),
+        # Nature de la session (SESSIONS-TTL-PER-KIND-001). Le store portait
+        # UNE durée pour tout le monde, ce qui force un arbitrage perdant :
+        # réglée court, elle déconnecte les authentifiés toutes les heures ;
+        # réglée long, elle laisse traîner des sessions anonymes par milliers.
+        # Défaut `anonymous` : une session existante non authentifiée l'est, et
+        # `authenticate` pose la nature au moment de la rotation.
+        Column("kind", "string", length=20, default="anonymous"),
         Column("expire_at", "datetime"),
         Column("version", "integer", default=0),
         Column("created_at", "datetime"),
@@ -43,6 +50,8 @@ FORGE_SESSIONS = TableDefinition(
     indexes=[
         Index("idx_forge_sessions_expire_at", "expire_at"),
         Index("idx_forge_sessions_user_id", "user_id"),
+        # La métrique compte par nature (SESSIONS-ACTIVE-METRIC-001).
+        Index("idx_forge_sessions_kind", "kind"),
     ],
 )
 
@@ -57,5 +66,14 @@ MIGRATIONS: list[tuple[str, TableDefinition | AddColumn]] = [
     (
         "20260901090000_add_user_id_to_forge_sessions.sql",
         AddColumn(FORGE_SESSIONS, "user_id"),
+    ),
+    # Même raison pour `kind` : les projets déjà provisionnés ne rejouent pas
+    # la création de la table (SESSIONS-TTL-PER-KIND-001).
+    (
+        "20260903110000_add_kind_to_forge_sessions.sql",
+        AddColumn(
+            FORGE_SESSIONS, "kind",
+            index_names=("idx_forge_sessions_kind",),
+        ),
     ),
 ]

@@ -146,8 +146,8 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `WORKFLOW-HISTORY-001` | Historique des transitions, auteur et date |
-| `WORKFLOW-CONDITIONS-001` | Conditions de transition par fonction enregistrée |
+| `WORKFLOW-HISTORY-001` | **Livré.** Table dédiée ; enregistrement explicite, dans la transaction de l'appelant |
+| `WORKFLOW-CONDITIONS-001` | **Livré.** Une condition dit pourquoi elle refuse ; une panne refuse |
 
 ### 7.5 mfa
 
@@ -159,9 +159,9 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `SESSIONS-TTL-PER-KIND-001` | Durée de vie distincte selon la nature de la session |
-| `SESSIONS-ACTIVE-METRIC-001` | Compteur de sessions actives |
-| `SESSIONS-GC-TIMER-DOC-001` | Minuterie systemd documentée pour `sessions:gc` |
+| `SESSIONS-TTL-PER-KIND-001` | **Livré.** Trois natures fermées ; valeur illisible refusée |
+| `SESSIONS-ACTIVE-METRIC-001` | **Livré.** Filtre en SQL ; une session expirée n'est pas active |
+| `SESSIONS-GC-TIMER-DOC-001` | **Livré.** Deux unités, `Persistent`, dispersion, et le piège du `.service` |
 
 ### 7.7 jobs
 

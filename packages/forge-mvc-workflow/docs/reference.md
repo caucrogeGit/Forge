@@ -88,7 +88,17 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
 
     #### 3. Poser ce dont il a besoin
 
-    Rien à faire : cet opt-in n'apporte aucune table.
+    ```bash
+    forge workflow:init
+    forge migration:apply
+    ```
+
+    `forge workflow:init` écrit la migration de `workflow_history` dans `mvc/migrations/`,
+    où elle reste relisible avant d'être appliquée (charte §7, ADR-071).
+    La commande n'ouvre aucune connexion.
+
+    Cette table est apparue avec `WORKFLOW-HISTORY-001` ; l'opt-in n'en avait aucune avant.
+    Les transitions et les conditions fonctionnent **sans** elle, seul l'historique en dépend.
 
     #### 4. Le brancher là où il agit
 
@@ -421,6 +431,79 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
 
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-workflow` : la dépendance va de l'opt-in vers le cœur.
+
+??? note "12. Historique des transitions"
+
+    Le paquet appliquait les transitions sans en garder trace (`WORKFLOW-HISTORY-001`) : on savait dans quel état une entité se trouve, jamais comment elle y est arrivée, ni quand, ni par qui.
+
+    C'est pourtant la question qu'on pose à un workflow dès qu'un dossier pose problème. « Qui a validé cette commande, et à quelle date » n'avait aucune réponse, et chaque application réinventait sa table.
+
+    ```python
+    from forge_mvc_workflow import history_for, record_transition
+
+    record_transition(
+        "Commande", commande.id, "validee",
+        from_status="brouillon", actor_kind="user", actor_id=utilisateur.id,
+        comment="stock vérifié",
+    )
+
+    for entree in history_for("Commande", commande.id):
+        entree.to_status, entree.actor_id, entree.created_at
+    ```
+
+    !!! danger "L'enregistrement est explicite, et dans VOTRE transaction"
+        `apply_transition` n'écrit rien de soi même.
+
+        Écrire depuis le paquet imposerait une connexion à un module qui n'en avait pas besoin, et surtout séparerait l'historique de l'écriture qu'il décrit : une transaction annulée laisserait une ligne d'historique pour une transition qui n'a pas eu lieu.
+
+    !!! info "Un acteur absent est une information"
+        Une transition automatique, déclenchée par une tâche de fond, n'a pas d'auteur.
+
+        Inventer « system » masquerait la différence, et `is_automatic` la rend lisible. `actor_kind` et `actor_id` vont en revanche de pair : un identifiant sans nature ne désigne personne.
+
+    !!! info "Aucune clé étrangère vers l'entité"
+        Le paquet ne sait pas ce qu'est une entité de l'application, et un historique doit survivre à la suppression de son sujet.
+
+        C'est justement quand une commande a été supprimée qu'on veut savoir qui l'avait validée.
+
+    La table est décrite dans `tables.py` (`WORKFLOW_HISTORY`, `WORKFLOW_HISTORY_TABLE`), les opérations dans `history.py` et les règles dans `conditions.py`.
+
+    L'historique est trié par identifiant décroissant et non par date : deux transitions de la même seconde se départageraient sinon au hasard, et l'ordre est ce qu'on vient y lire.
+
+??? note "13. Conditions de transition"
+
+    `can_transition` répond à une seule question : cette transition est elle **déclarée** ? (`WORKFLOW-CONDITIONS-001`)
+
+    Elle ne peut pas répondre à « cette commande a t elle au moins une ligne », ni à « ce dossier a t il été relu », qui sont pourtant les vraies conditions d'un passage d'état. L'application les vérifiait donc avant d'appeler, chacune à sa façon, et la règle vivait dans les contrôleurs plutôt que dans le workflow. Deux chemins menant au même état s'oubliaient l'un l'autre, et le second passait sans contrôle.
+
+    ```python
+    from forge_mvc_workflow import ensure_conditions, register_condition
+
+    def stock_verifie(depuis, vers, contexte):
+        if not contexte.get("stock_ok"):
+            return "le stock doit être vérifié avant validation"
+        return None
+
+    register_condition(stock_verifie, to_status="validee")
+    ensure_conditions("brouillon", "validee", {"stock_ok": True})
+    ```
+
+    !!! info "Une condition dit POURQUOI elle refuse"
+        Une condition qui rendrait `False` laisserait l'utilisateur devant « transition impossible », message qui n'indique rien à corriger.
+
+        Elle rend donc `None` pour accepter, ou un **motif**, qui remonte jusqu'à l'écran.
+
+    !!! danger "Une condition qui échoue refuse la transition"
+        Une condition qui lève ne dit **pas** que la transition est permise, elle ne dit rien.
+
+        Traiter ce silence comme une autorisation est particulièrement coûteux ici : le jour où le service qu'elle interroge tombe, toutes les transitions passeraient.
+
+    !!! info "Les conditions s'ajoutent, elles ne se remplacent pas"
+        Toutes doivent accepter, et le premier refus arrête la série.
+
+        Une condition sans `from_status` ni `to_status` s'applique à toutes les transitions ; « rien ne sort de brouillon sans relecture » se déclare une fois, plutôt qu'une fois par transition sortante.
+
+    `check_conditions` ne lève jamais et sert à **afficher** ce qui bloque, par exemple pour griser un bouton et dire pourquoi. `ensure_conditions` sert à refuser.
 
 ## Voir aussi
 

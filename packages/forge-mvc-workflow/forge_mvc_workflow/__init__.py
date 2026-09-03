@@ -39,6 +39,27 @@ from forge_mvc_workflow.status import (
     validate_status_name,
     validate_statuses,
 )
+from forge_mvc_workflow.conditions import (
+    ConditionResult,
+    TransitionCondition,
+    check_conditions,
+    clear_conditions,
+    ensure_conditions,
+    register_condition,
+    registered_conditions,
+    unregister_condition,
+)
+from forge_mvc_workflow.history import (
+    TransitionRecord,
+    WorkflowHistoryError,
+    history_for,
+    last_transition,
+    record_transition,
+)
+from forge_mvc_workflow.tables import (
+    WORKFLOW_HISTORY,
+    WORKFLOW_HISTORY_TABLE,
+)
 from forge_mvc_workflow.transitions import (
     WorkflowTransition,
     WorkflowTransitionError,
@@ -69,6 +90,23 @@ __all__ = [
     "validate_status_name",
     "validate_statuses",
     "WorkflowTransition",
+    # Historique des transitions (WORKFLOW-HISTORY-001)
+    "record_transition",
+    "history_for",
+    "last_transition",
+    "TransitionRecord",
+    "WorkflowHistoryError",
+    "WORKFLOW_HISTORY",
+    "WORKFLOW_HISTORY_TABLE",
+    # Conditions de transition (WORKFLOW-CONDITIONS-001)
+    "register_condition",
+    "unregister_condition",
+    "registered_conditions",
+    "clear_conditions",
+    "check_conditions",
+    "ensure_conditions",
+    "ConditionResult",
+    "TransitionCondition",
     "WorkflowTransitionError",
     "can_transition",
     "get_available_transitions",

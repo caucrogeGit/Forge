@@ -51,10 +51,18 @@ class TestSchema:
         assert colonne.nullable
 
     def test_une_migration_ajoute_la_colonne_aux_projets_existants(self) -> None:
-        """La migration de création ne se rejoue pas : son empreinte est enregistrée."""
+        """La migration de création ne se rejoue pas : son empreinte est enregistrée.
+
+        Le test figeait le **nombre** de migrations additives, ce qui l'a fait
+        échouer quand `SESSIONS-TTL-PER-KIND-001` en a ajouté une seconde pour
+        `kind`. Ce qui compte est que `user_id` en ait une, et une seule : deux
+        migrations pour la même colonne s'appliqueraient deux fois.
+        """
         ajouts = [d for _, d in MIGRATIONS if isinstance(d, AddColumn)]
-        assert len(ajouts) == 1
-        assert ajouts[0].column_name == "user_id"
+        pour_user_id = [a for a in ajouts if a.column_name == "user_id"]
+
+        assert len(pour_user_id) == 1
+        assert len({a.column_name for a in ajouts}) == len(ajouts)
 
     def test_les_noms_de_migration_restent_ordonnes(self) -> None:
         noms = [nom for nom, _ in MIGRATIONS]
