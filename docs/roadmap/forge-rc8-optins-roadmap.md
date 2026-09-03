@@ -302,10 +302,10 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `TESTING-CLIENT-001` | Client de test léger, requête vers réponse, sans navigateur |
-| `TESTING-LOGIN-AS-001` | Aide d'authentification de test par rôle |
-| `TESTING-FIXTURES-ALIGN-001` | Fixtures pytest alignées sur `forge-mvc-fixtures` |
-| `TESTING-ASSERTIONS-001` | Assertions de session et de jeton anti-rejeu |
+| `TESTING-CLIENT-001` | **Livré.** Passe par le vrai callable WSGI, pas par un jumeau |
+| `TESTING-LOGIN-AS-001` | **Livré.** Vrai magasin de sessions ; `logout` détruit vraiment |
+| `TESTING-FIXTURES-ALIGN-001` | **Livré.** Réutilise le code du paquet, pas une seconde implémentation |
+| `TESTING-ASSERTIONS-001` | **Livré.** Messages qui nomment la cause ; la rotation exige l'ancienne morte |
 
 ---
 

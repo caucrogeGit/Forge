@@ -353,6 +353,124 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-testing` : la dépendance va de l'outil de test vers le cœur.
 
+??? note "12. Client de test, de la requête à la réponse"
+
+    `FakeRequest` permet d'appeler un contrôleur directement. C'est utile et insuffisant : rien n'y passe par le routeur, ni par les middlewares, ni par la construction d'une `Request` depuis un environnement WSGI (`TESTING-CLIENT-001`).
+
+    Un test qui appelle `ArticleController.show(fake_request)` ne prouve donc rien du CSRF, de l'authentification, des en-têtes de sécurité, ni même de l'existence de la route.
+
+    ```python
+    def test_la_liste_repond(make_client):
+        client = make_client(application)
+
+        reponse = client.get("/articles")
+
+        assert reponse.status == 200
+        assert "Articles" in reponse.text
+    ```
+
+    !!! danger "Le client passe par le VRAI chemin de production"
+        Il construit un environnement WSGI et appelle le callable rendu par `create_wsgi_app`, c'est à dire exactement ce que Gunicorn appelle.
+
+        Ce n'est pas un détail d'élégance. Un client qui reconstruirait sa propre boucle serait un **jumeau** : il passerait là où la production échoue, et les deux dériveraient sans que rien ne le signale. Forge a déjà payé cette erreur une fois, avec un serveur de développement qui répondait là où Gunicorn rendait 404.
+
+    !!! info "Les cookies sont gardés entre deux requêtes"
+        Un scénario réaliste enchaîne une connexion, une lecture de formulaire et un envoi, et chacune dépend de la précédente.
+
+        Un cookie effacé par le serveur est **retiré** du client : garder le cookie ferait passer un test de déconnexion qui ne prouve rien.
+
+        Rien d'autre n'est gardé, le client étant un navigateur minimal et non un environnement.
+
+    !!! warning "Une seule redirection est suivie"
+        Une boucle de redirections est un défaut à voir, pas à absorber : la suivre indéfiniment ferait tourner le test sans fin.
+
+    `data` et `json` ensemble sont refusés : une requête ne porte qu'un corps, et laisser l'un gagner en silence produirait un test qui vérifie autre chose que ce qu'il croit.
+
+??? note "13. Authentifier un client de test"
+
+    Tester une page protégée demandait de jouer le formulaire de connexion, donc d'avoir un utilisateur en base, un mot de passe haché et un jeton CSRF (`TESTING-LOGIN-AS-001`).
+
+    Un test de « la page d'administration refuse un visiteur » passait ainsi par cinq étapes qui n'ont rien à voir avec ce qu'il vérifie, et cassait dès que le formulaire changeait.
+
+    ```python
+    from forge_mvc_testing import login_as, logout
+
+    login_as(client, 42, roles=["admin"])
+    assert client.get("/admin").status == 200
+
+    logout(client)
+    assert client.get("/admin").status in (302, 403)
+    ```
+
+    !!! danger "L'aide passe par le vrai magasin de sessions"
+        Elle n'écrit **pas** un cookie signé à la main.
+
+        Fabriquer le cookie soi même produirait un jumeau : le test passerait avec une session que la production aurait refusée, et les deux dériveraient sans que rien ne le signale.
+
+    !!! info "Aucun utilisateur n'est créé en base"
+        Le contenu de la session est celui que l'appelant donne, et il n'a pas à correspondre à une ligne.
+
+        Un test de contrôle d'accès vérifie ce que le middleware fait d'une session, pas ce que le dépôt contient. Un test qui a besoin des deux crée son utilisateur lui même.
+
+    !!! warning "`logout` détruit la session"
+        Oublier le cookie sans détruire la session laisserait un test de déconnexion passer alors que la session reste utilisable par qui la connaît.
+
+??? note "14. Assertions de session et de jeton"
+
+    Vérifier qu'un contrôleur a bien authentifié, qu'il a bien fait tourner l'identifiant de session, ou qu'un jeton à usage unique a bien été consommé, demandait d'aller lire le magasin à la main dans chaque test (`TESTING-ASSERTIONS-001`).
+
+    Chacun écrivait donc sa version, et aucune ne disait la même chose en cas d'échec.
+
+    | Assertion | Ce qu'elle vérifie |
+    |---|---|
+    | `assert_authenticated` | session présente et authentifiée |
+    | `assert_not_authenticated` | pas de session authentifiée, anonyme toléré |
+    | `assert_no_session` | aucune session, pas même anonyme |
+    | `assert_session_key` | une clé, et sa valeur si elle est donnée |
+    | `assert_session_rotated` | l'identifiant a changé **et** l'ancien est mort |
+    | `assert_token_valid` | le jeton anti-rejeu est encore utilisable |
+    | `assert_token_consumed` | il a bien été consommé |
+
+    !!! info "Un message qui nomme la cause"
+        `assert_authenticated` distingue trois échecs qu'un `assert` unique confondrait : pas de cookie, cookie pointant sur une session disparue, session présente mais non authentifiée.
+
+        Une assertion de test n'a pas d'autre raison d'exister que de raccourcir le chemin entre l'échec et la correction.
+
+    !!! danger "`assert_session_rotated` vérifie que l'ancienne est morte"
+        Un test qui vérifierait seulement le changement d'identifiant laisserait passer une rotation qui garde l'ancienne session vivante, ce qui ne protège de rien contre la fixation de session.
+
+    !!! warning "Un jeton non consommé est une faille silencieuse"
+        Un jeton à usage unique qui reste utilisable après emploi est rejouable, et rien ne le révèle sans le vérifier.
+
+    `assert_token_valid` et `assert_token_consumed` interrogent le magasin par duck typing : `forge-mvc-testing` ne dépend d'aucun opt-in.
+
+??? note "15. Charger les fixtures du projet dans un test"
+
+    Un projet qui écrit ses données de démonstration avec `forge-mvc-fixtures` les réécrivait une seconde fois pour ses tests, en Python (`TESTING-FIXTURES-ALIGN-001`).
+
+    Les deux jeux divergeaient, et un test passait sur des données que l'application ne verrait jamais.
+
+    ```python
+    def test_liste(real_db, fixtures_loader):
+        fixtures_loader(PROJECT_ROOT, real_db.execute, scenario="test")
+        ...
+    ```
+
+    !!! info "Pas une seconde implémentation"
+        Les mêmes fichiers, le même ordre topologique, le même code que `fixtures:load`.
+
+        En recalculer un second ici le ferait dériver, et c'est exactement le défaut que le ticket corrige.
+
+    !!! info "La connexion appartient au test"
+        Le paquet ne se connecte pas lui même : le test sait sur quel backend il tourne et dans quelle transaction il travaille.
+
+        Créer et détruire une base appartient aux fixtures d'intégration serveur réel (`real_db`, `real_backend_db`), qui savent déjà le faire pour les quatre backends.
+
+    !!! warning "L'opt-in fixtures est facultatif"
+        La fixture `fixtures_loader` **saute** le test quand il est absent, plutôt que de faire échouer une suite qui ne s'en sert pas.
+
+        En Python, `load_fixture_scenario` lève `FixturesUnavailable` avec la commande d'installation.
+
 ## Voir aussi
 
 - [Welcome-Testing](welcome/debutant/testing-welcome.md) : apprendre l'outillage pas à pas.

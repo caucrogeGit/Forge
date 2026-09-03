@@ -4,6 +4,25 @@
 
 ### Ajouté
 
+- **Un client de test qui passe par le vrai chemin WSGI (`TESTING-CLIENT-001`).**
+  `FakeRequest` permet d'appeler un contrôleur directement, ce qui est utile et insuffisant : rien n'y passe par le routeur, ni par les middlewares, ni par la construction d'une `Request` depuis un environnement WSGI. Un test qui appelle `Controller.show(fake_request)` ne prouve rien du CSRF, de l'authentification, ni même de l'existence de la route.
+  `ForgeTestClient` construit un environnement WSGI et appelle le callable rendu par `create_wsgi_app`, c'est à dire **exactement ce que Gunicorn appelle**. Un client qui reconstruirait sa propre boucle serait un jumeau : il passerait là où la production échoue, et Forge a déjà payé cette erreur une fois, avec un serveur de développement qui répondait là où Gunicorn rendait 404.
+  Les cookies sont gardés entre deux requêtes, un scénario réaliste enchaînant connexion, formulaire et envoi. Un cookie effacé par le serveur est **retiré** du client, sans quoi un test de déconnexion passerait sans rien prouver. Une seule redirection est suivie, une boucle étant un défaut à voir et non à absorber.
+
+- **Authentifier un client de test en une ligne (`TESTING-LOGIN-AS-001`).**
+  Tester une page protégée demandait de jouer le formulaire de connexion, donc d'avoir un utilisateur en base, un mot de passe haché et un jeton CSRF. Un test de « la page d'administration refuse un visiteur » passait par cinq étapes sans rapport avec ce qu'il vérifie, et cassait dès que le formulaire changeait.
+  `login_as` passe par le **vrai magasin de sessions** : fabriquer le cookie soi même produirait un jumeau, et le test passerait avec une session que la production aurait refusée. `logout` **détruit** la session, oublier le cookie sans la détruire laissant un test de déconnexion passer alors qu'elle reste utilisable.
+  Aucun utilisateur n'est créé en base : un test de contrôle d'accès vérifie ce que le middleware fait d'une session, pas ce que le dépôt contient.
+
+- **Des assertions qui nomment la cause (`TESTING-ASSERTIONS-001`).**
+  Vérifier une authentification, une rotation de session ou la consommation d'un jeton demandait de lire le magasin à la main dans chaque test. Chacun écrivait sa version, et aucune ne disait la même chose en cas d'échec.
+  `assert_authenticated` distingue trois échecs qu'un `assert` unique confondrait : pas de cookie, cookie pointant sur une session disparue, session présente mais non authentifiée.
+  **`assert_session_rotated` exige que l'ancienne session soit morte.** Vérifier seulement le changement d'identifiant laisserait passer une rotation qui garde l'ancienne vivante, ce qui ne protège de rien contre la fixation de session. `assert_token_consumed` couvre la faille symétrique : un jeton à usage unique encore utilisable après emploi est rejouable, et rien ne le révèle sans le vérifier.
+
+- **Les fixtures du projet se chargent dans un test (`TESTING-FIXTURES-ALIGN-001`).**
+  Un projet qui écrit ses données de démonstration avec `forge-mvc-fixtures` les réécrivait une seconde fois pour ses tests. Les deux jeux divergeaient, et un test passait sur des données que l'application ne verrait jamais.
+  `load_fixture_scenario` réutilise le code du paquet, les mêmes fichiers et le même ordre topologique : en recalculer un second ici le ferait dériver, ce qui est exactement le défaut corrigé. La connexion appartient au test, qui sait sur quel backend il tourne. La fixture `fixtures_loader` saute proprement quand l'opt-in facultatif est absent.
+
 - **`forge qrcode:make` produit un fichier (`QRCODE-CLI-001`).**
   Le paquet savait produire un QR Code depuis Python et le servir en HTTP. Produire un fichier, pour une affiche ou une étiquette, demandait un script à usage unique.
   Affiche par défaut, écrit sur `--out` (charte §7). **Un fichier existant n'est jamais écrasé** : deux QR Codes se ressemblent à l'œil, ce sont deux carrés noirs et blancs, et l'ancien serait perdu sans que rien ne le signale jusqu'à ce qu'un scan mène au mauvais endroit.

@@ -16,6 +16,9 @@ import pytest
 import core.forge as forge
 
 from forge_mvc_testing.fake_request import FakeRequest
+from forge_mvc_testing.fixtures_support import (  # noqa: F401 — exposée comme fixture
+    fixtures_loader,
+)
 
 # Fixtures d'intégration serveur réel (TESTING-REAL-DB-FIXTURES-001). Importées
 # ici pour que le plugin les expose à toute la suite, y compris aux tests des
@@ -118,3 +121,32 @@ def clear_upload_rate_limits():
 def fake_request():
     """Retourne la classe `FakeRequest` pour construire des requêtes simulées."""
     return FakeRequest
+
+
+@pytest.fixture
+def make_client():
+    """Fabrique un `ForgeTestClient` sur une `Application` Forge.
+
+    ```python
+    def test_page(make_client):
+        client = make_client(application)
+        assert client.get("/").status == 200
+    ```
+
+    Le client passe par `create_wsgi_app`, c'est à dire par le **vrai** chemin
+    de production : un client qui reconstruirait sa propre boucle serait un
+    jumeau, et passerait là où la production échoue.
+
+    Les avertissements de production sont coupés : ils appartiennent au
+    démarrage d'un vrai service, et pollueraient le journal de chaque test.
+    """
+    from core.app.wsgi import create_wsgi_app
+
+    from forge_mvc_testing.client import ForgeTestClient
+
+    def _fabrique(application, **kw):
+        return ForgeTestClient(
+            create_wsgi_app(application, emit_prod_warnings=False), **kw
+        )
+
+    return _fabrique
