@@ -1,0 +1,51 @@
+{% extends "admin/layout.html" %}
+{% block title %}Confirmer l'action groupée{% endblock %}
+{% block content %}
+  <p><a href="/admin/{{ resource.slug }}">← {{ resource.plural_label }}</a></p>
+
+  {% if transition %}
+    <h2>Faire passer {{ rows | length }} {{ resource.plural_label | lower }}
+        de « {{ transition[0] }} » à « {{ transition[1] }} »</h2>
+  {% else %}
+    <h2>Supprimer {{ rows | length }} {{ resource.plural_label | lower }}</h2>
+    <p><strong>Cette action est irréversible.</strong></p>
+  {% endif %}
+
+  {% if manquantes %}
+    {# L'écart entre ce qui a été coché et ce qui existe encore se dit ici :
+       une ligne supprimée entre l'affichage et la validation n'est pas une
+       erreur, mais la taire ferait croire l'action plus large qu'elle n'est. #}
+    <p>{{ manquantes }} ligne(s) sélectionnée(s) n'existent plus et seront ignorées.</p>
+  {% endif %}
+
+  {% if rows %}
+    <table>
+      <thead>
+        <tr>{% for column in columns %}<th>{{ column }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>{% for column in columns %}<td>{{ row[column] }}</td>{% endfor %}</tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <form method="post"
+          action="/admin/{{ resource.slug }}/{% if transition %}bulk-transition{% else %}bulk-delete{% endif %}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="{{ action }}">
+      {# La sélection est repostée telle quelle : la page de confirmation ne
+         doit pas élargir ce qui a été coché. #}
+      {% for identifiant in ids %}
+        <input type="hidden" name="ids" value="{{ identifiant }}">
+      {% endfor %}
+      <button type="submit">
+        {% if transition %}Confirmer la transition{% else %}Confirmer la suppression{% endif %}
+      </button>
+      <a href="/admin/{{ resource.slug }}">Annuler</a>
+    </form>
+  {% else %}
+    <p>Aucune des lignes sélectionnées n'existe encore.</p>
+    <p><a href="/admin/{{ resource.slug }}">Revenir à la liste</a></p>
+  {% endif %}
+{% endblock %}

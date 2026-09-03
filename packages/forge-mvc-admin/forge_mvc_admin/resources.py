@@ -83,6 +83,23 @@ class AdminResource:
     #: n'affiche pas, un mot de passe haché par exemple. La déclaration est donc
     #: obligatoire, jamais déduite de `list_fields` (`ADMIN-LIST-FILTERS-001`).
     filter_fields: tuple[str, ...] = ()
+    #: Actions groupées offertes en liste (`ADMIN-BULK-ACTIONS-001`).
+    #:
+    #: `bulk_delete` ouvre la suppression groupée. Elle est **fermée par
+    #: défaut** : une case à cocher offerte sans qu'on l'ait demandée invite à
+    #: un geste irréversible sur une table que l'exploitant croyait en lecture.
+    bulk_delete: bool = False
+    #: Colonne portant le statut, quand la ressource suit un workflow.
+    status_field: str = ""
+    #: Transitions offertes en masse, `(depuis, vers)`.
+    #:
+    #: Déclarées ici et non déduites : `forge-mvc-admin` ne lit pas le workflow
+    #: de l'application, et deviner qu'un statut `brouillon` mène à `publie`
+    #: appliquerait à N lignes une transition que personne n'a écrite.
+    #:
+    #: La déclaration ne demande **pas** `forge-mvc-workflow` : elle nomme des
+    #: chaînes. C'est l'exécution qui l'exige, pour vérifier la transition.
+    bulk_transitions: tuple[tuple[str, str], ...] = ()
     #: Champs balayés par la recherche plein texte, en `LIKE`.
     #:
     #: Vide par défaut, pour la même raison. Une recherche sur une colonne non
@@ -131,6 +148,29 @@ class AdminResource:
         # sont déclarés : `_validate_fields` refuse une liste vide.
         if self.filter_fields:
             _validate_fields("filter_fields", self.filter_fields)
+
+        # ADMIN-BULK-ACTIONS-001 : une transition groupée écrit une colonne de
+        # statut. Sans elle, la déclaration ne désigne rien, et l'action
+        # échouerait à l'exécution sur N lignes plutôt qu'ici, à la
+        # déclaration, où elle se corrige.
+        if self.status_field and not _FIELD_RE.fullmatch(self.status_field):
+            raise AdminResourceError(
+                f"status_field invalide : {self.status_field!r} (snake_case attendu)."
+            )
+        if self.bulk_transitions and not self.status_field:
+            raise AdminResourceError(
+                "bulk_transitions déclarée sans status_field : la transition "
+                "ne saurait pas quelle colonne écrire."
+            )
+        for depuis, vers in self.bulk_transitions:
+            if not depuis or not vers:
+                raise AdminResourceError(
+                    f"transition incomplète : ({depuis!r}, {vers!r})."
+                )
+            if depuis == vers:
+                raise AdminResourceError(
+                    f"transition sans effet : {depuis!r} vers lui même."
+                )
         if self.search_fields:
             _validate_fields("search_fields", self.search_fields)
 

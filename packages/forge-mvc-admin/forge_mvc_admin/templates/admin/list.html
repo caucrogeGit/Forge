@@ -31,10 +31,19 @@
     </form>
   {% endif %}
 
+  {# Actions groupées : la colonne de cases n'apparaît QUE si la ressource en
+     déclare (ADMIN-BULK-ACTIONS-001). Une case offerte sans qu'on l'ait
+     demandée invite à un geste irréversible sur une table qu'on croyait en
+     lecture. #}
+  {% set actions_groupees = resource.bulk_delete or resource.bulk_transitions %}
+
   {% if rows %}
+    <form method="post" action="/admin/{{ resource.slug }}/bulk">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <table>
       <thead>
         <tr>
+          {% if actions_groupees %}<th></th>{% endif %}
           {% for column in columns %}
             <th>
               {# Trier sur la colonne déjà triée en inverse le sens. #}
@@ -48,11 +57,31 @@
       <tbody>
         {% for row in rows %}
           <tr>
+            {% if actions_groupees %}
+              <td><input type="checkbox" name="ids" value="{{ row[resource.pk] }}"></td>
+            {% endif %}
             {% for column in columns %}<td>{{ row[column] }}</td>{% endfor %}
           </tr>
         {% endfor %}
       </tbody>
     </table>
+
+    {% if actions_groupees %}
+      <fieldset>
+        <legend>Sur la sélection</legend>
+        {% if resource.bulk_delete %}
+          <button type="submit" name="action" value="delete">Supprimer</button>
+        {% endif %}
+        {% for depuis, vers in resource.bulk_transitions %}
+          <button type="submit" name="action" value="transition:{{ depuis }}:{{ vers }}">
+            {{ depuis }} → {{ vers }}
+          </button>
+        {% endfor %}
+        {# Aucune action ne s'applique directement : toutes passent par la page
+           de confirmation, comme la suppression unitaire. #}
+      </fieldset>
+    {% endif %}
+    </form>
     <nav>
       {% if pagination.has_prev %}<a href="/admin/{{ resource.slug }}?page={{ pagination.prev_page }}{{ criteria_query }}">Précédent</a>{% endif %}
       <span>Page {{ pagination.page }} / {{ pagination.nb_pages }}</span>

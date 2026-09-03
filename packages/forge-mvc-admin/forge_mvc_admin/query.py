@@ -406,6 +406,84 @@ def delete_rows(
     return execute(sql, tuple(valeurs))
 
 
+def rows_by_pk(
+    resource: AdminResource,
+    fetch_all: FetchAll,
+    *,
+    pk_values: "Sequence[Any]",
+    max_rows: int = BULK_MAX_ROWS,
+) -> "list[dict[str, Any]]":
+    """Lignes désignées par leurs clés primaires, pour une page de confirmation.
+
+    Une ligne demandée mais absente n'est **pas** une erreur : elle a pu être
+    supprimée entre l'affichage de la liste et la validation. L'appelant
+    compare les deux longueurs et le dit, plutôt que de refuser la fournée.
+    """
+    valeurs = list(pk_values)
+    if not valeurs:
+        return []
+    if len(valeurs) > max_rows:
+        raise BulkActionError(
+            f"{len(valeurs)} lignes demandées, plafond {max_rows}."
+        )
+    colonnes = ", ".join(_ident(c) for c in resource.list_fields)
+    marqueurs = ", ".join("?" for _ in valeurs)
+    sql = (
+        f"SELECT {colonnes} FROM {resource.table} "
+        f"WHERE {_ident(resource.pk)} IN ({marqueurs})"
+    )
+    return fetch_all(sql, tuple(valeurs))
+
+
+def transition_rows(
+    resource: AdminResource,
+    execute: Execute,
+    *,
+    pk_values: "Sequence[Any]",
+    from_status: str,
+    to_status: str,
+    max_rows: int = BULK_MAX_ROWS,
+) -> int:
+    """Fait passer plusieurs lignes d'un statut à un autre.
+
+    La clause porte **aussi** sur le statut de départ, `WHERE pk IN (...) AND
+    statut = ?`. C'est ce qui rend l'opération sûre : une ligne dont le statut
+    a changé entre l'affichage et la validation n'est pas touchée, là où une
+    mise à jour sur la seule clé primaire écraserait un état que quelqu'un
+    d'autre vient de poser.
+
+    Rend le nombre de lignes réellement passées, qui peut donc être inférieur à
+    la sélection. L'écart est une **information** à montrer, pas une erreur.
+
+    Raises:
+        BulkActionError: sélection vide, au delà du plafond, ou statut vide.
+    """
+    valeurs = list(pk_values)
+    if not valeurs:
+        raise BulkActionError("aucune ligne sélectionnée.")
+    if len(valeurs) > max_rows:
+        raise BulkActionError(
+            f"{len(valeurs)} lignes sélectionnées, plafond {max_rows}."
+        )
+    if not resource.status_field:
+        raise BulkActionError(
+            f"{resource.slug} ne déclare pas de status_field : aucune colonne "
+            "de statut à écrire."
+        )
+    depuis, vers = (from_status or "").strip(), (to_status or "").strip()
+    if not depuis or not vers:
+        raise BulkActionError(
+            f"transition incomplète : {from_status!r} vers {to_status!r}."
+        )
+
+    marqueurs = ", ".join("?" for _ in valeurs)
+    sql = (
+        f"UPDATE {resource.table} SET {resource.status_field} = ? "
+        f"WHERE {resource.pk} IN ({marqueurs}) AND {resource.status_field} = ?"
+    )
+    return execute(sql, (vers, *valeurs, depuis))
+
+
 def count_rows(
     resource: AdminResource,
     fetch_one: FetchOne,

@@ -5,7 +5,8 @@ Opt-in Forge pour un **back-office applicatif** (Forge Admin).
 > **Statut : livré, en beta.**
 > Le paquet fournit un back-office fonctionnel, adossé aux contrats Forge :
 > tableau de bord, liste paginée avec recherche et filtres, fiche, création,
-> édition, suppression unitaire et suppression groupée.
+> édition, suppression unitaire, suppression groupée et transitions groupées quand
+> `forge-mvc-workflow` est installé.
 >
 > Ce paragraphe annonçait que « les filtres de liste et les actions en masse
 > restent à venir » alors que les filtres étaient livrés et que les actions

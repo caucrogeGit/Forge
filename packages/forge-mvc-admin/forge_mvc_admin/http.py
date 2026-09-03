@@ -15,24 +15,29 @@ from __future__ import annotations
 
 import logging
 from urllib.parse import urlencode
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from core.mvc.controller.base_controller import BaseController
 from core.mvc.view.pagination import Pagination
 from core.security.decorators import require_auth
 
 from forge_mvc_admin.exceptions import AdminRegistryError, AdminResourceError
+from forge_mvc_admin.resources import AdminResource
 from forge_mvc_admin.query import (
+    BulkActionError,
     Execute,
     FetchAll,
     FetchOne,
     Insert,
     count_rows,
     delete_row,
+    delete_rows,
     detail_columns,
     get_row,
     insert_row,
     list_rows,
+    rows_by_pk,
+    transition_rows,
     update_row,
 )
 from forge_mvc_admin.registry import AdminRegistry
@@ -407,6 +412,212 @@ class AdminController:
             f"{resource.label} supprimé.",
         )
 
+    # ── Actions groupées (ADMIN-BULK-ACTIONS-001) ───────────────────────────
+
+    def _selection(self, request: Request) -> "list[str]":
+        """Identifiants cochés dans la liste.
+
+        Lus par `files_list`-like : le formulaire pose plusieurs champs du même
+        nom, et n'en lire qu'un supprimerait une ligne sur N sans le dire.
+        """
+        lecteur = getattr(request, "body", None)
+        if not isinstance(lecteur, dict):
+            return []
+        brut = cast("dict[str, Any]", lecteur).get("ids")
+        if isinstance(brut, list):
+            valeurs = cast("list[Any]", brut)
+            return [str(v).strip() for v in valeurs if str(v).strip()]
+        if brut:
+            return [str(brut).strip()]
+        return []
+
+    def _resource_ou_404(self, request: Request) -> "AdminResource | None":
+        slug = request.route("slug")
+        if slug is None:
+            return None
+        try:
+            return self._registry.get(slug)
+        except AdminRegistryError:
+            return None
+
+    def resource_bulk_confirm(self, request: Request) -> Response:
+        """Confirmation d'une action groupée (`POST /admin/<slug>/bulk`).
+
+        En POST et non en GET : la sélection est longue, et une URL de plusieurs
+        centaines d'identifiants serait tronquée par le serveur avant d'arriver.
+
+        Ne mute **rien**. La suppression unitaire a sa page de confirmation ;
+        une action qui porte sur cinquante lignes n'a pas moins besoin de la
+        sienne.
+        """
+        from core.http.response import Response as _Response
+
+        resource = self._resource_ou_404(request)
+        if resource is None:
+            return BaseController.not_found()
+
+        action = str(request.form("action") or "").strip()
+        identifiants = self._selection(request)
+        if not identifiants:
+            return BaseController.redirect_with_flash(
+                request, f"/admin/{resource.slug}",
+                "Aucune ligne sélectionnée.",
+            )
+
+        if action == "delete" and not resource.bulk_delete:
+            return _Response.text(
+                f"{resource.slug} n'ouvre pas la suppression groupée.", status=403
+            )
+        transition: "tuple[str, str] | None" = None
+        if action.startswith("transition:"):
+            transition = _parse_transition(resource, action)
+            if transition is None:
+                return _Response.text("Transition inconnue.", status=400)
+
+        fetch_all, _fetch_one = self._db()
+        lignes = rows_by_pk(resource, fetch_all, pk_values=identifiants)
+        return BaseController.render(
+            "admin/bulk.html",
+            context={
+                "resource": resource,
+                "columns": resource.list_fields,
+                "rows": lignes,
+                "ids": identifiants,
+                "action": action,
+                "transition": transition,
+                "manquantes": len(identifiants) - len(lignes),
+            },
+            request=request,
+        )
+
+    def resource_bulk_delete(self, request: Request) -> Response:
+        """Suppression groupée (`POST /admin/<slug>/bulk-delete`)."""
+        from core.http.response import Response as _Response
+
+        resource = self._resource_ou_404(request)
+        if resource is None:
+            return BaseController.not_found()
+        if not resource.bulk_delete:
+            return _Response.text(
+                f"{resource.slug} n'ouvre pas la suppression groupée.", status=403
+            )
+
+        try:
+            supprimees = delete_rows(
+                resource, self._execute_fn(), pk_values=self._selection(request)
+            )
+        except BulkActionError as erreur:
+            return _Response.text(str(erreur), status=400)
+
+        return BaseController.redirect_with_flash(
+            request, f"/admin/{resource.slug}",
+            f"{supprimees} {resource.plural_label.lower()} supprimés.",
+        )
+
+    def resource_bulk_transition(self, request: Request) -> Response:
+        """Transition groupée (`POST /admin/<slug>/bulk-transition`).
+
+        Exige `forge-mvc-workflow` **installé**, et refuse sinon.
+
+        Ce refus est délibéré, et il diffère de la suppression : appliquer un
+        changement de statut à N lignes sans pouvoir vérifier que la transition
+        est déclarée écrirait un état que le workflow de l'application interdit
+        peut-être, sur cinquante lignes d'un coup. Une fonctionnalité absente
+        vaut mieux qu'une fonctionnalité qui contourne la règle.
+        """
+        from core.http.response import Response as _Response
+
+        resource = self._resource_ou_404(request)
+        if resource is None:
+            return BaseController.not_found()
+
+        transition = _parse_transition(
+            resource, str(request.form("action") or "").strip()
+        )
+        if transition is None:
+            return _Response.text("Transition inconnue.", status=400)
+
+        refus = _verifier_transition_workflow(resource, transition)
+        if refus is not None:
+            return _Response.text(refus, status=409)
+
+        depuis, vers = transition
+        try:
+            passees = transition_rows(
+                resource, self._execute_fn(),
+                pk_values=self._selection(request),
+                from_status=depuis, to_status=vers,
+            )
+        except BulkActionError as erreur:
+            return _Response.text(str(erreur), status=400)
+
+        demandees = len(self._selection(request))
+        message = f"{passees} {resource.plural_label.lower()} passés en « {vers} »."
+        if passees < demandees:
+            # L'écart est une information : une ligne dont le statut a changé
+            # entre l'affichage et la validation n'a pas été touchée, et le
+            # taire ferait croire l'action complète.
+            message += (
+                f" {demandees - passees} n'étaient plus en « {depuis} » et "
+                "n'ont pas été touchés."
+            )
+        return BaseController.redirect_with_flash(
+            request, f"/admin/{resource.slug}", message
+        )
+
+
+def _parse_transition(
+    resource: "AdminResource", action: str
+) -> "tuple[str, str] | None":
+    """Transition désignée par `transition:<depuis>:<vers>`, si elle est déclarée.
+
+    La comparaison porte sur les transitions **déclarées par la ressource** :
+    une valeur venue du formulaire ne peut donc désigner qu'un couple que
+    l'application a écrit.
+    """
+    if not action.startswith("transition:"):
+        return None
+    morceaux = action.split(":", 2)
+    if len(morceaux) != 3:
+        return None
+    couple = (morceaux[1], morceaux[2])
+    return couple if couple in resource.bulk_transitions else None
+
+
+def _verifier_transition_workflow(
+    resource: "AdminResource", transition: "tuple[str, str]"
+) -> "str | None":
+    """Refus motivé, ou `None` si la transition est jouable.
+
+    `forge-mvc-workflow` est importé paresseusement, comme `forge-mvc-rbac`
+    l'est pour la garde de permission : `forge-mvc-admin` ne le déclare pas en
+    dépendance, et un projet qui n'a pas de workflow n'a pas à l'installer pour
+    afficher une liste.
+    """
+    depuis, vers = transition
+    try:
+        from forge_mvc_workflow import (  # type: ignore[import-not-found]
+            can_transition,
+            ensure_conditions,
+            make_transition,
+        )
+    except ImportError:
+        return (
+            "La transition groupée exige l'opt-in forge-mvc-workflow "
+            "(pip install forge-mvc-workflow). Sans lui, rien ne peut vérifier "
+            "que la transition est déclarée, et l'appliquer à plusieurs lignes "
+            "écrirait un état que le workflow interdit peut-être."
+        )
+
+    declarees = [make_transition(d, v) for d, v in resource.bulk_transitions]
+    if not can_transition(declarees, depuis, vers):
+        return f"Transition non déclarée : « {depuis} » vers « {vers} »."
+    try:
+        ensure_conditions(depuis, vers, {"resource": resource.slug, "bulk": True})
+    except Exception as exc:  # noqa: BLE001 — le motif remonte à l'écran
+        return str(exc)
+    return None
+
 
 def register_admin_routes(
     router: Any,
@@ -423,10 +634,16 @@ def register_admin_routes(
     (sinon redirection vers /login).
 
     `permission` (opt-in RBAC, ADMIN-RBAC-INTEGRATION-001) : si fournie, toutes
-    les routes admin exigent cette permission via `forge-mvc-rbac` **s'il est
-    installé** (403 sinon). Sans `forge-mvc-rbac`, une route avec permission déclarée renvoie 403 (auth
-    seule, fail-open ; `forge doctor` avertit). Par défaut, aucune permission
-    n'est exigée : auth seule.
+    les routes admin exigent cette permission via `forge-mvc-rbac`.
+
+    Sans `forge-mvc-rbac` installé, une route portant une permission déclarée
+    répond **403**. C'est un comportement **fail-closed** : on ne peut pas
+    vérifier la permission, donc on refuse. Ce paragraphe écrivait « fail-open »
+    alors que le code refusait, contradiction relevée en revue : une
+    documentation qui annonce une ouverture là où le code ferme fait chercher
+    une faille qui n'existe pas, et inversement.
+
+    Par défaut, aucune permission n'est exigée : auth seule.
     """
     controller = AdminController(registry if registry is not None else _default_registry)
 
@@ -484,4 +701,29 @@ def register_admin_routes(
         "/admin/{slug}/{id}/delete",
         protect(controller.resource_delete),
         name="admin-resource-delete",
+    )
+    # Actions groupées (ADMIN-BULK-ACTIONS-001). Toutes en POST : la sélection
+    # est longue, et une URL de plusieurs centaines d'identifiants serait
+    # tronquée avant d'arriver. Le CSRF s'applique donc, par défaut du routeur.
+    #
+    # Déclarées APRÈS `/{id}/delete` : `/admin/{slug}/bulk` ne peut pas être
+    # confondu avec `/admin/{slug}/{id}`, les deux segments diffèrent, mais
+    # l'ordre reste explicite pour qui relit.
+    router.add(
+        "POST",
+        "/admin/{slug}/bulk",
+        protect(controller.resource_bulk_confirm),
+        name="admin-resource-bulk-confirm",
+    )
+    router.add(
+        "POST",
+        "/admin/{slug}/bulk-delete",
+        protect(controller.resource_bulk_delete),
+        name="admin-resource-bulk-delete",
+    )
+    router.add(
+        "POST",
+        "/admin/{slug}/bulk-transition",
+        protect(controller.resource_bulk_transition),
+        name="admin-resource-bulk-transition",
     )

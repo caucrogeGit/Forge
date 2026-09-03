@@ -125,7 +125,7 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `ADMIN-BULK-ACTIONS-001` | **Livré.** Suppression groupée en paramètres liés ; sélection vide et plafond refusés |
+| `ADMIN-BULK-ACTIONS-001` | **Livré.** Suppression et transitions groupées, câblées de la case à cocher au workflow. La première livraison n'avait posé que la fonction de requête, inatteignable depuis le back-office |
 
 ### 7.2 entities
 

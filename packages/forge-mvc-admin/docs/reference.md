@@ -309,6 +309,63 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
 Le module `query.py` construit le SQL des ressources du back-office à partir d'un `AdminResource`, en ne laissant entrer que des **identifiants déclarés et revalidés** (anti-injection).
 Il expose les constructeurs `build_list_sql`, `build_count_sql`, `build_get_sql`, `build_insert_sql`, `build_update_sql`, `build_delete_sql`, et leurs exécuteurs `list_rows`, `count_rows`, `get_row`, `insert_row`, `update_row`, `delete_row`.
 
+??? note "12. Actions groupées"
+
+    Le back-office ne savait supprimer qu'une ligne à la fois (`ADMIN-BULK-ACTIONS-001`) : nettoyer deux cents inscriptions de test demandait deux cents allers-retours, et deux cents confirmations.
+
+    ```python
+    AdminResource(
+        entity="Article", slug="articles", label="Article", plural_label="Articles",
+        list_fields=("id", "titre", "statut"), form_fields=("titre",),
+        table="articles",
+        bulk_delete=True,
+        status_field="statut",
+        bulk_transitions=(("brouillon", "publie"), ("publie", "archive")),
+    )
+    ```
+
+    Une colonne de cases apparaît alors en liste, et une barre d'actions sous le tableau.
+
+    !!! info "Rien n'est offert par défaut"
+        `bulk_delete` vaut `False`, et `bulk_transitions` est vide.
+
+        Une case à cocher offerte sans qu'on l'ait demandée invite à un geste irréversible sur une table que l'exploitant croyait en lecture.
+
+    !!! warning "Toute action passe par une confirmation"
+        Comme la suppression unitaire.
+
+        Une action qui porte sur cinquante lignes n'a pas moins besoin de sa page de confirmation, et celle ci montre les lignes concernées ainsi que celles qui ont disparu entre l'affichage et la validation.
+
+    !!! danger "Les identifiants partent en paramètres liés"
+        Les concaténer serait une injection, et le fait qu'ils viennent de cases cochées n'y change rien : une case cochée est une donnée de requête comme une autre.
+
+        Une sélection vide est refusée, une suppression groupée sans sélection effaçant la table entière si la clause était omise. Le plafond vaut 200 lignes, une sélection de cette taille venant plus souvent d'un « tout cocher » que d'une intention.
+
+    ### Transitions groupées, et le workflow
+
+    Une transition écrit la colonne `status_field`. La clause porte **aussi** sur le statut de départ.
+
+    ```sql
+    UPDATE articles SET statut = ? WHERE id IN (?, ?) AND statut = ?
+    ```
+
+    !!! info "C'est ce qui rend l'opération sûre"
+        Une ligne dont le statut a changé entre l'affichage et la validation n'est pas touchée.
+
+        Une mise à jour sur la seule clé primaire écraserait un état que quelqu'un d'autre vient de poser. L'écart entre demandé et effectué est **dit** dans le message de retour.
+
+    !!! danger "La transition groupée exige `forge-mvc-workflow` installé"
+        Sans lui, elle est **refusée**, et ce refus diffère délibérément de celui de la suppression.
+
+        Appliquer un changement de statut à N lignes sans pouvoir vérifier que la transition est déclarée écrirait un état que le workflow de l'application interdit peut-être, sur cinquante lignes d'un coup. Une fonctionnalité absente vaut mieux qu'une fonctionnalité qui contourne la règle.
+
+    !!! info "Les transitions sont déclarées, jamais déduites"
+        `forge-mvc-admin` ne lit pas le workflow de l'application.
+
+        Deviner qu'un statut `brouillon` mène à `publie` appliquerait à N lignes une transition que personne n'a écrite. La déclaration ne demande d'ailleurs pas `forge-mvc-workflow` : elle nomme des chaînes, et c'est l'exécution qui l'exige.
+
+    Les conditions de transition du workflow sont consultées, avec un contexte portant `bulk: True` : une règle métier peut refuser en masse ce qu'elle permet à l'unité. Le motif du refus remonte à l'écran.
+
 ## Voir aussi
 
 - [Contrat de ressource](resources.md) : détail de `AdminResource`.

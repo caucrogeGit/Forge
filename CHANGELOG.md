@@ -8,6 +8,18 @@
   Il annonçait que « les filtres de liste et les actions en masse restent à venir » alors que les filtres étaient livrés depuis longtemps, et que les actions groupées le sont depuis `ADMIN-BULK-ACTIONS-001`.
   Un README qui décrit un état antérieur à son code est pire qu'un README absent : il fait chercher ailleurs ce qui est déjà là, et personne ne le relit puisqu'il a l'air à jour.
 
+### Corrigé
+
+- **Les actions groupées du back-office sont câblées, et couplées au workflow (`ADMIN-BULK-ACTIONS-001`).**
+  La première livraison avait posé la fonction de requête `delete_rows` et ses garde-fous, **sans aucun câblage HTTP** : ni méthode de contrôleur, ni route, ni case à cocher. Depuis le back-office, elle était inatteignable, et le ticket était marqué livré à tort. La revue l'a relevé.
+  Une ressource déclare désormais `bulk_delete` et `bulk_transitions`, tous deux **fermés par défaut** : une case à cocher offerte sans qu'on l'ait demandée invite à un geste irréversible sur une table qu'on croyait en lecture. Toute action passe par une page de confirmation, comme la suppression unitaire, et cette page montre les lignes concernées ainsi que celles qui ont disparu entre l'affichage et la validation.
+  **La transition groupée écrit aussi le statut de départ dans sa clause** : une ligne dont le statut a changé entre l'affichage et la validation n'est pas touchée, là où une mise à jour sur la seule clé primaire écraserait un état que quelqu'un vient de poser. L'écart entre demandé et effectué est dit dans le message de retour.
+  Elle **exige `forge-mvc-workflow` installé, et refuse sinon**. Ce refus diffère délibérément de celui de la suppression : appliquer un changement de statut à N lignes sans pouvoir vérifier que la transition est déclarée écrirait un état que le workflow interdit peut-être, sur cinquante lignes d'un coup. Les transitions sont déclarées et jamais déduites, et les conditions du workflow sont consultées avec un contexte portant `bulk`, une règle pouvant refuser en masse ce qu'elle permet à l'unité.
+
+- **La documentation de la garde RBAC de l'admin se contredisait.**
+  `_permission_guard` est **fail-closed** depuis toujours, et le dit : sans `forge-mvc-rbac` installé, une route portant une permission déclarée répond 403. La docstring de `register_admin_routes` annonçait « fail-open » deux cents lignes plus bas.
+  Une documentation qui annonce une ouverture là où le code ferme fait chercher une faille qui n'existe pas, et inversement. Un test verrouille désormais l'absence de cette contradiction.
+
 ### Ajouté
 
 - **Un rôle RBAC peut hériter d'un autre (`RBAC-ROLE-HIERARCHY-001`, ADR-095).**
