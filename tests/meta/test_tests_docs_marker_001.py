@@ -30,7 +30,22 @@ pytestmark = pytest.mark.meta
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 # Fichiers prose pure autorisés à ne PAS porter le marqueur docs.
-EXCEPTIONS_SANS_MARQUEUR: frozenset[str] = frozenset()
+EXCEPTIONS_SANS_MARQUEUR: frozenset[str] = frozenset({
+    # META-README-COMMANDS-RATCHET-001 compare un README au contenu de
+    # `COMMANDS`, donc de la prose À DU CODE. La règle statique le voit comme
+    # de la prose pure parce que l'import du module d'opt-in est dynamique :
+    # les paquets sont découverts, et aucune ligne `import forge_mvc_x` ne peut
+    # les nommer d'avance.
+    #
+    # Le marquer `docs` le retirerait de la boucle code (`-m "not docs"`), où
+    # une commande RETIRÉE de `COMMANDS` alors que le README la cite encore
+    # doit être vue. C'est précisément le sens du garde-fou.
+    #
+    # Ajouter `importlib` aux signaux de code aurait reclassé deux fichiers
+    # déjà marqués `docs`, `test_docs_python_examples_executable_001` et
+    # `test_crud_generator_split_001`, qui l'emploient sans être du code.
+    "tests/meta/test_readme_commands_ratchet_001.py",
+})
 
 # Fichiers marqués docs bien que la règle statique voie un signal code.
 EXCEPTIONS_AVEC_MARQUEUR: frozenset[str] = frozenset()

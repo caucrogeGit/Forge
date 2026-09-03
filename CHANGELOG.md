@@ -2,7 +2,19 @@
 
 ## [Non publié]
 
+### Corrigé
+
+- **Le README de `forge-mvc-admin` décrivait un état antérieur à son code (`ADMIN-DOC-ETAT-REEL-001`).**
+  Il annonçait que « les filtres de liste et les actions en masse restent à venir » alors que les filtres étaient livrés depuis longtemps, et que les actions groupées le sont depuis `ADMIN-BULK-ACTIONS-001`.
+  Un README qui décrit un état antérieur à son code est pire qu'un README absent : il fait chercher ailleurs ce qui est déjà là, et personne ne le relit puisqu'il a l'air à jour.
+
 ### Ajouté
+
+- **Un garde-fou refuse qu'un README promette une commande qui n'existe pas (`META-README-COMMANDS-RATCHET-001`).**
+  Une phrase de prose ne se vérifie pas en général. Ce qui se vérifie, et qui dérive de la même façon, ce sont les **commandes** : chaque opt-in les déclare dans `COMMANDS`, table que le cœur lit (ADR-059), et son README en annonce dans un tableau.
+  Le garde-fou refuse une commande citée au README et absente de `COMMANDS`, promesse que l'utilisateur tape avant de comprendre, et refuse qu'une commande **déclarée** soit annoncée « à venir », ce qui est la dérive exacte que le ticket précédent a corrigée.
+  Il **tolère** l'inverse, une commande de `COMMANDS` absente du README : un README n'est pas une référence exhaustive, l'aide riche du CLI porte déjà ce contrat, et exiger la réciproque transformerait chaque README en catalogue.
+  Le fichier est exempté du marqueur `docs`, avec sa justification : il compare de la prose à du **code**, et le marquer le retirerait de la boucle où une commande retirée de `COMMANDS` doit être vue.
 
 - **Le contrat RBAC s'exporte (`RBAC-CONTRACT-EXPORT-001`).**
   `rbac:validate` dit si le contrat est valide, `rbac:audit` le compare à la base. Ni l'un ni l'autre ne répond à « qui a le droit de faire quoi », question d'une revue de sécurité, qui demandait de lire `rbac.json` à l'œil.

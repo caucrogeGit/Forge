@@ -3,9 +3,16 @@
 Opt-in Forge pour un **back-office applicatif** (Forge Admin).
 
 > **Statut : livré, en beta.**
-> Le paquet fournit un back-office fonctionnel, adossé aux contrats Forge.
-> Les filtres de liste et les actions en masse restent à venir, suivis dans
-> `docs/roadmap/forge-rc8-optins-roadmap.md`.
+> Le paquet fournit un back-office fonctionnel, adossé aux contrats Forge :
+> tableau de bord, liste paginée avec recherche et filtres, fiche, création,
+> édition, suppression unitaire et suppression groupée.
+>
+> Ce paragraphe annonçait que « les filtres de liste et les actions en masse
+> restent à venir » alors que les filtres étaient livrés et que les actions
+> groupées le sont depuis `ADMIN-BULK-ACTIONS-001`. Un README qui décrit un
+> état antérieur à son code est pire qu'un README absent : il fait chercher
+> ailleurs ce qui est déjà là. Le garde-fou `META-README-COMMANDS-RATCHET-001`
+> ferme désormais une partie de cette dérive.
 
 ## Positionnement
 

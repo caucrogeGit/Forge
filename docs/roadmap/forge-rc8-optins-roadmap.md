@@ -63,8 +63,8 @@ Il est petit, et il empêche la prochaine revue de repartir d'un état faux.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `ADMIN-DOC-ETAT-REEL-001` | Réaligner le README et la roadmap de `forge-mvc-admin` sur le code livré |
-| `META-README-COMMANDS-RATCHET-001` | Garde-fou comparant, par opt-in, les commandes annoncées au README et le contenu de `COMMANDS` |
+| `ADMIN-DOC-ETAT-REEL-001` | **Livré.** Le README annonçait « à venir » des filtres livrés et des actions groupées désormais livrées |
+| `META-README-COMMANDS-RATCHET-001` | **Livré.** Refuse une commande promise et absente, et une commande livrée annoncée « à venir » |
 
 ---
 
