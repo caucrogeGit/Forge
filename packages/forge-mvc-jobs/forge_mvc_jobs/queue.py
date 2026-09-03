@@ -379,13 +379,20 @@ def drain(
     queue: str = "default",
     max_jobs: int | None = None,
     db: Any = None,
+    stop: Callable[[], bool] | None = None,
 ) -> int:
     """Traite les tâches disponibles de `queue` jusqu'à épuisement (ou `max_jobs`).
 
     Renvoie le nombre de tâches traitées. C'est une passe unique : pas d'attente.
+
+    `stop` est consultée **entre deux tâches**, jamais pendant l'une d'elles :
+    une tâche commencée va à son terme, sans quoi l'arrêt propre ne serait
+    qu'un autre nom pour l'interruption brutale (`JOBS-WORKER-GRACEFUL-STOP-001`).
     """
     processed = 0
     while max_jobs is None or processed < max_jobs:
+        if stop is not None and stop():
+            break
         if not process_one(handlers, queue=queue, db=db):
             break
         processed += 1
@@ -404,13 +411,19 @@ def run_worker(
 
     L'application lance cette fonction depuis son propre point d'entrée (un
     script worker), en fournissant ses gestionnaires : le worker est donc une
-    commande explicite, jamais déclenchée par la requête HTTP. `stop` est une
-    condition d'arrêt optionnelle vérifiée à chaque cycle.
+    commande explicite, jamais déclenchée par la requête HTTP.
+
+    `stop` est une condition d'arrêt consultée à chaque cycle **et entre deux
+    tâches**. Elle ne l'était qu'entre deux passes, ce qui la rendait sans
+    effet sur une file chargée : mesuré, un worker recevant l'ordre d'arrêt
+    après trois tâches en traitait cinquante avant de le remarquer. Sous
+    systemd, `TimeoutStopSec` expirait et le worker était tué au milieu d'une
+    tâche, laissée à `jobs:reclaim` (`JOBS-WORKER-GRACEFUL-STOP-001`).
     """
     while True:
         if stop is not None and stop():
             return
-        processed = drain(handlers, queue=queue, db=db)
+        processed = drain(handlers, queue=queue, db=db, stop=stop)
         if processed == 0:
             time.sleep(poll_interval)
 

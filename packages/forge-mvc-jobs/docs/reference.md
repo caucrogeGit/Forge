@@ -198,7 +198,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
             <<module>>
             +enqueue(task, payload, queue, max_attempts, available_in, priority, db) int
             +process_one(handlers, queue, db) bool
-            +drain(handlers, queue, max_jobs, db) int
+            +drain(handlers, queue, max_jobs, db, stop) int
             +run_worker(handlers, queue, poll_interval, db, stop) None
             +pending_count(queue, db) int
             +get_job(job_id, db) Job
@@ -292,7 +292,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     | `status_counts` | `status_counts(*, queue=None, db=None) -> list[QueueStatus]` | état des files, toutes par défaut |
     | `QueueStatus` | `queue`, `counts`, `ready`, `total` | compteurs d'une file |
     | `process_one` | `process_one(handlers, *, queue="default", db=None) -> bool` | traite une tâche, `False` si file vide |
-    | `drain` | `drain(handlers, *, queue="default", max_jobs=None, db=None) -> int` | traite jusqu'à vider la file, renvoie le nombre traité |
+    | `drain` | `drain(handlers, *, queue="default", max_jobs=None, db=None, stop=None) -> int` | traite jusqu'à vider la file, renvoie le nombre traité |
     | `run_worker` | `run_worker(handlers, *, queue="default", poll_interval=1.0, db=None, stop=None) -> None` | boucle de traitement (process worker) |
     | `pending_count` | `pending_count(*, queue="default", db=None) -> int` | nombre de tâches en attente |
     | `get_job` | `get_job(job_id, *, db=None) -> Job \| None` | état d'une tâche |

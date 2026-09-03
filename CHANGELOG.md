@@ -2,6 +2,13 @@
 
 ## [Non publié]
 
+### Corrigé
+
+- **Un worker de tâches de fond ignorait l'ordre d'arrêt tant que sa file n'était pas vide (`JOBS-WORKER-GRACEFUL-STOP-001`).**
+  `run_worker` accepte `stop`, une condition d'arrêt destinée à répondre au `SIGTERM` que systemd envoie pour arrêter un service. Elle n'était consultée qu'entre deux **passes**, c'est à dire une fois la file vidée, ce qui la rendait sans effet précisément quand elle sert.
+  Mesuré : un worker recevant l'ordre d'arrêt après trois tâches en traitait **cinquante** avant de le remarquer. Sous systemd, `TimeoutStopSec` expire au bout de quatre-vingt-dix secondes, le worker est alors tué au milieu d'une tâche, et celle ci repart par `jobs:reclaim` après l'expiration de son bail. Un déploiement se fait justement quand la file est pleine, et c'est le seul moment où ce défaut se voyait.
+  `drain` accepte désormais `stop` et la consulte **entre deux tâches**, jamais pendant l'une d'elles : interrompre une tâche en cours ne serait qu'un autre nom pour l'interruption brutale, et laisserait la moitié d'un envoi fait. `run_worker` la lui transmet. L'ajout est un mot-clé facultatif, aucun appel existant ne change de comportement.
+
 ### Ajouté
 
 - **Les notifications s'exposent en HTTP (`NOTIF-HTTP-ROUTES-001`).**

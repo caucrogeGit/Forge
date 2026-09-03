@@ -33,7 +33,7 @@ enqueue("email.envoi", {"to": "eleve@exemple.fr"}, max_attempts=3)
 
 ```python
 def process_one(handlers, *, queue="default", db=None) -> bool
-def drain(handlers, *, queue="default", max_jobs=None, db=None) -> int
+def drain(handlers, *, queue="default", max_jobs=None, db=None, stop=None) -> int
 def run_worker(handlers, *, queue="default", poll_interval=1.0, db=None, stop=None) -> None
 ```
 
@@ -44,6 +44,36 @@ Chaque fonction reçoit la charge utile (un dict).
 - `drain` traite toutes les tâches disponibles en une passe et renvoie le nombre traité.
 - `run_worker` boucle (vide la file, puis attend si vide).
   L'application la lance depuis son propre script worker, jamais depuis la requête HTTP.
+
+### L'arrêt propre (`stop`)
+
+`stop` est une fonction sans argument, consultée entre deux tâches, qui demande au worker de s'arrêter.
+
+Elle sert à répondre à un `SIGTERM`, celui que systemd envoie pour arrêter un service.
+
+```python
+import signal
+
+arret = False
+
+def _demander_l_arret(signum, frame):
+    global arret
+    arret = True
+
+signal.signal(signal.SIGTERM, _demander_l_arret)
+run_worker({"email.envoi": envoyer_email}, stop=lambda: arret)
+```
+
+La tâche en cours va à son terme.
+L'interrompre ne serait qu'un autre nom pour l'interruption brutale, et laisserait la moitié d'un envoi fait.
+
+!!! warning "Elle n'était consultée qu'une fois la file vidée"
+    `stop` ne l'était qu'entre deux passes, ce qui la rendait sans effet sur une file chargée.
+
+    Mesuré, un worker recevant l'ordre d'arrêt après trois tâches en traitait cinquante avant de le remarquer.
+    Sous systemd, `TimeoutStopSec` expirait au bout de quatre-vingt-dix secondes et le worker était tué au milieu d'une tâche, laissée à `jobs:reclaim` (`JOBS-WORKER-GRACEFUL-STOP-001`).
+
+    Un déploiement se fait justement quand la file est pleine, et c'est le seul moment où ce défaut se voyait.
 
 ```python
 from forge_mvc_jobs import run_worker
