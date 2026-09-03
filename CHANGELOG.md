@@ -2,13 +2,25 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **Les notifications s'exposent en HTTP (`NOTIF-HTTP-ROUTES-001`).**
+  Le paquet savait écrire une notification et la relire depuis Python, et n'exposait **aucune route**. `forge-mvc-video` livre `register_video_routes`, `forge-mvc-iot` livre `register_iot_routes`, celui ci ne livrait rien. Chaque application devait donc écrire son contrôleur, sa sérialisation JSON et son compteur de non-lus avant d'afficher quoi que ce soit. Mesuré sur une application réelle : elle appelait `notify()` depuis des mois et n'avait jamais affiché une seule notification, ayant buté sur cette marche manquante.
+  `register_notification_routes(router, recipient_of=...)` pose quatre routes JSON, le compteur de non-lus, la liste paginée par curseur, le marquage d'une notification et le marquage global.
+  **Le destinataire vient de la session, jamais de la requête**, et c'est le point qui décide de tout le reste. Un destinataire est une chaîne libre, « professeur.42 », dont la convention appartient à l'application. La seule autre façon de le connaître serait de le lire dans la requête, et `?recipient=professeur.7` donnerait alors à quiconque les notifications de n'importe qui. `recipient_of` est donc **obligatoire**, et son absence lève à l'enregistrement plutôt qu'à la première requête : une application qui monte ces routes sans résolveur a fait une erreur de câblage, et la découvrir au démarrage vaut mieux qu'en production. Un résolveur qui lève est journalisé et la requête traitée comme non authentifiée, se rabattre sur « personne » étant acceptable là où se rabattre sur « tout le monde » ne l'est pas.
+  **Le marquage est borné au destinataire**, ce qui a demandé d'ajouter `recipient` à `mark_read` **avant** d'exposer la moindre route. Sans cette borne, l'identifiant seul suffisait à faire disparaître l'alerte de quelqu'un d'autre, et les identifiants d'une table se devinent. La réponse ne distingue pas « déjà lue » de « celle d'un autre », les distinguer apprendrait à l'appelant qu'un identifiant existe chez quelqu'un d'autre. `mark_read(id)` sans destinataire reste ce qu'il était, pour l'appel depuis le code de l'application.
+  `recipient` est **absent du JSON rendu** : le client ne reçoit que les siennes, le lui répéter n'apprend rien et expose la convention de nommage interne de l'application. Un `limit` ou un `before_id` illisible rend 400 et jamais la page par défaut, la remplacer en silence rendrait une page que l'appelant n'a pas demandée. Le curseur de page suivante vaut `null` quand la page n'est pas pleine, en rendre un ferait demander une page vide.
+  Ces routes rendent du JSON et ne poussent rien. Le rafraîchissement s'écrit avec HTMX, que le squelette livre déjà. Une interrogation toutes les dix secondes coûte, pour quarante écrans ouverts, quatre requêtes par seconde ; les tenir ouvertes en SSE coûterait quarante travailleurs immobilisés.
+
 ### Corrigé
+
+- **Un motif de retrait du cycle rc8 portait une affirmation fausse.**
+  Le retrait de `NOTIF-POLLING-HELPER-001` disait que « la route JSON que l'aide aurait appelée existe déjà côté notifications ». Le paquet n'exposait alors aucune route, et cette affirmation n'avait pas été mesurée.
+  Le retrait tient sur son motif principal, le rafraîchissement d'un écran relève de l'application. Mais la marche manquante n'était pas l'assistant, c'était la route, désormais livrée. Un motif de retrait qui s'appuie sur un fait faux fait renoncer à autre chose que ce qu'on croyait écarter.
 
 - **Le README de `forge-mvc-admin` décrivait un état antérieur à son code (`ADMIN-DOC-ETAT-REEL-001`).**
   Il annonçait que « les filtres de liste et les actions en masse restent à venir » alors que les filtres étaient livrés depuis longtemps, et que les actions groupées le sont depuis `ADMIN-BULK-ACTIONS-001`.
   Un README qui décrit un état antérieur à son code est pire qu'un README absent : il fait chercher ailleurs ce qui est déjà là, et personne ne le relit puisqu'il a l'air à jour.
-
-### Corrigé
 
 - **Les actions groupées du back-office sont câblées, et couplées au workflow (`ADMIN-BULK-ACTIONS-001`).**
   La première livraison avait posé la fonction de requête `delete_rows` et ses garde-fous, **sans aucun câblage HTTP** : ni méthode de contrôleur, ni route, ni case à cocher. Depuis le back-office, elle était inatteignable, et le ticket était marqué livré à tort. La revue l'a relevé.

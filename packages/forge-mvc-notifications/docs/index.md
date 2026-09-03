@@ -33,5 +33,6 @@ mark_read(1)
 ## Pour aller plus loin
 
 - [Les notifications](references/store.md) : `notify`, `get_notifications`, `mark_read`.
+- [Les routes HTTP](references/http.md) : `register_notification_routes`, le compteur de non-lus et la liste paginée.
 - [L'initialisation](references/cli.md) : `forge notifications:init`.
 - [Les erreurs](references/errors.md) : `NotificationError`.

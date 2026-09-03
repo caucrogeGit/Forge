@@ -255,12 +255,16 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     | `notify` | `notify(recipient, message, *, type="info", data=None, db=None) -> int` | crée une notification, renvoie son id |
     | `get_notifications` | `get_notifications(recipient, *, unread_only=False, limit=50, db=None) -> list[Notification]` | liste les notifications d'un destinataire |
     | `unread_count` | `unread_count(recipient, *, db=None) -> int` | nombre de non lues |
-    | `mark_read` | `mark_read(notification_id, *, db=None) -> bool` | marque une notification lue |
+    | `mark_read` | `mark_read(notification_id, *, recipient=None, db=None) -> bool` | marque une notification lue, bornée au destinataire s'il est fourni |
     | `mark_all_read` | `mark_all_read(recipient, *, db=None) -> int` | marque tout lu, renvoie le nombre marqué |
+    | `register_notification_routes` | `register_notification_routes(router, *, recipient_of, db=None)` | pose les quatre routes JSON sur le routeur |
+    | `NotificationHttpController` | classe | les quatre handlers, si l'application préfère les brancher elle-même |
+    | `serialize_notification` | `serialize_notification(notification) -> dict` | notification rendue en JSON, sans `recipient` |
     | `Notification` | dataclass | `id`, `recipient`, `type`, `message`, `data`, `read`, `created_at` |
     | `NotificationError` | exception (`ValueError`) | destinataire/message vide ou limite invalide |
     | `TABLE_NAME` | `"notifications"` | nom de la table |
     | `MAX_LIMIT` | `1000` | plafond du paramètre `limit` |
+    | `DEFAULT_PAGE_SIZE` | `20` | taille de page des routes HTTP |
 
     `recipient` est un identifiant applicatif (par exemple `"eleve.42"` ou un login).
 
@@ -277,6 +281,8 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     | Ne montrer que les non lues | `unread_only=True` |
     | Afficher un badge | `unread_count(recipient)` |
     | Marquer lu | `mark_read(id)` / `mark_all_read(recipient)` |
+    | Marquer lu sans laisser toucher celle d'un autre | `mark_read(id, recipient=...)` |
+    | Afficher les notifications dans une page | `register_notification_routes(router, recipient_of=...)` |
     | Créer la table | `forge notifications:init` puis `forge migration:apply` |
 
 ??? note "10. Exemples d'utilisation"
@@ -445,3 +451,87 @@ page2 = get_notifications("roger", limit=20, before_id=page1[-1].id)
     Une liste de notifications est justement celle qui reçoit des écritures pendant qu'on la parcourt.
 
 Le curseur se combine à `unread_only`, et l'ordre reste du plus récent au plus ancien, ce qui fait de `before_id` un « plus ancien que ».
+
+## Afficher les notifications dans une page
+
+Le paquet savait écrire une notification et la relire depuis Python.
+Il n'exposait aucune route, là où `forge-mvc-video` livre `register_video_routes` et `forge-mvc-iot` livre `register_iot_routes`.
+
+Chaque application devait donc écrire son contrôleur, sa sérialisation JSON et son compteur de non-lus avant d'afficher quoi que ce soit (`NOTIF-HTTP-ROUTES-001`).
+
+### Poser les routes
+
+```python
+from forge_mvc_notifications import register_notification_routes
+
+from mvc.services.auth import utilisateur_courant
+
+
+def _destinataire(request):
+    utilisateur = utilisateur_courant(request)
+    return f"professeur.{utilisateur.id}" if utilisateur else None
+
+
+register_notification_routes(router, recipient_of=_destinataire)
+```
+
+L'appel est explicite, comme tout câblage de routes d'opt-in (ADR-030).
+
+| Méthode | Chemin | Rend |
+|---|---|---|
+| `GET` | `/api/notifications/unread-count` | `{"data": {"count": 3}}` |
+| `GET` | `/api/notifications` | `{"data": {"notifications": [...], "next_before_id": 41}}` |
+| `POST` | `/api/notifications/{id}/read` | `{"data": {"marked": true}}` |
+| `POST` | `/api/notifications/read-all` | `{"data": {"marked": 3}}` |
+
+La liste accepte `limit`, `before_id` et `unread=1`.
+
+!!! danger "Le destinataire vient de la session, jamais de la requête"
+    C'est le point qui décide de tout le reste.
+
+    Un destinataire est une chaîne libre, `professeur.42`, et Forge ne sait pas la dériver d'une session puisque la convention appartient à l'application.
+    Elle fournit donc `recipient_of`, dont l'absence lève à l'enregistrement.
+
+    Accepter `?recipient=professeur.7` donnerait à quiconque les notifications de n'importe qui.
+    Ce n'est pas une précaution théorique, c'est la première chose qu'on écrit quand on veut aller vite.
+
+!!! warning "Une session illisible ne rend pas 500, elle refuse"
+    Un `recipient_of` qui lève est journalisé, et la requête est traitée comme non authentifiée.
+
+    Se rabattre sur « personne » est acceptable, se rabattre sur « tout le monde » ne l'est pas.
+
+!!! info "Le marquage est borné au destinataire"
+    `POST /api/notifications/12/read` ne marque la notification 12 que si elle appartient au demandeur.
+
+    Sans cette borne, l'identifiant seul suffirait à faire disparaître l'alerte de quelqu'un d'autre, et les identifiants d'une table se devinent.
+    La réponse ne distingue pas « déjà lue » de « celle d'un autre », car les distinguer apprendrait à l'appelant qu'un identifiant existe ailleurs.
+
+!!! info "`recipient` est absent du JSON rendu"
+    Le client ne reçoit que les siennes.
+
+    Le lui répéter à chaque ligne n'apprend rien et expose la convention de nommage interne de l'application.
+
+### Rafraîchir l'écran sans le recharger
+
+Ces routes rendent du JSON.
+Elles ne poussent rien, n'ouvrent aucune connexion longue et ne fournissent aucun script.
+
+Le rafraîchissement s'écrit avec HTMX, que le squelette livre déjà :
+
+```html
+<span id="badge-notifications"
+      hx-get="/api/notifications/unread-count"
+      hx-trigger="load, every 10s"
+      hx-swap="innerHTML"></span>
+```
+
+!!! info "Pourquoi interroger plutôt que pousser"
+    Une interrogation toutes les dix secondes coûte, pour quarante écrans ouverts, quatre requêtes par seconde servies en quelques millisecondes.
+
+    Les tenir ouvertes en SSE coûterait quarante travailleurs immobilisés, soit davantage que ce qu'un serveur WSGI de taille courante en compte.
+    Le choix se renverse à un autre ordre de grandeur, et une application qui l'atteint peut poser sa propre route sans rien changer ici.
+
+!!! warning "Les mutations portent le jeton CSRF"
+    Les deux `POST` ne sont pas dispensés de CSRF.
+
+    Un appel HTMX doit donc envoyer le jeton, par exemple avec `hx-headers` posé une fois sur `<body>`.

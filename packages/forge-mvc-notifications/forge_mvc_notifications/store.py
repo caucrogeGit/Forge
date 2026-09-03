@@ -59,8 +59,19 @@ def _now() -> str:
     return get_backend().dialect.now_expression()
 
 
-def _mark_read_sql() -> str:
-    return f"UPDATE {TABLE_NAME} SET read_at = {_now()} WHERE id = ? AND read_at IS NULL"
+def _mark_read_sql(*, scoped: bool = False) -> str:
+    """SQL de marquage. `scoped` ajoute la condition sur le destinataire.
+
+    Sans elle, l'identifiant seul suffit à marquer lue la notification de
+    quelqu'un d'autre. Ce n'est pas une fuite de donnée, mais c'est une
+    écriture inter-comptes : il suffit de deviner un entier pour faire
+    disparaître l'alerte d'un collègue, et rien ne le signale.
+    """
+    condition = " AND recipient = ?" if scoped else ""
+    return (
+        f"UPDATE {TABLE_NAME} SET read_at = {_now()} "
+        f"WHERE id = ?{condition} AND read_at IS NULL"
+    )
 
 
 def _mark_all_read_sql() -> str:
@@ -255,9 +266,28 @@ def unread_count(recipient: str, *, db: Any = None) -> int:
     return int(row["n"]) if row else 0
 
 
-def mark_read(notification_id: int, *, db: Any = None) -> bool:
-    """Marque une notification comme lue. Renvoie `True` si elle était non lue."""
-    return (db if db is not None else _db_module()).execute(_mark_read_sql(), (notification_id,)) > 0
+def mark_read(
+    notification_id: int, *, recipient: "str | None" = None, db: Any = None
+) -> bool:
+    """Marque une notification comme lue. Renvoie `True` si elle était non lue.
+
+    `recipient` **borne le marquage à son destinataire** (`NOTIF-HTTP-ROUTES-001`).
+    Sans lui, l'identifiant seul suffit, et deviner un entier permettrait de
+    faire disparaître l'alerte de quelqu'un d'autre.
+
+    Toute route HTTP le passe, sans exception. L'appel sans `recipient` reste
+    permis pour du code applicatif qui a **déjà** vérifié à qui la notification
+    appartient, par exemple une purge administrative.
+    """
+    acces = db if db is not None else _db_module()
+    if recipient is None:
+        return acces.execute(_mark_read_sql(), (notification_id,)) > 0
+    cible = recipient.strip()
+    if not cible:
+        raise NotificationError("Le destinataire ne peut pas être vide.")
+    return acces.execute(
+        _mark_read_sql(scoped=True), (notification_id, cible)
+    ) > 0
 
 
 def mark_all_read(recipient: str, *, db: Any = None) -> int:

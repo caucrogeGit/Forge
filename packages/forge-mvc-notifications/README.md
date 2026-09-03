@@ -40,10 +40,31 @@ L'API expose `notify`, `get_notifications`, `unread_count`, `mark_read`,
 `mark_all_read`, plus `Notification`, `NotificationError`, `TABLE_NAME`,
 `MAX_LIMIT`.
 
+## Afficher les notifications dans une page
+
+```python
+from forge_mvc_notifications import register_notification_routes
+
+register_notification_routes(router, recipient_of=lambda r: destinataire_de(r))
+```
+
+Quatre routes JSON : `GET /api/notifications/unread-count`,
+`GET /api/notifications` (paginée par curseur), `POST /api/notifications/{id}/read`
+et `POST /api/notifications/read-all`.
+
+`recipient_of` est obligatoire. Le destinataire vient de la session, jamais de la
+requête : accepter `?recipient=...` donnerait à quiconque les notifications de
+n'importe qui. Le marquage est borné au même destinataire.
+
+Ces routes rendent du JSON et ne poussent rien ; le rafraîchissement s'écrit
+avec HTMX, que le squelette livre déjà.
+
 ## Périmètre
 
 - Stockage in-app uniquement (lignes en base).
+- Routes JSON de lecture et de marquage, à câbler explicitement.
 - Hors périmètre : livraison email/push (à combiner avec `forge-mvc-jobs` +
-  `forge-mvc-mail`), préférences de notification, temps réel.
+  `forge-mvc-mail`), préférences de notification, poussée temps réel
+  (SSE, WebSocket) et script de rafraîchissement.
 
 Documentation complète : <https://forgemvc.com/docs/forge/>.

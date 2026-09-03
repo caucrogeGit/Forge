@@ -185,6 +185,7 @@ Chacun dépend d'un ticket du lot 2.
 |---|---|
 | `NOTIF-TARGET-URL-001` | **Livré.** Colonne dédiée validée à l'écriture, schémas exécutables refusés |
 | `NOTIF-PAGINATION-001` | **Livré.** Curseur `before_id`, jamais d'`OFFSET` |
+| `NOTIF-HTTP-ROUTES-001` | **Livré** hors cycle, voir section 11. Quatre routes JSON, destinataire résolu par l'application et jamais lu dans la requête |
 
 ### 7.10 files
 
@@ -349,8 +350,12 @@ La documentation peut nommer Caddy comme alternative viable sans que Forge en en
 
 **`NOTIF-POLLING-HELPER-001`, retiré.**
 Le rafraîchissement d'un écran relève de l'application, principe 1.
-Forge livre déjà HTMX, avec lequel un rafraîchissement périodique tient en un attribut, et la route JSON que l'aide aurait appelée existe déjà côté notifications.
+Forge livre déjà HTMX, avec lequel un rafraîchissement périodique tient en un attribut.
 Ajouter un assistant ne retirerait aucune décision à l'application, il en masquerait une.
+
+Ce motif portait une **affirmation fausse**, corrigée ici.
+Il disait que « la route JSON que l'aide aurait appelée existe déjà côté notifications », et le paquet n'exposait alors aucune route.
+Le retrait tient, la marche manquante n'était pas l'assistant mais la route, livrée par `NOTIF-HTTP-ROUTES-001` (section 11).
 
 ---
 
@@ -383,3 +388,31 @@ Le cycle rc8 est clos quand les six conditions suivantes sont vraies.
 - Chaque paquet touché voit sa documentation embarquée mise à jour dans le même commit que le code.
 - Aucun README d'opt-in ne décrit un état antérieur à son code, garde-fou `META-README-COMMANDS-RATCHET-001` vert.
 - Le `CHANGELOG.md` porte une entrée par ticket livré.
+
+---
+
+## 11. Après la clôture
+
+Le cycle est clos, et cette section recueille ce que sa revue a fait apparaître ensuite.
+
+Elle n'en rouvre pas le périmètre.
+Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visible se relit mal.
+
+| Ticket | Paquet | Révélé par | État |
+|---|---|---|---|
+| `ADMIN-BULK-ACTIONS-001`, câblage | admin | Revue de la proposition admin | **Livré.** La première livraison n'avait posé que la fonction de requête, inatteignable depuis le back-office |
+| `ADMIN-DOC-ETAT-REEL-001` | admin | Même revue | **Livré.** Le README annonçait « à venir » des capacités déjà présentes |
+| `NOTIF-HTTP-ROUTES-001` | notifications | Besoin d'asynchrone d'une application réelle | **Livré.** Quatre routes JSON, marquage borné au destinataire |
+
+**`NOTIF-HTTP-ROUTES-001`.**
+Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.
+`forge-mvc-video` livre `register_video_routes`, `forge-mvc-iot` livre `register_iot_routes`, celui ci ne livrait rien.
+
+Chaque application devait donc écrire son contrôleur, sa sérialisation et son compteur de non-lus avant d'afficher quoi que ce soit.
+Mesuré sur une application réelle, elle appelait `notify()` depuis des mois sans avoir jamais affiché une seule notification, ayant buté sur cette marche.
+
+Le point qui décide de tout le reste est le destinataire.
+Il est résolu par l'application, jamais lu dans la requête, et l'absence du résolveur empêche l'enregistrement des routes.
+
+Le marquage est borné au même destinataire, ce qui a demandé d'ajouter `recipient` à `mark_read` avant d'exposer quoi que ce soit.
+Sans cette borne, l'identifiant seul suffisait à faire disparaître l'alerte de quelqu'un d'autre.

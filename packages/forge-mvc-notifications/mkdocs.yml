@@ -8,6 +8,7 @@ nav:
   - Référence: reference.md
   - Référence (par module):
       - Notifications (store.py): references/store.md
+      - Routes HTTP (http.py): references/http.md
       - Initialisation (notifications:init): references/cli.md
       - Erreurs (errors.py): references/errors.md
   - Progression Notifications:

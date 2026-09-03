@@ -46,12 +46,16 @@ for n in get_notifications("eleve.42", unread_only=True):
 ## 4. Marquer lu (`mark_read`, `mark_all_read`)
 
 ```python
-def mark_read(notification_id, *, db=None) -> bool
+def mark_read(notification_id, *, recipient=None, db=None) -> bool
 def mark_all_read(recipient, *, db=None) -> int
 ```
 
 `mark_read` renvoie `True` si la notification était non lue.
 `mark_all_read` renvoie le nombre de notifications marquées.
+
+`recipient` borne le marquage à un destinataire.
+Sans lui, l'identifiant seul suffit à marquer n'importe quelle notification, ce qui convient à un appel depuis le code de l'application et jamais à un identifiant venu d'une requête.
+Les [routes HTTP](http.md) le passent systématiquement.
 
 ## 5. L'objet (`Notification`)
 
@@ -73,5 +77,6 @@ Les fonctions acceptent un `db` injectable (par défaut `core.database.db`), ce 
 
 ## 7. Voir aussi
 
+- [Les routes HTTP](http.md) : exposer les notifications à une page.
 - [L'initialisation](cli.md) : créer la table via `forge notifications:init`.
 - [Les erreurs](errors.md) : `NotificationError`.

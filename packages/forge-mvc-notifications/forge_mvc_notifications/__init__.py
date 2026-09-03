@@ -19,6 +19,13 @@ from forge_mvc_notifications.relays import (
     on_notification_created,
 )
 from forge_mvc_notifications.errors import NotificationError
+from forge_mvc_notifications.http import (
+    DEFAULT_PAGE_SIZE,
+    NotificationHttpController,
+    RecipientResolver,
+    register_notification_routes,
+    serialize_notification,
+)
 from forge_mvc_notifications.store import (
     MAX_LIMIT,
     TABLE_NAME,
@@ -46,6 +53,12 @@ __all__ = [
     "TABLE_NAME",
     "MAX_LIMIT",
     "notify",
+    # Routes HTTP (NOTIF-HTTP-ROUTES-001)
+    "register_notification_routes",
+    "serialize_notification",
+    "NotificationHttpController",
+    "RecipientResolver",
+    "DEFAULT_PAGE_SIZE",
     "get_notifications",
     "unread_count",
     "mark_read",
