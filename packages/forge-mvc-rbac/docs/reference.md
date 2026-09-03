@@ -512,6 +512,37 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
 
     Pour un `can()` de template adossé au contrat (`rbac.json`), `jinja.py` expose `make_contract_jinja_can`, `make_contract_jinja_context` et `register_contract_rbac_provider`, en complément du provider table par défaut.
 
+??? note "14. Rendre le contrat lisible"
+
+    `rbac:validate` dit si le contrat est valide, `rbac:audit` le compare à la base (`RBAC-CONTRACT-EXPORT-001`).
+
+    Ni l'un ni l'autre ne répond à « qui a le droit de faire quoi dans cette application », qui demandait d'ouvrir `mvc/security/rbac.json` et de le lire à l'œil, ce qui se fait mal dès la dizaine de rôles. C'est pourtant la question que pose une revue de sécurité, un audit, ou simplement un nouveau venu dans l'équipe.
+
+    ```bash
+    forge rbac:export
+    forge rbac:export --format csv --out revue-2026.csv
+    ```
+
+    | Format | Pour quoi |
+    |---|---|
+    | `markdown` | lire et versionner à côté du code |
+    | `csv` | mener une revue ligne à ligne dans un tableur |
+
+    !!! info "Versionner le Markdown a un intérêt propre"
+        Une différence dans un journal de modifications montre alors qu'un rôle a gagné une permission, ce qu'un diff de JSON montre mal.
+
+    !!! danger "L'export rend le contrat, jamais l'état de la base"
+        Il ne lit aucune table : il rend ce qui est **déclaré**, et non ce qui est provisionné.
+
+        Confondre les deux ferait prendre une intention pour un état. `forge rbac:audit` compare déjà les deux, et c'est lui qu'il faut pour cette question.
+
+    !!! warning "Un contrat invalide n'est pas exporté"
+        Le tableau ne s'appliquerait à rien, et le lecteur le prendrait pour la vérité.
+
+    Le tri rend deux exports comparables : sans lui, l'ordre suivrait celui du JSON, et un simple réarrangement du fichier ferait apparaître une différence là où rien n'a changé. Les cellules sont échappées, un nom de rôle commençant par `=` redevenant sinon une formule vive à l'ouverture du CSV.
+
+    Les fonctions vivent dans `export.py` (`to_markdown`, `to_csv`, `contract_rows`).
+
 ## Voir aussi
 
 - [Cœur RBAC (rbac.py)](references/rbac.md) : modèle, primitives, `make_can`.

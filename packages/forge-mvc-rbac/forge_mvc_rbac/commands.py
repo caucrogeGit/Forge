@@ -22,4 +22,7 @@ COMMANDS: dict[str, dict[str, str | bool]] = {
     "rbac:init": {"module": "forge_mvc_rbac.cli.init"},
     "rbac:validate": _RBAC,
     "rbac:audit": _RBAC,
+    # rbac:export rend le contrat en Markdown ou CSV. Lecture seule,
+    # aucune connexion (RBAC-CONTRACT-EXPORT-001).
+    "rbac:export": {"module": "forge_mvc_rbac.cli.export"},
 }

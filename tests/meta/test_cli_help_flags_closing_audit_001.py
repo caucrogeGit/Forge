@@ -60,6 +60,8 @@ ALL_DISPATCHED_COMMANDS: frozenset[str] = frozenset({
     "schema:list", "schema:doctor",
     # RBAC
     "rbac:validate", "rbac:audit",
+    # rbac:export rend le contrat lisible (RBAC-CONTRACT-EXPORT-001).
+    "rbac:export",
     # Modules
     "module:list", "module:install", "module:files", "module:routes", "module:remove",
     # Auth

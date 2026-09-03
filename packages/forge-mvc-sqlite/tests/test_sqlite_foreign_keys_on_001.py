@@ -22,6 +22,8 @@ from pathlib import Path
 
 import pytest
 
+from core.database.errors import ForeignKeyViolationError
+
 pytest.importorskip("forge_mvc_sqlite")
 
 import core.forge as forge  # noqa: E402
@@ -71,9 +73,12 @@ def test_le_pragma_est_arme_sur_toute_connexion_empruntee(base) -> None:
 
 def test_un_enfant_orphelin_est_refuse(base) -> None:
     """Le cas mesuré : `auteur_id = 999` entrait sans broncher."""
-    import sqlite3
 
-    with pytest.raises(sqlite3.IntegrityError, match="FOREIGN KEY"):
+    # DB-ERROR-MESSAGES-HOMOGENES-001 : la violation est désormais qualifiée.
+    # Le test attendait `sqlite3.IntegrityError`, ce que l'ADR-054 refuse :
+    # une application qui attrape l'exception d'un pilote n'est portable
+    # sur aucun autre backend. L'exception d'origine reste en `__cause__`.
+    with pytest.raises(ForeignKeyViolationError, match="FOREIGN KEY"):
         base.insert("INSERT INTO livre (titre, auteur_id) VALUES (?, ?)",
                     ("Fantôme", 999))
 
@@ -92,11 +97,14 @@ def test_la_contrainte_tient_aussi_dans_un_bloc_transaction(base) -> None:
     `core.database.transaction` opère juste après. Cette preuve est le pendant
     du commentaire d'ordre laissé dans le backend.
     """
-    import sqlite3
 
     from core.database.transaction import transaction
 
-    with pytest.raises(sqlite3.IntegrityError, match="FOREIGN KEY"):
+    # DB-ERROR-MESSAGES-HOMOGENES-001 : la violation est désormais qualifiée.
+    # Le test attendait `sqlite3.IntegrityError`, ce que l'ADR-054 refuse :
+    # une application qui attrape l'exception d'un pilote n'est portable
+    # sur aucun autre backend. L'exception d'origine reste en `__cause__`.
+    with pytest.raises(ForeignKeyViolationError, match="FOREIGN KEY"):
         with transaction() as tx:
             base.insert("INSERT INTO livre (titre, auteur_id) VALUES (?, ?)",
                         ("Fantôme", 999), tx=tx)
@@ -137,12 +145,15 @@ def test_le_report_n_est_pas_une_desactivation(base) -> None:
     Différence assumée avec MariaDB, qui désactive vraiment : ce que SQLite
     offre est un report de la vérification au `COMMIT`, pas son abandon.
     """
-    import sqlite3
 
     from core.database.transaction import transaction
 
     dialect = SQLiteDialect()
-    with pytest.raises(sqlite3.IntegrityError, match="FOREIGN KEY"):
+    # DB-ERROR-MESSAGES-HOMOGENES-001 : la violation est désormais qualifiée.
+    # Le test attendait `sqlite3.IntegrityError`, ce que l'ADR-054 refuse :
+    # une application qui attrape l'exception d'un pilote n'est portable
+    # sur aucun autre backend. L'exception d'origine reste en `__cause__`.
+    with pytest.raises(ForeignKeyViolationError, match="FOREIGN KEY"):
         with transaction() as tx:
             for statement in dialect.foreign_key_checks_ddl(enabled=False):
                 base.execute(statement, tx=tx)

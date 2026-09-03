@@ -349,6 +349,63 @@ def delete_row(
     return execute(build_delete_sql(resource), (pk_value,))
 
 
+#: Plafond d'une action groupée. Au delà, la requête devient longue et son
+#: annulation coûteuse, et une sélection de cette taille vient plus souvent
+#: d'un « tout cocher » malencontreux que d'une intention.
+BULK_MAX_ROWS = 200
+
+
+class BulkActionError(ValueError):
+    """Sélection refusée pour une action groupée."""
+
+
+def delete_rows(
+    resource: AdminResource,
+    execute: Execute,
+    *,
+    pk_values: "Sequence[Any]",
+    max_rows: int = BULK_MAX_ROWS,
+) -> int:
+    """Supprime plusieurs lignes en une requête (`ADMIN-BULK-ACTIONS-001`).
+
+    Le back-office ne savait supprimer qu'une ligne à la fois : nettoyer deux
+    cents inscriptions de test demandait deux cents allers-retours, et deux
+    cents confirmations.
+
+    Les identifiants partent en **paramètres liés**, un marqueur par valeur.
+    Les concaténer dans la requête serait une injection, et le fait qu'ils
+    viennent d'une liste de cases cochées n'y change rien : une case cochée est
+    une donnée de requête comme une autre.
+
+    Rend le nombre de lignes réellement supprimées, qui peut être inférieur à
+    la sélection : une ligne supprimée entre l'affichage et la validation n'est
+    pas une erreur, et refuser toute la fournée pour cela ferait échouer une
+    action correcte.
+
+    Raises:
+        BulkActionError: sélection vide, ou au delà du plafond.
+    """
+    valeurs = list(pk_values)
+    if not valeurs:
+        raise BulkActionError(
+            "aucune ligne sélectionnée : une suppression groupée sans "
+            "sélection effacerait la table entière si la clause était omise."
+        )
+    if len(valeurs) > max_rows:
+        raise BulkActionError(
+            f"{len(valeurs)} lignes sélectionnées, plafond {max_rows}. Une "
+            "sélection de cette taille vient plus souvent d'un « tout cocher » "
+            "malencontreux que d'une intention."
+        )
+
+    marqueurs = ", ".join("?" for _ in valeurs)
+    sql = (
+        f"DELETE FROM {resource.table} "
+        f"WHERE {resource.pk} IN ({marqueurs})"
+    )
+    return execute(sql, tuple(valeurs))
+
+
 def count_rows(
     resource: AdminResource,
     fetch_one: FetchOne,

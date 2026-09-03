@@ -62,8 +62,40 @@ server {{
         alias {project_dir}/static/;
         # Fichiers versionnes : le cache long est sans risque.
         add_header Cache-Control "max-age=604800, immutable";
+        # Ce `location` court-circuite l'application : AUCUN en-tete de securite
+        # de Forge ne l'atteint (DEPLOY-NGINX-MEDIA-HEADERS-001). `nosniff` y
+        # compte le plus : sans lui, un navigateur devine le type d'un fichier
+        # servi depuis votre domaine, et un fichier depose peut etre interprete
+        # autrement qu'il n'est declare.
+        add_header X-Content-Type-Options "nosniff" always;
         access_log off;
     }}
+
+    # HSTS est pose ICI, et nulle part ailleurs (DEPLOY-NGINX-MEDIA-HEADERS-001).
+    #
+    # Le coeur pose deja X-Frame-Options, X-Content-Type-Options,
+    # Referrer-Policy, Permissions-Policy et la CSP. Il NE POSE PAS
+    # Strict-Transport-Security derriere un proxy : `wsgi.url_scheme` y vaut
+    # `http`, la requete ayant atteint Forge en clair, et l'emettre a tort
+    # bloquerait l'acces. `core/security/headers.py` delegue explicitement au
+    # reverse proxy, et ce gabarit ne l'avait jamais recu.
+    #
+    # A n'activer qu'une fois HTTPS en place : un navigateur qui a vu cet
+    # en-tete refuse le HTTP pour un an, y compris si votre certificat expire.
+    # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # Envoi delegue (DOC-FILES-XACCEL-001). Decommentez pour laisser Nginx
+    # emettre les gros fichiers, le controleur gardant la decision d'acces.
+    #
+    # `internal;` est la moitie qui protege : sans lui, /protected/ repond
+    # directement sur une requete venue de l'exterieur, et le controle d'acces
+    # du controleur ne sert plus a rien. La delegation devient alors PIRE que
+    # le service par Python, puisqu'elle publie tout UPLOAD_ROOT.
+    #
+    # location /protected/ {{
+    #     internal;
+    #     alias {upload_root}/;
+    # }}
 
     location = /favicon.ico {{
         alias {project_dir}/static/favicon.ico;
@@ -226,6 +258,83 @@ Ce dossier contient les fichiers générés par `forge deploy:init`.
 9. Vérifier : `forge deploy:check`
 
 > Ces fichiers sont des modèles. Adaptez-les à votre infrastructure.
+
+## Minuteries périodiques (DEPLOY-TIMERS-DOC-001)
+
+Trois gestes doivent tourner régulièrement, et **aucun n'est planifié par
+Forge** : embarquer un ordonnanceur ferait du framework autre chose que ce
+qu'il est. C'est le rôle du système.
+
+| Geste | Commande | Rythme conseillé |
+|---|---|---|
+| Purge des sessions expirées | `forge sessions:gc` | horaire |
+| Reprise des tâches orphelines | `forge jobs:reclaim` | toutes les 5 minutes |
+| Sauvegarde de la base | votre outil de dump | quotidien |
+
+Le modèle est le même pour les trois : un `.service` de type `oneshot` et un
+`.timer` qui le déclenche.
+
+```ini
+# /etc/systemd/system/forge-jobs-reclaim.service
+[Unit]
+Description=Reprise des taches Forge orphelines
+After=network.target
+
+[Service]
+Type=oneshot
+User=forge-app
+WorkingDirectory=/srv/monapp
+EnvironmentFile=/srv/monapp/env/prod
+ExecStart=/srv/monapp/.venv/bin/forge jobs:reclaim
+```
+
+```ini
+# /etc/systemd/system/forge-jobs-reclaim.timer
+[Unit]
+Description=Reprise des taches Forge, toutes les cinq minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+Persistent=true
+RandomizedDelaySec=30
+
+[Install]
+WantedBy=timers.target
+```
+
+```
+sudo systemctl enable --now forge-jobs-reclaim.timer
+systemctl list-timers 'forge-*'
+journalctl -u forge-jobs-reclaim.service --since today
+```
+
+### Quatre pièges, et pourquoi ils comptent
+
+**Activez le `.timer`, jamais le `.service`.** `systemctl enable` sur le
+service le ferait tourner une fois au démarrage, puis plus jamais. La panne est
+silencieuse : la première exécution réussit.
+
+**`Persistent=true` rattrape ce qui a été manqué.** Un serveur éteint la nuit
+ne saute pas huit purges : la première au redémarrage les remplace.
+
+**`RandomizedDelaySec` étale la charge.** Plusieurs applications purgeant à la
+même minute frappent la base ensemble.
+
+**`EnvironmentFile` porte les identifiants de base.** Le fichier appartient au
+compte de service et n'est lisible que par lui, `chmod 600`. Ces commandes se
+connectent à la base, et un `env/prod` lisible par tous rend les identifiants
+applicatifs lisibles par tous.
+
+### La sauvegarde n'est pas une commande Forge
+
+Forge ne sauvegarde pas votre base : chaque backend a son outil, `mysqldump`,
+`pg_dump`, `sqlite3 .backup` ou une sauvegarde de fichier, et leurs options
+dépendent de votre volume et de votre fenêtre de restauration.
+
+Ce que Forge peut dire, et qui vaut plus qu'un script générique : **une
+sauvegarde jamais restaurée n'est pas une sauvegarde**. Éprouvez la restauration
+sur un environnement de recette avant d'en avoir besoin.
 
 ## Le point d'entrée sert l'application armée
 

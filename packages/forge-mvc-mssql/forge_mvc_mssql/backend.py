@@ -332,6 +332,19 @@ class MSSQLBackend:
         message = str(error)
         return "(2627)" in message or "(2601)" in message
 
+    def is_foreign_key_violation(self, error: Exception) -> bool:
+        """Clé étrangère SQL Server : numéro natif 547.
+
+        Un seul numéro pour les deux situations, contrairement à MariaDB :
+        547 couvre le refus de suppression comme celui d'insertion, le message
+        seul les distinguant, et il est traduit.
+
+        pyodbc n'expose pas le numéro natif en attribut : il figure dans le
+        message sous la forme « (547) », et c'est là qu'on le cherche, comme
+        pour `is_unique_violation`.
+        """
+        return "(547)" in str(error)
+
     def is_insufficient_privilege_error(self, error: Exception) -> bool:
         """Droit refusé SQL Server : numéros natifs 229 et 262.
 

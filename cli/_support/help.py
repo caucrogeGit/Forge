@@ -54,6 +54,7 @@ Schémas JSON
 Sécurité
   rbac:validate      Valide mvc/security/rbac.json avec le schéma RBAC Forge.
   rbac:audit         Audit de cohérence fonctionnelle de mvc/security/rbac.json.
+  rbac:export         Rend le contrat RBAC en Markdown ou CSV (lecture seule).
 
 Modules
   module:list         Liste les modules disponibles.

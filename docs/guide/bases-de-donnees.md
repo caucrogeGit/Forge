@@ -82,6 +82,92 @@ Documentation : [backend SQL Server](../mssql/index.md).
 
 Le passage d'un backend à l'autre se fait en changeant l'opt-in installé et la configuration de connexion ; le code applicatif (modèles, SQL, contrôleurs) ne change pas.
 
+## 8. Les écarts de dialecte, et qui les porte
+
+Forge écrit son SQL une fois pour les quatre backends.
+Ce n'est possible que parce que le contrat `Dialect` porte chaque écart, et il en existe plus qu'on ne croit (`DOC-DIALECT-ECARTS-001`).
+
+Cette section les nomme.
+Un écart connu se contourne ; un écart ignoré se découvre en production, sur le seul backend où il mord.
+
+### Borner un nombre de lignes
+
+| Backend | Forme |
+|---|---|
+| MariaDB, SQLite, PostgreSQL | `LIMIT ? OFFSET ?` |
+| SQL Server | `OFFSET ? ROWS FETCH NEXT ? ROWS ONLY` |
+
+T-SQL ne connaît pas `LIMIT`, et sa forme **inverse l'ordre des deux paramètres** : le décalage précède le nombre de lignes.
+
+!!! danger "Les deux méthodes vont par paire"
+    `pagination_clause()` rend la clause, `pagination_param_order()` rend l'ordre des paramètres.
+
+    Lire la première sans la seconde produit une pagination inversée, silencieuse : la page 2 affiche les lignes 20 à 40 au lieu de 10 à 20, et personne ne s'en aperçoit avant de compter.
+
+La clause de T-SQL exige par ailleurs un `ORDER BY`, là où les trois autres l'acceptent sans.
+
+### Les booléens
+
+| Backend | Vrai | Type de colonne |
+|---|---|---|
+| MariaDB | `1` | `BOOLEAN`, alias de `TINYINT(1)` |
+| SQLite | `1` | `INTEGER` |
+| PostgreSQL | `TRUE` | `BOOLEAN` natif |
+| SQL Server | `1` | `BIT` |
+
+PostgreSQL est le seul à refuser `1` là où un booléen est attendu, et le seul à rendre un vrai `bool` en lecture.
+Les trois autres rendent un entier, que Python considère comme vrai ou faux sans se plaindre.
+
+!!! warning "Un `DEFAULT` de booléen n'est pas un littéral de requête"
+    `Dialect.boolean_default_literal()` est distinct de `render_literal()` (ADR-075).
+
+    Le premier écrit du DDL, relu et joué une fois ; le second écrit un artefact de données. Les confondre marcherait sur trois backends et casserait sur PostgreSQL.
+
+### L'insertion conditionnelle
+
+Aucune forme n'est portable, et Forge n'en fournit **aucune**.
+
+| Backend | Forme propre au moteur |
+|---|---|
+| MariaDB | `INSERT ... ON DUPLICATE KEY UPDATE` |
+| SQLite | `INSERT ... ON CONFLICT DO UPDATE` |
+| PostgreSQL | `INSERT ... ON CONFLICT DO UPDATE` |
+| SQL Server | `MERGE`, avec ses propres pièges de concurrence |
+
+!!! info "Pourquoi Forge n'en propose pas"
+    Les quatre formes n'ont pas la même sémantique de verrouillage, et `MERGE` de SQL Server est connu pour des conditions de course que les trois autres n'ont pas.
+
+    Une abstraction qui les recouvrirait promettrait une équivalence qui n'existe pas. Le motif portable est de **tenter l'insertion et de rattraper le doublon**, `UniqueViolationError` étant qualifiée sur les quatre backends.
+
+### Les erreurs
+
+Aucun signal n'est portable, et c'est pourquoi Forge les traduit.
+
+| Condition | MariaDB | SQLite | PostgreSQL | SQL Server |
+|---|---|---|---|---|
+| Doublon | errno 1062 | message | SQLSTATE 23505 | numéro 2627 ou 2601 |
+| Clé étrangère | errno 1451, 1452 | message | SQLSTATE 23503 | numéro 547 |
+| Droit refusé | errno 1044, 1142, 1227 | sans objet | SQLSTATE 42501 | numéro 229 |
+
+!!! danger "Le SQLSTATE ne discrimine pas partout"
+    MariaDB rend `23000` pour un doublon **comme** pour un `NOT NULL` et pour une clé étrangère.
+
+    SQL Server rend `23000` pour les trois également. Seuls l'errno et le numéro natif discriminent, et c'est pourquoi le contrat les lit plutôt que le SQLSTATE.
+
+!!! warning "Un message d'erreur est traduit"
+    PostgreSQL rend « droit refusé pour ... » sur un serveur en français.
+
+    Le message n'est donc jamais un signal, sauf sur SQLite, qui ne traduit pas les siens et n'offre rien d'autre.
+
+Attrapez `core.database.errors.UniqueViolationError` et `ForeignKeyViolationError`, jamais `mariadb.IntegrityError` : une application qui attrape l'exception d'un pilote n'est portable sur aucun autre backend (ADR-054).
+
+### Ce qui reste hors du contrat
+
+L'extraction d'une date, la troncature d'un horodatage, l'ajout d'un intervalle et le rendu d'un littéral y sont, chacun avec sa méthode.
+
+Les fonctions de fenêtrage n'y sont **pas** : les quatre les écrivent différemment, et une abstraction masquerait quatre dialectes derrière un générateur, ce que le principe 5 refuse.
+Une application qui en a besoin écrit son SQL, et sait alors sur quel backend elle tourne.
+
 ## Voir aussi
 
 - [ADR-054 : backends de base de données opt-in](../adr/054-database-backend-optins.md) : la décision et le modèle exclusif.

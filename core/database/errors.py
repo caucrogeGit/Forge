@@ -60,6 +60,46 @@ class UniqueViolationError(DatabaseError):
     """
 
 
+class ForeignKeyViolationError(DatabaseError):
+    """Une contrainte de clé étrangère a été violée (`DB-ERROR-MESSAGES-HOMOGENES-001`).
+
+    Deux situations, de même nature du point de vue de l'appelant.
+
+    **Suppression d'une ligne encore référencée.** Supprimer une catégorie que
+    des articles désignent encore.
+
+    **Insertion d'une référence qui n'existe pas.** Poser `categorie_id = 42`
+    quand aucune catégorie ne porte cet identifiant.
+
+    C'est l'erreur d'écriture la plus courante après le doublon, et elle
+    n'était **pas qualifiée** : l'exception du pilote remontait telle quelle,
+    ce que l'ADR-054 refuse précisément, une application ne devant jamais avoir
+    à attraper `mariadb.IntegrityError` sous peine de n'être portable nulle
+    part.
+
+    Aucun signal n'est portable, mesuré sur les quatre backends :
+
+        MariaDB      errno 1451 (suppression) et 1452 (insertion)
+        SQLite       message « FOREIGN KEY constraint failed »
+        PostgreSQL   SQLSTATE 23503 (`foreign_key_violation`)
+        SQL Server   numéro natif 547
+
+    Usage dans un contrôleur :
+
+        from core.database.errors import ForeignKeyViolationError
+
+        try:
+            supprimer_categorie(identifiant)
+        except ForeignKeyViolationError:
+            form.add_error(None, "Des articles utilisent encore cette catégorie.")
+
+    Ce que cette erreur ne dit **pas** : laquelle des deux situations s'est
+    produite, ni quelle contrainte a sauté. MariaDB les distingue par son
+    errno, les trois autres non, et prétendre le contraire donnerait une
+    information juste sur un backend et fausse sur trois.
+    """
+
+
 class DatabaseUnavailableError(DatabaseError):
     """Pas de connexion utilisable : condition passagère, pas une panne.
 

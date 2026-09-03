@@ -15,6 +15,8 @@ import uuid
 
 import pytest
 
+from core.database.errors import ForeignKeyViolationError
+
 from core.database import db
 from core.database.transaction import transaction
 
@@ -118,7 +120,6 @@ def test_transaction_rollback_discards(real_pg_db: None) -> None:
 
 
 def test_foreign_key_constraint_is_enforced(real_pg_db: None) -> None:
-    import psycopg
 
     parent = _table("forge_it_pg_parent")
     child = _table("forge_it_pg_child")
@@ -131,7 +132,11 @@ def test_foreign_key_constraint_is_enforced(real_pg_db: None) -> None:
         db.execute(f"INSERT INTO {parent} (id) VALUES (?)", [1])
         db.execute(f"INSERT INTO {child} (id, parent_id) VALUES (?, ?)", [10, 1])
         # parent_id inexistant : la contrainte FK rejette réellement l'insertion.
-        with pytest.raises(psycopg.Error):
+        # DB-ERROR-MESSAGES-HOMOGENES-001 : la violation est désormais
+        # QUALIFIÉE. Le test attendait l'exception brute du pilote, ce que
+        # l'ADR-054 refuse précisément : une application qui l'attrape n'est
+        # portable sur aucun autre backend.
+        with pytest.raises(ForeignKeyViolationError):
             db.execute(f"INSERT INTO {child} (id, parent_id) VALUES (?, ?)", [11, 999])
     finally:
         db.execute(f"DROP TABLE IF EXISTS {child}")

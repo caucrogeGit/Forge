@@ -99,6 +99,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     # RBAC
     "rbac:validate":    "Valide mvc/security/rbac.json avec le schéma RBAC Forge.",
     "rbac:audit":       "Audit de cohérence fonctionnelle de mvc/security/rbac.json.",
+    "rbac:export":      "Rend le contrat RBAC en Markdown ou CSV (lecture seule).",
     # Auth
     "auth:init":        "Initialise les tables d'authentification.",
     "make:auth":        "Scaffolde le flux de connexion (contrôleur, vue, routes).",
@@ -552,6 +553,34 @@ Limites :
   l'écriture qu'il décrit, et une transaction annulée laisserait une
   ligne pour une transition qui n'a pas eu lieu.
   Appliquer la migration demande ensuite forge migration:apply.
+""",
+    "rbac:export": """\
+Usage :
+  forge rbac:export [--format markdown|csv] [--out FICHIER]
+
+Description :
+  Rend mvc/security/rbac.json en tableau lisible. rbac:validate dit si le
+  contrat est valide, rbac:audit le compare a la base ; ni l'un ni l'autre
+  ne repond a « qui a le droit de faire quoi », question d'une revue de
+  securite.
+
+Effets :
+  Affiche par defaut. Avec --out, ecrit le fichier et refuse s'il existe.
+
+Prerequis :
+  Un contrat mvc/security/rbac.json valide.
+
+Options :
+  --format markdown|csv  markdown pour lire et versionner, csv pour un
+                         tableur (defaut markdown)
+  --out FICHIER          ecrit au lieu d'afficher
+
+Limites :
+  L'export rend le CONTRAT, c'est-a-dire ce qui est declare, jamais l'etat
+  de la base. Confondre les deux ferait prendre une intention pour un
+  etat : forge rbac:audit compare les deux.
+  Un contrat invalide n'est pas exporte : le tableau ne s'appliquerait a
+  rien, et le lecteur le prendrait pour la verite.
 """,
     "jobs:status": """\
 Usage:

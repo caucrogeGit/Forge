@@ -397,6 +397,15 @@ class PostgreSQLBackend:
         """
         return getattr(error, "sqlstate", None) == "23505"
 
+    def is_foreign_key_violation(self, error: Exception) -> bool:
+        """Clé étrangère PostgreSQL : SQLSTATE 23503 (`foreign_key_violation`).
+
+        Le SQLSTATE discrimine réellement ici, PostgreSQL distinguant 23505
+        (unicité), 23503 (clé étrangère) et 23502 (NOT NULL). Le message ne
+        conviendrait pas : il est traduit selon la locale du serveur.
+        """
+        return getattr(error, "sqlstate", None) == "23503"
+
     def is_insufficient_privilege_error(self, error: Exception) -> bool:
         """Droit refusé PostgreSQL : SQLSTATE 42501 (`insufficient_privilege`).
 

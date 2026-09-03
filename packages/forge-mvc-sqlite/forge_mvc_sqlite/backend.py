@@ -247,6 +247,19 @@ class SQLiteBackend:
             return False
         return "UNIQUE constraint failed" in str(error)
 
+    def is_foreign_key_violation(self, error: Exception) -> bool:
+        """Clé étrangère SQLite : le message, faute de code.
+
+        SQLite n'expose ni errno ni SQLSTATE exploitable : `sqlite3.IntegrityError`
+        porte l'information dans son texte seul, « FOREIGN KEY constraint
+        failed ». Le message n'est **pas** traduit par SQLite, contrairement à
+        PostgreSQL, ce qui le rend ici utilisable.
+
+        La comparaison est insensible à la casse, la bibliothèque ayant changé
+        la casse de ce message entre deux versions.
+        """
+        return "foreign key constraint failed" in str(error).lower()
+
     def is_insufficient_privilege_error(self, error: Exception) -> bool:
         """Toujours faux : SQLite n'a pas de système de droits.
 

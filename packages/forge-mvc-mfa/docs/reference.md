@@ -601,6 +601,43 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     !!! note "Indépendance du cœur"
         Le cœur de Forge ne dépend pas de `forge-mvc-mfa` : la dépendance va de l'opt-in vers le cœur.
 
+??? note "15. Rendre le facteur obligatoire pour un rôle"
+
+    Le paquet savait dire si un utilisateur **a** un facteur actif. Il ne savait pas dire s'il **devrait** en avoir un (`MFA-REQUIRED-BY-ROLE-001`).
+
+    L'application écrivait donc, dans chaque contrôleur sensible, un « si cet utilisateur est administrateur et n'a pas de MFA, alors refuser ». Elle l'écrivait bien la première fois, et l'oubliait au troisième écran d'administration ajouté six mois plus tard.
+
+    ```bash
+    MFA_REQUIRED_ROLES=admin,comptable
+    ```
+
+    ```python
+    from forge_mvc_mfa.policy import check_mfa_requirement
+
+    verdict = check_mfa_requirement(session, facteurs_de_l_utilisateur)
+    if verdict.must_enroll:
+        return BaseController.redirect_with_flash(request, "/mfa/setup", verdict.reason)
+    ```
+
+    !!! info "La politique n'active rien"
+        Rendre un facteur obligatoire ne peut pas le créer à la place de l'utilisateur : il faut son téléphone, et son consentement.
+
+        La politique dit qu'un accès doit être refusé tant que le facteur manque ; c'est à l'application de conduire l'utilisateur vers l'inscription, et `reason` lui donne le message.
+
+    !!! info "Le paquet ne connaît pas `forge-mvc-rbac`"
+        Aucun opt-in n'importe un autre.
+
+        Les rôles sont lus dans la session, où l'authentification les a rangés, et la politique n'a pas besoin de savoir d'où ils viennent. Trois emplacements sont acceptés, `user.roles`, `user.role` et `roles` à la racine : les applications les emploient tous les trois, et n'en reconnaître qu'un ferait échouer la politique en silence, ce qui est la pire issue pour un contrôle de sécurité.
+
+    !!! warning "`check_mfa_requirement` ne lève jamais"
+        Un contrôle de sécurité qui échoue en levant sur une session mal formée priverait d'accès un utilisateur légitime.
+
+        Il rend un verdict, et l'appelant décide.
+
+    Sans `MFA_REQUIRED_ROLES`, rien n'est obligatoire : le paquet n'impose pas une politique que personne n'a demandée. Les noms de rôles sont normalisés en minuscules, une majuscule ne devant pas faire échouer une politique.
+
+    Les fonctions vivent dans `policy.py` (`check_mfa_requirement`, `required_roles`, `roles_of`, `is_mfa_required_for`, `MfaRequirement`).
+
 ## Voir aussi
 
 - [Cœur MFA (mfa.py)](references/mfa.md) : enrôlement, challenge, revalidation.

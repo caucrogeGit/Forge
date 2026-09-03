@@ -234,6 +234,19 @@ class MariaDBBackend:
         """
         return getattr(error, "errno", None) == 1062
 
+    def is_foreign_key_violation(self, error: Exception) -> bool:
+        """Clé étrangère MariaDB : errno 1451 et 1452.
+
+        1451 (ER_ROW_IS_REFERENCED_2) à la suppression d'une ligne encore
+        référencée, 1452 (ER_NO_REFERENCED_ROW_2) à l'insertion d'une référence
+        qui n'existe pas.
+
+        Le SQLSTATE ne convient pas, MariaDB rendant `23000` pour ces deux cas
+        comme pour un doublon et pour un NOT NULL. Seuls les errno discriminent,
+        exactement comme pour `is_unique_violation`.
+        """
+        return getattr(error, "errno", None) in (1451, 1452)
+
     def is_insufficient_privilege_error(self, error: Exception) -> bool:
         """Droit refusé MariaDB : errno 1044, 1142 et 1227.
 

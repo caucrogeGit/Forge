@@ -24,7 +24,11 @@ là où la requête simple rendait un 503 (CORE-TX-LOST-CONNECTION-001).
 from typing import NoReturn
 
 from core.database.backend import get_backend
-from core.database.errors import DatabaseUnavailableError, UniqueViolationError
+from core.database.errors import (
+    DatabaseUnavailableError,
+    ForeignKeyViolationError,
+    UniqueViolationError,
+)
 
 
 def is_unique_violation(error: Exception) -> bool:
@@ -56,6 +60,18 @@ def is_undefined_table_error(error: Exception) -> bool:
         return False
 
 
+def is_foreign_key_violation(error: Exception) -> bool:
+    """Demande au backend actif si `error` est une violation de clé étrangère.
+
+    Même enveloppe que `is_unique_violation`, pour la même raison
+    (`DB-ERROR-MESSAGES-HOMOGENES-001`).
+    """
+    try:
+        return bool(get_backend().is_foreign_key_violation(error))
+    except Exception:  # noqa: BLE001 — un backend muet ne masque rien
+        return False
+
+
 def is_unavailable(error: Exception) -> bool:
     """Demande au backend actif si `error` invite à réessayer.
 
@@ -70,12 +86,21 @@ def is_unavailable(error: Exception) -> bool:
 def qualify(error: Exception) -> Exception:
     """Rend l'erreur portable correspondante, ou `error` inchangée.
 
-    Le doublon a la priorité sur l'indisponibilité : c'est la condition la plus
-    spécifique et la plus actionnable, celle qui s'affiche dans un formulaire
-    là où l'indisponibilité fait une page d'erreur.
+    L'ordre suit la spécificité, du plus actionnable au moins actionnable.
+
+    Le doublon et la clé étrangère s'affichent dans un formulaire, en face d'un
+    champ ou en tête de page ; l'indisponibilité fait une page d'erreur et un
+    503. Une condition spécifique qualifiée en indisponibilité enverrait
+    attendre là où il faut corriger une saisie.
+
+    Doublon et clé étrangère ne se recouvrent pas : aucun backend ne rend le
+    même signal pour les deux, et l'ordre entre eux n'a donc pas d'effet. Il
+    est fixé pour que deux lectures du code donnent la même réponse.
     """
     if is_unique_violation(error):
         return UniqueViolationError(str(error))
+    if is_foreign_key_violation(error):
+        return ForeignKeyViolationError(str(error))
     if is_unavailable(error):
         return DatabaseUnavailableError(str(error))
     return error

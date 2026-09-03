@@ -17,6 +17,8 @@ import uuid
 
 import pytest
 
+from core.database.errors import ForeignKeyViolationError
+
 from core.database import db
 from core.database.transaction import transaction
 
@@ -124,7 +126,6 @@ def test_transaction_rollback_discards(real_mssql_db: None) -> None:
 
 
 def test_foreign_key_constraint_is_enforced(real_mssql_db: None) -> None:
-    import pyodbc
 
     parent = _table("forge_it_ms_parent")
     child = _table("forge_it_ms_child")
@@ -137,7 +138,11 @@ def test_foreign_key_constraint_is_enforced(real_mssql_db: None) -> None:
         db.execute(f"INSERT INTO {parent} (id) VALUES (?)", [1])
         db.execute(f"INSERT INTO {child} (id, parent_id) VALUES (?, ?)", [10, 1])
         # parent_id inexistant : la contrainte FK rejette réellement l'insertion.
-        with pytest.raises(pyodbc.Error):
+        # DB-ERROR-MESSAGES-HOMOGENES-001 : la violation est désormais
+        # QUALIFIÉE. Le test attendait l'exception brute du pilote, ce que
+        # l'ADR-054 refuse précisément : une application qui l'attrape n'est
+        # portable sur aucun autre backend.
+        with pytest.raises(ForeignKeyViolationError):
             db.execute(f"INSERT INTO {child} (id, parent_id) VALUES (?, ?)", [11, 999])
     finally:
         db.execute(f"DROP TABLE IF EXISTS {child}")

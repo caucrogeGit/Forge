@@ -125,7 +125,7 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `ADMIN-BULK-ACTIONS-001` | Actions en masse, adossées aux transitions quand workflow est présent |
+| `ADMIN-BULK-ACTIONS-001` | **Livré.** Suppression groupée en paramètres liés ; sélection vide et plafond refusés |
 
 ### 7.2 entities
 
@@ -140,7 +140,7 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `RBAC-CONTRACT-EXPORT-001` | Export du contrat, documentation des rôles d'une application |
+| `RBAC-CONTRACT-EXPORT-001` | **Livré.** Markdown et CSV ; rend le contrat, jamais l'état de la base |
 
 ### 7.4 workflow
 
@@ -153,7 +153,7 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `MFA-REQUIRED-BY-ROLE-001` | Politique rendant le facteur obligatoire pour un rôle |
+| `MFA-REQUIRED-BY-ROLE-001` | **Livré.** Trois emplacements de rôles lus ; ne lève jamais, n'active rien |
 
 ### 7.6 sessions-db
 
@@ -288,15 +288,15 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `DEPLOY-NGINX-MEDIA-HEADERS-001` | Gabarit couvrant les médias, l'envoi délégué et les en-têtes de sécurité |
-| `DEPLOY-TIMERS-DOC-001` | Minuteries de sauvegarde et de reprise des tâches |
+| `DEPLOY-NGINX-MEDIA-HEADERS-001` | **Livré.** HSTS que le cœur délègue au proxy, `nosniff` sur `/static/`, `internal;` |
+| `DEPLOY-TIMERS-DOC-001` | **Livré.** Deux unités complètes et quatre pièges nommés |
 
 ### 7.23 backends
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `DB-ERROR-MESSAGES-HOMOGENES-001` | Messages d'erreur homogènes entre les quatre dialectes |
-| `DOC-DIALECT-ECARTS-001` | Écarts de dialecte documentés, limite, booléens et insertion conditionnelle |
+| `DB-ERROR-MESSAGES-HOMOGENES-001` | **Livré.** La clé étrangère n'était pas qualifiée ; vérifié sur les quatre serveurs |
+| `DOC-DIALECT-ECARTS-001` | **Livré.** Bornes, booléens, insertion conditionnelle, erreurs, et ce qui reste hors contrat |
 
 ### 7.24 testing
 

@@ -4,6 +4,43 @@
 
 ### Ajouté
 
+- **Le contrat RBAC s'exporte (`RBAC-CONTRACT-EXPORT-001`).**
+  `rbac:validate` dit si le contrat est valide, `rbac:audit` le compare à la base. Ni l'un ni l'autre ne répond à « qui a le droit de faire quoi », question d'une revue de sécurité, qui demandait de lire `rbac.json` à l'œil.
+  `forge rbac:export` rend un tableau Markdown, à versionner à côté du code où une différence montre qu'un rôle a gagné une permission, ou un CSV pour une revue en tableur.
+  **L'export rend le contrat, jamais l'état de la base** : confondre les deux ferait prendre une intention pour un état. Un contrat invalide n'est pas exporté, le tableau ne s'appliquant à rien et le lecteur le prenant pour la vérité. Le tri rend deux exports comparables, et les cellules sont échappées.
+
+- **Un rôle peut exiger un second facteur (`MFA-REQUIRED-BY-ROLE-001`).**
+  Le paquet savait dire si un utilisateur **a** un facteur actif, jamais s'il **devrait** en avoir un. L'application écrivait donc le contrôle dans chaque écran sensible, le faisait bien la première fois, et l'oubliait au troisième écran ajouté six mois plus tard.
+  `MFA_REQUIRED_ROLES` déclare la politique une fois. **Elle n'active rien** : rendre un facteur obligatoire ne peut pas le créer à la place de l'utilisateur, il faut son téléphone et son consentement ; elle dit qu'un accès doit être refusé, et `reason` donne le message qui conduit vers l'inscription.
+  Le paquet **n'importe pas `forge-mvc-rbac`** : les rôles sont lus dans la session, où l'authentification les a rangés, et trois emplacements sont acceptés, les applications les employant tous les trois. `check_mfa_requirement` ne lève jamais : un contrôle de sécurité qui échoue en levant priverait d'accès un utilisateur légitime.
+
+- **Le back-office supprime plusieurs lignes en une fois (`ADMIN-BULK-ACTIONS-001`).**
+  Il ne savait supprimer qu'une ligne à la fois : nettoyer deux cents inscriptions de test demandait deux cents allers-retours et deux cents confirmations.
+  Les identifiants partent en **paramètres liés**, un marqueur par valeur : les concaténer serait une injection, et le fait qu'ils viennent de cases cochées n'y change rien. Une sélection vide est refusée, une suppression groupée sans sélection effaçant la table entière si la clause était omise, et un plafond de deux cents lignes l'est aussi, une sélection de cette taille venant plus souvent d'un « tout cocher » que d'une intention.
+  Le nombre réellement supprimé est rendu : une ligne disparue entre l'affichage et la validation n'est pas une erreur.
+
+- **Les minuteries périodiques sont documentées (`DEPLOY-TIMERS-DOC-001`).**
+  Purge des sessions, reprise des tâches, sauvegarde : trois gestes qui doivent tourner, et aucun n'est planifié par Forge, embarquer un ordonnanceur faisant du framework autre chose que ce qu'il est.
+  Deux unités systemd complètes et quatre pièges nommés : activer le `.timer` et non le `.service`, faute de quoi la commande tourne une fois au démarrage puis plus jamais ; `Persistent=true` qui rattrape les exécutions manquées ; `RandomizedDelaySec` qui étale la charge ; et `EnvironmentFile` en `chmod 600`, ces commandes se connectant à la base.
+  La sauvegarde reste hors de Forge, chaque backend ayant son outil. Ce que la documentation dit et qui vaut plus qu'un script générique : **une sauvegarde jamais restaurée n'est pas une sauvegarde**.
+
+- **Les écarts de dialecte sont documentés (`DOC-DIALECT-ECARTS-001`).**
+  Bornes de lignes, booléens, insertion conditionnelle, signaux d'erreur, et ce qui reste délibérément hors du contrat. Un écart connu se contourne ; un écart ignoré se découvre en production, sur le seul backend où il mord.
+  La documentation nomme les pièges qui ont déjà coûté : `pagination_clause` et `pagination_param_order` se lisent en **paire**, T-SQL inversant l'ordre des deux paramètres ; le SQLSTATE ne discrimine pas sur MariaDB ni SQL Server, qui rendent `23000` pour trois conditions différentes ; et un message d'erreur PostgreSQL est traduit, donc n'est jamais un signal.
+  Forge ne fournit **aucune** insertion conditionnelle : les quatre formes n'ont pas la même sémantique de verrouillage, et une abstraction promettrait une équivalence qui n'existe pas.
+
+### Corrigé
+
+- **Une violation de clé étrangère est enfin qualifiée (`DB-ERROR-MESSAGES-HOMOGENES-001`).**
+  Le doublon, la table absente, l'indisponibilité et le droit refusé l'étaient. **Pas la clé étrangère**, qui est pourtant l'erreur d'écriture la plus courante après le doublon : supprimer une ligne encore référencée, ou poser une référence qui n'existe pas.
+  L'exception du pilote remontait donc telle quelle, ce que l'ADR-054 refuse précisément, une application ne devant jamais avoir à attraper `mariadb.IntegrityError` sous peine de n'être portable nulle part. Six tests du dépôt attrapaient d'ailleurs l'exception brute, et trois importaient le pilote pour cela : ces imports ont disparu avec le correctif.
+  Aucun signal n'est portable, et les quatre sont **vérifiés contre des serveurs réels**, jamais contre une exception fabriquée : errno 1451 et 1452 sur MariaDB, message sur SQLite qui n'offre rien d'autre, SQLSTATE 23503 sur PostgreSQL, numéro 547 sur SQL Server. Un test vérifie en outre qu'un doublon ne devient pas une clé étrangère, une erreur mal nommée envoyant chercher au mauvais endroit.
+
+- **Le gabarit Nginx pose HSTS et protège `/static/` (`DEPLOY-NGINX-MEDIA-HEADERS-001`).**
+  Le cœur pose déjà cinq en-têtes de sécurité, et **délègue explicitement HSTS au reverse proxy** : derrière un proxy qui termine TLS, `wsgi.url_scheme` vaut `http` côté Forge, et l'émettre à tort bloquerait l'accès. Cette délégation était documentée et personne ne la recevait : le gabarit ne portait pas la directive.
+  Le `location /static/` court-circuite par ailleurs l'application, donc **aucun** en-tête de Forge ne l'atteint. `nosniff` y compte le plus, un navigateur devinant sinon le type d'un fichier servi depuis votre domaine.
+  Le bloc `internal;` de l'envoi délégué est fourni, commenté, avec le rappel que c'est cette directive et elle seule qui protège : sans elle, la délégation publie tout `UPLOAD_ROOT`.
+
 - **Un champ d'entité peut être dérivé (`ENTITIES-COMPUTED-FIELDS-001`).**
   Un total de ligne, un âge, un nom complet : la valeur se calcule depuis d'autres colonnes, et l'écrire en base la ferait mentir dès qu'une source change. L'application dupliquait l'expression dans chaque requête, ou la recalculait en Python après avoir tout rapatrié.
   `"computed": "qte * pu"` projette le champ en lecture, `(qte * pu) AS "total"`, et l'exclut des écritures : il n'a pas de colonne, et l'inclure dans un `INSERT` ferait échouer la requête sur les quatre backends. L'alias reste entre guillemets, c'est lui qui préserve la casse sur PostgreSQL.

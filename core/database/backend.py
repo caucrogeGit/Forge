@@ -627,6 +627,25 @@ class DatabaseBackend(Protocol):
         """
         ...
 
+    def is_foreign_key_violation(self, error: Exception) -> bool:
+        """Vrai si `error` signale une violation de clé étrangère.
+
+        Sur le backend et non sur `Dialect`, pour la même raison que
+        `is_unique_violation` : reconnaître une exception relève du pilote.
+
+        Aucun signal n'est portable (`DB-ERROR-MESSAGES-HOMOGENES-001`) :
+
+            MariaDB      errno 1451 (suppression) et 1452 (insertion)
+            SQLite       message « FOREIGN KEY constraint failed »
+            PostgreSQL   SQLSTATE 23503
+            SQL Server   numéro natif 547
+
+        Un backend qui ne sait pas conclure rend `False` : mieux vaut laisser
+        l'exception du pilote remonter que la qualifier à tort, une erreur mal
+        nommée envoyant chercher au mauvais endroit.
+        """
+        return False
+
     def is_unavailable(self, error: Exception) -> bool:
         """Vrai si `error` dit « réessayez », non « votre requête est fautive ».
 
