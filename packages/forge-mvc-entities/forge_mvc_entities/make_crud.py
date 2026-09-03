@@ -54,6 +54,7 @@ from cli._support.scaffold import CREATED, PRESERVED, write_if_new
 
 # ── Re-exports from submodules (backward compatibility) ───────────────────────
 
+from forge_mvc_entities.crud.routes_slug import slug_route_lines
 from forge_mvc_entities.crud.context import (  # noqa: F401
     _RBAC_ACTION_TO_METHOD,
     _with_permission,
@@ -117,6 +118,8 @@ def build_routes_file(definition: dict[str, Any]) -> str:
     snake = _to_snake(entity)
     ctrl = f"{entity}Controller"
 
+    slug_route = slug_route_lines(definition, snake, ctrl)
+
     return "\n".join([
         f'"""Routes du contrôleur {ctrl} (ADR-068)."""',
         "from core.http.router import Router",
@@ -137,6 +140,7 @@ def build_routes_file(definition: dict[str, Any]) -> str:
         f'        g.add("POST", "/bulk-delete", {ctrl}.bulk_delete, name="{snake}-bulk_delete")',
         f'        g.add("POST", "/bulk-delete-confirm", {ctrl}.bulk_delete_confirm, name="{snake}-bulk_delete_confirm")',
         f'        g.add("GET", "/export-csv", {ctrl}.export_csv, name="{snake}-export_csv")',
+        *slug_route,
         "",
     ])
 

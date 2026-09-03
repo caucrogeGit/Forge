@@ -655,14 +655,96 @@ def _run_make_command(args: list[str]) -> None:
     print(f"[OK] Migration créée : {path.as_posix()}")
 
 
+#: Statuts qui signalent un écart entre le contrat et la base.
+DIFF_DRIFT_STATUSES = frozenset({"COLUMN_MISSING", "COLUMN_CHANGED", "COLUMN_EXTRA"})
+
+
+def summarize_schema_diff(report: SchemaDiffReport) -> "dict[str, int]":
+    """Compte les lignes par statut (`ENTITIES-MIGRATION-DIFF-READABLE-001`).
+
+    La commande rendait un tableau de lignes, sans total. Sur une entité de
+    trente colonnes, savoir s'il reste un écart demandait de lire les trente
+    lignes et de compter à la main, ce qui se fait mal et se fait faux.
+    """
+    compte: dict[str, int] = {}
+    for row in report.rows:
+        compte[row.status] = compte.get(row.status, 0) + 1
+    return compte
+
+
+def has_schema_drift(report: SchemaDiffReport) -> bool:
+    """Vrai si le contrat et la base diffèrent.
+
+    La table absente compte comme un écart : c'est même le plus grand.
+    """
+    if report.table_status != "OK":
+        return True
+    return any(row.status in DIFF_DRIFT_STATUSES for row in report.rows)
+
+
+def _print_diff_summary(report: SchemaDiffReport) -> None:
+    compte = summarize_schema_diff(report)
+    total = sum(compte.values())
+    ecarts = sum(nombre for statut, nombre in compte.items() if statut in DIFF_DRIFT_STATUSES)
+    detail = ", ".join(f"{statut} {nombre}" for statut, nombre in sorted(compte.items()))
+    print()
+    print(f"RESUME : {total} colonne(s) examinée(s), {ecarts} écart(s). {detail or '<aucun>'}")
+    if not has_schema_drift(report):
+        print("Le contrat et la base sont d'accord.")
+
+
 def _run_diff_command(args: list[str]) -> None:
+    """`forge migration:diff <Entite> [--sql] [--check]`.
+
+    `--sql` montre, sans rien écrire, la migration que `migration:make
+    --from-diff` produirait. C'est l'essai à blanc du ticket
+    `ENTITIES-MIGRATION-DIFF-READABLE-001` : lire le SQL avant de créer un
+    fichier évite d'avoir à supprimer une migration qu'on vient d'engendrer.
+
+    `--check` rend un code de sortie non nul quand un écart subsiste, pour une
+    intégration continue. Le comportement par défaut reste inchangé : le faire
+    échouer d'office aurait cassé les scripts qui appellent la commande
+    aujourd'hui.
+    """
     _assert_migration_contracts_valid(Path.cwd() / "mvc" / "entities")
+    veut_sql = "--sql" in args
+    veut_check = "--check" in args
+
     report = diff_entity_schema(args[2])
     print(f"[OK] Diff de schéma pour l’entité {report.entity}.")
     print()
     print(f"TABLE {report.table} : {report.table_status}")
     print()
     _print_schema_diff_table(report.rows)
+    _print_diff_summary(report)
+
+    if veut_sql:
+        print()
+        if not has_schema_drift(report):
+            print("Aucun écart : il n'y a pas de migration à produire.")
+        else:
+            try:
+                sql = entity_diff_migration_sql(args[2])
+            except MigrationError as exc:
+                # Un diff risqué ne se traduit pas en SQL automatiquement, et
+                # le dire ici vaut mieux que de laisser l'exploitant découvrir
+                # le refus au moment où il croyait créer sa migration.
+                print(f"[ATTENTION] Aucun SQL automatique : {exc}")
+            else:
+                print("-- SQL qui serait engendré par migration:make --from-diff :")
+                print(sql.rstrip())
+                print()
+                print(
+                    "Rien n'a été écrit. Pour créer le fichier : "
+                    f"forge migration:make <nom> --from-diff {report.entity}"
+                )
+
+    if veut_check and has_schema_drift(report):
+        raise MigrationError(
+            f"Écart de schéma pour {report.entity} : le contrat et la base "
+            "diffèrent. Produisez une migration, ou appliquez celles qui "
+            "manquent."
+        )
 
 
 def _print_status_table(statuses: list[MigrationStatus]) -> None:

@@ -36,7 +36,31 @@ from forge_mvc_entities.service import (
 )
 from forge_mvc_entities.validation import to_snake
 
+from forge_mvc_entities.validators import (
+    EntityValidationError,
+    EntityValidator,
+    ValidationIssue,
+    ValidationReport,
+    clear_entity_validators,
+    ensure_entity_data,
+    register_entity_validator,
+    registered_validators,
+    unregister_entity_validator,
+    validate_entity_data,
+)
+
 __all__ = [
+    # Validation métier déclarable (ENTITIES-BUSINESS-VALIDATION-001)
+    "register_entity_validator",
+    "unregister_entity_validator",
+    "registered_validators",
+    "clear_entity_validators",
+    "validate_entity_data",
+    "ensure_entity_data",
+    "ValidationIssue",
+    "ValidationReport",
+    "EntityValidationError",
+    "EntityValidator",
     "PivotAdvancedService",
     "PivotConstraintError",
     "PivotFieldConstraint",

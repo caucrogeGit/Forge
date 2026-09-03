@@ -6,6 +6,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, cast
 
+from forge_mvc_entities.crud.routes_slug import slug_field_of
 from forge_mvc_entities.crud.context import (
     CrudManyToOneRelation,
     CrudManyToManyRelation,
@@ -69,6 +70,9 @@ class _ControllerContext:
     # Champs porteurs d'une contrainte UNIQUE (CRUD-DUP-HANDLING-001). Vide =
     # aucun garde anti-doublon n'est émis, la sortie reste celle d'avant.
     unique_fields: list[str]
+    # Nom du champ slug, s'il y en a un (ENTITIES-SLUG-ROUTES-001). Vide =
+    # aucune méthode show_by_slug n'est émise, la sortie reste celle d'avant.
+    slug_field: str = ""
 
 
 def _render_export_csv(ctx: _ControllerContext) -> list[str]:
@@ -451,6 +455,34 @@ def _render_show(ctx: _ControllerContext) -> list[str]:
         f'            context={{{", ".join(ctx_items)}}},',
         "            request=request)",
     ]
+
+    # ENTITIES-SLUG-ROUTES-001 : la recherche par slug existait
+    # (`get_<snake>_by_<slug>`, ADR-017), aucune route ne s'en servait. Une URL
+    # publique lisible demandait donc d'écrire la méthode et la route à la
+    # main, dans chaque projet.
+    if ctx.slug_field:
+        slug_name = ctx.slug_field
+        show_lines += [
+            "",
+            "    @staticmethod",
+            "    def show_by_slug(request: Request) -> Response:",
+            '        """Fiche publique, adressée par son slug.',
+            "",
+            "        Distincte de `show`, qui adresse par clé primaire : les deux",
+            "        rendent la même vue, et un identifiant numérique dans une URL",
+            "        publique renseigne sur le volume de la table.",
+            '        """',
+            f'        {slug_name} = (request.route("{slug_name}") or "").strip()',
+            f"        if not {slug_name}:",
+            "            return BaseController.not_found()",
+            f'        {snake} = get_{snake}_by_{slug_name}({slug_name})',
+            f'        if {snake} is None:',
+            "            return BaseController.not_found()",
+            f'        return BaseController.render("{ctx.view_dir}/show.html",',
+            f'            context={{"{snake}": {snake}, "flash": '
+            f'get_flash(get_session_id(request))}},',
+            "            request=request)",
+        ]
     return show_lines
 
 
@@ -1030,6 +1062,9 @@ def build_controller(
         allowed_sort_keys_repr=allowed_sort_keys_repr,
         filter_flds=filter_flds, relation_filter_names=relation_filter_names,
         unique_fields=unique_fields,
+        # Le champ slug est calculé par le module qui porte la règle, plutôt
+        # que réécrit ici : deux lectures du contrat divergeraient.
+        slug_field=slug_field_of(definition),
     )
     lines += _render_list_context(_ctx, pk_col)
 

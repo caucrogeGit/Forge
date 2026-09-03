@@ -131,10 +131,10 @@ Chacun dépend d'un ticket du lot 2.
 
 | Ticket | Responsabilité unique |
 |---|---|
-| `ENTITIES-COMPUTED-FIELDS-001` | Champs dérivés en lecture seule, documentés au contrat |
-| `ENTITIES-BUSINESS-VALIDATION-001` | Validation métier déclarable au delà des types |
-| `ENTITIES-SLUG-ROUTES-001` | Recherche par slug et routes publiques correspondantes |
-| `ENTITIES-MIGRATION-DIFF-READABLE-001` | Sortie de `migration:diff` lisible, et essai à blanc |
+| `ENTITIES-COMPUTED-FIELDS-001` | **Livré.** Projetés par leur expression, absents des écritures ; quatre combinaisons refusées |
+| `ENTITIES-BUSINESS-VALIDATION-001` | **Livré.** Fonction enregistrée, pas de mini-langue ; toutes les règles évaluées |
+| `ENTITIES-SLUG-ROUTES-001` | **Livré.** La recherche existait, la route non ; déclarée en dernier |
+| `ENTITIES-MIGRATION-DIFF-READABLE-001` | **Livré.** Résumé, `--sql` sans écrire, `--check` pour la CI |
 
 ### 7.3 rbac
 

@@ -201,6 +201,7 @@ def _build_select_base(
     table: str,
     relations: list[CrudManyToOneRelation] | None,
     columns: list[str] | None = None,
+    computed: "dict[str, str] | None" = None,
 ) -> str:
     """Génère la clause SELECT...FROM...LEFT JOIN pour les requêtes de liste.
 
@@ -219,11 +220,19 @@ def _build_select_base(
     serveurs réels. Nommer les colonnes rend au passage le SQL plus lisible,
     conformément au principe 5.
     """
-    projection = (
-        ", ".join(f'{table}.{col} AS \\"{col}\\"' for col in columns)
-        if columns
-        else f"{table}.*"
-    )
+    # ENTITIES-COMPUTED-FIELDS-001 : un champ calculé se projette par son
+    # expression, sans préfixe de table puisqu'il n'a pas de colonne. L'alias
+    # entre guillemets reste posé de la même façon : c'est lui qui préserve la
+    # casse sur PostgreSQL, et le perdre rendrait la clé en minuscules.
+    derives = computed or {}
+
+    def _item(col: str) -> str:
+        expression = derives.get(col)
+        if expression is not None:
+            return f'({expression}) AS \\"{col}\\"'
+        return f'{table}.{col} AS \\"{col}\\"'
+
+    projection = ", ".join(_item(col) for col in columns) if columns else f"{table}.*"
     if not relations:
         return f"SELECT {projection} FROM {table}"
     join_cols = ", ".join(

@@ -41,6 +41,21 @@ def _non_pk_fields(definition: dict[str, Any]) -> list[dict[str, Any]]:
     return [f for f in definition["fields"] if not f.get("primary_key")]
 
 
+def _is_computed(field: dict[str, Any]) -> bool:
+    """Champ dérivé, en lecture seule (`ENTITIES-COMPUTED-FIELDS-001`).
+
+    Un total de ligne, un âge, un nom complet : la valeur se calcule depuis
+    d'autres colonnes, et l'écrire en base la ferait mentir dès qu'une source
+    change. L'application dupliquait donc l'expression dans chaque requête, ou
+    la recalculait en Python après avoir tout rapatrié.
+
+    Un champ calculé est **projeté** dans les lectures et **absent** des
+    écritures : il n'a pas de colonne à écrire, et l'inclure dans un `INSERT`
+    ferait échouer la requête sur les quatre backends.
+    """
+    return bool(field.get("computed"))
+
+
 def _is_generated(field: dict[str, Any]) -> bool:
     """Champ auto-généré depuis un champ source (slug avec ``source``).
 

@@ -323,6 +323,121 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     `configure_serverless_db` fournit la connexion runtime d'un backend BDD **sans serveur** (SQLite, ADR-054), qui n'a pas de comptes d'administration `DB_ADMIN_*`.
     Elle est utilisée hors du flux `db:init` / `db:apply`, réservé aux SGBD serveur.
 
+??? note "10. Champs dérivés, en lecture seule"
+
+    Un total de ligne, un âge, un nom complet : la valeur se calcule depuis d'autres colonnes, et l'écrire en base la ferait mentir dès qu'une source change (`ENTITIES-COMPUTED-FIELDS-001`).
+
+    L'application dupliquait donc l'expression dans chaque requête, ou la recalculait en Python après avoir tout rapatrié.
+
+    ```json
+    {"name": "total", "column": "total", "sql_type": "INTEGER",
+     "python_type": "int", "nullable": true, "computed": "qte * pu"}
+    ```
+
+    Le champ est **projeté** dans les lectures, `(qte * pu) AS "total"`, et **absent** des écritures.
+
+    !!! danger "Il n'a pas de colonne à écrire"
+        L'inclure dans un `INSERT` ferait échouer la requête sur les quatre backends.
+
+        Le générateur l'exclut donc de l'`INSERT` et de l'`UPDATE`, et il n'y a rien à faire pour cela.
+
+    !!! info "L'alias reste entre guillemets"
+        C'est lui qui préserve la casse sur PostgreSQL, qui replie tout identifiant non protégé en minuscules.
+
+        Le perdre rendrait la clé en minuscules, et un gabarit lisant `{{ ligne.Total }}` afficherait du vide sans une ligne de journal.
+
+    !!! danger "L'expression n'est pas paramétrable, et c'est voulu"
+        Elle part telle quelle dans la projection. Une expression construite depuis une saisie serait une injection.
+
+        Le contrat d'entité est du code du projet, relu et versionné, pas une donnée d'utilisateur. Un point-virgule y est néanmoins refusé : l'expression est projetée dans un `SELECT`, pas exécutée comme une instruction.
+
+    Quatre combinaisons sont refusées, chacune parce qu'elle produirait un SQL faux plutôt qu'une simple maladresse : clé primaire, contrainte `UNIQUE`, valeur par défaut, et présence dans un formulaire.
+
+??? note "11. Validation métier déclarable"
+
+    Le contrat décrit des **types** et des contraintes de forme (`ENTITIES-BUSINESS-VALIDATION-001`). Il ne peut rien dire de « la date de fin doit suivre la date de début », ni de « une remise au delà de trente pour cent demande une validation ».
+
+    Ces règles vivaient donc dans les contrôleurs, réécrites à chaque point d'entrée. Une entité créée par l'écran passait le contrôle ; la même créée par un import CSV ne le passait pas, et rien ne le signalait.
+
+    ```python
+    from forge_mvc_entities import ValidationIssue, ensure_entity_data, register_entity_validator
+
+    def dates_coherentes(donnees, contexte):
+        if donnees["fin"] < donnees["debut"]:
+            return [ValidationIssue("la date de fin doit suivre la date de début")]
+        return []
+
+    register_entity_validator("Contrat", dates_coherentes)
+    ensure_entity_data("Contrat", form.cleaned_data)
+    ```
+
+    !!! info "Une fonction, et non une expression au contrat"
+        Une règle métier a besoin de la base, de l'heure, parfois d'un service.
+
+        Une mini-langue d'expressions dans le JSON en couvrirait un dixième et demanderait un interpréteur, c'est à dire du code caché dans de la donnée, que le principe 3 refuse. Le contrat déclare qu'une entité **a** des règles ; le code dit lesquelles.
+
+    !!! info "Toutes les règles sont évaluées"
+        Rendre le premier problème seul obligerait l'utilisateur à corriger son formulaire une erreur à la fois.
+
+        `ValidationReport.by_field()` les groupe pour les rendre en face de leur champ. Un problème sans champ est permis : « la date de fin doit suivre la date de début » n'appartient à aucun des deux.
+
+    !!! danger "Une règle qui échoue refuse l'écriture"
+        Une règle qui lève ne dit pas que la donnée est valide, elle ne dit rien.
+
+        Le jour où le service qu'elle interroge tombe, tout passerait.
+
+    `validate_entity_data` ne lève jamais et sert à afficher ; `ensure_entity_data` sert à refuser.
+
+??? note "12. URL publique par slug"
+
+    La recherche par slug existait depuis l'ADR-017, `get_<snake>_by_<slug>`, et **aucune route ne s'en servait** (`ENTITIES-SLUG-ROUTES-001`).
+
+    Une URL publique lisible demandait donc d'écrire la méthode et la route à la main, dans chaque projet.
+
+    ```python
+    with router.group("/article", public=True, csrf=False) as public:
+        public.add("GET", "/{slug}", ArticleController.show_by_slug,
+                   name="article-show_by_slug")
+    ```
+
+    La méthode `show_by_slug` et sa route sont engendrées dès que l'entité porte un champ de formulaire `slug`. Une entité sans slug ne voit aucun changement.
+
+    !!! warning "La route est déclarée en dernier, et ce n'est pas cosmétique"
+        Les segments fixes, `/new`, `/edit/{id}`, `/export-csv`, sont déclarés avant.
+
+        Un slug valant « new » serait capturé par eux, et sa fiche resterait inatteignable. `RESERVED_SLUG_SEGMENTS` nomme ces valeurs, pour que l'application les écarte à l'écriture : Forge ne peut pas le faire à sa place, un slug étant une donnée.
+
+    !!! info "Distincte de `show`, qui adresse par clé primaire"
+        Les deux rendent la même vue.
+
+        Un identifiant numérique dans une URL publique renseigne sur le volume de la table, ce qu'un slug ne fait pas.
+
+??? note "13. Lire un diff de schéma, et l'essayer à blanc"
+
+    `migration:diff` rendait un tableau de lignes, sans total (`ENTITIES-MIGRATION-DIFF-READABLE-001`). Sur une entité de trente colonnes, savoir s'il reste un écart demandait de lire les trente lignes et de compter à la main, ce qui se fait mal et se fait faux.
+
+    ```bash
+    forge migration:diff Article
+    forge migration:diff Article --sql      # essai à blanc
+    forge migration:diff Article --check    # échoue s'il reste un écart
+    ```
+
+    La sortie porte désormais un résumé, le nombre de colonnes examinées et le nombre d'écarts, avec le détail par statut.
+
+    !!! info "`--sql` montre sans écrire"
+        C'est l'essai à blanc : lire le SQL avant de créer un fichier évite d'avoir à supprimer une migration qu'on vient d'engendrer.
+
+        Un diff risqué, colonne changée ou colonne en trop, ne se traduit pas en SQL automatiquement. La commande le dit à cet instant, plutôt que de laisser l'exploitant découvrir le refus au moment où il croyait créer sa migration.
+
+    !!! info "`--check` sert à l'intégration continue"
+        Il rend un code de sortie non nul quand un écart subsiste.
+
+        Le comportement par défaut reste inchangé : faire échouer la commande d'office aurait cassé les scripts qui l'appellent aujourd'hui.
+
+    Une table absente compte comme un écart, et c'est même le plus grand.
+
+    Les fonctions vivent dans `validators.py` (`register_entity_validator`, `validate_entity_data`, `ensure_entity_data`, `ValidationIssue`, `ValidationReport`) et dans `crud/routes_slug.py` (`slug_field_of`, `slug_route_lines`, `RESERVED_SLUG_SEGMENTS`).
+
 ## Voir aussi
 
 - [Référence par module](modules/make_entity.md) : une page par commande et module du moteur.

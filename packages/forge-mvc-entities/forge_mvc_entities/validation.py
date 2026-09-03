@@ -31,6 +31,9 @@ ALLOWED_FIELD_KEYS = {
     "list",
     "source",
     "references",
+    # Expression SQL d'un champ dérivé, en lecture seule
+    # (ENTITIES-COMPUTED-FIELDS-001).
+    "computed",
     "managed",
 }
 # Champs gérés par le framework (ADR-081) : le normaliseur pose ce marqueur sur
@@ -515,6 +518,56 @@ def _normalize_media_list(media: list[Any]) -> list[dict[str, Any]]:
     return result
 
 
+def _validate_computed_field(
+    field: "dict[str, Any]", path: str, issues: "list[EntityDefinitionIssue]"
+) -> None:
+    """Regles d'un champ calcule (ENTITIES-COMPUTED-FIELDS-001).
+
+    L'expression part telle quelle dans la projection SQL : elle n'est pas
+    parametrable, et c'est voulu. Une expression construite depuis une saisie
+    serait une injection, et le contrat d'entite est du code du projet, relu
+    et versionne, pas une donnee d'utilisateur.
+
+    Trois interdits, chacun parce qu'il produirait un SQL faux plutot qu'une
+    simple maladresse.
+    """
+    expression = field.get("computed")
+    if expression is None:
+        return
+    if not isinstance(expression, str) or not expression.strip():
+        _add_issue(issues, f"{path}.computed", "doit etre une expression SQL non vide")
+        return
+    if field.get("primary_key"):
+        _add_issue(
+            issues, f"{path}.computed",
+            "une cle primaire ne peut pas etre calculee : elle doit etre stockee "
+            "pour etre indexee et referencee",
+        )
+    if field.get("unique"):
+        _add_issue(
+            issues, f"{path}.computed",
+            "une contrainte UNIQUE porte sur une colonne stockee, pas sur une "
+            "expression",
+        )
+    if "default" in field:
+        _add_issue(
+            issues, f"{path}.computed",
+            "un champ calcule n'a pas de valeur par defaut : il n'est jamais ecrit",
+        )
+    if field.get("form"):
+        _add_issue(
+            issues, f"{path}.computed",
+            "un champ calcule est en lecture seule : il n'a pas sa place dans un "
+            "formulaire",
+        )
+    if ";" in expression:
+        _add_issue(
+            issues, f"{path}.computed",
+            "l'expression ne peut pas porter de point-virgule : elle est projetee "
+            "dans un SELECT, pas executee comme une instruction",
+        )
+
+
 def _normalize_field_data(
     field: Any,
     index: int,
@@ -567,6 +620,12 @@ def _normalize_field_data(
     # décident sans lire un nom de type SQL (OPTIN-SQL-TYPE-BRANCHING-001).
     if "forge_type" in field and isinstance(field.get("forge_type"), str):
         normalized_field["forge_type"] = field["forge_type"]
+    # Expression d'un champ dérivé, propagée telle quelle jusqu'aux générateurs
+    # (ENTITIES-COMPUTED-FIELDS-001). La valider sans la propager laisserait le
+    # champ passer pour une colonne ordinaire.
+    if "computed" in field and isinstance(field.get("computed"), str):
+        normalized_field["computed"] = field["computed"]
+    _validate_computed_field(field, path, issues)
     return normalized_field
 
 

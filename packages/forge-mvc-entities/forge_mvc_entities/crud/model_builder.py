@@ -11,6 +11,7 @@ from forge_mvc_entities.crud.context import (
 )
 from forge_mvc_entities.crud.utils import (
     _filter_fields,
+    _is_computed,
     _is_generated,
     _is_managed,
     _is_soft_delete,
@@ -263,6 +264,15 @@ def build_model(
     # Colonnes projetees et aliasees, pour que PostgreSQL n'en replie pas la
     # casse (`CRUD-PG-COLUMN-CASE-001`).
     colonnes_projetees = [pk_col] + [f["column"] for f in _non_pk_fields(definition)]
+    # ENTITIES-COMPUTED-FIELDS-001 : la projection d'un champ calculé est son
+    # expression, sans préfixe de table puisqu'il n'a pas de colonne. L'alias
+    # entre guillemets reste posé de la même façon, c'est lui qui préserve la
+    # casse sur PostgreSQL.
+    expressions_calculees = {
+        f["column"]: str(f["computed"])
+        for f in _non_pk_fields(definition)
+        if _is_computed(f)
+    }
     pk_name = pk["name"]
     non_pk = _non_pk_fields(definition)
     auto_inc = pk.get("auto_increment", False)
@@ -277,7 +287,12 @@ def build_model(
     soft_where_all = f" WHERE {main_q}{soft_col} IS NULL" if soft_col else ""
     soft_where_by_id = f" AND {main_q}{soft_col} IS NULL" if soft_col else ""
 
-    insert_fields = [f for f in (non_pk if auto_inc else definition["fields"]) if not _is_soft_delete(f)]
+    # Un champ calculé n'a pas de colonne à écrire : l'inclure ici ferait
+    # échouer l'INSERT sur les quatre backends.
+    insert_fields = [
+        f for f in (non_pk if auto_inc else definition["fields"])
+        if not _is_soft_delete(f) and not _is_computed(f)
+    ]
     insert_cols = ", ".join(f["column"] for f in insert_fields)
     insert_placeholders = ", ".join("?" for _ in insert_fields)
     insert_values = ", ".join(_column_value_expr(f) for f in insert_fields)
@@ -296,6 +311,7 @@ def build_model(
     update_fields = [
         f for f in non_pk
         if not _is_generated(f)
+        and not _is_computed(f)
         and not (_is_managed(f) and not _managed_touches_update(f))
     ]
     if update_fields:
@@ -335,8 +351,8 @@ def build_model(
         "",
         "from core.database.db import fetch_one, fetch_all, execute, insert",
         "",
-        f'SELECT_ALL   = "{_build_select_base(table, relations, colonnes_projetees)}{soft_where_all} ORDER BY {main_q}{pk_col}"',
-        f'SELECT_BY_ID = "{_build_select_base(table, relations, colonnes_projetees)} WHERE {main_q}{pk_col} = ?{soft_where_by_id}"',
+        f'SELECT_ALL   = "{_build_select_base(table, relations, colonnes_projetees, expressions_calculees)}{soft_where_all} ORDER BY {main_q}{pk_col}"',
+        f'SELECT_BY_ID = "{_build_select_base(table, relations, colonnes_projetees, expressions_calculees)} WHERE {main_q}{pk_col} = ?{soft_where_by_id}"',
         f'INSERT       = "INSERT INTO {table} ({insert_cols}) VALUES ({insert_placeholders})"',
         f'UPDATE       = {update_constant}',
         f'DELETE       = {delete_constant}',

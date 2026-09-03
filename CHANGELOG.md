@@ -4,6 +4,28 @@
 
 ### Ajouté
 
+- **Un champ d'entité peut être dérivé (`ENTITIES-COMPUTED-FIELDS-001`).**
+  Un total de ligne, un âge, un nom complet : la valeur se calcule depuis d'autres colonnes, et l'écrire en base la ferait mentir dès qu'une source change. L'application dupliquait l'expression dans chaque requête, ou la recalculait en Python après avoir tout rapatrié.
+  `"computed": "qte * pu"` projette le champ en lecture, `(qte * pu) AS "total"`, et l'exclut des écritures : il n'a pas de colonne, et l'inclure dans un `INSERT` ferait échouer la requête sur les quatre backends. L'alias reste entre guillemets, c'est lui qui préserve la casse sur PostgreSQL.
+  **L'expression n'est pas paramétrable, et c'est voulu** : le contrat d'entité est du code du projet, relu et versionné, pas une donnée d'utilisateur. Un point-virgule y est néanmoins refusé, l'expression étant projetée dans un `SELECT` et non exécutée. Quatre combinaisons sont refusées, clé primaire, `UNIQUE`, valeur par défaut et présence au formulaire, chacune parce qu'elle produirait un SQL faux plutôt qu'une maladresse.
+
+- **Une règle métier se déclare (`ENTITIES-BUSINESS-VALIDATION-001`).**
+  Le contrat décrit des types. Il ne peut rien dire de « la date de fin doit suivre la date de début », qui vivait donc dans les contrôleurs, réécrite à chaque point d'entrée : une entité créée par l'écran passait le contrôle, la même créée par un import CSV ne le passait pas, et rien ne le signalait.
+  **Une fonction, et non une expression au contrat.** Une règle a besoin de la base, de l'heure, parfois d'un service ; une mini-langue dans le JSON en couvrirait un dixième et demanderait un interpréteur, c'est à dire du code caché dans de la donnée.
+  Toutes les règles sont évaluées, rendre le premier problème seul obligeant l'utilisateur à corriger une erreur à la fois. Une règle qui lève **refuse** l'écriture. Un problème peut n'appartenir à aucun champ, le rattacher arbitrairement ferait pointer le formulaire au mauvais endroit.
+
+- **Une entité à slug gagne sa route publique (`ENTITIES-SLUG-ROUTES-001`).**
+  La recherche par slug existait depuis l'ADR-017, et **aucune route ne s'en servait** : une URL publique lisible demandait d'écrire la méthode et la route à la main, dans chaque projet.
+  `show_by_slug` et sa route sont engendrées dès que l'entité porte un champ `slug`. Une entité sans slug ne voit aucun changement.
+  **La route est déclarée en dernier**, après les segments fixes : un slug valant « new » serait sinon capturé par `/new`, et sa fiche resterait inatteignable. `RESERVED_SLUG_SEGMENTS` nomme ces valeurs pour que l'application les écarte à l'écriture, Forge ne pouvant le faire à sa place puisqu'un slug est une donnée.
+
+### Modifié
+
+- **`migration:diff` se lit, et s'essaie à blanc (`ENTITIES-MIGRATION-DIFF-READABLE-001`).**
+  La commande rendait un tableau de lignes sans total : sur une entité de trente colonnes, savoir s'il reste un écart demandait de lire les trente lignes et de compter à la main.
+  Un résumé s'ajoute, `--sql` montre la migration que `migration:make --from-diff` produirait **sans rien écrire**, et `--check` rend un code de sortie non nul pour l'intégration continue. Le comportement par défaut reste inchangé, faire échouer la commande d'office aurait cassé les scripts existants.
+  Un diff risqué ne se traduit pas en SQL automatiquement, et la commande le dit à cet instant plutôt que de laisser découvrir le refus au moment de créer la migration.
+
 - **Le workflow garde trace de ses transitions (`WORKFLOW-HISTORY-001`).**
   Le paquet appliquait les transitions sans en garder trace : on savait dans quel état une entité se trouve, jamais comment elle y est arrivée, ni quand, ni par qui. « Qui a validé cette commande, et à quelle date » n'avait aucune réponse, et chaque application réinventait sa table.
   **L'enregistrement est explicite, et dans la transaction de l'appelant.** Écrire depuis le paquet imposerait une connexion à un module qui n'en avait pas besoin, et surtout séparerait l'historique de l'écriture qu'il décrit : une transaction annulée laisserait une ligne pour une transition qui n'a pas eu lieu.
