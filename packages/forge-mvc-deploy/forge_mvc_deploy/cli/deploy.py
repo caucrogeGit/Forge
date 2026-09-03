@@ -183,6 +183,124 @@ WantedBy=multi-user.target
 """
 
 
+def _jobs_installe() -> bool:
+    """`forge-mvc-jobs` est-il installe dans cet environnement ?
+
+    Lu sans importer le paquet : `deploy` est CLI-only et ne depend d'aucun
+    autre opt-in. Meme intention que `_backend_installe`, qui interroge les
+    entry points plutot que d'importer un backend.
+    """
+    from importlib.util import find_spec
+
+    try:
+        return find_spec("forge_mvc_jobs") is not None
+    except (ImportError, ValueError):  # pragma: no cover - environnement casse
+        return False
+
+
+def _systemd_worker_service(project_dir: Path) -> str:
+    """Unite du worker de taches de fond (DEPLOY-JOBS-WORKER-UNIT-001).
+
+    Le guide documentait le minuteur `jobs:reclaim`, qui remet en file les
+    taches orphelines, et **aucun service pour les traiter**. Une application
+    qui enfile en production obtenait donc une table qui grossit, et un
+    minuteur donnant l'impression que quelque chose tourne.
+    """
+    backend = _backend_installe()
+    service = SERVICES_SYSTEMD.get(backend or "", "")
+    apres = f"network-online.target {service}".strip() if service else "network-online.target"
+    return f"""\
+[Unit]
+Description=Forge Jobs Worker
+Wants=network-online.target
+After={apres}
+# Meme raison que pour forge-app : sans cette cle, cinq demarrages en dix
+# secondes suffisent a laisser le worker a terre, et la file cesse d'etre
+# traitee sans que rien ne le dise.
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+# Le meme compte que l'application : le worker lit les memes secrets et
+# ecrit dans la meme base.
+User=forge-app
+WorkingDirectory={project_dir}
+ExecStart={project_dir}/.venv/bin/python worker.py
+Restart=always
+RestartSec=5
+EnvironmentFile={project_dir}/env/prod
+# Delai laisse au worker pour finir la tache en cours apres un SIGTERM.
+# Au dela, systemd le tue : la tache est perdue en vol et repart par
+# `forge jobs:reclaim`, une fois son bail expire.
+# A porter au dela de la duree de votre tache la plus longue. Un transcodage
+# video depasse largement les quatre-vingt-dix secondes par defaut.
+TimeoutStopSec=90
+
+[Install]
+WantedBy=multi-user.target
+"""
+
+
+def _worker_py() -> str:
+    return '''\
+"""Point d'entrée du worker de tâches de fond.
+
+Lancé dans un processus séparé du serveur web, jamais depuis une requête :
+
+    .venv/bin/python worker.py
+
+C'est VOTRE fichier. Forge ne connaît pas vos gestionnaires, il ne peut donc
+pas les inscrire à votre place. Remplissez `HANDLERS`, puis déclarez l'unité
+`deploy/systemd/forge-jobs-worker.service`.
+"""
+import signal
+from types import FrameType
+
+from forge_mvc_jobs import run_worker
+
+# Vos gestionnaires : {nom de tâche: fonction}. Le nom est celui passé à
+# `enqueue("email.envoi", ...)`. La fonction reçoit la charge utile (un dict).
+#
+#     from mvc.services.mail import envoyer_email
+#     HANDLERS = {"email.envoi": envoyer_email}
+HANDLERS: "dict[str, object]" = {}
+
+_arret = False
+
+
+def _demander_l_arret(signum: int, frame: "FrameType | None") -> None:
+    """Note l'ordre d'arrêt, sans interrompre la tâche en cours.
+
+    `run_worker` consulte cette condition entre deux tâches : celle qui tourne
+    va à son terme, et le worker s'arrête avant de prendre la suivante.
+    """
+    global _arret
+    _arret = True
+
+
+def main() -> None:
+    if not HANDLERS:
+        # Refus délibéré. Une tâche dont le nom n'a aucun gestionnaire est
+        # marquée `failed` : un worker sans gestionnaire ne se contenterait
+        # pas de ne rien faire, il DÉTRUIRAIT la file, tâche par tâche, en
+        # affichant un service parfaitement vert.
+        raise SystemExit(
+            "worker.py : HANDLERS est vide. Un worker sans gestionnaire "
+            "marque `failed` toutes les tâches qu'il retire de la file, "
+            "sans les exécuter. Inscrivez vos gestionnaires avant de "
+            "démarrer le service."
+        )
+
+    signal.signal(signal.SIGTERM, _demander_l_arret)
+    signal.signal(signal.SIGINT, _demander_l_arret)
+    run_worker(HANDLERS, stop=lambda: _arret)  # type: ignore[arg-type]
+
+
+if __name__ == "__main__":
+    main()
+'''
+
+
 def _wsgi_py() -> str:
     return '''\
 """Point d'entrée WSGI de production.
@@ -222,6 +340,8 @@ Ce dossier contient les fichiers générés par `forge deploy:init`.
 | `../wsgi.py` (racine du projet) | Point d'entrée WSGI servi par Gunicorn, sur l'application de `app.py` |
 | `nginx/forge-app.conf` | Configuration Nginx (reverse proxy) |
 | `systemd/forge-app.service` | Unité systemd (daemon Gunicorn) |
+| `../worker.py` (racine du projet) | Point d'entrée du worker de tâches de fond, si `forge-mvc-jobs` est installé |
+| `systemd/forge-jobs-worker.service` | Unité systemd du worker, même condition |
 
 ## Étapes d'installation
 
@@ -255,21 +375,102 @@ Ce dossier contient les fichiers générés par `forge deploy:init`.
    sudo systemctl enable forge-app
    sudo systemctl start forge-app
    ```
-9. Vérifier : `forge deploy:check`
+9. Si vous utilisez `forge-mvc-jobs`, mettre le worker en service :
+   ```
+   # Inscrire d'abord vos gestionnaires dans worker.py (HANDLERS)
+   sudo cp systemd/forge-jobs-worker.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now forge-jobs-worker
+   ```
+10. Vérifier : `forge deploy:check`
 
 > Ces fichiers sont des modèles. Adaptez-les à votre infrastructure.
 
+## Le worker de tâches de fond (DEPLOY-JOBS-WORKER-UNIT-001)
+
+`enqueue()` met une tâche en file, dans une table. **Rien ne la traite tant
+qu'un worker ne tourne pas.**
+
+Ce guide documentait le minuteur `jobs:reclaim` et aucun service pour traiter
+les tâches. La panne est silencieuse et trompeuse : la table grossit, le
+minuteur remet consciencieusement en file des tâches que personne ne prend, et
+`systemctl` affiche un `forge-app` parfaitement vert.
+
+### Vos gestionnaires, dans `worker.py`
+
+Forge ne connaît pas vos gestionnaires et ne peut pas les inscrire à votre
+place. `worker.py` est votre fichier : `forge deploy:init` le crée s'il
+n'existe pas, et ne le réécrit jamais.
+
+```python
+from mvc.services.mail import envoyer_email
+
+HANDLERS = {"email.envoi": envoyer_email}
+```
+
+**Le worker refuse de démarrer si `HANDLERS` est vide, et c'est voulu.** Une
+tâche dont le nom n'a aucun gestionnaire est marquée `failed` : un worker sans
+gestionnaire ne se contenterait pas de ne rien faire, il viderait la file en la
+détruisant tâche par tâche, en affichant un service vert.
+
+### L'arrêt propre
+
+L'unité envoie `SIGTERM`. `worker.py` le note et laisse la tâche en cours aller
+à son terme, puis s'arrête avant de prendre la suivante.
+
+`TimeoutStopSec=90` borne cette attente. Au delà, systemd tue le worker, la
+tâche est perdue en vol et repart par `forge jobs:reclaim` une fois son bail
+expiré. Portez cette valeur au delà de votre tâche la plus longue : un
+transcodage vidéo dépasse largement quatre-vingt-dix secondes.
+
+### Surveiller
+
+```
+systemctl status forge-jobs-worker
+journalctl -u forge-jobs-worker --since today
+forge jobs:status
+```
+
+Une file dont le nombre de tâches prêtes ne redescend jamais est un worker
+arrêté, pas une file chargée.
+
 ## Minuteries périodiques (DEPLOY-TIMERS-DOC-001)
 
-Trois gestes doivent tourner régulièrement, et **aucun n'est planifié par
+Certains gestes doivent tourner régulièrement, et **aucun n'est planifié par
 Forge** : embarquer un ordonnanceur ferait du framework autre chose que ce
 qu'il est. C'est le rôle du système.
 
-| Geste | Commande | Rythme conseillé |
+Chaque ligne ne concerne que l'opt-in installé. Un projet sans `forge-mvc-iot`
+n'a pas de `iot:gc` à planifier.
+
+| Geste | Commande à planifier | Rythme conseillé |
 |---|---|---|
+| Sauvegarde de la base | votre outil de dump | quotidien |
 | Purge des sessions expirées | `forge sessions:gc` | horaire |
 | Reprise des tâches orphelines | `forge jobs:reclaim` | toutes les 5 minutes |
-| Sauvegarde de la base | votre outil de dump | quotidien |
+| Purge du journal d'audit | `forge audit:gc --days 90 --run` | quotidien |
+| Purge des statistiques | `forge stats:gc --days 365 --run` | quotidien |
+| Purge des mesures IoT | `forge iot:gc --days 30 --run` | quotidien |
+| Nettoyage des vidéos ratées | `forge video:cleanup --failed --apply` | quotidien |
+| Fichiers orphelins | `forge files:orphans --delete` | hebdomadaire |
+| Images orphelines | `forge images:orphans --delete` | hebdomadaire |
+
+Ce tableau n'en citait que trois, alors que les opt-ins en livrent neuf. Un
+geste d'entretien qui n'est pas dans le guide n'est pas planifié, et une table
+qui grossit sans purge est une panne différée.
+
+**Six de ces commandes ne suppriment rien sans leur option.** Lancées seules,
+elles affichent ce qu'elles feraient, puis sortent en succès. C'est un bon
+défaut, il évite une suppression involontaire. Mais un minuteur qui planifie la
+commande nue tourne pour rien, indéfiniment, en affichant un succès à chaque
+passage. Les invocations ci-dessus sont donc complètes, à dessein.
+
+Lancez chacune une fois **sans** son option avant de la planifier, pour voir ce
+qu'elle emporte. Ajustez `--days` : les valeurs ci-dessus sont un point de
+départ, pas une recommandation de rétention, qui vous regarde.
+
+Le worker de tâches de fond n'est **pas** dans ce tableau : ce n'est pas un
+geste périodique mais un service qui tourne en permanence, voir plus haut.
 
 Le modèle est le même pour les trois : un `.service` de type `oneshot` et un
 `.timer` qui le déclenche.
@@ -488,6 +689,15 @@ def cmd_deploy_init(root: Path | None = None) -> None:
         root / "deploy" / "README_DEPLOY.md": _readme_deploy(),
     }
 
+    # Le worker n'est engendre que si `forge-mvc-jobs` est installe : poser un
+    # `worker.py` dans un projet sans file de taches donnerait un fichier a
+    # comprendre pour rien (DEPLOY-JOBS-WORKER-UNIT-001).
+    jobs = _jobs_installe()
+    if jobs:
+        files[root / "worker.py"] = _worker_py()
+        files[root / "deploy" / "systemd" / "forge-jobs-worker.service"] = (
+            _systemd_worker_service(root))
+
     for path, content in files.items():
         rel = path.relative_to(root)
         if _write_if_new(path, content):
@@ -497,6 +707,11 @@ def cmd_deploy_init(root: Path | None = None) -> None:
 
     print()
     print(_tag("OK", "Fichiers de déploiement prêts dans deploy/"))
+    if jobs:
+        print(_tag("ACTION", "worker.py : inscrire vos gestionnaires dans HANDLERS."))
+        print(_tag("INFO", "Sans eux, le worker refuse de démarrer, et c'est voulu."))
+    else:
+        print(_tag("INFO", "forge-mvc-jobs absent : aucun worker engendré."))
     print(_tag("INFO", "Consulter deploy/README_DEPLOY.md pour les étapes."))
     print(_tag("INFO", "Lancer forge deploy:check pour vérifier l'environnement."))
     print()

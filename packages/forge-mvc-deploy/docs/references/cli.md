@@ -9,6 +9,7 @@ Le fichier de code correspondant est `forge_mvc_deploy/cli/deploy.py`.
 Elles préparent et contrôlent la configuration de déploiement d'un projet Forge.
 
 `deploy:init` génère les gabarits de déploiement (Nginx, service systemd, point d'entrée WSGI, README de déploiement).
+Quand `forge-mvc-jobs` est installé, il ajoute le point d'entrée du worker (`worker.py`) et son unité systemd.
 Ces fichiers sont écrits en mode write-if-new : un fichier existant n'est jamais écrasé (principe 9).
 
 `deploy:check` contrôle la cohérence de la configuration de déploiement sans rien modifier.

@@ -237,6 +237,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     | Servir en production | Gunicorn sur `wsgi:application` |
     | Mettre derrière un proxy | configuration Nginx générée |
     | Gérer le service | unité systemd générée |
+    | Traiter les tâches de fond | `worker.py` et `forge-jobs-worker.service` engendrés |
 
 ??? note "9. Exemple d'utilisation"
 
@@ -327,3 +328,53 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
 
 - [Commandes deploy:* (cli/deploy.py)](references/cli.md) : détail de `deploy:init` / `deploy:check`.
 - [Welcome-Deploy](welcome/debutant/deploy-welcome.md) : parcours d'apprentissage.
+
+## Le worker de tâches de fond
+
+`forge deploy:init` engendre deux fichiers de plus quand `forge-mvc-jobs` est installé.
+
+| Fichier | Rôle |
+|---|---|
+| `worker.py` | point d'entrée du worker, à la racine du projet |
+| `deploy/systemd/forge-jobs-worker.service` | unité systemd du worker |
+
+Ils ne sont engendrés que si le paquet est là.
+Poser un `worker.py` dans un projet sans file de tâches donnerait un fichier à comprendre pour rien.
+
+!!! danger "Rien ne traite la file sans worker"
+    `enqueue()` écrit une ligne dans une table.
+
+    Le guide documentait l'unité `forge-app`, le minuteur `forge-jobs-reclaim`, et aucun service pour traiter les tâches (`DEPLOY-JOBS-WORKER-UNIT-001`).
+    Une application qui le suivait à la lettre obtenait donc une table qui grossit, et un minuteur qui remet consciencieusement en file des tâches que personne ne prend.
+
+    La panne est silencieuse et trompeuse.
+    `systemctl` affiche un `forge-app` parfaitement vert, et le minuteur donne l'impression que quelque chose tourne.
+
+!!! warning "Le worker refuse de démarrer sans gestionnaire, et c'est voulu"
+    Forge ne connaît pas vos gestionnaires et ne peut pas les inscrire à votre place.
+    `worker.py` est votre fichier, engendré s'il n'existe pas et jamais réécrit.
+
+    Une tâche dont le nom n'a aucun gestionnaire est marquée `failed`.
+    Un worker parti avec un `HANDLERS` vide ne se contenterait donc pas de ne rien faire, il viderait la file en la détruisant tâche par tâche, en affichant un service vert.
+
+!!! info "L'arrêt propre laisse finir la tâche en cours"
+    L'unité envoie `SIGTERM`, que `worker.py` note sans interrompre la tâche en cours.
+
+    `TimeoutStopSec` borne cette attente, à quatre-vingt-dix secondes par défaut.
+    Au delà, systemd tue le worker, la tâche est perdue en vol et repart par `forge jobs:reclaim` une fois son bail expiré.
+    Portez cette valeur au delà de votre tâche la plus longue, un transcodage vidéo dépassant largement ce délai.
+
+## Les gestes périodiques
+
+Le guide engendré porte un tableau des commandes d'entretien à planifier.
+
+Il n'en citait que trois, alors que les opt-ins en livrent neuf.
+Un geste d'entretien absent du guide n'est pas planifié, et une table qui grossit sans purge est une panne différée.
+
+!!! danger "Six de ces commandes ne suppriment rien sans leur option"
+    Lancées seules, `audit:gc`, `stats:gc`, `iot:gc`, `video:cleanup`, `files:orphans` et `images:orphans` affichent ce qu'elles feraient, puis sortent en succès.
+
+    C'est un bon défaut, il évite une suppression involontaire.
+    Mais un minuteur qui planifie la commande nue tourne pour rien, indéfiniment, en affichant un succès à chaque passage.
+
+    Le tableau du guide cite donc les invocations complètes, `--run`, `--apply` ou `--delete` compris.

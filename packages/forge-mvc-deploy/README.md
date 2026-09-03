@@ -35,7 +35,7 @@ pip install -r requirements-dev.txt  # installe forge-mvc-deploy depuis packages
 
 | Commande | Rôle |
 |---|---|
-| `forge deploy:init` | Génère `wsgi.py`, `deploy/nginx/forge-app.conf`, `deploy/systemd/forge-app.service` et `deploy/README_DEPLOY.md` dans le projet (écriture si nouveau, jamais d'écrasement). |
+| `forge deploy:init` | Génère `wsgi.py`, `deploy/nginx/forge-app.conf`, `deploy/systemd/forge-app.service` et `deploy/README_DEPLOY.md` dans le projet (écriture si nouveau, jamais d'écrasement). Ajoute `worker.py` et `deploy/systemd/forge-jobs-worker.service` quand `forge-mvc-jobs` est installé. |
 | `forge deploy:check` | Vérifie l'environnement de production (Python, `.venv`, `env/prod`, variables DB, modules, `wsgi.py`, fichiers `deploy/`). Sort en code 1 si une erreur bloquante est détectée. |
 
 `forge deploy:init` adapte `client_max_body_size` de la configuration Nginx à
