@@ -112,6 +112,51 @@ finally:
 
     Dans le code applicatif, `fetch_*`, `execute` et `insert` gèrent l'emprunt, le commit et la restitution à votre place.
 
+## 7. Paralléliser dans une requête
+
+Le runtime de Forge est synchrone, ce qui n'interdit pas de paralléliser.
+Un `ThreadPoolExecutor` fonctionne sous Gunicorn, et trois appels sortants de huit cents millisecondes coûtent huit cents millisecondes au lieu de deux secondes quatre.
+
+Forge ne livre pas de client HTTP, ce choix appartient à l'application.
+Ce qui suit ne concerne que la base, dont le comportement sous threads n'était écrit nulle part (`DB-POOL-THREADS-DOC-001`).
+
+### Le parallélisme est plafonné par le pool
+
+Le pool est fermé par un sémaphore aux jetons de `DB_POOL_SIZE`, cinq par défaut, **et par processus**.
+Ouvrir vingt threads n'ouvre donc pas vingt connexions, il en ouvre cinq et les dix-huit autres patientent.
+
+Mesuré sur MariaDB, avec un pool de cinq et un appel qui tient sa connexion trois cents millisecondes.
+
+| Threads dans une requête | Durée | Refus |
+|---|---|---|
+| 4 | 0,32 s | aucun |
+| 8 | 0,60 s | aucun |
+| 20 | 1,21 s | aucun |
+
+Le parallélisme reste gagnant, vingt appels en série coûteraient six secondes.
+Personne n'est refusé, l'attente étant bornée par `DB_POOL_TIMEOUT`, cinq secondes par défaut, au delà desquelles Forge rend un `503`.
+
+### Ce qu'il faut vraiment surveiller
+
+Une requête qui parallélise prend les connexions de **tout son processus**, donc de toutes les requêtes que ce travailleur sert au même moment.
+
+Mesuré dans les mêmes conditions, pendant qu'une requête tient le pool avec dix appels d'une seconde, une lecture ordinaire de dix millisecondes a attendu **1,83 s**.
+Cent quatre-vingts fois sa durée, pour un utilisateur qui n'a rien demandé de particulier.
+
+!!! danger "Ne tenez pas une connexion pendant un appel réseau"
+    C'est le vrai piège, et il n'a rien à voir avec le parallélisme.
+
+    Une connexion empruntée avant un appel à une API distante reste immobilisée pendant toute son attente.
+    Cinq requêtes qui font cela épuisent le pool du travailleur, et les suivantes reçoivent un `503` alors que la base n'a rien à se reprocher.
+
+    Faites les appels sortants **sans** connexion, puis écrivez une fois les réponses arrivées.
+
+!!! info "Bornez l'exécuteur, et sachez ce que vous bornez"
+    Un `ThreadPoolExecutor(max_workers=...)` au delà de `DB_POOL_SIZE` n'accélère rien s'il n'y a que des requêtes SQL derrière, il ne fait qu'allonger la file d'attente du sémaphore.
+
+    Élargir `DB_POOL_SIZE` se décide côté serveur : chaque connexion en est une de plus ouverte, multipliée par le nombre de travailleurs.
+    Quatre travailleurs et un pool de vingt font quatre-vingts connexions, à comparer au `max_connections` du serveur.
+
 ## Voir aussi
 
 - [Les helpers SQL dans Forge](db.md) : l'API publique qui s'appuie sur cet emprunt.

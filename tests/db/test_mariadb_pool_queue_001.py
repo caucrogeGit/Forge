@@ -162,3 +162,76 @@ def test_apres_la_saturation_le_service_repart(real_db: None, monkeypatch: pytes
 
     reprise = backend.get_connection()
     backend.close_connection(reprise)
+
+
+# ── Le pool est celui du PROCESSUS, pas celui d'une requête ──────────────────
+#
+# `DB-POOL-THREADS-DOC-001`. La documentation de l'emprunt de connexion décrit
+# désormais ce que subit une requête ordinaire pendant qu'une voisine
+# parallélise ses appels. Ce fait n'était figé nulle part, alors qu'il décide
+# du conseil donné : ne pas tenir une connexion pendant une attente réseau.
+#
+# Mesuré sur MariaDB, pool de cinq, dix appels d'une seconde chez la voisine :
+# une lecture ordinaire de dix millisecondes a attendu 1,83 s, cent quatre-vingts
+# fois sa durée, pour un utilisateur qui n'avait rien demandé de particulier.
+
+def test_une_requete_qui_parallelise_prive_ses_voisines(real_db: None) -> None:
+    """Les jetons pris par une requête manquent à toutes les autres.
+
+    Le seuil est volontairement large : ce test fige une **conséquence**, que
+    l'attente devient perceptible, et non une durée, qui dépendrait de la
+    machine et rendrait le test capricieux.
+    """
+    backend = _backend()
+    # Forcer la création du pool sans lui prendre un jeton au passage : sans la
+    # restitution, la voisine n'en trouverait plus assez, et le test mesurerait
+    # sa propre fuite.
+    backend.close_connection(backend.get_connection())
+    taille = backend._gate._initial_value  # pyright: ignore[reportPrivateUsage]
+
+    tenues: list[Any] = []
+    libere = threading.Event()
+    prises = threading.Event()
+
+    def _voisine_gourmande() -> None:
+        """Prend tous les jetons, comme le ferait un ThreadPoolExecutor."""
+        for _ in range(taille):
+            tenues.append(backend.get_connection())
+        prises.set()
+        libere.wait(timeout=10)
+        for connexion in tenues:
+            backend.close_connection(connexion)
+
+    fil = threading.Thread(target=_voisine_gourmande)
+    fil.start()
+    try:
+        assert prises.wait(timeout=10), "la voisine n'a pas pris le pool"
+
+        # Une requête ordinaire arrive maintenant. Elle doit patienter, et non
+        # échouer : c'est la file qui la retient, pas une panne.
+        mesure: dict[str, float] = {}
+
+        def _ordinaire() -> None:
+            depart = time.time()
+            connexion = backend.get_connection()
+            mesure["attente"] = time.time() - depart
+            backend.close_connection(connexion)
+
+        voisin = threading.Thread(target=_ordinaire)
+        voisin.start()
+        voisin.join(timeout=0.5)
+
+        assert voisin.is_alive(), (
+            "la requête ordinaire a été servie alors que la voisine tenait "
+            "tous les jetons : le pool ne serait donc pas commun au processus"
+        )
+
+        libere.set()
+        voisin.join(timeout=10)
+        assert not voisin.is_alive(), "la requête ordinaire n'a jamais été servie"
+        assert mesure["attente"] >= 0.4, (
+            f"attente de {mesure['attente']:.2f}s, trop courte pour prouver "
+            f"que la voisine tenait le pool")
+    finally:
+        libere.set()
+        fil.join(timeout=10)

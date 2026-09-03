@@ -82,6 +82,23 @@ _NON_PORTABLE = re.compile(
     r"\bNOW\(\)|ON DUPLICATE KEY|INTERVAL \?|\bLIMIT\b", re.IGNORECASE
 )
 
+#: Une chaîne qui porte des titres Markdown est un DOCUMENT, pas du SQL.
+#:
+#: Le relevé classe comme SQL toute chaîne contenant un mot de `_MOTS_SQL`,
+#: volontairement large : le SQL de Forge s'assemble par fragments, et un
+#: fragment comme `" WHERE id = ?"` n'a pas de verbe. Resserrer sur « verbe plus
+#: clause » écarterait 261 chaînes sur 387, donc du vrai SQL.
+#:
+#: Cette largeur a un revers, mesuré : le gabarit du guide de déploiement,
+#: deux cents lignes de Markdown, contient `--delete` dans son tableau des
+#: gestes périodiques, ce qui le classait SQL, puis `RATE-LIMIT-001` dans un
+#: code de ticket, ce qui le déclarait non portable. Deux mots de prose.
+#:
+#: Contourner en renommant la section aurait été céder au détecteur plutôt que
+#: le corriger. Le critère retenu est net : aucune instruction SQL ne contient
+#: de titre Markdown. Mesuré, il n'exclut qu'une chaîne sur 387, celle là.
+_DOCUMENT_MARKDOWN = re.compile(r"^#{1,6} \S", re.MULTILINE)
+
 #: Mots qui font d'une chaîne une instruction SQL, `DELETE` compris.
 #: Il manquait, et `DELETE FROM ... LIMIT 1` échappait donc au relevé.
 _MOTS_SQL = ("SELECT", "UPDATE", "INSERT", "VALUES", "DELETE")
@@ -163,6 +180,8 @@ def _chaines_sql(module: "Path") -> "list[tuple[int, str]]":
         if noeud.lineno in docs:
             continue
         texte = noeud.value
+        if _DOCUMENT_MARKDOWN.search(texte):
+            continue
         if any(mot in texte.upper() for mot in _MOTS_SQL):
             trouvees.append((noeud.lineno, texte))
     return trouvees
@@ -239,3 +258,69 @@ def test_le_cliquet_dml_se_resserre() -> None:
         "Retirez ces entrées de _DETTE_CONNUE pour que le relevé les surveille "
         "de nouveau :\n  " + "\n  ".join(a_retirer)
     )
+
+
+# ── L'exclusion des documents reste étroite ──────────────────────────────────
+
+class TestExclusionDesDocuments:
+    """`DEPLOY-NGINX-RATE-LIMIT-001` a révélé un faux positif du relevé.
+
+    Le gabarit du guide de déploiement, deux cents lignes de Markdown, était
+    classé SQL parce qu'il contient `--delete`, puis déclaré non portable parce
+    qu'un code de ticket contient `RATE-LIMIT-001`.
+
+    L'exclusion qui répare cela doit rester étroite : elle ne vaut que pour ce
+    qui est manifestement un document, jamais pour du SQL qui contiendrait un
+    caractère `#`.
+    """
+
+    def _releve(self, source: str, tmp_path: Path) -> list:
+        module = tmp_path / "m.py"
+        module.write_text(source, encoding="utf-8")
+        return _chaines_sql(module)
+
+    def test_un_document_markdown_n_est_pas_du_sql(self, tmp_path: Path) -> None:
+        source = 'DOC = """\\n# Titre\\n\\nUn tableau citant --delete et LIMIT.\\n"""\n'
+
+        assert self._releve(source, tmp_path) == []
+
+    def test_du_sql_portant_un_commentaire_diese_reste_examine(
+        self, tmp_path: Path
+    ) -> None:
+        """`#` seul ne fait pas un titre. Un SQL commenté doit rester jugé."""
+        source = 'SQL = "SELECT id FROM t # commentaire\\nWHERE n = ? LIMIT 1"\n'
+        releve = self._releve(source, tmp_path)
+
+        assert len(releve) == 1
+        assert _NON_PORTABLE.search(releve[0][1])
+
+    def test_du_sql_multiligne_ordinaire_reste_examine(self, tmp_path: Path) -> None:
+        source = 'SQL = """\\nSELECT id\\nFROM t\\nORDER BY n LIMIT 10\\n"""\n'
+        releve = self._releve(source, tmp_path)
+
+        assert len(releve) == 1
+
+    def test_l_exclusion_ne_touche_qu_une_chaine_du_depot(self) -> None:
+        """Mesuré : 387 chaînes classées SQL avant, 386 après.
+
+        Si ce compte s'effondre un jour, l'exclusion sera devenue large, et le
+        relevé rassurant plutôt que vrai.
+        """
+        avec, sans = 0, 0
+        for module in _fichiers_sql_des_optins():
+            arbre = ast.parse(module.read_text(encoding="utf-8"))
+            docs = _lignes_de_docstring(arbre)
+            for noeud in ast.walk(arbre):
+                if not isinstance(noeud, ast.Constant) or not isinstance(noeud.value, str):
+                    continue
+                if noeud.lineno in docs:
+                    continue
+                if not any(mot in noeud.value.upper() for mot in _MOTS_SQL):
+                    continue
+                avec += 1
+                if not _DOCUMENT_MARKDOWN.search(noeud.value):
+                    sans += 1
+
+        assert avec - sans <= 5, (
+            f"{avec - sans} chaînes écartées comme documents : l'exclusion "
+            f"devait n'en écarter qu'une poignée, elle est devenue large")

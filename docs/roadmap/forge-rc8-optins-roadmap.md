@@ -408,6 +408,7 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `DEPLOY-CHECK-JOBS-WORKER-001` | deploy | Même mesure | **Livré.** Le pré-vol ne regardait pas si quelqu'un traitait la file |
 | `DEPLOY-NGINX-RATE-LIMIT-001` | deploy | Même mesure | **Livré.** La parade prescrite n'était pas dans la configuration engendrée |
 | `MFA-RATE-LIMIT-SHARED-STORE-001` | mfa | Même mesure | **Retiré du périmètre**, voir ci dessous |
+| `DB-POOL-THREADS-DOC-001` | cœur | Même mesure | **Livré.** Ce que devient la base quand une requête ouvre des threads |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.

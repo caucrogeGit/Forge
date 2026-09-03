@@ -4,6 +4,18 @@
 
 ### Corrigé
 
+- **Le relevé de SQL non portable prenait un gabarit Markdown pour une instruction SQL.**
+  `tests/test_optin_dml_dialect_001.py` classe comme SQL toute chaîne d'un opt-in contenant `SELECT`, `INSERT`, `UPDATE`, `VALUES` ou `DELETE`. Cette largeur est voulue, le SQL de Forge s'assemblant par fragments dont beaucoup n'ont pas de verbe.
+  Elle a un revers, révélé par `DEPLOY-NGINX-RATE-LIMIT-001` : le gabarit du guide de déploiement, deux cents lignes de Markdown, contient `--delete` dans son tableau des gestes périodiques, ce qui le classait SQL, puis `RATE-LIMIT-001` dans un code de ticket, ce qui le déclarait non portable. Deux mots de prose.
+  Renommer la section pour contenter le détecteur aurait été céder au symptôme. Le relevé écarte désormais les chaînes portant un titre Markdown, aucune instruction SQL n'en contenant. **Mesuré avant d'être appliqué** : 387 chaînes classées SQL, 386 après, la seule écartée étant ce gabarit. Un resserrement plus ambitieux, « verbe plus clause », en aurait écarté 261, donc du vrai SQL. Un test fige l'étroitesse de l'exclusion.
+
+- **Ce que fait le pool de connexions quand une requête ouvre des threads n'était écrit nulle part (`DB-POOL-THREADS-DOC-001`).**
+  Le runtime de Forge est synchrone, ce qui n'interdit pas de paralléliser des appels sortants dans une requête. Rien ne disait ce que la base y devient.
+  Mesuré sur MariaDB, pool de cinq, appels tenant leur connexion trois cents millisecondes : quatre threads en 0,32 s, huit en 0,60 s, vingt en 1,21 s, sans un seul refus. Le parallélisme reste gagnant, vingt appels en série coûteraient six secondes, mais il est **plafonné par `DB_POOL_SIZE`**, cinq par défaut et par processus, non par le nombre de threads.
+  **Le fait qui compte est ailleurs**, et c'est celui qu'un développeur ne voit pas venir. Une requête qui parallélise prend les connexions de tout son processus, donc de toutes les requêtes que ce travailleur sert au même moment. Mesuré : pendant qu'une voisine tient le pool avec dix appels d'une seconde, une lecture ordinaire de dix millisecondes a attendu **1,83 s**, cent quatre-vingts fois sa durée, pour un utilisateur qui n'avait rien demandé de particulier.
+  Le conseil qui en découle est écrit : ne pas tenir une connexion pendant un appel réseau, faire les appels sortants sans connexion puis écrire une fois les réponses arrivées. Cinq requêtes qui tiennent une connexion pendant l'attente d'une API distante épuisent le pool de leur travailleur, et les suivantes reçoivent un `503` alors que la base n'a rien à se reprocher.
+  Forge ne livre pas de client HTTP, ce choix appartenant à l'application, et la documentation le dit plutôt que de le laisser deviner. Un test d'intégration fige désormais la conséquence, qu'une requête qui parallélise prive ses voisines, seul le fait étant figé et non une durée.
+
 - **La parade anti-bruteforce que Forge prescrit n'était pas dans la configuration qu'il engendre (`DEPLOY-NGINX-RATE-LIMIT-001`).**
   Le compteur anti-bruteforce du cœur vit en mémoire du **processus**, et l'unité systemd engendrée lance quatre travailleurs. Les cinq tentatives par minute en deviennent donc jusqu'à vingt, et le verrouillage ne suit pas l'attaquant d'un travailleur à l'autre. Cela vaut pour le contrôleur de connexion engendré par `make:auth` comme pour le challenge MFA.
   **Ce n'était pas une découverte** : `docs/deployment/production-security.md` le disait, prescrivait la parade Nginx et en donnait l'extrait. C'est précisément le défaut. Une ligne de défense qui vit dans une page de documentation est absente de tout projet qui n'a pas lu cette page, et la configuration engendrée n'en portait rien.

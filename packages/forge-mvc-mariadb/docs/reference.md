@@ -123,6 +123,9 @@ Forge n'impose aucun backend de référence.
     `DB_POOL_SIZE` ne borne pas le **volume** de requêtes, seulement le nombre en vol au même instant.
     Mesuré sur une lecture indexée de 0,26 ms, cinq connexions servent près de 19 000 requêtes par seconde.
 
+    Une requête qui ouvre des threads prend les connexions de tout son processus, donc de ses voisines.
+    Le comportement mesuré est décrit dans [l'emprunt de connexion](/docs/forge/core-database/connection/), section « Paralléliser dans une requête ».
+
     Une requête qui arrive alors que toutes les connexions sont prises **patiente** dans une file d'attente, elle n'échoue pas.
     Ce n'est qu'au bout de `DB_POOL_TIMEOUT` que Forge renonce, avec une réponse `503` et un en-tête `Retry-After` : une saturation est passagère, elle ne mérite pas la page d'erreur 500 qui annoncerait un défaut de l'application.
 
