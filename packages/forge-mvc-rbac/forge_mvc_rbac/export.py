@@ -27,6 +27,12 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+from forge_mvc_rbac.hierarchy import (
+    RoleHierarchyError,
+    expand_roles,
+    inheritance_map,
+)
+
 __all__ = [
     "RbacExportError",
     "MARKDOWN_COLUMNS",
@@ -64,24 +70,47 @@ def contract_rows(data: "dict[str, Any] | None") -> "list[tuple[str, str, str]]"
             "le contrat ne déclare pas d'objet « roles » : il n'y a rien à exporter."
         )
 
+    # RBAC-ROLE-HIERARCHY-001 : l'export rend les permissions EFFECTIVES,
+    # héritées comprises. Rendre les seules permissions directes ferait croire
+    # à un administrateur privé de droits qu'il possède, et c'est exactement ce
+    # qu'une revue de sécurité ne doit pas conclure.
+    table = inheritance_map(data)
+
     lignes: list[tuple[str, str, str]] = []
     par_role = cast("dict[str, Any]", roles)
-    for role, contenu in sorted(par_role.items()):
+    for role, _ in sorted(par_role.items()):
         nom_role = str(role)
-        if not isinstance(contenu, dict):
+        # Permissions du rôle et de tous ceux dont il hérite.
+        try:
+            portes = sorted(expand_roles([nom_role], table))
+        except RoleHierarchyError as exc:
+            raise RbacExportError(
+                f"hiérarchie de rôles inexploitable : {exc}"
+            ) from exc
+        # Les actions se REUNISSENT par entité. Remplacer le bloc d'une
+        # entité par celui du rôle hérité ferait perdre les actions propres au
+        # rôle héritier, et l'export montrerait moins de droits qu'il n'y en a.
+        contenu: "dict[str, list[str]]" = {}
+        for herite in portes:
+            bloc = par_role.get(herite)
+            if not isinstance(bloc, dict):
+                continue
+            for entite, actions in cast("dict[str, Any]", bloc).items():
+                cible = contenu.setdefault(str(entite), [])
+                if isinstance(actions, list):
+                    for action in cast("list[Any]", actions):
+                        if str(action) not in cible:
+                            cible.append(str(action))
+                elif isinstance(actions, bool) and actions:
+                    if "*" not in cible:
+                        cible.append("*")
+                elif isinstance(actions, str) and actions not in cible:
+                    cible.append(actions)
+        if not contenu:
             continue
-        par_entite = cast("dict[str, Any]", contenu)
-        for entite, actions in sorted(par_entite.items()):
-            nom_entite = str(entite)
-            if isinstance(actions, list):
-                liste = cast("list[Any]", actions)
-                for action in sorted(str(a) for a in liste):
-                    lignes.append((nom_role, nom_entite, action))
-            elif isinstance(actions, bool) and actions:
-                # Forme abrégée : toutes les actions de l'entité.
-                lignes.append((nom_role, nom_entite, "*"))
-            elif isinstance(actions, str):
-                lignes.append((nom_role, nom_entite, actions))
+        for entite, actions in sorted(contenu.items()):
+            for action in sorted(set(actions)):
+                lignes.append((nom_role, str(entite), action))
     return lignes
 
 

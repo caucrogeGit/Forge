@@ -5,7 +5,9 @@
   "description": "Contrat JSON Schema pour le fichier mvc/security/rbac.json. Définit les rôles et permissions RBAC séparément du schéma d'entité. Les clés inconnues à la racine sont interdites.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version"],
+  "required": [
+    "schema_version"
+  ],
   "properties": {
     "$schema": {
       "description": "Référence au schéma JSON Schema pour la validation en temps réel dans l'éditeur.",
@@ -14,7 +16,9 @@
     "schema_version": {
       "description": "Version du contrat Forge. Doit valoir '1.0'.",
       "type": "string",
-      "enum": ["1.0"]
+      "enum": [
+        "1.0"
+      ]
     },
     "entities": {
       "description": "Permissions par entité Forge. Clé = nom d'entité (PascalCase), valeur = bloc permissions.",
@@ -22,7 +26,9 @@
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["permissions"],
+        "required": [
+          "permissions"
+        ],
         "properties": {
           "permissions": {
             "description": "Table action → code de permission. Clé = nom d'action (ex: list, create), valeur = code de permission (ex: article.list).",
@@ -44,6 +50,18 @@
           "type": "string",
           "minLength": 1
         }
+      }
+    },
+    "role_inherits": {
+      "description": "Héritage entre rôles (RBAC-ROLE-HIERARCHY-001, ADR-095). Clé = rôle héritier, valeur = liste des rôles dont il reprend les permissions. L'héritage est transitif. Un cycle est refusé, et un rôle hérité doit être déclaré dans « roles ».",
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minItems": 1
       }
     }
   }

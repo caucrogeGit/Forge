@@ -13,6 +13,12 @@ Comportement :
 
 from __future__ import annotations
 
+from forge_mvc_rbac.hierarchy import (
+    RoleHierarchyError,
+    expand_roles,
+    inheritance_map,
+    validate_hierarchy,
+)
 from forge_mvc_rbac.denials import notify_permission_denied
 
 import functools
@@ -185,6 +191,14 @@ def load_rbac_contract(project_root: str | Path = ".") -> RbacContractResult:
         return _result_degraded(path_str, instance)
 
     errors = _collect_errors(validator, instance)
+
+    # RBAC-ROLE-HIERARCHY-001 (ADR-095) : le schéma JSON vérifie la FORME de
+    # `role_inherits`, pas sa cohérence. Un cycle et un rôle hérité inconnu
+    # sont tous deux des objets JSON parfaitement valides, et tous deux
+    # rendraient le contrat inexploitable en silence.
+    for probleme in validate_hierarchy(instance):
+        errors.append(RbacContractError(path="$.role_inherits", message=probleme))
+
     is_valid = not errors
 
     return RbacContractResult(
@@ -211,8 +225,20 @@ def get_contract_permissions(result: RbacContractResult, roles: Iterable[str]) -
     if not isinstance(contract_roles, dict):
         return set()
 
+    # RBAC-ROLE-HIERARCHY-001 (ADR-095) : les rôles hérités sont ajoutés avant
+    # la résolution. Sans héritage déclaré, `expand_roles` rend les rôles tels
+    # quels et le comportement est celui d'avant le ticket.
+    try:
+        portes = expand_roles(list(roles), inheritance_map(result.data))
+    except RoleHierarchyError:
+        # Une hiérarchie fautive n'accorde RIEN. Accorder les rôles directs en
+        # ignorant l'héritage donnerait des droits partiels sans que rien ne le
+        # signale, et un contrôle d'accès qui se dégrade en silence est pire
+        # qu'un contrôle qui refuse. `rbac:validate` nomme la faute.
+        return set()
+
     permissions: set[str] = set()
-    for role in roles:
+    for role in portes:
         role_perms = cast("dict[str, Any]", contract_roles).get(role)
         if isinstance(role_perms, list):
             for perm in cast("list[Any]", role_perms):

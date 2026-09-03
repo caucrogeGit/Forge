@@ -353,6 +353,7 @@ nav:
             - "ADR-092 : le chemin WSGI refuse une application désarmée": adr/092-wsgi-entrypoint-wiring-parity.md
             - "ADR-093 : le câblage vit dans une source unique": adr/093-application-wiring-module.md
             - "ADR-094 : un registre de fichiers dans forge-mvc-files": adr/094-files-metadata-registry.md
+            - ADR-095 Héritage entre rôles RBAC: adr/095-rbac-role-hierarchy.md
 
     - Tests terrain:
         - Vue d'ensemble: testing/index.md

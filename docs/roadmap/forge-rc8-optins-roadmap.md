@@ -314,13 +314,43 @@ Chacun dépend d'un ticket du lot 2.
 Ces cinq tickets sont demandés, et chacun entre en tension avec un principe.
 La tension est nommée ici pour être tranchée en connaissance de cause, non pour bloquer la livraison.
 
-| Ticket | Tension |
-|---|---|
-| `MFA-WEBAUTHN-001` | Principe 8, le facteur TOTP suffit au socle et la charge de maintenance est durable |
-| `RBAC-ROLE-HIERARCHY-001` | Limite assumée par l'ADR-014, la rouvrir élargit le contrat public |
-| `AUDIO-STATEFUL-OPTION-001` | Principe 11, une seconde façon de gérer un média avec état existe déjà dans video |
-| `DEPLOY-CADDY-001` | Principe 11, deux serveurs frontaux officiels au lieu d'un |
-| `NOTIF-POLLING-HELPER-001` | Principe 1, le rafraîchissement d'interface relève de l'application |
+| Ticket | Tension | Décision |
+|---|---|---|
+| `MFA-WEBAUTHN-001` | Principe 8, le facteur TOTP suffit au socle et la charge de maintenance est durable | **Retiré du périmètre** |
+| `RBAC-ROLE-HIERARCHY-001` | Limite assumée par l'ADR-014, la rouvrir élargit le contrat public | **Livré**, ADR-095 |
+| `AUDIO-STATEFUL-OPTION-001` | Principe 11, une seconde façon de gérer un média avec état existe déjà dans video | **Retiré du périmètre** |
+| `DEPLOY-CADDY-001` | Principe 11, deux serveurs frontaux officiels au lieu d'un | **Retiré du périmètre** |
+| `NOTIF-POLLING-HELPER-001` | Principe 1, le rafraîchissement d'interface relève de l'application | **Retiré du périmètre** |
+
+### Décisions écrites, 2026-09-03
+
+Roger a tranché les cinq en connaissance de cause, comme ce lot le prévoyait.
+Un ticket est livré, quatre sont retirés du périmètre.
+Le critère de clôture du cycle admet le retrait par décision écrite, et ces paragraphes en tiennent lieu.
+
+**`RBAC-ROLE-HIERARCHY-001`, livré.**
+La tension était réelle mais bornée : la fonction est petite, la demande est constante, et l'ADR-014 citait déjà l'héritage de permissions comme relevant d'un contrat RBAC.
+La limite levée était une limite d'implémentation, non une frontière de conception.
+L'élargissement du contrat public est cadré par l'[ADR-095](../adr/095-rbac-role-hierarchy.md).
+
+**`MFA-WEBAUTHN-001`, retiré.**
+WebAuthn est une spécification large et mouvante, qui demande une bibliothèque à suivre, une gestion d'attestation, et des contournements par navigateur.
+Le principe 8 vise exactement cette charge : un noyau minimal ne porte pas ce que sa maintenance ne peut pas garantir sur la durée.
+Le facteur TOTP couvre le socle, et une application qui a besoin de WebAuthn l'implémente avec une bibliothèque dédiée, sans que Forge prétende le faire à sa place.
+
+**`AUDIO-STATEFUL-OPTION-001`, retiré.**
+Une seconde façon de gérer un média avec état existe déjà dans `forge-mvc-video`, et le principe 11 en veut une seule.
+Si le besoin revient, la bonne réponse n'est pas de dupliquer la machinerie dans `audio` mais de l'**extraire** en socle partagé.
+C'est un ticket d'architecture, à instruire quand deux besoins indépendants l'auront demandé, pas une option à ajouter aujourd'hui.
+
+**`DEPLOY-CADDY-001`, retiré.**
+Un second gabarit officiel doit être maintenu, testé et tenu à jour au même rythme que le premier, et le principe 11 refuse deux façons officielles de faire la même chose.
+La documentation peut nommer Caddy comme alternative viable sans que Forge en engendre la configuration : dire qu'une chose est possible ne coûte rien, la maintenir coûte à chaque version.
+
+**`NOTIF-POLLING-HELPER-001`, retiré.**
+Le rafraîchissement d'un écran relève de l'application, principe 1.
+Forge livre déjà HTMX, avec lequel un rafraîchissement périodique tient en un attribut, et la route JSON que l'aide aurait appelée existe déjà côté notifications.
+Ajouter un assistant ne retirerait aucune décision à l'application, il en masquerait une.
 
 ---
 

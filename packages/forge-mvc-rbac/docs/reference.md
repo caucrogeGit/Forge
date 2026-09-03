@@ -543,6 +543,55 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
 
     Les fonctions vivent dans `export.py` (`to_markdown`, `to_csv`, `contract_rows`).
 
+??? note "15. Héritage entre rôles"
+
+    Le contrat associait un rôle à une liste plate de permissions (`RBAC-ROLE-HIERARCHY-001`, ADR-095).
+
+    Un projet à trois rôles, `lecteur`, `editeur` et `admin`, recopiait donc la liste du lecteur dans l'éditeur, puis les deux dans l'admin. Trois copies de la même règle, qui divergent au premier ajout : on ajoute une permission à l'éditeur, on oublie l'admin, et l'administrateur se retrouve avec **moins** de droits qu'un éditeur.
+
+    Le défaut est silencieux : personne n'écrit un test vérifiant qu'un administrateur peut faire tout ce qu'un éditeur peut faire.
+
+    ```json
+    {
+      "schema_version": "1.0",
+      "roles": {
+        "lecteur": ["article.list"],
+        "editeur": ["article.create"],
+        "admin":   ["article.destroy"]
+      },
+      "role_inherits": {
+        "admin":   ["editeur"],
+        "editeur": ["lecteur"]
+      }
+    }
+    ```
+
+    L'héritage est **transitif** : l'administrateur porte les trois permissions.
+
+    !!! info "La clé est facultative"
+        Un contrat qui ne déclare pas `role_inherits` se résout exactement comme avant, et aucun projet existant n'a de geste à faire.
+
+    !!! danger "Rien n'est deviné"
+        Forge ne déduit aucune hiérarchie d'un nom de rôle.
+
+        « admin » ne domine pas « editeur » parce qu'il s'appelle ainsi, et supposer le contraire accorderait des droits que personne n'a écrits. Une déduction fausse sur un contrôle d'accès ne se répare pas après coup.
+
+    !!! danger "Une hiérarchie fautive n'accorde RIEN"
+        Ni cycle, ni rôle hérité inconnu ne sont tolérés.
+
+        `get_contract_permissions` rend un ensemble vide plutôt que les permissions directes : accorder les droits directs donnerait un contrôle d'accès dégradé sans que rien ne le signale, et un contrôle qui se dégrade en silence est pire qu'un contrôle qui refuse. `forge rbac:validate` nomme la faute.
+
+        Un cycle est **nommé** dans le message, « admin puis editeur puis admin » : un cycle qu'on peut lire se corrige.
+
+    !!! warning "La profondeur est bornée à dix niveaux"
+        Au delà, l'héritage n'est plus un modèle de droits mais un enchevêtrement, et une revue de sécurité qui ne peut pas suivre la chaîne ne vérifie rien.
+
+    Deux branches qui ne se dominent pas sont parfaitement permises : un `comptable` et un `editeur` peuvent hériter tous deux du `lecteur` sans se voir l'un l'autre.
+
+    `forge rbac:export` rend les permissions **effectives**, héritages compris : montrer les seules permissions directes ferait croire à un administrateur privé de droits qu'il possède.
+
+    Les fonctions vivent dans `hierarchy.py` (`expand_roles`, `inheritance_map`, `detect_cycle`, `validate_hierarchy`).
+
 ## Voir aussi
 
 - [Cœur RBAC (rbac.py)](references/rbac.md) : modèle, primitives, `make_can`.

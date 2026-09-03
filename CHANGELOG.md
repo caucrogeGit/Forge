@@ -10,6 +10,22 @@
 
 ### Ajouté
 
+- **Un rôle RBAC peut hériter d'un autre (`RBAC-ROLE-HIERARCHY-001`, ADR-095).**
+  Le contrat associait un rôle à une liste plate de permissions. Un projet à trois rôles recopiait donc la liste du lecteur dans l'éditeur, puis les deux dans l'admin. Trois copies de la même règle, qui divergent au premier ajout : on ajoute une permission à l'éditeur, on oublie l'admin, et l'administrateur se retrouve avec **moins** de droits qu'un éditeur, sans que rien ne le signale, puisque personne n'écrit un test vérifiant qu'un administrateur peut faire ce qu'un éditeur peut faire.
+  `role_inherits` déclare l'héritage, qui est transitif. La clé est **facultative** : un contrat qui ne la porte pas se résout exactement comme avant, et aucun projet existant n'a de geste à faire.
+  **Rien n'est deviné.** « admin » ne domine pas « editeur » parce qu'il s'appelle ainsi, et supposer le contraire accorderait des droits que personne n'a écrits. Une déduction fausse sur un contrôle d'accès ne se répare pas après coup.
+  **Une hiérarchie fautive n'accorde rien.** Un cycle et un rôle hérité inconnu sont refusés, et la résolution rend un ensemble vide plutôt que les permissions directes : accorder les droits directs donnerait un contrôle d'accès dégradé en silence, ce qui est pire qu'un refus. Le cycle est nommé, « admin puis editeur puis admin » se corrigeant là où « hiérarchie invalide » ne se corrige pas. La profondeur est bornée à dix niveaux, au delà desquels une revue de sécurité ne peut plus suivre la chaîne.
+  `rbac:export` rend les permissions **effectives**, héritages compris : montrer les seules permissions directes ferait croire à un administrateur privé de droits qu'il possède.
+
+### Retiré du périmètre
+
+- **Quatre tickets du lot 5 du cycle rc8 sont retirés par décision écrite** (roadmap `forge-rc8-optins-roadmap.md`, section 8).
+  Chacun entrait en tension avec un principe de la charte, et la tension a été tranchée en connaissance de cause plutôt que contournée.
+  `MFA-WEBAUTHN-001` : une spécification large et mouvante dont la maintenance ne peut pas être garantie sur la durée, ce que le principe 8 vise exactement.
+  `AUDIO-STATEFUL-OPTION-001` : la bonne réponse, si le besoin revient, est d'extraire la machinerie d'état partagée avec `video`, pas de la dupliquer.
+  `DEPLOY-CADDY-001` : dire qu'une chose est possible ne coûte rien, maintenir un second gabarit officiel coûte à chaque version.
+  `NOTIF-POLLING-HELPER-001` : Forge livre déjà HTMX, et un assistant ne retirerait aucune décision à l'application, il en masquerait une.
+
 - **Un garde-fou refuse qu'un README promette une commande qui n'existe pas (`META-README-COMMANDS-RATCHET-001`).**
   Une phrase de prose ne se vérifie pas en général. Ce qui se vérifie, et qui dérive de la même façon, ce sont les **commandes** : chaque opt-in les déclare dans `COMMANDS`, table que le cœur lit (ADR-059), et son README en annonce dans un tableau.
   Le garde-fou refuse une commande citée au README et absente de `COMMANDS`, promesse que l'utilisateur tape avant de comprendre, et refuse qu'une commande **déclarée** soit annoncée « à venir », ce qui est la dérive exacte que le ticket précédent a corrigée.
