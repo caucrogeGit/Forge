@@ -15,6 +15,9 @@ Ces fichiers sont écrits en mode write-if-new : un fichier existant n'est jamai
 `deploy:check` contrôle la cohérence de la configuration de déploiement sans rien modifier.
 Elle restitue une liste de résultats tagués (`ok`, `warn`, `error`) et sort en code 1 si une erreur bloquante est détectée.
 
+Elle refuse notamment un projet qui enfile des tâches sans worker pour les traiter (`DEPLOY-CHECK-JOBS-WORKER-001`).
+`--unite`, `--nginx` et `--worker` déclarent l'emplacement des artefacts d'un projet qui les a rangés ailleurs.
+
 ## 2. L'API
 
 | Symbole | Rôle |

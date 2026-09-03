@@ -357,6 +357,34 @@ Poser un `worker.py` dans un projet sans file de tâches donnerait un fichier à
     Une tâche dont le nom n'a aucun gestionnaire est marquée `failed`.
     Un worker parti avec un `HANDLERS` vide ne se contenterait donc pas de ne rien faire, il viderait la file en la détruisant tâche par tâche, en affichant un service vert.
 
+!!! danger "Le pré-vol refuse une file que personne ne traite"
+    Les dix-neuf contrôles de `deploy:check` n'en regardaient aucun (`DEPLOY-CHECK-JOBS-WORKER-001`).
+
+    Un projet pouvait donc passer le pré-vol au vert avec une file que personne ne draine.
+
+    Le contrôle ne se déclenche que si le projet **appelle réellement** `enqueue`, lu par `ast` et jamais par grep.
+    Une occurrence dans un commentaire, une chaîne ou une docstring ferait accuser un projet qui n'enfile rien, et un détecteur qui accuse à tort se fait désactiver.
+
+    | Situation | Verdict |
+    |---|---|
+    | `forge-mvc-jobs` absent | silence |
+    | installé, mais rien n'enfile | silence |
+    | le projet enfile, `worker.py` absent | erreur |
+    | `worker.py` présent, `HANDLERS` vide | erreur |
+    | `HANDLERS` rempli, aucune unité déclarée | erreur |
+    | tout est là | ok |
+
+    C'est une erreur, pas un avertissement, comme pour les sessions multi-travailleurs.
+    Les emails ne partiront pas, il n'y a rien à nuancer.
+
+    Un `HANDLERS` construit autrement qu'en littéral, par une fonction ou un registre, n'est pas jugeable statiquement.
+    Le pré-vol se tait alors, plutôt que d'accuser.
+
+!!! info "Dire où vit l'unité du worker"
+    `forge deploy:check --worker deploiement/w.service` déclare son emplacement, comme `--unite` et `--nginx` le font pour les autres.
+
+    Un projet qui range ou renomme son unité, ce que le principe 9 l'invite à faire, deviendrait sinon invisible du pré-vol.
+
 !!! info "L'arrêt propre laisse finir la tâche en cours"
     L'unité envoie `SIGTERM`, que `worker.py` note sans interrompre la tâche en cours.
 

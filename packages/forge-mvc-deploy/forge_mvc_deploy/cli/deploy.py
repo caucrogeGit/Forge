@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from core.security.secrets import is_sensitive_name, looks_like_placeholder
 
+import ast
 import importlib.util
 import re
 import sys
@@ -569,6 +570,7 @@ def _upload_max_mb(root: Path) -> int:
 #: Emplacements par defaut des artefacts, tels que `deploy:init` les ecrit.
 UNITE_PAR_DEFAUT = Path("deploy") / "systemd" / "forge-app.service"
 NGINX_PAR_DEFAUT = Path("deploy") / "nginx" / "forge-app.conf"
+WORKER_PAR_DEFAUT = Path("deploy") / "systemd" / "forge-jobs-worker.service"
 
 
 class Artefacts(NamedTuple):
@@ -586,16 +588,22 @@ class Artefacts(NamedTuple):
 
     unite: Path
     nginx: Path
+    #: Unite du worker de taches de fond. Valeur par defaut plutot que champ
+    #: obligatoire : les appelants anterieurs a DEPLOY-CHECK-JOBS-WORKER-001
+    #: construisent `Artefacts(unite=..., nginx=...)` et continuent de marcher.
+    worker: Path = WORKER_PAR_DEFAUT
 
     @classmethod
     def par_defaut(cls, root: Path) -> "Artefacts":
-        return cls(unite=root / UNITE_PAR_DEFAUT, nginx=root / NGINX_PAR_DEFAUT)
+        return cls(unite=root / UNITE_PAR_DEFAUT, nginx=root / NGINX_PAR_DEFAUT,
+                   worker=root / WORKER_PAR_DEFAUT)
 
     def resolus(self, root: Path) -> "Artefacts":
         """Chemins absolus, un chemin relatif etant lu depuis la racine."""
         return Artefacts(
             unite=self.unite if self.unite.is_absolute() else root / self.unite,
             nginx=self.nginx if self.nginx.is_absolute() else root / self.nginx,
+            worker=self.worker if self.worker.is_absolute() else root / self.worker,
         )
 
 
@@ -1199,6 +1207,119 @@ def _verifier_sessions_multi_travailleurs(root: Path, unite: Path) -> "_Result |
         f"(forge.configure(session_store=...)), ou revenir à --workers 1")
 
 
+def _projet_enfile_des_taches(root: Path) -> bool:
+    """Le projet appelle-t-il `enqueue` quelque part ?
+
+    Lu par `ast`, jamais par `grep` : une occurrence dans un commentaire, une
+    chaine ou une docstring ferait accuser un projet qui n'enfile rien, et
+    `.enqueue` d'un autre objet n'est pas celui de la file. Un detecteur
+    approximatif qui accuse a tort se fait desactiver, et ne garde plus rien.
+
+    La lecture se borne a `mvc/`, ou vivent controleurs et services. Un fichier
+    illisible ou syntaxiquement faux est ignore : le pre-vol constate, il ne
+    juge pas la syntaxe du projet, dont `compileall` s'occupe.
+    """
+    mvc = root / "mvc"
+    if not mvc.is_dir():
+        return False
+    for source in mvc.rglob("*.py"):
+        try:
+            arbre = ast.parse(source.read_text(encoding="utf-8"))
+        except (OSError, SyntaxError, ValueError):
+            continue
+        for noeud in ast.walk(arbre):
+            if not isinstance(noeud, ast.Call):
+                continue
+            appele = noeud.func
+            nom = (
+                appele.id if isinstance(appele, ast.Name)
+                else appele.attr if isinstance(appele, ast.Attribute)
+                else None
+            )
+            if nom == "enqueue":
+                return True
+    return False
+
+
+def _worker_sans_gestionnaire(worker: Path) -> bool:
+    """`worker.py` part-il avec un `HANDLERS` vide ?
+
+    Le gabarit engendre refuse alors de demarrer, et c'est voulu : une tache
+    dont le nom n'a aucun gestionnaire est marquee `failed`. Mais le refus se
+    lit dans le journal du service, apres la mise en production. Le voir au
+    pre-vol vaut mieux.
+
+    Un `HANDLERS` construit autrement qu'en litteral, par une fonction ou une
+    boucle, n'est pas jugeable statiquement : le pre-vol se tait alors, plutot
+    que d'accuser.
+    """
+    try:
+        arbre = ast.parse(worker.read_text(encoding="utf-8"))
+    except (OSError, SyntaxError, ValueError):
+        return False
+    for noeud in arbre.body:
+        cibles: "list[ast.expr]" = []
+        if isinstance(noeud, ast.AnnAssign):
+            cibles = [noeud.target]
+        elif isinstance(noeud, ast.Assign):
+            cibles = list(noeud.targets)
+        else:
+            continue
+        if not any(isinstance(c, ast.Name) and c.id == "HANDLERS" for c in cibles):
+            continue
+        if isinstance(noeud.value, ast.Dict):
+            return not noeud.value.keys
+    return False
+
+
+def _verifier_worker_jobs(root: Path, worker_unite: Path) -> "_Result | None":
+    """La file de taches a-t-elle quelqu'un pour la traiter ?
+
+    DEPLOY-CHECK-JOBS-WORKER-001. `enqueue()` ecrit une ligne dans une table, et
+    rien ne la traite tant qu'un worker ne tourne pas. Le guide documentait le
+    minuteur `jobs:reclaim`, qui remet en file les taches orphelines, et aucun
+    service pour les prendre.
+
+    La panne est silencieuse et trompeuse : la table grossit, le minuteur remet
+    consciencieusement en file des taches que personne ne prend, et
+    `systemctl` affiche un `forge-app` parfaitement vert. C'est le motif
+    d'ADR-092 et ADR-093, la production servant une application desarmee.
+
+    C'est une ERREUR, pas un avertissement : les emails ne partiront pas, et il
+    n'y a rien a nuancer.
+    """
+    if not _jobs_installe():
+        return None
+
+    worker = root / "worker.py"
+    enfile = _projet_enfile_des_taches(root)
+
+    if not enfile and not worker.exists():
+        # `forge-mvc-jobs` installe sans que rien n'enfile encore : il n'y a
+        # rien a traiter, donc rien a reprocher.
+        return None
+
+    if not worker.exists():
+        return _Result(
+            "error", "Worker de tâches",
+            "le projet enfile des tâches et worker.py est absent — rien ne "
+            "traitera la file ; lancer forge deploy:init")
+
+    if _worker_sans_gestionnaire(worker):
+        return _Result(
+            "error", "Worker de tâches",
+            "worker.py n'inscrit aucun gestionnaire (HANDLERS vide) — le "
+            "service refusera de démarrer et la file ne sera jamais traitée")
+
+    if not worker_unite.is_file():
+        return _Result(
+            "error", "Worker de tâches",
+            f"aucune unité en {worker_unite.name} — worker.py ne tournera pas "
+            f"tout seul ; déclarer le service, ou dire où il vit avec --worker")
+
+    return _Result("ok", "Worker de tâches", "worker.py et son unité déclarés")
+
+
 #: Repere la cle `ReadWritePaths=` d'une unite durcie.
 def _chemins_inscriptibles(texte: str) -> list[str]:
     """Chemins declares par `ReadWritePaths=`, dans l'ordre."""
@@ -1400,6 +1521,9 @@ def _check_results(root: Path, artefacts: "Artefacts | None" = None) -> list[_Re
     inscriptibles = _verifier_read_write_paths(root, ou.unite)
     if inscriptibles is not None:
         results.append(inscriptibles)
+    travailleur = _verifier_worker_jobs(root, ou.worker)
+    if travailleur is not None:
+        results.append(travailleur)
 
     # module jinja2
     if importlib.util.find_spec("jinja2") is not None:
@@ -1433,6 +1557,11 @@ def _check_results(root: Path, artefacts: "Artefacts | None" = None) -> list[_Re
         (ou.unite, "--unite"),
         (root / "deploy" / "README_DEPLOY.md", None),
     ]
+    # L'unite du worker n'est attendue que si `forge-mvc-jobs` est installe :
+    # l'annoncer absente dans un projet sans file de taches ferait chercher un
+    # fichier dont personne n'a besoin.
+    if _jobs_installe():
+        attendus.insert(2, (ou.worker, "--worker"))
     for path, drapeau in attendus:
         try:
             libelle = str(path.relative_to(root))
@@ -1450,7 +1579,7 @@ def _check_results(root: Path, artefacts: "Artefacts | None" = None) -> list[_Re
 
 
 def _parser_artefacts(args: list[str]) -> "Artefacts | None":
-    """Lit `--unite <chemin>` et `--nginx <chemin>`, ou `None` si aucun.
+    """Lit `--unite`, `--nginx` et `--worker <chemin>`, ou `None` si aucun.
 
     Sans ces drapeaux, un projet qui a adapté son déploiement, ce que le
     principe 9 l'invite à faire, devient invisible du pré-vol : les
@@ -1460,7 +1589,7 @@ def _parser_artefacts(args: list[str]) -> "Artefacts | None":
     reste = list(args)
     while reste:
         drapeau = reste.pop(0)
-        if drapeau not in ("--unite", "--nginx"):
+        if drapeau not in ("--unite", "--nginx", "--worker"):
             continue
         if not reste:
             raise SystemExit(f"{drapeau} attend un chemin.")
@@ -1471,6 +1600,7 @@ def _parser_artefacts(args: list[str]) -> "Artefacts | None":
     return Artefacts(
         unite=valeurs.get("--unite", UNITE_PAR_DEFAUT),
         nginx=valeurs.get("--nginx", NGINX_PAR_DEFAUT),
+        worker=valeurs.get("--worker", WORKER_PAR_DEFAUT),
     )
 
 

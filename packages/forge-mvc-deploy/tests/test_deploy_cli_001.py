@@ -233,17 +233,32 @@ def test_deploy_check_warn_si_nginx_http_et_app_ssl_force(tmp_path):
     assert protocol_result.status == "warn"
 
 
+#: Artefacts que `deploy:init` ecrit sous `deploy/`, nommes plutot que comptes.
+#
+# Ces deux tests figeaient le NOMBRE d'artefacts, trois, et non la fin visee :
+# chacun est annonce absent avant `deploy:init`, present apres. Ajouter l'unite
+# du worker les faisait echouer sans qu'aucune de ces deux affirmations cesse
+# d'etre vraie (DEPLOY-JOBS-WORKER-UNIT-001).
+_ARTEFACTS_DEPLOY = (
+    "deploy/nginx/forge-app.conf",
+    "deploy/systemd/forge-app.service",
+    "deploy/README_DEPLOY.md",
+)
+
+
 def test_deploy_check_deploy_files_warn_si_absent(tmp_path):
     results = _check_results(tmp_path)
-    deploy_warns = [r for r in results if "deploy/" in r.label and r.status == "warn"]
-    assert len(deploy_warns) == 3
+    absents = {r.label for r in results if r.status == "warn"}
+    for artefact in _ARTEFACTS_DEPLOY:
+        assert artefact in absents, f"{artefact} devrait être annoncé absent"
 
 
 def test_deploy_check_deploy_files_ok_apres_init(tmp_path):
     cmd_deploy_init(tmp_path)
     results = _check_results(tmp_path)
-    deploy_oks = [r for r in results if "deploy/" in r.label and r.status == "ok"]
-    assert len(deploy_oks) == 3
+    presents = {r.label for r in results if r.status == "ok"}
+    for artefact in _ARTEFACTS_DEPLOY:
+        assert artefact in presents, f"{artefact} devrait être annoncé présent"
 
 
 # ── Entrypoint Forge ──────────────────────────────────────────────────────────

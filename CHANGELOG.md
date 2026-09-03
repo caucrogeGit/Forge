@@ -4,6 +4,13 @@
 
 ### Corrigé
 
+- **Le pré-vol de déploiement ne regardait pas si quelqu'un traitait la file de tâches (`DEPLOY-CHECK-JOBS-WORKER-001`).**
+  Les dix-neuf contrôles de `deploy:check` n'en regardaient aucun. Un projet pouvait donc passer le pré-vol au vert avec une file que personne ne draine, et découvrir en production que ses emails ne partent pas.
+  Le contrôle ne se déclenche que si le projet **appelle réellement** `enqueue`, lu par `ast` et jamais par grep : une occurrence dans un commentaire, une chaîne ou une docstring ferait accuser un projet qui n'enfile rien, et un détecteur qui accuse à tort se fait désactiver, donc ne garde plus rien. Un projet où `forge-mvc-jobs` est installé sans que rien n'enfile n'est pas inquiété : il n'y a rien à traiter, donc rien à reprocher.
+  Trois situations sont refusées : `worker.py` absent, `worker.py` présent avec un `HANDLERS` vide, donc un service qui refusera de démarrer, et aucune unité déclarée. **C'est une erreur, pas un avertissement**, comme pour les sessions multi-travailleurs : les emails ne partiront pas, il n'y a rien à nuancer.
+  Un `HANDLERS` construit autrement qu'en littéral, par une fonction ou un registre, n'est pas jugeable statiquement. Le pré-vol se tait alors, plutôt que d'accuser. `--worker` déclare l'emplacement de l'unité, comme `--unite` et `--nginx` le font déjà, pour qu'un projet qui la range ailleurs ne devienne pas invisible du pré-vol.
+  Deux tests figeaient au passage le **nombre** d'artefacts de `deploy/`, trois, et non la fin qu'ils visaient, chaque artefact étant annoncé absent avant `deploy:init` et présent après. Ils sont réalignés sur les artefacts nommés.
+
 - **Le guide de déploiement engendrait un minuteur pour les tâches orphelines, et aucun service pour les traiter (`DEPLOY-JOBS-WORKER-UNIT-001`).**
   `enqueue()` écrit une ligne dans une table. **Rien ne la traite tant qu'un worker ne tourne pas.** Le guide de `deploy:init` documentait l'unité `forge-app`, le minuteur `forge-jobs-reclaim`, et aucun service de traitement. Grep sur le générateur : zéro occurrence de `run_worker`. Le squelette ne livrait aucun gabarit non plus, et les 19 contrôles de `deploy:check` n'en regardaient aucun.
   Une application qui enfilait en production et suivait le guide à la lettre obtenait donc une table qui grossit, et un minuteur qui remet consciencieusement en file des tâches que personne ne prend. La panne est silencieuse **et trompeuse** : `systemctl` affiche un `forge-app` parfaitement vert, et le minuteur donne l'impression que quelque chose tourne. C'est le motif d'ADR-092 et ADR-093, la production servant une application désarmée.

@@ -3091,7 +3091,7 @@ Limites:
 
     "deploy:check": """\
 Usage:
-  forge deploy:check [--unite <chemin>] [--nginx <chemin>]
+  forge deploy:check [--unite <chemin>] [--nginx <chemin>] [--worker <chemin>]
 
 Description:
   Diagnostique l'environnement de déploiement du projet : racine
@@ -3112,16 +3112,19 @@ Effets:
     partagé : chacun aurait le sien, en mémoire ;
   - vérifie que chaque chemin de ReadWritePaths existe, un chemin
     absent faisant boucler le service sans rien écrire au journal ;
+  - refuse un projet qui enfile des tâches sans worker pour les
+    traiter : la file grossirait sans que rien ne le signale ;
   - imprime un tableau de statuts + résumé ;
   - exit 1 s'il existe au moins une erreur.
 
 Options:
   --unite <chemin>  Emplacement de l'unité systemd de ce projet.
   --nginx <chemin>  Emplacement de la configuration Nginx de ce projet.
+  --worker <chemin> Emplacement de l'unité systemd du worker de tâches.
   -h, --help        Affiche cette aide sans exécuter la commande.
 
 Note:
-  Sans ces deux options, les emplacements sont ceux qu'écrit
+  Sans ces options, les emplacements sont ceux qu'écrit
   forge deploy:init. Un projet qui a rangé ou renommé ses artefacts,
   ce que le principe 9 l'invite à faire, doit les déclarer : sinon le
   pré-vol les annonce absents alors qu'ils tournent en production.
