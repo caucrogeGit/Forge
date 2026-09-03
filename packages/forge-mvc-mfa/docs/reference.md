@@ -560,8 +560,11 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         Un même code TOTP peut donc être accepté une fois par worker, soit jusqu'à autant de fois qu'il y a de workers.
 
         La fenêtre est courte, un code TOTP vivant trente secondes, et l'attaquant doit déjà détenir le code.
-        Le rate-limit du challenge borne par ailleurs le nombre de tentatives.
         Le risque réel est donc le rejeu d'un code intercepté, pas la découverte d'un code.
+
+        Cette note invoquait auparavant le rate-limit du challenge en atténuation.
+        C'était trompeur, et corrigé ici : ce compteur vit dans la même mémoire de processus, et souffre exactement du même défaut.
+        Le paragraphe suivant le dit.
 
         Trois remèdes, au choix de l'exploitant.
 
@@ -570,6 +573,20 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         - Porter le registre dans un magasin partagé de votre cru, en écrivant une classe conforme au protocole `TotpReplayStore`.
 
         Le registre n'est pas non plus persisté : un redémarrage l'oublie, avec la même fenêtre de moins de trente secondes.
+
+    !!! danger "Le rate-limit du challenge vaut lui aussi par processus"
+        `MFA_CHALLENGE_MAX_ATTEMPTS` vaut cinq essais par fenêtre de cinq minutes, et `MFA_REVALIDATION_MAX_ATTEMPTS` trois.
+
+        Ces compteurs vivent dans `core.auth.rate_limit`, en mémoire du processus.
+        Derrière quatre travailleurs Gunicorn, ce que l'unité systemd engendrée par Forge lance, les cinq essais en deviennent jusqu'à vingt, et le verrouillage ne suit pas l'attaquant d'un travailleur à l'autre.
+
+        La parade est la même que pour la connexion, et elle se pose au proxy, qui compte pour tous les travailleurs.
+        La configuration Nginx engendrée par `forge deploy:init` porte cette limite sur `/login` depuis `DEPLOY-NGINX-RATE-LIMIT-001`.
+
+        **Le challenge MFA vit sur une autre route, que Forge ne connaît pas** : le paquet ne pose aucune route, c'est l'application qui les écrit.
+        Ajoutez donc un `location` de même forme sur votre route de challenge, sans quoi elle reste la seule porte non bornée du parcours d'authentification.
+
+        Un compteur applicatif partagé reste possible sans que Forge en livre un : `check_auth_rate_limit` accepte une liste de tentatives chargée d'où vous voulez.
 
     !!! tip "Partager le registre entre tous les processus"
         Forge livre `DbTotpReplayStore`, adossé au backend BDD du projet, donc commun à tous les workers.

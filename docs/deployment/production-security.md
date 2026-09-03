@@ -268,30 +268,54 @@ Le compteur anti-bruteforce vit **en mémoire du processus** (`core.auth.rate_li
 Il est donc **local à chaque worker** et remis à zéro à chaque redémarrage.
 
 Sur le chemin de production recommandé (Gunicorn multi-worker), la limite effective devient `5 × N` tentatives par fenêtre, où `N` est le nombre de workers, puisque chaque worker compte séparément.
-Contrairement aux sessions (l'opt-in `forge-mvc-sessions-db` fournit un store partagé), il n'existe pas de store de tentatives partagé livré.
+Contrairement aux sessions (l'opt-in `forge-mvc-sessions-db` fournit un store partagé), il n'existe pas de store de tentatives partagé livré, et c'est un choix, motivé plus bas.
 
-**Mitigation recommandée en multi-worker : poser un rate-limit sur `/login` au niveau du reverse proxy**, qui compte pour l'ensemble des workers.
+**La parade se pose au reverse proxy**, qui compte pour l'ensemble des workers.
 
-Exemple Nginx (`limit_req`) :
+Cette page la prescrivait sans que la configuration engendrée la porte : elle restait un extrait à recopier, donc une ligne de défense absente de tout projet qui n'avait pas lu cette page.
+`forge deploy:init` l'engendre depuis `DEPLOY-NGINX-RATE-LIMIT-001`.
 
 ```nginx
-# Dans le bloc http : une zone dédiée aux tentatives de connexion.
-limit_req_zone $binary_remote_addr zone=forge_login:10m rate=5r/m;
+# Contexte http. Le fichier engendré y est, étant inclus depuis sites-enabled/.
+# Seul le POST est compté : limiter aussi le GET ferait répondre 429 à qui
+# recharge la page de connexion, et une limite qui gêne se fait désactiver.
+map $request_method $forge_login_monapp_key {
+    POST    $binary_remote_addr;
+    default "";
+}
+limit_req_zone $forge_login_monapp_key zone=forge_login_monapp:10m rate=5r/m;
 
 server {
     # ... TLS, proxy_pass vers Gunicorn ...
 
     location = /login {
         # 5 requêtes/minute par IP, petite rafale tolérée, puis 429.
-        limit_req zone=forge_login burst=5 nodelay;
+        limit_req        zone=forge_login_monapp burst=5 nodelay;
         limit_req_status 429;
-        proxy_pass http://127.0.0.1:8000;
+        proxy_pass       http://127.0.0.1:8000;
     }
 }
 ```
 
+Le nom de la zone est dérivé du dossier du projet.
+Deux projets Forge derrière le même Nginx déclareraient sinon deux zones homonymes, et Nginx refuserait de démarrer sur un message qui ne dit pas quel fichier est en cause.
+
+!!! warning "Une route de connexion renommée n'est plus bornée"
+    Le `location` engendré vise `/login`, la route qu'écrit `forge make:auth`.
+
+    Un projet qui a renommé sa route de connexion adapte ce bloc, sans quoi la limite ne garde rien tout en paraissant posée.
+
+!!! warning "Le challenge MFA n'est pas couvert"
+    `forge-mvc-mfa` ne pose aucune route, l'application écrit les siennes, et Forge ne peut donc pas viser la route de challenge.
+
+    Son compteur souffre pourtant du même défaut, cinq essais par processus.
+    Ajoutez un `location` de même forme sur votre route de challenge.
+
 Le rate-limit applicatif reste utile (défense en profondeur, mono-worker, développement) ; le rate-limit du proxy est la ligne de défense fiable en multi-worker.
-Le moteur `check_auth_rate_limit` accepte déjà une liste de tentatives externe : un backend partagé (base, cache) reste une évolution possible si un rate-limit purement applicatif est requis.
+
+Forge ne livre **pas** de store de tentatives partagé, et ce n'est pas un oubli.
+Une fois la limite posée au proxy, le nombre de workers ne change plus ce qu'un attaquant peut tenter à travers lui.
+Une application qui veut malgré tout un compteur applicatif partagé n'a besoin de rien de nouveau : `check_auth_rate_limit` accepte une liste de tentatives chargée d'où elle veut.
 
 ---
 
@@ -597,7 +621,7 @@ Sécurité applicative
 [ ] RBAC : routes protégées par décorateurs serveur (@require_permission)
 [ ] Auth audit : handler de log configuré (forge.auth.audit)
 [ ] Rate limiting login actif
-[ ] Rate limiting login au reverse proxy si multi-worker (compteur applicatif par processus, voir section 5)
+[ ] Rate limiting login au reverse proxy : engendré par deploy:init, à adapter si la route de connexion a été renommée (voir section 5)
 [ ] Rate limiting upload actif (module d'upload optionnel)
 
 Fichiers et stockage

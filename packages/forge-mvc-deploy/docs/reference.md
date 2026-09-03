@@ -406,3 +406,35 @@ Un geste d'entretien absent du guide n'est pas planifié, et une table qui gross
     Mais un minuteur qui planifie la commande nue tourne pour rien, indéfiniment, en affichant un succès à chaque passage.
 
     Le tableau du guide cite donc les invocations complètes, `--run`, `--apply` ou `--delete` compris.
+
+## La limite sur la connexion
+
+`forge deploy:init` engendre une configuration Nginx qui borne `/login` à cinq POST par minute et par IP, puis répond 429.
+
+!!! danger "Le compteur applicatif vaut par processus"
+    Le compteur anti-bruteforce du cœur vit en mémoire du processus.
+
+    L'unité systemd engendrée lance quatre travailleurs, chacun comptant séparément : les cinq tentatives par minute en deviennent vingt, et le verrouillage ne suit pas l'attaquant d'un travailleur à l'autre.
+
+    Ce n'était pas une découverte, le guide de sécurité de Forge le disait et prescrivait cette parade.
+    C'était bien le défaut : la configuration engendrée ne la portait pas, et une ligne de défense qui vit dans une page de documentation est absente de tout projet qui n'a pas lu cette page (`DEPLOY-NGINX-RATE-LIMIT-001`).
+
+!!! info "Seul le POST est compté"
+    Un `map` sur `$request_method` donne une clé vide hors POST, ce qui n'applique pas la limite.
+
+    Limiter aussi le GET ferait répondre 429 à qui recharge la page de connexion six fois.
+    Une limite qui gêne se fait désactiver, et ne protège alors plus rien.
+
+!!! warning "Une route de connexion renommée n'est plus bornée"
+    Le `location` vise `/login`, la route qu'écrit `forge make:auth`.
+
+    Un projet qui a renommé sa route adapte ce bloc, sans quoi la limite paraît posée et ne garde rien.
+
+!!! warning "Le challenge MFA n'est pas couvert"
+    `forge-mvc-mfa` ne pose aucune route, l'application écrit les siennes, et Forge ne peut donc pas viser celle du challenge.
+
+    Son compteur souffre pourtant du même défaut.
+    Ajoutez un `location` de même forme sur votre route de challenge.
+
+!!! info "Le nom de la zone vient du dossier du projet"
+    Deux projets Forge derrière le même Nginx déclareraient sinon deux zones homonymes, et Nginx refuserait de démarrer sur un message qui ne dit pas quel fichier est en cause.

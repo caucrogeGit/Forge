@@ -4,6 +4,18 @@
 
 ### Corrigé
 
+- **La parade anti-bruteforce que Forge prescrit n'était pas dans la configuration qu'il engendre (`DEPLOY-NGINX-RATE-LIMIT-001`).**
+  Le compteur anti-bruteforce du cœur vit en mémoire du **processus**, et l'unité systemd engendrée lance quatre travailleurs. Les cinq tentatives par minute en deviennent donc jusqu'à vingt, et le verrouillage ne suit pas l'attaquant d'un travailleur à l'autre. Cela vaut pour le contrôleur de connexion engendré par `make:auth` comme pour le challenge MFA.
+  **Ce n'était pas une découverte** : `docs/deployment/production-security.md` le disait, prescrivait la parade Nginx et en donnait l'extrait. C'est précisément le défaut. Une ligne de défense qui vit dans une page de documentation est absente de tout projet qui n'a pas lu cette page, et la configuration engendrée n'en portait rien.
+  `forge deploy:init` engendre désormais un `location = /login` borné à cinq POST par minute et par IP, avec `limit_req_status 429`, aux valeurs exactes que le guide prescrivait, Forge ne disant qu'une chose d'une seule façon.
+  **Seul le POST est compté**, par un `map` sur `$request_method` qui donne une clé vide ailleurs. Limiter aussi le GET ferait répondre 429 à qui recharge la page de connexion six fois, et une limite qui gêne se fait désactiver, donc ne protège plus rien.
+  Le nom de la zone est dérivé du dossier du projet. Deux projets Forge derrière le même Nginx déclareraient sinon deux zones homonymes, et Nginx refuserait de démarrer sur « is already bound », message qui ne dit pas quel fichier est en cause.
+  Deux limites sont écrites plutôt que tues. Une route de connexion renommée n'est plus bornée, le `location` visant `/login`. Et **le challenge MFA n'est pas couvert** : `forge-mvc-mfa` ne pose aucune route, l'application écrit les siennes, et Forge ne peut pas viser celle du challenge.
+
+- **La documentation du MFA s'appuyait sur un contrôle qui souffre du même défaut qu'elle relativisait.**
+  Le bloc `danger` sur l'anti-rejeu par processus, exact par ailleurs, atténuait le risque ainsi : « Le rate-limit du challenge borne par ailleurs le nombre de tentatives. » Ce compteur vit dans la même mémoire de processus. Invoquer en atténuation un contrôle affaibli de la même façon fait sous-estimer les deux à la fois.
+  La phrase est retirée, et une note dit ce qu'il en est, avec le geste qui manque : le challenge MFA vit sur une route que Forge ne connaît pas, et demande son propre `location`.
+
 - **Le pré-vol de déploiement ne regardait pas si quelqu'un traitait la file de tâches (`DEPLOY-CHECK-JOBS-WORKER-001`).**
   Les dix-neuf contrôles de `deploy:check` n'en regardaient aucun. Un projet pouvait donc passer le pré-vol au vert avec une file que personne ne draine, et découvrir en production que ses emails ne partent pas.
   Le contrôle ne se déclenche que si le projet **appelle réellement** `enqueue`, lu par `ast` et jamais par grep : une occurrence dans un commentaire, une chaîne ou une docstring ferait accuser un projet qui n'enfile rien, et un détecteur qui accuse à tort se fait désactiver, donc ne garde plus rien. Un projet où `forge-mvc-jobs` est installé sans que rien n'enfile n'est pas inquiété : il n'y a rien à traiter, donc rien à reprocher.

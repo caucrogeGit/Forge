@@ -34,6 +34,17 @@ class _Result(NamedTuple):
 
 # ── Templates ─────────────────────────────────────────────────────────────────
 
+def _zone_limite(project_dir: Path) -> str:
+    """Nom de la zone `limit_req`, derive du projet.
+
+    Deux projets Forge derriere le meme Nginx declareraient sinon deux zones
+    homonymes, et Nginx refuserait de demarrer sur `limit_req_zone "forge_login"
+    is already bound`. Le message ne dit pas quel fichier est en cause.
+    """
+    brut = "".join(c if c.isalnum() else "_" for c in project_dir.name.lower())
+    return f"forge_login_{brut.strip('_') or 'app'}"
+
+
 def _nginx_conf(upload_max_mb: int, project_dir: Path, upload_root: str) -> str:
     """Configuration Nginx du projet, avec les portes que WSGI ne sert plus.
 
@@ -48,7 +59,29 @@ def _nginx_conf(upload_max_mb: int, project_dir: Path, upload_root: str) -> str:
     et la question posee a celui qui deploie.
     """
     client_max = upload_max_mb + 1
+    zone = _zone_limite(project_dir)
     return f"""\
+# Limitation des tentatives de connexion (DEPLOY-NGINX-RATE-LIMIT-001).
+#
+# Le compteur anti-bruteforce de Forge vit en memoire du PROCESSUS. Sous
+# Gunicorn a quatre travailleurs, chacun compte separement : les cinq
+# tentatives par minute en deviennent vingt, et le verrouillage ne suit pas
+# l'attaquant d'un travailleur a l'autre. Le guide de securite de Forge
+# prescrivait deja cette parade sans que la configuration engendree la porte.
+#
+# Ces deux directives vivent dans le contexte `http`. Ce fichier y est, etant
+# inclus depuis `sites-enabled/`, mais les deplacer DANS le bloc `server`
+# ferait refuser Nginx au demarrage.
+#
+# Seul le POST est compte. Limiter aussi le GET ferait repondre 429 a qui
+# recharge la page de connexion six fois, et une limite qui gene se fait
+# desactiver : elle ne protege alors plus rien.
+map $request_method ${zone}_key {{
+    POST    $binary_remote_addr;
+    default "";
+}}
+limit_req_zone ${zone}_key zone={zone}:10m rate=5r/m;
+
 server {{
     listen 80;
     server_name _;
@@ -117,6 +150,21 @@ server {{
     # Une application qui sert de gros fichiers a forte charge peut vouloir
     # decharger Nginx malgre tout : ce n'est alors legitime que si TOUT le
     # contenu de UPLOAD_ROOT est public, et cela se decide, cela ne se subit pas.
+
+    # Route engendree par `forge make:auth`. Un projet qui a renomme sa route
+    # de connexion adapte ce `location`, sans quoi la limite ne garde rien.
+    location = /login {{
+        limit_req        zone={zone} burst=5 nodelay;
+        limit_req_status 429;
+
+        proxy_pass         http://127.0.0.1:8000;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_read_timeout 30s;
+    }}
 
     location / {{
         # Forge écoute en HTTP local en mode prod ; Nginx termine HTTPS côté public.
@@ -386,6 +434,28 @@ Ce dossier contient les fichiers générés par `forge deploy:init`.
 10. Vérifier : `forge deploy:check`
 
 > Ces fichiers sont des modèles. Adaptez-les à votre infrastructure.
+
+## La limite sur la connexion (DEPLOY-NGINX-RATE-LIMIT-001)
+
+`nginx/forge-app.conf` borne `/login` à cinq POST par minute et par IP, puis
+répond 429.
+
+Cette limite est posée au proxy, et non dans l'application, parce que le
+compteur anti-bruteforce de Forge vit en mémoire du **processus**. L'unité
+lance quatre travailleurs, chacun compte séparément, et les cinq tentatives
+en deviennent vingt.
+
+Trois points à vérifier avant la mise en service.
+
+- **Une route de connexion renommée n'est plus bornée.** Le `location` vise
+  `/login`, la route qu'écrit `forge make:auth`. Adaptez-le si la vôtre diffère,
+  sans quoi la limite paraît posée et ne garde rien.
+- **Le challenge MFA n'est pas couvert.** `forge-mvc-mfa` ne pose aucune route,
+  c'est votre application qui les écrit, et Forge ne peut donc pas viser celle
+  du challenge. Ajoutez un `location` de même forme.
+- **Deux projets Forge derrière le même Nginx** déclarent deux zones, nommées
+  d'après leur dossier. Si vous renommez le fichier, gardez les deux noms
+  cohérents.
 
 ## Le worker de tâches de fond (DEPLOY-JOBS-WORKER-UNIT-001)
 

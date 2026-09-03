@@ -403,6 +403,11 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `ADMIN-BULK-ACTIONS-001`, câblage | admin | Revue de la proposition admin | **Livré.** La première livraison n'avait posé que la fonction de requête, inatteignable depuis le back-office |
 | `ADMIN-DOC-ETAT-REEL-001` | admin | Même revue | **Livré.** Le README annonçait « à venir » des capacités déjà présentes |
 | `NOTIF-HTTP-ROUTES-001` | notifications | Besoin d'asynchrone d'une application réelle | **Livré.** Quatre routes JSON, marquage borné au destinataire |
+| `JOBS-WORKER-GRACEFUL-STOP-001` | jobs | Écriture de l'unité systemd du worker | **Livré.** `stop` était sans effet sur une file chargée |
+| `DEPLOY-JOBS-WORKER-UNIT-001` | deploy | Mesure des besoins d'asynchrone | **Livré.** Le worker n'existait nulle part sur le chemin de production |
+| `DEPLOY-CHECK-JOBS-WORKER-001` | deploy | Même mesure | **Livré.** Le pré-vol ne regardait pas si quelqu'un traitait la file |
+| `DEPLOY-NGINX-RATE-LIMIT-001` | deploy | Même mesure | **Livré.** La parade prescrite n'était pas dans la configuration engendrée |
+| `MFA-RATE-LIMIT-SHARED-STORE-001` | mfa | Même mesure | **Retiré du périmètre**, voir ci dessous |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.
@@ -416,3 +421,24 @@ Il est résolu par l'application, jamais lu dans la requête, et l'absence du r�
 
 Le marquage est borné au même destinataire, ce qui a demandé d'ajouter `recipient` à `mark_read` avant d'exposer quoi que ce soit.
 Sans cette borne, l'identifiant seul suffisait à faire disparaître l'alerte de quelqu'un d'autre.
+
+**`MFA-RATE-LIMIT-SHARED-STORE-001`, retiré.**
+Je l'avais proposé, puis mesuré, et la mesure a renversé la recommandation.
+
+Le compteur de tentatives vit en mémoire de processus, et vaut donc `5 × N` travailleurs.
+La conclusion semblait couler de source : livrer un magasin partagé adossé à la base, sur le modèle de `DbTotpReplayStore`.
+
+Trois faits s'y opposent.
+
+Le premier est que la parade tient ailleurs, et mieux.
+Une fois `limit_req` posé au proxy, cinq POST par minute et par IP, le nombre de travailleurs ne change plus rien à ce qu'un attaquant peut tenter à travers lui.
+Le multiplicateur devient inatteignable, et il l'est pour la connexion comme pour le challenge.
+
+Le deuxième est que la couture existe déjà.
+`check_auth_rate_limit` accepte une liste de tentatives chargée d'où l'application veut : celle qui exige un compteur applicatif partagé peut l'écrire sans que Forge grossisse.
+
+Le troisième est le principe 8.
+Un protocole, une table, une migration et un magasin de plus dans un chemin de sécurité coûtent à chaque version, pour un besoin qui est une hypothèse de ma part et non un retour de terrain.
+C'est la règle des deux occurrences indépendantes, celle qui a écarté quatre tickets du lot 5.
+
+La moitié utile du ticket restait la révélation, règle B, et elle est livrée : la documentation du MFA ne s'appuie plus sur un contrôle affaibli de la même façon que celui qu'elle relativise.
