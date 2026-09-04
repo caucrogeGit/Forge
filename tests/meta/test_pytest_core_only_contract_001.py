@@ -64,6 +64,12 @@ CORE_DEPS = {
     # Validation JSON Schema (utilisé dans test_docs_json_examples_001.py)
     "jsonschema",
     "referencing",
+    # Fonction de slug de MkDocs, utilisée par
+    # test_doc_absolute_links_001.py pour vérifier les ancres des liens
+    # absolus. Importée plutôt que réécrite : une réimplémentation
+    # approximative inventerait des ancres fausses dans les deux sens.
+    # Déclarée explicitement dans requirements-dev.txt (META-DOC-ABSOLUTE-LINKS-001).
+    "markdown",
 }
 
 # Modules opt-in Forge et leurs dépendances connues

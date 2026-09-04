@@ -2,6 +2,14 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **Un garde-fou vérifie les liens absolus, que `mkdocs --strict` laisse passer (`META-DOC-ABSOLUTE-LINKS-001`).**
+  Le build strict vérifie les liens **relatifs** et échoue sur une cible absente. Il ne vérifie pas les liens **absolus** : il les signale d'une ligne `INFO ... it was left as is`, et sort en succès quelle que soit la cible.
+  Ce n'est pas théorique. `DB-POOL-THREADS-DOC-001` a livré un lien vers `/docs/forge/reference/database/connection/`, page qui n'existe pas, la vraie étant `/docs/forge/core-database/connection/`. Le piège est que le préfixe d'URL d'une documentation embarquée est le `site_name` de son `mkdocs.yml`, et non son chemin de fichier. Vérifié en réintroduisant la faute : `mkdocs build --strict` sort en 0, le garde-fou échoue.
+  Le dépôt porte quarante-trois liens absolus, dont **vingt-six vers une seule ancre**. La reformuler casserait vingt-six liens d'un coup, en silence, sur le site publié.
+  Les URL sont reconstruites depuis les sources plutôt que lues dans `site/`, avec les mêmes règles que MkDocs, le `docs_dir` de la racine plus le `site_name` de chaque `!include`. Un contrôle qui exigerait `site/` se sauterait quand le dossier n'existe pas, c'est à dire la plupart du temps, et un garde-fou sauté ne garde rien. La fonction de slug est **celle de MkDocs**, importée et non réécrite, une réimplémentation approximative inventant des ancres fausses dans les deux sens.
+
 ### Corrigé
 
 - **Le relevé de SQL non portable prenait un gabarit Markdown pour une instruction SQL.**

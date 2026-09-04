@@ -354,6 +354,22 @@ Les backticks rendent le fichier identifiable sans déclencher de résolution de
 
 Origine : `DOCS-CHARTER-DEDUP-001`.
 
+### D.1 bis : les liens absolus échappent à `mkdocs --strict`
+
+`mkdocs build --strict` vérifie les liens **relatifs** et échoue sur une cible absente.
+Il ne vérifie pas les liens **absolus** : il les signale d'une ligne `INFO ... it was left as is`, et sort en succès quelle que soit la cible.
+
+Mesuré : un lien vers `/docs/forge/reference/database/connection/`, page inexistante, a traversé le build strict sans un mot.
+Le piège est que le préfixe d'URL d'une documentation embarquée est le `site_name` de son `mkdocs.yml`, et non son chemin de fichier : la vraie page est `/docs/forge/core-database/connection/`.
+
+Préférez donc un lien relatif, que le build vérifie.
+Un lien absolu est parfois nécessaire, pour viser une page d'une autre documentation embarquée depuis un paquet, et il est alors couvert par le garde-fou `tests/meta/test_doc_absolute_links_001.py`, qui reconstruit les URL du site depuis les sources et vérifie page et ancre.
+
+Attention aux ancres partagées.
+Vingt-six liens du dépôt visent une seule ancre : la reformuler casserait les vingt-six d'un coup.
+
+Origine : `META-DOC-ABSOLUTE-LINKS-001`.
+
 ### D.2 : `docs/history/` comme mémoire brute
 
 Quand un fichier de roadmap ou de documentation devient obsolète, le déplacer dans `docs/history/` via `git mv` sans fusion ni synthèse.

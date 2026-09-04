@@ -12,6 +12,11 @@ setuptools>=77.0.3
 twine>=5.0
 mkdocs>=1.6
 mkdocs-material>=9.7
+# Importé DIRECTEMENT par tests/meta/test_doc_absolute_links_001.py, qui
+# vérifie les ancres avec la fonction de slug de MkDocs plutôt qu'avec une
+# réimplémentation approximative. Il arrivait déjà par mkdocs ; une
+# dépendance transitive suffit tant qu'elle dure, et cesse sans prévenir.
+Markdown>=3.6
 pymdown-extensions>=10.0
 mkdocs-monorepo-plugin>=1.1
 mkdocs-glightbox>=0.5
