@@ -373,7 +373,20 @@ class DbSessionStore:
         raise self._conflict_error("regenerate")
 
     def authenticate(self, session_id: str, user_data: dict[str, Any], ttl_seconds: int) -> str | None:
-        """Rotation atomique : invalide l'ancienne session, crée une nouvelle authentifiée."""
+        """Rotation atomique : invalide l'ancienne session, crée une nouvelle authentifiée.
+
+        La durée suit la même règle que `create` : le `ttl_seconds` de
+        l'appelant l'emporte quand il diffère du défaut historique, sinon la
+        durée de la nature s'applique (`SESSIONS-TTL-AUTHENTICATED-APPLIED-001`).
+
+        Elle ne la suivait pas, et `SESSION_TTL_AUTHENTICATED` **ne servait à
+        rien**. Le cœur appelle avec `SESSION_DURATION`, égal au défaut
+        historique, si bien qu'un exploitant réglant la variable à trente
+        minutes obtenait une heure quand même, sans un mot. La documentation
+        promettait pourtant les trois variables, et argumentait sur ce cas
+        précis, « réglée court, elle déconnecte les utilisateurs authentifiés
+        toutes les heures ».
+        """
         if not self._valid(session_id):
             return None
         for _ in range(_MAX_WRITE_RETRIES):
@@ -385,7 +398,11 @@ class DbSessionStore:
             if rc == 0:
                 continue  # conflit : la session a changé, on recharge
             nouveau_id = secrets.token_hex(32)
-            expires_at = time.time() + ttl_seconds
+            duree = (
+                ttl_seconds if ttl_seconds != DEFAULT_SESSION_TTL
+                else ttl_for(KIND_AUTHENTICATED)
+            )
+            expires_at = time.time() + duree
             new_session = {
                 **existing,
                 "authenticated": True,

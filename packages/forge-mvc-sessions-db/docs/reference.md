@@ -339,6 +339,23 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
         Retomber en silence sur le défaut donnerait une durée que personne n'a écrite, et une session qui expire trop tôt se diagnostique très mal.
 
+    !!! danger "Le réglage de l'authentifié ne servait à rien"
+        `ttl_for()` n'était appelée qu'à **un seul endroit**, la création d'une session anonyme (`SESSIONS-TTL-AUTHENTICATED-APPLIED-001`).
+
+        La connexion passe par `authenticate()`, qui prenait le `ttl_seconds` de son appelant, et le cœur appelle avec `SESSION_DURATION`, égal au défaut historique.
+        Mesuré, un exploitant réglant `SESSION_TTL_AUTHENTICATED=1800` obtenait trois mille six cents secondes quand même.
+
+        C'est un réglage de sécurité : celui qui l'a posé croyait ses sessions raccourcies, et elles ne l'étaient pas.
+        Le module refuse pourtant une valeur illisible, en disant que « retomber en silence sur le défaut donnerait une durée que personne n'a écrite » ; la valeur lisible était ignorée tout aussi silencieusement.
+
+        Les deux chemins suivent désormais la même règle, et un garde-fou lu sur l'arbre syntaxique refuse qu'ils divergent à nouveau.
+
+    !!! info "La nature `remembered` s'écrit depuis l'application"
+        Le protocole `SessionStore` du cœur déclare `create(data=None)`, sans nature : Forge n'implémente pas de « se souvenir de moi ».
+
+        Une application qui en veut un tient son `DbSessionStore` et appelle `create(kind=KIND_REMEMBERED)` elle même.
+        La durée est prête, le geste lui appartient.
+
     !!! warning "Un `ttl` passé au constructeur reste prioritaire"
         Un projet qui l'avait réglé à la main garde son réglage : le retirer sous ses pieds serait une rupture silencieuse.
 

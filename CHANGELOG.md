@@ -14,6 +14,13 @@
 
 ### Ajouté
 
+- **Le réglage de durée des sessions authentifiées ne servait à rien (`SESSIONS-TTL-AUTHENTICATED-APPLIED-001`).**
+  `SESSIONS-TTL-PER-KIND-001` a livré trois durées par nature de session, et la documentation promet trois variables d'environnement pour les régler. Elle argumente même sur le cas qui ne fonctionnait pas : « réglée court, elle déconnecte les utilisateurs authentifiés toutes les heures ». La revue du référentiel sessions-db l'a relevé.
+  `ttl_for()` n'était appelée qu'à **un seul endroit**, `create()`, qui crée une session anonyme. La connexion passe par `authenticate()`, qui prenait le `ttl_seconds` de son appelant, et le cœur appelle avec `SESSION_DURATION`, égal au défaut historique de trois mille six cents secondes.
+  **Mesuré** : un exploitant réglant `SESSION_TTL_AUTHENTICATED=1800` pour raccourcir ses sessions authentifiées obtenait trois mille six cents secondes quand même, sans un mot. C'est un réglage de **sécurité** : celui qui l'a posé croyait ses sessions raccourcies, et elles ne l'étaient pas. Le module refuse pourtant une valeur illisible, en disant que « retomber en silence sur le défaut donnerait une durée que personne n'a écrite » ; la valeur lisible était ignorée tout aussi silencieusement.
+  `authenticate()` suit désormais la règle de `create()` : le `ttl_seconds` de l'appelant l'emporte quand il **diffère** du défaut historique, sinon la durée de la nature s'applique. Un projet qui l'avait réglé à la main garde son réglage, le retirer sous ses pieds serait une rupture silencieuse dans l'autre sens.
+  Un garde-fou lu sur l'arbre syntaxique refuse que les deux chemins divergent à nouveau : c'est leur divergence qui avait rendu une des trois durées inerte. La documentation dit par ailleurs que la nature `remembered` s'écrit depuis l'application, le protocole `SessionStore` du cœur n'ayant pas de paramètre de nature et Forge n'implémentant pas de « se souvenir de moi ».
+
 - **`forge-mvc-fixtures` n'était vérifié par aucun typage (`PKG-PYRIGHT-FIXTURES-001`).**
   Le commentaire de `[tool.pyright]` annonce que « le cliquet couvre le cœur, **tous les opt-ins** et les 4 backends BDD ». Il en couvrait **vingt-six sur vingt-sept** : `forge-mvc-fixtures` manquait à `include` comme à `extraPaths`.
   Ses dix fichiers portent pourtant tous `# pyright: strict`. Ils ont donc été écrits pour être vérifiés, et ne l'étaient pas. **Trois erreurs s'y étaient accumulées** sans qu'un seul contrôle proteste : deux fonctions mortes laissées dans `cli/load.py` par le déplacement de l'ordonnancement vers `ordering.py` (`FIXTURES-FK-ORDER-ROBUST-001`), et un type partiellement inconnu que trois `pyright: ignore` masquaient à moitié.

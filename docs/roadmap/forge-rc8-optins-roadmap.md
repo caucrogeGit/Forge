@@ -418,6 +418,7 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `WORKFLOW-CONDITIONS-APPLIED-001` | workflow | Revue du référentiel workflow | **Livré.** `apply_transition` ne consultait pas le registre de conditions |
 | `OPTINS-MATURITY-FOLLOWS-CORE-001` | tous | Consigne : plus aucun opt-in en bêta | **Livré.** Dix fichiers s'attribuaient un stade propre, dont des affirmations fausses sur le MFA |
 | `PKG-PYRIGHT-FIXTURES-001` | fixtures | Relecture du `pyproject.toml` racine | **Livré.** Le paquet n'était vérifié par aucun typage, alors que ses dix fichiers portent `# pyright: strict` |
+| `SESSIONS-TTL-AUTHENTICATED-APPLIED-001` | sessions-db | Revue du référentiel sessions-db | **Livré.** `SESSION_TTL_AUTHENTICATED` était sans effet : `ttl_for()` n'était lue que par `create()` |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.
