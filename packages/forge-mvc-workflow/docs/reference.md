@@ -251,7 +251,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     | `make_status` | `make_status(name, label="", color="", is_initial=False, is_final=False) -> WorkflowStatus` | déclare un statut |
     | `make_transition` | `make_transition(from_status, to_status) -> WorkflowTransition` | déclare une transition |
     | `can_transition` | `can_transition(transitions, from_name, to_name) -> bool` | transition autorisée ? |
-    | `apply_transition` | `apply_transition(transitions, from_status, to_status, *, before=None, commit=None, after=None, context=None) -> str` | applique dans un ordre garanti, rend le statut atteint |
+    | `apply_transition` | `apply_transition(transitions, from_status, to_status, *, before=None, commit=None, after=None, context=None) -> str` | consulte les conditions enregistrées, puis applique dans un ordre garanti |
     | `TransitionEvent` | `from_status`, `to_status`, `context` | ce que reçoivent les points d'accroche |
     | `statuses_from_entity_field` | `statuses_from_entity_field(entity, field_name, *, initial=None, final=None) -> list[WorkflowStatus]` | statuts lus des `choices` d'un contrat d'entité |
     | `statuses_from_choices` | `statuses_from_choices(choices, *, initial=None, final=None) -> list[WorkflowStatus]` | même conversion, depuis les choix seuls |
@@ -504,6 +504,26 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
         Une condition sans `from_status` ni `to_status` s'applique à toutes les transitions ; « rien ne sort de brouillon sans relecture » se déclare une fois, plutôt qu'une fois par transition sortante.
 
     `check_conditions` ne lève jamais et sert à **afficher** ce qui bloque, par exemple pour griser un bouton et dire pourquoi. `ensure_conditions` sert à refuser.
+
+    !!! danger "`apply_transition` consulte le registre, et ne le faisait pas"
+        Le registre existe parce que « deux chemins menant au même état s'oubliaient l'un l'autre, et le second passait sans contrôle ».
+
+        Il ne corrigeait pas cela (`WORKFLOW-CONDITIONS-APPLIED-001`).
+        `apply_transition`, la seule fonction du paquet qui sait qu'une transition a lieu, ne le consultait pas : il fallait appeler `ensure_conditions` à chaque site, donc s'en souvenir à chaque site, donc reproduire exactement le défaut visé.
+        Mesuré, une condition enregistrée pour refuser le passage à `validee` n'était jamais appelée, et `apply_transition` rendait `validee`.
+
+        Ce n'est pas de la magie cachée, c'est l'inverse : l'application a explicitement enregistré ses conditions, et les consulter à l'endroit où une transition a lieu est ce pour quoi le registre existe.
+
+    !!! info "Les conditions passent avant tout effet de bord"
+        L'ordre est : transition déclarée, puis conditions, puis `before`, `commit`, `after`.
+
+        `before` peut écrire : refuser après lui laisserait la trace d'une transition qui n'a pas eu lieu.
+        Une transition non déclarée est refusée **avant** les conditions, pour ne pas exécuter du code applicatif sur un passage qui n'existe pas.
+
+    !!! info "Un appel manuel reste sans danger"
+        Une application qui appelait déjà `ensure_conditions` avant `apply_transition` les évalue deux fois.
+
+        Une condition est un prédicat par contrat, elle rend un motif ou `None` : la double évaluation est sans effet, et retirer l'appel du contrôleur le simplifie.
 
 ## Voir aussi
 

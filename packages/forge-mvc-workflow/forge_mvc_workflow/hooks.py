@@ -26,6 +26,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
+from .conditions import ensure_conditions
 from .transitions import WorkflowTransition, WorkflowTransitionError, can_transition
 
 __all__ = [
@@ -74,16 +75,39 @@ def apply_transition(
     L'ordre est le suivant, et chaque étape conditionne la suivante.
 
     1. La transition est vérifiée contre `transitions`.
-    2. `before` est appelé. S'il lève, tout s'arrête ici.
-    3. `commit` est appelé, s'il est fourni. C'est l'écriture de l'application.
-    4. `after` est appelé.
+    2. Les **conditions enregistrées** applicables sont consultées.
+    3. `before` est appelé. S'il lève, tout s'arrête ici.
+    4. `commit` est appelé, s'il est fourni. C'est l'écriture de l'application.
+    5. `after` est appelé.
 
     Sans `commit`, `after` suit immédiatement `before` : le paquet n'a alors
     aucun moyen de savoir si l'écriture a eu lieu, et le dire vaut mieux que de
     laisser croire à une garantie qui n'existe pas.
 
+    ## Pourquoi les conditions sont consultées ici
+
+    Elles ne l'étaient pas (`WORKFLOW-CONDITIONS-APPLIED-001`). Une condition
+    enregistrée pour refuser un passage était ignorée, et `apply_transition`
+    rendait le statut cible comme si de rien n'était.
+
+    Le module des conditions dit pourtant exister parce que « deux chemins
+    menant au même état s'oubliaient l'un l'autre, et le second passait sans
+    contrôle ». Laisser l'application appeler `ensure_conditions` à chaque site
+    reproduisait exactement cela : celui qui oubliait passait.
+
+    Ce n'est pas de la magie cachée, c'est l'inverse. L'application a
+    explicitement enregistré ses conditions ; les consulter à l'endroit où une
+    transition a lieu est ce pour quoi le registre existe.
+
+    Une application qui appelait déjà `ensure_conditions` avant de venir ici les
+    évalue deux fois. Une condition est un prédicat par contrat, elle rend un
+    motif ou `None` : la double évaluation est sans effet, et la retirer du
+    contrôleur simplifie ce dernier.
+
     Raises:
-        WorkflowTransitionError: la transition n'est pas déclarée.
+        WorkflowTransitionError: la transition n'est pas déclarée, ou une
+            condition s'y oppose. Le message porte alors le **motif** rendu par
+            la condition.
         Exception: celle qu'un point d'accroche ou l'écriture a levée, telle
             quelle. Le paquet n'en enveloppe aucune, un message maquillé
             faisant perdre la cause.
@@ -93,10 +117,17 @@ def apply_transition(
             f"Transition non déclarée : '{from_status}' vers '{to_status}'."
         )
 
+    donnees = dict(context or {})
+
+    # Les conditions passent AVANT tout effet de bord : `before` peut écrire,
+    # et refuser après coup laisserait une trace d'une transition qui n'a pas eu
+    # lieu.
+    ensure_conditions(from_status, to_status, donnees)
+
     evenement = TransitionEvent(
         from_status=from_status,
         to_status=to_status,
-        context=dict(context or {}),
+        context=donnees,
     )
 
     if before is not None:

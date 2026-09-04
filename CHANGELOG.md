@@ -14,6 +14,14 @@
 
 ### Ajouté
 
+- **Le registre de conditions de transition n'était consulté par personne (`WORKFLOW-CONDITIONS-APPLIED-001`).**
+  `WORKFLOW-CONDITIONS-001` a livré un registre, et sa raison d'être est écrite dans son propre module : l'application vérifiait ses règles avant d'appeler, chacune à sa façon, si bien que « deux chemins menant au même état s'oubliaient l'un l'autre, et le second passait sans contrôle ». La revue du référentiel workflow l'a relevé.
+  **Le registre ne corrigeait pas cela.** `apply_transition`, la seule fonction du paquet qui sait qu'une transition a lieu, ne le consultait pas. Il fallait appeler `ensure_conditions` à chaque site, donc s'en souvenir à chaque site, donc reproduire exactement le défaut visé.
+  Mesuré : une condition enregistrée pour refuser le passage à `validee` n'était jamais appelée, et `apply_transition` rendait `'validee'`.
+  Ce n'est pas de la magie cachée, c'est l'inverse. L'application a **explicitement** enregistré ses conditions, et les consulter à l'endroit où une transition a lieu est ce pour quoi le registre existe. Un registre que rien ne lit est une décoration.
+  L'ordre est désormais : transition déclarée, conditions, `before`, `commit`, `after`. Les conditions passent **avant tout effet de bord**, `before` pouvant écrire, et une transition non déclarée est refusée **avant** elles, pour ne pas exécuter du code applicatif sur un passage qui n'existe pas. Une application qui appelait déjà `ensure_conditions` les évalue deux fois, sans effet : une condition est un prédicat par contrat.
+  Un garde-fou lu par `ast` refuse qu'une réécriture d'`apply_transition` perde cet appel.
+
 - **L'audit des refus RBAC était sourd sur deux gardes, dont la canonique (`RBAC-DENIAL-AUDIT-COMPLETE-001`).**
   `RBAC-DENIAL-AUDIT-001` a livré l'observation des refus, et sa ligne de roadmap le dit honnêtement : « les **3** gardes annoncent ». Le paquet en compte cinq. La revue du référentiel rbac l'a relevé.
   Les deux oubliées sont les deux qui comptent le plus. `require_user_permission` se décrit dans sa propre docstring comme la garde **canonique** (`SEC-RBAC-CANONICAL-GUARD-001`), celle que « les nouveaux projets utilisent ». `require_instance_permission` refuse l'accès à l'objet d'un autre, c'est à dire le refus qu'un exploitant veut précisément voir passer.
