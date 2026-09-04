@@ -4,6 +4,11 @@
 
 ### Ajouté
 
+- **Le cliquet des README d'opt-in sautait plus du tiers de sa cible, et sa règle était fausse (`META-README-RATCHET-WIDEN-001`).**
+  Il ne reconnaissait une commande que citée entre accents simples **et** précédée de `forge `. Ni un bloc ```bash, qui est précisément l'endroit où un README montre comment installer et provisionner, ni une citation nue comme `mail:doctor`. **Dix paquets sur vingt-sept étaient sautés** faute de citation reconnue : le relevé paraissait large en ne regardant pas les deux tiers de sa cible. Cinq le restent, et ceux là ne citent aucune commande sous aucune forme.
+  Sa règle était fausse par ailleurs, et l'élargissement l'a révélé. Il exigeait qu'une commande citée dans un **espace de noms de l'opt-in** figure dans son `COMMANDS`. Or un espace se partage : `db:config` vient de `forge-mvc-entities`, `db:init` et `db:apply` du cœur, dépêchées en dur par `forge.py`. Le README d'entities, qui cite les trois, aurait été accusé de promettre deux commandes qui existent et fonctionnent.
+  La règle porte désormais sur ce que Forge accepte, quel qu'en soit le déclarant : l'aide générale, l'aide riche, le dispatch en dur de `forge.py` lu par `ast`, et le `COMMANDS` de chaque opt-in, soit cent quatorze commandes. Aucun README n'annonce de commande inexistante, vérifié avant comme après : le trou était de couverture, pas de correction, et un cliquet sert à attraper la faute suivante.
+
 - **Un garde-fou vérifie les liens absolus, que `mkdocs --strict` laisse passer (`META-DOC-ABSOLUTE-LINKS-001`).**
   Le build strict vérifie les liens **relatifs** et échoue sur une cible absente. Il ne vérifie pas les liens **absolus** : il les signale d'une ligne `INFO ... it was left as is`, et sort en succès quelle que soit la cible.
   Ce n'est pas théorique. `DB-POOL-THREADS-DOC-001` a livré un lien vers `/docs/forge/reference/database/connection/`, page qui n'existe pas, la vraie étant `/docs/forge/core-database/connection/`. Le piège est que le préfixe d'URL d'une documentation embarquée est le `site_name` de son `mkdocs.yml`, et non son chemin de fichier. Vérifié en réintroduisant la faute : `mkdocs build --strict` sort en 0, le garde-fou échoue.
