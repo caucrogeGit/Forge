@@ -38,11 +38,12 @@ La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 """
 from __future__ import annotations
 
+import inspect
 import json
 import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 from uuid import uuid4
 
 from forge_mvc_jobs.errors import JobError
@@ -328,6 +329,37 @@ def enqueue(
         raise
 
 
+def _veut_le_jeton(handler: JobHandler) -> bool:
+    """Le gestionnaire déclare-t-il `claim_token` ?
+
+    `heartbeat` prolonge le bail d'une tâche longue, et se garde par le jeton
+    de réservation. Le worker appelait `handler(payload)` : un gestionnaire
+    n'avait donc **aucun moyen** d'obtenir ce jeton, et la fonction était
+    inutilisable depuis le seul endroit où elle sert
+    (`JOBS-HEARTBEAT-REACHABLE-001`).
+
+    La documentation montrait pourtant `def transcoder(payload, *, claim_token)`.
+    Mesuré, un gestionnaire écrit ainsi levait `TypeError`, repartait en réessai,
+    puis finissait `failed` : l'exemple ne se contentait pas d'être inopérant,
+    il cassait la tâche.
+
+    Le gestionnaire **demande** ce qu'il reçoit, ce n'est donc pas de la magie
+    cachée : ceux qui ne déclarent rien continuent de recevoir la seule charge
+    utile, et aucun projet n'a de geste à faire.
+
+    Un appelable dont la signature ne s'inspecte pas, un objet C par exemple,
+    est traité comme n'en voulant pas : deviner ferait échouer un gestionnaire
+    qui marchait.
+    """
+    try:
+        parametres = inspect.signature(handler).parameters
+    except (TypeError, ValueError):  # pragma: no cover - appelable opaque
+        return False
+    if "claim_token" in parametres:
+        return True
+    return any(p.kind is inspect.Parameter.VAR_KEYWORD for p in parametres.values())
+
+
 def process_one(handlers: Mapping[str, JobHandler], *, queue: str = "default", db: Any = None) -> bool:
     """Réserve et exécute une tâche disponible de `queue`. Renvoie `True` si une
     tâche a été traitée, `False` si la file est vide.
@@ -361,7 +393,10 @@ def process_one(handlers: Mapping[str, JobHandler], *, queue: str = "default", d
         return True
 
     try:
-        handler(payload)
+        if _veut_le_jeton(handler):
+            cast("Callable[..., object]", handler)(payload, claim_token=token)
+        else:
+            handler(payload)
     except Exception as exc:  # noqa: BLE001 — toute erreur du gestionnaire est rapportée
         if attempts < max_attempts:
             database.execute(_retry_sql(), (backoff_seconds(attempts), job_id))

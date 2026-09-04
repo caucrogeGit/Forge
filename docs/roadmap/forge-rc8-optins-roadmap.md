@@ -420,6 +420,7 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `PKG-PYRIGHT-FIXTURES-001` | fixtures | Relecture du `pyproject.toml` racine | **Livré.** Le paquet n'était vérifié par aucun typage, alors que ses dix fichiers portent `# pyright: strict` |
 | `SESSIONS-TTL-AUTHENTICATED-APPLIED-001` | sessions-db | Revue du référentiel sessions-db | **Livré.** `SESSION_TTL_AUTHENTICATED` était sans effet : `ttl_for()` n'était lue que par `create()` |
 | `ADMIN-SESSIONS-VIEW-001` | admin | Même revue | **Livré.** La métrique existait, l'écran non ; couplage souple, aucun identifiant exposé |
+| `JOBS-HEARTBEAT-REACHABLE-001` | jobs | Revue du référentiel jobs | **Livré.** Le gestionnaire ne recevait pas son jeton ; l'exemple documenté cassait la tâche |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.

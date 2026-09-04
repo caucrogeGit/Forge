@@ -24,6 +24,12 @@
 
 ### Ajouté
 
+- **`heartbeat` était inutilisable depuis le seul endroit où elle sert (`JOBS-HEARTBEAT-REACHABLE-001`).**
+  Elle prolonge le bail d'une tâche longue, pour qu'elle ne soit pas reprise par `jobs:reclaim` alors qu'elle travaille encore, et se garde par le jeton de réservation. Le worker appelait `handler(payload)` : un gestionnaire n'avait **aucun moyen** d'obtenir ce jeton. Revue du référentiel jobs.
+  **L'exemple documenté cassait la tâche.** La référence montre `def transcoder(payload, *, claim_token)`. Mesuré, un gestionnaire écrit ainsi levait `TypeError`, repartait en réessai au bout de dix secondes, puis finissait `failed`. Il ne se contentait pas d'être inopérant, et le motif inscrit dans `last_error` parlait d'un argument manquant plutôt que du travail.
+  Un gestionnaire qui déclare `claim_token`, en mot-clé ou par `**kwargs`, le reçoit désormais. Celui qui ne déclare rien continue de recevoir la seule charge utile, et **aucun projet existant n'a de geste à faire**. Ce n'est pas de la magie cachée, c'est le gestionnaire qui demande. Un appelable dont la signature ne s'inspecte pas ne reçoit rien : deviner ferait échouer un gestionnaire qui marchait.
+  Un test rejoue l'exemple exact de la documentation, l'écart entre les deux étant précisément ce qui a fait le défaut.
+
 - **Le réglage de durée des sessions authentifiées ne servait à rien (`SESSIONS-TTL-AUTHENTICATED-APPLIED-001`).**
   `SESSIONS-TTL-PER-KIND-001` a livré trois durées par nature de session, et la documentation promet trois variables d'environnement pour les régler. Elle argumente même sur le cas qui ne fonctionnait pas : « réglée court, elle déconnecte les utilisateurs authentifiés toutes les heures ». La revue du référentiel sessions-db l'a relevé.
   `ttl_for()` n'était appelée qu'à **un seul endroit**, `create()`, qui crée une session anonyme. La connexion passe par `authenticate()`, qui prenait le `ttl_seconds` de son appelant, et le cœur appelle avec `SESSION_DURATION`, égal au défaut historique de trois mille six cents secondes.

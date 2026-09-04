@@ -509,6 +509,18 @@ def transcoder(payload, *, claim_token):
 `heartbeat` rend `False` quand le jeton ne désigne aucune tâche en cours.
 C'est une information utile : le travail est peut-être en train d'être refait ailleurs.
 
+!!! danger "Cet exemple ne fonctionnait pas, et cassait la tâche"
+    Le worker appelait `handler(payload)`. Un gestionnaire n'avait donc aucun moyen d'obtenir son jeton, et `heartbeat` était inutilisable depuis le seul endroit où elle sert (`JOBS-HEARTBEAT-REACHABLE-001`).
+
+    Mesuré, un gestionnaire écrit comme ci dessus levait `TypeError`, repartait en réessai au bout de dix secondes, puis finissait `failed`.
+    L'exemple ne se contentait pas d'être inopérant : il cassait la tâche, et le motif inscrit dans `last_error` parlait d'un argument manquant plutôt que du travail.
+
+!!! info "Le gestionnaire demande ce qu'il reçoit"
+    Un gestionnaire qui déclare `claim_token`, en mot-clé ou par `**kwargs`, le reçoit. Celui qui ne déclare rien continue de recevoir la seule charge utile, et aucun projet existant n'a de geste à faire.
+
+    Ce n'est pas de la magie cachée : c'est le gestionnaire qui demande.
+    Un appelable dont la signature ne s'inspecte pas ne reçoit rien, deviner ferait échouer un gestionnaire qui marchait.
+
 !!! info "Seul l'ouvrier qui détient la tâche la prolonge"
     La requête est gardée par `claim_token`.
 
