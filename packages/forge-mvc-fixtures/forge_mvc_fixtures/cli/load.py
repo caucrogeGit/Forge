@@ -127,18 +127,6 @@ def collect_fixture_files(root: Path, scenario: "str | None" = None) -> list[Pat
     return list(select_scenario_files(root, scenario, pattern="*.sql").files)
 
 
-def _table_of_file(path: Path) -> str | None:
-    """Table ciblée par le fichier (premier ``INSERT INTO``), sinon le nom de fichier."""
-    try:
-        text = path.read_text(encoding="utf-8")
-    except OSError:
-        return None
-    match = _INSERT_INTO.search(text)
-    if match:
-        return match.group(1)
-    return path.stem
-
-
 def _entity_tables(root: Path) -> dict[str, str]:
     """Table de chaque entité (``<entity>.json`` -> ``table``), indexée par nom PascalCase."""
     entities_dir = root / "mvc" / "entities"
@@ -193,22 +181,6 @@ def _fk_dependencies(root: Path) -> dict[str, set[str]] | None:
             deps.setdefault(source, set()).add(target)
             deps.setdefault(target, set())
     return deps
-
-
-def _topological_order(deps: dict[str, set[str]]) -> list[str] | None:
-    """Ordre topologique des entités (dépendances chargées d'abord). ``None`` si cycle."""
-    remaining = {node: set(edges) for node, edges in deps.items()}
-    ordered: list[str] = []
-    while remaining:
-        ready = sorted(node for node, edges in remaining.items() if not edges)
-        if not ready:
-            return None  # cycle
-        for node in ready:
-            ordered.append(node)
-            del remaining[node]
-        for edges in remaining.values():
-            edges.difference_update(ready)
-    return ordered
 
 
 def order_fixture_files(root: Path, files: list[Path]) -> list[Path]:

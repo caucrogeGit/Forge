@@ -14,6 +14,12 @@
 
 ### Ajouté
 
+- **`forge-mvc-fixtures` n'était vérifié par aucun typage (`PKG-PYRIGHT-FIXTURES-001`).**
+  Le commentaire de `[tool.pyright]` annonce que « le cliquet couvre le cœur, **tous les opt-ins** et les 4 backends BDD ». Il en couvrait **vingt-six sur vingt-sept** : `forge-mvc-fixtures` manquait à `include` comme à `extraPaths`.
+  Ses dix fichiers portent pourtant tous `# pyright: strict`. Ils ont donc été écrits pour être vérifiés, et ne l'étaient pas. **Trois erreurs s'y étaient accumulées** sans qu'un seul contrôle proteste : deux fonctions mortes laissées dans `cli/load.py` par le déplacement de l'ordonnancement vers `ordering.py` (`FIXTURES-FK-ORDER-ROBUST-001`), et un type partiellement inconnu que trois `pyright: ignore` masquaient à moitié.
+  Le code est corrigé, et le paquet passe à zéro erreur. Le typage de `ordering.py` nomme son type une fois par `cast` plutôt que d'empiler des `ignore` à chaque accès : c'est un `ignore` de trop qui avait rendu l'erreur invisible.
+  Une annonce de complétude qui n'en est pas fait cesser de vérifier : on lit la phrase, on conclut que c'est couvert, et on ne compte jamais. L'ajout à la configuration relève du `pyproject.toml` racine, protégé par le hook.
+
 - **Aucun opt-in ne s'attribue plus une maturité propre (`OPTINS-MATURITY-FOLLOWS-CORE-001`).**
   Les vingt-sept opt-ins portent déjà la version du cœur et le même classifieur. Leur **prose** disait autre chose : dix fichiers annonçaient un « Statut : Beta » par paquet, plusieurs adossé à `1.0.0-beta.9` ou `1.0.0-beta.13`, séries closes depuis le renumérotage vers 1.0.
   **Ce n'était pas une coquetterie, la maturité annoncée avait dérivé.** Le README de `forge-mvc-mfa`, module de sécurité, annonçait que « la politique de rotation de la clé Fernet n'est pas encore formalisée » alors que `MFA-KEY-ROTATION-001` l'avait livrée. Il conseillait des **sticky sessions** en multi-worker, là où le paquet livre `DbTotpReplayStore`, magasin partagé par tous les workers, et il ignorait que la parade du rate-limit se pose désormais au proxy (`DEPLOY-NGINX-RATE-LIMIT-001`). Il citait aussi « Forge 2.4.0 » et « Forge 3.0 », numérotation abandonnée.

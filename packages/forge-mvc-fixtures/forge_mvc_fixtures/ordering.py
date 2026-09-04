@@ -30,7 +30,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 __all__ = [
     "FixtureOrderPlan",
@@ -122,16 +122,21 @@ def fk_dependencies(root: Path) -> "tuple[dict[str, set[str]] | None, tuple[str,
     if not isinstance(donnees, dict):
         return (None, ("relations.json ne contient pas un objet JSON.",), ())
 
-    relations = donnees.get("relations")  # pyright: ignore[reportUnknownMemberType]
+    # `json.loads` rend `Any` : on nomme le type une fois, plutôt que d'empiler
+    # des `pyright: ignore` à chaque accès. Trois d'entre eux masquaient une
+    # erreur que la configuration ne voyait pas, ce paquet ayant été oublié de
+    # la liste vérifiée (`PKG-PYRIGHT-FIXTURES-001`).
+    contenu = cast("dict[str, Any]", donnees)
+    relations = contenu.get("relations")
     if not isinstance(relations, list):
         return (None, ("relations.json ne déclare aucune liste « relations ».",), ())
 
     deps: dict[str, set[str]] = {}
     auto: list[str] = []
-    for brut in relations:  # pyright: ignore[reportUnknownVariableType]
+    for brut in cast("list[Any]", relations):
         if not isinstance(brut, dict):
             continue
-        relation: dict[str, Any] = brut  # pyright: ignore[reportUnknownVariableType]
+        relation = cast("dict[str, Any]", brut)
         if relation.get("type") != "many_to_one":
             continue
         source = relation.get("from")
