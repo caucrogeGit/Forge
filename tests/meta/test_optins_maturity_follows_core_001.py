@@ -17,13 +17,17 @@ Un README qui décrit un état antérieur à son code est pire qu'un README abse
 il fait chercher ailleurs ce qui est déjà là, et personne ne le relit puisqu'il
 a l'air à jour.
 
-## Ce que ce garde-fou fige
+## Ce que ce garde-fou fige, et ce qu'il laisse à un autre
 
-La fin : la version d'un opt-in est celle du cœur, et aucune documentation de
-paquet ne lui prête un cycle de maturité propre.
+La fin qu'il garde : aucune documentation de paquet ne prête à un opt-in un
+cycle de maturité propre.
 
-Il ne fige ni le numéro de version, qui change à chaque publication, ni le
-classifieur, qui est une décision de release.
+Il ne garde **pas** les numéros de version. `tools/check_version_sync.py` le
+fait depuis `PKG-VERSION-SYNC-CHECK-001`, sur soixante et un fichiers, et il
+est joué par la suite de tests comme par `release-validate.sh`. Deux gardiens
+de la même chose, c'est l'assurance que l'un des deux dérive.
+
+Il ne fige pas non plus le classifieur, qui est une décision de release.
 """
 from __future__ import annotations
 
@@ -51,12 +55,6 @@ _MATURITE = re.compile(
 )
 
 
-def _version(pyproject: Path) -> "str | None":
-    trouve = re.search(r'^version\s*=\s*"([^"]+)"', 
-                       pyproject.read_text(encoding="utf-8"), re.MULTILINE)
-    return trouve.group(1) if trouve else None
-
-
 def _paquets() -> "list[Path]":
     return sorted(d for d in PACKAGES.iterdir()
                   if d.is_dir() and (d / "pyproject.toml").is_file())
@@ -72,26 +70,44 @@ def _documents(paquet: Path) -> "list[Path]":
 
 
 _PAQUETS = _paquets()
-_VERSION_COEUR = _version(PROJECT_ROOT / "pyproject.toml")
 
 
 def test_le_releve_a_des_entrees() -> None:
     """Un garde-fou sans entrée est un garde-fou qui ne garde rien."""
     assert len(_PAQUETS) > 20, f"{len(_PAQUETS)} paquets trouvés"
-    assert _VERSION_COEUR, "la version du cœur n'est plus lisible"
+    assert any(_documents(p) for p in _PAQUETS), (
+        "aucun document de paquet n'est lu : le relevé ne garde plus rien")
 
 
-class TestVersion:
+class TestUneSeuleAutorite:
+    """La version est gardée ailleurs, et une seule fois.
 
-    @pytest.mark.parametrize(
-        "paquet", _PAQUETS, ids=[p.name for p in _PAQUETS])
-    def test_l_optin_porte_la_version_du_coeur(self, paquet: Path) -> None:
-        """Un opt-in publié à une version différente laisserait croire à un
-        cycle de vie séparé, et obligerait à tenir une matrice de
-        compatibilité que Forge n'entretient pas."""
-        assert _version(paquet / "pyproject.toml") == _VERSION_COEUR, (
-            f"{paquet.name} ne suit pas la version du cœur "
-            f"({_VERSION_COEUR}) : les opt-ins n'ont pas de cycle propre.")
+    Ce module a d'abord vérifié lui même que chaque `pyproject.toml` d'opt-in
+    portait la version du cœur. C'était un doublon : `tools/check_version_sync.py`
+    le fait depuis `PKG-VERSION-SYNC-CHECK-001`, sur **soixante et un** fichiers
+    et non vingt-sept, `__version__` des modules, pins `forge-mvc>=`, extras du
+    pyproject racine, `core/__init__.py`, `forge.py`, pin du squelette et
+    `package.json` compris.
+
+    Deux gardiens de la même chose, c'est l'assurance que l'un des deux dérive,
+    et le principe 11 refuse deux façons officielles de faire la même chose. Ce
+    module ne garde donc que ce que l'autre ne regarde pas : la **prose**.
+    """
+
+    def test_l_outil_de_synchronisation_existe_toujours(self) -> None:
+        outil = PROJECT_ROOT / "tools" / "check_version_sync.py"
+
+        assert outil.is_file(), (
+            "tools/check_version_sync.py est l'autorité sur la version "
+            "(PKG-VERSION-SYNC-CHECK-001). S'il disparaît, plus rien ne "
+            "garantit que les opt-ins suivent le cœur.")
+
+    def test_il_est_joue_par_la_suite(self) -> None:
+        """Un outil que personne ne lance ne garde rien."""
+        appelant = PROJECT_ROOT / "tests" / "meta" / "test_version_sync_001.py"
+
+        assert appelant.is_file()
+        assert "check_version_sync.py" in appelant.read_text(encoding="utf-8")
 
 
 class TestProse:
