@@ -23,7 +23,7 @@ dependencies = [
     "jinja2==3.1.6",
     # CORE-DROP-PILLOW-001 (ADR-018) : Pillow a quitté le core. Le traitement
     # d'image vit dans l'opt-in forge-mvc-images, qui déclare Pillow lui-même.
-        "argon2-cffi>=25.1,<26",
+    "argon2-cffi>=25.1,<26",
     # CORE-DROP-JSONSCHEMA-001 (ADR-070) : jsonschema a quitté le core avec le
     # moteur d'entités. forge-mvc-entities et forge-mvc-rbac le déclarent eux-mêmes.
     # Les commandes du core (schema:list, schema:doctor) n'inspectent que présence,
@@ -32,6 +32,10 @@ dependencies = [
 
 
 classifiers = [
+    # PyPI n'a pas de classifieur pour une release candidate : « 4 - Beta »
+    # couvre la stabilisation d'avant 1.0. Il passera à
+    # « 5 - Production/Stable » au tag 1.0.0 stable, et les vingt-sept opt-ins
+    # le suivront, comme ils suivent la version (tools/check_version_sync.py).
     "Development Status :: 4 - Beta",
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
@@ -50,26 +54,28 @@ Repository = "https://github.com/caucrogeGit/Forge"
 Documentation = "https://forgemvc.com/docs/forge/"
 Issues = "https://github.com/caucrogeGit/Forge/issues"
 
-# Extras de raccourci vers les opt-ins publiables stables (rbac/workflow/stats).
+# Extras de raccourci vers trois opt-ins sans dépendance lourde.
 # Pins alignés sur la version courante : forge-mvc-<nom>>=1.0.0rc7,<2
 # (politique unifiée OPTIN-DEPS-PIN-B13-001).
-# Exclus de [all] : forge-mvc-mfa, forge-mvc-images, forge-mvc-iot, forge-mvc-video
-#   images = traitement d'image (Pillow), API applicative encore Alpha
-#   mfa   = Alpha (secret TOTP chiffré au repos)
-#   iot   = Alpha + dépendance MQTT (paho-mqtt)
-#   video = Alpha + binaire système FFmpeg
-# Ces quatre opt-ins s'installent explicitement (pip install --pre forge-mvc-<nom>).
-# Donc `forge-mvc[all]` ≠ « tous les opt-ins publiés » : il cible le socle
-# stable rbac/workflow/stats sans tirer de dépendances Alpha/MQTT/FFmpeg.
+#
+# `forge-mvc[all]` ≠ « tous les opt-ins » : le dépôt en compte vingt-sept, et
+# vingt-quatre s'installent explicitement. « all » nomme le socle recommandé,
+# celui qui n'ajoute ni bibliothèque lourde, ni binaire système, ni choix de
+# sécurité qui appartient à l'application.
+#
+# Un opt-in n'a pas de maturité propre : il suit la version du cœur
+# (OPTINS-MATURITY-FOLLOWS-CORE-001). Ce qui l'écarte de « all » est donc ce
+# qu'il tire avec lui, jamais un stade de développement.
+#   images = Pillow, plus forge-mvc-files
+#   mfa    = pyotp et cryptography ; activer la MFA est un choix explicite
+#   iot    = paho-mqtt, et un courtier MQTT à faire tourner
+#   video  = ffmpeg / ffprobe, binaires système hors pip
 
 [project.optional-dependencies]
 rbac = ["forge-mvc-rbac>=1.0.0rc7,<2"]
 workflow = ["forge-mvc-workflow>=1.0.0rc7,<2"]
 stats = ["forge-mvc-stats>=1.0.0rc7,<2"]
 all = [
-    # Périmètre restreint aux 3 opt-ins sans dépendance lourde ni binaire
-    # système : « all » = base recommandée, pas la totalité des opt-ins.
-    # Les autres s'installent explicitement (rationale détaillée : README).
     "forge-mvc-rbac>=1.0.0rc7,<2",
     "forge-mvc-workflow>=1.0.0rc7,<2",
     "forge-mvc-stats>=1.0.0rc7,<2",
@@ -114,12 +120,20 @@ include = ["core*", "cli*", "integrations*", "skeleton*"]
 ]
 
 [tool.pyright]
-# ADR-036 - typage statique vérifié en CI. Le cliquet couvre le cœur, tous les
-# opt-ins et les 4 backends BDD (ADR-054), en `# pyright: strict` par fichier.
-# `forge-mvc-testing` (dev-only, ADR-041) est inclus mais vérifié en mode
-# "standard" seulement (annotation stricte complète à faire séparément). `extraPaths` rend chaque paquet importable par les
-# autres (images→files, video→files, etc.) : pyright ne suit pas les installs
-# éditables PEP 660, on lui donne donc les sources directement.
+# ADR-036 - typage statique vérifié en CI. Le cliquet couvre le cœur et les
+# vingt-sept opt-ins, backends BDD compris (ADR-054), en `# pyright: strict`
+# par fichier : le mode global reste "standard", et chaque fichier décide.
+# `forge-mvc-testing` (dev-only, ADR-041) n'est strict que sur six de ses dix
+# fichiers, annotation complète à faire séparément.
+#
+# `forge-mvc-fixtures` manquait aux deux listes (PKG-PYRIGHT-FIXTURES-001) : ses
+# dix fichiers portaient `# pyright: strict` sans que rien ne les vérifie, et
+# trois erreurs s'y étaient accumulées. Un garde-fou refuse désormais qu'un
+# paquet du dépôt manque ici.
+#
+# `extraPaths` rend chaque paquet importable par les autres (images→files,
+# video→files, etc.) : pyright ne suit pas les installs éditables PEP 660, on
+# lui donne donc les sources directement.
 include = [
     "core",
     "packages/forge-mvc-admin/forge_mvc_admin",
@@ -128,6 +142,7 @@ include = [
     "packages/forge-mvc-deploy/forge_mvc_deploy",
     "packages/forge-mvc-entities/forge_mvc_entities",
     "packages/forge-mvc-files/forge_mvc_files",
+    "packages/forge-mvc-fixtures/forge_mvc_fixtures",
     "packages/forge-mvc-i18n/forge_mvc_i18n",
     "packages/forge-mvc-images/forge_mvc_images",
     "packages/forge-mvc-import-export/forge_mvc_import_export",
@@ -156,6 +171,7 @@ extraPaths = [
     "packages/forge-mvc-deploy",
     "packages/forge-mvc-entities",
     "packages/forge-mvc-files",
+    "packages/forge-mvc-fixtures",
     "packages/forge-mvc-i18n",
     "packages/forge-mvc-images",
     "packages/forge-mvc-import-export",

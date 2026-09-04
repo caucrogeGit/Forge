@@ -112,20 +112,51 @@ class TestDoctorMfaWarningMessage:
 # ---------------------------------------------------------------------------
 
 class TestPyotpNotInCoreDeps:
+    """`pyotp` n'est pas une dépendance du cœur.
+
+    Ces contrôles cherchaient la **chaîne** `pyotp` n'importe où dans le
+    fichier. Ils figeaient le moyen, pas la fin qu'ils énoncent eux mêmes,
+    « pas dans les dépendances runtime du core »
+    (`PKG-PYRIGHT-FIXTURES-001`, relecture du pyproject racine).
+
+    Conséquence : le fichier ne pouvait pas **expliquer** pourquoi
+    `forge-mvc-mfa` est hors de l'extra `all`, alors que nommer ce qu'un opt-in
+    tire avec lui est la seule raison durable de l'en écarter. Un commentaire
+    qui dit « mfa tire pyotp » faisait échouer un test qui vise les
+    dépendances.
+    """
+
+    def _dependances(self) -> "set[str]":
+        """Toutes les dépendances déclarées, extras compris, en minuscules."""
+        import tomllib
+
+        projet = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))["project"]
+        declarees = list(projet.get("dependencies", []))
+        for extra in projet.get("optional-dependencies", {}).values():
+            declarees.extend(extra)
+        return {d.lower() for d in declarees}
 
     def test_pyotp_not_in_pyproject_dependencies(self):
-        content = PYPROJECT.read_text(encoding="utf-8")
-        assert "pyotp" not in content, (
-            "pyotp ne doit pas apparaître dans pyproject.toml du core forge-mvc"
+        fautives = [d for d in self._dependances() if "pyotp" in d]
+
+        assert not fautives, (
+            f"pyotp ne doit pas être une dépendance du core forge-mvc : "
+            f"{', '.join(fautives)}. Il appartient à forge-mvc-mfa, qui le "
+            f"déclare lui-même."
         )
 
     def test_requirements_txt_exists_or_skip(self):
         req = PROJECT_ROOT / "requirements.txt"
         if not req.exists():
             pytest.skip("requirements.txt absent — pas de dépendances runtime listées")
-        content = req.read_text(encoding="utf-8")
-        assert "pyotp" not in content, (
-            "pyotp ne doit pas être dans requirements.txt du core"
+        lignes = [
+            ligne.split("#", 1)[0].strip()
+            for ligne in req.read_text(encoding="utf-8").splitlines()
+        ]
+        fautives = [ligne for ligne in lignes if ligne and "pyotp" in ligne.lower()]
+
+        assert not fautives, (
+            f"pyotp ne doit pas être une exigence du core : {', '.join(fautives)}"
         )
 
 
