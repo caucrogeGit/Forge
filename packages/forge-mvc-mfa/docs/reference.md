@@ -5,9 +5,9 @@ Ce document explique ce que fait l'opt-in `forge-mvc-mfa`, ce qu'il expose, et c
 !!! note "Module extrait"
     Le code MFA a été extrait du cœur vers le paquet `forge-mvc-mfa` ; le cœur Forge n'en dépend pas.
 
-!!! info "Statut : Beta"
-    `forge-mvc-mfa` est en **Beta** (`Development Status :: 4 - Beta`), publié sur PyPI depuis `1.0.0-beta.9` (`MFA-PYPI-READY-001`).
-    Le secret TOTP est chiffré au repos via Fernet (`SEC-MFA-SECRET-ENCRYPTION-001`).
+!!! info "Cet opt-in suit la version du cœur"
+    Il n'a pas de cycle de maturité propre : sa version est celle du `pyproject.toml` racine (`OPTINS-MATURITY-FOLLOWS-CORE-001`).
+    Le secret TOTP est chiffré au repos via Fernet (`SEC-MFA-SECRET-ENCRYPTION-001`), et sa clé se tourne depuis `MFA-KEY-ROTATION-001`.
 
 `forge-mvc-mfa` ajoute un second facteur d'authentification : TOTP (application d'authentification), codes de récupération, challenge à la connexion, revalidation et protections (anti-rejeu, rate-limit).
 
@@ -410,9 +410,8 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
 ??? note "13. Politique de stockage des secrets MFA"
 
-    ### Statut actuel
+    ### Ce qui est en place
 
-    `forge-mvc-mfa` est en Beta.
     Le secret TOTP est **chiffré au repos** via Fernet (bibliothèque `cryptography`).
 
     Le module est opt-in, non inclus dans `forge-mvc[all]`, et doit être configuré avec `FORGE_MFA_SECRET_KEY` avant tout déploiement.
@@ -434,9 +433,8 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     ### Production
 
-    Le module est en Beta.
-    Le chiffrement Fernet est en place (depuis `SEC-MFA-SECRET-ENCRYPTION-001`).
-    Certaines exigences avancées (rotation de clé, sauvegarde/restauration, revue sécurité formelle) restent à la charge de l'application avant un usage critique.
+    Le chiffrement Fernet est en place (`SEC-MFA-SECRET-ENCRYPTION-001`) et la rotation de clé l'est aussi (`MFA-KEY-ROTATION-001`).
+    Deux exigences restent à la charge de l'exploitant : la **sauvegarde** de la clé, dont la perte rend les secrets illisibles, et la **revue de sécurité** de son propre déploiement.
 
     **Protection additionnelle recommandée en production :**
 
@@ -470,7 +468,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     ### Codes de récupération
 
-    Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` (série `1.0.0-beta.x`) :
+    Les codes de récupération sont correctement protégés dans `forge-mvc-mfa` :
 
     - générés via `secrets.choice()` sur un alphabet sans ambiguïté ;
     - hashés avant stockage via `hash_recovery_code()` (SHA-256) ;
@@ -482,17 +480,13 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     ### Exigences avant production-ready
 
-    `forge-mvc-mfa` est en **Beta** (publié sur PyPI depuis `1.0.0-beta.9`).
-    Avant un usage en production critique, l'application doit couvrir les exigences suivantes :
+    Ce qui relevait du paquet est livré. Ce qui reste relève de l'exploitant, et ne peut pas en relever autrement : Forge ne sait ni où vous sauvegardez vos clés, ni qui relit votre déploiement.
 
     1. ~~**Chiffrement applicatif des secrets TOTP**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : Fernet + `FORGE_MFA_SECRET_KEY`.
-    2. **Politique de rotation documentée** : rotation ou invalidation maîtrisée des secrets compromis.
-    3. **Documentation de sauvegarde/restauration** : procédure en cas de perte de la clé de chiffrement.
-    4. ~~**Tests dédiés au stockage chiffré**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : `tests/test_mfa_secret_crypto.py`.
-    5. **Revue sécurité explicite** : validation que le stockage chiffré est correct.
-    6. ~~**Décision explicite de changement de statut**~~ ✓ livré (`MFA-PYPI-READY-001`).
-    7. ~~**Publication PyPI**~~ ✓ livré en `1.0.0-beta.9`.
-    8. ~~**Passage en Beta**~~ ✓ acté (tous les opt-ins en Beta).
+    2. ~~**Politique de rotation**~~ ✓ livré (`MFA-KEY-ROTATION-001`) : `FORGE_MFA_SECRET_KEY_PREVIOUS`, `rotate_totp_secret`, `uses_current_key`.
+    3. ~~**Tests dédiés au stockage chiffré**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : `tests/test_mfa_secret_crypto.py`.
+    4. **Sauvegarde de la clé de chiffrement** : à votre charge. Sa perte rend tous les secrets TOTP illisibles, et aucun facteur ne se revalide.
+    5. **Revue de sécurité de votre déploiement** : à votre charge.
 
     ### Tickets liés
 

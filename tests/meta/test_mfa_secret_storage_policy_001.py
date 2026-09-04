@@ -41,10 +41,17 @@ class TestStoragePolicySectionExists:
             "'Politique de stockage des secrets MFA'."
         )
 
-    def test_subsection_statut_actuel(self):
+    def test_subsection_etat_des_lieux(self):
+        """La page dit ce qui est en place, quel que soit le titre retenu.
+
+        Ce contrôle exigeait le libellé exact « Statut actuel »
+        (`OPTINS-MATURITY-FOLLOWS-CORE-001`). Le titre a changé en même temps
+        que la prose de maturité, sans que la fin visée cesse d'être vraie :
+        un lecteur doit trouver ce que le module protège et comment.
+        """
         text = AUTH_MFA_REF.read_text(encoding="utf-8")
-        assert "Statut actuel" in text, (
-            "La section politique doit inclure '### Statut actuel'."
+        assert "Ce qui est en place" in text or "Statut actuel" in text, (
+            "La section politique doit dire ce qui est en place."
         )
 
     def test_subsection_developpement(self):

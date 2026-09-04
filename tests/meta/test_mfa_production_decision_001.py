@@ -91,9 +91,16 @@ class TestMfaStatusDocumented:
         )
 
     def test_mfa_readme_documents_status(self):
+        """Le README dit d'où vient sa version.
+
+        Ce contrôle exigeait le mot « Beta »
+        (`OPTINS-MATURITY-FOLLOWS-CORE-001`). Un opt-in n'a plus de maturité
+        propre : l'exiger obligerait à réafficher un stade périmé pour
+        satisfaire un test, ce que la règle D interdit.
+        """
         text = MFA_README.read_text(encoding="utf-8")
-        assert "Beta" in text, (
-            "Le README MFA doit afficher le statut 'Beta' clairement."
+        assert "suit la version du cœur" in text, (
+            "Le README MFA doit dire que le paquet suit la version du cœur."
         )
 
     def test_mfa_readme_documents_pypi_roadmap(self):

@@ -2,9 +2,11 @@
 
 Données de démonstration et de test opt-in pour le framework Forge.
 
-## Statut : Beta — opt-in officiel (scaffold)
+## Un opt-in officiel
 
-`forge-mvc-fixtures` est marqué `Development Status :: 4 - Beta`.
+Cet opt-in **suit la version du cœur** de Forge et n'a pas de cycle de maturité
+propre : sa version est celle du `pyproject.toml` racine (`OPTINS-MATURITY-FOLLOWS-CORE-001`).
+
 Le paquet est introduit par l'ADR-074.
 
 C'est un **opt-in à CLI seule** : il ajoute les commandes `forge fixtures:load`

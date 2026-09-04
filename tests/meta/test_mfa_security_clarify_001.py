@@ -40,10 +40,17 @@ AUTH_DOC = PROJECT_ROOT / "docs" / "features" / "auth.md"
 class TestAuthMfaRefHasStatusWarning:
     """La référence du paquet MFA affiche le statut et la sécurité MFA."""
 
-    def test_mentions_beta_status(self):
+    def test_mentions_la_version_suivie(self):
+        """La page dit d'où vient sa version.
+
+        Ce contrôle exigeait le mot « Beta »
+        (`OPTINS-MATURITY-FOLLOWS-CORE-001`). Il figeait le moyen : un opt-in
+        n'a plus de maturité propre, il suit la version du cœur, et l'exiger
+        obligerait à réécrire un stade périmé pour satisfaire un test.
+        """
         text = AUTH_MFA_REF.read_text(encoding="utf-8")
-        assert "Beta" in text, (
-            "La référence MFA doit mentionner le statut Beta."
+        assert "version du cœur" in text, (
+            "La référence MFA doit dire que le paquet suit la version du cœur."
         )
 
     def test_mentions_secret_chiffre(self):
@@ -67,12 +74,16 @@ class TestAuthMfaRefHasStatusWarning:
         )
 
     def test_status_block_at_top(self):
-        """L'avertissement de statut MFA apparaît dans les 30 premières lignes."""
+        """Le lecteur sait tôt à quoi s'en tenir.
+
+        La fin est qu'un bloc de situation ouvre la page, avant la première
+        ligne de code. Le contenu de ce bloc a changé, la fin non.
+        """
         text = AUTH_MFA_REF.read_text(encoding="utf-8")
         first_30_lines = "\n".join(text.splitlines()[:30])
-        assert "Beta" in first_30_lines or "MFA-PYPI-READY-001" in first_30_lines, (
-            "L'avertissement de statut (Beta ou ticket MFA-PYPI-READY-001) "
-            "doit être en début de page (dans les 30 premières lignes)."
+        assert "version du cœur" in first_30_lines, (
+            "Le bloc de situation doit être en début de page (dans les 30 "
+            "premières lignes)."
         )
 
 

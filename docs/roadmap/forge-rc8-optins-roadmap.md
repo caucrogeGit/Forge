@@ -416,6 +416,7 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `ENTITIES-COMPUTED-CANONICAL-001` | entities | Revue du référentiel entities | **Livré.** Les champs calculés n'étaient déclarables que dans le format interne ; le normaliseur perdait l'expression en silence |
 | `RBAC-DENIAL-AUDIT-COMPLETE-001` | rbac | Revue du référentiel rbac | **Livré.** L'audit des refus couvrait 3 gardes sur 5, et manquait la canonique |
 | `WORKFLOW-CONDITIONS-APPLIED-001` | workflow | Revue du référentiel workflow | **Livré.** `apply_transition` ne consultait pas le registre de conditions |
+| `OPTINS-MATURITY-FOLLOWS-CORE-001` | tous | Consigne : plus aucun opt-in en bêta | **Livré.** Dix fichiers s'attribuaient un stade propre, dont des affirmations fausses sur le MFA |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.

@@ -3,7 +3,10 @@
 Module **opt-in** Forge pour la gestion audio : upload, sondage de métadonnées,
 transcodage MP3 et lecture en streaming. **Sans état** (aucune base de données).
 
-## Statut : Beta — opt-in officiel
+## Un opt-in officiel
+
+Cet opt-in **suit la version du cœur** de Forge et n'a pas de cycle de maturité
+propre : sa version est celle du `pyproject.toml` racine (`OPTINS-MATURITY-FOLLOWS-CORE-001`).
 
 `forge-mvc-audio` fournit une chaîne audio complète et **sobre**, calquée sur
 `forge-mvc-video` mais **sans la machinerie à état** (pas de table SQL, pas de

@@ -4,7 +4,10 @@ Module **opt-in** propriétaire de tout l'image dans Forge MVC : traitement
 (variantes, miniatures, validation de contenu — Pillow) **et** couche médias
 applicative (repository, galerie, couverture).
 
-## Statut : Beta (extraction terminée, ADR-018)
+## Extraction terminée (ADR-018)
+
+Cet opt-in **suit la version du cœur** de Forge et n'a pas de cycle de maturité
+propre : sa version est celle du `pyproject.toml` racine (`OPTINS-MATURITY-FOLLOWS-CORE-001`).
 
 `forge-mvc-images` est désormais l'unique propriétaire de tout l'image dans
 Forge. Le traitement (Pillow) et la couche applicative médias ont été rapatriés

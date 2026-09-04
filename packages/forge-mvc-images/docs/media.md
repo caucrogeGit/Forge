@@ -1,11 +1,11 @@
 # Module média Forge
 
-!!! info "Statut : opt-in officiel, publié sur PyPI depuis `1.0.0-beta.13`, API encore bêta"
-    `forge-mvc-images` (qui détient la couche applicative média) est publié sur PyPI depuis `1.0.0-beta.13` : `pip install --pre forge-mvc-images`.
-    L'API applicative reste bêta, voir les limites de production avant déploiement.
-    Pour le développement depuis les sources, voir [section ci-dessous](#installation).
+!!! info "Un opt-in officiel, qui suit la version du cœur"
+    `forge-mvc-images` détient la couche applicative média. Il n'a pas de cycle de maturité propre : sa version est celle du `pyproject.toml` racine (`OPTINS-MATURITY-FOLLOWS-CORE-001`).
 
-    Le module reste opt-in : le core Forge ne dépend pas de `forge-mvc-images`.
+    Installation : `pip install --pre forge-mvc-images`. Pour le développement depuis les sources, voir [section ci-dessous](#installation).
+
+    Le module reste opt-in : le cœur de Forge ne dépend pas de `forge-mvc-images`.
 
 Forge sépare l'**upload générique** (opt-in `forge-mvc-files`, ADR-019) des helpers applicatifs médias (`forge_mvc_images`).
 L'upload (écriture, storage, service de fichiers) est fourni par `forge-mvc-files` ; la **validation** pure (extension/MIME/taille) reste dans le core (`core.forms`).
@@ -35,7 +35,7 @@ Utiliser `from forge_mvc_images import ...`.
 
 ## Installation
 
-`forge-mvc-images` est publié sur PyPI depuis `1.0.0-beta.13` :
+`forge-mvc-images` est publié sur PyPI :
 
 ```bash
 pip install --pre forge-mvc-images
@@ -720,7 +720,7 @@ Elles ne couvrent pas la détection MIME côté serveur (repose sur le `Content-
 
 ## Conditions de publication PyPI (remplies)
 
-Ces conditions ont toutes été remplies avant la publication sur PyPI en `1.0.0-beta.13` (retrait du classifier `"Private :: Do Not Upload"`) :
+Ces conditions ont toutes été remplies avant la publication sur PyPI, sous une numérotation antérieure au renumérotage vers 1.0 (retrait du classifier `"Private :: Do Not Upload"`) :
 
 | Condition | Ticket | État |
 |---|---|---|

@@ -2,18 +2,18 @@
 
 Brique MFA (TOTP + codes de récupération) pour le framework Forge.
 
-## Statut : Beta — opt-in officiel publié sur PyPI depuis 1.0.0-beta.9
+## Un opt-in officiel
 
-`forge-mvc-mfa` est marqué `Development Status :: 4 - Beta` (publication PyPI
-préparée par `MFA-PYPI-READY-001`).
+Cet opt-in **suit la version du cœur** de Forge et n'a pas de cycle de maturité
+propre : sa version est celle du `pyproject.toml` racine (`OPTINS-MATURITY-FOLLOWS-CORE-001`).
 
 Depuis `SEC-MFA-SECRET-ENCRYPTION-001`, **le secret TOTP est chiffré au repos**
 via Fernet (`cryptography`). La clé est lue depuis `FORGE_MFA_SECRET_KEY`,
-obligatoire au démarrage.
+obligatoire au démarrage, et `MFA-KEY-ROTATION-001` en livre la rotation.
 
-Le module est **publié sur PyPI** depuis `1.0.0-beta.9` (forme PEP 440 :
-`1.0.0b9`). Il reste **hors** de `forge-mvc[all]` : l'installer directement,
-car l'activation de la MFA est un choix de sécurité explicite de l'application.
+Le module est **publié sur PyPI** (`MFA-PYPI-READY-001`). Il reste **hors** de
+`forge-mvc[all]` : l'installer directement, car l'activation de la MFA est un
+choix de sécurité explicite de l'application.
 
 Installation :
 
@@ -147,13 +147,22 @@ avec `forge db:apply`. Les fichiers `sql/` du dépôt source en sont la référe
 
 ## Compatibilité
 
-Disponible séparément depuis Forge 2.4.0 (ADR-004, MFA-EXTRACT-001).
-Les anciens chemins `core.auth.mfa`, `core.auth.recovery` et
-`core.auth.totp_replay` ont été retirés en Forge 3.0.
+Extrait du cœur par l'ADR-004 (`MFA-EXTRACT-001`). Les anciens chemins
+`core.auth.mfa`, `core.auth.recovery` et `core.auth.totp_replay` ont été
+retirés depuis, sous une numérotation antérieure au renumérotage vers 1.0.
 
 ## Limites connues
 
-- Le store anti-replay et le rate-limit sont in-memory process-local.
-  En multi-worker, utiliser des sticky sessions.
-- La politique de rotation et la procédure de sauvegarde/restauration de la
-  clé Fernet ne sont pas encore formalisées (exigences Beta restantes).
+- Le registre anti-rejeu vit en mémoire du processus **par défaut**. Forge
+  livre `DbTotpReplayStore`, adossé au backend BDD, donc commun à tous les
+  workers ; l'application le pose au démarrage en une ligne visible. Les
+  sticky sessions ne sont pas la réponse recommandée : elles déplacent le
+  problème sans le résoudre.
+- Le rate-limit du challenge vit lui aussi en mémoire du processus, et les cinq
+  essais deviennent donc `5 × N` workers. La parade se pose au proxy, et la
+  configuration Nginx engendrée par `forge deploy:init` la porte sur `/login`
+  depuis `DEPLOY-NGINX-RATE-LIMIT-001`. **Le challenge MFA vit sur une autre
+  route, que Forge ne connaît pas** : ajoutez un `location` de même forme.
+- La rotation de la clé Fernet est livrée (`MFA-KEY-ROTATION-001`) :
+  `FORGE_MFA_SECRET_KEY_PREVIOUS`, `rotate_totp_secret`, `uses_current_key`.
+  La procédure de sauvegarde de la clé relève de l'exploitant.

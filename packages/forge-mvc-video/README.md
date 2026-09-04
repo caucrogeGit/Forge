@@ -3,8 +3,10 @@
 Module **opt-in** Forge pour la vidéo applicative : upload contrôlé,
 transcodage **MP4 H.264/AAC** et lecture en **streaming** (HTTP Range / 206).
 
-Statut : **Beta**. Upload, transcodage MP4 et lecture en streaming HTTP Range
-sont livrés.
+Upload, transcodage MP4 et lecture en streaming HTTP Range sont livrés.
+
+Cet opt-in **suit la version du cœur** de Forge et n'a pas de cycle de maturité
+propre : sa version est celle du `pyproject.toml` racine (`OPTINS-MATURITY-FOLLOWS-CORE-001`).
 
 ## Principes
 

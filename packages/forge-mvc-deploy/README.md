@@ -2,9 +2,11 @@
 
 Outillage de déploiement opt-in pour le framework Forge.
 
-## Statut : Beta — opt-in officiel
+## Un opt-in officiel
 
-`forge-mvc-deploy` est marqué `Development Status :: 4 - Beta`.
+Cet opt-in **suit la version du cœur** de Forge et n'a pas de cycle de maturité
+propre : sa version est celle du `pyproject.toml` racine (`OPTINS-MATURITY-FOLLOWS-CORE-001`).
+
 Le module a été extrait du cœur par l'ADR-053 (`DEPLOY-EXTRACT-001`).
 
 C'est un **opt-in à CLI seule** : il ajoute les commandes `forge deploy:init`
