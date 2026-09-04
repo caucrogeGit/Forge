@@ -330,8 +330,8 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     L'application dupliquait donc l'expression dans chaque requête, ou la recalculait en Python après avoir tout rapatrié.
 
     ```json
-    {"name": "total", "column": "total", "sql_type": "INTEGER",
-     "python_type": "int", "nullable": true, "computed": "qte * pu"}
+    {"name": "total", "type": "integer", "required": false,
+     "nullable": true, "unique": false, "computed": "qte * pu"}
     ```
 
     Le champ est **projeté** dans les lectures, `(qte * pu) AS "total"`, et **absent** des écritures.
@@ -351,7 +351,18 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
 
         Le contrat d'entité est du code du projet, relu et versionné, pas une donnée d'utilisateur. Un point-virgule y est néanmoins refusé : l'expression est projetée dans un `SELECT`, pas exécutée comme une instruction.
 
-    Quatre combinaisons sont refusées, chacune parce qu'elle produirait un SQL faux plutôt qu'une simple maladresse : clé primaire, contrainte `UNIQUE`, valeur par défaut, et présence dans un formulaire.
+    Six combinaisons sont refusées, chacune parce qu'elle produirait un SQL faux plutôt qu'une simple maladresse : `required`, `unique`, `default`, `form`, `source`, et le type `foreign_key`.
+
+    !!! danger "La clé n'était pas déclarable, et sa perte était muette"
+        Cet exemple montrait le format **interne**, celui que les applications n'écrivent jamais (`ENTITIES-COMPUTED-CANONICAL-001`).
+
+        Sur le chemin canonique, la chaîne était rompue en trois endroits.
+        `field.schema.json` refuse les clés inconnues et ne déclarait pas `computed` : `forge entity:validate` rejetait le contrat.
+        Le résolveur de champs laissait tomber l'expression, si bien que le champ ressortait en colonne ordinaire.
+        `make:crud` engendrait alors un `INSERT` et un `UPDATE` sur une colonne qui devait être en lecture seule.
+
+        Le deuxième point est le pire des trois : la perte ne levait rien.
+        Qui ajoutait `computed` à la main obtenait une colonne, pas une erreur.
 
 ??? note "11. Validation métier déclarable"
 

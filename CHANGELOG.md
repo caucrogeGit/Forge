@@ -14,6 +14,15 @@
 
 ### Ajouté
 
+- **Les champs calculés étaient livrés pour un format que les applications n'utilisent pas (`ENTITIES-COMPUTED-CANONICAL-001`).**
+  `ENTITIES-COMPUTED-FIELDS-001` les avait livrés, et son test les déclarait au **format interne V1** (`column`, `sql_type`, `python_type`), celui qu'ADR-086 élimine. Le vert du ticket ne disait donc rien du chemin qu'empruntent les applications. La revue du référentiel entities l'a relevé.
+  Mesuré sur le chemin canonique, la chaîne était rompue **en trois endroits**. `field.schema.json` porte `additionalProperties: false` et ne déclarait pas `computed` : `forge entity:validate` refusait le contrat. Le résolveur de champs laissait tomber l'expression, si bien que le champ ressortait en colonne ordinaire. `make:crud` engendrait alors un `INSERT` et un `UPDATE` sur une colonne qui devait être en lecture seule.
+  **Le deuxième point est le pire des trois** : la perte ne levait rien. Passé dans le normaliseur, un contrat portant `computed: "qte * pu"` ressortait avec `sql_type INTEGER` et aucune trace de l'expression. Qui l'ajoutait à la main obtenait une colonne, pas une erreur.
+  `computed` est désormais déclaré dans le contrat, propagé par le résolveur, et le SQL engendré est vérifié de bout en bout depuis un contrat canonique : `SELECT` projette `(qte * pu) AS "Total"`, `INSERT` et `UPDATE` l'ignorent.
+  Six combinaisons sont refusées sur le vocabulaire canonique, où `required` et `type` remplacent `nullable` et `sql_type` : `required`, `unique`, `default`, `form`, `source` et le type `foreign_key`. Chacune produirait un SQL faux plutôt qu'une simple maladresse. Le motif du schéma refuse aussi une expression faite d'espaces, que `minLength: 1` laissait passer et qui aurait produit `(   ) AS "Total"`.
+  La documentation montrait le même exemple au format interne : elle montre le format canonique, et dit ce qui était rompu.
+
+
 - **Le CSS livré par le squelette ne couvrait plus ses propres gabarits (`SKELETON-TAILWIND-CSS-STALE-001`).**
   Le squelette versionne `static/tailwind.css`. Il lui manquait **quinze classes** que ses gabarits utilisent, dont `grid`, `grid-cols-2`, `sm:grid-cols-4`, `flex-wrap`, `text-4xl`, `bg-red-600`, `hover:bg-red-700` et `text-white`.
   La dérive était masquée : `forge new` reconstruit le CSS par `npm install && npm run build:css`. Mais **npm peut être absent**, cas que Forge gère explicitement par un avertissement, et le projet part alors avec le fichier versionné. Sa page « charte » perd sa grille, et le bouton `danger` de `components/ui.html` perd son fond rouge et son texte blanc : un geste destructeur qui ne se distingue plus d'un lien ordinaire. L'avertissement dit « Node.js / npm absent », pas « votre mise en page sera fausse », et personne ne relie les deux.

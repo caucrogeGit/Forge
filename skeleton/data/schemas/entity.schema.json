@@ -44,7 +44,7 @@
       "minItems": 1
     },
     "indexes": {
-      "description": "Index MariaDB supplémentaires à créer sur la table. La cohérence avec les champs déclarés sera vérifiée par la validation sémantique Forge.",
+      "description": "Index supplémentaires à créer sur la table, rendus par le dialecte du backend installé (ADR-054). Un index `unique` devient une contrainte nommée, ce qui exprime une unicité composite. La cohérence avec les champs déclarés est vérifiée par la validation sémantique Forge.",
       "type": "array",
       "items": {
         "type": "object",

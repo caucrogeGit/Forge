@@ -33,6 +33,7 @@ from datetime import date, datetime
 from forge_mvc_entities.entity_validation_errors import (
     FORGE_ENTITY_DUPLICATE_FIELD,
     FORGE_ENTITY_DUPLICATE_TABLE,
+    FORGE_ENTITY_INVALID_COMPUTED,
     FORGE_ENTITY_INVALID_DEFAULT,
     FORGE_ENTITY_INVALID_INDEX,
     FORGE_ENTITY_INVALID_SLUG_SOURCE,
@@ -113,6 +114,61 @@ class SemanticError:
     path: str
     message: str
     hint: str = ""
+
+
+def _check_field_computed(
+    errors: list[SemanticError], source: str, index: int, field: dict[str, Any]
+) -> None:
+    """Combinaisons impossibles d'un champ calculé (`ENTITIES-COMPUTED-CANONICAL-001`).
+
+    Un champ calculé n'a **pas de colonne** : il est projeté par son expression
+    et n'est jamais écrit. Tout ce qui suppose une colonne stockée est donc une
+    contradiction, et produirait du SQL faux plutôt qu'une simple maladresse.
+
+    Le format interne portait déjà ces règles, mais aucun contrat canonique ne
+    les atteignait : le schéma refusait la clé, et le résolveur la laissait
+    tomber. Elles sont contrôlées ici, sur le vocabulaire canonique, où
+    `required` et `type` remplacent `nullable` et `sql_type`.
+    """
+    fname = field.get("name", "?")
+    path = f"$.fields[{index}].computed"
+
+    interdits = (
+        ("required", field.get("required") is True,
+         "un champ calculé n'est jamais écrit : l'exiger n'a pas de sens",
+         "Retirez required, ou retirez computed."),
+        ("unique", field.get("unique") is True,
+         "une contrainte UNIQUE porte sur une colonne stockée, pas sur une expression",
+         "Posez l'unicité sur les champs dont l'expression dérive."),
+        ("default", "default" in field,
+         "un champ calculé n'a pas de valeur par défaut : il n'est jamais écrit",
+         "Retirez default."),
+        ("form", "form" in field,
+         "un champ calculé est en lecture seule : il n'a pas sa place dans un formulaire",
+         "Retirez form."),
+        ("source", "source" in field,
+         "source alimente un slug à l'écriture, ce qu'un champ calculé ne connaît pas",
+         "Retirez source, ou retirez computed."),
+    )
+    for cle, en_faute, message, conseil in interdits:
+        if en_faute:
+            errors.append(SemanticError(
+                code=FORGE_ENTITY_INVALID_COMPUTED,
+                file=source,
+                path=path,
+                message=f'le champ calculé "{fname}" déclare aussi {cle} : {message}.',
+                hint=conseil,
+            ))
+
+    if str(field.get("type", "")) == "foreign_key":
+        errors.append(SemanticError(
+            code=FORGE_ENTITY_INVALID_COMPUTED,
+            file=source,
+            path=path,
+            message=f'le champ calculé "{fname}" est de type foreign_key : une clé '
+                    f"étrangère référence une colonne stockée, pas une expression.",
+            hint="Choisissez un type scalaire, ou retirez computed.",
+        ))
 
 
 def _check_field_default(
@@ -284,6 +340,14 @@ def validate_semantic(
             fdict = cast("dict[str, Any]", f)
             if "default" in fdict:
                 _check_field_default(errors, source, i, fdict)
+
+        # 8. Champ calculé : aucune clé qui suppose une colonne stockée
+        for i, f in enumerate(fields):
+            if not isinstance(f, dict):
+                continue
+            fdict = cast("dict[str, Any]", f)
+            if "computed" in fdict:
+                _check_field_computed(errors, source, i, fdict)
 
         entity_by_name[name] = entity
 

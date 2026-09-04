@@ -253,6 +253,15 @@ def _resolve_business_field(field: dict[str, Any]) -> dict[str, Any]:
         if "source" in field:
             resolved["source"] = field["source"]
 
+    # Champ calculé : l'expression accompagne le champ jusqu'aux générateurs
+    # (`ENTITIES-COMPUTED-CANONICAL-001`). Sans cette ligne, le contrat
+    # canonique la portait, le résolveur la laissait tomber, et le champ
+    # ressortait en colonne ordinaire : `make:crud` engendrait alors un INSERT
+    # et un UPDATE sur une colonne qui devait être en lecture seule. La perte
+    # était silencieuse, ce qui est le pire des modes de panne.
+    if "computed" in field:
+        resolved["computed"] = field["computed"]
+
     if "default" in field:
         resolved["default"] = field["default"]
 

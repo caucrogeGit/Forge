@@ -67,6 +67,12 @@
       "minimum": 1,
       "maximum": 10000
     },
+    "computed": {
+      "description": "Expression SQL d'un champ dérivé, projetée en lecture seule. Le champ n'a pas de colonne : il n'est ni inséré ni mis à jour. L'expression part telle quelle dans le SELECT, elle n'est pas paramétrable, et le contrat d'entité est du code du projet, relu et versionné, jamais une donnée d'utilisateur. Incompatible avec required, unique, default, form et foreign_key.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?=.*[^\\s])[^;]+$"
+    },
     "source": {
       "description": "Champ source d'un slug auto-généré (type slug). Le slug est généré depuis ce champ, absent du formulaire, et reste stable à l'édition.",
       "$ref": "common.schema.json#/$defs/fieldName"
