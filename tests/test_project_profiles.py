@@ -126,7 +126,8 @@ def test_cmd_new_ecrit_forge_profile_txt(tmp_path, monkeypatch):
         patch.object(forge, "_materialize_skeleton", side_effect=fake_materialize),
         patch.object(forge, "_configure_env_files"),
         patch.object(forge, "_setup_python_environment"),
-        patch.object(forge, "_setup_node_environment", return_value=[]),
+        patch.object(forge, "installer_node", return_value=[]),
+        patch.object(forge, "annoncer_css_livre", return_value=None),
         patch.object(forge, "_generate_certificates"),
         patch.object(forge, "_reinitialize_git"),
     ):
@@ -150,7 +151,8 @@ def test_cmd_new_tous_profils_valides_acceptes(tmp_path, monkeypatch):
             patch.object(forge, "_materialize_skeleton"),
             patch.object(forge, "_configure_env_files"),
             patch.object(forge, "_setup_python_environment"),
-            patch.object(forge, "_setup_node_environment", return_value=[]),
+            patch.object(forge, "installer_node", return_value=[]),
+        patch.object(forge, "annoncer_css_livre", return_value=None),
             patch.object(forge, "_generate_certificates"),
             patch.object(forge, "_reinitialize_git"),
             patch.object(sys, "exit") as mock_exit,
@@ -173,7 +175,7 @@ def test_dispatch_parse_profile_option():
 
     calls = []
 
-    def fake_cmd_new(name, profile=DEFAULT_PROJECT_PROFILE, bare=False):
+    def fake_cmd_new(name, profile=DEFAULT_PROJECT_PROFILE, bare=False, **autres):
         calls.append({"name": name, "profile": profile})
 
     with (
@@ -192,7 +194,7 @@ def test_dispatch_profile_defaut_si_absent():
 
     calls = []
 
-    def fake_cmd_new(name, profile=DEFAULT_PROJECT_PROFILE, bare=False):
+    def fake_cmd_new(name, profile=DEFAULT_PROJECT_PROFILE, bare=False, **autres):
         calls.append({"profile": profile})
 
     with (
@@ -219,7 +221,8 @@ def _run_cmd_new(forge, monkeypatch, tmp_path, name="Demo", **kwargs):
         patch.object(forge, "_materialize_skeleton", side_effect=_fake_clone),
         patch.object(forge, "_configure_env_files"),
         patch.object(forge, "_setup_python_environment"),
-        patch.object(forge, "_setup_node_environment", return_value=[]),
+        patch.object(forge, "installer_node", return_value=[]),
+        patch.object(forge, "annoncer_css_livre", return_value=None),
         patch.object(forge, "_generate_certificates"),
         patch.object(forge, "_reinitialize_git"),
     ):

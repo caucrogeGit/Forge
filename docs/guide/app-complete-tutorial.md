@@ -55,7 +55,7 @@ Les variantes ciblées `forge sync:entity <Nom>` (une seule entité) et `forge s
 - Forge installé (`forge --version` doit répondre) ;
 - Python {{python_min}} ou plus ;
 - MariaDB installé et démarré (pour `forge db:init`) ;
-- npm installé (optionnel, pour recompiler le CSS Tailwind).
+- npm installé (facultatif, seulement pour recompiler le CSS Tailwind après avoir modifié les gabarits).
 
 ---
 
@@ -67,7 +67,10 @@ cd carnet_contacts
 source .venv/bin/activate
 ```
 
-`forge new` crée la structure du projet, installe les dépendances Python, génère les certificats SSL de développement, compile le CSS Tailwind si npm est disponible, et initialise un dépôt Git propre.
+`forge new` crée la structure du projet, installe les dépendances Python, génère les certificats SSL de développement et initialise un dépôt Git propre.
+
+Le CSS Tailwind est livré compilé par le squelette : Node n'est pas requis.
+Ajoutez `--with-node` pour installer les dépendances front dès la création.
 
 ### Installer les deux opt-ins nécessaires
 

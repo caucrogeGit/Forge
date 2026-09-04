@@ -15,6 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
+from cli.project.front_assets import annoncer_css_livre, installer_node
 from cli.project.install_source import forge_mvc_git_spec, pin_forge_mvc_to_git
 # Le moteur d'entités (forge-mvc-entities) n'est plus importé au chargement du
 # cœur (ADR-070) : ses commandes sont gatées sur son installation (entry point
@@ -188,27 +189,6 @@ def _setup_python_environment(dest: str) -> None:
         _run([venv_python, "-m", "pip", "install", "-r", "requirements.txt", "-q"], cwd=dest, check=True)
 
 
-def _setup_node_environment(dest: str) -> list[str]:
-    warnings: list[str] = []
-    package_json = os.path.join(dest, "package.json")
-    if not os.path.exists(package_json):
-        return warnings
-
-    if shutil.which("npm") is None:
-        warnings.append("Node.js / npm absent — relance 'npm install && npm run build:css' pour compiler Tailwind")
-        return warnings
-
-    _print_step("Installation des dépendances Node.js...")
-    _run(["npm", "install"], cwd=dest, check=True)
-
-    _print_step("Compilation du CSS Tailwind...")
-    result = _run(["npm", "run", "build:css"], cwd=dest, capture=True)
-    if result.returncode != 0:
-        warnings.append("build:css a échoué — relance 'npm run build:css' après avoir configuré Tailwind")
-
-    return warnings
-
-
 def _generate_certificates(dest: str) -> None:
     cert_path = os.path.join(dest, "cert.pem")
     key_path = os.path.join(dest, "key.pem")
@@ -268,10 +248,41 @@ def _warn_initial_git_failed(exc: Exception) -> None:
 
 # ── Commande : new ────────────────────────────────────────────────────────────
 
+def _etapes_suivantes(project_name: str) -> None:
+    """Ce que l'utilisateur fait maintenant, et d'où vient son forge-mvc.
+
+    Extrait de `cmd_new`, que le budget de complexité plafonne à quatre-vingt-dix
+    lignes : rallonger le bloc d'affichage plutôt que l'extraire aurait fait
+    grossir une fonction qui fait déjà tout le reste.
+    """
+    print("  Étapes suivantes :\n")
+    print(f"    cd {project_name}")
+    print(f"    {_venv_activate_hint()}")
+    print("    forge doctor")
+    print("    forge run")
+    print()
+    print("  Les premiers paliers tournent sans base de données.")
+    print("  Pour la base de données : installez un backend (ex. pip install forge-mvc-sqlite),")
+    print("  configurez son environnement dans env/dev, puis forge db:init.")
+    print()
+
+    dev_src = os.environ.get("FORGE_DEV_SRC")
+    if dev_src and os.path.isdir(dev_src):
+        print(f"  Mode dev (FORGE_DEV_SRC={dev_src}) : forge-mvc installé en éditable.")
+        print("  Pour tester aussi un backend sur le working tree, installez-le en éditable :")
+        print(f"    pip install -e {dev_src}/packages/forge-mvc-<backend>")
+        print()
+    elif (git_spec := forge_mvc_git_spec()):
+        print(f"  Version GitHub (ADR-062) : forge-mvc suit {git_spec}.")
+        print("  Le projet suit la dernière version poussée sur GitHub, épinglée au commit installé.")
+        print()
+
+
 def cmd_new(
     project_name: str,
     profile: str = DEFAULT_PROJECT_PROFILE,
     bare: bool = False,
+    with_node: bool = False,
 ) -> None:
     if not re.match(r"^[A-Za-z][A-Za-z0-9_-]*$", project_name):
         sys.exit(
@@ -293,7 +304,9 @@ def cmd_new(
     if os.path.exists(dest):
         sys.exit(f"Erreur : le dossier '{dest}' existe déjà.")
 
-    print(f"\nForge {_FORGE_VERSION} — nouveau projet : {project_name} [profil : {profile}]{' [bare]' if bare else ''}\n")
+    print(f"\nForge {_FORGE_VERSION} — nouveau projet : {project_name} "
+          f"[profil : {profile}]{' [bare]' if bare else ''}"
+          f"{' [avec Node]' if with_node else ''}\n")
 
     node_warnings = []
     agent_files: list[str] = []
@@ -301,7 +314,10 @@ def cmd_new(
         _materialize_skeleton(dest, bare=bare)
         _configure_env_files(dest, project_name)
         _setup_python_environment(dest)
-        node_warnings = _setup_node_environment(dest)
+        if with_node:
+            node_warnings = installer_node(dest, _print_step, _run)
+        else:
+            annoncer_css_livre(_print_step)
         _generate_certificates(dest)
         Path(dest, "forge_profile.txt").write_text(profile + "\n", encoding="utf-8")
         # Couche guidance agent IA (ADR-047) : CLAUDE.md, AGENTS.md, ADR-001.
@@ -336,27 +352,7 @@ def cmd_new(
             print(f"    - {created}")
         print()
 
-    print("  Étapes suivantes :\n")
-    print(f"    cd {project_name}")
-    print(f"    {_venv_activate_hint()}")
-    print("    forge doctor")
-    print("    forge run")
-    print()
-    print("  Les premiers paliers tournent sans base de données.")
-    print("  Pour la base de données : installez un backend (ex. pip install forge-mvc-sqlite),")
-    print("  configurez son environnement dans env/dev, puis forge db:init.")
-    print()
-
-    dev_src = os.environ.get("FORGE_DEV_SRC")
-    if dev_src and os.path.isdir(dev_src):
-        print(f"  Mode dev (FORGE_DEV_SRC={dev_src}) : forge-mvc installé en éditable.")
-        print("  Pour tester aussi un backend sur le working tree, installez-le en éditable :")
-        print(f"    pip install -e {dev_src}/packages/forge-mvc-<backend>")
-        print()
-    elif (git_spec := forge_mvc_git_spec()):
-        print(f"  Version GitHub (ADR-062) : forge-mvc suit {git_spec}.")
-        print("  Le projet suit la dernière version poussée sur GitHub, épinglée au commit installé.")
-        print()
+    _etapes_suivantes(project_name)
 
 
 # ── Commande : help ───────────────────────────────────────────────────────────
@@ -571,6 +567,54 @@ def dispatch_core(command: str, args: list[str]) -> bool:
     return True
 
 
+def _options_de_new(remaining: "list[str]") -> "tuple[str, bool, bool]":
+    """Options de `forge new` : profil, bare, with-node.
+
+    `CLI-NEW-UNKNOWN-ARGS-001` : seuls les drapeaux connus sont consommés, et
+    tout autre argument est refusé plutôt qu'ignoré. Une option mal orthographiée
+    doit échouer, pas passer inaperçue.
+
+    Extraite de `main`, que le budget de complexité plafonne à cent quarante
+    lignes : le dispatcheur central ne doit pas grossir d'une option
+    (`FORGE-NEW-NO-NODE-DEFAULT-001`).
+    """
+    profile = DEFAULT_PROJECT_PROFILE
+    consumed: "set[int]" = set()
+
+    bare = "--bare" in remaining
+    if bare:
+        consumed.add(remaining.index("--bare"))
+
+    # `forge new` n'installe plus Node par defaut : il regenerait un CSS
+    # identique a celui que le squelette livre.
+    with_node = "--with-node" in remaining
+    if with_node:
+        consumed.add(remaining.index("--with-node"))
+
+    if "--profile" in remaining:
+        idx = remaining.index("--profile")
+        consumed.add(idx)
+        if idx + 1 < len(remaining):
+            profile = remaining[idx + 1]
+            consumed.add(idx + 1)
+        else:
+            cli_fail(
+                "argument manquant pour «forge new».",
+                hint="indique le profil après --profile. Profils disponibles : "
+                     + ", ".join(SUPPORTED_PROJECT_PROFILES),
+            )
+
+    unexpected = [tok for i, tok in enumerate(remaining) if i not in consumed]
+    if unexpected:
+        cli_fail(
+            "argument inconnu pour «forge new» : " + ", ".join(unexpected) + ".",
+            hint="usage : forge new <NomDuProjet> [--profile <profil>] [--bare] "
+                 "[--with-node]. Profils disponibles : "
+                 + ", ".join(SUPPORTED_PROJECT_PROFILES),
+        )
+    return profile, bare, with_node
+
+
 def main() -> None:
     args = sys.argv[1:]
 
@@ -600,35 +644,8 @@ def main() -> None:
                 "argument manquant pour «forge new».",
                 hint="indique le nom du projet. Exemple : forge new GestionVentes",
             )
-        profile = DEFAULT_PROJECT_PROFILE
-        remaining = args[2:]
-        # CLI-NEW-UNKNOWN-ARGS-001 : on consomme uniquement `--profile <valeur>`
-        # et on refuse explicitement tout autre argument, plutôt que de l'ignorer
-        # silencieusement (une option mal orthographiée doit échouer, pas passer).
-        consumed: set[int] = set()
-        bare = "--bare" in remaining
-        if bare:
-            consumed.add(remaining.index("--bare"))
-        if "--profile" in remaining:
-            idx = remaining.index("--profile")
-            consumed.add(idx)
-            if idx + 1 < len(remaining):
-                profile = remaining[idx + 1]
-                consumed.add(idx + 1)
-            else:
-                cli_fail(
-                    "argument manquant pour «forge new».",
-                    hint="indique le profil après --profile. Profils disponibles : "
-                         + ", ".join(SUPPORTED_PROJECT_PROFILES),
-                )
-        unexpected = [tok for i, tok in enumerate(remaining) if i not in consumed]
-        if unexpected:
-            cli_fail(
-                "argument inconnu pour «forge new» : " + ", ".join(unexpected) + ".",
-                hint="usage : forge new <NomDuProjet> [--profile <profil>] [--bare]. "
-                     "Profils disponibles : " + ", ".join(SUPPORTED_PROJECT_PROFILES),
-            )
-        cmd_new(args[1], profile=profile, bare=bare)
+        profile, bare, with_node = _options_de_new(args[2:])
+        cmd_new(args[1], profile=profile, bare=bare, with_node=with_node)
         return
 
     if command == "db:init":

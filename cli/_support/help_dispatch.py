@@ -2857,13 +2857,16 @@ Limites:
 
     "new": """\
 Usage:
-  forge new <NomProjet> [--profile <profil>] [--bare]
+  forge new <NomProjet> [--profile <profil>] [--bare] [--with-node]
 
 Description:
   Crée un nouveau projet Forge nu dans ./<NomProjet>/ à partir du
   squelette de projet embarqué : configuration env/, environnement
-  virtuel Python (avec forge-mvc), dépendances Node et certificats SSL
-  de développement.
+  virtuel Python (avec forge-mvc) et certificats SSL de développement.
+
+  N'installe PAS Node par défaut. Le squelette livre son
+  static/tailwind.css, et le rebâtir produisait un fichier identique
+  au bit près pour deux minutes d'installation npm.
 
 Arguments:
   <NomProjet>        Nom du projet (lettres, chiffres, _ ou -, doit
@@ -2873,6 +2876,9 @@ Options:
   --profile <id>     Profil de projet (voir SUPPORTED_PROJECT_PROFILES).
   --bare             Omet l'apparat qualité du squelette (config qualité,
                      tests, doc, CI — ADR-063).
+  --with-node        Installe les dépendances Node et recompile le CSS
+                     Tailwind à la création. Utile seulement si vous
+                     modifiez les gabarits tout de suite.
   -h, --help         Affiche cette aide sans exécuter la commande.
 
 Effets (CRÉE un dossier complet) :
@@ -2881,7 +2887,8 @@ Effets (CRÉE un dossier complet) :
   - configure env/example et env/dev (APP_NAME, DB_NAME, DB_APP_LOGIN) ;
   - python -m venv .venv puis pip install -r requirements.txt
     (installe forge-mvc) ;
-  - npm install + npm run build:css si package.json présent ;
+  - le CSS Tailwind livré est laissé tel quel ; avec --with-node,
+    npm install + npm run build:css si package.json présent ;
   - openssl req génère cert.pem / key.pem (HTTPS local) ;
   - écrit forge_profile.txt ;
   - initialise un dépôt Git (git init + commit initial) ;
@@ -2890,7 +2897,7 @@ Effets (CRÉE un dossier complet) :
 ATTENTION:
   - cette commande crée un grand nombre de fichiers en une fois ;
   - elle EXIGE git et openssl dans le PATH ;
-  - elle suppose une connexion réseau (pip, npm) ;
+  - elle suppose une connexion réseau (pip, et npm avec --with-node) ;
   - le commit Git initial peut échouer si user.name/user.email Git
     ne sont pas configurés (le projet reste créé, message d'aide).
 

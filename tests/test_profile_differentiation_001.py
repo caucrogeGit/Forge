@@ -48,7 +48,8 @@ def _run_cmd_new(forge, monkeypatch, tmp_path, name="Demo", profile="standard"):
         ),
         patch.object(forge, "_configure_env_files"),
         patch.object(forge, "_setup_python_environment"),
-        patch.object(forge, "_setup_node_environment", return_value=[]),
+        patch.object(forge, "installer_node", return_value=[]),
+        patch.object(forge, "annoncer_css_livre", return_value=None),
         patch.object(forge, "_generate_certificates"),
         patch.object(forge, "_reinitialize_git"),
     ):

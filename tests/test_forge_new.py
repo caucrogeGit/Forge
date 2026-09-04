@@ -36,7 +36,10 @@ def _patch_cmd_new(monkeypatch, tmp_path):
     monkeypatch.setattr(forge, "_materialize_skeleton", lambda dest, *, bare=False: os.makedirs(dest, exist_ok=True))
     monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
-    monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
+    # La phase Node a quitté forge.py pour cli/project/front_assets.py, et
+    # n'est plus lancée par défaut (FORGE-NEW-NO-NODE-DEFAULT-001).
+    monkeypatch.setattr(forge, "installer_node", lambda dest, etape, run: [])
+    monkeypatch.setattr(forge, "annoncer_css_livre", lambda etape: None)
     monkeypatch.setattr(forge, "_generate_certificates", lambda dest: None)
     monkeypatch.setattr(forge, "_reinitialize_git", reinit)
 
@@ -138,7 +141,10 @@ def test_echec_commit_git_final_conserve_le_projet(monkeypatch, tmp_path, capsys
     monkeypatch.setattr(forge, "_materialize_skeleton", create_dest)
     monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
-    monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
+    # La phase Node a quitté forge.py pour cli/project/front_assets.py, et
+    # n'est plus lancée par défaut (FORGE-NEW-NO-NODE-DEFAULT-001).
+    monkeypatch.setattr(forge, "installer_node", lambda dest, etape, run: [])
+    monkeypatch.setattr(forge, "annoncer_css_livre", lambda etape: None)
     monkeypatch.setattr(forge, "_generate_certificates", lambda dest: None)
     monkeypatch.setattr(forge, "_reinitialize_git", fail_git)
     monkeypatch.chdir(tmp_path)
@@ -183,7 +189,10 @@ def test_openssl_echec_nettoie_dossier(monkeypatch, tmp_path):
     monkeypatch.setattr(forge, "_materialize_skeleton", create_dest)
     monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
-    monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
+    # La phase Node a quitté forge.py pour cli/project/front_assets.py, et
+    # n'est plus lancée par défaut (FORGE-NEW-NO-NODE-DEFAULT-001).
+    monkeypatch.setattr(forge, "installer_node", lambda dest, etape, run: [])
+    monkeypatch.setattr(forge, "annoncer_css_livre", lambda etape: None)
     monkeypatch.setattr(forge, "_generate_certificates", fail_certificates)
     monkeypatch.chdir(tmp_path)
 
@@ -241,7 +250,10 @@ def test_cmd_new_materialise_sans_cloner(monkeypatch, tmp_path):
     monkeypatch.setattr(forge, "_materialize_skeleton", spy_materialize)
     monkeypatch.setattr(forge, "_configure_env_files", lambda dest, name: None)
     monkeypatch.setattr(forge, "_setup_python_environment", lambda dest: None)
-    monkeypatch.setattr(forge, "_setup_node_environment", lambda dest: [])
+    # La phase Node a quitté forge.py pour cli/project/front_assets.py, et
+    # n'est plus lancée par défaut (FORGE-NEW-NO-NODE-DEFAULT-001).
+    monkeypatch.setattr(forge, "installer_node", lambda dest, etape, run: [])
+    monkeypatch.setattr(forge, "annoncer_css_livre", lambda etape: None)
     monkeypatch.setattr(forge, "_generate_certificates", lambda dest: None)
     monkeypatch.setattr(forge, "_reinitialize_git", lambda dest, name: None)
     monkeypatch.chdir(tmp_path)
@@ -258,7 +270,7 @@ def test_dispatch_new_sans_ref(monkeypatch, tmp_path):
     """forge new MonProjet appelle cmd_new sans paramètre ref."""
     received = {}
 
-    def spy_cmd_new(name, profile="standard", bare=False):
+    def spy_cmd_new(name, profile="standard", bare=False, **autres):
         received["name"] = name
         received["profile"] = profile
 

@@ -2,6 +2,16 @@
 
 ## [Non publié]
 
+### Modifié
+
+- **`forge new` n'installe plus Node par défaut (`FORGE-NEW-NO-NODE-DEFAULT-001`).**
+  Il lançait `npm install` puis `npm run build:css` à chaque création. Mesuré : **deux minutes sur cent quarante-quatre**, pour produire un `static/tailwind.css` **identique au bit près** à celui que le squelette versionne. La dépense était entière et son produit nul.
+  Elle exigeait en outre une chaîne Node complète, `@parcel/watcher` compilé depuis ses sources compris. Le squelette active `engine-strict` : sous une version de Node antérieure à `.nvmrc`, `npm install` refusait de tourner et `forge new` échouait entièrement.
+  **Cesser de reconstruire n'était honnête qu'à une condition** : que le fichier livré ne puisse plus dériver en silence. C'est ce que garantit `SKELETON-TAILWIND-CSS-STALE-001`, livré juste avant. Les deux vont ensemble, et dans cet ordre.
+  Mesuré après : `forge new` passe de **144 s à 5,3 s**. Le parcours du guide de prise en main, qui rejoue le tutoriel de bout en bout, passe de 173 s à 10,7 s, et **cesse de se sauter** quand Node manque ou est trop ancien, ce qu'il faisait pour une raison étrangère à ce qu'il vérifie.
+  **Rien n'est retiré, seule la dépense l'est.** Le squelette continue de livrer `package.json` et `static/src/input.css`. Node est à un appel de distance, annoncé plutôt que deviné : `forge new <nom> --with-node` à la création, ou `npm install && npm run build:css` plus tard. L'avertissement émis quand npm manque dit désormais que le CSS livré reste en place.
+  La phase front quitte `forge.py` pour `cli/project/front_assets.py`, et les options de `new` pour `_options_de_new` : le budget de complexité plafonne `forge.py` et son `main`, et il demande une extraction, pas un plafond relevé. Huit doublures de test figeaient la signature exacte de `cmd_new` et se cassaient sur toute option nouvelle ; elles acceptent désormais ce qu'elles ne regardent pas.
+
 ### Ajouté
 
 - **Le CSS livré par le squelette ne couvrait plus ses propres gabarits (`SKELETON-TAILWIND-CSS-STALE-001`).**

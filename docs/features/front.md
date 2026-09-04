@@ -449,7 +449,13 @@ Node.js et npm sont nécessaires uniquement pour installer l'outillage front et 
 
 Ils ne sont pas nécessaires pour exécuter le serveur Python Forge quand le CSS compilé existe déjà.
 
-`forge new` tente d'installer les dépendances front et de compiler Tailwind si npm est disponible.
+`forge new` **n'installe plus** les dépendances front par défaut.
+
+Le squelette livre `static/tailwind.css` déjà compilé, et le rebâtir à la création produisait un fichier identique au bit près pour deux minutes d'installation npm (`FORGE-NEW-NO-NODE-DEFAULT-001`).
+Un garde-fou refuse que ce fichier manque une classe utilisée par les gabarits du squelette, ce qui est la condition pour ne plus le reconstruire.
+
+Pour l'installer dès la création : `forge new <nom> --with-node`.
+Après modification des gabarits : `npm install && npm run build:css`.
 Si npm est absent, le projet est créé quand même et Forge affiche un avertissement.
 
 ## Initialiser HTMX

@@ -412,6 +412,7 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `META-DOC-ABSOLUTE-LINKS-001` | méta | Un lien cassé accepté par le build strict | **Livré.** Les liens absolus échappaient à `mkdocs --strict` |
 | `META-README-RATCHET-WIDEN-001` | méta | Dix paquets sur vingt-sept sautés | **Livré.** Le cliquet ne lisait ni les blocs de code ni les citations nues, et sa règle était fausse |
 | `SKELETON-TAILWIND-CSS-STALE-001` | squelette | Enquête sur le coût de `forge new` | **Livré.** Le CSS versionné manquait quinze classes de ses propres gabarits |
+| `FORGE-NEW-NO-NODE-DEFAULT-001` | CLI | Même enquête | **Livré.** `forge new` passe de 144 s à 5,3 s ; `--with-node` pour l'ancien comportement |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.

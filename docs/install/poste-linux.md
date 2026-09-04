@@ -103,7 +103,8 @@ Elle se fait une seule fois sur un poste neuf, ou lorsqu'un outil système manqu
     **Node.js 24 (compilation du CSS)**
 
     Le squelette Forge compile ses styles avec Tailwind CSS via npm.
-    À la création du projet, `forge new` lance `npm install` puis `npm run build:css`.
+    `forge new` ne lance plus `npm install` : le squelette livre son CSS compilé.
+    Node ne sert qu'à recompiler après modification des gabarits, ou avec `forge new <nom> --with-node`.
     Le squelette exige **Node.js 24.17.0 ou plus récent** (`.nvmrc` et `engines` du `package.json`, avec `engine-strict`).
 
     Le paquet `nodejs` d'`apt` est souvent trop ancien.
