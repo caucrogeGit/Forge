@@ -28,6 +28,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
+from forge_mvc_rbac.denials import notify_permission_denied
+
 __all__ = [
     "OwnershipCheck",
     "PermissionCheck",
@@ -126,6 +128,13 @@ def require_instance_permission(
         is_owner=is_owner,
     ):
         demandees = [p for p in (any_permission, own_permission) if p]
+        # Un refus de propriété n'était annoncé à personne
+        # (`RBAC-DENIAL-AUDIT-COMPLETE-001`). C'est pourtant le refus le plus
+        # intéressant à voir passer : quelqu'un qui tente d'atteindre l'objet
+        # d'un autre, une ressource à la fois.
+        notify_permission_denied(
+            ", ".join(demandees), request=request, source="instance",
+        )
         raise InstancePermissionDenied(
             f"droit refusé sur l'objet : aucune des permissions "
             f"{', '.join(demandees)} ne s'applique."

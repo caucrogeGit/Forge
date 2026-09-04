@@ -102,9 +102,23 @@ def notify_permission_denied(
 ) -> None:
     """Annonce un refus aux observateurs. N'échoue jamais.
 
-    Appelée par les gardes du paquet. L'événement est construit **une fois**
-    pour tous les observateurs, et chacun est isolé : l'un qui lève n'empêche
-    pas les suivants, et aucun ne peut transformer le 403 en 500.
+    Appelée par les **cinq** gardes du paquet, `require_permission`,
+    `require_user_permission`, `require_contract_permission`,
+    `require_contract_permission_for_request` et `require_instance_permission`,
+    ainsi que par `PrefixPermissionMiddleware`.
+
+    Elle n'en couvrait que trois, et cette docstring affirmait pourtant qu'elle
+    couvrait « les gardes du paquet » (`RBAC-DENIAL-AUDIT-COMPLETE-001`). Les
+    deux muettes étaient la garde **canonique**, celle que les nouveaux projets
+    utilisent, et celle de propriété. Un observateur branché sur
+    `forge-mvc-audit` recevait donc un journal qui paraissait complet.
+
+    Les `has_*` n'appellent pas : ils rendent un booléen, et c'est l'appelant
+    qui décide s'il refuse.
+
+    L'événement est construit **une fois** pour tous les observateurs, et chacun
+    est isolé : l'un qui lève n'empêche pas les suivants, et aucun ne peut
+    transformer le 403 en 500.
     """
     if not _observers:
         return

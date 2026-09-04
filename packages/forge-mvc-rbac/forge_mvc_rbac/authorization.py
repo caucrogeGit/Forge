@@ -8,6 +8,7 @@ from functools import wraps
 from typing import Any
 
 from core.auth.session import get_authenticated_user_id
+from forge_mvc_rbac.denials import notify_permission_denied
 from forge_mvc_rbac.resolver import FetchAll, user_has_permission
 from core.http.response import Response
 from forge_mvc_rbac.rbac import normalize_permission_code, validate_permission
@@ -74,6 +75,14 @@ def require_user_permission(
                 allowed = False
 
             if not allowed:
+                # Un refus de la garde CANONIQUE n'était annoncé à personne
+                # (`RBAC-DENIAL-AUDIT-COMPLETE-001`). L'observateur branché sur
+                # `forge-mvc-audit` recevait donc les refus des trois autres
+                # gardes et pas ceux-ci, alors que c'est celle-ci que les
+                # nouveaux projets utilisent : le journal paraissait complet.
+                notify_permission_denied(
+                    normalized, request=request, source="user-permissions"
+                )
                 return Response(
                     403,
                     body=f"Permission required: {normalized}".encode(),

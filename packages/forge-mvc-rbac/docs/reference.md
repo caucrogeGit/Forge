@@ -2,7 +2,7 @@
 
 Ce document explique ce que fait l'opt-in `forge-mvc-rbac`, ce qu'il expose, et comment on s'en sert.
 
-`forge-mvc-rbac` protège les routes par **permissions**, organisées en **rôles**, avec trois gardes selon la source des permissions, un helper Jinja `can()`, et des commandes `rbac:validate` / `rbac:audit`.
+`forge-mvc-rbac` protège les routes par **permissions**, organisées en **rôles**, avec plusieurs gardes selon la source des permissions, un helper Jinja `can()`, et des commandes `rbac:validate` / `rbac:audit`.
 
 Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est refusé.
 
@@ -304,7 +304,17 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     Aucune trace nulle part, si bien qu'une énumération de droits, quelqu'un qui essaie une à une les routes protégées, ne laissait rien derrière elle.
     L'exploitant n'avait aucun moyen de la voir, ni même de savoir qu'un compte butait sur une permission mal attribuée (`RBAC-DENIAL-AUDIT-001`).
 
-    Les trois gardes annoncent désormais leurs refus, et l'application décide de ce qu'elle en fait.
+    Les **cinq** gardes annoncent leurs refus, et l'application décide de ce qu'elle en fait.
+
+    !!! danger "Elles n'étaient que trois, et il manquait les deux qui comptent"
+        La livraison initiale couvrait `require_permission`, les deux gardes contractuelles et le garde de préfixe (`RBAC-DENIAL-AUDIT-COMPLETE-001`).
+
+        Manquaient `require_user_permission`, la garde **canonique**, celle que les nouveaux projets utilisent, et `require_instance_permission`, celle qui refuse l'accès à l'objet d'un autre.
+
+        Une application qui branchait l'observateur obtenait donc un journal **qui paraissait complet**.
+        Une énumération de droits menée contre des routes gardées par la garde canonique ne laissait aucune trace, ce que ce module existe précisément pour éviter.
+
+        Un garde-fou refuse désormais qu'une fonction `require_*` du paquet refuse sans annoncer.
 
     ```python
     from forge_mvc_audit import record_audit
@@ -323,7 +333,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     | `permission` | la permission qui manquait |
     | `actor` | l'utilisateur, ou `None` s'il n'est pas authentifié |
     | `path`, `method` | la route visée, quand la requête les porte |
-    | `source` | la garde qui a refusé, `contract`, `request-permissions` ou `prefix-guard` |
+    | `source` | la garde qui a refusé : `contract`, `request-permissions`, `user-permissions`, `instance` ou `prefix-guard` |
 
     !!! info "Le paquet annonce, il ne journalise pas"
         `forge-mvc-rbac` n'importe aucun autre opt-in, et un test le vérifie sur l'arbre syntaxique.

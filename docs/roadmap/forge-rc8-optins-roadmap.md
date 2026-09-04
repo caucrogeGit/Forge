@@ -414,6 +414,7 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `SKELETON-TAILWIND-CSS-STALE-001` | squelette | Enquête sur le coût de `forge new` | **Livré.** Le CSS versionné manquait quinze classes de ses propres gabarits |
 | `FORGE-NEW-NO-NODE-DEFAULT-001` | CLI | Même enquête | **Livré.** `forge new` passe de 144 s à 5,3 s ; `--with-node` pour l'ancien comportement |
 | `ENTITIES-COMPUTED-CANONICAL-001` | entities | Revue du référentiel entities | **Livré.** Les champs calculés n'étaient déclarables que dans le format interne ; le normaliseur perdait l'expression en silence |
+| `RBAC-DENIAL-AUDIT-COMPLETE-001` | rbac | Revue du référentiel rbac | **Livré.** L'audit des refus couvrait 3 gardes sur 5, et manquait la canonique |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.

@@ -14,6 +14,14 @@
 
 ### Ajouté
 
+- **L'audit des refus RBAC était sourd sur deux gardes, dont la canonique (`RBAC-DENIAL-AUDIT-COMPLETE-001`).**
+  `RBAC-DENIAL-AUDIT-001` a livré l'observation des refus, et sa ligne de roadmap le dit honnêtement : « les **3** gardes annoncent ». Le paquet en compte cinq. La revue du référentiel rbac l'a relevé.
+  Les deux oubliées sont les deux qui comptent le plus. `require_user_permission` se décrit dans sa propre docstring comme la garde **canonique** (`SEC-RBAC-CANONICAL-GUARD-001`), celle que « les nouveaux projets utilisent ». `require_instance_permission` refuse l'accès à l'objet d'un autre, c'est à dire le refus qu'un exploitant veut précisément voir passer.
+  **La conséquence est pire qu'un simple manque.** Une application qui branchait l'observateur sur `forge-mvc-audit` obtenait un journal **qui paraissait complet** : les refus contractuels y figuraient, ceux du préfixe aussi, et ceux de la garde canonique manquaient sans que rien ne le signale. Une énumération de droits menée contre des routes gardées par la garde canonique ne laissait aucune trace, ce que ce module existe précisément pour éviter.
+  La docstring de `notify_permission_denied` affirmait par ailleurs « Appelée par les gardes du paquet », faux pour deux d'entre elles, et la référence annonçait « les trois gardes ».
+  Les deux gardes annoncent désormais, avec les sources `user-permissions` et `instance`, cette dernière nommant les **deux** permissions demandées, le refus venant de ce qu'aucune ne s'applique. Un 401 reste hors du journal d'accès : il dit « je ne sais pas qui vous êtes », pas « vous n'avez pas le droit », et les confondre noierait les vrais refus sous les visiteurs anonymes.
+  Un garde-fou lu par `ast` refuse qu'une fonction `require_*` du paquet refuse sans annoncer. Les `has_*` en sont exclus : ils rendent un booléen, et c'est l'appelant qui décide s'il refuse.
+
 - **Les champs calculés étaient livrés pour un format que les applications n'utilisent pas (`ENTITIES-COMPUTED-CANONICAL-001`).**
   `ENTITIES-COMPUTED-FIELDS-001` les avait livrés, et son test les déclarait au **format interne V1** (`column`, `sql_type`, `python_type`), celui qu'ADR-086 élimine. Le vert du ticket ne disait donc rien du chemin qu'empruntent les applications. La revue du référentiel entities l'a relevé.
   Mesuré sur le chemin canonique, la chaîne était rompue **en trois endroits**. `field.schema.json` porte `additionalProperties: false` et ne déclarait pas `computed` : `forge entity:validate` refusait le contrat. Le résolveur de champs laissait tomber l'expression, si bien que le champ ressortait en colonne ordinaire. `make:crud` engendrait alors un `INSERT` et un `UPDATE` sur une colonne qui devait être en lecture seule.
