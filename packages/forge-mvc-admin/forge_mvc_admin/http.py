@@ -41,6 +41,7 @@ from forge_mvc_admin.query import (
     update_row,
 )
 from forge_mvc_admin.registry import AdminRegistry
+from forge_mvc_admin.sessions_panel import sessions_panel
 from forge_mvc_admin.registry import registry as _default_registry
 
 if TYPE_CHECKING:
@@ -167,6 +168,19 @@ class AdminController:
         return BaseController.render(
             "admin/dashboard.html",
             context={"resources": self._registry.all()},
+            request=request,
+        )
+
+    def sessions(self, request: Request) -> Response:
+        """Panneau des sessions actives (`GET /admin/_sessions`).
+
+        Le chemin porte un tiret bas de tête : `/admin/{slug}` capturerait
+        sinon `sessions` comme une ressource, et une application qui déclare
+        une ressource nommée « sessions » prendrait la place de ce panneau.
+        """
+        return BaseController.render(
+            "admin/sessions.html",
+            context={"panel": sessions_panel()},
             request=request,
         )
 
@@ -652,6 +666,12 @@ def register_admin_routes(
         return require_auth(_permission_guard(handler, permission))
 
     router.add("GET", "/admin", protect(controller.dashboard), name="admin-dashboard")
+    # Avant `/admin/{slug}` : le routeur retient la première route qui
+    # matche, et `_sessions` serait sinon lu comme un slug de ressource.
+    router.add(
+        "GET", "/admin/_sessions", protect(controller.sessions),
+        name="admin-sessions",
+    )
     router.add(
         "GET",
         "/admin/{slug}",

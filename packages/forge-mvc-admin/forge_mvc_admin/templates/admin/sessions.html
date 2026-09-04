@@ -1,0 +1,39 @@
+{% extends "admin/layout.html" %}
+{% block title %}Sessions actives{% endblock %}
+{% block content %}
+  <h2>Sessions actives</h2>
+
+  {% if not panel.disponible %}
+    <p>{{ panel.indisponible }}</p>
+  {% else %}
+    {% if panel.purge_en_retard %}
+      <p><strong>La purge est en retard.</strong>
+      {{ (panel.part_a_purger * 100) | round | int }} % des lignes sont
+      expirées. Vérifiez que le minuteur <code>forge sessions:gc</code> tourne :
+      une table qui grossit pendant que le nombre d'actives stagne coûte deux
+      fois ce qu'elle devrait à chaque balayage.</p>
+    {% endif %}
+
+    <table>
+      <tbody>
+        <tr><th scope="row">Actives</th><td>{{ panel.actives }}</td></tr>
+        <tr><th scope="row">Expirées, en attente de purge</th><td>{{ panel.expirees }}</td></tr>
+        <tr><th scope="row">Lignes en table</th><td>{{ panel.total }}</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Par nature</h3>
+    <table>
+      <thead><tr><th scope="col">Nature</th><th scope="col">Actives</th></tr></thead>
+      <tbody>
+        {% for nature, nombre in panel.par_nature %}
+          <tr><td>{{ nature }}</td><td>{{ nombre }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p>Aucun identifiant de session n'est affiché, et il n'y en a pas à
+    afficher : la mesure rend des totaux. Un identifiant lu sur un écran ou une
+    capture est une session volée.</p>
+  {% endif %}
+{% endblock %}

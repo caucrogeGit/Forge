@@ -422,3 +422,42 @@ AdminResource(
 
 Les critères suivent la pagination.
 Sans cela, tourner une page les perdrait et la liste repartirait entière.
+
+## Sessions actives
+
+`forge deploy:init` demande de planifier `forge sessions:gc`, et rien ne disait si ce minuteur tournait.
+
+`forge-mvc-sessions-db` compte les sessions depuis `SESSIONS-METRICS-001`, réparties par nature, et sait dire si la purge suit.
+Personne ne regardait ce nombre : il fallait ouvrir un client SQL (`ADMIN-SESSIONS-VIEW-001`).
+
+Le panneau vit sur `/admin/_sessions`, et le tableau de bord y mène.
+
+| Ce qu'il montre | Ce que cela dit |
+|---|---|
+| Actives | combien de personnes sont connectées ou ont un panier en cours |
+| Expirées, en attente de purge | ce que `sessions:gc` n'a pas encore balayé |
+| Lignes en table | ce que la table coûte à chaque balayage |
+| Répartition par nature | anonyme, authentifié, souvenir |
+
+!!! info "La question à laquelle cette page répond"
+    Une table qui grossit pendant que le nombre d'actives stagne signale un minuteur `sessions:gc` arrêté.
+
+    Au delà de la moitié de lignes expirées, la page le dit et nomme la commande.
+    C'est le seuil que `SessionMetrics.purge_backlog_ratio` documente : la table coûte alors deux fois ce qu'elle devrait.
+
+!!! danger "Aucun identifiant de session n'est affiché"
+    Il n'y en a d'ailleurs pas à afficher, la mesure rendant des totaux, et c'est heureux.
+
+    Un identifiant de session lu sur un écran, une capture ou une épaule est une session volée.
+    Le contrat de la donnée l'interdit autant que le gabarit : `SessionsPanel` ne porte aucun champ d'identifiant, si bien qu'un gabarit modifié ne peut rien en faire fuir.
+
+!!! info "Le couplage est souple"
+    `forge-mvc-admin` ne déclare pas `forge-mvc-sessions-db` en dépendance, comme il ne déclare ni `forge-mvc-rbac` ni `forge-mvc-workflow`.
+
+    Un projet dont les sessions vivent en mémoire n'a pas à l'installer pour ouvrir son back-office : le panneau dit alors pourquoi il est vide.
+    Une table absente ne fait pas tomber la page non plus : une page d'administration qui tombe parce qu'un panneau ne répond pas retire l'accès à tout le reste.
+
+!!! warning "Le panneau ne révoque rien"
+    Fermer une session depuis cet écran demanderait de désigner laquelle, donc de l'identifier, donc de l'exposer.
+
+    Fermer toutes celles d'un utilisateur est possible sans cela, `delete_for_user` existe, mais c'est un geste destructeur qui mérite sa page de confirmation et sa décision propre.

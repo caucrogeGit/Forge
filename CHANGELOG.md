@@ -2,6 +2,16 @@
 
 ## [Non publié]
 
+### Ajouté
+
+- **Le back-office montre l'état des sessions (`ADMIN-SESSIONS-VIEW-001`).**
+  `forge deploy:init` demande de planifier `forge sessions:gc`, et rien ne disait si ce minuteur tournait. `forge-mvc-sessions-db` compte les sessions depuis `SESSIONS-METRICS-001`, réparties par nature, et sait dire si la purge suit : **personne ne regardait ce nombre**, il fallait ouvrir un client SQL. Dernier point ouvert de la revue du référentiel sessions-db.
+  Le panneau vit sur `/admin/_sessions`, et le tableau de bord y mène : une page qu'aucun lien n'atteint n'est pas une page. Le chemin porte un tiret bas de tête, `/admin/{slug}` capturant sinon `sessions` comme le slug d'une ressource, et la route est posée **avant** celle à slug, le routeur retenant la première qui correspond.
+  Il répond à une question d'exploitation : une table qui grossit pendant que le nombre d'actives stagne signale un `sessions:gc` arrêté. Au delà de la moitié de lignes expirées, la page le dit et nomme la commande, au seuil que `purge_backlog_ratio` documente déjà.
+  **Aucun identifiant de session n'est affiché**, et il n'y en a pas à afficher, la mesure rendant des totaux. Le contrat de la donnée l'interdit autant que le gabarit : `SessionsPanel` ne porte aucun champ d'identifiant, si bien qu'un gabarit modifié ne peut rien en faire fuir. Un identifiant lu sur un écran, une capture ou une épaule est une session volée.
+  **Le couplage est souple**, comme pour `forge-mvc-rbac` et `forge-mvc-workflow` : `forge-mvc-admin` ne déclare pas `forge-mvc-sessions-db` en dépendance, et un test le vérifie. Son absence rend un panneau qui dit pourquoi il est vide, et une table absente ne fait pas tomber la page. Une page d'administration qui tombe parce qu'un panneau ne répond pas retire l'accès à tout le reste. L'indisponibilité ne rend pas des zéros : « aucune session » et « je ne sais pas » ne se corrigent pas au même endroit.
+  Le panneau **ne révoque rien**, et c'est écrit. Fermer une session depuis cet écran demanderait de la désigner, donc de l'identifier, donc de l'exposer ; fermer toutes celles d'un utilisateur est possible sans cela, mais c'est un geste destructeur qui mérite sa décision propre.
+
 ### Modifié
 
 - **`forge new` n'installe plus Node par défaut (`FORGE-NEW-NO-NODE-DEFAULT-001`).**
