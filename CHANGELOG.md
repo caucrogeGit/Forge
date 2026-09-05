@@ -24,6 +24,11 @@
 
 ### Ajouté
 
+- **Ce que la purge de fichiers ne fait pas est désormais écrit (`DOC-FILES-RETENTION-SCOPE-001`).**
+  `files:orphans` supprime des fichiers que rien ne réclame. Il n'existe pas de purge par ancienneté, et la documentation était **silencieuse** sur cette absence.
+  Elle est délibérée : Forge ne sait pas qu'une facture se garde dix ans et une vignette trente jours. La différence avec `audit:gc --days`, `stats:gc --days` et `iot:gc --days` n'est pas de principe, ces commandes suppriment des lignes **dont elles connaissent le sens**, un événement de journal ou une mesure de capteur. Un fichier appartient au domaine de l'application, et supprimer par date sans savoir ce qu'on supprime est le geste qu'il ne faut pas offrir.
+  Le chemin est donné plutôt que refusé : le registre porte `created_at`, indexé, et une rétention applicative tient en une requête suivie de `delete_upload` puis `forget_file`. L'écrire soi même force à nommer sa règle, ce qui est le bon endroit pour cette décision.
+
 - **Une notification pouvait être écrite et jamais relue (`NOTIF-STORE-AS-VALIDATED-001`).**
   `notify` validait le destinataire sur sa forme **élaguée** et stockait la forme **brute**. Une notification écrite pour `"  professeur.42  "` était donc invisible à `get_notifications`, `unread_count` et `mark_all_read`, qui interrogent la valeur telle qu'on la leur passe. Revue du référentiel notifications.
   Mesuré : écrit avec `recipient = '  professeur.42  '`, relu avec `'professeur.42'` rendait **zéro notification et zéro non lue**. Aucune erreur nulle part, l'écriture rendant son identifiant comme si tout allait bien. C'est le pire mode de panne, tout paraît avoir marché.

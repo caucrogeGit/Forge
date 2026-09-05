@@ -603,3 +603,20 @@ Cette hypothèse est fausse dès qu'un autre composant écrit là sans inscrire.
     `forge files:orphans` affiche par défaut et ne supprime que sur `--delete`.
 
     Lancez la commande sans l'option une première fois : la liste dit ce que le registre ignore, et c'est le meilleur moyen de découvrir un écrivain qui n'inscrit pas.
+
+## Ce que Forge purge, et ce qu'il ne purge pas
+
+`files:orphans` supprime des fichiers **que rien ne réclame** : le registre ne les connaît pas, ou il les connaît alors qu'ils ont disparu du disque.
+
+Il n'existe **pas** de purge par ancienneté, et c'est délibéré (`DOC-FILES-RETENTION-SCOPE-001`).
+
+!!! info "Une durée de conservation est une règle métier"
+    Forge ne sait pas qu'une facture se garde dix ans et une vignette trente jours.
+
+    D'autres opt-ins purgent bien par âge, `audit:gc --days`, `stats:gc --days`, `iot:gc --days`. La différence n'est pas de principe : ils suppriment des lignes **dont ils connaissent le sens**, un événement de journal ou une mesure de capteur.
+    Un fichier appartient au domaine de l'application, et supprimer par date sans savoir ce qu'on supprime est le geste qu'il ne faut pas offrir.
+
+!!! tip "L'écrire soi même est court"
+    Le registre porte `created_at` : une application qui veut une rétention interroge `forge_files` sur ce critère, appelle `delete_upload` puis `forget_file`, et garde la décision de ce qu'elle efface.
+
+    Le faire elle même la force à nommer sa règle, ce qui est le bon endroit pour cette décision.
