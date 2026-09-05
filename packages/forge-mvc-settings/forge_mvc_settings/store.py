@@ -268,11 +268,23 @@ def _all_settings_raw(*, db: Any = None) -> dict[str, SettingValue]:
 def get_settings_with_types(
     *, db: Any = None
 ) -> "list[tuple[str, SettingValue, str]]":
-    """Tous les paramètres, avec leur valeur typée **et** leur type déclaré.
+    """Paramètres **globaux**, avec leur valeur typée et leur type déclaré.
 
     `get_all_settings` perd le type, qu'un écran d'édition doit pourtant
     afficher et renvoyer : sans lui, une page réécrirait le paramètre en
     devinant, et changerait son type au passage (`ADMIN-SETTINGS-UI-001`).
+
+    Comme `get_all_settings`, l'espace des paramètres par utilisateur en est
+    exclu (`SETTINGS-ADMIN-USER-SCOPE-LEAK-001`). Il ne l'était pas, et cette
+    fonction est celle que sert `describe_settings`, donc l'écran de réglages :
+    la page affichait les préférences de tous les comptes, adresses comprises,
+    et les offrait à l'édition. `get_all_settings` refusait déjà cela en
+    nommant le danger ; la garde manquait sur la porte que l'écran emprunte.
+
+    Le refus d'écriture, lui, tenait : `set_setting` rejette le préfixe
+    réservé. Seule la lecture fuyait.
+
+    Employer `get_user_settings` pour les paramètres d'un utilisateur.
 
     L'ordre est celui de la requête, trié par clé.
     """
@@ -284,6 +296,7 @@ def get_settings_with_types(
             str(ligne["value_type"]),
         )
         for ligne in database.fetch_all(_SELECT_ALL_SQL, ())
+        if not str(ligne["setting_key"]).startswith(USER_SCOPE_PREFIX)
     ]
 
 

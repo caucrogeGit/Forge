@@ -347,6 +347,10 @@ for ligne in describe_settings():
 set_setting(cle, parse_setting_value(saisie, type_declare))
 ```
 
+`describe_settings` ne rend que les paramètres **globaux**.
+Les paramètres appartenant à un utilisateur en sont exclus, comme dans `get_all_settings` : un écran de réglages afficherait sinon les préférences de tous les comptes, adresses comprises, et les offrirait à l'édition.
+Employez `get_user_settings` pour ceux d'un utilisateur.
+
 | Champ de `SettingRow` | Rôle |
 |---|---|
 | `key` | la clé du paramètre |
