@@ -438,3 +438,53 @@ Un geste d'entretien absent du guide n'est pas planifié, et une table qui gross
 
 !!! info "Le nom de la zone vient du dossier du projet"
     Deux projets Forge derrière le même Nginx déclareraient sinon deux zones homonymes, et Nginx refuserait de démarrer sur un message qui ne dit pas quel fichier est en cause.
+
+## Servir derrière Caddy plutôt que Nginx
+
+Forge engendre **un** gabarit de reverse proxy, celui de Nginx, et il n'en engendrera pas un second.
+Ce n'est pas un manque de temps : `deploy:check` lit cette configuration pour vous dire ce qui manque, et deux syntaxes voudraient dire deux lecteurs, dont l'un finirait en retard sur l'autre sans que rien ne le signale.
+
+Caddy reste un choix légitime, et il obtient ses certificats tout seul.
+Voici ce que chaque bloc du gabarit Nginx y devient, y compris ceux qui n'y ont pas d'équivalent direct.
+
+```caddyfile
+monapp.example.com {
+    encode zstd gzip
+
+    handle_path /static/* {
+        root * /srv/monapp/public/static
+        header Cache-Control "max-age=604800, immutable"
+        header X-Content-Type-Options "nosniff"
+        file_server
+    }
+
+    # L'équivalent de `internal;` : ce chemin n'est atteignable que
+    # par un en-tête X-Accel-Redirect émis par l'application.
+    handle_path /protected/* {
+        root * /srv/monapp/storage/uploads
+        file_server
+    }
+
+    reverse_proxy unix//run/forge-app.sock
+}
+```
+
+| Bloc Nginx | En Caddy | Écart à connaître |
+|---|---|---|
+| `listen 443 ssl` et les directives `ssl_*` | rien à écrire | Caddy obtient et renouvelle le certificat seul ; il lui faut le port 80 ouvert |
+| `add_header Strict-Transport-Security` | rien à écrire | Caddy le pose par défaut sur un site en HTTPS |
+| `location /static/` | `handle_path /static/*` | `handle_path` retire le préfixe, ce que `alias` faisait |
+| `location /protected/ { internal; }` | `handle_path` non exposé | **Caddy n'a pas d'équivalent de `internal;`** : c'est votre `X-Accel-Redirect` qui doit pointer là, et rien ne l'empêchera d'être appelé directement |
+| `limit_req_zone` sur `/login` | `rate_limit` | Le module n'est pas dans la version standard : il faut un binaire construit avec lui |
+| `proxy_pass` | `reverse_proxy` | Les en-têtes `X-Forwarded-*` sont posés par défaut |
+
+!!! danger "Le point qui ne se transpose pas"
+    `internal;` est la moitié qui protège dans le service de fichiers par accélération.
+
+    Sans lui, `/protected/` répond à quiconque devine un nom de fichier, et l'autorisation que l'application venait de faire ne sert plus à rien.
+    Caddy ne l'a pas : si vous servez des fichiers protégés, gardez Nginx, ou faites passer les téléchargements par l'application.
+
+!!! warning "`deploy:check` ne lira pas votre Caddyfile"
+    Les contrôles qui portent sur Nginx se tairont, et leur silence n'est pas un feu vert.
+
+    Les autres, l'unité systemd, les secrets, `APP_ENV`, le compte de service, les droits du stockage et le worker, restent valables tels quels.
