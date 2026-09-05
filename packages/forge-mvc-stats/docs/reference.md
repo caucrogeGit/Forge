@@ -469,3 +469,53 @@ Aucun cookie visiteur, aucune IP.
 - [Affichage admin (admin.py)](references/admin.md) : lister et filtrer.
 - [Agrégation (aggregate.py)](references/aggregate.md) : compter par dimension (ADR-037).
 - [Welcome-Stats](welcome/debutant/stats-welcome.md) : parcours d'apprentissage.
+
+## Un tableau de bord minimal
+
+Forge affiche, il ne génère pas d'écran de statistiques (principe 1, et ADR-035 pour les parcours faits à la main).
+Voici les quatre chiffres qui suffisent à un tableau de bord, et le code à copier dans un contrôleur.
+
+```python
+from forge_mvc_stats import (
+    KIND_ACTION, KIND_PAGE_VIEW, count_stats_events, list_stats_events,
+)
+
+def tableau_de_bord(fetch_all, *, depuis: str) -> dict[str, object]:
+    return {
+        "pages_les_plus_vues": count_stats_events(
+            fetch_all, group_by="name", kind=KIND_PAGE_VIEW, since=depuis),
+        "actions_les_plus_frequentes": count_stats_events(
+            fetch_all, group_by="name", kind=KIND_ACTION, since=depuis),
+        "consultations_par_jour": count_stats_events(
+            fetch_all, group_by="day", kind=KIND_PAGE_VIEW, since=depuis),
+        "derniers_evenements": list_stats_events(fetch_all, limit=20),
+    }
+```
+
+Les trois premiers rendent des `{"bucket", "total"}`, le dernier des lignes normalisées.
+Un gabarit Jinja les parcourt sans autre traitement.
+
+```html
+<h2>Pages les plus vues</h2>
+<table>
+  <tr><th>Page</th><th>Vues</th></tr>
+  {% for ligne in pages_les_plus_vues %}
+    <tr><td>{{ ligne.bucket }}</td><td>{{ ligne.total }}</td></tr>
+  {% endfor %}
+</table>
+```
+
+!!! warning "Séparer les deux types n'est pas un raffinement"
+    Sans `kind`, les deux premières lignes rendraient le même total mêlé.
+
+    Mille pages vues valent moins qu'une commande passée, et les additionner donne un chiffre que personne ne peut interpréter.
+
+!!! info "`bucket` d'une série temporelle se rend en texte"
+    Le type de la valeur varie selon le backend, date native ici, chaîne là.
+
+    Convertissez-la avant de l'afficher plutôt que de supposer l'un des deux.
+
+!!! note "Cet écran est à vous"
+    Le tri, la période, la mise en forme et le contrôle d'accès relèvent de l'application.
+
+    Une page de statistiques expose l'activité d'un site : protégez la route, par exemple avec `forge-mvc-rbac`.

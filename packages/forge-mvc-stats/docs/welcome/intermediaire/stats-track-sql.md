@@ -57,6 +57,12 @@ class StatsTrackSqlController(BaseController):
         )
 ```
 
+!!! note "`page_view` est ici un nom, pas un type"
+    Ce parcours se sert de cette chaîne comme d'un nom d'événement quelconque, et c'est légitime.
+
+    Une consultation de page se déclare autrement, par `kind=KIND_PAGE_VIEW`, le nom restant celui de la page consultée.
+    Employer `"page_view"` comme nom rangerait toutes les pages sous un seul nom, et l'axe qui répond « quelles pages reviennent le plus » ne répondrait plus rien.
+
 ### Comprendre ce code
 
 - Le SQL est **paramétré** (`?`) : les valeurs ne sont jamais concaténées (anti-injection).

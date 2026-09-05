@@ -150,15 +150,24 @@ def count_stats_events(
     name: str | None = None,
     category: str | None = None,
     since: str | None = None,
+    kind: str | None = None,
 ) -> list[dict[str, Any]]:
     """Count events grouped by `group_by`, using the provided fetch_all executor.
 
     Returns normalized `{"bucket", "total"}` dicts. The caller supplies
     fetch_all — Forge never accesses the database automatically.
+
+    `kind` filtre sur le vocabulaire fermé des types d'événement. Les deux
+    constructeurs SQL le portaient, cette fonction non
+    (`STATS-KIND-API-COMPLETENESS-001`), alors que la référence documentait
+    l'appel `count_stats_events(fetch_all, group_by="name", kind="page_view")`.
+    Il levait une `TypeError`.
     """
-    sql = get_stats_counts_sql(group_by, name=name, category=category, since=since)
+    sql = get_stats_counts_sql(
+        group_by, name=name, category=category, since=since, kind=kind
+    )
     params = prepare_stats_counts_params(
-        group_by, name=name, category=category, since=since
+        group_by, name=name, category=category, since=since, kind=kind
     )
     rows = fetch_all(sql, params)
     return [normalize_stats_count_row(row) for row in rows]

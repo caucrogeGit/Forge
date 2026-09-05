@@ -6,7 +6,7 @@ from __future__ import annotations
 import json
 from typing import Any, Callable, Iterable, cast
 
-from .events import StatsEventError, validate_event_name
+from .events import KIND_ACTION, StatsEventError, validate_event_name
 from .schema import STATS_EVENTS_TABLE
 
 _DEFAULT_LIMIT = 50
@@ -32,6 +32,7 @@ def get_stats_events_admin_sql(
     name: str | None = None,
     category: str | None = None,
     limit: int = _DEFAULT_LIMIT,
+    kind: str | None = None,
 ) -> str:
     """Return the SELECT SQL for listing stats events with optional filters.
 
@@ -45,7 +46,7 @@ def get_stats_events_admin_sql(
     from core.database.backend import get_backend
 
     parts = [
-        f"SELECT id, name, label, category, metadata, created_at"
+        f"SELECT id, name, label, category, metadata, kind, created_at"
         f" FROM {STATS_EVENTS_TABLE}"
         f" WHERE 1 = 1",
     ]
@@ -53,6 +54,8 @@ def get_stats_events_admin_sql(
         parts.append(" AND name = ?")
     if category is not None:
         parts.append(" AND category = ?")
+    if kind is not None:
+        parts.append(" AND kind = ?")
     parts.append(" ORDER BY created_at DESC, id DESC")
     parts.append(get_backend().dialect.limit_clause())
     return "".join(parts)
@@ -62,6 +65,7 @@ def prepare_stats_events_admin_params(
     name: str | None = None,
     category: str | None = None,
     limit: int = _DEFAULT_LIMIT,
+    kind: str | None = None,
 ) -> tuple[Any, ...]:
     """Return the SQL parameter tuple for a stats events query."""
     if name is not None:
@@ -81,6 +85,18 @@ def prepare_stats_events_admin_params(
         params.append(name)
     if category is not None:
         params.append(category)
+    if kind is not None:
+        # Vocabulaire fermé : un type inventé ne rendrait aucune ligne, et un
+        # filtre qui rend zéro sans motif fait chercher le défaut ailleurs.
+        from forge_mvc_stats.events import EVENT_KINDS
+
+        valeur = str(kind).strip().lower()
+        if valeur not in EVENT_KINDS:
+            raise StatsAdminError(
+                f"kind invalide : {kind!r}. Valeurs autorisées : "
+                f"{', '.join(sorted(EVENT_KINDS))}."
+            )
+        params.append(valeur)
     params.append(effective_limit)
     return tuple(params)
 
@@ -129,6 +145,10 @@ def normalize_stats_event_row(row: dict[str, Any]) -> dict[str, Any]:
         "label": row["label"],
         "category": row["category"],
         "metadata": metadata,
+        # Absent des lignes écrites avant `STATS-EVENT-KIND-001`, et des
+        # doubles de test qui ne le posent pas : le défaut du contrat vaut
+        # mieux qu'une clé manquante que l'affichage devrait deviner.
+        "kind": row.get("kind") or KIND_ACTION,
         "created_at": row["created_at"],
     }
 
@@ -138,13 +158,23 @@ def list_stats_events(
     name: str | None = None,
     category: str | None = None,
     limit: int = _DEFAULT_LIMIT,
+    kind: str | None = None,
 ) -> list[dict[str, Any]]:
     """List stats events from the database using the provided fetch_all executor.
 
     Returns a list of normalized dicts. The caller must supply fetch_all —
     Forge never accesses the database automatically.
+
+    `kind` filtre sur le vocabulaire fermé des types d'événement. Ni le filtre
+    ni la **colonne** n'existaient ici : la requête ne sélectionnait pas `kind`,
+    si bien qu'un écran d'administration ne pouvait ni distinguer une vue de
+    page d'une action, ni l'afficher (`STATS-KIND-API-COMPLETENESS-001`).
     """
-    sql = get_stats_events_admin_sql(name=name, category=category, limit=limit)
-    params = prepare_stats_events_admin_params(name=name, category=category, limit=limit)
+    sql = get_stats_events_admin_sql(
+        name=name, category=category, limit=limit, kind=kind
+    )
+    params = prepare_stats_events_admin_params(
+        name=name, category=category, limit=limit, kind=kind
+    )
     rows = fetch_all(sql, params)
     return [normalize_stats_event_row(row) for row in rows]

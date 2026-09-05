@@ -122,13 +122,22 @@ def make_event(
     label: str = "",
     category: str = "general",
     metadata: dict[str, Any] | None = None,
+    kind: str = KIND_ACTION,
 ) -> StatsEvent:
-    """Create a validated StatsEvent."""
+    """Create a validated StatsEvent.
+
+    `kind` manquait ici alors que `StatsEvent` le porte depuis
+    `STATS-EVENT-KIND-001` (`STATS-KIND-API-COMPLETENESS-001`). Cette fonction
+    étant la porte que la documentation fait employer, toute vue de page écrite
+    par le chemin documenté était enregistrée comme une **action**, et le
+    vocabulaire fermé que ce ticket avait introduit ne servait à rien.
+    """
     return StatsEvent(
         name=name,
         label=label,
         category=category,
         metadata=metadata if metadata is not None else {},
+        kind=kind,
     )
 
 

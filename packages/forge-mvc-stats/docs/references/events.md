@@ -28,16 +28,19 @@ Le constructeur valide et normalise `name` ; `metadata` doit être un dictionnai
 ## 3. Créer et valider
 
 ```python
-from forge_mvc_stats import make_event, validate_event
+from forge_mvc_stats import KIND_PAGE_VIEW, make_event, validate_event
 
-e = make_event("page_view", label="Vue de page", category="traffic",
-               metadata={"path": "/contact"})
+e = make_event("contact", label="Page contact", category="traffic",
+               metadata={"path": "/contact"}, kind=KIND_PAGE_VIEW)
 validate_event(e)   # retourne e
 ```
 
+Le **nom** dit quelle page ou quelle action, le **type** dit laquelle des deux.
+Cette page employait `"page_view"` comme nom, convention d'avant le champ `kind` : l'événement était alors compté comme une action, et l'agrégation par type devenait fausse.
+
 | Fonction | Comportement |
 |---|---|
-| `make_event(name, ...)` | crée un `StatsEvent` validé |
+| `make_event(name, ..., kind)` | crée un `StatsEvent` validé ; `kind` vaut `action` par défaut |
 | `validate_event(event)` | vérifie que `event` est un `StatsEvent` ; retourne l'événement ou lève |
 | `normalize_event_name(value)` | minuscule, espaces et tirets vers `_` ; lève si caractères interdits |
 | `validate_event_name(value)` | normalise puis vérifie le format `[a-z][a-z0-9_]*` |
@@ -47,7 +50,10 @@ validate_event(e)   # retourne e
 Les noms sont de simples chaînes `snake_case` **définies par l'application**.
 Forge ne fournit pas de liste prédéfinie, conformément au principe 1 (le framework n'est pas l'application).
 
-Noms courants à utiliser directement : `"page_view"`, `"contact_click"`, `"form_submit"`, `"download_click"`, `"external_link_click"`, `"media_view"`.
+Noms courants à utiliser directement : `"accueil"`, `"contact_click"`, `"form_submit"`, `"download_click"`, `"external_link_click"`, `"media_view"`.
+
+`"page_view"` ne figure plus dans cette liste, et ce n'est pas un oubli.
+Une consultation de page se déclare par `kind=KIND_PAGE_VIEW`, le nom restant celui de la page consultée : sans quoi toutes les pages se comptent sous un seul nom, et l'axe qui répond « quelles pages reviennent le plus » ne répond plus rien.
 
 ## 5. Les erreurs
 

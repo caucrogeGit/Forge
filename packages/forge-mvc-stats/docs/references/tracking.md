@@ -19,16 +19,20 @@ Principes :
 ## 2. Enregistrer un événement
 
 ```python
-from forge_mvc_stats import track_event
+from forge_mvc_stats import KIND_PAGE_VIEW, track_event
 
 track_event(
     execute=db.execute,
-    event_or_name="page_view",
-    label="Vue de page",
+    event_or_name="contact",
+    label="Page contact",
     category="traffic",
     metadata={"path": "/contact"},
+    kind=KIND_PAGE_VIEW,
 )
 ```
+
+Sans `kind`, l'événement est une **action**, le défaut du contrat.
+Cette page employait `"page_view"` comme nom d'événement, convention d'avant le champ : les vues de page écrites ainsi étaient comptées parmi les actions.
 
 Avec un événement déjà construit :
 
@@ -38,6 +42,9 @@ from forge_mvc_stats import make_event, track_event
 event = make_event("contact_click", label="Clic contact", metadata={"source": "footer"})
 track_event(db.execute, event)
 ```
+
+Un `StatsEvent` porte déjà sa forme : lui joindre `label`, `category`, `metadata` ou `kind` est refusé.
+Ces arguments étaient auparavant ignorés en silence, si bien qu'un appelant croyait poser une vue de page et écrivait une action.
 
 ## 3. L'API
 
