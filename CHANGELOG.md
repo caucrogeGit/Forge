@@ -24,6 +24,14 @@
 
 ### Ajouté
 
+- **Une notification pouvait être écrite et jamais relue (`NOTIF-STORE-AS-VALIDATED-001`).**
+  `notify` validait le destinataire sur sa forme **élaguée** et stockait la forme **brute**. Une notification écrite pour `"  professeur.42  "` était donc invisible à `get_notifications`, `unread_count` et `mark_all_read`, qui interrogent la valeur telle qu'on la leur passe. Revue du référentiel notifications.
+  Mesuré : écrit avec `recipient = '  professeur.42  '`, relu avec `'professeur.42'` rendait **zéro notification et zéro non lue**. Aucune erreur nulle part, l'écriture rendant son identifiant comme si tout allait bien. C'est le pire mode de panne, tout paraît avoir marché.
+  **Le paquet était incohérent d'une fonction à l'autre, et j'y ai contribué.** `mark_read` élaguait, seule de toutes ; elle a été ajoutée par `NOTIF-HTTP-ROUTES-001`, qui a donc creusé l'écart sans le voir. Une notification au destinataire mal saisi pouvait être listée, par correspondance brute, et pas marquée lue, par correspondance élaguée.
+  La normalisation vit désormais à un seul endroit, traversée par l'écriture comme par la lecture, et un garde-fou lu sur l'arbre syntaxique refuse qu'une fonction à destinataire la contourne. Il a d'ailleurs attrapé `mark_read`, qui élaguait en ligne plutôt que d'appeler le normaliseur commun.
+  **`type` était le seul champ ni validé ni normalisé**, alors que `recipient`, `message`, `data` et `target_url` le sont tous, et que c'est celui sur lequel un client branche son affichage. Il est désormais élagué, refusé vide, et refusé au delà des soixante-quatre caractères de sa colonne : tronquer donnerait un type sur lequel un gabarit brancherait à tort, et se rabattre en silence sur « info » donnerait un type que personne n'a écrit.
+  **Le vocabulaire des types reste ouvert**, et ce n'est pas un oubli : une application réelle observée écrit `type="copie_a_corriger"`, et fermer la liste à « info, alerte, tâche » casserait ce que Forge est censé servir. Le contraste avec `forge-mvc-workflow` et `forge-mvc-sessions-db`, dont les vocabulaires sont fermés, est délibéré : là bas, une nature inventée rendrait la métrique incomparable d'un projet à l'autre.
+
 - **La purge d'orphelins supprimait les images d'un autre opt-in (`IMAGES-REGISTRY-RECORD-001`).**
   `forge-mvc-images` écrit sous `UPLOAD_ROOT`, la racine que `forge-mvc-files` connaît, et n'inscrivait rien à son registre. `forge files:orphans` rapproche le disque et le registre : une image absente du registre y était **un orphelin**, et `--delete` la supprimait. Revue du référentiel files.
   **Le garde-fou du registre vide ne protégeait pas ce cas.** Il ne se déclenche que si le registre est **entièrement** vide. Un projet qui inscrit ses documents, comme la documentation de `forge-mvc-files` l'enseigne, et qui utilise cet opt-in pour ses images, avait un registre peuplé et des images signalées orphelines.

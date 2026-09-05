@@ -423,6 +423,7 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `JOBS-HEARTBEAT-REACHABLE-001` | jobs | Revue du référentiel jobs | **Livré.** Le gestionnaire ne recevait pas son jeton ; l'exemple documenté cassait la tâche |
 | `MAIL-QUEUE-ATTACHMENTS-REFUSED-001` | mail | Revue du référentiel mail | **Livré.** Pièces jointes et file ne composaient pas ; la pièce disparaissait en silence |
 | `IMAGES-REGISTRY-RECORD-001` | images, files | Revue du référentiel files | **Livré.** `files:orphans --delete` supprimait les images et leurs vignettes |
+| `NOTIF-STORE-AS-VALIDATED-001` | notifications | Revue du référentiel notifications | **Livré.** Destinataire validé élagué et stocké brut : notification écrite, jamais relue |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.

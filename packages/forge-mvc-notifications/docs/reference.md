@@ -252,7 +252,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
 
     | Élément | Signature | Rôle |
     |---|---|---|
-    | `notify` | `notify(recipient, message, *, type="info", data=None, db=None) -> int` | crée une notification, renvoie son id |
+    | `notify` | `notify(recipient, message, *, type="info", data=None, target_url=None, db=None) -> int` | crée une notification, renvoie son id |
     | `get_notifications` | `get_notifications(recipient, *, unread_only=False, limit=50, db=None) -> list[Notification]` | liste les notifications d'un destinataire |
     | `unread_count` | `unread_count(recipient, *, db=None) -> int` | nombre de non lues |
     | `mark_read` | `mark_read(notification_id, *, recipient=None, db=None) -> bool` | marque une notification lue, bornée au destinataire s'il est fourni |
@@ -535,3 +535,41 @@ Le rafraîchissement s'écrit avec HTMX, que le squelette livre déjà :
     Les deux `POST` ne sont pas dispensés de CSRF.
 
     Un appel HTMX doit donc envoyer le jeton, par exemple avec `hx-headers` posé une fois sur `<body>`.
+
+
+## Ce qui est écrit est ce qui se relit
+
+`notify` validait le destinataire sur sa forme **élaguée** et stockait la forme **brute**.
+
+Une notification écrite pour `"  professeur.42  "` était donc invisible à `get_notifications`, `unread_count` et `mark_all_read`, qui interrogent la valeur telle qu'on la leur passe (`NOTIF-STORE-AS-VALIDATED-001`).
+
+!!! danger "Écrite, comptée comme réussie, et jamais lue"
+    Mesuré : écrit avec `recipient = '  professeur.42  '`, relu avec `'professeur.42'` rendait zéro notification et zéro non lue.
+
+    Aucune erreur nulle part. C'est le pire mode de panne, tout paraît avoir marché.
+
+!!! warning "Le paquet était incohérent d'une fonction à l'autre"
+    `mark_read` élaguait, seule de toutes.
+
+    Elle a été ajoutée par `NOTIF-HTTP-ROUTES-001`, qui a donc creusé l'écart sans le voir : une notification au destinataire mal saisi pouvait être listée, par correspondance brute, et pas marquée lue, par correspondance élaguée.
+
+    La normalisation vit désormais à un seul endroit, et un garde-fou lu sur l'arbre syntaxique refuse qu'une fonction à destinataire la contourne.
+
+## Le type d'une notification
+
+`type` était le **seul** champ ni validé ni normalisé, alors que `recipient`, `message`, `data` et `target_url` le sont tous.
+
+C'est pourtant celui sur lequel un client branche son affichage : `" Alerte "` et `"Alerte"` y produisent deux comportements.
+
+| Refusé | Pourquoi |
+|---|---|
+| vide, ou fait d'espaces | il ne qualifie rien, et se rabattre en silence sur « info » donnerait un type que personne n'a écrit |
+| plus de 64 caractères | c'est la largeur de la colonne, et tronquer donnerait un type sur lequel un gabarit brancherait à tort |
+
+!!! info "Le vocabulaire reste ouvert, et ce n'est pas un oubli"
+    Une application réelle observée écrit `type="copie_a_corriger"`.
+
+    Fermer la liste à « info, alerte, tâche » casserait ce que Forge est censé servir.
+    Ce qui est refusé n'est pas un mot inconnu, c'est une valeur qui ne peut pas qualifier.
+
+    Le contraste avec `forge-mvc-workflow` et `forge-mvc-sessions-db`, dont les vocabulaires sont **fermés**, est délibéré : là bas, une nature inventée rendrait la métrique incomparable d'un projet à l'autre, ce qui est justement ce que ces champs doivent permettre.

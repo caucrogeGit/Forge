@@ -159,6 +159,55 @@ def validate_target_url(url: "str | None") -> "str | None":
     )
 
 
+#: Longueur de la colonne `type`. Tronquer donnerait un type que personne n'a
+#: écrit, et sur lequel un gabarit brancherait à tort.
+TYPE_MAX_LENGTH = 64
+
+
+def _destinataire(valeur: object) -> str:
+    """Destinataire normalisé, tel qu'il sera **stocké et recherché**.
+
+    `notify` validait sur la forme élaguée et stockait la forme brute
+    (`NOTIF-STORE-AS-VALIDATED-001`). Une notification écrite pour
+    `"  professeur.42  "` était donc invisible à `get_notifications`,
+    `unread_count` et `mark_all_read`, qui interrogent la forme élaguée : écrite,
+    comptée comme réussie, et jamais lue.
+
+    Normaliser au même endroit pour l'écriture et la lecture ferme l'écart, quel
+    que soit le soin de l'appelant.
+    """
+    return str(valeur or "").strip()
+
+
+def _type_de_notification(valeur: object) -> str:
+    """Type normalisé, refusé s'il ne peut pas qualifier.
+
+    Le type était le **seul** champ ni validé ni normalisé, alors que
+    `recipient`, `message`, `data` et `target_url` le sont tous. C'est pourtant
+    celui sur lequel un client branche son affichage : `" Alerte "` et
+    `"Alerte"` y produisent deux comportements.
+
+    Le vocabulaire reste **ouvert**, et ce n'est pas un oubli. Une application
+    réelle observée écrit `type="copie_a_corriger"` : fermer la liste à
+    « info, alerte, tâche » casserait ce que Forge est censé servir. Ce qui est
+    refusé n'est pas un mot inconnu, c'est une valeur qui ne peut pas qualifier.
+    """
+    nature = str(valeur or "").strip()
+    if not nature:
+        raise NotificationError(
+            "Le type ne peut pas être vide : il qualifie la notification, et "
+            "un client branche son affichage dessus. Omettez le paramètre pour "
+            "obtenir « info »."
+        )
+    if len(nature) > TYPE_MAX_LENGTH:
+        raise NotificationError(
+            f"Le type dépasse {TYPE_MAX_LENGTH} caractères ({len(nature)}), la "
+            f"largeur de la colonne. Tronquer donnerait un type que personne "
+            f"n'a écrit."
+        )
+    return nature
+
+
 def notify(
     recipient: str,
     message: str,
@@ -175,25 +224,27 @@ def notify(
     sérialisé en JSON. Lève :class:`NotificationError` si `recipient`/`message`
     est vide ou si `data` n'est pas sérialisable en JSON.
     """
-    if not recipient or not recipient.strip():
+    cible = _destinataire(recipient)
+    if not cible:
         raise NotificationError("Le destinataire ne peut pas être vide.")
     if not message or not message.strip():
         raise NotificationError("Le message ne peut pas être vide.")
+    nature = _type_de_notification(type)
     try:
         data_json = json.dumps(data or {})
     except (TypeError, ValueError) as exc:
         raise NotificationError(f"Données non sérialisables en JSON : {exc}") from exc
     lien = validate_target_url(target_url)
     identifiant = (db if db is not None else _db_module()).insert(
-        _INSERT_SQL, (recipient, type, message, data_json, lien)
+        _INSERT_SQL, (cible, nature, message, data_json, lien)
     )
     # Annoncé APRÈS l'écriture : un relais ne peut pas annuler une notification
     # déjà enregistrée (NOTIF-MAIL-BRIDGE-001).
     notify_relays(NotificationEvent(
         notification_id=identifiant,
-        recipient=recipient,
+        recipient=cible,
         message=message,
-        type=type,
+        type=nature,
         data=dict(data or {}),
     ))
     return identifiant
@@ -226,7 +277,7 @@ def get_notifications(
         raise NotificationError(f"limit doit être >= 1. Reçu : {limit}.")
     limit = min(limit, MAX_LIMIT)
     where = "WHERE recipient = ?"
-    params: list[object] = [recipient]
+    params: list[object] = [_destinataire(recipient)]
     if unread_only:
         where += " AND read_at IS NULL"
     if before_id is not None:
@@ -262,7 +313,8 @@ def get_notifications(
 
 def unread_count(recipient: str, *, db: Any = None) -> int:
     """Nombre de notifications non lues de `recipient`."""
-    row = (db if db is not None else _db_module()).fetch_one(_UNREAD_COUNT_SQL, (recipient,))
+    row = (db if db is not None else _db_module()).fetch_one(
+        _UNREAD_COUNT_SQL, (_destinataire(recipient),))
     return int(row["n"]) if row else 0
 
 
@@ -282,7 +334,7 @@ def mark_read(
     acces = db if db is not None else _db_module()
     if recipient is None:
         return acces.execute(_mark_read_sql(), (notification_id,)) > 0
-    cible = recipient.strip()
+    cible = _destinataire(recipient)
     if not cible:
         raise NotificationError("Le destinataire ne peut pas être vide.")
     return acces.execute(
@@ -292,4 +344,5 @@ def mark_read(
 
 def mark_all_read(recipient: str, *, db: Any = None) -> int:
     """Marque toutes les notifications de `recipient` comme lues. Renvoie le nombre marqué."""
-    return (db if db is not None else _db_module()).execute(_mark_all_read_sql(), (recipient,))
+    return (db if db is not None else _db_module()).execute(
+        _mark_all_read_sql(), (_destinataire(recipient),))
