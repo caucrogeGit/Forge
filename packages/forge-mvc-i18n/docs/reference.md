@@ -418,12 +418,23 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     ```
 
     ```python
-    from forge_mvc_i18n import plural_form, select_plural
+    from forge_mvc_i18n import trans
 
-    select_plural(catalogue["articles"], compte, "fr").format(n=compte)
+    trans("articles", "fr", count=compte).format(n=compte)
     ```
 
-    Une clé dont la valeur est une chaîne reste une clé ordinaire : le format existant continue de fonctionner sans changement.
+    Une clé dont la valeur est une chaîne reste une clé ordinaire : le format existant continue de fonctionner sans changement, et `count` y est sans effet.
+    Vous pouvez donc écrire l'appel pluralisé sans savoir si la clé l'est encore.
+
+    !!! danger "Ce catalogue était refusé au chargement"
+        Cette page montrait déjà ce JSON, et un appel `select_plural(catalogue["articles"], ...)`.
+
+        Le chargeur refusait pourtant toute valeur qui n'était pas une chaîne, et `trans` n'avait pas de `count` : la valeur que `select_plural` attendait ne pouvait pas venir d'un catalogue, et le pluriel n'était joignable qu'en construisant le dictionnaire à la main (`I18N-PLURAL-CATALOG-REACHABLE-001`).
+
+    !!! info "Le texte n'est pas formaté pour vous"
+        `trans` choisit la forme, il ne substitue rien : le `.format(n=compte)` de l'exemple est à vous.
+
+        Ce module n'a jamais formaté, et le faire ici casserait toute traduction contenant une accolade littérale.
 
     !!! danger "Forge implémente deux formes, CLDR en définit six"
         `one` et `other`, avec une règle par famille de langues. C'est exact pour le français, l'anglais et la plupart des langues d'Europe occidentale.
@@ -437,8 +448,12 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
 
         La règle dépend de la langue et jamais de la région : le français de Belgique et celui de France comptent pareil.
 
-    !!! warning "Une forme absente du catalogue lève"
+    !!! warning "Une forme absente est refusée au chargement"
         Retomber sur l'autre forme afficherait « 3 article » sans que rien ne le signale.
+
+        Le refus tombe au chargement du catalogue, et non à la requête qui porte le nombre manquant : sans cela, la page marche pour un article et casse pour deux.
+
+        `forge i18n:check` applique le même contrôle avant l'exécution.
 
 ## Voir aussi
 

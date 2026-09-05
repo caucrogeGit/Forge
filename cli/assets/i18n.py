@@ -8,6 +8,44 @@ from typing import Any, cast
 
 from cli._support.output import created, error, info, ok, preserved
 
+
+def _formes_de_pluriel() -> "tuple[str, ...]":
+    """Formes attendues, demandées à l'opt-in quand il est installé.
+
+    Le cœur ne dépend pas de `forge-mvc-i18n` (ADR-027), et cette commande doit
+    marcher sans lui. Elle vérifie donc ce qu'elle peut : une valeur composite
+    dont toutes les formes sont des textes. Quand l'opt-in est là, elle exige
+    en plus les formes qu'il sait choisir, plutôt que de dupliquer ici un
+    vocabulaire dont il est la source.
+    """
+    try:
+        from forge_mvc_i18n import PLURAL_FORMS  # noqa: PLC0415
+    except ImportError:
+        return ()
+    return tuple(PLURAL_FORMS)
+
+
+def _erreurs_de_pluriel(cle: str, formes: "dict[Any, Any]") -> "list[str]":
+    """Reproches à faire à une entrée pluralisée, du plus grave au plus léger.
+
+    Une forme absente ne se voit sinon qu'à la requête qui porte le nombre
+    correspondant : la page marche pour un élève et casse pour deux.
+    """
+    erreurs: "list[str]" = []
+    if not formes:
+        return [f'la clé "{cle}" a un objet de formes vide']
+    for nom, texte in formes.items():
+        if not isinstance(nom, str):
+            erreurs.append(f'la clé "{cle}" a un nom de forme non-chaîne : {nom!r}')
+        elif not isinstance(texte, str) or not texte.strip():
+            erreurs.append(f'la forme "{nom}" de la clé "{cle}" est vide ou non-chaîne')
+    manquantes = [f for f in _formes_de_pluriel() if f not in formes]
+    if manquantes:
+        erreurs.append(
+            f'la clé "{cle}" ne porte pas la forme {", ".join(manquantes)}'
+        )
+    return erreurs
+
 _FR_CATALOG: dict[str, str] = {
     "common.save": "Enregistrer",
     "common.cancel": "Annuler",
@@ -113,8 +151,13 @@ def cmd_i18n_check(args: list[str], root: Path | None = None) -> int:
                         f'la clé "{k}" contient un terme métier interdit : {term}'
                     )
                     break
-            if not isinstance(v, str):
-                file_errors.append(f'la clé "{k}" a une valeur non-chaîne')
+            if isinstance(v, dict):
+                file_errors.extend(_erreurs_de_pluriel(k, cast("dict[Any, Any]", v)))
+            elif not isinstance(v, str):
+                file_errors.append(
+                    f'la clé "{k}" a une valeur qui n\'est ni une chaîne ni un '
+                    "objet de formes de pluriel"
+                )
             elif not v.strip():
                 file_errors.append(f'la clé "{k}" a une valeur vide')
 
