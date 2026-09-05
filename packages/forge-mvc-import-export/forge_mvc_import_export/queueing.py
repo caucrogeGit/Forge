@@ -169,16 +169,39 @@ def make_import_job_handler(
 ) -> "Callable[[dict[str, Any]], None]":
     """Rend le gestionnaire de tâche à enregistrer auprès de la file.
 
-    `root` borne les chemins acceptés. Le laisser à `None` accepte n'importe
-    quel chemin, ce qui ne convient qu'à un dépôt de fichiers dont l'application
-    maîtrise entièrement l'origine.
+    `root` borne les chemins acceptés, et il est **obligatoire**
+    (`IMPEXP-JOB-ROOT-REQUIRED-001`).
+
+    Il ne l'était pas, alors que la décision de livraison l'annonçait comme tel.
+    Sans racine, `_resoudre_source` ne vérifiait **rien** : un `../../etc/passwd`
+    déposé dans la charge utile était lu et importé ligne à ligne dans la base.
+    Le chemin vient d'une file que plusieurs processus écrivent, si bien que
+    pouvoir y écrire une ligne suffisait à lire n'importe quel fichier du
+    serveur.
+
+    L'absence lève **ici**, à la création du gestionnaire, plutôt qu'au premier
+    import : une application qui enregistre ce gestionnaire sans racine a fait
+    une erreur de câblage, et la découvrir au démarrage du worker vaut mieux
+    qu'en production. C'est le même parti que `register_notification_routes`
+    pour son résolveur de destinataire.
 
     Le gestionnaire **lève** quand l'importeur est inconnu ou le fichier
     illisible : ce sont des erreurs de configuration ou de dépôt, qu'un réessai
     peut résoudre ou qu'un exploitant doit voir. Il ne lève **pas** pour des
     lignes invalides, qu'un réessai ne corrigerait jamais.
+
+    Raises:
+        ImportSourceError: `root` n'est pas fourni.
     """
-    racine = None if root is None else Path(root)
+    if root is None:
+        raise ImportSourceError(
+            "make_import_job_handler exige root : le chemin du fichier vient "
+            "de la charge utile, donc d'une file que plusieurs processus "
+            "écrivent. Sans racine, un « ../../etc/passwd » serait lu et "
+            "importé ligne à ligne dans la base. Passez le dossier de dépôt, "
+            "par exemple root=\"storage/imports\"."
+        )
+    racine = Path(root)
 
     def handler(payload: "dict[str, Any]") -> None:
         nom = str(payload.get("importer", "")).strip()

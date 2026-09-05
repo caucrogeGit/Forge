@@ -510,3 +510,25 @@ run_worker({IMPORT_JOB_TASK: make_import_job_handler(root="storage/imports")})
 
 !!! info "Un nom déjà pris est refusé"
     Écraser un importeur en silence ferait traiter un fichier par le mauvais, et écrire dans la mauvaise table.
+
+
+## La racine des imports asynchrones est obligatoire
+
+`make_import_job_handler(root=...)` borne les chemins que le worker accepte de lire.
+
+`root` valait `None` par défaut, et la garde ne s'activait alors pas (`IMPEXP-JOB-ROOT-REQUIRED-001`).
+
+!!! danger "Écrire une ligne dans la file suffisait à lire tout le disque"
+    Le chemin du fichier vient de la charge utile d'une tâche, donc d'une table que plusieurs processus écrivent.
+
+    Sans racine, un `../../etc/passwd` déposé dans cette charge était lu et **importé ligne à ligne dans la base**.
+    C'est une escalade de « je peux écrire une ligne » vers « je peux lire tout le disque », et la décision de livraison annonçait pourtant cette racine comme obligatoire.
+
+!!! info "Le refus a lieu au câblage, pas au premier import"
+    Une application qui enregistre ce gestionnaire sans racine a fait une erreur de câblage, et la découvrir au démarrage du worker vaut mieux qu'en production.
+
+    C'est le même parti que `register_notification_routes` pour son résolveur de destinataire.
+
+```python
+run_worker({IMPORT_JOB_TASK: make_import_job_handler(root="storage/imports")})
+```

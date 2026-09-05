@@ -4,6 +4,13 @@
 
 ### Ajouté
 
+- **La racine des imports asynchrones n'était pas obligatoire, contrairement à ce que sa livraison annonçait (`IMPEXP-JOB-ROOT-REQUIRED-001`).**
+  La décision de livraison d'`IMPEXP-ASYNC-JOBS-001` annonce « racine de chemins **obligatoire** ». Elle ne l'était pas : `root` valait `None` par défaut, et la garde de chemin ne s'activait alors pas du tout. Revue du référentiel import-export.
+  Le chemin du fichier vient de la charge utile d'une tâche, donc d'une table que plusieurs processus écrivent. **Pouvoir y écrire une ligne suffisait donc à faire lire au worker n'importe quel fichier du serveur, et à l'importer ligne à ligne dans la base.** C'est une escalade de « je peux écrire une ligne » vers « je peux lire tout le disque ».
+  L'absence lève désormais **au câblage**, à la création du gestionnaire, plutôt qu'au premier import : une application qui l'enregistre sans racine a fait une erreur de câblage, et la découvrir au démarrage du worker vaut mieux qu'en production. Même parti que `register_notification_routes` pour son résolveur.
+  **Aucun appelant du dépôt ne dépendait du défaut permissif** : la documentation et les huit sites de test passaient tous une racine. Un garde-fou lu par `ast` refuse qu'un appel sans racine réapparaisse.
+  La garde elle même était juste, et reste vérifiée sur les trois formes : remontée relative, chemin absolu, remontée interne. Un fichier absent rend un motif **distinct** d'un chemin hors racine, les deux ne se corrigeant pas au même endroit.
+
 - **La vignette de première image est enfin servable (`VIDEO-POSTER-ROUTE-001`).**
   Le poster est engendré au transcodage et inscrit en base depuis la livraison du paquet. **Aucune route ne le servait**, et la réponse d'état ne le mentionnait pas. Revue du référentiel video.
   `duration_seconds`, `width` et `height` étaient dans la même situation : trois colonnes sondées au transcodage, remplies, et rien pour les lire. Une interface qui sonde `/videos/<uuid>/status` pour savoir quand afficher n'avait donc ni vignette, ni durée, ni dimensions, et devait interroger la base par un chemin qu'un client n'a pas, ou l'application réécrire une route en refaisant la résolution anti-traversal que la lecture porte déjà.

@@ -427,6 +427,7 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `DOC-FILES-RETENTION-SCOPE-001` | files | Revue du référentiel files, deuxième passe | **Livré.** L'absence de purge par ancienneté était silencieuse ; elle est motivée et le chemin applicatif donné |
 | `FILES-DELETE-FORGETS-001` | files, images | Revue du référentiel images | **Livré.** Trois chemins de suppression laissaient la ligne au registre ; le quota comptait des fichiers supprimés |
 | `VIDEO-POSTER-ROUTE-001` | video | Revue du référentiel video | **Livré.** Vignette et métadonnées inscrites en base, sans route ni exposition |
+| `IMPEXP-JOB-ROOT-REQUIRED-001` | import-export | Revue du référentiel import-export | **Livré.** La racine annoncée obligatoire ne l'était pas : lire tout le disque depuis une ligne de file |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.
