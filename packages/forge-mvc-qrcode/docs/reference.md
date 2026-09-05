@@ -297,6 +297,14 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
 
     Des valeurs hors bornes lèvent `QrCodeError` plutôt que de produire une image illisible.
 
+    Les bornes sont **basses** : `scale` vaut au moins 1, `border` au moins 0.
+
+    !!! danger "Ne faites pas venir `scale` d'un paramètre de requête"
+        Il n'y a pas de borne haute, et il n'y en aura pas : une affiche imprimée en grand format en demande légitimement une valeur élevée, si bien qu'un plafond choisi au hasard refuserait un usage réel.
+
+        La conséquence est que `scale` reçu d'une requête laisse un visiteur commander la taille de l'image que votre serveur calcule.
+        Posez-le dans le contrôleur, comme la cible du code.
+
     !!! warning "Entrées invalides"
         Un texte vide ou un `fmt` inconnu lève `QrCodeError` (sous-classe de `ValueError`).
 
@@ -368,3 +376,82 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
 - [La réponse HTTP (response.py)](references/response.md) : détail de `QrCodeResponse`.
 - [Les erreurs (errors.py)](references/errors.md) : détail de `QrCodeError`.
 - [Welcome-QR Code](welcome/debutant/qrcode-welcome.md) : parcours d'apprentissage.
+
+## Deux cas concrets : le lien d'une séance, le badge d'un élève
+
+Les exemples précédents encodent une URL reçue en paramètre.
+C'est commode pour essayer, et ce n'est pas ce qu'on met en production.
+
+!!! danger "Une route qui encode l'URL reçue encode celle d'un attaquant"
+    `QrCodeResponse.from_text(request.query("url"))` produit, depuis **votre** domaine, un QR Code vers n'importe quelle destination.
+
+    Un visiteur scanne un code servi par un site qu'il connaît et arrive ailleurs, sans jamais lire l'adresse : le QR Code est précisément le format où l'on ne vérifie pas où l'on va.
+
+    Construisez la cible dans le contrôleur, depuis un identifiant interne.
+
+### Le lien d'une séance
+
+La cible est fabriquée côté serveur, l'identifiant seul vient de la route.
+
+```python
+from core.http.request import Request
+from core.http.response import Response
+from forge_mvc_qrcode import QrCodeResponse
+
+BASE_PUBLIQUE = "https://lycee.exemple.fr"
+
+
+class SeanceController:
+    @staticmethod
+    def qrcode(request: Request) -> Response:
+        identifiant = request.route("id", default="")
+        if not identifiant.isdigit():
+            return Response(404, b"Seance inconnue", "text/plain; charset=utf-8")
+        cible = f"{BASE_PUBLIQUE}/seance/rejoindre?id={identifiant}"
+        return QrCodeResponse.from_text(
+            cible,
+            fmt="png",
+            scale=6,
+            error="h",
+            headers={"Cache-Control": "public, max-age=3600"},
+        )
+```
+
+Trois choix se lisent dans ce code.
+
+| Choix | Pourquoi |
+|---|---|
+| L'identifiant est vérifié avant usage | Il entre dans une URL ; un contenu quelconque y ferait entrer autre chose |
+| `error="h"` | Un code projeté ou imprimé est vu de travers et parfois masqué ; `h` tolère 30 % de perte, le défaut `m` en tolère 15 |
+| `Cache-Control` | Le code d'une séance donnée ne change pas ; le régénérer à chaque affichage est du calcul pur |
+
+### Le badge d'un élève
+
+Un badge s'imprime, se glisse dans une pochette et se raye.
+
+```python
+class BadgeController:
+    @staticmethod
+    def qrcode(request: Request) -> Response:
+        eleve = request.route("id", default="")
+        if not eleve.isdigit():
+            return Response(404, b"Eleve inconnu", "text/plain; charset=utf-8")
+        return QrCodeResponse.from_text(
+            f"{BASE_PUBLIQUE}/presence/pointer?eleve={eleve}",
+            fmt="svg",
+            scale=8,
+            error="h",
+        )
+```
+
+Le SVG est le bon format ici : il s'agrandit sans se pixeliser, ce que demande une impression.
+
+!!! warning "Un QR Code n'est pas un secret"
+    Il se lit par quiconque le photographie, et il ne s'agit là que d'un encodage.
+
+    Ne mettez donc pas dans un badge ce qu'un élève ne doit pas pouvoir présenter à la place d'un autre : la route pointée fait l'authentification et l'autorisation, par exemple avec `forge-mvc-rbac`.
+
+!!! note "La route reste écrite par vous"
+    Forge affiche ce code, il ne l'installe pas (principe 9).
+
+    Le câblage de la route suit la convention ordinaire, un fichier par contrôleur dans `mvc/routes/`.
