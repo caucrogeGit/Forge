@@ -1046,8 +1046,30 @@ def _valeur_de_la_cle(texte: str, cle: str, section: str) -> "str | None":
     return None
 
 
-def _peut_lire(chemin: Path, utilisateur: str) -> "bool | None":
-    """`utilisateur` peut-il lire `chemin` ? `None` si la question n'a pas de sens ici.
+#: Droits demandes pour lire un fichier : le bit de lecture.
+LIRE = 0o4
+
+#: Droits demandes pour ecrire dans un dossier : ecriture **et** traversee.
+#:
+#: Le bit d'ecriture seul ne suffit pas. Sans le bit d'execution, le compte ne
+#: peut pas entrer dans le dossier, et la creation du fichier echoue avec la
+#: meme erreur que s'il n'avait aucun droit. Ne verifier que l'ecriture
+#: rendrait donc un « autorise » qui ne l'est pas.
+ECRIRE_DOSSIER = 0o3
+
+
+def _peut_acceder(
+    chemin: Path, utilisateur: str, *, droits: int = LIRE
+) -> "bool | None":
+    """`utilisateur` a-t-il `droits` sur `chemin` ? `None` si indecidable ici.
+
+    `droits` est un triplet de bits POSIX applique au bon rang selon que le
+    compte est proprietaire, membre du groupe, ou ni l'un ni l'autre.
+
+    Le compte examine est celui **declare dans l'unite**, jamais celui qui
+    lance le pre-vol : celui-ci tourne souvent en root ou sous le compte qui
+    deploie, et lui demander s'il peut ecrire repondrait a une autre question
+    que celle posee.
 
     Rend `None` quand le compte n'existe pas sur cette machine, ou quand la
     plateforme n'a pas de notion de proprietaire POSIX : le pre-vol se lance
@@ -1074,7 +1096,7 @@ def _peut_lire(chemin: Path, utilisateur: str) -> "bool | None":
     if compte.pw_uid == 0:
         return True
     if etat.st_uid == compte.pw_uid:
-        return bool(mode & 0o400)
+        return mode & (droits << 6) == (droits << 6)
 
     groupes = {compte.pw_gid}
     try:
@@ -1082,9 +1104,14 @@ def _peut_lire(chemin: Path, utilisateur: str) -> "bool | None":
     except OSError:  # pragma: no cover — base de groupes illisible
         pass
     if etat.st_gid in groupes:
-        return bool(mode & 0o040)
+        return mode & (droits << 3) == (droits << 3)
 
-    return bool(mode & 0o004)
+    return mode & droits == droits
+
+
+def _peut_lire(chemin: Path, utilisateur: str) -> "bool | None":
+    """`utilisateur` peut-il lire `chemin` ? Voir :func:`_peut_acceder`."""
+    return _peut_acceder(chemin, utilisateur, droits=LIRE)
 
 
 def _verifier_lecture_env_prod(root: Path, unite: Path) -> "_Result | None":
@@ -1397,6 +1424,91 @@ def _chemins_inscriptibles(texte: str) -> list[str]:
     return valeur.split() if valeur else []
 
 
+def _stockage_couvert(chemin: Path, texte_unite: str) -> "bool | None":
+    """Le durcissement systemd laisse-t-il ecrire dans `chemin` ?
+
+    Rend `None` quand l'unite ne durcit pas le systeme de fichiers : la
+    question ne se pose alors pas.
+    """
+    protection = (_valeur_de_la_cle(texte_unite, "ProtectSystem", "Service") or "").lower()
+    if protection not in {"strict", "full"}:
+        return None
+    for declare in _chemins_inscriptibles(texte_unite):
+        try:
+            candidat = Path(declare)
+            if chemin == candidat or chemin.is_relative_to(candidat):
+                return True
+        except ValueError:  # pragma: no cover — chemin mal forme
+            continue
+    return False
+
+
+def _verifier_stockage_inscriptible(root: Path, unite: Path) -> "_Result | None":
+    """Le compte de service peut-il ecrire dans le dossier des televersements ?
+
+    DEPLOY-CHECK-STORAGE-WRITABLE-001. Le pre-vol verifiait que `storage/` et
+    `storage/uploads/` **existent**, jamais qu'ils soient inscriptibles par le
+    compte qui fera l'ecriture. Or les deux se separent tres facilement : le
+    dossier est cree par celui qui deploie, souvent root, et le service tourne
+    sous un compte dedie.
+
+    La panne ne se voit alors ni au demarrage ni dans aucun controle : elle
+    attend le **premier televersement** d'un utilisateur, en production, et se
+    presente comme une erreur cinq cents sans rapport apparent avec le
+    deploiement.
+
+    Deux causes distinctes donnent ce meme symptome, et les deux sont
+    verifiees ici. La premiere est le proprietaire et le mode du dossier. La
+    seconde est le durcissement `ProtectSystem=strict`, qui remonte le systeme
+    de fichiers en lecture seule : le dossier peut alors appartenir au bon
+    compte avec les bons droits et rester inscriptible pour personne.
+
+    Le compte examine est celui de l'unite, jamais celui qui lance le pre-vol.
+
+    Rend `None` des que la question n'est pas tranchable ici : unite absente,
+    pas de `User=`, dossier absent, ou compte inconnu de cette machine.
+    """
+    if not unite.is_file():
+        return None
+    try:
+        texte = unite.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+    utilisateur = _valeur_de_la_cle(texte, "User", "Service")
+    if not utilisateur:
+        return None
+
+    chemin = Path(_upload_root(root))
+    if not chemin.is_dir():
+        # L'absence du dossier est deja signalee par ailleurs.
+        return None
+
+    libelle = f"Écriture dans {chemin.name}/ par {utilisateur}"
+
+    couvert = _stockage_couvert(chemin, texte)
+    if couvert is False:
+        return _Result(
+            "error", libelle,
+            f"refusée — ProtectSystem={_valeur_de_la_cle(texte, 'ProtectSystem', 'Service')} "
+            f"remonte le disque en lecture seule et {chemin} n'est pas dans "
+            f"ReadWritePaths ; le premier téléversement échouera, pas le démarrage")
+
+    inscriptible = _peut_acceder(chemin, utilisateur, droits=ECRIRE_DOSSIER)
+    if inscriptible is None:
+        return _Result(
+            "warn", libelle,
+            "compte inconnu de cette machine — vérifier depuis le serveur de production")
+    if inscriptible:
+        return _Result("ok", libelle, "autorisée")
+
+    return _Result(
+        "error", libelle,
+        f"refusée — le premier téléversement échouera, pas le démarrage ; "
+        f"donner le dossier au compte (chown -R {utilisateur}: {chemin}) plutôt "
+        f"qu'élargir les droits en 777")
+
+
 def _verifier_read_write_paths(root: Path, unite: Path) -> "_Result | None":
     """Chaque chemin de `ReadWritePaths` existe-t-il ?
 
@@ -1591,6 +1703,9 @@ def _check_results(root: Path, artefacts: "Artefacts | None" = None) -> list[_Re
     inscriptibles = _verifier_read_write_paths(root, ou.unite)
     if inscriptibles is not None:
         results.append(inscriptibles)
+    stockage = _verifier_stockage_inscriptible(root, ou.unite)
+    if stockage is not None:
+        results.append(stockage)
     travailleur = _verifier_worker_jobs(root, ou.worker)
     if travailleur is not None:
         results.append(travailleur)
