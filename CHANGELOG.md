@@ -4,6 +4,16 @@
 
 ### Ajouté
 
+- **La vignette de première image est enfin servable (`VIDEO-POSTER-ROUTE-001`).**
+  Le poster est engendré au transcodage et inscrit en base depuis la livraison du paquet. **Aucune route ne le servait**, et la réponse d'état ne le mentionnait pas. Revue du référentiel video.
+  `duration_seconds`, `width` et `height` étaient dans la même situation : trois colonnes sondées au transcodage, remplies, et rien pour les lire. Une interface qui sonde `/videos/<uuid>/status` pour savoir quand afficher n'avait donc ni vignette, ni durée, ni dimensions, et devait interroger la base par un chemin qu'un client n'a pas, ou l'application réécrire une route en refaisant la résolution anti-traversal que la lecture porte déjà.
+  `GET /videos/{uuid}/poster` sert la vignette, avec **la même garde que la lecture** : le chemin vient de la base, jamais de l'URL, et il est revalidé sous `storage_root`. Une ligne corrompue ou écrite par un autre composant ne permet pas de sortir du dossier de stockage, et le refus ne distingue pas « hors racine » de « absent », les distinguer apprenant à l'appelant ce que contient le disque.
+  **`poster_path` n'est pas rendu**, et c'est délibéré : c'est un chemin de stockage, pas une URL, et le rendre publierait l'arborescence du serveur. Cette réponse évite déjà cela avec soin, la sortie d'erreur de ffmpeg en étant absente par construction. Un booléen `has_poster` dit qu'une vignette existe, et la route la sert.
+  Une métadonnée absente **n'apparaît pas** dans la réponse : rendre `null` ferait afficher « durée : null » à une interface qui ne teste que la présence de la clé. Une valeur illisible ne lève pas, le contrat de cette vue étant de toujours pouvoir afficher quelque chose.
+  Une vidéo sans vignette rend **409**, pas 404 : elle existe, sa vignette non, et un 404 ferait croire à une vidéo inconnue.
+
+### Ajouté
+
 - **Le back-office montre l'état des sessions (`ADMIN-SESSIONS-VIEW-001`).**
   `forge deploy:init` demande de planifier `forge sessions:gc`, et rien ne disait si ce minuteur tournait. `forge-mvc-sessions-db` compte les sessions depuis `SESSIONS-METRICS-001`, réparties par nature, et sait dire si la purge suit : **personne ne regardait ce nombre**, il fallait ouvrir un client SQL. Dernier point ouvert de la revue du référentiel sessions-db.
   Le panneau vit sur `/admin/_sessions`, et le tableau de bord y mène : une page qu'aucun lien n'atteint n'est pas une page. Le chemin porte un tiret bas de tête, `/admin/{slug}` capturant sinon `sessions` comme le slug d'une ressource, et la route est posée **avant** celle à slug, le routeur retenant la première qui correspond.

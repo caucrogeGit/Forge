@@ -420,3 +420,36 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
 - [Traitement (process.py)](references/process.md) : orchestration complète.
 - [Lecture HTTP (http.py)](references/http.md) : routes et streaming.
 - [Welcome-Vidéo](welcome/debutant/video-welcome.md) : parcours d'apprentissage.
+
+## La vignette et les métadonnées
+
+Le poster de première image est engendré au transcodage et inscrit en base depuis la livraison du paquet.
+
+**Aucune route ne le servait**, et la réponse d'état ne le mentionnait pas (`VIDEO-POSTER-ROUTE-001`).
+
+| Route | Ce qu'elle rend |
+|---|---|
+| `GET /videos/{uuid}` | la vidéo, en streaming HTTP Range |
+| `GET /videos/{uuid}/status` | l'état, et les métadonnées quand elles existent |
+| `GET /videos/{uuid}/poster` | la vignette de première image |
+| `GET /videos/{uuid}/subtitles/{lang}` | une piste WebVTT |
+
+!!! danger "Trois colonnes remplies, et rien pour les lire"
+    `duration_seconds`, `width` et `height` étaient sondées au transcodage et inscrites en base, et la réponse d'état ne les rendait pas.
+
+    Une interface qui sonde `/videos/<uuid>/status` pour savoir quand afficher n'avait donc ni vignette, ni durée, ni dimensions.
+    Elle devait interroger la base par un chemin qu'un client n'a pas, ou l'application réécrire une route en refaisant la résolution anti-traversal que la lecture porte déjà.
+
+!!! info "`poster_path` n'est pas rendu, et c'est délibéré"
+    C'est un chemin de **stockage**, pas une URL.
+
+    Le rendre publierait l'arborescence du serveur, ce que cette réponse évite ailleurs avec soin : la sortie d'erreur de ffmpeg en est absente par construction, pour la même raison.
+    Un booléen `has_poster` dit qu'une vignette existe, et la route la sert.
+
+!!! info "Une métadonnée absente n'apparaît pas dans la réponse"
+    Rendre `null` ferait afficher « durée : null » à une interface qui ne teste que la présence de la clé.
+
+!!! warning "Une vidéo sans vignette rend 409, pas 404"
+    Pas encore transcodée, ou transcodage en échec : la vidéo existe, sa vignette non.
+
+    Un 404 ferait croire à une vidéo inconnue, ce qui envoie chercher au mauvais endroit.

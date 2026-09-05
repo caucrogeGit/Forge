@@ -82,6 +82,14 @@ class VideoStatusView:
     label: str
     public_message: str
     technical_detail: "str | None" = None
+    #: Métadonnées sondées au transcodage. Elles étaient inscrites en base et
+    #: jamais rendues (`VIDEO-POSTER-ROUTE-001`).
+    duration_seconds: "int | None" = None
+    width: "int | None" = None
+    height: "int | None" = None
+    #: Une vignette existe. Son chemin de stockage n'est pas rendu, la route
+    #: `/videos/<uuid>/poster` la sert.
+    has_poster: bool = False
 
     @property
     def is_known(self) -> bool:
@@ -113,15 +121,51 @@ class VideoStatusView:
 
         `technical_detail` en est absent par construction : la sortie d'erreur
         de ffmpeg porte les chemins absolus du serveur.
+
+        Les métadonnées accompagnent l'état (`VIDEO-POSTER-ROUTE-001`). Elles
+        étaient sondées au transcodage et inscrites en base, et cette réponse ne
+        les rendait pas : une interface qui sonde l'état pour savoir quand
+        afficher n'avait ni la durée, ni les dimensions, ni la vignette, et
+        devait interroger la base par un chemin qu'elle n'a pas.
+
+        `poster_path` n'est **pas** rendu : c'est un chemin de stockage, pas une
+        URL. Le rendre publierait l'arborescence du serveur, ce que le reste de
+        cette classe évite. Un booléen dit qu'une vignette existe, et la route
+        `/videos/<uuid>/poster` la sert.
         """
-        return {
+        rendu: "dict[str, Any]" = {
             "status": self.status,
             "label": self.label,
             "message": self.public_message,
             "ready": self.is_ready,
             "failed": self.is_failed,
             "pending": self.is_pending,
+            "has_poster": self.has_poster,
         }
+        if self.duration_seconds is not None:
+            rendu["duration_seconds"] = self.duration_seconds
+        if self.width is not None and self.height is not None:
+            rendu["width"] = self.width
+            rendu["height"] = self.height
+        return rendu
+
+
+def _entier(row: "dict[str, Any] | None", cle: str) -> "int | None":
+    """Entier d'une colonne, ou `None`.
+
+    Une ligne peut porter `None`, une chaîne venue d'un pilote, ou rien du tout.
+    Lever ici remplacerait une page par une erreur, alors que le contrat de
+    cette fonction est justement de toujours pouvoir afficher quelque chose.
+    """
+    if not row:
+        return None
+    valeur = row.get(cle)
+    if valeur is None or isinstance(valeur, bool):
+        return None
+    try:
+        return int(valeur)  # pyright: ignore[reportArgumentType]
+    except (TypeError, ValueError):
+        return None
 
 
 def describe_video_status(row: "dict[str, Any] | None") -> VideoStatusView:
@@ -149,4 +193,8 @@ def describe_video_status(row: "dict[str, Any] | None") -> VideoStatusView:
             else "",
         ),
         technical_detail=detail,
+        duration_seconds=_entier(row, "duration_seconds"),
+        width=_entier(row, "width"),
+        height=_entier(row, "height"),
+        has_poster=bool(row and row.get("poster_path")),
     )

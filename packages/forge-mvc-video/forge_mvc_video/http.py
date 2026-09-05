@@ -50,6 +50,11 @@ ROUTE_PLAYBACK = "/videos/{uuid}"
 ROUTE_STATUS = "/videos/{uuid}/status"
 #: Piste de sous-titres WebVTT (VIDEO-SUBTITLES-001).
 ROUTE_SUBTITLE = "/videos/{uuid}/subtitles/{lang}"
+#: Vignette de la première image (`VIDEO-POSTER-ROUTE-001`). Elle était
+#: engendrée et stockée, et aucune route ne la servait : une interface qui
+#: sondait l'état pour savoir quand afficher n'avait aucun moyen de
+#: l'obtenir.
+ROUTE_POSTER = "/videos/{uuid}/poster"
 
 
 
@@ -104,6 +109,51 @@ class VideoHttpController:
         # Streaming + Range délégués à la primitive core.
         return Response.file(path, request)
 
+
+    def poster(self, request: Any) -> Response:
+        """Sert la vignette de première image (`VIDEO-POSTER-ROUTE-001`).
+
+        Le poster était engendré au transcodage et inscrit en base, sans route
+        pour le rendre. L'application devait écrire la sienne, en refaisant la
+        résolution anti-traversal que `stream` porte déjà.
+
+        Même garde que la lecture : le chemin vient de la **base**, jamais de
+        l'URL, et il est revalidé sous `storage_root`. Une ligne corrompue ou
+        écrite par un autre composant ne doit pas permettre de sortir du
+        dossier de stockage.
+        """
+        if not is_bearer_authorized(request, self._api_token):
+            return json_error("unauthorized", 401)
+
+        uuid = request.route("uuid")
+        try:
+            row = self._repo.get_by_uuid(uuid)
+        except Exception:
+            logger.exception("Forge Video — erreur DB sur get_by_uuid")
+            return json_error("internal_server_error", 500)
+
+        if row is None:
+            return json_error("not_found", 404)
+
+        rel = row.get("poster_path")
+        if not rel:
+            # Pas encore transcodée, ou transcodage en échec : il n'y a pas de
+            # vignette, et le dire vaut mieux qu'un 404 qui ferait croire à une
+            # vidéo inconnue.
+            return json_error("not_available", 409)
+
+        storage_root = Path(self._config.storage_root).resolve()
+        path = (storage_root / rel).resolve()
+        if not path.is_relative_to(storage_root):
+            logger.warning(
+                "Forge Video — chemin de vignette hors storage_root refusé "
+                "pour %s : %s", uuid, rel)
+            return json_error("not_found", 404)
+        if not path.is_file():
+            logger.warning("Forge Video — vignette absente pour %s : %s", uuid, path)
+            return json_error("file_missing", 404)
+
+        return Response.file(path, request)
 
     def status(self, request: Any) -> Response:
         """État de traitement, en JSON (`VIDEO-STATUS-UI-001`).
@@ -214,6 +264,11 @@ def register_video_routes(
     router.add(
         "GET", ROUTE_SUBTITLE, controller.subtitle,
         name="video_subtitle",
+        public=True, csrf=False, api=False,
+    )
+    router.add(
+        "GET", ROUTE_POSTER, controller.poster,
+        name="video_poster",
         public=True, csrf=False, api=False,
     )
     return router
