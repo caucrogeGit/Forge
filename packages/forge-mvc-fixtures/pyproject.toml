@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "forge-mvc-fixtures"
 version = "1.0.0rc7"
-description = "Forge Fixtures — opt-in de données de démo et de test rejouables et cadrées par environnement : forge fixtures:load et forge fixtures:purge, CLI-only, SQL visible (ADR-074)."
+description = "Forge Fixtures — opt-in de données de démo et de test rejouables et cadrées par environnement ; fixtures:load, purge, generate, make-factory et snapshot, CLI-only, SQL visible (ADR-074)."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
 authors = [
@@ -28,8 +28,8 @@ classifiers = [
 ]
 
 # ADR-059 : commandes CLI de l'opt-in decouvertes par le coeur (dispatch_optin).
-# Table vide au scaffold (ADR-074) : fixtures:load et fixtures:purge arrivent
-# aux tickets suivants.
+# La table vit dans forge_mvc_fixtures/commands.py et porte les cinq commandes
+# livrees : load, purge, generate, make-factory, snapshot.
 [project.entry-points."forge_mvc.commands"]
 forge_mvc_fixtures = "forge_mvc_fixtures.commands:COMMANDS"
 
