@@ -25,6 +25,7 @@ __all__ = [
     "APP_ENV_VAR",
     "DEFAULT_APP_ENV",
     "PROD",
+    "PROD_SPELLINGS",
     "normalize_app_env",
     "read_app_env",
     "is_prod",
@@ -36,8 +37,27 @@ APP_ENV_VAR = "APP_ENV"
 #: Environnement retenu quand la variable est absente, vide ou blanche.
 DEFAULT_APP_ENV = "dev"
 
-#: Valeur normalisée désignant la production.
+#: Valeur normalisée désignant la production, forme canonique.
 PROD = "prod"
+
+#: Orthographes qui désignent la production sans ambiguïté
+#: (`ENV-APP-ENV-PRODUCTION-SPELLING-001`).
+#:
+#: `production` s'écrit au moins aussi naturellement que `prod`, et ne valait
+#: pas production : `is_prod("production")` rendait **faux**. Les mêmes gardes
+#: que `Prod` avait désarmées l'étaient donc encore, à une orthographe près.
+#: `fixtures:purge --run` supprimait les données sans exiger `--force`, et
+#: l'application servait ses pages d'erreur en mode développement, pile
+#: d'exception comprise.
+#:
+#: La liste s'arrête là, et ce n'est pas un oubli. `staging`, `preprod` ou
+#: `ci` sont des environnements distincts, que leurs exploitants ne veulent pas
+#: voir traités comme la production. Accepter tout ce qui n'est pas connu
+#: rendrait le refus si fréquent qu'on le désactiverait.
+#:
+#: `forge deploy:check` continue d'exiger la forme canonique `prod` dans
+#: `env/prod` : ceci défend contre une faute, cela pousse vers la convention.
+PROD_SPELLINGS = frozenset({PROD, "production"})
 
 
 def normalize_app_env(value: object) -> str:
@@ -71,5 +91,9 @@ def is_prod(value: object) -> bool:
 
     À préférer à une comparaison écrite à la main : c'est l'écriture à la main
     qui avait laissé passer `Prod`.
+
+    Reconnaît `prod` et `production` (`ENV-APP-ENV-PRODUCTION-SPELLING-001`).
+    La seconde ne valait pas production, si bien que les gardes désarmées par
+    `Prod` l'étaient encore à une orthographe près.
     """
-    return normalize_app_env(value) == PROD
+    return normalize_app_env(value) in PROD_SPELLINGS
