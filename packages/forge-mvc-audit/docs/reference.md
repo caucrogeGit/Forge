@@ -489,3 +489,51 @@ def update(self, request):
     Un journal qui interrompt l'opération qu'il devait enregistrer serait pire que l'absence de journal.
 
 Le reste du contrat est celui de `record_audit` : mêmes champs de cible, même refus d'une action vide, même identifiant rendu.
+
+## Journaliser les refus d'accès
+
+`forge-mvc-rbac` annonce ses refus de permission à qui veut les entendre, sans imposer de destinataire.
+Un refus rendait sinon une 403 et rien d'autre : une énumération de droits, quelqu'un qui essaie une à une les routes protégées, ne laissait aucune trace.
+
+Le branchement est explicite, et se pose une fois au câblage de l'application (`AUDIT-RBAC-DENIALS-BRIDGE-001`).
+
+```python
+from forge_mvc_audit import audit_permission_denials
+
+audit_permission_denials()
+```
+
+Chaque refus devient alors une ligne du journal.
+
+| Champ de la ligne | Contenu |
+|---|---|
+| `action` | `acces.refuse` (constante `DENIAL_ACTION`) |
+| `actor` | l'utilisateur authentifié, ou `None` s'il ne l'était pas |
+| `target_type` | `permission` (constante `DENIAL_TARGET_TYPE`) |
+| `target_id` | la permission refusée, par exemple `eleve.supprimer` |
+| `details` | la méthode, le chemin et la garde, par exemple `POST /admin/eleves/12 (garde : contract)` |
+
+La permission tient dans la cible, donc les lister tous est une lecture ordinaire.
+
+```python
+from forge_mvc_audit import DENIAL_TARGET_TYPE, get_audit_log
+
+refus = get_audit_log(target_type=DENIAL_TARGET_TYPE, limit=100)
+```
+
+!!! info "Le second branchement ne rebranche pas"
+    Appeler `audit_permission_denials()` deux fois rend l'observateur déjà posé, sans en ajouter un second.
+
+    Deux observateurs écriraient deux lignes par refus, et compter les refus donnerait le double sans que rien ne le signale.
+
+!!! warning "Un refus ne devient jamais une panne"
+    Si la base d'audit est indisponible, l'exception est avalée et journalisée par `forge-mvc-rbac`, et le refus s'applique quand même.
+
+    Transformer un 403 en 500 parce que le journal est en panne ferait d'un contrôle d'accès qui fonctionne une panne du site.
+
+!!! note "La garde qui a refusé est retenue, et ce n'est pas un détail"
+    Un refus contractuel et un refus de permissions chargées en base ne se corrigent pas au même endroit.
+
+    C'est pourquoi le branchement porte `source`, que la recette d'une ligne montrée dans la documentation de `forge-mvc-rbac` laissait tomber.
+
+Si `forge-mvc-rbac` n'est pas installé, l'appel lève `AuditError` au câblage, moment où l'erreur se corrige, plutôt qu'au premier refus où elle serait avalée.

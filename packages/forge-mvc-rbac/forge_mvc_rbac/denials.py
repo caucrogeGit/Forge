@@ -13,12 +13,22 @@ Ce module ne journalise rien lui même et n'importe aucun opt-in. Il **annonce**
 les refus, et l'application décide de ce qu'elle en fait, `forge-mvc-audit`
 étant le destinataire évident sans être imposé.
 
-    from forge_mvc_audit import record_audit
-    from forge_mvc_rbac import on_permission_denied
+Ce branchement là est livré, et c'est la façon officielle de le faire
+(`AUDIT-RBAC-DENIALS-BRIDGE-001`) :
 
-    on_permission_denied(lambda refus: record_audit(
-        "acces.refuse", actor=refus.actor, details=refus.permission,
-    ))
+    from forge_mvc_audit import audit_permission_denials
+
+    audit_permission_denials()
+
+Cette page montrait auparavant un observateur écrit à la main, en une ligne. Il
+marche, et il ne retient que deux des cinq champs de `DenialEvent` : `path`,
+`method` et `source` tombaient, alors que le premier couple dit ce qui a été
+tenté et que le dernier nomme la garde, distinction que ce module déclare
+décisive quelques lignes plus bas.
+
+Un projet qui veut son propre observateur reste libre : `on_permission_denied`
+n'est pas réservé, et `forge_mvc_audit.denial_details` rend le même texte pour
+qu'il n'ait pas à en réinventer un moins complet.
 
 ## Un observateur ne peut pas casser une réponse
 

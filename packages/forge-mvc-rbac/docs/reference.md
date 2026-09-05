@@ -316,17 +316,19 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
 
         Un garde-fou refuse désormais qu'une fonction `require_*` du paquet refuse sans annoncer.
 
-    ```python
-    from forge_mvc_audit import record_audit
-    from forge_mvc_rbac import on_permission_denied
+    Le branchement sur `forge-mvc-audit` est livré, et c'est la façon officielle de le faire (`AUDIT-RBAC-DENIALS-BRIDGE-001`).
 
-    on_permission_denied(lambda refus: record_audit(
-        "acces.refuse",
-        actor=refus.actor,
-        target_type="permission",
-        target_id=refus.permission,
-    ))
+    ```python
+    from forge_mvc_audit import audit_permission_denials
+
+    audit_permission_denials()
     ```
+
+    Cette page montrait auparavant un observateur écrit à la main.
+    Il marche, et il ne retenait que trois des cinq champs du tableau ci dessous : `path`, `method` et `source` tombaient, alors que le premier couple dit ce qui a été tenté et que le dernier nomme la garde.
+    Le contenu des lignes engendrées est décrit dans la référence de `forge-mvc-audit`, section « Journaliser les refus d'accès ».
+
+    Une application qui préfère son propre observateur reste libre : `on_permission_denied` n'est pas réservé, et `forge_mvc_audit.denial_details` rend le même texte pour qu'elle n'ait pas à en réinventer un moins complet.
 
     | Champ | Ce qu'il porte |
     |---|---|

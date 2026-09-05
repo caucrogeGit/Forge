@@ -9,6 +9,14 @@ Périmètre borné : audit applicatif, pas un SIEM de cybersécurité. Cohérent
 ADR-008 (Forge fournit la table et le helper, la décision de tracer reste
 applicative). La dépendance va de l'opt-in vers le cœur, jamais l'inverse.
 """
+from forge_mvc_audit.denials import (
+    DENIAL_ACTION,
+    DENIAL_TARGET_TYPE,
+    audit_permission_denials,
+    denial_details,
+    permission_denials_audited,
+    reset_denial_bridge,
+)
 from forge_mvc_audit.errors import AuditError
 from forge_mvc_audit.export import (
     AUDIT_EXPORT_COLUMNS,
@@ -32,6 +40,13 @@ __version__ = "1.0.0rc7"
 
 __all__ = [
     # Export du journal (AUDIT-CSV-EXPORT-001)
+    # Refus d'accès RBAC journalisés (AUDIT-RBAC-DENIALS-BRIDGE-001)
+    "audit_permission_denials",
+    "permission_denials_audited",
+    "reset_denial_bridge",
+    "denial_details",
+    "DENIAL_ACTION",
+    "DENIAL_TARGET_TYPE",
     "record_request_audit",
     "iter_audit_rows",
     "entry_to_row",
