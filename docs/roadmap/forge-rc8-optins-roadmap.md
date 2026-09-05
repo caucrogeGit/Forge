@@ -421,6 +421,7 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `SESSIONS-TTL-AUTHENTICATED-APPLIED-001` | sessions-db | Revue du référentiel sessions-db | **Livré.** `SESSION_TTL_AUTHENTICATED` était sans effet : `ttl_for()` n'était lue que par `create()` |
 | `ADMIN-SESSIONS-VIEW-001` | admin | Même revue | **Livré.** La métrique existait, l'écran non ; couplage souple, aucun identifiant exposé |
 | `JOBS-HEARTBEAT-REACHABLE-001` | jobs | Revue du référentiel jobs | **Livré.** Le gestionnaire ne recevait pas son jeton ; l'exemple documenté cassait la tâche |
+| `MAIL-QUEUE-ATTACHMENTS-REFUSED-001` | mail | Revue du référentiel mail | **Livré.** Pièces jointes et file ne composaient pas ; la pièce disparaissait en silence |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.

@@ -351,6 +351,33 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
         Rendre `None` en silence ferait marquer la tâche comme réussie, et l'email ne partirait jamais.
         Un envoi **sauté** par `NullTransport` n'est pas un échec : réessayer sans fin un envoi que personne ne veut serait absurde.
 
+    !!! danger "Une pièce jointe ne passe pas par la file"
+        Les pièces jointes et la mise en file ont été livrées séparément, et **ne composaient pas** (`MAIL-QUEUE-ATTACHMENTS-REFUSED-001`).
+
+        `message_to_payload` recopie huit champs nommés, et `attachments` n'en faisait pas partie : un message avec pièce jointe passait la sérialisation sans erreur et ressortait sans elle.
+        L'email partait, le journal inscrivait `sent`, et le destinataire recevait un corps annonçant un document absent.
+
+        La charge utile est du JSON rangé dans la colonne `payload` de la table `jobs`, de type `text`.
+        Sur MariaDB, un `TEXT` tient soixante-cinq mille octets ; une pièce jointe de dix mégaoctets, plafond du paquet, en ferait quatorze millions une fois encodée. Deux cent treize fois la capacité de la colonne.
+        Élargir la colonne ferait de la file une réserve de fichiers, ce qu'elle n'est pas.
+
+        `message_to_payload` **refuse** donc, en nommant les fichiers concernés.
+
+    !!! info "Le refus est uniforme, et non conditionné à la taille"
+        Accepter les petites pièces jointes ferait dépendre le comportement du poids du fichier.
+
+        Cela marcherait en développement avec un PDF d'essai, et échouerait en production sur un vrai document, par une erreur de base opaque.
+        Une fonctionnalité qui marche parfois est la plus difficile à diagnostiquer.
+
+    !!! tip "Ce qu'il faut faire à la place"
+        Rangez le fichier, mettez en file sa **référence**, et attachez le dans le gestionnaire au moment de l'envoi.
+
+        ```python
+        enqueue(MAIL_JOB_TASK, message_to_payload(message) | {"facture_id": 12})
+        ```
+
+        Le gestionnaire relit la référence, charge le fichier et appelle `message.with_attachment(...)` avant d'envoyer.
+
     !!! info "Le message est validé à la mise en file"
         Un sujet vide ou une adresse forgée est refusé dans la requête, là où l'utilisateur le voit.
 

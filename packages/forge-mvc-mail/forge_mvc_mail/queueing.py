@@ -83,7 +83,42 @@ def message_to_payload(
     Le message est **validé à la construction** : le mettre en file ne peut
     donc pas différer une erreur de saisie jusqu'à l'ouvrier, où plus personne
     ne la verrait.
+
+    Raises:
+        MailPayloadError: le message porte une pièce jointe. Voir ci dessous.
+
+    ## Une pièce jointe ne passe pas par la file, et le dire vaut mieux
+
+    La charge utile est du JSON, rangé dans la colonne `payload` de la table
+    `jobs`, de type `text`. Sur MariaDB, un `TEXT` tient soixante-cinq mille
+    octets ; une pièce jointe de dix mégaoctets, plafond du paquet, en ferait
+    quatorze millions une fois encodée en base64. Deux cent treize fois la
+    capacité de la colonne.
+
+    Les deux fonctionnalités ont été livrées séparément et ne composaient pas.
+    `message_to_payload` ne recopiait que huit champs, et les pièces jointes
+    **disparaissaient en silence** : l'email partait sans elles, le journal
+    inscrivait `sent`, et le destinataire recevait un corps annonçant un
+    document absent (`MAIL-QUEUE-ATTACHMENTS-REFUSED-001`).
+
+    Le refus est **uniforme**, et non conditionné à la taille. Accepter les
+    petites ferait dépendre le comportement du poids du fichier, et une
+    fonctionnalité qui marche parfois est la plus difficile à diagnostiquer.
+
+    Ce qu'il faut faire à la place : ranger le fichier, mettre en file sa
+    **référence**, et l'attacher dans le gestionnaire, au moment de l'envoi.
     """
+    if message.attachments:
+        noms = ", ".join(piece.filename for piece in message.attachments)
+        raise MailPayloadError(
+            f"Ce message porte {len(message.attachments)} pièce(s) jointe(s) "
+            f"({noms}) et ne peut pas être mis en file : la charge utile est du "
+            f"JSON rangé dans une colonne texte, qu'une pièce jointe encodée "
+            f"dépasserait. Rangez le fichier, mettez en file sa référence, et "
+            f"attachez le dans le gestionnaire avec "
+            f"`message.with_attachment(...)` au moment de l'envoi."
+        )
+
     charge: dict[str, Any] = {
         champ: _serialisable(getattr(message, champ)) for champ in _CHAMPS
     }

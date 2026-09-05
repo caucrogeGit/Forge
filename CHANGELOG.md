@@ -24,6 +24,14 @@
 
 ### Ajouté
 
+- **Une pièce jointe se perdait en silence au passage par la file (`MAIL-QUEUE-ATTACHMENTS-REFUSED-001`).**
+  `MAIL-ATTACHMENTS-001` a livré les pièces jointes, `MAIL-QUEUE-VIA-JOBS-001` la mise en file. Les deux ont été livrés séparément et **ne composaient pas**. Revue du référentiel mail.
+  `message_to_payload` recopie huit champs nommés, et `attachments` n'en faisait pas partie. Mesuré : un message avec pièce jointe passait la sérialisation sans erreur, et ressortait de l'aller-retour **sans elle**. L'email partait, le journal inscrivait `sent`, et le destinataire recevait un corps annonçant un document absent. C'est le pire mode de panne, tout paraît réussi.
+  La composition est pourtant celle que la documentation recommande, « la file est le point de passage de tout ce qui ne doit pas faire attendre une requête » : envoyer une facture en PDF est exactement ce qu'on met en file.
+  **Sérialiser n'était pas viable.** La charge utile est du JSON rangé dans la colonne `payload` de la table `jobs`, de type `text` ; sur MariaDB un `TEXT` tient soixante-cinq mille octets, et une pièce jointe de dix mégaoctets en ferait quatorze millions une fois encodée. Deux cent treize fois la capacité de la colonne, et élargir celle ci ferait de la file une réserve de fichiers.
+  `message_to_payload` refuse donc, en nommant les fichiers concernés et en disant quoi faire à la place : ranger le fichier, mettre en file sa référence, l'attacher dans le gestionnaire. **Le refus est uniforme**, et non conditionné à la taille : accepter les petites ferait marcher la chose en développement avec un PDF d'essai et échouer en production sur un vrai document, par une erreur de base opaque. Une fonctionnalité qui marche parfois est la plus difficile à diagnostiquer.
+  Un garde-fou refuse qu'un champ de `MailMessage` ajouté demain soit ni recopié, ni refusé, ni dérivé : la cause était une liste de champs muette sur ce qu'elle laissait derrière.
+
 - **`heartbeat` était inutilisable depuis le seul endroit où elle sert (`JOBS-HEARTBEAT-REACHABLE-001`).**
   Elle prolonge le bail d'une tâche longue, pour qu'elle ne soit pas reprise par `jobs:reclaim` alors qu'elle travaille encore, et se garde par le jeton de réservation. Le worker appelait `handler(payload)` : un gestionnaire n'avait **aucun moyen** d'obtenir ce jeton. Revue du référentiel jobs.
   **L'exemple documenté cassait la tâche.** La référence montre `def transcoder(payload, *, claim_token)`. Mesuré, un gestionnaire écrit ainsi levait `TypeError`, repartait en réessai au bout de dix secondes, puis finissait `failed`. Il ne se contentait pas d'être inopérant, et le motif inscrit dans `last_error` parlait d'un argument manquant plutôt que du travail.
