@@ -508,3 +508,26 @@ Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis �
 dans `mvc/migrations/` par `forge images:init` (chantier `OPTIN-DDL-DIALECTAL`).
 Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
 MariaDB, SQLite, PostgreSQL comme SQL Server.
+
+
+## Inscription au registre des fichiers
+
+`forge-mvc-images` écrit sous `UPLOAD_ROOT`, la racine que `forge-mvc-files` connaît.
+
+Il inscrit désormais au registre de ce dernier tout ce qu'il écrit, l'original comme chaque variante (`IMAGES-REGISTRY-RECORD-001`).
+
+!!! danger "La purge d'orphelins supprimait les images"
+    `forge files:orphans` rapproche le disque et le registre : une image absente du registre y était **un orphelin**, et `--delete` la supprimait.
+
+    Le garde-fou du registre vide ne protégeait pas ce cas.
+    Il ne se déclenche que si le registre est **entièrement** vide, et un projet qui inscrit ses documents, comme la documentation de `forge-mvc-files` l'enseigne, avait un registre peuplé et des images signalées orphelines.
+
+    Mesuré sur un projet portant un document inscrit et une image non inscrite : l'original **et sa vignette** étaient signalés.
+
+!!! info "L'inscription est au mieux"
+    La table `forge_files` est optionnelle (ADR-094), et faire échouer une sauvegarde d'image parce qu'un registre n'est pas provisionné serait disproportionné.
+
+    L'échec est journalisé sur une ligne, sans pile : ce chemin se déclenche une fois par fichier écrit, et une trace complète par vignette noierait le journal.
+
+    Ce n'est pas une dégradation silencieuse pour autant : sans cette table, `find_orphans` lève aussi, et la purge ne peut pas tourner.
+    Les deux cas s'alignent, il n'y a pas de fenêtre où l'inscription manque pendant que la purge supprime.

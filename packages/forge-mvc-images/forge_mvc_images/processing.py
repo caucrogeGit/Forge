@@ -17,6 +17,7 @@ import io
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
+import logging
 from types import SimpleNamespace
 from typing import cast
 
@@ -33,6 +34,8 @@ from forge_mvc_files import storage
 from forge_mvc_images.focal import FocalPoint, crop_to_focal
 from forge_mvc_images.limits import check_dimensions, check_weight
 from forge_mvc_images.presets import VariantPreset, variant_presets
+
+logger = logging.getLogger("forge.images")
 from forge_mvc_files.manager import (
     SavedUpload,
     _read_upload,  # pyright: ignore[reportPrivateUsage]
@@ -125,6 +128,57 @@ def verify_image_content(data: bytes) -> None:
         )
 
 
+def _inscrire_au_registre(
+    chemin: str,
+    nom_origine: str,
+    taille: int,
+    mime_type: "str | None",
+    entity_name: "str | None",
+    entity_id: "int | None",
+) -> None:
+    """Inscrit l'image au registre de `forge-mvc-files` (`IMAGES-REGISTRY-RECORD-001`).
+
+    `forge-mvc-images` écrit sous `UPLOAD_ROOT` et n'inscrivait rien. La purge
+    d'orphelins de `forge-mvc-files` rapproche le disque et le registre : une
+    image absente du registre y est donc **un orphelin**, et
+    `forge files:orphans --delete` la supprimait.
+
+    Le garde-fou du registre vide ne protégeait pas ce cas. Il ne se déclenche
+    que si le registre est **entièrement** vide ; un projet qui inscrit ses
+    documents, comme la documentation de `forge-mvc-files` l'enseigne, et qui
+    utilise cet opt-in pour ses images, avait un registre peuplé et des images
+    signalées orphelines. Mesuré, l'original **et ses variantes**.
+
+    ## Pourquoi au mieux, et pourquoi ce n'est pas une dégradation silencieuse
+
+    La table `forge_files` est optionnelle (ADR-094). Faire échouer une
+    sauvegarde d'image parce qu'un registre n'est pas provisionné serait
+    disproportionné.
+
+    L'échec est donc journalisé, et il est **sans conséquence** : sans cette
+    table, `find_orphans` lève aussi, et la purge ne peut pas tourner. Les deux
+    cas s'alignent, il n'y a pas de fenêtre où l'inscription manque pendant que
+    la purge supprime.
+    """
+    try:
+        from forge_mvc_files import record_file
+
+        record_file(
+            chemin, nom_origine, taille,
+            mime_type=mime_type,
+            owner_kind=entity_name or None,
+            owner_id=entity_id if entity_name else None,
+        )
+    except Exception as exc:  # noqa: BLE001 - l'ecriture de l'image prime
+        # Une ligne, sans pile : ce chemin se declenche une fois par fichier
+        # ecrit, et une trace complete par vignette noierait le journal.
+        logger.warning(
+            "Forge Images - inscription au registre impossible pour %s (%s) ; "
+            "la purge d'orphelins de forge-mvc-files prendrait ce fichier pour "
+            "un orphelin si sa table existe.", chemin, exc,
+        )
+
+
 def save_image(
     file: object,
     *,
@@ -170,6 +224,10 @@ def save_image(
         root=root,
     )
     relative_path = saved_path.relative_to(Path(root).resolve())
+    _inscrire_au_registre(
+        relative_path.as_posix(), safe_name, len(data), mime_type,
+        entity_name, entity_id,
+    )
 
     return MediaRecord(
         filename=saved_path.name,
@@ -298,6 +356,14 @@ def generate_image_variants(
             for preset in retenus:
                 target = physical_paths[preset.name]
                 _write_resized_image(image, target, preset, focal)
+                # Une variante est un fichier de plus sous UPLOAD_ROOT, donc un
+                # orphelin de plus pour `files:orphans` si rien ne l'inscrit
+                # (`IMAGES-REGISTRY-RECORD-001`). Mesuré, la vignette était
+                # signalée au même titre que l'original.
+                _inscrire_au_registre(
+                    relative_paths[preset.name], target.name,
+                    target.stat().st_size, None, None, None,
+                )
     except UnidentifiedImageError as exc:
         raise UploadStorageError("Fichier source non reconnu comme image compatible.") from exc
     except Image.DecompressionBombError as exc:

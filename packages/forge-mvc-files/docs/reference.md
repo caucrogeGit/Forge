@@ -582,3 +582,24 @@ C'est le socle des médias : `forge-mvc-images`, `forge-mvc-video` et `forge-mvc
 - [Primitives de stockage (storage.py)](references/storage.md) : anti-traversal, écriture bas niveau (ADR-020).
 - [Rate-limit d'upload (rate_limit.py)](references/rate_limit.md) : limiter le débit.
 - [Welcome-Files](welcome/debutant/files-welcome.md) : parcours d'apprentissage.
+
+
+## Ce que la purge d'orphelins ne peut pas savoir
+
+`find_orphans` rapproche le disque et le registre. Elle suppose donc que le registre décrit **tout** ce qui vit sous `UPLOAD_ROOT`.
+
+Cette hypothèse est fausse dès qu'un autre composant écrit là sans inscrire.
+
+!!! danger "Un écrivain qui n'inscrit pas voit ses fichiers déclarés orphelins"
+    C'est arrivé entre deux opt-ins officiels : `forge-mvc-images` écrivait sous cette racine sans rien inscrire, et la purge signalait ses images et leurs vignettes (`IMAGES-REGISTRY-RECORD-001`).
+
+    Le refus sur registre vide ne couvre pas ce cas : il ne se déclenche que si le registre est **entièrement** vide.
+    Un projet qui inscrit une partie de ses fichiers a un registre peuplé, et tout le reste passe pour orphelin.
+
+    Tout composant qui écrit sous `UPLOAD_ROOT` doit appeler `record_file`.
+    C'est ce que `forge-mvc-images` fait désormais, et ce que votre application doit faire pour ce qu'elle écrit elle même.
+
+!!! info "Regardez avant de supprimer"
+    `forge files:orphans` affiche par défaut et ne supprime que sur `--delete`.
+
+    Lancez la commande sans l'option une première fois : la liste dit ce que le registre ignore, et c'est le meilleur moyen de découvrir un écrivain qui n'inscrit pas.

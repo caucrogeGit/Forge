@@ -24,6 +24,14 @@
 
 ### Ajouté
 
+- **La purge d'orphelins supprimait les images d'un autre opt-in (`IMAGES-REGISTRY-RECORD-001`).**
+  `forge-mvc-images` écrit sous `UPLOAD_ROOT`, la racine que `forge-mvc-files` connaît, et n'inscrivait rien à son registre. `forge files:orphans` rapproche le disque et le registre : une image absente du registre y était **un orphelin**, et `--delete` la supprimait. Revue du référentiel files.
+  **Le garde-fou du registre vide ne protégeait pas ce cas.** Il ne se déclenche que si le registre est **entièrement** vide. Un projet qui inscrit ses documents, comme la documentation de `forge-mvc-files` l'enseigne, et qui utilise cet opt-in pour ses images, avait un registre peuplé et des images signalées orphelines.
+  Mesuré sur un projet portant un document inscrit et une image non inscrite : trois fichiers sur disque, une inscription, et deux orphelins signalés, l'original **et sa vignette**. Deux opt-ins officiels, dont l'un dépend de l'autre, et la purge de l'un supprimait les fichiers de l'autre.
+  `save_image` et `generate_image_variants` inscrivent désormais tout ce qu'ils écrivent. **L'inscription est au mieux** : la table `forge_files` est optionnelle (ADR-094), et faire échouer une sauvegarde d'image parce qu'un registre n'est pas provisionné serait disproportionné. Ce n'est pas une dégradation silencieuse pour autant, sans cette table `find_orphans` lève aussi et la purge ne peut pas tourner : les deux cas s'alignent, et il n'y a pas de fenêtre où l'inscription manque pendant que la purge supprime.
+  L'échec est journalisé sur une ligne, **sans pile** : ce chemin se déclenche une fois par fichier écrit, et une trace complète par vignette noierait le journal.
+  La documentation de `forge-mvc-files` nomme désormais la limite générale : la purge suppose que le registre décrit tout ce qui vit sous `UPLOAD_ROOT`, et cette hypothèse est fausse dès qu'un composant écrit là sans inscrire.
+
 - **Une pièce jointe se perdait en silence au passage par la file (`MAIL-QUEUE-ATTACHMENTS-REFUSED-001`).**
   `MAIL-ATTACHMENTS-001` a livré les pièces jointes, `MAIL-QUEUE-VIA-JOBS-001` la mise en file. Les deux ont été livrés séparément et **ne composaient pas**. Revue du référentiel mail.
   `message_to_payload` recopie huit champs nommés, et `attachments` n'en faisait pas partie. Mesuré : un message avec pièce jointe passait la sérialisation sans erreur, et ressortait de l'aller-retour **sans elle**. L'email partait, le journal inscrivait `sent`, et le destinataire recevait un corps annonçant un document absent. C'est le pire mode de panne, tout paraît réussi.
