@@ -24,6 +24,8 @@ de décider quand, et une purge qui écrit serait deux gestes sous un seul nom.
 """
 from __future__ import annotations
 
+import logging
+
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -32,6 +34,8 @@ from forge_mvc_images.presets import (
     RESERVED_PRESET_NAMES,
     preset_names,
 )
+
+logger = logging.getLogger("forge.images")
 
 __all__ = [
     "VariantOrphanReport",
@@ -128,6 +132,29 @@ def find_orphan_variants(*, root: "str | Path | None" = None) -> VariantOrphanRe
     )
 
 
+def _oublier_du_registre(chemin: str) -> None:
+    """Retire l'inscription d'une variante supprimée (`FILES-DELETE-FORGETS-001`).
+
+    Les variantes sont inscrites depuis `IMAGES-REGISTRY-RECORD-001`. Les
+    supprimer sans désinscrire laisserait des lignes décrivant des fichiers
+    absents, que `owner_usage_bytes` continuerait de compter : le quota
+    grossirait à chaque nettoyage.
+
+    Au mieux, comme l'inscription : la table est optionnelle, et faire échouer
+    un nettoyage parce qu'un registre n'est pas provisionné empêcherait de
+    nettoyer.
+    """
+    try:
+        from forge_mvc_files import forget_file
+
+        forget_file(chemin)
+    except Exception as exc:  # noqa: BLE001 - le nettoyage prime
+        logger.warning(
+            "Forge Images - désinscription impossible pour %s (%s) ; le quota "
+            "continuera de compter cette variante supprimée.", chemin, exc,
+        )
+
+
 def purge_orphan_variants(
     report: VariantOrphanReport,
     *,
@@ -166,6 +193,7 @@ def purge_orphan_variants(
                 echecs.append((relatif, "chemin hors de la racine d'upload"))
                 continue
             cible.unlink()
+            _oublier_du_registre(relatif)
             supprimes.append(relatif)
         except OSError as exc:
             echecs.append((relatif, str(exc)))

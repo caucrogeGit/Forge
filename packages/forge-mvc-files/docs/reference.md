@@ -620,3 +620,27 @@ Il n'existe **pas** de purge par ancienneté, et c'est délibéré (`DOC-FILES-R
     Le registre porte `created_at` : une application qui veut une rétention interroge `forge_files` sur ce critère, appelle `delete_upload` puis `forget_file`, et garde la décision de ce qu'elle efface.
 
     Le faire elle même la force à nommer sa règle, ce qui est le bon endroit pour cette décision.
+
+
+## Supprimer un fichier le retire aussi du registre
+
+Les suppressions retiraient le fichier du disque sans toucher au registre.
+
+La ligne restait, et `owner_usage_bytes` somme les tailles inscrites : le quota comptait donc des fichiers qui n'existaient plus (`FILES-DELETE-FORGETS-001`).
+
+!!! danger "Un quota qui comptait des fichiers supprimés"
+    Mesuré : trois dépôts d'un mégaoctet, puis trois suppressions par le chemin documenté, et le quota annonçait toujours trois mégaoctets.
+
+    Un utilisateur qui dépose et supprime finit refusé pour un espace qu'il n'occupe pas, avec un message « quota dépassé » impossible à diagnostiquer de l'extérieur : son stockage est vide.
+
+!!! info "Trois chemins, un seul défaut"
+    `delete_upload`, `delete_media_file` et `purge_orphan_variants` suppriment tous des fichiers sous `UPLOAD_ROOT`, et aucun ne désinscrivait.
+
+    Le dernier est le plus ironique : c'est le nettoyage, et il faisait grossir le quota à chaque passage.
+
+    Un garde-fou lu sur l'arbre syntaxique refuse qu'une fonction publique supprime un fichier sans le désinscrire.
+
+!!! info "L'oubli est au mieux, et il a lieu quel que soit le sort du fichier"
+    La table `forge_files` est optionnelle (ADR-094), et faire échouer une suppression parce qu'un registre n'est pas provisionné **empêcherait de supprimer**, ce qui est pire que le défaut corrigé.
+
+    Une inscription qui décrit un fichier absent est fausse dans tous les cas : la corriger ne dépend pas de la réussite de la suppression sur disque.

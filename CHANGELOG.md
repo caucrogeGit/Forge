@@ -24,6 +24,14 @@
 
 ### Ajouté
 
+- **Le quota comptait des fichiers supprimés (`FILES-DELETE-FORGETS-001`).**
+  Les suppressions retiraient le fichier du disque sans toucher au registre. La ligne restait, et `owner_usage_bytes` somme les tailles inscrites. Revue du référentiel images.
+  Mesuré : trois dépôts d'un mégaoctet, puis trois suppressions par le chemin documenté, et le quota annonçait toujours **trois mégaoctets**, trois lignes restant au registre. Un utilisateur qui dépose et supprime finit refusé pour un espace qu'il n'occupe pas, avec un message « quota dépassé » impossible à diagnostiquer de l'extérieur : son stockage est vide.
+  **Trois chemins, un seul défaut.** `delete_upload`, `delete_media_file` et `purge_orphan_variants` suppriment tous des fichiers sous `UPLOAD_ROOT`, et aucun ne désinscrivait. Le dernier est le plus ironique : c'est le nettoyage, et il faisait grossir le quota à chaque passage.
+  Le défaut existait déjà pour toute application suivant le chemin documenté, `save_upload` puis `record_file`, puis `delete_upload`. `IMAGES-REGISTRY-RECORD-001` l'a étendu aux images en les faisant inscrire, ce qui est la contrepartie d'avoir fermé la faille de suppression : les deux gestes vont ensemble.
+  L'oubli est **au mieux**, la table étant optionnelle : faire échouer une suppression parce qu'un registre n'est pas provisionné empêcherait de supprimer, ce qui est pire que le défaut corrigé. Il a lieu **quel que soit le sort du fichier**, une inscription décrivant un fichier absent étant fausse dans tous les cas.
+  Un garde-fou lu sur l'arbre syntaxique refuse qu'une fonction publique supprime un fichier sans le désinscrire.
+
 - **Ce que la purge de fichiers ne fait pas est désormais écrit (`DOC-FILES-RETENTION-SCOPE-001`).**
   `files:orphans` supprime des fichiers que rien ne réclame. Il n'existe pas de purge par ancienneté, et la documentation était **silencieuse** sur cette absence.
   Elle est délibérée : Forge ne sait pas qu'une facture se garde dix ans et une vignette trente jours. La différence avec `audit:gc --days`, `stats:gc --days` et `iot:gc --days` n'est pas de principe, ces commandes suppriment des lignes **dont elles connaissent le sens**, un événement de journal ou une mesure de capteur. Un fichier appartient au domaine de l'application, et supprimer par date sans savoir ce qu'on supprime est le geste qu'il ne faut pas offrir.

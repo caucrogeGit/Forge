@@ -1,6 +1,7 @@
 # pyright: strict
 from __future__ import annotations
 
+import logging
 import os
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -17,6 +18,8 @@ from core.forms.upload_exceptions import UploadStorageError
 from core.forms.upload_validation import validate_magic_bytes, validate_upload_metadata
 from forge_mvc_files import storage
 from forge_mvc_files.scan import scan_upload
+
+logger = logging.getLogger("forge.files")
 
 
 @dataclass(frozen=True)
@@ -160,8 +163,41 @@ def save_upload(file: object, category: str = "documents") -> SavedUpload:
     )
 
 
+def _oublier(chemin: str) -> None:
+    """Retire l'inscription d'un fichier supprimé (`FILES-DELETE-FORGETS-001`).
+
+    Les suppressions retiraient le fichier du disque sans toucher au registre.
+    La ligne restait, et `owner_usage_bytes` somme les tailles inscrites : le
+    quota comptait donc des fichiers qui n'existaient plus.
+
+    Mesuré : trois dépôts d'un mégaoctet, puis trois suppressions par le chemin
+    documenté, et le quota annonçait toujours trois mégaoctets. Un utilisateur
+    qui dépose et supprime finit refusé pour un espace qu'il n'occupe pas, avec
+    un message impossible à diagnostiquer de l'extérieur.
+
+    L'oubli est **au mieux** : la table `forge_files` est optionnelle
+    (ADR-094), et faire échouer une suppression parce qu'un registre n'est pas
+    provisionné empêcherait de supprimer. Sans registre, il n'y a d'ailleurs ni
+    quota ni purge, donc rien à fausser.
+
+    Il a lieu **quel que soit le sort du fichier** : une inscription qui décrit
+    un fichier absent est fausse dans tous les cas.
+    """
+    try:
+        from forge_mvc_files.registry import forget_file
+
+        forget_file(chemin)
+    except Exception as exc:  # noqa: BLE001 - la suppression prime
+        logger.warning(
+            "Forge Files - désinscription impossible pour %s (%s) ; le quota "
+            "continuera de compter ce fichier supprimé.", chemin, exc,
+        )
+
+
 def delete_upload(path: str | Path) -> bool:
-    return storage.delete_file(path, root=upload_root())
+    supprime = storage.delete_file(path, root=upload_root())
+    _oublier(storage.normalize_media_path(str(path)))
+    return supprime
 
 
 def delete_media_file(path: str, *, root: str | Path | None = None, variants: bool = False) -> dict[str, bool]:
@@ -176,10 +212,15 @@ def delete_media_file(path: str, *, root: str | Path | None = None, variants: bo
         )
         paths = cast("dict[str, str]", image_variant_relative_paths(relative_path))
 
-    return {
+    resultats = {
         media_path: storage.delete_file(media_path, root=root)
         for media_path in paths.values()
     }
+    # L'original comme chaque variante : toutes sont inscrites depuis
+    # IMAGES-REGISTRY-RECORD-001, toutes doivent être oubliées.
+    for media_path in paths.values():
+        _oublier(media_path)
+    return resultats
 
 
 def serve_media_file(

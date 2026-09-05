@@ -425,6 +425,7 @@ Chaque entrée nomme ce qui l'a révélée, parce qu'un ticket sans cause visibl
 | `IMAGES-REGISTRY-RECORD-001` | images, files | Revue du référentiel files | **Livré.** `files:orphans --delete` supprimait les images et leurs vignettes |
 | `NOTIF-STORE-AS-VALIDATED-001` | notifications | Revue du référentiel notifications | **Livré.** Destinataire validé élagué et stocké brut : notification écrite, jamais relue |
 | `DOC-FILES-RETENTION-SCOPE-001` | files | Revue du référentiel files, deuxième passe | **Livré.** L'absence de purge par ancienneté était silencieuse ; elle est motivée et le chemin applicatif donné |
+| `FILES-DELETE-FORGETS-001` | files, images | Revue du référentiel images | **Livré.** Trois chemins de suppression laissaient la ligne au registre ; le quota comptait des fichiers supprimés |
 
 **`NOTIF-HTTP-ROUTES-001`.**
 Le paquet savait écrire une notification et la relire depuis Python, et n'exposait aucune route.
