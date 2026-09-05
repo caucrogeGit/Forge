@@ -1,9 +1,9 @@
 # pyright: strict
-"""Paramètres applicatifs persistés dans MariaDB, sans logique métier.
+"""Paramètres applicatifs persistés en base, sans logique métier.
 
 `forge-mvc-settings` stocke des réglages d'application (nom d'établissement,
 durée d'une session, mode maintenance, options pédagogiques) dans une table
-`app_settings`, en paire clé/valeur typée. L'API est explicite : on lit avec
+`app_settings`, en paire clé/valeur typée, sur le backend installé (ADR-054). L'API est explicite : on lit avec
 :func:`get_setting`, on écrit avec :func:`set_setting`. Le SQL reste visible
 (constantes ci-dessous), aucune écriture cachée, aucune dépendance lourde.
 
@@ -13,6 +13,8 @@ migration:apply`). Les fonctions acceptent un paramètre `db` injectable (par
 défaut `core.database.db`) pour rester testables.
 """
 from __future__ import annotations
+
+import json
 
 import re
 from typing import Any
@@ -25,10 +27,19 @@ from forge_mvc_settings.errors import SettingsError
 TABLE_NAME = "app_settings"
 
 #: Types de valeur supportés (sérialisés en texte, recoercés à la lecture).
-SUPPORTED_TYPES = ("str", "int", "bool", "float")
+SUPPORTED_TYPES = ("str", "int", "bool", "float", "json")
 
 #: Une valeur de paramètre, telle que rendue à la lecture.
-SettingValue = str | int | bool | float
+SettingValue = str | int | bool | float | list[Any] | dict[str, Any]
+
+#: Types Python rendus en JSON dans la colonne `setting_value`.
+#:
+#: `json` sert les valeurs **composites** (`SETTINGS-JSON-TYPE-001`) : une
+#: liste d'extensions permises, une plage d'horaires. Les scalaires en sont
+#: exclus, et c'est délibéré : ils ont déjà leur type, et un `42` déclaré
+#: `json` redeviendrait `int` au premier enregistrement depuis un écran, le
+#: type changeant sans que personne ne l'ait demandé.
+JSON_TYPES = (list, dict)
 
 # Clé : commence par une lettre, puis lettres/chiffres/`_`/`.` ; 191 max
 # (limite d'index utf8mb4). Le point autorise des clés hiérarchiques
@@ -124,6 +135,17 @@ def _serialize(value: object) -> tuple[str, str]:
         return (repr(value), "float")
     if isinstance(value, str):
         return (value, "str")
+    if isinstance(value, JSON_TYPES):
+        # `sort_keys` rend le texte stable : réécrire la même table ne produit
+        # pas une ligne différente. `ensure_ascii=False` garde les accents
+        # lisibles dans la base, que la charte veut auditable à l'œil.
+        try:
+            return (json.dumps(value, ensure_ascii=False, sort_keys=True), "json")
+        except (TypeError, ValueError) as exc:
+            raise SettingsError(
+                f"Valeur json non sérialisable : {exc}. Un paramètre ne porte "
+                "que des types JSON (texte, nombre, booléen, liste, objet)."
+            ) from exc
     raise SettingsError(
         f"Type de valeur non supporté : {type(value).__name__}. "
         f"Types acceptés : {', '.join(SUPPORTED_TYPES)}."
@@ -138,6 +160,14 @@ def _coerce(raw: Any, value_type: Any) -> SettingValue:
         return float(text)
     if value_type == "bool":
         return text == "1"
+    if value_type == "json":
+        try:
+            return json.loads(text)
+        except ValueError as exc:
+            raise SettingsError(
+                f"Paramètre json illisible en base : {exc}. La ligne a été "
+                "écrite hors de set_setting, ou modifiée à la main."
+            ) from exc
     return text
 
 

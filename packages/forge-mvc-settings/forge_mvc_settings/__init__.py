@@ -2,7 +2,7 @@
 """forge-mvc-settings — paramètres applicatifs opt-in (SETTINGS-OPTIN-SCAFFOLD-001).
 
 Brique générique : persister des réglages d'application en paire clé/valeur
-typée dans une table MariaDB (`app_settings`), avec une API explicite
+typée dans une table `app_settings`, sur le backend installé (ADR-054), avec une API explicite
 `get_setting`/`set_setting`. Le cœur de Forge ignore tout des paramètres ; ce
 paquet fournit l'API ; l'application décide de ce qu'elle stocke (nom
 d'établissement, durée d'une session, mode maintenance, options pédagogiques).

@@ -140,7 +140,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     | Dépend de | `forge-mvc` et un backend BDD installé (ADR-054) |
     | API publique | `get_setting`, `set_setting`, `get_all_settings`, `delete_setting`, `parse_setting_value`, `describe_settings`, `set_user_setting`, `enable_settings_cache` |
     | Table SQL | `app_settings` (`TABLE_NAME`) |
-    | Types supportés | `str`, `int`, `bool`, `float` (`SUPPORTED_TYPES`) |
+    | Types supportés | `str`, `int`, `bool`, `float`, `json` (`SUPPORTED_TYPES`) |
     | Exception liée | `SettingsError` si la clé est invalide ou le type non supporté |
     | Stratégie opt-in | ADR-052 |
     | Installation | `pip install --pre forge-mvc-settings` |
@@ -350,6 +350,10 @@ set_setting(cle, parse_setting_value(saisie, type_declare))
 `describe_settings` ne rend que les paramètres **globaux**.
 Les paramètres appartenant à un utilisateur en sont exclus, comme dans `get_all_settings` : un écran de réglages afficherait sinon les préférences de tous les comptes, adresses comprises, et les offrirait à l'édition.
 Employez `get_user_settings` pour ceux d'un utilisateur.
+
+Une valeur `json` se saisit telle qu'elle s'écrit, `["pdf", "odt"]` ou `{"lundi": "8h-17h"}`.
+Une saisie malformée produit un `SettingsError`, jamais une erreur cinq cents.
+Un scalaire y est refusé : `42` a déjà son type, et l'accepter ferait changer le type déclaré au premier enregistrement.
 
 | Champ de `SettingRow` | Rôle |
 |---|---|

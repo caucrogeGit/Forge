@@ -101,14 +101,22 @@ class TestSaisieTexte:
 
 
 class TestTypeInconnu:
-    @pytest.mark.parametrize("type_", ["date", "json", "", "INT"])
+    # `json` figurait ici comme exemple de type hors contrat. Il est devenu un
+    # type déclaré (`SETTINGS-JSON-TYPE-001`), et l'exemple a suivi : ce que ce
+    # test fixe est le refus d'un type absent du contrat, pas la liste d'alors.
+    @pytest.mark.parametrize("type_", ["date", "decimal", "", "INT"])
     def test_un_type_hors_contrat_est_refuse(self, type_: str) -> None:
         with pytest.raises(SettingsError, match="Type inconnu"):
             parse_setting_value("x", type_)
 
     def test_le_refus_enumere_les_types_acceptes(self) -> None:
-        with pytest.raises(SettingsError, match="str, int, bool, float"):
+        """Le message doit citer le contrat courant, pas une liste figée ici."""
+        from forge_mvc_settings import SUPPORTED_TYPES
+
+        with pytest.raises(SettingsError) as capture:
             parse_setting_value("x", "date")
+
+        assert ", ".join(SUPPORTED_TYPES) in str(capture.value)
 
 
 class TestAffichage:

@@ -36,8 +36,10 @@ duree = get_setting("qcm.session_duration", 20)
 
 ## Périmètre
 
-Types supportés : `str`, `int`, `bool`, `float`, sérialisés en texte et recoercés à la lecture.
-Hors périmètre : cache, secrets chiffrés, paramètres par utilisateur.
+Types supportés : `str`, `int`, `bool`, `float` et `json`, sérialisés en texte et recoercés à la lecture.
+Le type `json` porte les valeurs composites, liste ou objet ; un scalaire garde son propre type.
+Un cache mémoire à invalidation explicite et des paramètres par utilisateur sont disponibles, tous deux facultatifs.
+Hors périmètre : secrets chiffrés, dont le refus est motivé dans la référence.
 
 ## Pour aller plus loin
 

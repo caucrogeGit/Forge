@@ -113,5 +113,17 @@ def test_valid_keys_accepted(db: FakeDb, good_key: str) -> None:
 
 
 def test_unsupported_value_type_raises(db: FakeDb) -> None:
+    """Une liste servait d'exemple ; elle est devenue un type déclaré.
+
+    `SETTINGS-JSON-TYPE-001` a ajouté `json`, qui porte listes et objets. Ce
+    que ce test fixe reste le refus d'un type que le store ne sait pas écrire,
+    et il faut donc un exemple qui le soit encore.
+    """
     with pytest.raises(SettingsError):
-        set_setting("k", ["liste"], db=db)  # type: ignore[arg-type]
+        set_setting("k", {"a", "b"}, db=db)  # type: ignore[arg-type]
+
+
+def test_unserializable_json_value_raises(db: FakeDb) -> None:
+    """Une liste bien typée mais au contenu illisible est refusée de même."""
+    with pytest.raises(SettingsError, match="non sérialisable"):
+        set_setting("k", [object()], db=db)  # type: ignore[arg-type]

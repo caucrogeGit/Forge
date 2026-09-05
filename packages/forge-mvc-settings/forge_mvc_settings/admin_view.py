@@ -27,11 +27,12 @@ paramètres depuis sa propre interface avec les mêmes fonctions.
 """
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 from forge_mvc_settings.errors import SettingsError
-from forge_mvc_settings.store import SUPPORTED_TYPES, SettingValue
+from forge_mvc_settings.store import JSON_TYPES, SUPPORTED_TYPES, SettingValue
 
 __all__ = [
     "TRUE_INPUTS",
@@ -100,6 +101,22 @@ def parse_setting_value(raw: str, value_type: str) -> SettingValue:
     if not texte:
         raise SettingsError(f"Valeur {value_type} manquante.")
 
+    if value_type == "json":
+        try:
+            valeur: Any = json.loads(texte)
+        except ValueError as exc:
+            raise SettingsError(
+                f"Valeur json invalide : {exc}. Attendu une liste ou un objet, "
+                'par exemple ["pdf", "odt"] ou {"lundi": "8h-17h"}.'
+            ) from exc
+        if not isinstance(valeur, JSON_TYPES):
+            raise SettingsError(
+                f"Valeur json scalaire : {raw!r}. Le type json porte les "
+                "valeurs composites ; un nombre, un texte ou un booléen a "
+                "déjà son propre type."
+            )
+        return cast("list[Any] | dict[str, Any]", valeur)
+
     try:
         return int(texte) if value_type == "int" else float(texte)
     except ValueError as exc:
@@ -114,6 +131,11 @@ def _raw_form(value: SettingValue, value_type: str) -> str:
         # `str(True)` donnerait « True », que `parse_setting_value` accepte,
         # mais qui dépend de la langue de Python plutôt que du contrat.
         return "1" if value else "0"
+    if value_type == "json":
+        # `str(dict)` rendrait la forme Python, apostrophes simples comprises,
+        # que `parse_setting_value` refuserait au réenregistrement : le champ
+        # aurait affiché quelque chose que l'écran ne sait pas relire.
+        return json.dumps(value, ensure_ascii=False, sort_keys=True)
     return str(value)
 
 
