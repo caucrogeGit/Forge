@@ -26,6 +26,9 @@ Ajoutez une méthode `new` (affiche le formulaire) et `store` (recevra l'envoi) 
 Déclarez les routes :
 
 ```python
+# mvc/routes/__init__.py
+from mvc.controllers.showcase_controller import ShowcaseController
+
 public.add("GET",  "/showcase/new",   ShowcaseController.new,   name="showcase-new")
 public.add("POST", "/showcase/store", ShowcaseController.store, name="showcase-store")
 ```

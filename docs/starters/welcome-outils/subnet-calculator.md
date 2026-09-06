@@ -117,6 +117,9 @@ Tout le calcul reste en Python : la vue ne fait qu'afficher, Jinja échappe les 
     Ajoutez les deux routes dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
+    # mvc/routes/__init__.py
+    from mvc.controllers.sandbox_controller import SandboxController
+
     with router.group("", public=True) as public:
         # ... routes existantes ...
         public.add("GET",  "/sandbox/subnet", SandboxController.subnet_form, name="sandbox-subnet_form")

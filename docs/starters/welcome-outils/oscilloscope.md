@@ -47,6 +47,9 @@ La règle reste stricte : le JavaScript est local, servi depuis `'self'`, jamais
     Ajoutez la route dans le groupe public de `mvc/routes/__init__.py` :
 
     ```python
+    # mvc/routes/__init__.py
+    from mvc.controllers.sandbox_controller import SandboxController
+
     with router.group("", public=True) as public:
         # ... routes existantes ...
         public.add("GET", "/sandbox/oscilloscope", SandboxController.oscilloscope, name="sandbox-oscilloscope")

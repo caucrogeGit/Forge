@@ -60,6 +60,9 @@ Côté contrôleur, branchez la route de suppression (l'action `<form>` ci-dessu
 ```
 
 ```python
+# mvc/routes/__init__.py
+from mvc.controllers.showcase_controller import ShowcaseController
+
 public.add("POST", "/showcase/delete", ShowcaseController.delete, name="showcase-delete")
 ```
 
