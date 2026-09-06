@@ -732,6 +732,14 @@ def _dispatch_db_init(*, run: bool) -> None:
     """
     from core.database.backend import get_backend
 
+    # L'environnement du projet AVANT de resoudre le backend
+    # (`DB-INIT-BACKEND-FROM-ENV-001`). `_discover` lit `DB_BACKEND` dans
+    # `os.environ`, et c'est `env/dev` qui le porte : `forge db:config` l'y
+    # ecrit (ADR-064). Resoudre d'abord revenait a ignorer la declaration du
+    # projet, et a echouer des que plusieurs backends sont installes, ce qui
+    # est l'etat ordinaire d'un poste de developpement.
+    load_project_config()
+
     backend = get_backend()
     if not getattr(backend, "requires_provisioning", True):
         # SQLite : rien à générer, provisioning sans identifiants (les deux modes
@@ -774,7 +782,11 @@ def main(argv: list[str] | None = None) -> None:
 
     try:
         _dispatch_db_init(run=run)
-    except (DbInitError, ProjectConfigError, ValueError) as exc:
+    except (DbInitError, ProjectConfigError, ValueError, RuntimeError) as exc:
+        # `RuntimeError` est celle que leve la resolution du backend : aucun
+        # backend installe, ou plusieurs sans arbitre. Son message est bon et
+        # dit quoi faire ; il sortait pourtant en trace Python nue, ce qu'une
+        # commande n'a pas a montrer (`DB-INIT-BACKEND-FROM-ENV-001`).
         print(f"[ERREUR] {exc}")
         raise SystemExit(1)
 

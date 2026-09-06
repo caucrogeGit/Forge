@@ -21,6 +21,26 @@ from forge_mvc_entities.db_init import (
 )
 
 
+@pytest.fixture(autouse=True)
+def _sans_projet_sur_le_disque(monkeypatch):
+    """Neutralise le chargement de `config.py` pour les tests de dispatch.
+
+    `_dispatch_db_init` charge la configuration du projet avant de résoudre le
+    backend (`DB-INIT-BACKEND-FROM-ENV-001`) : `DB_BACKEND` vit dans `env/dev`,
+    et le résoudre d'abord revenait à ignorer ce que le projet déclare.
+
+    Ces tests-ci portent sur l'aiguillage, quel backend mène à quel générateur,
+    et montent un backend factice. Ils n'ont pas de projet sur le disque, et
+    n'en ont pas besoin.
+
+    L'ordre réel des deux appels est fixé ailleurs, sur l'arbre syntaxique et
+    par un test de comportement dans un projet temporaire
+    (`packages/forge-mvc-entities/tests/test_db_init_backend_from_env_001.py`).
+    """
+    monkeypatch.setattr(db_init, "load_project_config", lambda *a, **k: None)
+
+
+
 def _cfg(**over: object) -> ProvisioningEnv:
     base: dict[str, object] = dict(
         db_name="ventes",
