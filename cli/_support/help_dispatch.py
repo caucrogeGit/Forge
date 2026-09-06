@@ -89,7 +89,7 @@ HELP_DESCRIPTIONS: dict[str, str] = {
     "make:public-contact": "Génère une page de contact publique.",
     # Base de données
     "db:config":        "Amorce les variables d'environnement du backend BDD.",
-    "db:init":          "Affiche le SQL de provisioning de la base MariaDB (--run pour exécuter).",
+    "db:init":          "Affiche le SQL de provisioning de la base du backend installé (--run pour exécuter).",
     "migration:status": "Statut des migrations SQL.",
     "migration:apply":  "Applique les migrations en attente.",
     "migration:diff":   "Génère un diff SQL entre entité et base.",
@@ -201,7 +201,7 @@ Prérequis:
   - être à la racine d'un projet Forge (dossier mvc/).
 
 Limites:
-  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - n'exécute aucun SQL et ne contacte pas la base ;
   - lancer ensuite forge migration:apply pour appliquer la migration.
 
 Options:
@@ -222,7 +222,7 @@ Prérequis:
   - être à la racine d'un projet Forge (dossier mvc/).
 
 Limites:
-  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - n'exécute aucun SQL et ne contacte pas la base ;
   - lancer ensuite forge migration:apply pour appliquer la migration.
 
 Options:
@@ -703,7 +703,7 @@ Prérequis:
   - être à la racine d'un projet Forge (dossier mvc/).
 
 Limites:
-  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - n'exécute aucun SQL et ne contacte pas la base ;
   - lancer ensuite forge migration:apply pour appliquer la migration.
 
 Options:
@@ -751,7 +751,7 @@ Prérequis:
   - être à la racine d'un projet Forge (dossier mvc/).
 
 Limites:
-  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - n'exécute aucun SQL et ne contacte pas la base ;
   - lancer ensuite forge migration:apply pour appliquer la migration.
 
 Options:
@@ -772,7 +772,7 @@ Prérequis:
   - être à la racine d'un projet Forge (dossier mvc/).
 
 Limites:
-  - n'exécute aucun SQL et ne contacte pas MariaDB ;
+  - n'exécute aucun SQL et ne contacte pas la base ;
   - lancer ensuite forge migration:apply pour appliquer la migration.
 
 Options:
@@ -941,12 +941,12 @@ Vérifications statiques (toujours actives):
   - fonction `register_iot_routes` exposée pour brancher l'API HTTP.
 
 Vérification optionnelle (--db):
-  - connexion MariaDB Forge (via core.database.db.fetch_one) +
+  - connexion à la base Forge (via core.database.db.fetch_one) +
     `SELECT COUNT(*) FROM iot_events`.
   - Résultats :
       [OK]   table accessible (N événement(s))
       [WARN] table absente → lance forge iot:init && forge migration:apply
-      [FAIL] connexion MariaDB impossible (exit 1)
+      [FAIL] connexion à la base impossible (exit 1)
   - Si la table est accessible, le schéma réel est aussi comparé au
     contrat Forge IoT (colonnes, types, nullabilité, AUTO_INCREMENT)
     via INFORMATION_SCHEMA :
@@ -1472,10 +1472,14 @@ Usage:
   forge db:init [--run]
 
 Description:
-  Prépare la base de données MariaDB du projet (base + deux comptes). Par défaut,
-  GÉNÈRE et affiche le SQL de provisioning dérivé de env/, à exécuter dans une
-  session d'administration (ex. sudo mariadb). Forge ne demande jamais le root du
-  serveur (ADR-067).
+  Prépare la base de données du projet (base + deux comptes), sur le backend
+  installé : MariaDB, PostgreSQL ou SQL Server. Par défaut, GÉNÈRE et affiche le
+  SQL de provisioning dérivé de env/, à exécuter dans une session
+  d'administration (ex. sudo mariadb, sudo -u postgres psql, sqlcmd). Forge ne
+  demande jamais le compte administrateur du serveur (ADR-067).
+
+  SQLite n'a pas de serveur ni de comptes : la commande y initialise simplement
+  le fichier et la table des migrations.
 
 Effets par défaut (mode affiche):
   - lit env/dev (DB_NAME, DB_HOST, DB_ADMIN_*, DB_APP_*) ;
@@ -1494,7 +1498,7 @@ Vérification préalable (dans les deux modes):
   - s'arrête si DB_NAME n'est pas un nom de base valide.
 
 Prérequis:
-  - un serveur MariaDB joignable ;
+  - un serveur joignable, celui du backend installé (sauf SQLite, sans serveur) ;
   - env/dev renseigné.
 
 Options:
@@ -2274,7 +2278,7 @@ Effets (12 contrôles, lecture seule) :
   - dépendance MFA (forge_mvc_mfa / pyotp) si indices détectés ;
   - SSL : certificats cert.pem / key.pem si HTTPS activé ;
   - Node : npm disponible pour build:css ;
-  - base de données : DB_APP_* renseignés, MariaDB joignable.
+  - base de données : DB_APP_* renseignés, serveur du backend joignable.
 
 Comportement:
   - chaque contrôle remonte un état (ok / warn / fail / skip) ;
