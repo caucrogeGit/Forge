@@ -23,5 +23,6 @@ nav:
           - trans dans un template: welcome/avance/i18n-jinja.md
           - Vider le cache: welcome/avance/i18n-cache.md
           - Gérer les erreurs: welcome/avance/i18n-errors.md
+          - Pluriels et détection de la locale: welcome/avance/i18n-pluriels-locale.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

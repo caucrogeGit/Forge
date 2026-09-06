@@ -69,4 +69,4 @@ with router.group("", public=True) as public:
 Vous tenez l'i18n de bout en bout.
 Faisons le **bilan** du niveau avancé.
 
-[Bilan du niveau avancé](bilan.md)
+[Suivant : pluriels et détection de la locale](i18n-pluriels-locale.md)

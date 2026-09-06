@@ -14,6 +14,7 @@ nav:
       - Intermédiaire:
           - Fixtures et isolation: welcome/intermediaire/testing-fixtures.md
           - Tester un contrôleur: welcome/intermediaire/testing-controller.md
+          - Le client de test: welcome/intermediaire/testing-client.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Tester un opt-in: welcome/avance/testing-optin.md

@@ -39,4 +39,4 @@ def test_create_refuse_titre_vide():
 
 ## Après cette étape
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Suivant : le client de test](testing-client.md)
