@@ -42,6 +42,10 @@ nav:
           - Bilan débutant: welcome/debutant/bilan.md
       - Intermédiaire (faire évoluer):
           - Les migrations: welcome/intermediaire/migrations.md
+          - Horodatages et suppression logique: welcome/intermediaire/options-entite.md
+          - Les champs calculés: welcome/intermediaire/champs-calcules.md
+          - L'unicité composite: welcome/intermediaire/unicite-composite.md
+          - La validation métier: welcome/intermediaire/validation-metier.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé (pivot enrichi):
           - Le pivot enrichi: welcome/avance/pivot-welcome.md

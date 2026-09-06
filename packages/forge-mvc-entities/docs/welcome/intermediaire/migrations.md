@@ -76,4 +76,4 @@ Ce cycle garde le contrat comme source, la base comme reflet appliqué, et chaqu
 Vous savez modéliser et faire évoluer une couche de données.
 Faisons le bilan du niveau intermédiaire avant le niveau avancé.
 
-[Continuer : bilan du niveau intermédiaire](bilan.md)
+[Suivant : horodatages et suppression logique](options-entite.md)
