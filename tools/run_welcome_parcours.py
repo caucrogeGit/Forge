@@ -69,7 +69,10 @@ PLACEHOLDER = re.compile(r"<[a-zA-Zà-ÿ][\w à-ÿ'-]*>")
 # `docker run` d'un serveur de base occupe le terminal tant qu'il tourne :
 # les parcours des backends l'emploient pour proposer une instance jetable.
 BLOQUANTES = ("forge run", "mkdocs serve", "npm run dev", "python -m http.server",
-              "docker run", "podman run", "worker.py")
+              "docker run", "podman run", "worker.py",
+              # Un observateur de fichiers ne rend pas la main non plus, et
+              # `welcome-design` en ouvre un des sa premiere page.
+              "npm run watch")
 
 #: Gestes qui sortent du terminal, donc hors de portée d'une exécution.
 #:
@@ -148,6 +151,31 @@ DIAGNOSTICS = ("forge deploy:check", "forge iot:doctor")
 DELAI = 180
 
 
+#: Parcours d'accueil du **cœur**, qui vivent à la racine et non dans un paquet.
+#:
+#: Ils étaient hors de portée de ce harnais (`WELCOME-CORE-EXECUTION-001`), qui
+#: résolvait `packages/forge-mvc-<nom>/`. Les vingt-sept parcours d'opt-ins
+#: étaient donc joués, et les six du cœur jamais, `welcome-forge` compris,
+#: c'est à dire le premier que lit un débutant. Cet outil existe précisément
+#: parce que lire un parcours ne dit pas s'il marche.
+PARCOURS_DU_COEUR = (
+    "welcome-forge", "welcome-design", "welcome-events",
+    "welcome-helpers", "welcome-markdown", "welcome-outils",
+)
+
+
+def _source(paquet: str) -> "tuple[Path, Path, str]":
+    """Config mkdocs, dossier des pages, et préfixe des chemins du parcours.
+
+    Deux emplacements, une seule règle de lecture : le `nav` fait autorité,
+    parce que c'est l'ordre que le lecteur voit dans le menu.
+    """
+    if paquet in PARCOURS_DU_COEUR:
+        return (PROJECT_ROOT / "mkdocs.yml", PROJECT_ROOT / "docs", f"starters/{paquet}/")
+    dossier = PROJECT_ROOT / "packages" / f"forge-mvc-{paquet}"
+    return (dossier / "mkdocs.yml", dossier / "docs", "welcome/")
+
+
 def nav_pages(paquet: str, *, welcome_seul: bool = True) -> "list[Path]":
     """Pages du paquet, dans l'ordre du menu du site.
 
@@ -159,12 +187,11 @@ def nav_pages(paquet: str, *, welcome_seul: bool = True) -> "list[Path]":
     chemins `welcome/...` importe, et une dépendance à PyYAML pour cela serait
     disproportionnée.
     """
-    config = PROJECT_ROOT / "packages" / f"forge-mvc-{paquet}" / "mkdocs.yml"
+    config, docs, prefixe = _source(paquet)
     if not config.is_file():
         raise SystemExit(f"Erreur : {config} est introuvable.")
-    docs = config.parent / "docs"
     pages: "list[Path]" = []
-    motif = (r"(welcome/[\w/-]+\.md)\s*$" if welcome_seul
+    motif = (rf"({prefixe}[\w/-]+\.md)\s*$" if welcome_seul
              else r"([\w/-]*\.md)\s*$")
     for ligne in config.read_text(encoding="utf-8").splitlines():
         trouve = re.search(motif, ligne)
@@ -356,8 +383,23 @@ def _invoque_une_commande(script: str, motifs: "tuple[str, ...]") -> bool:
 
 FICHIER_LANCE = re.compile(r"^\s*python3?\s+([\w./-]+\.py)", re.MULTILINE)
 
+#: Parcours dont les blocs de code sont **montrés**, jamais à jouer.
+#:
+#: `welcome-markdown` enseigne le Markdown : ses blocs `bash` illustrent une
+#: syntaxe de clôture, et la même commande y figure deux fois, littérale puis
+#: rendue. Les exécuter n'apprend rien et échoue au second passage, le premier
+#: ayant déjà créé le dossier (`WELCOME-CORE-EXECUTION-001`).
+#:
+#: Le saut est **déclaré et compté**, comme les autres : un harnais qui tait ce
+#: qu'il n'a pas fait se lit comme une couverture complète (principe 3).
+PARCOURS_ILLUSTRATIFS = ("welcome-markdown",)
 
-def raison_de_sauter(script: str, projet: "Path | None" = None) -> "str | None":
+
+def raison_de_sauter(
+    script: str, projet: "Path | None" = None, *, paquet: str = ""
+) -> "str | None":
+    if paquet in PARCOURS_ILLUSTRATIFS:
+        return "ILLUSTRATION"
     if PLACEHOLDER.search(script):
         return "PLACEHOLDER"
     if any(motif in script for motif in BLOQUANTES):
@@ -571,13 +613,14 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
             # entière. Mesuré sur le `docker run` du parcours SQL Server, dont
             # la seconde ligne partait seule en « -p : commande introuvable ».
             lignes_du_bloc = _lignes_logiques(script)
-            jouables = [l for l in lignes_du_bloc if raison_de_sauter(l, projet) is None]
+            jouables = [l for l in lignes_du_bloc
+                        if raison_de_sauter(l, projet, paquet=paquet) is None]
             # La commande annoncée est la première JOUÉE, pas la première du
             # bloc : afficher celle qu'on a écartée désignerait un coupable
             # innocent dans le message d'échec.
             premiere = (jouables or lignes_du_bloc or [""])[0]
             if not jouables:
-                raison = raison_de_sauter(script, projet) or "BLOQUANT"
+                raison = raison_de_sauter(script, projet, paquet=paquet) or "BLOQUANT"
                 sautes[raison] = sautes.get(raison, 0) + 1
                 print(f"  [SAUTÉ {raison}] {relatif}:{ligne} — {premiere}")
                 continue
@@ -585,7 +628,7 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
                 # Un saut partiel est ANNONCÉ : taire ce qu'on n'a pas fait,
                 # c'est laisser lire une couverture complète (principe 3).
                 for ecartee in lignes_du_bloc:
-                    motif = raison_de_sauter(ecartee, projet)
+                    motif = raison_de_sauter(ecartee, projet, paquet=paquet)
                     if motif:
                         sautes[motif] = sautes.get(motif, 0) + 1
                         print(f"  [SAUTÉ {motif}] {relatif}:{ligne} — {ecartee.strip()}")
@@ -661,7 +704,18 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
             propre, lignes = appeler_routes(routes, projet)
             for ligne in lignes:
                 print(ligne)
-            if not propre:
+            if not propre and fragments:
+                # Un parcours qui fait AJOUTER une méthode à une classe laisse
+                # un fragment que ce harnais ne sait pas fusionner : la classe
+                # posée n'a donc pas la méthode que la route vise, et l'appel
+                # échoue sur un parcours pourtant juste
+                # (`WELCOME-CORE-EXECUTION-001`).
+                #
+                # Le dire plutôt que le compter comme un échec : un harnais qui
+                # accuse à tort finit désactivé, et ne garde alors plus rien.
+                print(f"INDÉCIS : {paquet} laisse {fragments} fragment(s) au "
+                      "lecteur ; les routes ne peuvent pas être conclues ici.")
+            elif not propre:
                 print(f"ÉCHEC : le parcours {paquet} déclare des routes qui ne répondent pas.")
                 return 1
     if lister:
