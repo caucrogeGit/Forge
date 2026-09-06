@@ -96,7 +96,45 @@ def authenticate_session(session_id: str, user: dict[str, Any]) -> str | None:
         stacklevel=2,
     )
     user_data = _normalize_legacy_user(user)
-    return _get_store().authenticate(session_id, user_data, SESSION_DURATION)
+    nouveau = _get_store().authenticate(session_id, user_data, SESSION_DURATION)
+    if nouveau is not None:
+        _poser_la_cle_canonique(nouveau, user_data)
+    return nouveau
+
+
+def _poser_la_cle_canonique(session_id: str, user_data: dict[str, Any]) -> None:
+    """Écrit `SESSION_KEY_AUTH_USER_ID` à côté de la représentation legacy.
+
+    `SESSIONS-DELETE-FOR-USER-DEPRECATED-DOOR-001`. Une session ouverte par
+    cette porte s'authentifiait, `get_authenticated_user_id` portant un pont de
+    compatibilité, mais **survivait à la révocation** : `delete_for_user` lit
+    la clé canonique sans pont, et rendait 0.
+
+    Une application encore sur ce chemin, activant un second facteur ou
+    changeant un mot de passe, croyait donc avoir fermé les autres sessions
+    (`MFA-SESSION-INVALIDATION-001`, `SESSIONS-DELETE-FOR-USER-001`). Une
+    opération de sécurité qui ne fait rien en silence est pire qu'une qui
+    échoue bruyamment.
+
+    La clé est posée **ici** plutôt qu'un second pont ajouté dans les trois
+    magasins : cela fait converger les deux représentations au lieu d'étendre
+    la seconde, ce que l'ADR-086 demande.
+
+    L'identifiant doit être un entier positif, comme le pont l'exige déjà : un
+    identifiant d'une autre forme laisserait la clé absente plutôt que d'y
+    écrire une valeur que le cœur ne saurait pas relire.
+    """
+    from core.sessions.keys import SESSION_KEY_AUTH_USER_ID
+
+    brut = user_data.get("id")
+    if not isinstance(brut, int) or isinstance(brut, bool) or brut <= 0:
+        return
+    magasin = _get_store()
+    donnees = magasin.get(session_id)
+    if donnees is None:
+        return
+    donnees[SESSION_KEY_AUTH_USER_ID] = brut
+    magasin.set(session_id, donnees)
 
 
 def is_authenticated(request: Request) -> bool:

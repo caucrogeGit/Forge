@@ -325,7 +325,16 @@ class TestDonneesSensiblesAbsentes:
         # `created_at` rejoint les champs prévus (ADMIN-SESSIONS-VIEW-001) :
         # un écran de sessions n'a que les dates pour distinguer deux lignes.
         # Ce n'est pas une donnée sensible, et l'ajouter ici est délibéré.
-        expected_top = {"authenticated", "user", "csrf_token", "expires_at", "created_at"}
+        # `_auth_user_id` rejoint les champs prévus
+        # (`SESSIONS-DELETE-FOR-USER-DEPRECATED-DOOR-001`) : la porte dépréciée
+        # pose désormais la clé canonique à côté de la forme legacy, faute de
+        # quoi la session s'authentifiait mais survivait à `delete_for_user`.
+        # C'est un identifiant entier, que `login_user` écrit déjà dans toute
+        # session canonique, et l'ajouter ici est délibéré.
+        expected_top = {
+            "authenticated", "user", "csrf_token", "expires_at", "created_at",
+            "_auth_user_id",
+        }
         assert set(session.keys()) <= expected_top | {"_auth_mfa_user_id", "_auth_mfa_started_at"}
 
     def test_utilisateur_session_ne_contient_que_champs_prevus(self):
