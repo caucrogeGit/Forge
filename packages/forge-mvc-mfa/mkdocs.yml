@@ -20,10 +20,12 @@ nav:
           - Enrôler un facteur TOTP: welcome/intermediaire/mfa-enroll.md
           - Challenge de connexion: welcome/intermediaire/mfa-challenge.md
           - Codes de récupération: welcome/intermediaire/mfa-recovery.md
+          - Rendre le facteur obligatoire: welcome/intermediaire/mfa-politique.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Revalidation (step-up): welcome/avance/mfa-revalidation.md
           - Anti-rejeu TOTP: welcome/avance/mfa-replay.md
           - Secret chiffré au repos: welcome/avance/mfa-crypto.md
+          - Fermer les sessions à l'activation: welcome/avance/mfa-invalidation.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

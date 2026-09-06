@@ -149,4 +149,4 @@ with router.group("", public=True) as public:
 
 Vous avez parcouru toute la progression MFA : mécaniques, flux, durcissement.
 
-[Bilan du niveau avancé](bilan.md)
+[Suivant : fermer les sessions à l'activation](mfa-invalidation.md)

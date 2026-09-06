@@ -171,4 +171,4 @@ with router.group("", public=True) as public:
 Vous maîtrisez le flux MFA.
 La suite (avancé) : le durcissement.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Suivant : rendre le facteur obligatoire](mfa-politique.md)

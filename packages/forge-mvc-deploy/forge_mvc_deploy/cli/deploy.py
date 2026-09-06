@@ -1232,6 +1232,88 @@ def _magasin_partage_cable(root: Path) -> bool:
     )
 
 
+def _mfa_installe() -> bool:
+    """`forge-mvc-mfa` est-il installe dans cet environnement ?"""
+    from importlib.util import find_spec
+
+    try:
+        return find_spec("forge_mvc_mfa") is not None
+    except (ImportError, ValueError):  # pragma: no cover - environnement casse
+        return False
+
+
+def _appelle(source: Path, fonction: str) -> bool:
+    """Le fichier appelle-t-il `fonction`, lu sur l'arbre syntaxique ?
+
+    Par `ast` et jamais par `grep` : une occurrence en commentaire, en chaine
+    ou en docstring ferait croire a un cablage qui n'existe pas, et le squelette
+    livre justement des exemples commentes. Un detecteur qui se trompe se fait
+    desactiver, et ne garde plus rien.
+    """
+    import ast
+
+    if not source.is_file():
+        return False
+    try:
+        arbre = ast.parse(source.read_text(encoding="utf-8"))
+    except (OSError, SyntaxError, ValueError):
+        return False
+    for noeud in ast.walk(arbre):
+        if not isinstance(noeud, ast.Call):
+            continue
+        cible = noeud.func
+        nom = cible.attr if isinstance(cible, ast.Attribute) else getattr(cible, "id", "")
+        if nom == fonction:
+            return True
+    return False
+
+
+def _verifier_rejeu_totp_multi_travailleurs(
+    root: Path, unite: Path
+) -> "_Result | None":
+    """Plusieurs travailleurs avec un magasin anti-rejeu TOTP en memoire ?
+
+    `DEPLOY-CHECK-MFA-REPLAY-WORKERS-001`. Le pre-vol refusait deja un magasin
+    de **sessions** en memoire sous plusieurs travailleurs. Le registre
+    anti-rejeu TOTP a exactement la meme forme, et une consequence plus grave.
+
+    La RFC 6238 §5.2 demande qu'un code accepte ne soit pas rejouable. Le
+    magasin par defaut vit dans la memoire du processus : chaque travailleur a
+    le sien, et un meme code vaut donc **une fois par travailleur**. Quatre
+    travailleurs, quatre usages d'un code a six chiffres qui n'aurait du servir
+    qu'une fois.
+
+    Un avertissement et non une erreur : l'application fonctionne, la seconde
+    authentification protege toujours, et seule la fenetre de rejeu s'elargit.
+    Le remede reste au choix de l'exploitant selon son modele de menace, ce que
+    le paquet pose explicitement.
+    """
+    if not _mfa_installe() or not unite.is_file():
+        return None
+    try:
+        texte = unite.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+    travailleurs = _travailleurs_declares(texte)
+    if travailleurs is None or travailleurs <= 1:
+        return None
+
+    cable = any(
+        _appelle(root / nom, "set_replay_store") for nom in ("bootstrap.py", "app.py")
+    )
+    if cable:
+        return _Result("ok", "Rejeu TOTP et travailleurs",
+                       f"{travailleurs} travailleurs, magasin anti-rejeu partagé")
+
+    return _Result(
+        "warn", "Rejeu TOTP et travailleurs",
+        f"{travailleurs} travailleurs sans magasin anti-rejeu partagé — un code "
+        f"TOTP vaudra {travailleurs} fois au lieu d'une (RFC 6238 §5.2) ; câbler "
+        f"set_replay_store(DbTotpReplayStore()) dans bootstrap.py, ou assumer "
+        f"cette fenêtre")
+
+
 def _verifier_secrets_amorces(cfg: "dict[str, str]") -> "list[_Result]":
     """Refuse les secrets de env/prod laissés à leur valeur d'amorçage.
 
@@ -1703,6 +1785,9 @@ def _check_results(root: Path, artefacts: "Artefacts | None" = None) -> list[_Re
     inscriptibles = _verifier_read_write_paths(root, ou.unite)
     if inscriptibles is not None:
         results.append(inscriptibles)
+    rejeu = _verifier_rejeu_totp_multi_travailleurs(root, ou.unite)
+    if rejeu is not None:
+        results.append(rejeu)
     stockage = _verifier_stockage_inscriptible(root, ou.unite)
     if stockage is not None:
         results.append(stockage)
