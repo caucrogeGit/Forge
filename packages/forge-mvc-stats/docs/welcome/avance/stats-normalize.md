@@ -122,4 +122,4 @@ with router.group("", public=True) as public:
 
 Vous avez parcouru toute la progression stats : événement, enregistrement, consultation.
 
-[Bilan du niveau avancé](bilan.md)
+[Suivant : compter sans ficher](stats-vie-privee.md)

@@ -75,4 +75,4 @@ print(TABLE_NAME)   # "audit_log"
 Vous avez fait le tour du socle.
 Place au bilan du niveau avancé.
 
-[Bilan avancé](bilan.md)
+[Suivant : refus d'accès et rétention](audit-refus-purge.md)

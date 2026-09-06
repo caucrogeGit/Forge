@@ -37,4 +37,4 @@ Vous pouvez le désinstaller sans rien casser dans le cœur.
 
 Faisons le bilan du niveau avancé.
 
-[Continuer : bilan du niveau avancé](bilan.md)
+[Suivant : scénarios et instantanés](fixtures-scenarios-snapshot.md)

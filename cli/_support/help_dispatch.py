@@ -1623,7 +1623,7 @@ Options:
 
     "fixtures:load": """\
 Usage:
-  forge fixtures:load [--run] [--force] [--no-fk-checks]
+  forge fixtures:load [--scenario NOM] [--run] [--force] [--no-fk-checks]
 
 Description:
   Charge les fixtures du projet dans la base de l'environnement actif (APP_ENV,
@@ -1636,7 +1636,12 @@ Comportement (charte §7, comme forge db:init) :
     (ADR-077/078) : une table est chargée après celles qu'elle référence ;
   - par défaut, AFFICHE le SQL et le source des fixtures Python sans rien exécuter ;
   - --run exécute le chargement (SQL et load() des fixtures callable) ;
-  - en APP_ENV=prod, --run seul refuse : ajouter --force pour confirmer.
+  - en APP_ENV=prod, --run seul refuse : ajouter --force pour confirmer ;
+  - --scenario NOM ajoute mvc/fixtures/<NOM>/ au jeu commun de la racine
+    (FIXTURES-SCENARIOS-001). Le jeu commun est chargé d'abord, le scénario
+    ensuite : un scénario s'ajoute, il ne remplace pas. Un nom inconnu est
+    refusé en nommant les scénarios présents, plutôt que de charger zéro
+    fichier en annonçant un succès.
 
 Prérequis:
   - opt-in installé (pip install --pre forge-mvc-fixtures) ;

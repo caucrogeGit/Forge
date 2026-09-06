@@ -83,4 +83,4 @@ print(TABLE_NAME)   # "app_settings"
 Vous avez fait le tour du socle.
 Place au bilan du niveau avancé.
 
-[Bilan avancé](bilan.md)
+[Suivant : le cache et les paramètres par utilisateur](settings-cache-users.md)

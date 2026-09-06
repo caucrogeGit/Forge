@@ -24,5 +24,6 @@ nav:
           - Fixtures callable (hooks Python): welcome/avance/fixtures-callable.md
           - Fixtures ou migration de seed: welcome/avance/fixtures-vs-seed.md
           - Un opt-in CLI-only: welcome/avance/fixtures-optin.md
+          - Scénarios et instantanés: welcome/avance/fixtures-scenarios-snapshot.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

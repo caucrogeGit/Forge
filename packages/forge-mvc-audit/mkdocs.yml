@@ -22,5 +22,6 @@ nav:
       - Avancé:
           - Le périmètre: welcome/avance/audit-perimeter.md
           - Indépendance du cœur: welcome/avance/audit-independance.md
+          - Refus d'accès et rétention: welcome/avance/audit-refus-purge.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

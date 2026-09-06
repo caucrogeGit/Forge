@@ -22,5 +22,6 @@ nav:
       - Avancé:
           - Clés et erreurs: welcome/avance/settings-keys.md
           - Indépendance du cœur: welcome/avance/settings-independance.md
+          - Cache et paramètres par utilisateur: welcome/avance/settings-cache-users.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

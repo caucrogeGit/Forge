@@ -26,5 +26,6 @@ nav:
           - Le SQL de consultation: welcome/avance/stats-admin-sql.md
           - Lister les événements: welcome/avance/stats-list.md
           - Normaliser une ligne: welcome/avance/stats-normalize.md
+          - Compter sans ficher: welcome/avance/stats-vie-privee.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md
