@@ -9,7 +9,8 @@ Règle d'auto-classification (la même que l'application initiale) :
   - candidat prose : le source référence un artefact de prose du dépôt ;
   - signal code : exécution (tmp_path, subprocess), lecture de source d'un
     module importé (<mod>.__file__, getsource), import du framework,
-    chemin de code en dur (hors doc embarquée core/docs, cli/docs — ADR-043),
+    chemin de code en dur, `tools/` compris (hors doc embarquée core/docs,
+    cli/docs — ADR-043),
     packaging (pyproject.toml, requirements, .github), fixtures d'app ;
   - prose pure = candidat SANS signal code → doit porter `pytest.mark.docs` ;
   - un fichier marqué `docs` doit être prose pure (pas de test de
@@ -61,8 +62,8 @@ _CODE_SIGNALS = (
         r"^\s*(?:from|import)\s+(?:core|cli|forge_mvc\w*|skeleton|integrations)\b",
         re.MULTILINE,
     ),
-    re.compile(r"[\"'](?:core|cli|skeleton)[\"'](?!\s*/\s*[\"']docs[\"'])"),
-    re.compile(r"[\"'](?:core|cli|skeleton)/(?!docs)"),
+    re.compile(r"[\"'](?:core|cli|skeleton|tools)[\"'](?!\s*/\s*[\"']docs[\"'])"),
+    re.compile(r"[\"'](?:core|cli|skeleton|tools)/(?!docs)"),
     re.compile(r"[\"']forge\.py[\"']|pyproject\.toml"),
     re.compile(r"fixtures/|requirements|\.github"),
 )

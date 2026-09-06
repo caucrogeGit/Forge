@@ -264,6 +264,18 @@ if [ -n "$PUBLIC_VERSION" ]; then
     fi
 fi
 
+# Un titre de version n'est pas un journal. Le contrôle ci-dessus vérifie que
+# la section existe ; celui-ci vérifie qu'elle dise ce qui a été livré.
+# GOV-CHANGELOG-COMPLETUDE-GARDEFOU-001.
+echo ""
+echo "--- Complétude du CHANGELOG (check_changelog_completeness.py) ---"
+if CCC_OUT=$("$PYTHON_BIN" tools/check_changelog_completeness.py 2>&1); then
+    _ok "CHANGELOG.md : tous les tickets livrés y figurent"
+else
+    _fail "CHANGELOG.md : des tickets livrés manquent au journal"
+    printf '%s\n' "$CCC_OUT" | sed 's/^/         /' || true
+fi
+
 # ── 4. Tests ──────────────────────────────────────────────────────────────────
 echo ""
 echo "--- Exécution des tests (pytest -x -q) ---"

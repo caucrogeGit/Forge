@@ -934,6 +934,11 @@
 
 ### Documentation
 
+- **Le journal des changements taisait la moitié de ce qui a été livré (`GOV-CHANGELOG-RC8-COMPLETUDE-001`, `GOV-CHANGELOG-COMPLETUDE-GARDEFOU-001`).**
+  Le CHANGELOG portait 51 des 106 tickets livrés depuis la rc7. Les 55 absents n'étaient pas des détails : le refus de servir une application désarmée, la source unique de câblage, les neuf tickets de déploiement, et les trois opt-ins qui n'étaient pas provisionnables sur un projet neuf.
+  La section portait par ailleurs 21 titres de rubrique pour six rubriques distinctes, sept « Corrigé » et six « Modifié » séparés par rien : un lecteur cherchant les correctifs devait parcourir toute la section pour être sûr de les avoir tous vus. Les entrées existantes sont regroupées sans qu'un mot change.
+  Le pré-vol de release vérifiait que le journal **contient un titre** pour la version publiée, jamais que la section dise ce qui a été livré. Il compare désormais les tickets des commits depuis le dernier tag au contenu du journal, et refuse la publication s'il en manque un. Sans tag ni historique, il échoue au lieu de passer : un contrôle qui ne mesure rien doit le dire.
+
 - **Le chemin de démarrage n'était documenté que par ses ADR (`DOC-CORE-BOOTSTRAP-WIRING-001`).**
   `bootstrap.py`, le module de câblage que les deux points d'entrée lisent, n'apparaissait dans aucune page vivante : le mot n'y figurait que comme étiquette de couche. Un lecteur du site ne pouvait pas savoir où câbler ses middlewares. Le refus de servir une application désarmée tenait en une phrase, sans nommer l'exception que l'exploitant voit, ni dire laquelle des deux causes s'applique.
   Relevé au passage : les 215 imports de `core` documentés s'importent tous, et les 255 appels documentés correspondent tous à leur signature réelle.
