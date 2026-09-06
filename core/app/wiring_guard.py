@@ -45,14 +45,30 @@ class AppWiring(NamedTuple):
     middlewares: int
     session_store: bool
     names: tuple[str, ...]
+    unreadable: bool = False
+    """`app.py` existe mais ne s'analyse pas : ce qu'il câble est **inconnu**.
+
+    Distinct de « rien de câblé » (`WSGI-WIRING-GUARD-UNPARSABLE-001`). Une
+    erreur de syntaxe se lisait auparavant comme un fichier vide, ce qui
+    désarmait la garde chargée de détecter une application désarmée.
+    """
 
     @property
     def is_empty(self) -> bool:
-        """Rien de câblé : les deux chemins construisent la même application."""
+        """Rien de câblé : les deux chemins construisent la même application.
+
+        Faux quand le fichier ne s'analyse pas : on ne sait alors rien, et
+        l'ignorance ne vaut pas l'absence.
+        """
+        if self.unreadable:
+            return False
         return self.middlewares == 0 and not self.session_store
 
 
 _EMPTY = AppWiring(middlewares=0, session_store=False, names=())
+
+#: `app.py` présent et illisible : ce qu'il câble reste inconnu.
+_ILLISIBLE = AppWiring(middlewares=0, session_store=False, names=(), unreadable=True)
 
 
 def _appelle(node: ast.Call, nom: str) -> bool:
@@ -94,7 +110,13 @@ def read_app_wiring(source: str) -> AppWiring:
     try:
         arbre = ast.parse(source)
     except (SyntaxError, ValueError):
-        return _EMPTY
+        # Surtout pas `_EMPTY` : un fichier qui ne s'analyse pas ne dit pas
+        # qu'il ne câble rien, il ne dit rien du tout. Mesuré avant correction :
+        # le même `app.py` câblant deux middlewares était refusé quand il
+        # s'analysait, et servi avec une parenthèse en trop
+        # (`WSGI-WIRING-GUARD-UNPARSABLE-001`). Le chemin WSGI n'important
+        # jamais `app.py`, rien d'autre n'aurait vu l'erreur.
+        return _ILLISIBLE
 
     middlewares = 0
     session_store = False
@@ -128,11 +150,21 @@ def read_app_wiring(source: str) -> AppWiring:
 
 
 def read_app_wiring_from(app_py: Path) -> AppWiring:
-    """Comme `read_app_wiring`, depuis un fichier. Absent ou illisible : vide."""
+    """Comme `read_app_wiring`, depuis un fichier.
+
+    Un fichier **absent** est vide : un projet peut n'avoir pas d'`app.py`, et
+    le chemin WSGI se suffit alors à lui même.
+
+    Un fichier présent mais indécodable est **illisible**, comme un fichier qui
+    ne s'analyse pas : ce qu'il câble reste inconnu.
+    """
     try:
-        return read_app_wiring(app_py.read_text(encoding="utf-8"))
+        texte = app_py.read_text(encoding="utf-8")
     except OSError:
         return _EMPTY
+    except UnicodeDecodeError:
+        return _ILLISIBLE
+    return read_app_wiring(texte)
 
 
 def format_unarmed_error(wiring: AppWiring, app_py: Path) -> str:
@@ -196,4 +228,21 @@ def assert_wiring_is_visible(app_py: Path) -> None:
     wiring = read_app_wiring_from(app_py)
     if wiring.is_empty:
         return
+    if wiring.unreadable:
+        raise UnarmedApplicationError(_message_illisible(app_py))
     raise UnarmedApplicationError(format_unarmed_error(wiring, app_py))
+
+
+def _message_illisible(app_py: Path) -> str:
+    """Refus d'un `app.py` qu'on ne sait pas lire, et pourquoi il est ferme."""
+    return "\n".join([
+        "Le chemin WSGI ne peut pas savoir si l'application serait ARMÉE.",
+        "",
+        f"  {app_py} ne s'analyse pas : erreur de syntaxe, ou encodage",
+        "  qui n'est pas de l'UTF-8.",
+        "",
+        "Ce chemin n'importe jamais ce fichier : personne d'autre ne verrait",
+        "l'erreur, et l'application partirait sans les gardes qu'il câble.",
+        "",
+        "  Corrigez le fichier : `python -m py_compile app.py` la nomme.",
+    ])

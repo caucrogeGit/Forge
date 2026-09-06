@@ -144,9 +144,13 @@ class TestPasDeFauxRefus:
     def test_source_vide(self) -> None:
         assert read_app_wiring("").is_empty
 
-    def test_source_syntaxiquement_invalide(self) -> None:
-        """Ce module décide d'un refus : il ne doit jamais en inventer un."""
-        assert read_app_wiring("def (((\n").is_empty
+    # `test_source_syntaxiquement_invalide` vivait ici, et affirmait qu'une
+    # source illisible « ne câble rien ». Elle est passée dans les refus
+    # (`WSGI-WIRING-GUARD-UNPARSABLE-001`) : ce module ne doit pas inventer un
+    # refus, mais un fichier qu'il ne sait pas lire ne lui dit rien, et
+    # l'ignorance ne vaut pas l'absence. Le même `app.py` câblant deux
+    # middlewares était refusé quand il s'analysait, et servi avec une
+    # parenthèse en trop.
 
     @pytest.mark.parametrize("source", [
         "# _app = Application(r, middlewares=[AuthMiddleware('/login')])\n",
