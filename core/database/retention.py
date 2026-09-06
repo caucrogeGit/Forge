@@ -38,9 +38,10 @@ def cutoff_for_days(
     table de l'appelant et non d'une abstraction.
 
     Raises:
-        ValueError: `keep_days` n'est pas un entier, ou est inférieur à 1. Une
-            rétention nulle ou négative viderait tout, ce qui ne peut pas être
-            le résultat d'une étourderie de frappe.
+        ValueError: `keep_days` n'est pas un entier, est inférieur à 1, ou
+            dépasse ce qu'une date sait représenter. Une rétention nulle ou
+            négative viderait tout, ce qui ne peut pas être le résultat d'une
+            étourderie de frappe.
     """
     if not isinstance(keep_days, int) or isinstance(keep_days, bool):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise ValueError(f"keep_days doit être un entier. Reçu : {keep_days!r}.")
@@ -50,4 +51,16 @@ def cutoff_for_days(
             f"Une rétention nulle ou négative viderait {quoi}."
         )
     instant = now if now is not None else utc_now()
-    return (instant - timedelta(days=keep_days)).strftime(DATETIME_FMT)
+    try:
+        return (instant - timedelta(days=keep_days)).strftime(DATETIME_FMT)
+    except (OverflowError, ValueError) as exc:
+        # `timedelta` et `datetime` lèvent une `OverflowError`, qui n'est pas
+        # une `ValueError` : elle traversait donc les enveloppes des opt-ins,
+        # et `forge audit:gc --days 99999999999` sortait en trace Python nue
+        # (`DB-RETENTION-OVERFLOW-001`). La borne citée est celle de la
+        # bibliothèque standard, pas une politique inventée ici.
+        raise ValueError(
+            f"keep_days est trop grand : {keep_days}. Une date ne remonte pas "
+            "au delà de l'an 1, et une rétention de cet ordre ne supprimerait "
+            "de toute façon rien."
+        ) from exc

@@ -78,6 +78,16 @@ def resolve_keep_days(argv: list[str], env: "dict[str, str] | None" = None) -> "
             f"Rétention invalide : {jours}. "
             "Une rétention nulle ou négative viderait tout le journal."
         )
+    try:
+        # La borne est calculee par le coeur, qui seul connait ce qu'une date
+        # sait representer. Sans ce controle, une retention absurde traversait
+        # la validation et sortait en trace Python nue depuis la commande
+        # (`DB-RETENTION-OVERFLOW-001`).
+        from forge_mvc_audit.store import cutoff_for_days as _borne
+
+        _borne(jours)
+    except ValueError as exc:
+        return str(exc)
     return jours
 
 
