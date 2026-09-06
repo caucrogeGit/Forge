@@ -46,4 +46,4 @@ Avec `forge-mvc-rbac`, ajoutez la permission à un rôle dans le contrat `mvc/se
 
 ## Étape suivante
 
-[Bilan du niveau avancé](bilan.md)
+[Suivant : voir les sessions ouvertes](admin-sessions.md)

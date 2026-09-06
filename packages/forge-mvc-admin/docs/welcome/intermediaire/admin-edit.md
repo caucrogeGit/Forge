@@ -29,4 +29,4 @@ En cas de succès, le back-office redirige vers la fiche avec un message de conf
 
 ## Étape suivante
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Suivant : filtrer et rechercher](admin-filtres.md)

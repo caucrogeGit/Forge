@@ -17,10 +17,13 @@ nav:
           - La fiche détail: welcome/intermediaire/admin-detail.md
           - Créer une ligne: welcome/intermediaire/admin-new.md
           - Éditer une ligne: welcome/intermediaire/admin-edit.md
+          - Filtrer et rechercher: welcome/intermediaire/admin-filtres.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Supprimer une ligne: welcome/avance/admin-delete.md
+          - Agir sur plusieurs lignes: welcome/avance/admin-groupees.md
           - Surcharger un template: welcome/avance/admin-override.md
           - Exiger une permission: welcome/avance/admin-rbac.md
+          - Voir les sessions ouvertes: welcome/avance/admin-sessions.md
           - Bilan avancé: welcome/avance/bilan.md
       - Récapitulatif: welcome/recapitulatif.md

@@ -30,4 +30,4 @@ En cas de succès, le back-office redirige vers la liste avec un message de conf
 
 ## Étape suivante
 
-[Suivant : surcharger un template](admin-override.md)
+[Suivant : agir sur plusieurs lignes](admin-groupees.md)

@@ -6,6 +6,7 @@ commande de création (`installation.md` exempté).
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -33,36 +34,48 @@ def _has(page: str, needle: str) -> bool:
     return needle in (ADMIN / page).read_text(encoding="utf-8")
 
 
-class TestDebutantChain:
+MKDOCS = PROJECT_ROOT / "packages" / "forge-mvc-admin" / "mkdocs.yml"
 
-    def test_chain(self):
-        assert _has("debutant/admin-welcome.md", "(admin-resource.md)")
-        assert _has("debutant/admin-resource.md", "(admin-list.md)")
-        assert _has("debutant/admin-list.md", "(bilan.md)")
 
-    def test_bilan_points_to_next_level(self):
+def _nav_par_niveau() -> "dict[str, list[str]]":
+    """Pages du parcours, par niveau, dans l'ordre du menu.
+
+    La chaîne était figée ici, palier par palier
+    (`WELCOME-ADMIN-CHAINE-DERIVEE-001`). Trois paliers ajoutés, et ce
+    garde-fou tombait alors que la chaîne était intacte : il fixait la liste
+    d'alors, pas la propriété.
+
+    Le `nav` fait autorité, c'est l'ordre que le lecteur voit dans le menu.
+    Chaque page doit mener à la suivante ; la dernière, au bilan.
+    """
+    niveaux: "dict[str, list[str]]" = {}
+    for ligne in MKDOCS.read_text(encoding="utf-8").splitlines():
+        trouve = re.search(r"(welcome/(debutant|intermediaire|avance)/([\w-]+\.md))\s*$", ligne)
+        if trouve:
+            niveaux.setdefault(trouve.group(2), []).append(trouve.group(3))
+    return niveaux
+
+
+@pytest.mark.parametrize("niveau", ["debutant", "intermediaire", "avance"])
+def test_chaque_palier_mene_au_suivant(niveau: str) -> None:
+    """Aucun cul-de-sac : le lecteur doit toujours savoir où aller."""
+    pages_du_niveau = _nav_par_niveau()[niveau]
+
+    assert pages_du_niveau[-1] == "bilan.md", f"{niveau} ne finit pas par son bilan"
+    for courante, suivante in zip(pages_du_niveau, pages_du_niveau[1:]):
+        assert _has(f"{niveau}/{courante}", f"({suivante})"), (
+            f"{niveau}/{courante} ne mène pas à {suivante}")
+
+
+class TestBilans:
+
+    def test_debutant_mene_au_niveau_suivant(self):
         assert _has("debutant/bilan.md", "../intermediaire/admin-detail.md")
 
-
-class TestIntermediaireChain:
-
-    def test_chain(self):
-        assert _has("intermediaire/admin-detail.md", "(admin-new.md)")
-        assert _has("intermediaire/admin-new.md", "(admin-edit.md)")
-        assert _has("intermediaire/admin-edit.md", "(bilan.md)")
-
-    def test_bilan_points_to_next_level(self):
+    def test_intermediaire_mene_au_niveau_suivant(self):
         assert _has("intermediaire/bilan.md", "../avance/admin-delete.md")
 
-
-class TestAvanceChain:
-
-    def test_chain(self):
-        assert _has("avance/admin-delete.md", "(admin-override.md)")
-        assert _has("avance/admin-override.md", "(admin-rbac.md)")
-        assert _has("avance/admin-rbac.md", "(bilan.md)")
-
-    def test_bilan_points_to_recapitulatif(self):
+    def test_avance_mene_au_recapitulatif(self):
         assert _has("avance/bilan.md", "../recapitulatif.md")
 
 
