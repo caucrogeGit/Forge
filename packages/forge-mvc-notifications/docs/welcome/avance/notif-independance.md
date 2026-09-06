@@ -63,4 +63,4 @@ print(TABLE_NAME)
 Vous avez fait le tour du socle.
 Place au bilan du niveau avancé.
 
-[Bilan avancé](bilan.md)
+[Suivant : relayer vers un autre canal](notif-relais.md)

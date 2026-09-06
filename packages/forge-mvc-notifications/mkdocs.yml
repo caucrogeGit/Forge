@@ -19,9 +19,11 @@ nav:
       - Intermédiaire:
           - Marquer comme lu: welcome/intermediaire/notif-mark.md
           - Type et données: welcome/intermediaire/notif-data.md
+          - Les routes HTTP: welcome/intermediaire/notif-http.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Livraison hors application: welcome/avance/notif-delivery.md
           - Indépendance du cœur: welcome/avance/notif-independance.md
+          - Relayer vers un autre canal: welcome/avance/notif-relais.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

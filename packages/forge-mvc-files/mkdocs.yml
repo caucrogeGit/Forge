@@ -19,10 +19,13 @@ nav:
           - Valider un upload: welcome/intermediaire/file-validate.md
           - Limiter les uploads: welcome/intermediaire/file-rate-limit.md
           - Supprimer un fichier: welcome/intermediaire/file-delete.md
+          - Les quotas: welcome/intermediaire/file-quota.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Assainir un nom de fichier: welcome/avance/file-safe-name.md
           - Chemin anti-traversal: welcome/avance/file-safe-path.md
           - Écrire des octets générés: welcome/avance/file-bytes.md
+          - Le crochet d'analyse: welcome/avance/file-scan.md
+          - Le registre et les orphelins: welcome/avance/file-registre.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

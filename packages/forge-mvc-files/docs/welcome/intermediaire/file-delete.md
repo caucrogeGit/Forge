@@ -137,4 +137,4 @@ with router.group("", public=True) as public:
 Vous maîtrisez le cycle de vie.
 La suite : les **primitives** de sécurité qui le sous-tendent.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Suivant : les quotas](file-quota.md)

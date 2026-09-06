@@ -56,4 +56,4 @@ for notification in non_lues:
 Vous maîtrisez la qualification et l'enrichissement.
 Place au bilan du niveau intermédiaire.
 
-[Bilan intermédiaire](bilan.md)
+[Suivant : les routes HTTP](notif-http.md)
