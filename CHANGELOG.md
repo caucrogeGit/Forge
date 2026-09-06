@@ -2,7 +2,329 @@
 
 ## [Non publié]
 
+### Rupture
+
+- **`SessionStore` gagne une méthode (`SESSIONS-DELETE-FOR-USER-001`).**
+  Le contrat est `@runtime_checkable` : un store auquel il manque `delete_for_user` n'est plus reconnu par `isinstance`, et `forge.configure` le refuse.
+  Un store tiers écrit avant ce ticket doit l'implémenter pour rester accepté. C'est délibéré, un store qui ne sait pas révoquer ne remplissant pas le contrat de sécurité attendu (principe 10).
+  La clé d'identité de session, jusqu'ici dupliquée en dur dans `core/security/session.py`, vit désormais dans `core.sessions.keys`. `core.auth.session.AUTH_USER_ID_SESSION_KEY` en reste l'alias public.
+
+- **La clé de chiffrement MFA peut tourner sans fermer les comptes (`MFA-KEY-ROTATION-001`).**
+  `FORGE_MFA_SECRET_KEY` n'avait aucune procédure de rotation : la changer rendait tous les secrets TOTP illisibles au même instant, si bien que chaque porteur d'un facteur perdait son second facteur d'un coup.
+  La seule issue était de désactiver le MFA de tout le monde, ce qui transforme une mesure d'hygiène en panne d'authentification.
+  `FORGE_MFA_SECRET_KEY_PREVIOUS` déclare les clés retirées, séparées par des virgules, acceptées **au déchiffrement seulement**. Le chiffrement utilise toujours la clé courante, et plusieurs rotations rapprochées restent lisibles.
+  `rotate_totp_secret` rechiffre un secret et `uses_current_key` dit ce qu'il reste à traiter, ce qui permet de balayer une table sans tout réécrire. Le rechiffrement passe par `MultiFernet.rotate`, de jeton à jeton : le secret en clair ne transite ni ne se journalise.
+  Forge ne balaie pas la base lui-même, la table des facteurs appartenant à l'application dont il ne connaît ni le nom ni les colonnes (principe 1). Il fournit la primitive, l'application décide où elle s'applique.
+  Les clés retirées sont validées comme la clé courante, placeholders refusés, et aucun message ne révèle leur valeur. Sans la variable, le comportement est inchangé.
+
+### Corrigé
+
+- **Trois opt-ins n'étaient pas provisionnables sur un projet neuf (`OPTIN-MIGRATIONS-FRESH-INSTALL-001`).**
+  Un opt-in rend sa migration de création depuis sa déclaration de table **vivante**, qui porte toutes ses colonnes actuelles. Les colonnes ajoutées après coup ont pourtant aussi leur migration, pour les projets déjà provisionnés qui ne rejouent pas la création. Sur une base neuve les deux se contredisaient : la table était créée complète, puis un `ALTER TABLE ADD COLUMN` visait une colonne existante, et `forge migration:apply` s'arrêtait sur `duplicate column name`.
+  Mesuré depuis un projet créé par `forge new` : `forge-mvc-sessions-db`, `forge-mvc-jobs` et `forge-mvc-notifications` étaient **tous les trois impossibles à installer**. Aucun nouveau projet ne pouvait s'en servir.
+  `forge-mvc-stats` portait le défaut **inverse** : sa colonne ajoutée vivait dans une liste `ADDED_COLUMNS` que le socle de rendu ne lisait pas. Les projets neufs l'obtenaient par la création, les projets déjà provisionnés jamais, alors que le code la lit. Elle rejoint `MIGRATIONS`, seule source lue.
+  La correction tient dans le socle partagé : la création écarte les colonnes qu'une migration ultérieure ajoutera, et les index qui portent sur elles. Un projet neuf joue création puis ajouts, un projet déjà provisionné joue les seuls ajouts, et les deux aboutissent à la même table. Vérifié sur base neuve : huit migrations appliquées, trois tables complètes.
+  Un test d'intégration ne jouait que la **première** migration : il passait donc sur une table que `forge migration:apply` ne produit jamais.
+
+- **L'export du contrat RBAC rendait un document vide (`RBAC-EXPORT-FORME-CONTRAT-001`).**
+  `contract_rows` lisait `roles` comme une table `rôle -> entité -> actions`. Le schéma, qui fait autorité et que `rbac:audit` applique, déclare `rôle -> liste de codes de permission`. Les deux ne se rencontraient jamais : chaque rôle était écarté faute d'être un objet, et `forge rbac:export` rendait « Aucun rôle déclaré » sur **tout** contrat valide.
+  Ce qui a laissé vivre le défaut : le test de l'export employait la forme que le schéma interdit. La fonction passait donc au vert sur une donnée qu'aucun projet ne peut produire. Cinq contrats d'essai, ici et dans les tests de hiérarchie, sont réalignés sur la forme réelle.
+  L'export joint désormais les codes de permission des rôles aux actions déclarées par les entités : le tableau dit « éditeur peut publier un Article » plutôt que « éditeur a article.publier ». Une permission qu'aucune entité ne réclame apparaît sous « (aucune) » plutôt que de disparaître d'une revue de sécurité.
+  Le garde-fou fixe la fin et non la forme : un contrat accepté par le schéma produit un export non vide. Il vérifie d'abord que son propre contrat d'essai passe le schéma, sans quoi il prouverait autre chose que ce qu'il annonce.
+
+- **Un contrat RBAC jamais examiné passait pour sain (`RBAC-CONTRACT-DEGRADE-MUET-001`).**
+  `load_rbac_contract` se rabat sur un mode dégradé quand la machinerie de validation par schéma n'est pas disponible. Ce repli rendait `valid=True` sans **aucun** contrôle, sans champ pour le dire et sans une ligne de journal. Un contrat portant un cycle d'héritage, que ce paquet déclare pourtant inexploitable, recevait donc quitus de `rbac:audit`.
+  La cohérence de la hiérarchie est désormais vérifiée même en mode dégradé : elle est en Python pur et ne demande aucun schéma, rien ne justifiait de la sauter. Le repli s'annonce dans un drapeau `degraded` et dans le journal, avec laquelle des trois portes l'a déclenché.
+  `validate_hierarchy` examinait par ailleurs la table **déjà normalisée**, donc jamais ce que la normalisation avait jeté : une liste au lieu d'un objet, des crochets oubliés autour d'un parent unique, un parent qui n'est pas un nom de rôle. Le schéma les refuse sur le chemin de la CLI ; en mode dégradé il n'y a plus que cette couche, et elle est maintenant complète.
+  Se rabattre est acceptable ; se taire ne l'est pas, et sur un contrat d'accès moins qu'ailleurs.
+
+- **Un champ calculé avait une colonne en base et un champ de saisie (`ENTITIES-COMPUTED-DDL-FORM-001`).**
+  Le schéma d'entité le dit sans ambiguïté : « le champ n'a pas de colonne, il n'est ni inséré ni mis à jour, l'expression part telle quelle dans le SELECT ». Deux générateurs sur quatre l'ignoraient.
+  La table portait une colonne que rien n'écrit jamais, puisque l'`INSERT` l'exclut déjà, et que rien ne lit, puisque le `SELECT` projette l'expression : une colonne morte, toujours nulle, qui laissait croire à un stockage.
+  Le formulaire, lui, exposait un champ saisissable. Ce que l'utilisateur y tapait disparaissait sans message. Offrir une saisie qu'on jette est pire que ne rien offrir, et c'est le plus grave des deux.
+
+- **Une session ouverte par la porte dépréciée survivait à sa révocation (`SESSIONS-DELETE-FOR-USER-DEPRECATED-DOOR-001`).**
+  `get_authenticated_user_id` lit les deux représentations de l'identité en session, la canonique et la forme legacy, par un pont de compatibilité. `delete_for_user` ne lisait que la première, sans pont.
+  Une session ouverte par `authenticate_session` s'authentifiait donc parfaitement et **survivait à la révocation** : la mesure rendait zéro supprimée, session intacte, sur les deux magasins du cœur. Une application encore sur ce chemin, activant un second facteur ou changeant un mot de passe, croyait avoir fermé les autres sessions.
+  Une opération de sécurité qui ne fait rien en silence est pire qu'une qui échoue bruyamment. La correction fait **converger** les deux représentations, la porte dépréciée posant désormais la clé canonique, plutôt qu'ajouter un second pont dans chaque magasin : c'est la direction de l'ADR-086, et cela réduit la surface legacy au lieu de l'étendre.
+
+- **Une faute de frappe désarmait la garde d'application désarmée (`WSGI-WIRING-GUARD-UNPARSABLE-001`).**
+  La garde de l'ADR-092 lit `app.py` sur l'arbre syntaxique, sans jamais l'exécuter, et une `SyntaxError` y était traitée comme un fichier vide, donc comme « rien à signaler ».
+  Mesuré sur le même `app.py` câblant deux middlewares : il était refusé quand il s'analysait, et **servi** avec une parenthèse en trop. Rien d'autre ne l'aurait vu, ce chemin n'important jamais `app.py` : sous Gunicorn l'application serait partie sans CSRF ni RBAC, en répondant 200.
+  Un fichier illisible est désormais distingué d'un fichier vide, l'ignorance ne valant pas l'absence. Le refus couvre aussi un fichier qui n'est pas de l'UTF-8, dont l'erreur de décodage n'est pas une `OSError`. Le refus reste borné : un `app.py` absent, vide, ou qui ne câble rien laisse servir.
+
+- **Le mot `production` ne désarme plus les gardes (`ENV-APP-ENV-PRODUCTION-SPELLING-001`).**
+  `ENV-APP-ENV-NORMALISATION-001` avait fermé la variation de casse. Le même défaut subsistait à une orthographe près : `is_prod("production")` rendait faux, alors que ce mot s'écrit au moins aussi naturellement que son abréviation.
+  Mesuré avec `APP_ENV=production` : `fixtures:purge --run` supprimait les données sans exiger `--force` et tentait la connexion pour le faire, `fixtures:load --run` acceptait de peupler la base, et le squelette servait ses pages d'erreur en mode développement, pile d'exception comprise.
+  La liste s'arrête à `prod` et `production` : `staging`, `preprod` et `ci` sont des environnements distincts, et accepter tout inconnu rendrait le refus si fréquent qu'on le désactiverait. `forge deploy:check` continue d'exiger la forme canonique dans `env/prod` : ceci défend contre une faute, cela pousse vers la convention.
+
+- **Une rétention absurde sortait en trace Python (`DB-RETENTION-OVERFLOW-001`).**
+  Le socle de rétention promet dans sa docstring que « les erreurs sont des `ValueError` », et les trois opt-ins qui l'emploient enveloppent ce type dans le leur. `timedelta` lève une `OverflowError`, qui n'en est pas une sous-classe : elle traversait les trois enveloppes, et `forge audit:gc --days 99999999999` sortait en trace nue, là où `--days 0`, `--days -5` et `--days abc` étaient proprement refusés.
+  La cause est retirée dans le cœur, une fois pour les trois purges, et la borne citée est celle de la bibliothèque standard plutôt qu'une politique inventée. Une rétention de cent ans passe toujours.
+
+- **Trois diagnostics de base disaient autre chose que leur libellé (`DB-DOCTOR-DIALECT-PARITY-001`).**
+  Mesuré sur les quatre backends réels. `compte` interrogeait `CURRENT_USER` sur SQL Server, qui y est l'utilisateur de **base** et non le compte de connexion : la mesure rendait `dbo` pour une session ouverte en `sa`. Ce diagnostic existe pour révéler un compte inattendu, et il rendait la seule valeur qui ne peut jamais l'être.
+  `collation` y interrogeait le serveur et non la base, qui peut porter la sienne. `encodage` y manquait, alors que les trois autres backends le donnent : SQL Server n'a pas de réglage d'encodage, c'est la page de codes de la collation qui décide, et le serveur mesuré s'est révélé en page 1252, où tout caractère non représentable devient « ? » dans les colonnes `VARCHAR`.
+  PostgreSQL, lui, ne donnait pas de collation là où les deux autres en donnent. Le garde-fou exécute chaque requête sur les trois serveurs au lieu de seulement la lire : `COLLATIONPROPERTY` rend un `sql_variant` que le pilote ODBC refuse, et la ligne aurait disparu en silence.
+
+- **`db:init` ignorait le backend déclaré par le projet (`DB-INIT-BACKEND-FROM-ENV-001`).**
+  La commande résolvait le backend **avant** de charger `env/dev`, où `forge db:config` écrit précisément `DB_BACKEND` (ADR-064). Avec un seul backend installé cela marchait par accident ; avec plusieurs, l'état ordinaire d'un poste de développement, la commande échouait alors que le projet disait lequel employer.
+  Et elle échouait en trace Python nue : `main` rattrapait trois types d'erreur, jamais la `RuntimeError` que lève la résolution, dont le message était pourtant bon et disait quoi faire.
+
+- **Le pluriel de l'i18n était injoignable depuis un catalogue (`I18N-PLURAL-CATALOG-REACHABLE-001`).**
+  `select_plural` était écrite pour une valeur de catalogue, sa docstring le disant mot pour mot. Le chargeur refusait précisément cette valeur, et `trans` n'avait pas de `count` : la valeur que la fonction attendait ne pouvait pas venir d'un catalogue, et le pluriel n'était joignable qu'en construisant le dictionnaire à la main.
+  La documentation montrait déjà le JSON pluralisé et un appel `select_plural(catalogue["articles"], ...)`. Elle enseignait un chemin que le chargeur refusait.
+  Les refus tombent au **chargement** et non à la requête qui porte le nombre manquant, sans quoi la page marche pour un élève et casse pour deux. En repli, la forme se choisit dans la langue du texte rendu et non dans celle demandée : un texte anglais servi en secours suit la règle anglaise, où zéro est pluriel.
+
+- **Le type d'événement des statistiques n'atteignait que deux fonctions sur treize (`STATS-KIND-API-COMPLETENESS-001`).**
+  `STATS-EVENT-KIND-001` avait introduit un vocabulaire fermé, `page_view` et `action`, en expliquant que mille pages vues valent moins qu'une commande passée. `make_event` et `track_event`, les portes que la documentation fait employer, ne le prenaient pas : toute vue de page suivie par le chemin documenté était écrite comme une **action**, et la mesure le montre dans les données.
+  `count_stats_events` ne le prenait pas non plus, alors que la référence documentait l'appel avec `kind` : il levait une `TypeError`. Côté administration, la requête ne **sélectionnait** même pas la colonne. Principe 10 : une API publique est un contrat de complétude.
+  Joindre `label`, `category`, `metadata` ou `kind` à un `StatsEvent` déjà construit est désormais refusé : ces arguments étaient ignorés en silence, si bien qu'un appelant croyait poser une vue de page et écrivait une action.
+
+- **L'écran de réglages affichait les préférences de tous les comptes (`SETTINGS-ADMIN-USER-SCOPE-LEAK-001`).**
+  `get_all_settings` excluait déjà l'espace des paramètres par utilisateur, et sa docstring nommait le danger. La garde manquait sur `get_settings_with_types`, qui est précisément la porte que `describe_settings` emprunte, donc l'écran.
+  Mesuré sur une base SQLite montée par la DDL du framework : la page rendait `user.42.theme` et `user.7.notifications_email`, adresse électronique comprise, et la recette documentée les offrait à l'édition. Le refus d'écriture tenait, lui ; seule la lecture cédait, et c'est le désaccord entre les deux portes qui a fait le trou.
+
+- **Le harnais des parcours n'atteignait pas ceux du cœur (`WELCOME-CORE-EXECUTION-001`, `WELCOME-CORE-PREREQUIS-001`, `WELCOME-CORE-ROUTES-IMPORT-001`, `WELCOME-HARNAIS-VERDICT-EXACT-001`).**
+  L'outil existe parce que lire un parcours ne dit pas s'il marche. Il résolvait `packages/forge-mvc-<nom>/`, et les six parcours du cœur vivent à la racine : les vingt-sept parcours d'opt-ins étaient joués, et les six du cœur jamais, `welcome-forge` compris, c'est à dire le premier que lit un débutant.
+  Deux parcours s'arrêtaient net, et dans les deux cas chaque commande était juste, le manque n'existant qu'**entre** elles. Le palier « Première base SQL », dixième page sur douze, passait directement à `forge db:init` sans jamais mentionner de backend, de moteur d'entités ni de `forge db:config`. Le parcours de design employait `npm run watch:css` sans dire d'où viennent les dépendances Node.
+  Cinq blocs de routes ne portaient pas l'en-tête de fichier que `welcome-forge` emploie : le harnais ne les rattachait à rien, et deux parcours passaient pour vérifiés alors que rien ne les touchait. Une fois rattachés, ils ont révélé qu'aucun des deux ne dit d'importer son contrôleur.
+  Le verdict du harnais distingue enfin l'indécis de l'échec, et ne conclut plus « les routes répondent » quand l'application ne se charge pas : un harnais qui annonce un succès qu'il n'a pas constaté vaut moins que pas de harnais du tout.
+
+- **L'unité systemd restait à terre après cinq redémarrages (`DEPLOY-SYSTEMD-RESTART-LIMIT-001`).**
+  L'unité engendrée posait `Restart=always` et `RestartSec=5` sans lever le plafond de systemd : cinq démarrages en dix secondes, puis le service restait à terre. Deux minutes de base indisponible transformaient une coupure passagère en panne du lendemain matin, soit exactement ce que `Restart=always` prétendait couvrir.
+  La clé se pose dans `[Unit]`, jamais dans `[Service]` où systemd l'ignore avec un simple avertissement au journal. `deploy:check` vérifie désormais la **section** de la clé et non sa seule présence : un contrôle qui lit l'unité comme un bloc de texte valide une garantie qui n'existe pas.
+
+- **Nginx ne servait pas ce que le chemin WSGI ne sert plus (`DEPLOY-NGINX-STATIC-LOCATIONS-001`).**
+  La configuration engendrée n'avait qu'un `location /`, qui relaie tout vers Gunicorn. Or les fichiers statiques et le favicon vivent avant le routage : le chemin WSGI ne les voit pas.
+  L'application déployée démarrait, répondait 200, et servait des pages sans feuille de style. La panne coûte une heure à comprendre parce que tout paraît sain : le service tourne, les journaux sont vides.
+
+- **Le pré-vol de déploiement gagne six contrôles (`DEPLOY-CHECK-SESSIONS-WORKERS-001`, `DEPLOY-ENVFILE-READABLE-001`, `DEPLOY-ENV-PROD-APP-ENV-001`, `DEPLOY-CHECK-CHEMINS-DECLARABLES-001`, `DEPLOY-CHECK-ROUTES-PACKAGE-001`, `DEPLOY-CHECK-SSL-MESSAGE-001`).**
+  Quatre travailleurs avec un magasin de sessions en mémoire : chacun a le sien, et une connexion sur quatre seulement aboutit. C'est une erreur et non un avertissement, l'application ne fonctionnant pas.
+  Le compte de service ne peut pas lire `env/prod` posé en `600` par celui qui déploie : le service ne démarre pas, et la sortie de secours évidente, élargir les droits, est celle qu'il ne faut pas prendre.
+  `APP_ENV` absente d'`env/prod` fait tourner la production en configuration de développement, pile d'exception rendue au visiteur comprise.
+  Un chemin annoncé dans `ReadWritePaths` mais absent fait échouer le montage de l'espace de noms : le service redémarre toutes les dix secondes et le journal reste vide.
+
+- **Le briefing agent cessait d'être vrai (`GOV-CLAUDE-MD-DERIVE-GARDEFOU-001`).**
+  Un fichier refondu par version majeure ne peut pas porter une information qui change à chaque extraction. Un garde-fou refuse désormais qu'une décision d'architecture manque à l'index du briefing : sept y avaient déjà manqué.
+
+- **Le relevé de SQL non portable prenait un gabarit Markdown pour une instruction SQL.**
+  `tests/test_optin_dml_dialect_001.py` classe comme SQL toute chaîne d'un opt-in contenant `SELECT`, `INSERT`, `UPDATE`, `VALUES` ou `DELETE`. Cette largeur est voulue, le SQL de Forge s'assemblant par fragments dont beaucoup n'ont pas de verbe.
+  Elle a un revers, révélé par `DEPLOY-NGINX-RATE-LIMIT-001` : le gabarit du guide de déploiement, deux cents lignes de Markdown, contient `--delete` dans son tableau des gestes périodiques, ce qui le classait SQL, puis `RATE-LIMIT-001` dans un code de ticket, ce qui le déclarait non portable. Deux mots de prose.
+  Renommer la section pour contenter le détecteur aurait été céder au symptôme. Le relevé écarte désormais les chaînes portant un titre Markdown, aucune instruction SQL n'en contenant. **Mesuré avant d'être appliqué** : 387 chaînes classées SQL, 386 après, la seule écartée étant ce gabarit. Un resserrement plus ambitieux, « verbe plus clause », en aurait écarté 261, donc du vrai SQL. Un test fige l'étroitesse de l'exclusion.
+
+- **Ce que fait le pool de connexions quand une requête ouvre des threads n'était écrit nulle part (`DB-POOL-THREADS-DOC-001`).**
+  Le runtime de Forge est synchrone, ce qui n'interdit pas de paralléliser des appels sortants dans une requête. Rien ne disait ce que la base y devient.
+  Mesuré sur MariaDB, pool de cinq, appels tenant leur connexion trois cents millisecondes : quatre threads en 0,32 s, huit en 0,60 s, vingt en 1,21 s, sans un seul refus. Le parallélisme reste gagnant, vingt appels en série coûteraient six secondes, mais il est **plafonné par `DB_POOL_SIZE`**, cinq par défaut et par processus, non par le nombre de threads.
+  **Le fait qui compte est ailleurs**, et c'est celui qu'un développeur ne voit pas venir. Une requête qui parallélise prend les connexions de tout son processus, donc de toutes les requêtes que ce travailleur sert au même moment. Mesuré : pendant qu'une voisine tient le pool avec dix appels d'une seconde, une lecture ordinaire de dix millisecondes a attendu **1,83 s**, cent quatre-vingts fois sa durée, pour un utilisateur qui n'avait rien demandé de particulier.
+  Le conseil qui en découle est écrit : ne pas tenir une connexion pendant un appel réseau, faire les appels sortants sans connexion puis écrire une fois les réponses arrivées. Cinq requêtes qui tiennent une connexion pendant l'attente d'une API distante épuisent le pool de leur travailleur, et les suivantes reçoivent un `503` alors que la base n'a rien à se reprocher.
+  Forge ne livre pas de client HTTP, ce choix appartenant à l'application, et la documentation le dit plutôt que de le laisser deviner. Un test d'intégration fige désormais la conséquence, qu'une requête qui parallélise prive ses voisines, seul le fait étant figé et non une durée.
+
+- **La parade anti-bruteforce que Forge prescrit n'était pas dans la configuration qu'il engendre (`DEPLOY-NGINX-RATE-LIMIT-001`).**
+  Le compteur anti-bruteforce du cœur vit en mémoire du **processus**, et l'unité systemd engendrée lance quatre travailleurs. Les cinq tentatives par minute en deviennent donc jusqu'à vingt, et le verrouillage ne suit pas l'attaquant d'un travailleur à l'autre. Cela vaut pour le contrôleur de connexion engendré par `make:auth` comme pour le challenge MFA.
+  **Ce n'était pas une découverte** : `docs/deployment/production-security.md` le disait, prescrivait la parade Nginx et en donnait l'extrait. C'est précisément le défaut. Une ligne de défense qui vit dans une page de documentation est absente de tout projet qui n'a pas lu cette page, et la configuration engendrée n'en portait rien.
+  `forge deploy:init` engendre désormais un `location = /login` borné à cinq POST par minute et par IP, avec `limit_req_status 429`, aux valeurs exactes que le guide prescrivait, Forge ne disant qu'une chose d'une seule façon.
+  **Seul le POST est compté**, par un `map` sur `$request_method` qui donne une clé vide ailleurs. Limiter aussi le GET ferait répondre 429 à qui recharge la page de connexion six fois, et une limite qui gêne se fait désactiver, donc ne protège plus rien.
+  Le nom de la zone est dérivé du dossier du projet. Deux projets Forge derrière le même Nginx déclareraient sinon deux zones homonymes, et Nginx refuserait de démarrer sur « is already bound », message qui ne dit pas quel fichier est en cause.
+  Deux limites sont écrites plutôt que tues. Une route de connexion renommée n'est plus bornée, le `location` visant `/login`. Et **le challenge MFA n'est pas couvert** : `forge-mvc-mfa` ne pose aucune route, l'application écrit les siennes, et Forge ne peut pas viser celle du challenge.
+
+- **La documentation du MFA s'appuyait sur un contrôle qui souffre du même défaut qu'elle relativisait.**
+  Le bloc `danger` sur l'anti-rejeu par processus, exact par ailleurs, atténuait le risque ainsi : « Le rate-limit du challenge borne par ailleurs le nombre de tentatives. » Ce compteur vit dans la même mémoire de processus. Invoquer en atténuation un contrôle affaibli de la même façon fait sous-estimer les deux à la fois.
+  La phrase est retirée, et une note dit ce qu'il en est, avec le geste qui manque : le challenge MFA vit sur une route que Forge ne connaît pas, et demande son propre `location`.
+
+- **Le pré-vol de déploiement ne regardait pas si quelqu'un traitait la file de tâches (`DEPLOY-CHECK-JOBS-WORKER-001`).**
+  Les dix-neuf contrôles de `deploy:check` n'en regardaient aucun. Un projet pouvait donc passer le pré-vol au vert avec une file que personne ne draine, et découvrir en production que ses emails ne partent pas.
+  Le contrôle ne se déclenche que si le projet **appelle réellement** `enqueue`, lu par `ast` et jamais par grep : une occurrence dans un commentaire, une chaîne ou une docstring ferait accuser un projet qui n'enfile rien, et un détecteur qui accuse à tort se fait désactiver, donc ne garde plus rien. Un projet où `forge-mvc-jobs` est installé sans que rien n'enfile n'est pas inquiété : il n'y a rien à traiter, donc rien à reprocher.
+  Trois situations sont refusées : `worker.py` absent, `worker.py` présent avec un `HANDLERS` vide, donc un service qui refusera de démarrer, et aucune unité déclarée. **C'est une erreur, pas un avertissement**, comme pour les sessions multi-travailleurs : les emails ne partiront pas, il n'y a rien à nuancer.
+  Un `HANDLERS` construit autrement qu'en littéral, par une fonction ou un registre, n'est pas jugeable statiquement. Le pré-vol se tait alors, plutôt que d'accuser. `--worker` déclare l'emplacement de l'unité, comme `--unite` et `--nginx` le font déjà, pour qu'un projet qui la range ailleurs ne devienne pas invisible du pré-vol.
+  Deux tests figeaient au passage le **nombre** d'artefacts de `deploy/`, trois, et non la fin qu'ils visaient, chaque artefact étant annoncé absent avant `deploy:init` et présent après. Ils sont réalignés sur les artefacts nommés.
+
+- **Le guide de déploiement engendrait un minuteur pour les tâches orphelines, et aucun service pour les traiter (`DEPLOY-JOBS-WORKER-UNIT-001`).**
+  `enqueue()` écrit une ligne dans une table. **Rien ne la traite tant qu'un worker ne tourne pas.** Le guide de `deploy:init` documentait l'unité `forge-app`, le minuteur `forge-jobs-reclaim`, et aucun service de traitement. Grep sur le générateur : zéro occurrence de `run_worker`. Le squelette ne livrait aucun gabarit non plus, et les 19 contrôles de `deploy:check` n'en regardaient aucun.
+  Une application qui enfilait en production et suivait le guide à la lettre obtenait donc une table qui grossit, et un minuteur qui remet consciencieusement en file des tâches que personne ne prend. La panne est silencieuse **et trompeuse** : `systemctl` affiche un `forge-app` parfaitement vert, et le minuteur donne l'impression que quelque chose tourne. C'est le motif d'ADR-092 et ADR-093, la production servant une application désarmée.
+  `deploy:init` engendre désormais `worker.py` et `deploy/systemd/forge-jobs-worker.service`, **uniquement quand `forge-mvc-jobs` est installé** : poser un `worker.py` dans un projet sans file de tâches donnerait un fichier à comprendre pour rien. `worker.py` est un fichier applicatif, engendré s'il n'existe pas et jamais réécrit (principe 9), puisqu'il porte les gestionnaires que Forge ne peut pas connaître.
+  **Le worker engendré refuse de démarrer si `HANDLERS` est vide, et c'est la propriété la plus importante du gabarit.** Une tâche dont le nom n'a aucun gestionnaire est marquée `failed` : un worker parti sans gestionnaire ne se contenterait pas de ne rien faire, il viderait la file **en la détruisant**, tâche par tâche, en affichant un service vert. Il câble aussi `SIGTERM` sur la condition d'arrêt de `run_worker`, et son gestionnaire de signal ne lève pas, la tâche en cours allant à son terme.
+  L'unité pose `Restart=always`, `StartLimitIntervalSec=0` dans `[Unit]` (mal placée, systemd l'ignore avec un simple avertissement), et un `TimeoutStopSec` explicite avec le raisonnement qui va avec, un transcodage vidéo dépassant largement les quatre-vingt-dix secondes par défaut.
+
+- **Le tableau des gestes périodiques du guide en citait trois, alors que les opt-ins en livrent neuf.**
+  Manquaient `audit:gc`, `stats:gc`, `iot:gc`, `video:cleanup`, `files:orphans` et `images:orphans`. Un geste d'entretien absent du guide n'est pas planifié, et une table qui grossit sans purge est une panne différée.
+  **Six de ces commandes ne suppriment rien sans leur option.** Lancées seules elles affichent ce qu'elles feraient, puis sortent en succès. C'est un bon défaut, il évite une suppression involontaire, mais un minuteur qui planifie la commande nue tourne pour rien, indéfiniment, en affichant un succès à chaque passage. Le tableau cite donc les invocations complètes, `--run`, `--apply` ou `--delete` compris, et un garde-fou refuse qu'une ligne redevienne une commande nue.
+
+- **Un worker de tâches de fond ignorait l'ordre d'arrêt tant que sa file n'était pas vide (`JOBS-WORKER-GRACEFUL-STOP-001`).**
+  `run_worker` accepte `stop`, une condition d'arrêt destinée à répondre au `SIGTERM` que systemd envoie pour arrêter un service. Elle n'était consultée qu'entre deux **passes**, c'est à dire une fois la file vidée, ce qui la rendait sans effet précisément quand elle sert.
+  Mesuré : un worker recevant l'ordre d'arrêt après trois tâches en traitait **cinquante** avant de le remarquer. Sous systemd, `TimeoutStopSec` expire au bout de quatre-vingt-dix secondes, le worker est alors tué au milieu d'une tâche, et celle ci repart par `jobs:reclaim` après l'expiration de son bail. Un déploiement se fait justement quand la file est pleine, et c'est le seul moment où ce défaut se voyait.
+  `drain` accepte désormais `stop` et la consulte **entre deux tâches**, jamais pendant l'une d'elles : interrompre une tâche en cours ne serait qu'un autre nom pour l'interruption brutale, et laisserait la moitié d'un envoi fait. `run_worker` la lui transmet. L'ajout est un mot-clé facultatif, aucun appel existant ne change de comportement.
+
+- **Un motif de retrait du cycle rc8 portait une affirmation fausse.**
+  Le retrait de `NOTIF-POLLING-HELPER-001` disait que « la route JSON que l'aide aurait appelée existe déjà côté notifications ». Le paquet n'exposait alors aucune route, et cette affirmation n'avait pas été mesurée.
+  Le retrait tient sur son motif principal, le rafraîchissement d'un écran relève de l'application. Mais la marche manquante n'était pas l'assistant, c'était la route, désormais livrée. Un motif de retrait qui s'appuie sur un fait faux fait renoncer à autre chose que ce qu'on croyait écarter.
+
+- **Le README de `forge-mvc-admin` décrivait un état antérieur à son code (`ADMIN-DOC-ETAT-REEL-001`).**
+  Il annonçait que « les filtres de liste et les actions en masse restent à venir » alors que les filtres étaient livrés depuis longtemps, et que les actions groupées le sont depuis `ADMIN-BULK-ACTIONS-001`.
+  Un README qui décrit un état antérieur à son code est pire qu'un README absent : il fait chercher ailleurs ce qui est déjà là, et personne ne le relit puisqu'il a l'air à jour.
+
+- **Les actions groupées du back-office sont câblées, et couplées au workflow (`ADMIN-BULK-ACTIONS-001`).**
+  La première livraison avait posé la fonction de requête `delete_rows` et ses garde-fous, **sans aucun câblage HTTP** : ni méthode de contrôleur, ni route, ni case à cocher. Depuis le back-office, elle était inatteignable, et le ticket était marqué livré à tort. La revue l'a relevé.
+  Une ressource déclare désormais `bulk_delete` et `bulk_transitions`, tous deux **fermés par défaut** : une case à cocher offerte sans qu'on l'ait demandée invite à un geste irréversible sur une table qu'on croyait en lecture. Toute action passe par une page de confirmation, comme la suppression unitaire, et cette page montre les lignes concernées ainsi que celles qui ont disparu entre l'affichage et la validation.
+  **La transition groupée écrit aussi le statut de départ dans sa clause** : une ligne dont le statut a changé entre l'affichage et la validation n'est pas touchée, là où une mise à jour sur la seule clé primaire écraserait un état que quelqu'un vient de poser. L'écart entre demandé et effectué est dit dans le message de retour.
+  Elle **exige `forge-mvc-workflow` installé, et refuse sinon**. Ce refus diffère délibérément de celui de la suppression : appliquer un changement de statut à N lignes sans pouvoir vérifier que la transition est déclarée écrirait un état que le workflow interdit peut-être, sur cinquante lignes d'un coup. Les transitions sont déclarées et jamais déduites, et les conditions du workflow sont consultées avec un contexte portant `bulk`, une règle pouvant refuser en masse ce qu'elle permet à l'unité.
+
+- **La documentation de la garde RBAC de l'admin se contredisait.**
+  `_permission_guard` est **fail-closed** depuis toujours, et le dit : sans `forge-mvc-rbac` installé, une route portant une permission déclarée répond 403. La docstring de `register_admin_routes` annonçait « fail-open » deux cents lignes plus bas.
+  Une documentation qui annonce une ouverture là où le code ferme fait chercher une faille qui n'existe pas, et inversement. Un test verrouille désormais l'absence de cette contradiction.
+
+- **Une violation de clé étrangère est enfin qualifiée (`DB-ERROR-MESSAGES-HOMOGENES-001`).**
+  Le doublon, la table absente, l'indisponibilité et le droit refusé l'étaient. **Pas la clé étrangère**, qui est pourtant l'erreur d'écriture la plus courante après le doublon : supprimer une ligne encore référencée, ou poser une référence qui n'existe pas.
+  L'exception du pilote remontait donc telle quelle, ce que l'ADR-054 refuse précisément, une application ne devant jamais avoir à attraper `mariadb.IntegrityError` sous peine de n'être portable nulle part. Six tests du dépôt attrapaient d'ailleurs l'exception brute, et trois importaient le pilote pour cela : ces imports ont disparu avec le correctif.
+  Aucun signal n'est portable, et les quatre sont **vérifiés contre des serveurs réels**, jamais contre une exception fabriquée : errno 1451 et 1452 sur MariaDB, message sur SQLite qui n'offre rien d'autre, SQLSTATE 23503 sur PostgreSQL, numéro 547 sur SQL Server. Un test vérifie en outre qu'un doublon ne devient pas une clé étrangère, une erreur mal nommée envoyant chercher au mauvais endroit.
+
+- **Le gabarit Nginx pose HSTS et protège `/static/` (`DEPLOY-NGINX-MEDIA-HEADERS-001`).**
+  Le cœur pose déjà cinq en-têtes de sécurité, et **délègue explicitement HSTS au reverse proxy** : derrière un proxy qui termine TLS, `wsgi.url_scheme` vaut `http` côté Forge, et l'émettre à tort bloquerait l'accès. Cette délégation était documentée et personne ne la recevait : le gabarit ne portait pas la directive.
+  Le `location /static/` court-circuite par ailleurs l'application, donc **aucun** en-tête de Forge ne l'atteint. `nosniff` y compte le plus, un navigateur devinant sinon le type d'un fichier servi depuis votre domaine.
+  Le bloc `internal;` de l'envoi délégué est fourni, commenté, avec le rappel que c'est cette directive et elle seule qui protège : sans elle, la délégation publie tout `UPLOAD_ROOT`.
+
+- **Un champ d'entité peut être dérivé (`ENTITIES-COMPUTED-FIELDS-001`).**
+  Un total de ligne, un âge, un nom complet : la valeur se calcule depuis d'autres colonnes, et l'écrire en base la ferait mentir dès qu'une source change. L'application dupliquait l'expression dans chaque requête, ou la recalculait en Python après avoir tout rapatrié.
+  `"computed": "qte * pu"` projette le champ en lecture, `(qte * pu) AS "total"`, et l'exclut des écritures : il n'a pas de colonne, et l'inclure dans un `INSERT` ferait échouer la requête sur les quatre backends. L'alias reste entre guillemets, c'est lui qui préserve la casse sur PostgreSQL.
+  **L'expression n'est pas paramétrable, et c'est voulu** : le contrat d'entité est du code du projet, relu et versionné, pas une donnée d'utilisateur. Un point-virgule y est néanmoins refusé, l'expression étant projetée dans un `SELECT` et non exécutée. Quatre combinaisons sont refusées, clé primaire, `UNIQUE`, valeur par défaut et présence au formulaire, chacune parce qu'elle produirait un SQL faux plutôt qu'une maladresse.
+
+- **Une règle métier se déclare (`ENTITIES-BUSINESS-VALIDATION-001`).**
+  Le contrat décrit des types. Il ne peut rien dire de « la date de fin doit suivre la date de début », qui vivait donc dans les contrôleurs, réécrite à chaque point d'entrée : une entité créée par l'écran passait le contrôle, la même créée par un import CSV ne le passait pas, et rien ne le signalait.
+  **Une fonction, et non une expression au contrat.** Une règle a besoin de la base, de l'heure, parfois d'un service ; une mini-langue dans le JSON en couvrirait un dixième et demanderait un interpréteur, c'est à dire du code caché dans de la donnée.
+  Toutes les règles sont évaluées, rendre le premier problème seul obligeant l'utilisateur à corriger une erreur à la fois. Une règle qui lève **refuse** l'écriture. Un problème peut n'appartenir à aucun champ, le rattacher arbitrairement ferait pointer le formulaire au mauvais endroit.
+
+- **Une entité à slug gagne sa route publique (`ENTITIES-SLUG-ROUTES-001`).**
+  La recherche par slug existait depuis l'ADR-017, et **aucune route ne s'en servait** : une URL publique lisible demandait d'écrire la méthode et la route à la main, dans chaque projet.
+  `show_by_slug` et sa route sont engendrées dès que l'entité porte un champ `slug`. Une entité sans slug ne voit aucun changement.
+  **La route est déclarée en dernier**, après les segments fixes : un slug valant « new » serait sinon capturé par `/new`, et sa fiche resterait inatteignable. `RESERVED_SLUG_SEGMENTS` nomme ces valeurs pour que l'application les écarte à l'écriture, Forge ne pouvant le faire à sa place puisqu'un slug est une donnée.
+
+- **La réponse HTTP transmet enfin le niveau de correction d'erreur (`QRCODE-ERROR-LEVEL-001`).**
+  Le niveau existait sur `QrCode.from_text`, mais `QrCodeResponse.from_text` appelait `from_text(text)` tout court : un contrôleur, c'est à dire le chemin documenté pour servir un QR Code, ne pouvait pas le choisir.
+  Ce n'est pas un réglage de confort. Un code imprimé sur une étiquette ou une affiche, susceptible d'être rayé ou partiellement couvert, demande `h`, qui tolère 30 % de perte ; en `m`, le défaut, qui en tolère 15 %, il devient illisible, et la panne se découvre sur le terrain une fois les étiquettes collées.
+  `ERROR_LEVELS` est exporté, une application ne pouvant sinon connaître les valeurs valides sans lire la source du paquet.
+
+- **Compter des visiteurs sans garder d'adresse (`STATS-IP-ANONYMISATION-001`).**
+  `forge-mvc-stats` ne stockait **aucune** adresse : sa table n'a pas de colonne pour cela, et ce n'est pas un oubli mais son périmètre, il compte des événements et n'enquête pas.
+  `metadata` est pourtant libre, et rien n'empêchait d'y écrire `{"ip": request.remote_addr}`. C'est le geste naturel de qui veut compter des visiteurs uniques, et il transforme une table de statistiques en fichier de données personnelles, soumis à conservation limitée et à droit d'accès, sans que personne ne l'ait décidé.
+  **Une adresse brute est désormais refusée à l'écriture**, la ligne ne devant pas exister plutôt qu'être filtrée à chaque lecture. Le contrôle porte sur la **clé** et non sur la valeur : « 1.2.3.4 » est une adresse IPv4 valide et un numéro de version tout aussi valable, et refuser cette forme casserait des métadonnées légitimes.
+  `visitor_hash` répond au besoin réel sans rien garder : une empreinte salée valable une journée, identique pour deux visites du même visiteur le même jour, différente le lendemain. Un secret vide est refusé, sans lui l'espace des adresses IPv4 se parcourant en quelques secondes. `anonymize_ip` tronque quand une granularité géographique est vraiment nécessaire, et la documentation dit qu'elle ne rend **pas** une donnée anonyme.
+  Le message de refus oriente vers `forge-mvc-audit` pour qui doit conserver une adresse à des fins de sécurité : ce n'est pas une statistique.
+
+- **Une vue de page ne se compte pas comme une action (`STATS-EVENT-KIND-001`).**
+  `category` est la taxonomie libre de l'application. Le type est orthogonal : mille pages vues valent moins qu'une commande passée, et les mélanger sous un même total donne un chiffre que personne ne peut interpréter.
+  Le vocabulaire est **fermé**, `page_view` et `action` : un troisième type inventé par une application rendrait le champ incomparable d'un projet à l'autre, ce qui est exactement ce qu'il doit permettre. Le défaut est `action`, valeur qui décrit correctement les événements déjà en base, posés par des appels délibérés.
+  La colonne arrive par une **migration additive** : une table déjà créée ne se recrée pas, et c'est la seule façon de la faire évoluer sans perdre les événements enregistrés.
+
+- **Les statistiques s'agrègent enfin par jour (`DOC-STATS-AGGREGATES-001`).**
+  L'agrégation ne connaissait que `name` et `category`. Grouper par journée demandait de rapatrier tous les horodatages pour les tronquer en Python, ce que la base fait sans rien déplacer.
+  `Dialect.date_expression` porte la différence, aucun des quatre backends n'écrivant la troncature d'un horodatage de la même façon. La valeur rendue change aussi de type selon le backend, ce que le contrat annonce plutôt que de le laisser découvrir.
+  **Une série temporelle se trie par le temps**, là où les autres dimensions se trient du plus fréquent au moins fréquent : trier une courbe par total décroissant la rendrait illisible.
+  La liste des dimensions reste une liste blanche, `group_by` finissant dans un `GROUP BY` où aucun backend n'accepte de paramètre lié. Un `kind` inconnu lève de même, un filtre qui rend zéro sans motif faisant chercher un défaut ailleurs.
+
+- **L'ordre des fixtures ne se rabat plus en silence (`FIXTURES-FK-ORDER-ROBUST-001`).**
+  Le tri topologique existait, et se rabattait sur l'ordre alphabétique sans rien dire dans trois cas : `relations.json` absent, cycle dans le graphe, table sans entité déclarée.
+  Le repli est raisonnable, le **silence** ne l'était pas : le chargement échouait ensuite sur une violation de clé étrangère, et rien ne reliait cette erreur à l'ordre qui l'avait causée. L'exploitant cherchait dans ses données un défaut qui était dans son graphe. `fixtures:load` affiche maintenant ce qu'il n'a pas pu déduire, avant de charger, et nomme le cycle : « cycle entre Article, Auteur » se corrige, « ordre non déduit » ne se corrige pas.
+  **Un fichier peut écrire dans plusieurs tables**, et l'ordre ne regardait que le premier `INSERT INTO`. Un fichier insérant dans `articles` puis `commentaires` était classé comme s'il ne touchait qu'`articles`, et pouvait passer avant celui dont `commentaires` dépend. Toutes les tables écrites sont lues, et le fichier classé après la plus tardive de leurs dépendances.
+  Une table se référençant elle même est signalée : l'ordre doit y être respecté ligne à ligne dans le fichier, ce qu'aucun classement de fichiers ne peut garantir.
+
+- **Une colonne absente donne une erreur, et non dix mille (`IMPEXP-COLUMN-MAPPING-001`).**
+  `FieldSpec.name` servait à la fois de clé d'enregistrement et de nom de colonne CSV : un export tableur dont l'en-tête dit « Adresse e-mail » ne pouvait pas alimenter le champ `email`, et il fallait renommer les colonnes à la main avant chaque import. `source` déclare le ou les en-têtes acceptés, essayés dans l'ordre.
+  **Le défaut le plus coûteux était ailleurs.** Une colonne absente n'était pas détectée : `row.get(nom, "")` rendait une chaîne vide, et chaque ligne produisait « valeur requise manquante ». Un fichier de dix mille lignes rendait dix mille erreurs pour un seul en-tête mal orthographié, et la vraie cause restait introuvable au milieu. Les en-têtes sont maintenant rapprochés une fois, avant d'examiner la moindre ligne.
+  **Rien n'est rapproché par ressemblance.** Ni la casse ni les accents ne sont normalisés : rapprocher « Prix HT » de `prix_ttc` parce que les deux contiennent « prix » ferait importer la mauvaise colonne sans le signaler. Les espaces de bordure sont en revanche tolérées, un export tableur en posant souvent sans intention.
+
+- **Le rapport d'erreurs se télécharge (`IMPEXP-ERROR-REPORT-001`).**
+  `ImportReport` portait une liste exploitable en Python et inutilisable par la personne qui a déposé le fichier. Un import de deux mille lignes avec quarante erreurs ne se corrigeait qu'en lisant un écran, une erreur à la fois, sans jamais voir la ligne fautive.
+  Le rapport CSV porte la ligne, **le numéro affiché par un tableur** (la ligne 1 des données est la ligne 2 du fichier, et ne donner que l'une des deux fait chercher au mauvais endroit), la colonne, le message et la valeur refusée.
+  **Le rapport est lui même échappé** : il contient des données venues du fichier déposé, et sans échappement une cellule commençant par `=` redeviendrait une formule vive à son ouverture. Le rapport d'erreurs deviendrait le vecteur.
+
+- **Un second format, JSONL (`IMPEXP-JSONL-001`).**
+  Le CSV ne porte aucun type et ne sait pas représenter une valeur imbriquée : un export destiné à un autre programme y perd la différence entre le nombre `1`, le texte `"1"` et le booléen `true`.
+  JSONL plutôt que JSON : un tableau impose de tout charger avant de lire le premier enregistrement, et une virgule manquante le rend entièrement illisible, là où une ligne fautive en JSONL n'empêche pas de lire les autres.
+  Une clé absente est écrite à `null` et jamais omise, un consommateur de flux ayant besoin que toutes les lignes aient la même forme. La lecture est stricte par défaut ; le mode tolérant existe pour récupérer ce qui est lisible d'un fichier abîmé, et perd des données en silence, ce que la documentation dit.
+
+- **L'export CSV du CRUD ne tronque plus en silence (`IMPEXP-FILTERED-EXPORT-001`).**
+  **Faux besoin mesuré** : l'export respectait déjà recherche, tri et filtres de la liste. Le manque était ailleurs, et bien plus grave.
+  `_EXPORT_LIMIT` valait mille, et **rien ne le disait**. Un utilisateur qui filtrait trois mille lignes en recevait mille, dans un fichier impossible à distinguer d'un export complet jusqu'à ce que quelqu'un compte. Pour un export destiné à un contrôle ou à une reprise de données, c'est une perte silencieuse.
+  La fonction d'export demande désormais une ligne de plus que le plafond, seule façon de savoir qu'il en restait sans payer un `COUNT` sur la même requête. La troncature se voit dans le **nom du fichier**, suffixé `-TRONQUE`, ce que la personne lit, et dans les en-têtes `X-Forge-Export-Truncated` et `X-Forge-Export-Limit`, pour un client programmatique.
+  Le correctif vit dans le générateur : un contrôleur déjà engendré garde l'ancien comportement jusqu'à un nouveau `forge make:crud`.
+  Sept tests de `test_crud_export_csv.py` découpaient un **nombre fixe de caractères** après le début de la fonction engendrée, et l'un avait déjà vu sa fenêtre « étendue » une fois. Ils extraient maintenant la fonction entière, et ne demanderont plus d'extension.
+
+- **L'API IoT ne donne plus tous les sites à qui en veut un (`IOT-DEVICE-AUTH-001`).**
+  Elle était protégée par **un** jeton, `FORGE_IOT_API_TOKEN`, qui ouvrait toutes les mesures de tous les sites. Un prestataire chargé des capteurs d'un bâtiment recevait ce jeton, et lisait par là les mesures des autres, sans qu'aucun mécanisme ne l'en empêche ni ne le signale.
+  Un jeton porte désormais une portée, globale, un site, ou un seul équipement d'un site. `forge iot:token` les crée, les liste et les révoque. Le filtrage a lieu **en SQL** : rapatrier les mesures des autres sites pour les écarter ensuite les aurait fait passer par un processus qui n'y a pas droit.
+  **Le registre s'active en le passant à `register_iot_routes`, jamais d'office.** Le monter par défaut exigerait un jeton là où l'API était ouverte, et casserait sans le dire les déploiements existants. `FORGE_IOT_API_TOKEN` garde la portée globale, le retirer étant une rupture d'API publique que la règle C refuse.
+  Le jeton n'est **affiché qu'une fois** et n'est stocké que par son empreinte. Un simple SHA-256 y suffit, sans sel ni étirement : le jeton est engendré avec 256 bits d'entropie, contrairement à un mot de passe humain, et il n'existe donc ni dictionnaire ni table arc-en-ciel à lui opposer. La révocation pose une date et ne supprime pas la ligne.
+  Un refus de portée est un **403**, pas un 401 : un 401 ferait croire au porteur que son jeton est faux, et il le remplacerait au lieu d'en demander un dont la portée convient.
+
+- **Les relevés répondent enfin à la question qu'on leur pose (`IOT-AGGREGATES-001`).**
+  Le paquet rendait les mesures brutes et les comptait. « Quelle a été la température moyenne de la semaine, et jusqu'où est elle montée » n'avait aucune réponse, et l'application devait rapatrier toutes les mesures pour les additionner en Python, ce qui devient impraticable dès qu'un capteur relève chaque minute.
+  Deux routes et deux fonctions rendent moyenne, minimum, maximum et effectif sur une fenêtre, par site ou par équipement, en `AVG`/`MIN`/`MAX` standard écrits une fois pour les quatre backends.
+  **Une fenêtre vide ne rend pas zéro** : « le capteur n'a rien envoyé » et « le capteur a relevé zéro » sont deux faits différents, que confondre fausserait toute moyenne. Le comptage porte sur `value` et non sur `*`, une mesure sans valeur ne devant pas gonfler l'effectif d'une moyenne qu'elle n'alimente pas.
+  PostgreSQL rend `AVG` en `Decimal` là où MariaDB rend un flottant : la valeur est normalisée, sans quoi la même requête donnerait deux types selon le backend et la sérialisation JSON échouerait sur l'un des deux.
+
+- **Un contrôle d'accès applicatif peut se brancher sur la lecture (`IOT-RBAC-READ-001`).**
+  Le jeton dit ce qu'un porteur peut lire ; il ne dit rien de qui le porte ni de ce que cette personne a le droit de faire.
+  **Une prise, et non une dépendance à `forge-mvc-rbac`** : aucun opt-in n'importe un autre, et un paquet IoT qui dépendrait du RBAC obligerait à installer le RBAC pour recevoir des mesures MQTT. Un test le vérifie par `ast`.
+  **Une vérification qui échoue refuse la lecture.** Un contrôle qui lève ou qui rend autre chose qu'un booléen ne dit pas que l'accès est permis, il ne dit rien ; traiter ce silence comme une autorisation ouvrirait tout le jour où le service de permissions tombe. L'incident est journalisé pour l'exploitant.
+  Plusieurs contrôles cohabitent, tous doivent accepter, et le premier refus arrête la série. Sans contrôle branché, rien ne change : le paquet n'invente pas une politique que personne n'a demandée. La liste des actions est fermée, de sorte qu'un contrôle branché sache exactement ce qu'il peut recevoir.
+
+- **Les métadonnées d'un fichier audio sont enfin lisibles (`AUDIO-ID3-001`).**
+  `ffprobe` les rendait déjà, le paquet les jetait : le sondage lisait la durée, le codec et le débit, et laissait tomber le titre, l'artiste et l'album. Une application devait rappeler `ffprobe` elle même pour afficher le nom d'un morceau qu'elle venait de recevoir. `probe_audio(...).tags` les porte, et n'est jamais `None`.
+  **Le vrai sujet du ticket est le nettoyage.** Une étiquette vient du fichier envoyé, elle est écrite par qui l'a produit, et elle finit affichée dans une page. Les caractères de contrôle sont retirés, y compris `U+2028` que `str.strip` laisse passer et qui casse une chaîne JavaScript ; la longueur est bornée, rien n'empêchant un titre d'un mégaoctet ; et rien n'est interprété, l'échappement appartenant au gabarit.
+  Les noms d'étiquettes varient selon le conteneur, ID3 disant `tit2` là où Vorbis dit `TITLE` : les clés sont cherchées en minuscules, par ordre de préférence, et un conteneur sans bloc de format voit ses étiquettes lues sur le flux. Une année implausible ou un « piste 5 sur 2 » sont écartés, afficher une valeur manifestement fausse valant moins que ne rien afficher.
+  Le module ne réécrit jamais les étiquettes d'un fichier : lire et écrire sont deux gestes.
+
+- **Un fichier audio peut être découpé (`AUDIO-TRIM-001`).**
+  Extraire un extrait, retirer un silence de tête, produire un aperçu : le paquet transcodait un fichier entier et ne savait pas en prendre un morceau. Il fallait rappeler `ffmpeg` à la main, donc réécrire le durcissement des arguments et la gestion du délai.
+  `forge audio:trim source.wav extrait.mp3 --from 1:30 --to 2:00`. Les trois écritures d'un instant sont acceptées, `90`, `1:30` et `0:01:30.5`.
+  **La sortie ne peut pas être la source** : une découpe sur place n'existe pas côté `ffmpeg`, qui lit et écrit en même temps, et le fichier serait tronqué à zéro. La comparaison porte sur le chemin résolu, `a.mp3` et `./a.mp3` désignant le même fichier. **Un fichier de sortie existant n'est pas écrasé** sans `--force`, mode « Forge génère » de la charte.
+  Un intervalle vide ou renversé est refusé plutôt que joué, `ffmpeg` écrivant sinon un fichier de zéro seconde sans se plaindre. `-ss` est placé avant `-i`, ce qui fait sauter directement à l'instant demandé au lieu de décoder tout ce qui précède, et change une découpe de plusieurs minutes en une opération immédiate sur un long fichier.
+
+- **Les deux diagnostics média ne peuvent plus diverger (`AUDIO-DOCTOR-HARMONISE-001`).**
+  **Faux besoin mesuré** : `audio:doctor` et `video:doctor` étaient déjà alignés, même dataclass de résultat, mêmes statuts, mêmes contrôles. Le ticket livre donc le garde-fou qui manquait, qui exige l'égalité stricte des deux surfaces à un contrôle près, la migration que l'audio n'a pas puisqu'il est sans état.
+  La comparaison a en revanche fait apparaître une divergence réelle ailleurs, corrigée ici.
+
+- **La casse de `APP_ENV` désarmait deux gardes de sécurité (`ENV-APP-ENV-NORMALISATION-001`).**
+  Trois normalisations coexistaient pour la même variable : aucune, `.lower()` seul, et `.strip().lower()`.
+  Avec `APP_ENV=Prod`, une comparaison brute à `"prod"` est fausse, si bien que deux gardes cessaient de se déclencher sans rien dire.
+  L'API IoT s'enregistrait **sans jeton** en production, ce que `SEC-IOT-TOKEN-PROD-001` interdit, et `fixtures:load --run` acceptait de peupler la base de production sans `--force`, ce que l'ADR-074 interdit.
+  Les tests de ces deux gardes existaient et passaient : ils n'exerçaient que l'écriture `"prod"` en minuscules. Douze tests de comportement échouent sur le code d'avant et passent sur celui d'après.
+  `core.app.env` devient la seule lecture officielle, avec `normalize_app_env`, `read_app_env` et `is_prod`. Le module ne dépend que de la bibliothèque standard, pour rester importable au tout début du démarrage, y compris par la configuration du squelette.
+  Le cœur tolère désormais la variante quand le pré-vol `deploy:check`, lui, continue d'exiger la forme canonique : le premier ne doit jamais rater une production, le second impose une écriture unique. Ce partage de rôles est documenté plutôt que subi.
+  Le garde-fou `test_app_env_normalisation_001` refuse toute nouvelle lecture brute et toute comparaison non normalisée. Il travaille sur l'arbre syntaxique, parce qu'un `grep` sur « prod » remonte « produire » : c'est ce faux positif qui avait fait conclure à tort que `forge-mvc-fixtures` n'avait aucune garde.
+
 ### Ajouté
+
+- **Le chemin WSGI refuse de servir une application désarmée (`WSGI-UNARMED-APP-GUARD-001`, ADR-092).**
+  Forge a deux points d'entrée, et ils ne construisaient pas la même application. Un middleware câblé dans `app.py` était invisible du chemin WSGI, et rien ne le signalait : l'authentification survivait, `Application` la posant par défaut, et tout ce qui venait après tombait, magasin de sessions compris. L'application démarrait, répondait 200, authentifiait, et laissait passer ce que les gardes suivantes auraient refusé.
+  La lecture se fait sur l'arbre syntaxique et jamais par import : importer `app.py` serait exécuter précisément ce que ce chemin cherche à éviter. Une recherche de texte prendrait par ailleurs pour une déclaration l'exemple de câblage que le squelette livre en commentaire.
+
+- **Le câblage de l'application vit dans une source unique (`SKELETON-BOOTSTRAP-WIRING-001`, `SKELETON-PUBLIC-APPLICATION-001`, ADR-093).**
+  Le câblage vit désormais dans `bootstrap.py`, que les **deux** points d'entrée lisent. La divergence devient impossible au lieu d'être détectable : l'ADR-092 rend la panne bruyante, l'ADR-093 en retire la cause.
+
+- **Le chemin WSGI sert les médias, comme le serveur de développement (`CORE-WSGI-MEDIA-PARITY-001`, `CORE-WSGI-HEADERS-PARITY-001`, `CORE-WSGI-STATUS-PHRASE-PIN-001`).**
+  Les en-têtes sont construits avec `HTTPMessage` plutôt qu'imités, et les phrases de statut que Forge émet sont **figées** : celles de `http.HTTPStatus` changent avec la version de Python, si bien que la même réponse sortait en « Requested Range Not Satisfiable » sous 3.12 et « Range Not Satisfiable » sous 3.13. Ce que Forge émet ne doit dépendre que de Forge.
+
+- **Le pré-vol vérifie que le stockage est inscriptible (`DEPLOY-CHECK-STORAGE-WRITABLE-001`).**
+  Il vérifiait que `storage/` **existe**, jamais qu'il soit inscriptible par le compte qui écrira. Les deux se séparent très facilement : le dossier est créé par celui qui déploie, souvent root, et le service tourne sous un compte dédié. La panne attend le **premier téléversement** en production, et se présente comme une erreur cinq cents sans rapport apparent avec le déploiement.
+  Deux causes donnent ce symptôme et les deux sont couvertes : les droits du dossier, et le durcissement `ProtectSystem=strict` qui remonte le disque en lecture seule. Écrire dans un dossier demande l'écriture **et** la traversée : ne vérifier que la première rendrait « autorisé » sur un mode 600. Le compte examiné est celui déclaré dans l'unité, jamais celui qui lance le pré-vol.
+
+- **Le pré-vol avertit du rejeu TOTP sous plusieurs travailleurs (`DEPLOY-CHECK-MFA-REPLAY-WORKERS-001`).**
+  Le registre anti-rejeu par défaut vit dans la mémoire du processus. Quatre travailleurs, et un code à six chiffres vaut quatre fois au lieu d'une, là où la RFC 6238 §5.2 demande qu'un code accepté ne soit pas rejouable. Le paquet documente ce compromis et le laisse au choix de l'exploitant, mais rien ne le lui rappelait au moment où ce choix se fait.
+  Un avertissement et non une erreur : l'application fonctionne, la seconde authentification protège toujours, et seule la fenêtre de rejeu s'élargit.
+
+- **Les refus d'accès RBAC entrent au journal d'audit (`AUDIT-RBAC-DENIALS-BRIDGE-001`).**
+  Les deux paquets donnaient la recette du branchement en une ligne écrite à la main. Elle marche, et ne retient que deux des cinq champs de l'événement : `path` et `method` disent ce qui a été tenté, `source` nomme la garde qui a refusé, distinction que le module déclare décisive puisqu'un refus contractuel et un refus de permissions en base ne se corrigent pas au même endroit.
+  Le second appel ne rebranche pas : deux observateurs écriraient deux lignes par refus, et compter les refus donnerait le double. L'absence de `forge-mvc-rbac` lève au câblage, où elle se corrige, et non au premier refus où l'isolation des observateurs l'avalerait.
+
+- **Un paramètre applicatif peut porter une valeur composite (`SETTINGS-JSON-TYPE-001`).**
+  Le type `json` porte les listes et les objets, et **refuse les scalaires** : le store déduit le type de la valeur, si bien qu'un `42` déclaré `json` reviendrait `int` au premier enregistrement depuis un écran. Le texte stocké trie ses clés et garde les accents lisibles, la charte voulant la base auditable à l'œil.
+
+- **Deux cas concrets pour les QR Codes, et le piège de la route ouverte (`QRCODE-CAS-EDUCATIFS-001`).**
+  Les exemples encodaient une URL reçue en paramètre, ce qui produit depuis le domaine de l'application un QR Code vers n'importe quelle destination. Un visiteur scanne un code servi par un site qu'il connaît et arrive ailleurs : le QR Code est justement le format où l'on ne lit pas l'adresse avant d'y aller.
+
+- **L'équivalence Caddy, écarts compris (`DEPLOY-CADDY-EQUIVALENCE-001`).**
+  Forge engendre un seul gabarit de reverse proxy et n'en engendrera pas un second : `deploy:check` lit cette configuration, et deux syntaxes voudraient dire deux lecteurs, dont l'un finirait en retard sur l'autre. Le point qui ne se transpose pas est nommé : `internal;` est la moitié qui protège le service de fichiers par accélération, et Caddy n'en a pas.
 
 - **La racine des imports asynchrones n'était pas obligatoire, contrairement à ce que sa livraison annonçait (`IMPEXP-JOB-ROOT-REQUIRED-001`).**
   La décision de livraison d'`IMPEXP-ASYNC-JOBS-001` annonce « racine de chemins **obligatoire** ». Elle ne l'était pas : `root` valait `None` par défaut, et la garde de chemin ne s'activait alors pas du tout. Revue du référentiel import-export.
@@ -19,8 +341,6 @@
   Une métadonnée absente **n'apparaît pas** dans la réponse : rendre `null` ferait afficher « durée : null » à une interface qui ne teste que la présence de la clé. Une valeur illisible ne lève pas, le contrat de cette vue étant de toujours pouvoir afficher quelque chose.
   Une vidéo sans vignette rend **409**, pas 404 : elle existe, sa vignette non, et un 404 ferait croire à une vidéo inconnue.
 
-### Ajouté
-
 - **Le back-office montre l'état des sessions (`ADMIN-SESSIONS-VIEW-001`).**
   `forge deploy:init` demande de planifier `forge sessions:gc`, et rien ne disait si ce minuteur tournait. `forge-mvc-sessions-db` compte les sessions depuis `SESSIONS-METRICS-001`, réparties par nature, et sait dire si la purge suit : **personne ne regardait ce nombre**, il fallait ouvrir un client SQL. Dernier point ouvert de la revue du référentiel sessions-db.
   Le panneau vit sur `/admin/_sessions`, et le tableau de bord y mène : une page qu'aucun lien n'atteint n'est pas une page. Le chemin porte un tiret bas de tête, `/admin/{slug}` capturant sinon `sessions` comme le slug d'une ressource, et la route est posée **avant** celle à slug, le routeur retenant la première qui correspond.
@@ -28,18 +348,6 @@
   **Aucun identifiant de session n'est affiché**, et il n'y en a pas à afficher, la mesure rendant des totaux. Le contrat de la donnée l'interdit autant que le gabarit : `SessionsPanel` ne porte aucun champ d'identifiant, si bien qu'un gabarit modifié ne peut rien en faire fuir. Un identifiant lu sur un écran, une capture ou une épaule est une session volée.
   **Le couplage est souple**, comme pour `forge-mvc-rbac` et `forge-mvc-workflow` : `forge-mvc-admin` ne déclare pas `forge-mvc-sessions-db` en dépendance, et un test le vérifie. Son absence rend un panneau qui dit pourquoi il est vide, et une table absente ne fait pas tomber la page. Une page d'administration qui tombe parce qu'un panneau ne répond pas retire l'accès à tout le reste. L'indisponibilité ne rend pas des zéros : « aucune session » et « je ne sais pas » ne se corrigent pas au même endroit.
   Le panneau **ne révoque rien**, et c'est écrit. Fermer une session depuis cet écran demanderait de la désigner, donc de l'identifier, donc de l'exposer ; fermer toutes celles d'un utilisateur est possible sans cela, mais c'est un geste destructeur qui mérite sa décision propre.
-
-### Modifié
-
-- **`forge new` n'installe plus Node par défaut (`FORGE-NEW-NO-NODE-DEFAULT-001`).**
-  Il lançait `npm install` puis `npm run build:css` à chaque création. Mesuré : **deux minutes sur cent quarante-quatre**, pour produire un `static/tailwind.css` **identique au bit près** à celui que le squelette versionne. La dépense était entière et son produit nul.
-  Elle exigeait en outre une chaîne Node complète, `@parcel/watcher` compilé depuis ses sources compris. Le squelette active `engine-strict` : sous une version de Node antérieure à `.nvmrc`, `npm install` refusait de tourner et `forge new` échouait entièrement.
-  **Cesser de reconstruire n'était honnête qu'à une condition** : que le fichier livré ne puisse plus dériver en silence. C'est ce que garantit `SKELETON-TAILWIND-CSS-STALE-001`, livré juste avant. Les deux vont ensemble, et dans cet ordre.
-  Mesuré après : `forge new` passe de **144 s à 5,3 s**. Le parcours du guide de prise en main, qui rejoue le tutoriel de bout en bout, passe de 173 s à 10,7 s, et **cesse de se sauter** quand Node manque ou est trop ancien, ce qu'il faisait pour une raison étrangère à ce qu'il vérifie.
-  **Rien n'est retiré, seule la dépense l'est.** Le squelette continue de livrer `package.json` et `static/src/input.css`. Node est à un appel de distance, annoncé plutôt que deviné : `forge new <nom> --with-node` à la création, ou `npm install && npm run build:css` plus tard. L'avertissement émis quand npm manque dit désormais que le CSS livré reste en place.
-  La phase front quitte `forge.py` pour `cli/project/front_assets.py`, et les options de `new` pour `_options_de_new` : le budget de complexité plafonne `forge.py` et son `main`, et il demande une extraction, pas un plafond relevé. Huit doublures de test figeaient la signature exacte de `cmd_new` et se cassaient sur toute option nouvelle ; elles acceptent désormais ce qu'elles ne regardent pas.
-
-### Ajouté
 
 - **Le quota comptait des fichiers supprimés (`FILES-DELETE-FORGETS-001`).**
   Les suppressions retiraient le fichier du disque sans toucher au registre. La ligne restait, et `owner_usage_bytes` somme les tailles inscrites. Revue du référentiel images.
@@ -133,7 +441,6 @@
   Six combinaisons sont refusées sur le vocabulaire canonique, où `required` et `type` remplacent `nullable` et `sql_type` : `required`, `unique`, `default`, `form`, `source` et le type `foreign_key`. Chacune produirait un SQL faux plutôt qu'une simple maladresse. Le motif du schéma refuse aussi une expression faite d'espaces, que `minLength: 1` laissait passer et qui aurait produit `(   ) AS "Total"`.
   La documentation montrait le même exemple au format interne : elle montre le format canonique, et dit ce qui était rompu.
 
-
 - **Le CSS livré par le squelette ne couvrait plus ses propres gabarits (`SKELETON-TAILWIND-CSS-STALE-001`).**
   Le squelette versionne `static/tailwind.css`. Il lui manquait **quinze classes** que ses gabarits utilisent, dont `grid`, `grid-cols-2`, `sm:grid-cols-4`, `flex-wrap`, `text-4xl`, `bg-red-600`, `hover:bg-red-700` et `text-white`.
   La dérive était masquée : `forge new` reconstruit le CSS par `npm install && npm run build:css`. Mais **npm peut être absent**, cas que Forge gère explicitement par un avertissement, et le projet part alors avec le fichier versionné. Sa page « charte » perd sa grille, et le bouton `danger` de `components/ui.html` perd son fond rouge et son texte blanc : un geste destructeur qui ne se distingue plus d'un lien ordinaire. L'avertissement dit « Node.js / npm absent », pas « votre mise en page sera fausse », et personne ne relie les deux.
@@ -152,57 +459,6 @@
   Le dépôt porte quarante-trois liens absolus, dont **vingt-six vers une seule ancre**. La reformuler casserait vingt-six liens d'un coup, en silence, sur le site publié.
   Les URL sont reconstruites depuis les sources plutôt que lues dans `site/`, avec les mêmes règles que MkDocs, le `docs_dir` de la racine plus le `site_name` de chaque `!include`. Un contrôle qui exigerait `site/` se sauterait quand le dossier n'existe pas, c'est à dire la plupart du temps, et un garde-fou sauté ne garde rien. La fonction de slug est **celle de MkDocs**, importée et non réécrite, une réimplémentation approximative inventant des ancres fausses dans les deux sens.
 
-### Corrigé
-
-- **Le relevé de SQL non portable prenait un gabarit Markdown pour une instruction SQL.**
-  `tests/test_optin_dml_dialect_001.py` classe comme SQL toute chaîne d'un opt-in contenant `SELECT`, `INSERT`, `UPDATE`, `VALUES` ou `DELETE`. Cette largeur est voulue, le SQL de Forge s'assemblant par fragments dont beaucoup n'ont pas de verbe.
-  Elle a un revers, révélé par `DEPLOY-NGINX-RATE-LIMIT-001` : le gabarit du guide de déploiement, deux cents lignes de Markdown, contient `--delete` dans son tableau des gestes périodiques, ce qui le classait SQL, puis `RATE-LIMIT-001` dans un code de ticket, ce qui le déclarait non portable. Deux mots de prose.
-  Renommer la section pour contenter le détecteur aurait été céder au symptôme. Le relevé écarte désormais les chaînes portant un titre Markdown, aucune instruction SQL n'en contenant. **Mesuré avant d'être appliqué** : 387 chaînes classées SQL, 386 après, la seule écartée étant ce gabarit. Un resserrement plus ambitieux, « verbe plus clause », en aurait écarté 261, donc du vrai SQL. Un test fige l'étroitesse de l'exclusion.
-
-- **Ce que fait le pool de connexions quand une requête ouvre des threads n'était écrit nulle part (`DB-POOL-THREADS-DOC-001`).**
-  Le runtime de Forge est synchrone, ce qui n'interdit pas de paralléliser des appels sortants dans une requête. Rien ne disait ce que la base y devient.
-  Mesuré sur MariaDB, pool de cinq, appels tenant leur connexion trois cents millisecondes : quatre threads en 0,32 s, huit en 0,60 s, vingt en 1,21 s, sans un seul refus. Le parallélisme reste gagnant, vingt appels en série coûteraient six secondes, mais il est **plafonné par `DB_POOL_SIZE`**, cinq par défaut et par processus, non par le nombre de threads.
-  **Le fait qui compte est ailleurs**, et c'est celui qu'un développeur ne voit pas venir. Une requête qui parallélise prend les connexions de tout son processus, donc de toutes les requêtes que ce travailleur sert au même moment. Mesuré : pendant qu'une voisine tient le pool avec dix appels d'une seconde, une lecture ordinaire de dix millisecondes a attendu **1,83 s**, cent quatre-vingts fois sa durée, pour un utilisateur qui n'avait rien demandé de particulier.
-  Le conseil qui en découle est écrit : ne pas tenir une connexion pendant un appel réseau, faire les appels sortants sans connexion puis écrire une fois les réponses arrivées. Cinq requêtes qui tiennent une connexion pendant l'attente d'une API distante épuisent le pool de leur travailleur, et les suivantes reçoivent un `503` alors que la base n'a rien à se reprocher.
-  Forge ne livre pas de client HTTP, ce choix appartenant à l'application, et la documentation le dit plutôt que de le laisser deviner. Un test d'intégration fige désormais la conséquence, qu'une requête qui parallélise prive ses voisines, seul le fait étant figé et non une durée.
-
-- **La parade anti-bruteforce que Forge prescrit n'était pas dans la configuration qu'il engendre (`DEPLOY-NGINX-RATE-LIMIT-001`).**
-  Le compteur anti-bruteforce du cœur vit en mémoire du **processus**, et l'unité systemd engendrée lance quatre travailleurs. Les cinq tentatives par minute en deviennent donc jusqu'à vingt, et le verrouillage ne suit pas l'attaquant d'un travailleur à l'autre. Cela vaut pour le contrôleur de connexion engendré par `make:auth` comme pour le challenge MFA.
-  **Ce n'était pas une découverte** : `docs/deployment/production-security.md` le disait, prescrivait la parade Nginx et en donnait l'extrait. C'est précisément le défaut. Une ligne de défense qui vit dans une page de documentation est absente de tout projet qui n'a pas lu cette page, et la configuration engendrée n'en portait rien.
-  `forge deploy:init` engendre désormais un `location = /login` borné à cinq POST par minute et par IP, avec `limit_req_status 429`, aux valeurs exactes que le guide prescrivait, Forge ne disant qu'une chose d'une seule façon.
-  **Seul le POST est compté**, par un `map` sur `$request_method` qui donne une clé vide ailleurs. Limiter aussi le GET ferait répondre 429 à qui recharge la page de connexion six fois, et une limite qui gêne se fait désactiver, donc ne protège plus rien.
-  Le nom de la zone est dérivé du dossier du projet. Deux projets Forge derrière le même Nginx déclareraient sinon deux zones homonymes, et Nginx refuserait de démarrer sur « is already bound », message qui ne dit pas quel fichier est en cause.
-  Deux limites sont écrites plutôt que tues. Une route de connexion renommée n'est plus bornée, le `location` visant `/login`. Et **le challenge MFA n'est pas couvert** : `forge-mvc-mfa` ne pose aucune route, l'application écrit les siennes, et Forge ne peut pas viser celle du challenge.
-
-- **La documentation du MFA s'appuyait sur un contrôle qui souffre du même défaut qu'elle relativisait.**
-  Le bloc `danger` sur l'anti-rejeu par processus, exact par ailleurs, atténuait le risque ainsi : « Le rate-limit du challenge borne par ailleurs le nombre de tentatives. » Ce compteur vit dans la même mémoire de processus. Invoquer en atténuation un contrôle affaibli de la même façon fait sous-estimer les deux à la fois.
-  La phrase est retirée, et une note dit ce qu'il en est, avec le geste qui manque : le challenge MFA vit sur une route que Forge ne connaît pas, et demande son propre `location`.
-
-- **Le pré-vol de déploiement ne regardait pas si quelqu'un traitait la file de tâches (`DEPLOY-CHECK-JOBS-WORKER-001`).**
-  Les dix-neuf contrôles de `deploy:check` n'en regardaient aucun. Un projet pouvait donc passer le pré-vol au vert avec une file que personne ne draine, et découvrir en production que ses emails ne partent pas.
-  Le contrôle ne se déclenche que si le projet **appelle réellement** `enqueue`, lu par `ast` et jamais par grep : une occurrence dans un commentaire, une chaîne ou une docstring ferait accuser un projet qui n'enfile rien, et un détecteur qui accuse à tort se fait désactiver, donc ne garde plus rien. Un projet où `forge-mvc-jobs` est installé sans que rien n'enfile n'est pas inquiété : il n'y a rien à traiter, donc rien à reprocher.
-  Trois situations sont refusées : `worker.py` absent, `worker.py` présent avec un `HANDLERS` vide, donc un service qui refusera de démarrer, et aucune unité déclarée. **C'est une erreur, pas un avertissement**, comme pour les sessions multi-travailleurs : les emails ne partiront pas, il n'y a rien à nuancer.
-  Un `HANDLERS` construit autrement qu'en littéral, par une fonction ou un registre, n'est pas jugeable statiquement. Le pré-vol se tait alors, plutôt que d'accuser. `--worker` déclare l'emplacement de l'unité, comme `--unite` et `--nginx` le font déjà, pour qu'un projet qui la range ailleurs ne devienne pas invisible du pré-vol.
-  Deux tests figeaient au passage le **nombre** d'artefacts de `deploy/`, trois, et non la fin qu'ils visaient, chaque artefact étant annoncé absent avant `deploy:init` et présent après. Ils sont réalignés sur les artefacts nommés.
-
-- **Le guide de déploiement engendrait un minuteur pour les tâches orphelines, et aucun service pour les traiter (`DEPLOY-JOBS-WORKER-UNIT-001`).**
-  `enqueue()` écrit une ligne dans une table. **Rien ne la traite tant qu'un worker ne tourne pas.** Le guide de `deploy:init` documentait l'unité `forge-app`, le minuteur `forge-jobs-reclaim`, et aucun service de traitement. Grep sur le générateur : zéro occurrence de `run_worker`. Le squelette ne livrait aucun gabarit non plus, et les 19 contrôles de `deploy:check` n'en regardaient aucun.
-  Une application qui enfilait en production et suivait le guide à la lettre obtenait donc une table qui grossit, et un minuteur qui remet consciencieusement en file des tâches que personne ne prend. La panne est silencieuse **et trompeuse** : `systemctl` affiche un `forge-app` parfaitement vert, et le minuteur donne l'impression que quelque chose tourne. C'est le motif d'ADR-092 et ADR-093, la production servant une application désarmée.
-  `deploy:init` engendre désormais `worker.py` et `deploy/systemd/forge-jobs-worker.service`, **uniquement quand `forge-mvc-jobs` est installé** : poser un `worker.py` dans un projet sans file de tâches donnerait un fichier à comprendre pour rien. `worker.py` est un fichier applicatif, engendré s'il n'existe pas et jamais réécrit (principe 9), puisqu'il porte les gestionnaires que Forge ne peut pas connaître.
-  **Le worker engendré refuse de démarrer si `HANDLERS` est vide, et c'est la propriété la plus importante du gabarit.** Une tâche dont le nom n'a aucun gestionnaire est marquée `failed` : un worker parti sans gestionnaire ne se contenterait pas de ne rien faire, il viderait la file **en la détruisant**, tâche par tâche, en affichant un service vert. Il câble aussi `SIGTERM` sur la condition d'arrêt de `run_worker`, et son gestionnaire de signal ne lève pas, la tâche en cours allant à son terme.
-  L'unité pose `Restart=always`, `StartLimitIntervalSec=0` dans `[Unit]` (mal placée, systemd l'ignore avec un simple avertissement), et un `TimeoutStopSec` explicite avec le raisonnement qui va avec, un transcodage vidéo dépassant largement les quatre-vingt-dix secondes par défaut.
-
-- **Le tableau des gestes périodiques du guide en citait trois, alors que les opt-ins en livrent neuf.**
-  Manquaient `audit:gc`, `stats:gc`, `iot:gc`, `video:cleanup`, `files:orphans` et `images:orphans`. Un geste d'entretien absent du guide n'est pas planifié, et une table qui grossit sans purge est une panne différée.
-  **Six de ces commandes ne suppriment rien sans leur option.** Lancées seules elles affichent ce qu'elles feraient, puis sortent en succès. C'est un bon défaut, il évite une suppression involontaire, mais un minuteur qui planifie la commande nue tourne pour rien, indéfiniment, en affichant un succès à chaque passage. Le tableau cite donc les invocations complètes, `--run`, `--apply` ou `--delete` compris, et un garde-fou refuse qu'une ligne redevienne une commande nue.
-
-- **Un worker de tâches de fond ignorait l'ordre d'arrêt tant que sa file n'était pas vide (`JOBS-WORKER-GRACEFUL-STOP-001`).**
-  `run_worker` accepte `stop`, une condition d'arrêt destinée à répondre au `SIGTERM` que systemd envoie pour arrêter un service. Elle n'était consultée qu'entre deux **passes**, c'est à dire une fois la file vidée, ce qui la rendait sans effet précisément quand elle sert.
-  Mesuré : un worker recevant l'ordre d'arrêt après trois tâches en traitait **cinquante** avant de le remarquer. Sous systemd, `TimeoutStopSec` expire au bout de quatre-vingt-dix secondes, le worker est alors tué au milieu d'une tâche, et celle ci repart par `jobs:reclaim` après l'expiration de son bail. Un déploiement se fait justement quand la file est pleine, et c'est le seul moment où ce défaut se voyait.
-  `drain` accepte désormais `stop` et la consulte **entre deux tâches**, jamais pendant l'une d'elles : interrompre une tâche en cours ne serait qu'un autre nom pour l'interruption brutale, et laisserait la moitié d'un envoi fait. `run_worker` la lui transmet. L'ajout est un mot-clé facultatif, aucun appel existant ne change de comportement.
-
-### Ajouté
-
 - **Les notifications s'exposent en HTTP (`NOTIF-HTTP-ROUTES-001`).**
   Le paquet savait écrire une notification et la relire depuis Python, et n'exposait **aucune route**. `forge-mvc-video` livre `register_video_routes`, `forge-mvc-iot` livre `register_iot_routes`, celui ci ne livrait rien. Chaque application devait donc écrire son contrôleur, sa sérialisation JSON et son compteur de non-lus avant d'afficher quoi que ce soit. Mesuré sur une application réelle : elle appelait `notify()` depuis des mois et n'avait jamais affiché une seule notification, ayant buté sur cette marche manquante.
   `register_notification_routes(router, recipient_of=...)` pose quatre routes JSON, le compteur de non-lus, la liste paginée par curseur, le marquage d'une notification et le marquage global.
@@ -211,28 +467,6 @@
   `recipient` est **absent du JSON rendu** : le client ne reçoit que les siennes, le lui répéter n'apprend rien et expose la convention de nommage interne de l'application. Un `limit` ou un `before_id` illisible rend 400 et jamais la page par défaut, la remplacer en silence rendrait une page que l'appelant n'a pas demandée. Le curseur de page suivante vaut `null` quand la page n'est pas pleine, en rendre un ferait demander une page vide.
   Ces routes rendent du JSON et ne poussent rien. Le rafraîchissement s'écrit avec HTMX, que le squelette livre déjà. Une interrogation toutes les dix secondes coûte, pour quarante écrans ouverts, quatre requêtes par seconde ; les tenir ouvertes en SSE coûterait quarante travailleurs immobilisés.
 
-### Corrigé
-
-- **Un motif de retrait du cycle rc8 portait une affirmation fausse.**
-  Le retrait de `NOTIF-POLLING-HELPER-001` disait que « la route JSON que l'aide aurait appelée existe déjà côté notifications ». Le paquet n'exposait alors aucune route, et cette affirmation n'avait pas été mesurée.
-  Le retrait tient sur son motif principal, le rafraîchissement d'un écran relève de l'application. Mais la marche manquante n'était pas l'assistant, c'était la route, désormais livrée. Un motif de retrait qui s'appuie sur un fait faux fait renoncer à autre chose que ce qu'on croyait écarter.
-
-- **Le README de `forge-mvc-admin` décrivait un état antérieur à son code (`ADMIN-DOC-ETAT-REEL-001`).**
-  Il annonçait que « les filtres de liste et les actions en masse restent à venir » alors que les filtres étaient livrés depuis longtemps, et que les actions groupées le sont depuis `ADMIN-BULK-ACTIONS-001`.
-  Un README qui décrit un état antérieur à son code est pire qu'un README absent : il fait chercher ailleurs ce qui est déjà là, et personne ne le relit puisqu'il a l'air à jour.
-
-- **Les actions groupées du back-office sont câblées, et couplées au workflow (`ADMIN-BULK-ACTIONS-001`).**
-  La première livraison avait posé la fonction de requête `delete_rows` et ses garde-fous, **sans aucun câblage HTTP** : ni méthode de contrôleur, ni route, ni case à cocher. Depuis le back-office, elle était inatteignable, et le ticket était marqué livré à tort. La revue l'a relevé.
-  Une ressource déclare désormais `bulk_delete` et `bulk_transitions`, tous deux **fermés par défaut** : une case à cocher offerte sans qu'on l'ait demandée invite à un geste irréversible sur une table qu'on croyait en lecture. Toute action passe par une page de confirmation, comme la suppression unitaire, et cette page montre les lignes concernées ainsi que celles qui ont disparu entre l'affichage et la validation.
-  **La transition groupée écrit aussi le statut de départ dans sa clause** : une ligne dont le statut a changé entre l'affichage et la validation n'est pas touchée, là où une mise à jour sur la seule clé primaire écraserait un état que quelqu'un vient de poser. L'écart entre demandé et effectué est dit dans le message de retour.
-  Elle **exige `forge-mvc-workflow` installé, et refuse sinon**. Ce refus diffère délibérément de celui de la suppression : appliquer un changement de statut à N lignes sans pouvoir vérifier que la transition est déclarée écrirait un état que le workflow interdit peut-être, sur cinquante lignes d'un coup. Les transitions sont déclarées et jamais déduites, et les conditions du workflow sont consultées avec un contexte portant `bulk`, une règle pouvant refuser en masse ce qu'elle permet à l'unité.
-
-- **La documentation de la garde RBAC de l'admin se contredisait.**
-  `_permission_guard` est **fail-closed** depuis toujours, et le dit : sans `forge-mvc-rbac` installé, une route portant une permission déclarée répond 403. La docstring de `register_admin_routes` annonçait « fail-open » deux cents lignes plus bas.
-  Une documentation qui annonce une ouverture là où le code ferme fait chercher une faille qui n'existe pas, et inversement. Un test verrouille désormais l'absence de cette contradiction.
-
-### Ajouté
-
 - **Un rôle RBAC peut hériter d'un autre (`RBAC-ROLE-HIERARCHY-001`, ADR-095).**
   Le contrat associait un rôle à une liste plate de permissions. Un projet à trois rôles recopiait donc la liste du lecteur dans l'éditeur, puis les deux dans l'admin. Trois copies de la même règle, qui divergent au premier ajout : on ajoute une permission à l'éditeur, on oublie l'admin, et l'administrateur se retrouve avec **moins** de droits qu'un éditeur, sans que rien ne le signale, puisque personne n'écrit un test vérifiant qu'un administrateur peut faire ce qu'un éditeur peut faire.
   `role_inherits` déclare l'héritage, qui est transitif. La clé est **facultative** : un contrat qui ne la porte pas se résout exactement comme avant, et aucun projet existant n'a de geste à faire.
@@ -240,74 +474,15 @@
   **Une hiérarchie fautive n'accorde rien.** Un cycle et un rôle hérité inconnu sont refusés, et la résolution rend un ensemble vide plutôt que les permissions directes : accorder les droits directs donnerait un contrôle d'accès dégradé en silence, ce qui est pire qu'un refus. Le cycle est nommé, « admin puis editeur puis admin » se corrigeant là où « hiérarchie invalide » ne se corrige pas. La profondeur est bornée à dix niveaux, au delà desquels une revue de sécurité ne peut plus suivre la chaîne.
   `rbac:export` rend les permissions **effectives**, héritages compris : montrer les seules permissions directes ferait croire à un administrateur privé de droits qu'il possède.
 
-### Retiré du périmètre
-
-- **Quatre tickets du lot 5 du cycle rc8 sont retirés par décision écrite** (roadmap `forge-rc8-optins-roadmap.md`, section 8).
-  Chacun entrait en tension avec un principe de la charte, et la tension a été tranchée en connaissance de cause plutôt que contournée.
-  `MFA-WEBAUTHN-001` : une spécification large et mouvante dont la maintenance ne peut pas être garantie sur la durée, ce que le principe 8 vise exactement.
-  `AUDIO-STATEFUL-OPTION-001` : la bonne réponse, si le besoin revient, est d'extraire la machinerie d'état partagée avec `video`, pas de la dupliquer.
-  `DEPLOY-CADDY-001` : dire qu'une chose est possible ne coûte rien, maintenir un second gabarit officiel coûte à chaque version.
-  `NOTIF-POLLING-HELPER-001` : Forge livre déjà HTMX, et un assistant ne retirerait aucune décision à l'application, il en masquerait une.
-
-- **Un garde-fou refuse qu'un README promette une commande qui n'existe pas (`META-README-COMMANDS-RATCHET-001`).**
-  Une phrase de prose ne se vérifie pas en général. Ce qui se vérifie, et qui dérive de la même façon, ce sont les **commandes** : chaque opt-in les déclare dans `COMMANDS`, table que le cœur lit (ADR-059), et son README en annonce dans un tableau.
-  Le garde-fou refuse une commande citée au README et absente de `COMMANDS`, promesse que l'utilisateur tape avant de comprendre, et refuse qu'une commande **déclarée** soit annoncée « à venir », ce qui est la dérive exacte que le ticket précédent a corrigée.
-  Il **tolère** l'inverse, une commande de `COMMANDS` absente du README : un README n'est pas une référence exhaustive, l'aide riche du CLI porte déjà ce contrat, et exiger la réciproque transformerait chaque README en catalogue.
-  Le fichier est exempté du marqueur `docs`, avec sa justification : il compare de la prose à du **code**, et le marquer le retirerait de la boucle où une commande retirée de `COMMANDS` doit être vue.
-
-- **Le contrat RBAC s'exporte (`RBAC-CONTRACT-EXPORT-001`).**
-  `rbac:validate` dit si le contrat est valide, `rbac:audit` le compare à la base. Ni l'un ni l'autre ne répond à « qui a le droit de faire quoi », question d'une revue de sécurité, qui demandait de lire `rbac.json` à l'œil.
-  `forge rbac:export` rend un tableau Markdown, à versionner à côté du code où une différence montre qu'un rôle a gagné une permission, ou un CSV pour une revue en tableur.
-  **L'export rend le contrat, jamais l'état de la base** : confondre les deux ferait prendre une intention pour un état. Un contrat invalide n'est pas exporté, le tableau ne s'appliquant à rien et le lecteur le prenant pour la vérité. Le tri rend deux exports comparables, et les cellules sont échappées.
-
-- **Un rôle peut exiger un second facteur (`MFA-REQUIRED-BY-ROLE-001`).**
-  Le paquet savait dire si un utilisateur **a** un facteur actif, jamais s'il **devrait** en avoir un. L'application écrivait donc le contrôle dans chaque écran sensible, le faisait bien la première fois, et l'oubliait au troisième écran ajouté six mois plus tard.
-  `MFA_REQUIRED_ROLES` déclare la politique une fois. **Elle n'active rien** : rendre un facteur obligatoire ne peut pas le créer à la place de l'utilisateur, il faut son téléphone et son consentement ; elle dit qu'un accès doit être refusé, et `reason` donne le message qui conduit vers l'inscription.
-  Le paquet **n'importe pas `forge-mvc-rbac`** : les rôles sont lus dans la session, où l'authentification les a rangés, et trois emplacements sont acceptés, les applications les employant tous les trois. `check_mfa_requirement` ne lève jamais : un contrôle de sécurité qui échoue en levant priverait d'accès un utilisateur légitime.
-
-- **Le back-office supprime plusieurs lignes en une fois (`ADMIN-BULK-ACTIONS-001`).**
-  Il ne savait supprimer qu'une ligne à la fois : nettoyer deux cents inscriptions de test demandait deux cents allers-retours et deux cents confirmations.
-  Les identifiants partent en **paramètres liés**, un marqueur par valeur : les concaténer serait une injection, et le fait qu'ils viennent de cases cochées n'y change rien. Une sélection vide est refusée, une suppression groupée sans sélection effaçant la table entière si la clause était omise, et un plafond de deux cents lignes l'est aussi, une sélection de cette taille venant plus souvent d'un « tout cocher » que d'une intention.
-  Le nombre réellement supprimé est rendu : une ligne disparue entre l'affichage et la validation n'est pas une erreur.
-
-- **Les minuteries périodiques sont documentées (`DEPLOY-TIMERS-DOC-001`).**
-  Purge des sessions, reprise des tâches, sauvegarde : trois gestes qui doivent tourner, et aucun n'est planifié par Forge, embarquer un ordonnanceur faisant du framework autre chose que ce qu'il est.
-  Deux unités systemd complètes et quatre pièges nommés : activer le `.timer` et non le `.service`, faute de quoi la commande tourne une fois au démarrage puis plus jamais ; `Persistent=true` qui rattrape les exécutions manquées ; `RandomizedDelaySec` qui étale la charge ; et `EnvironmentFile` en `chmod 600`, ces commandes se connectant à la base.
-  La sauvegarde reste hors de Forge, chaque backend ayant son outil. Ce que la documentation dit et qui vaut plus qu'un script générique : **une sauvegarde jamais restaurée n'est pas une sauvegarde**.
-
-- **Les écarts de dialecte sont documentés (`DOC-DIALECT-ECARTS-001`).**
-  Bornes de lignes, booléens, insertion conditionnelle, signaux d'erreur, et ce qui reste délibérément hors du contrat. Un écart connu se contourne ; un écart ignoré se découvre en production, sur le seul backend où il mord.
-  La documentation nomme les pièges qui ont déjà coûté : `pagination_clause` et `pagination_param_order` se lisent en **paire**, T-SQL inversant l'ordre des deux paramètres ; le SQLSTATE ne discrimine pas sur MariaDB ni SQL Server, qui rendent `23000` pour trois conditions différentes ; et un message d'erreur PostgreSQL est traduit, donc n'est jamais un signal.
-  Forge ne fournit **aucune** insertion conditionnelle : les quatre formes n'ont pas la même sémantique de verrouillage, et une abstraction promettrait une équivalence qui n'existe pas.
-
-### Corrigé
-
-- **Une violation de clé étrangère est enfin qualifiée (`DB-ERROR-MESSAGES-HOMOGENES-001`).**
-  Le doublon, la table absente, l'indisponibilité et le droit refusé l'étaient. **Pas la clé étrangère**, qui est pourtant l'erreur d'écriture la plus courante après le doublon : supprimer une ligne encore référencée, ou poser une référence qui n'existe pas.
-  L'exception du pilote remontait donc telle quelle, ce que l'ADR-054 refuse précisément, une application ne devant jamais avoir à attraper `mariadb.IntegrityError` sous peine de n'être portable nulle part. Six tests du dépôt attrapaient d'ailleurs l'exception brute, et trois importaient le pilote pour cela : ces imports ont disparu avec le correctif.
-  Aucun signal n'est portable, et les quatre sont **vérifiés contre des serveurs réels**, jamais contre une exception fabriquée : errno 1451 et 1452 sur MariaDB, message sur SQLite qui n'offre rien d'autre, SQLSTATE 23503 sur PostgreSQL, numéro 547 sur SQL Server. Un test vérifie en outre qu'un doublon ne devient pas une clé étrangère, une erreur mal nommée envoyant chercher au mauvais endroit.
-
-- **Le gabarit Nginx pose HSTS et protège `/static/` (`DEPLOY-NGINX-MEDIA-HEADERS-001`).**
-  Le cœur pose déjà cinq en-têtes de sécurité, et **délègue explicitement HSTS au reverse proxy** : derrière un proxy qui termine TLS, `wsgi.url_scheme` vaut `http` côté Forge, et l'émettre à tort bloquerait l'accès. Cette délégation était documentée et personne ne la recevait : le gabarit ne portait pas la directive.
-  Le `location /static/` court-circuite par ailleurs l'application, donc **aucun** en-tête de Forge ne l'atteint. `nosniff` y compte le plus, un navigateur devinant sinon le type d'un fichier servi depuis votre domaine.
-  Le bloc `internal;` de l'envoi délégué est fourni, commenté, avec le rappel que c'est cette directive et elle seule qui protège : sans elle, la délégation publie tout `UPLOAD_ROOT`.
-
-- **Un champ d'entité peut être dérivé (`ENTITIES-COMPUTED-FIELDS-001`).**
-  Un total de ligne, un âge, un nom complet : la valeur se calcule depuis d'autres colonnes, et l'écrire en base la ferait mentir dès qu'une source change. L'application dupliquait l'expression dans chaque requête, ou la recalculait en Python après avoir tout rapatrié.
-  `"computed": "qte * pu"` projette le champ en lecture, `(qte * pu) AS "total"`, et l'exclut des écritures : il n'a pas de colonne, et l'inclure dans un `INSERT` ferait échouer la requête sur les quatre backends. L'alias reste entre guillemets, c'est lui qui préserve la casse sur PostgreSQL.
-  **L'expression n'est pas paramétrable, et c'est voulu** : le contrat d'entité est du code du projet, relu et versionné, pas une donnée d'utilisateur. Un point-virgule y est néanmoins refusé, l'expression étant projetée dans un `SELECT` et non exécutée. Quatre combinaisons sont refusées, clé primaire, `UNIQUE`, valeur par défaut et présence au formulaire, chacune parce qu'elle produirait un SQL faux plutôt qu'une maladresse.
-
-- **Une règle métier se déclare (`ENTITIES-BUSINESS-VALIDATION-001`).**
-  Le contrat décrit des types. Il ne peut rien dire de « la date de fin doit suivre la date de début », qui vivait donc dans les contrôleurs, réécrite à chaque point d'entrée : une entité créée par l'écran passait le contrôle, la même créée par un import CSV ne le passait pas, et rien ne le signalait.
-  **Une fonction, et non une expression au contrat.** Une règle a besoin de la base, de l'heure, parfois d'un service ; une mini-langue dans le JSON en couvrirait un dixième et demanderait un interpréteur, c'est à dire du code caché dans de la donnée.
-  Toutes les règles sont évaluées, rendre le premier problème seul obligeant l'utilisateur à corriger une erreur à la fois. Une règle qui lève **refuse** l'écriture. Un problème peut n'appartenir à aucun champ, le rattacher arbitrairement ferait pointer le formulaire au mauvais endroit.
-
-- **Une entité à slug gagne sa route publique (`ENTITIES-SLUG-ROUTES-001`).**
-  La recherche par slug existait depuis l'ADR-017, et **aucune route ne s'en servait** : une URL publique lisible demandait d'écrire la méthode et la route à la main, dans chaque projet.
-  `show_by_slug` et sa route sont engendrées dès que l'entité porte un champ `slug`. Une entité sans slug ne voit aucun changement.
-  **La route est déclarée en dernier**, après les segments fixes : un slug valant « new » serait sinon capturé par `/new`, et sa fiche resterait inatteignable. `RESERVED_SLUG_SEGMENTS` nomme ces valeurs pour que l'application les écarte à l'écriture, Forge ne pouvant le faire à sa place puisqu'un slug est une donnée.
-
 ### Modifié
+
+- **`forge new` n'installe plus Node par défaut (`FORGE-NEW-NO-NODE-DEFAULT-001`).**
+  Il lançait `npm install` puis `npm run build:css` à chaque création. Mesuré : **deux minutes sur cent quarante-quatre**, pour produire un `static/tailwind.css` **identique au bit près** à celui que le squelette versionne. La dépense était entière et son produit nul.
+  Elle exigeait en outre une chaîne Node complète, `@parcel/watcher` compilé depuis ses sources compris. Le squelette active `engine-strict` : sous une version de Node antérieure à `.nvmrc`, `npm install` refusait de tourner et `forge new` échouait entièrement.
+  **Cesser de reconstruire n'était honnête qu'à une condition** : que le fichier livré ne puisse plus dériver en silence. C'est ce que garantit `SKELETON-TAILWIND-CSS-STALE-001`, livré juste avant. Les deux vont ensemble, et dans cet ordre.
+  Mesuré après : `forge new` passe de **144 s à 5,3 s**. Le parcours du guide de prise en main, qui rejoue le tutoriel de bout en bout, passe de 173 s à 10,7 s, et **cesse de se sauter** quand Node manque ou est trop ancien, ce qu'il faisait pour une raison étrangère à ce qu'il vérifie.
+  **Rien n'est retiré, seule la dépense l'est.** Le squelette continue de livrer `package.json` et `static/src/input.css`. Node est à un appel de distance, annoncé plutôt que deviné : `forge new <nom> --with-node` à la création, ou `npm install && npm run build:css` plus tard. L'avertissement émis quand npm manque dit désormais que le CSS livré reste en place.
+  La phase front quitte `forge.py` pour `cli/project/front_assets.py`, et les options de `new` pour `_options_de_new` : le budget de complexité plafonne `forge.py` et son `main`, et il demande une extraction, pas un plafond relevé. Huit doublures de test figeaient la signature exacte de `cmd_new` et se cassaient sur toute option nouvelle ; elles acceptent désormais ce qu'elles ne regardent pas.
 
 - **`migration:diff` se lit, et s'essaie à blanc (`ENTITIES-MIGRATION-DIFF-READABLE-001`).**
   La commande rendait un tableau de lignes sans total : sur une entité de trente colonnes, savoir s'il reste un écart demandait de lire les trente lignes et de compter à la main.
@@ -377,33 +552,6 @@
   **Forge implémente deux formes, CLDR en définit six.** C'est exact pour le français, l'anglais et la plupart des langues d'Europe occidentale, et faux pour le russe, l'arabe, le polonais et le gallois : `plural_form` **lève** pour ces langues plutôt que de rendre une forme qu'elle sait fausse. Une implémentation partielle donnerait l'impression de couvrir une langue qu'elle massacre.
   Le français met zéro au singulier, l'anglais non, et la règle dépend de la langue jamais de la région. Une forme absente du catalogue lève, retomber sur l'autre afficherait « 3 article » sans que rien ne le signale.
 
-### Corrigé
-
-- **La réponse HTTP transmet enfin le niveau de correction d'erreur (`QRCODE-ERROR-LEVEL-001`).**
-  Le niveau existait sur `QrCode.from_text`, mais `QrCodeResponse.from_text` appelait `from_text(text)` tout court : un contrôleur, c'est à dire le chemin documenté pour servir un QR Code, ne pouvait pas le choisir.
-  Ce n'est pas un réglage de confort. Un code imprimé sur une étiquette ou une affiche, susceptible d'être rayé ou partiellement couvert, demande `h`, qui tolère 30 % de perte ; en `m`, le défaut, qui en tolère 15 %, il devient illisible, et la panne se découvre sur le terrain une fois les étiquettes collées.
-  `ERROR_LEVELS` est exporté, une application ne pouvant sinon connaître les valeurs valides sans lire la source du paquet.
-
-- **Compter des visiteurs sans garder d'adresse (`STATS-IP-ANONYMISATION-001`).**
-  `forge-mvc-stats` ne stockait **aucune** adresse : sa table n'a pas de colonne pour cela, et ce n'est pas un oubli mais son périmètre, il compte des événements et n'enquête pas.
-  `metadata` est pourtant libre, et rien n'empêchait d'y écrire `{"ip": request.remote_addr}`. C'est le geste naturel de qui veut compter des visiteurs uniques, et il transforme une table de statistiques en fichier de données personnelles, soumis à conservation limitée et à droit d'accès, sans que personne ne l'ait décidé.
-  **Une adresse brute est désormais refusée à l'écriture**, la ligne ne devant pas exister plutôt qu'être filtrée à chaque lecture. Le contrôle porte sur la **clé** et non sur la valeur : « 1.2.3.4 » est une adresse IPv4 valide et un numéro de version tout aussi valable, et refuser cette forme casserait des métadonnées légitimes.
-  `visitor_hash` répond au besoin réel sans rien garder : une empreinte salée valable une journée, identique pour deux visites du même visiteur le même jour, différente le lendemain. Un secret vide est refusé, sans lui l'espace des adresses IPv4 se parcourant en quelques secondes. `anonymize_ip` tronque quand une granularité géographique est vraiment nécessaire, et la documentation dit qu'elle ne rend **pas** une donnée anonyme.
-  Le message de refus oriente vers `forge-mvc-audit` pour qui doit conserver une adresse à des fins de sécurité : ce n'est pas une statistique.
-
-- **Une vue de page ne se compte pas comme une action (`STATS-EVENT-KIND-001`).**
-  `category` est la taxonomie libre de l'application. Le type est orthogonal : mille pages vues valent moins qu'une commande passée, et les mélanger sous un même total donne un chiffre que personne ne peut interpréter.
-  Le vocabulaire est **fermé**, `page_view` et `action` : un troisième type inventé par une application rendrait le champ incomparable d'un projet à l'autre, ce qui est exactement ce qu'il doit permettre. Le défaut est `action`, valeur qui décrit correctement les événements déjà en base, posés par des appels délibérés.
-  La colonne arrive par une **migration additive** : une table déjà créée ne se recrée pas, et c'est la seule façon de la faire évoluer sans perdre les événements enregistrés.
-
-- **Les statistiques s'agrègent enfin par jour (`DOC-STATS-AGGREGATES-001`).**
-  L'agrégation ne connaissait que `name` et `category`. Grouper par journée demandait de rapatrier tous les horodatages pour les tronquer en Python, ce que la base fait sans rien déplacer.
-  `Dialect.date_expression` porte la différence, aucun des quatre backends n'écrivant la troncature d'un horodatage de la même façon. La valeur rendue change aussi de type selon le backend, ce que le contrat annonce plutôt que de le laisser découvrir.
-  **Une série temporelle se trie par le temps**, là où les autres dimensions se trient du plus fréquent au moins fréquent : trier une courbe par total décroissant la rendrait illisible.
-  La liste des dimensions reste une liste blanche, `group_by` finissant dans un `GROUP BY` où aucun backend n'accepte de paramètre lié. Un `kind` inconnu lève de même, un filtre qui rend zéro sans motif faisant chercher un défaut ailleurs.
-
-### Modifié
-
 - **Un garde-fou cherchait une sous-chaîne là où il visait des noms exacts.**
   `test_stats_generic_events_001` interdisait `"PAGE_VIEW = "` dans `events.py`, moyen qui a fini par déborder sa fin : `KIND_PAGE_VIEW` contient cette sous-chaîne sans être une constante de nom d'événement, les deux vivant sur des axes différents. La lecture se fait maintenant par `ast` sur les affectations de premier niveau.
   Deux tests figeaient par ailleurs le nombre de colonnes et le nombre de paramètres d'insertion. Le second vérifie désormais l'égalité entre marqueurs et valeurs, qui est ce qui compte : un décalage fait échouer l'insertion sur les quatre backends.
@@ -419,75 +567,6 @@
   **La sortie vient d'une base réelle.** Sur un environnement de recette alimenté depuis la production, ces données sont celles de personnes, et le fichier finit dans un dépôt Git où il ne s'efface plus. L'exécution en `APP_ENV=prod` est refusée sans `--force`, la sortie est **affichée** par défaut, un fichier existant n'est jamais écrasé, et l'en-tête du fichier rappelle d'où il vient.
   Forge ne devine **pas** quelles colonnes masquer : il ne sait pas lesquelles portent une donnée personnelle, et prétendre le deviner donnerait une fausse assurance. C'est pourquoi la relecture précède l'écriture.
   Le plafond vaut 50 lignes, 1000 au maximum : une fixture est une amorce, pas une sauvegarde. Une ligne de plus est lue pour savoir qu'il en restait et le dire, plutôt que de rendre un instantané tronqué qui ressemble à un instantané complet.
-
-### Corrigé
-
-- **L'ordre des fixtures ne se rabat plus en silence (`FIXTURES-FK-ORDER-ROBUST-001`).**
-  Le tri topologique existait, et se rabattait sur l'ordre alphabétique sans rien dire dans trois cas : `relations.json` absent, cycle dans le graphe, table sans entité déclarée.
-  Le repli est raisonnable, le **silence** ne l'était pas : le chargement échouait ensuite sur une violation de clé étrangère, et rien ne reliait cette erreur à l'ordre qui l'avait causée. L'exploitant cherchait dans ses données un défaut qui était dans son graphe. `fixtures:load` affiche maintenant ce qu'il n'a pas pu déduire, avant de charger, et nomme le cycle : « cycle entre Article, Auteur » se corrige, « ordre non déduit » ne se corrige pas.
-  **Un fichier peut écrire dans plusieurs tables**, et l'ordre ne regardait que le premier `INSERT INTO`. Un fichier insérant dans `articles` puis `commentaires` était classé comme s'il ne touchait qu'`articles`, et pouvait passer avant celui dont `commentaires` dépend. Toutes les tables écrites sont lues, et le fichier classé après la plus tardive de leurs dépendances.
-  Une table se référençant elle même est signalée : l'ordre doit y être respecté ligne à ligne dans le fichier, ce qu'aucun classement de fichiers ne peut garantir.
-
-- **Une colonne absente donne une erreur, et non dix mille (`IMPEXP-COLUMN-MAPPING-001`).**
-  `FieldSpec.name` servait à la fois de clé d'enregistrement et de nom de colonne CSV : un export tableur dont l'en-tête dit « Adresse e-mail » ne pouvait pas alimenter le champ `email`, et il fallait renommer les colonnes à la main avant chaque import. `source` déclare le ou les en-têtes acceptés, essayés dans l'ordre.
-  **Le défaut le plus coûteux était ailleurs.** Une colonne absente n'était pas détectée : `row.get(nom, "")` rendait une chaîne vide, et chaque ligne produisait « valeur requise manquante ». Un fichier de dix mille lignes rendait dix mille erreurs pour un seul en-tête mal orthographié, et la vraie cause restait introuvable au milieu. Les en-têtes sont maintenant rapprochés une fois, avant d'examiner la moindre ligne.
-  **Rien n'est rapproché par ressemblance.** Ni la casse ni les accents ne sont normalisés : rapprocher « Prix HT » de `prix_ttc` parce que les deux contiennent « prix » ferait importer la mauvaise colonne sans le signaler. Les espaces de bordure sont en revanche tolérées, un export tableur en posant souvent sans intention.
-
-- **Le rapport d'erreurs se télécharge (`IMPEXP-ERROR-REPORT-001`).**
-  `ImportReport` portait une liste exploitable en Python et inutilisable par la personne qui a déposé le fichier. Un import de deux mille lignes avec quarante erreurs ne se corrigeait qu'en lisant un écran, une erreur à la fois, sans jamais voir la ligne fautive.
-  Le rapport CSV porte la ligne, **le numéro affiché par un tableur** (la ligne 1 des données est la ligne 2 du fichier, et ne donner que l'une des deux fait chercher au mauvais endroit), la colonne, le message et la valeur refusée.
-  **Le rapport est lui même échappé** : il contient des données venues du fichier déposé, et sans échappement une cellule commençant par `=` redeviendrait une formule vive à son ouverture. Le rapport d'erreurs deviendrait le vecteur.
-
-- **Un second format, JSONL (`IMPEXP-JSONL-001`).**
-  Le CSV ne porte aucun type et ne sait pas représenter une valeur imbriquée : un export destiné à un autre programme y perd la différence entre le nombre `1`, le texte `"1"` et le booléen `true`.
-  JSONL plutôt que JSON : un tableau impose de tout charger avant de lire le premier enregistrement, et une virgule manquante le rend entièrement illisible, là où une ligne fautive en JSONL n'empêche pas de lire les autres.
-  Une clé absente est écrite à `null` et jamais omise, un consommateur de flux ayant besoin que toutes les lignes aient la même forme. La lecture est stricte par défaut ; le mode tolérant existe pour récupérer ce qui est lisible d'un fichier abîmé, et perd des données en silence, ce que la documentation dit.
-
-### Corrigé
-
-- **L'export CSV du CRUD ne tronque plus en silence (`IMPEXP-FILTERED-EXPORT-001`).**
-  **Faux besoin mesuré** : l'export respectait déjà recherche, tri et filtres de la liste. Le manque était ailleurs, et bien plus grave.
-  `_EXPORT_LIMIT` valait mille, et **rien ne le disait**. Un utilisateur qui filtrait trois mille lignes en recevait mille, dans un fichier impossible à distinguer d'un export complet jusqu'à ce que quelqu'un compte. Pour un export destiné à un contrôle ou à une reprise de données, c'est une perte silencieuse.
-  La fonction d'export demande désormais une ligne de plus que le plafond, seule façon de savoir qu'il en restait sans payer un `COUNT` sur la même requête. La troncature se voit dans le **nom du fichier**, suffixé `-TRONQUE`, ce que la personne lit, et dans les en-têtes `X-Forge-Export-Truncated` et `X-Forge-Export-Limit`, pour un client programmatique.
-  Le correctif vit dans le générateur : un contrôleur déjà engendré garde l'ancien comportement jusqu'à un nouveau `forge make:crud`.
-  Sept tests de `test_crud_export_csv.py` découpaient un **nombre fixe de caractères** après le début de la fonction engendrée, et l'un avait déjà vu sa fenêtre « étendue » une fois. Ils extraient maintenant la fonction entière, et ne demanderont plus d'extension.
-
-- **L'API IoT ne donne plus tous les sites à qui en veut un (`IOT-DEVICE-AUTH-001`).**
-  Elle était protégée par **un** jeton, `FORGE_IOT_API_TOKEN`, qui ouvrait toutes les mesures de tous les sites. Un prestataire chargé des capteurs d'un bâtiment recevait ce jeton, et lisait par là les mesures des autres, sans qu'aucun mécanisme ne l'en empêche ni ne le signale.
-  Un jeton porte désormais une portée, globale, un site, ou un seul équipement d'un site. `forge iot:token` les crée, les liste et les révoque. Le filtrage a lieu **en SQL** : rapatrier les mesures des autres sites pour les écarter ensuite les aurait fait passer par un processus qui n'y a pas droit.
-  **Le registre s'active en le passant à `register_iot_routes`, jamais d'office.** Le monter par défaut exigerait un jeton là où l'API était ouverte, et casserait sans le dire les déploiements existants. `FORGE_IOT_API_TOKEN` garde la portée globale, le retirer étant une rupture d'API publique que la règle C refuse.
-  Le jeton n'est **affiché qu'une fois** et n'est stocké que par son empreinte. Un simple SHA-256 y suffit, sans sel ni étirement : le jeton est engendré avec 256 bits d'entropie, contrairement à un mot de passe humain, et il n'existe donc ni dictionnaire ni table arc-en-ciel à lui opposer. La révocation pose une date et ne supprime pas la ligne.
-  Un refus de portée est un **403**, pas un 401 : un 401 ferait croire au porteur que son jeton est faux, et il le remplacerait au lieu d'en demander un dont la portée convient.
-
-- **Les relevés répondent enfin à la question qu'on leur pose (`IOT-AGGREGATES-001`).**
-  Le paquet rendait les mesures brutes et les comptait. « Quelle a été la température moyenne de la semaine, et jusqu'où est elle montée » n'avait aucune réponse, et l'application devait rapatrier toutes les mesures pour les additionner en Python, ce qui devient impraticable dès qu'un capteur relève chaque minute.
-  Deux routes et deux fonctions rendent moyenne, minimum, maximum et effectif sur une fenêtre, par site ou par équipement, en `AVG`/`MIN`/`MAX` standard écrits une fois pour les quatre backends.
-  **Une fenêtre vide ne rend pas zéro** : « le capteur n'a rien envoyé » et « le capteur a relevé zéro » sont deux faits différents, que confondre fausserait toute moyenne. Le comptage porte sur `value` et non sur `*`, une mesure sans valeur ne devant pas gonfler l'effectif d'une moyenne qu'elle n'alimente pas.
-  PostgreSQL rend `AVG` en `Decimal` là où MariaDB rend un flottant : la valeur est normalisée, sans quoi la même requête donnerait deux types selon le backend et la sérialisation JSON échouerait sur l'un des deux.
-
-- **Un contrôle d'accès applicatif peut se brancher sur la lecture (`IOT-RBAC-READ-001`).**
-  Le jeton dit ce qu'un porteur peut lire ; il ne dit rien de qui le porte ni de ce que cette personne a le droit de faire.
-  **Une prise, et non une dépendance à `forge-mvc-rbac`** : aucun opt-in n'importe un autre, et un paquet IoT qui dépendrait du RBAC obligerait à installer le RBAC pour recevoir des mesures MQTT. Un test le vérifie par `ast`.
-  **Une vérification qui échoue refuse la lecture.** Un contrôle qui lève ou qui rend autre chose qu'un booléen ne dit pas que l'accès est permis, il ne dit rien ; traiter ce silence comme une autorisation ouvrirait tout le jour où le service de permissions tombe. L'incident est journalisé pour l'exploitant.
-  Plusieurs contrôles cohabitent, tous doivent accepter, et le premier refus arrête la série. Sans contrôle branché, rien ne change : le paquet n'invente pas une politique que personne n'a demandée. La liste des actions est fermée, de sorte qu'un contrôle branché sache exactement ce qu'il peut recevoir.
-
-- **Les métadonnées d'un fichier audio sont enfin lisibles (`AUDIO-ID3-001`).**
-  `ffprobe` les rendait déjà, le paquet les jetait : le sondage lisait la durée, le codec et le débit, et laissait tomber le titre, l'artiste et l'album. Une application devait rappeler `ffprobe` elle même pour afficher le nom d'un morceau qu'elle venait de recevoir. `probe_audio(...).tags` les porte, et n'est jamais `None`.
-  **Le vrai sujet du ticket est le nettoyage.** Une étiquette vient du fichier envoyé, elle est écrite par qui l'a produit, et elle finit affichée dans une page. Les caractères de contrôle sont retirés, y compris `U+2028` que `str.strip` laisse passer et qui casse une chaîne JavaScript ; la longueur est bornée, rien n'empêchant un titre d'un mégaoctet ; et rien n'est interprété, l'échappement appartenant au gabarit.
-  Les noms d'étiquettes varient selon le conteneur, ID3 disant `tit2` là où Vorbis dit `TITLE` : les clés sont cherchées en minuscules, par ordre de préférence, et un conteneur sans bloc de format voit ses étiquettes lues sur le flux. Une année implausible ou un « piste 5 sur 2 » sont écartés, afficher une valeur manifestement fausse valant moins que ne rien afficher.
-  Le module ne réécrit jamais les étiquettes d'un fichier : lire et écrire sont deux gestes.
-
-- **Un fichier audio peut être découpé (`AUDIO-TRIM-001`).**
-  Extraire un extrait, retirer un silence de tête, produire un aperçu : le paquet transcodait un fichier entier et ne savait pas en prendre un morceau. Il fallait rappeler `ffmpeg` à la main, donc réécrire le durcissement des arguments et la gestion du délai.
-  `forge audio:trim source.wav extrait.mp3 --from 1:30 --to 2:00`. Les trois écritures d'un instant sont acceptées, `90`, `1:30` et `0:01:30.5`.
-  **La sortie ne peut pas être la source** : une découpe sur place n'existe pas côté `ffmpeg`, qui lit et écrit en même temps, et le fichier serait tronqué à zéro. La comparaison porte sur le chemin résolu, `a.mp3` et `./a.mp3` désignant le même fichier. **Un fichier de sortie existant n'est pas écrasé** sans `--force`, mode « Forge génère » de la charte.
-  Un intervalle vide ou renversé est refusé plutôt que joué, `ffmpeg` écrivant sinon un fichier de zéro seconde sans se plaindre. `-ss` est placé avant `-i`, ce qui fait sauter directement à l'instant demandé au lieu de décoder tout ce qui précède, et change une découpe de plusieurs minutes en une opération immédiate sur un long fichier.
-
-- **Les deux diagnostics média ne peuvent plus diverger (`AUDIO-DOCTOR-HARMONISE-001`).**
-  **Faux besoin mesuré** : `audio:doctor` et `video:doctor` étaient déjà alignés, même dataclass de résultat, mêmes statuts, mêmes contrôles. Le ticket livre donc le garde-fou qui manquait, qui exige l'égalité stricte des deux surfaces à un contrôle près, la migration que l'audio n'a pas puisqu'il est sans état.
-  La comparaison a en revanche fait apparaître une divergence réelle ailleurs, corrigée ici.
-
-### Modifié
 
 - **Une valeur de configuration audio illisible lève, au lieu de retomber sur le défaut** (`AUDIO-DOCTOR-HARMONISE-001`).
   `FORGE_AUDIO_MAX_UPLOAD_MB=abc` donnait 200 en silence : les fichiers plus lourds étaient refusés, et rien ne l'expliquait. Les quatre paquets qui bornent quelque chose se comportent désormais pareil, `files`, `images`, `video` et `audio`.
@@ -513,8 +592,6 @@
   **WebVTT seul**, le seul format que la balise `track` lit nativement. En accepter d'autres demanderait de convertir à la volée ou de faire porter la conversion au navigateur, qui ne sait pas la faire ; le principe 11 veut une seule façon officielle.
   **Ce qui n'est pas du WebVTT est refusé à l'entrée**, sur la signature que la spécification exige. Sans ce contrôle, n'importe quel fichier serait stocké et servi depuis le domaine de l'application sous un nom rassurant. Le refuser à l'écriture vaut mieux que de le filtrer à chaque lecture.
   Le chemin est bâti depuis l'UUID et l'étiquette de langue, tous deux validés : le nom du fichier envoyé n'y entre pas, et aucune traversée n'est possible. L'étiquette est normalisée en minuscules, `FR` et `fr` créant sinon deux pistes que le lecteur afficherait deux fois. La piste est servie avec la règle d'accès de la vidéo, une piste disant ce que la vidéo raconte.
-
-### Modifié
 
 - **Une valeur de configuration vidéo illisible lève, au lieu de retomber sur le défaut** (`VIDEO-QUOTA-001`).
   `FORGE_VIDEO_MAX_DURATION_SECONDS=7200x` donnait 3600 en silence : les vidéos de deux heures étaient refusées, et rien n'expliquait pourquoi. Le paquet suit désormais `forge-mvc-files` et `forge-mvc-images`, une limite mal écrite se signalant au démarrage.
@@ -547,8 +624,6 @@
   Le paquet portait une seule limite, la surface en pixels, pensée contre la bombe de décompression. Elle laisse passer une image de 12000 sur 2000, qui tient sous les 24 mégapixels et qui est pourtant impossible à afficher, coûteuse à redimensionner et volumineuse à servir.
   `IMAGE_MAX_WIDTH`, `IMAGE_MAX_HEIGHT` et `IMAGE_MAX_BYTES` complètent la garde de surface, qui reste en place parce qu'elle protégeait contre autre chose. Le poids est distinct d'`upload_max_size` : une application peut accepter un PDF de 20 Mo et refuser une photo de 5 Mo.
   Une valeur illisible **lève**, comme pour le quota de `forge-mvc-files`, et le message dit que retirer la variable est la façon de ne pas borner. Les dimensions sont contrôlées sur l'en-tête avant tout décodage, et le poids avant même l'ouverture.
-
-### Modifié
 
 - **`IMAGE_VARIANT_SIZES` a disparu de l'API publique de `forge-mvc-images`** (`IMAGES-PRESETS-DECLARATIFS-001`).
   Le symbole était la cause du défaut, un instantané figé à l'import : le garder en le dérivant aurait laissé la même surprise. `variant_presets()` le remplace partout, y compris dans les parcours d'accueil, qui affichent désormais ce que le projet produit vraiment plutôt qu'un couple de valeurs écrit d'avance.
@@ -805,34 +880,76 @@
   Une colonne `NOT NULL` sans défaut est refusée au rendu, les lignes existantes ne pouvant pas la satisfaire. Les index de la colonne ajoutée sont toujours rendus séparément, y compris sur les dialectes qui les inlinent dans un `CREATE TABLE`.
   Rendu vérifié sur les quatre backends. Débloque au moins trois autres tickets rc8 qui ajoutent une colonne à une table existante.
 
-### Rupture
+### Retiré du périmètre
 
-- **`SessionStore` gagne une méthode (`SESSIONS-DELETE-FOR-USER-001`).**
-  Le contrat est `@runtime_checkable` : un store auquel il manque `delete_for_user` n'est plus reconnu par `isinstance`, et `forge.configure` le refuse.
-  Un store tiers écrit avant ce ticket doit l'implémenter pour rester accepté. C'est délibéré, un store qui ne sait pas révoquer ne remplissant pas le contrat de sécurité attendu (principe 10).
-  La clé d'identité de session, jusqu'ici dupliquée en dur dans `core/security/session.py`, vit désormais dans `core.sessions.keys`. `core.auth.session.AUTH_USER_ID_SESSION_KEY` en reste l'alias public.
+- **Quatre tickets du lot 5 du cycle rc8 sont retirés par décision écrite** (roadmap `forge-rc8-optins-roadmap.md`, section 8).
+  Chacun entrait en tension avec un principe de la charte, et la tension a été tranchée en connaissance de cause plutôt que contournée.
+  `MFA-WEBAUTHN-001` : une spécification large et mouvante dont la maintenance ne peut pas être garantie sur la durée, ce que le principe 8 vise exactement.
+  `AUDIO-STATEFUL-OPTION-001` : la bonne réponse, si le besoin revient, est d'extraire la machinerie d'état partagée avec `video`, pas de la dupliquer.
+  `DEPLOY-CADDY-001` : dire qu'une chose est possible ne coûte rien, maintenir un second gabarit officiel coûte à chaque version.
+  `NOTIF-POLLING-HELPER-001` : Forge livre déjà HTMX, et un assistant ne retirerait aucune décision à l'application, il en masquerait une.
 
+- **Un garde-fou refuse qu'un README promette une commande qui n'existe pas (`META-README-COMMANDS-RATCHET-001`).**
+  Une phrase de prose ne se vérifie pas en général. Ce qui se vérifie, et qui dérive de la même façon, ce sont les **commandes** : chaque opt-in les déclare dans `COMMANDS`, table que le cœur lit (ADR-059), et son README en annonce dans un tableau.
+  Le garde-fou refuse une commande citée au README et absente de `COMMANDS`, promesse que l'utilisateur tape avant de comprendre, et refuse qu'une commande **déclarée** soit annoncée « à venir », ce qui est la dérive exacte que le ticket précédent a corrigée.
+  Il **tolère** l'inverse, une commande de `COMMANDS` absente du README : un README n'est pas une référence exhaustive, l'aide riche du CLI porte déjà ce contrat, et exiger la réciproque transformerait chaque README en catalogue.
+  Le fichier est exempté du marqueur `docs`, avec sa justification : il compare de la prose à du **code**, et le marquer le retirerait de la boucle où une commande retirée de `COMMANDS` doit être vue.
 
-- **La clé de chiffrement MFA peut tourner sans fermer les comptes (`MFA-KEY-ROTATION-001`).**
-  `FORGE_MFA_SECRET_KEY` n'avait aucune procédure de rotation : la changer rendait tous les secrets TOTP illisibles au même instant, si bien que chaque porteur d'un facteur perdait son second facteur d'un coup.
-  La seule issue était de désactiver le MFA de tout le monde, ce qui transforme une mesure d'hygiène en panne d'authentification.
-  `FORGE_MFA_SECRET_KEY_PREVIOUS` déclare les clés retirées, séparées par des virgules, acceptées **au déchiffrement seulement**. Le chiffrement utilise toujours la clé courante, et plusieurs rotations rapprochées restent lisibles.
-  `rotate_totp_secret` rechiffre un secret et `uses_current_key` dit ce qu'il reste à traiter, ce qui permet de balayer une table sans tout réécrire. Le rechiffrement passe par `MultiFernet.rotate`, de jeton à jeton : le secret en clair ne transite ni ne se journalise.
-  Forge ne balaie pas la base lui-même, la table des facteurs appartenant à l'application dont il ne connaît ni le nom ni les colonnes (principe 1). Il fournit la primitive, l'application décide où elle s'applique.
-  Les clés retirées sont validées comme la clé courante, placeholders refusés, et aucun message ne révèle leur valeur. Sans la variable, le comportement est inchangé.
+- **Le contrat RBAC s'exporte (`RBAC-CONTRACT-EXPORT-001`).**
+  `rbac:validate` dit si le contrat est valide, `rbac:audit` le compare à la base. Ni l'un ni l'autre ne répond à « qui a le droit de faire quoi », question d'une revue de sécurité, qui demandait de lire `rbac.json` à l'œil.
+  `forge rbac:export` rend un tableau Markdown, à versionner à côté du code où une différence montre qu'un rôle a gagné une permission, ou un CSV pour une revue en tableur.
+  **L'export rend le contrat, jamais l'état de la base** : confondre les deux ferait prendre une intention pour un état. Un contrat invalide n'est pas exporté, le tableau ne s'appliquant à rien et le lecteur le prenant pour la vérité. Le tri rend deux exports comparables, et les cellules sont échappées.
 
-### Corrigé
+- **Un rôle peut exiger un second facteur (`MFA-REQUIRED-BY-ROLE-001`).**
+  Le paquet savait dire si un utilisateur **a** un facteur actif, jamais s'il **devrait** en avoir un. L'application écrivait donc le contrôle dans chaque écran sensible, le faisait bien la première fois, et l'oubliait au troisième écran ajouté six mois plus tard.
+  `MFA_REQUIRED_ROLES` déclare la politique une fois. **Elle n'active rien** : rendre un facteur obligatoire ne peut pas le créer à la place de l'utilisateur, il faut son téléphone et son consentement ; elle dit qu'un accès doit être refusé, et `reason` donne le message qui conduit vers l'inscription.
+  Le paquet **n'importe pas `forge-mvc-rbac`** : les rôles sont lus dans la session, où l'authentification les a rangés, et trois emplacements sont acceptés, les applications les employant tous les trois. `check_mfa_requirement` ne lève jamais : un contrôle de sécurité qui échoue en levant priverait d'accès un utilisateur légitime.
 
-- **La casse de `APP_ENV` désarmait deux gardes de sécurité (`ENV-APP-ENV-NORMALISATION-001`).**
-  Trois normalisations coexistaient pour la même variable : aucune, `.lower()` seul, et `.strip().lower()`.
-  Avec `APP_ENV=Prod`, une comparaison brute à `"prod"` est fausse, si bien que deux gardes cessaient de se déclencher sans rien dire.
-  L'API IoT s'enregistrait **sans jeton** en production, ce que `SEC-IOT-TOKEN-PROD-001` interdit, et `fixtures:load --run` acceptait de peupler la base de production sans `--force`, ce que l'ADR-074 interdit.
-  Les tests de ces deux gardes existaient et passaient : ils n'exerçaient que l'écriture `"prod"` en minuscules. Douze tests de comportement échouent sur le code d'avant et passent sur celui d'après.
-  `core.app.env` devient la seule lecture officielle, avec `normalize_app_env`, `read_app_env` et `is_prod`. Le module ne dépend que de la bibliothèque standard, pour rester importable au tout début du démarrage, y compris par la configuration du squelette.
-  Le cœur tolère désormais la variante quand le pré-vol `deploy:check`, lui, continue d'exiger la forme canonique : le premier ne doit jamais rater une production, le second impose une écriture unique. Ce partage de rôles est documenté plutôt que subi.
-  Le garde-fou `test_app_env_normalisation_001` refuse toute nouvelle lecture brute et toute comparaison non normalisée. Il travaille sur l'arbre syntaxique, parce qu'un `grep` sur « prod » remonte « produire » : c'est ce faux positif qui avait fait conclure à tort que `forge-mvc-fixtures` n'avait aucune garde.
+- **Le back-office supprime plusieurs lignes en une fois (`ADMIN-BULK-ACTIONS-001`).**
+  Il ne savait supprimer qu'une ligne à la fois : nettoyer deux cents inscriptions de test demandait deux cents allers-retours et deux cents confirmations.
+  Les identifiants partent en **paramètres liés**, un marqueur par valeur : les concaténer serait une injection, et le fait qu'ils viennent de cases cochées n'y change rien. Une sélection vide est refusée, une suppression groupée sans sélection effaçant la table entière si la clause était omise, et un plafond de deux cents lignes l'est aussi, une sélection de cette taille venant plus souvent d'un « tout cocher » que d'une intention.
+  Le nombre réellement supprimé est rendu : une ligne disparue entre l'affichage et la validation n'est pas une erreur.
+
+- **Les minuteries périodiques sont documentées (`DEPLOY-TIMERS-DOC-001`).**
+  Purge des sessions, reprise des tâches, sauvegarde : trois gestes qui doivent tourner, et aucun n'est planifié par Forge, embarquer un ordonnanceur faisant du framework autre chose que ce qu'il est.
+  Deux unités systemd complètes et quatre pièges nommés : activer le `.timer` et non le `.service`, faute de quoi la commande tourne une fois au démarrage puis plus jamais ; `Persistent=true` qui rattrape les exécutions manquées ; `RandomizedDelaySec` qui étale la charge ; et `EnvironmentFile` en `chmod 600`, ces commandes se connectant à la base.
+  La sauvegarde reste hors de Forge, chaque backend ayant son outil. Ce que la documentation dit et qui vaut plus qu'un script générique : **une sauvegarde jamais restaurée n'est pas une sauvegarde**.
+
+- **Les écarts de dialecte sont documentés (`DOC-DIALECT-ECARTS-001`).**
+  Bornes de lignes, booléens, insertion conditionnelle, signaux d'erreur, et ce qui reste délibérément hors du contrat. Un écart connu se contourne ; un écart ignoré se découvre en production, sur le seul backend où il mord.
+  La documentation nomme les pièges qui ont déjà coûté : `pagination_clause` et `pagination_param_order` se lisent en **paire**, T-SQL inversant l'ordre des deux paramètres ; le SQLSTATE ne discrimine pas sur MariaDB ni SQL Server, qui rendent `23000` pour trois conditions différentes ; et un message d'erreur PostgreSQL est traduit, donc n'est jamais un signal.
+  Forge ne fournit **aucune** insertion conditionnelle : les quatre formes n'ont pas la même sémantique de verrouillage, et une abstraction promettrait une équivalence qui n'existe pas.
+
+### Tests
+
+- **La promesse centrale du client de test n'était pas vérifiée (`TESTING-CLIENT-GUARDS-REACHED-001`).**
+  Le client dit passer par le chemin de production, et sa docstring explique pourquoi : un client qui reconstruirait sa propre boucle serait un jumeau, il passerait là où la production échoue. Les sept routes de son application d'essai se déclaraient toutes publiques et sans CSRF : un client qui court-circuiterait les middlewares aurait laissé la suite verte.
+  Les gardes sont désormais exercées dans les deux sens, et la boucle complète du jeton anti-CSRF est jouée, ce qui prouve aussi que le cookie de session est reporté d'une requête à la suivante.
+
+- **Deux garde-fous de structure sur l'arbre syntaxique (`META-ROUTES-REFS-AST-001`, `PKG-ENTRY-POINTS-VISIBLES-001`).**
+  Les chemins écrits en segments se lisent par `ast` et non par grep : une occurrence en commentaire ou en chaîne ferait accuser un projet qui ne déclare rien.
+
+- **La chaîne des parcours d'accueil est dérivée du menu (`WELCOME-CHAINES-DERIVEES-001`).**
+  Treize paquets portaient chacun leur garde-fou de chaîne, et chacun figeait la **liste des pages** plutôt que la propriété : six paliers ajoutés, six garde-fous tombés sur des chaînes pourtant intactes. Un seul contrôle dérive maintenant la chaîne du `nav` de chaque paquet, vérifie qu'aucun palier n'est un cul-de-sac, et qu'aucune entrée de menu ne pointe sur un fichier absent.
 
 ### Documentation
+
+- **Le chemin de démarrage n'était documenté que par ses ADR (`DOC-CORE-BOOTSTRAP-WIRING-001`).**
+  `bootstrap.py`, le module de câblage que les deux points d'entrée lisent, n'apparaissait dans aucune page vivante : le mot n'y figurait que comme étiquette de couche. Un lecteur du site ne pouvait pas savoir où câbler ses middlewares. Le refus de servir une application désarmée tenait en une phrase, sans nommer l'exception que l'exploitant voit, ni dire laquelle des deux causes s'applique.
+  Relevé au passage : les 215 imports de `core` documentés s'importent tous, et les 255 appels documentés correspondent tous à leur signature réelle.
+
+- **Les parcours d'accueil des seize opt-ins couvrent enfin leurs capacités (`WELCOME-ADMIN-NOUVEAUTES-001`, `WELCOME-ENTITIES-NOUVEAUTES-001`, `WELCOME-RBAC-NOUVEAUTES-001`, `WELCOME-WORKFLOW-NOUVEAUTES-001`, `WELCOME-MFA-NOUVEAUTES-001`, `WELCOME-JOBS-MAIL-NOUVEAUTES-001`, `WELCOME-NOTIF-FILES-NOUVEAUTES-001`, `WELCOME-IMAGES-NOUVEAUTES-001`, `WELCOME-VIDEO-AUDIO-NOUVEAUTES-001`, `WELCOME-IOT-IMPORT-NOUVEAUTES-001`, `WELCOME-FIXTURES-SETTINGS-AUDIT-STATS-001`, `WELCOME-TESTING-I18N-NOUVEAUTES-001`).**
+  Le motif était constant sur seize paquets : la référence documente, le parcours ignore. Environ cent cinquante symboles publics n'apparaissaient dans aucune page, dont seize pour `forge-mvc-files` seul, et `ForgeTestClient`, pièce maîtresse de `forge-mvc-testing`, ne figurait nulle part.
+  Trente-six paliers ont été écrits, chacun **exécuté** avant d'être publié. Ils nomment les pièges que la référence laissait supposer : un champ calculé n'a pas de colonne, un analyseur de fichiers en panne refuse le dépôt, une tâche qui dure plus que son bail s'exécute deux fois, la priorité d'une file n'interrompt jamais rien, et deux paquets voisins emploient des conventions opposées pour la même forme de crochet.
+
+- **Le packaging de `forge-mvc-fixtures` annonçait deux commandes sur cinq (`FIXTURES-PACKAGING-COMMANDES-001`).**
+  La description PyPI est ce que lit un visiteur avant d'installer : elle sous vendait l'opt-in et laissait croire absent ce qui existe.
+
+- **L'aide en ligne nommait MariaDB pour des commandes agnostiques (`DB-HELP-BACKEND-AGNOSTIC-001`).**
+  Le cœur est agnostique depuis l'ADR-054 et les quatre backends sont au niveau plein depuis l'ADR-084. Neuf commandes promettaient encore MariaDB : un lecteur qui déploie sur PostgreSQL y lisait que la commande ne le concerne pas.
+
+- **Les garde-fous méta du déploiement (`DEPLOY-META-GARDEFOUS-001`).**
+  Comptes et plafonds figés, à lancer avant de pousser.
 
 - **Le back-office était décrit comme un paquet vide (`ADMIN-DOC-ETAT-REEL-001`).**
   Le README, le docstring du paquet et le bandeau de la roadmap annonçaient tous les trois qu'aucun code n'existait, alors que `forge-mvc-admin` porte 1259 lignes et un back-office fonctionnel, et que la section 9 de cette même roadmap marquait ses dix-sept tickets « livré ».
@@ -841,8 +958,6 @@
 - **Le cycle rc8 des opt-ins est cadré (`ROADMAP-RC8-OPTINS-001`).**
   Quatre-vingt-cinq tickets en six lots, dont l'ordre est une contrainte de dépendance.
   Quinze améliorations demandées lors de la revue étaient déjà livrées, et sont consignées pour que la prochaine revue ne les redemande pas.
-
-
 
 ## [1.0.0-rc.7] - 2026-08-17
 
