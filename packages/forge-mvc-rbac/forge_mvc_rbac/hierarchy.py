@@ -110,17 +110,68 @@ def detect_cycle(table: "dict[str, tuple[str, ...]]") -> "tuple[str, ...] | None
     return None
 
 
+def _problemes_de_forme(data: "dict[str, Any] | None") -> "list[str]":
+    """Déclarations que le normaliseur écarte, et que rien ne signalait.
+
+    `RBAC-HIERARCHY-FORME-SILENCIEUSE-001`. `validate_hierarchy` examinait la
+    table **déjà normalisée**, donc jamais ce que la normalisation avait jeté.
+    Trois formes passaient sans un mot :
+
+        "role_inherits": ["admin"]                 une liste au lieu d'un objet
+        "role_inherits": {"admin": "editeur"}      des crochets oubliés
+        "role_inherits": {"admin": [123]}          un parent qui n'est pas un rôle
+
+    Dans les trois cas le contrat était déclaré valide et l'héritage n'existait
+    pas. Le modèle d'accès devenait plus étroit que ce que le fichier annonce,
+    et cela se découvrait en production, sous la forme « l'administrateur ne
+    peut pas faire ceci », sans que rien ne désigne le contrat.
+
+    Se rabattre sur une table vide est acceptable ; se taire ne l'est pas.
+    """
+    if data is None:
+        return []
+    brut = data.get("role_inherits")
+    if brut is None:
+        return []
+    if not isinstance(brut, dict):
+        return [
+            "role_inherits doit être un objet « rôle : [parents] », et non "
+            f"{type(brut).__name__}. Tel quel, aucun héritage n'est appliqué."
+        ]
+
+    problemes: list[str] = []
+    for role, parents in sorted(cast("dict[str, Any]", brut).items()):
+        if not isinstance(parents, list):
+            problemes.append(
+                f"« {role} » déclare ses parents en {type(parents).__name__} et "
+                "non en liste. Cet héritage n'est pas appliqué ; écrivez "
+                f'["{parents}"] si un seul parent est voulu.'
+                if isinstance(parents, str) else
+                f"« {role} » déclare ses parents en {type(parents).__name__} et "
+                "non en liste. Cet héritage n'est pas appliqué."
+            )
+            continue
+        for parent in cast("list[Any]", parents):
+            if not isinstance(parent, str) or not parent.strip():
+                problemes.append(
+                    f"« {role} » hérite de {parent!r}, qui n'est pas un nom de "
+                    "rôle. Ce parent est ignoré."
+                )
+    return problemes
+
+
 def validate_hierarchy(data: "dict[str, Any] | None") -> "list[str]":
     """Problèmes de la hiérarchie déclarée. Liste vide si elle est saine.
 
     Rend une liste plutôt que de lever : le contrat est validé en une passe, et
     un rapport complet vaut mieux qu'un premier problème suivi de l'inconnu.
     """
+    problemes: list[str] = _problemes_de_forme(data)
+
     table = inheritance_map(data)
     if not table:
-        return []
+        return problemes
 
-    problemes: list[str] = []
     declares: set[str] = set()
     if data is not None:
         roles = data.get("roles")

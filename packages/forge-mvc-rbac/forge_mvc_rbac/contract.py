@@ -13,6 +13,8 @@ Comportement :
 
 from __future__ import annotations
 
+import logging
+
 from forge_mvc_rbac.hierarchy import (
     RoleHierarchyError,
     expand_roles,
@@ -45,6 +47,9 @@ _RBAC_SCHEMA_ID = "https://forge-mvc.dev/schemas/rbac.schema.json"
 # ---------------------------------------------------------------------------
 
 
+logger = logging.getLogger("forge.rbac")
+
+
 @dataclass
 class RbacContractError:
     """Erreur de validation du contrat RBAC."""
@@ -64,6 +69,14 @@ class RbacContractResult:
     entities_count: int = 0
     errors: list[RbacContractError] = field(default_factory=list[RbacContractError])
     data: dict[str, Any] | None = None
+    degraded: bool = False
+    """La validation par schéma n'a pas pu tourner (`RBAC-CONTRACT-DEGRADE-MUET-001`).
+
+    `valid` ne vaut alors pas grand chose : seule la cohérence de la hiérarchie
+    a été vérifiée, et rien de la forme. Sans ce drapeau, le mode dégradé
+    rendait `valid=True` en silence, si bien qu'un contrat jamais examiné se
+    lisait comme un contrat sain.
+    """
 
 
 # ---------------------------------------------------------------------------
@@ -140,14 +153,38 @@ def _count_entities(instance: dict[str, Any]) -> int:
     return len(cast("dict[Any, Any]", entities)) if isinstance(entities, dict) else 0
 
 
-def _result_degraded(path_str: str, instance: dict[str, Any]) -> RbacContractResult:
+def _result_degraded(
+    path_str: str, instance: dict[str, Any], raison: str
+) -> RbacContractResult:
+    """Résultat quand la validation par schéma n'a pas pu tourner.
+
+    Elle rendait `valid=True` sans **aucun** contrôle, et sans le dire : un
+    contrat portant un cycle d'héritage, que ce module déclare pourtant
+    inexploitable, passait pour sain (`RBAC-CONTRACT-DEGRADE-MUET-001`).
+
+    Deux choses changent. La cohérence de la hiérarchie est vérifiée quand
+    même : elle est en Python pur et ne demande aucun schéma, donc rien ne
+    justifiait de la sauter. Et le mode dégradé s'annonce, dans le drapeau et
+    dans le journal, plutôt que de laisser lire une validation qui n'a pas eu
+    lieu.
+    """
+    erreurs = [
+        RbacContractError(path="$.role_inherits", message=probleme)
+        for probleme in validate_hierarchy(instance)
+    ]
+    logger.warning(
+        "Forge RBAC - contrat %s NON validé par schéma (%s) ; seule la "
+        "cohérence de la hiérarchie a été vérifiée.", path_str, raison,
+    )
     return RbacContractResult(
-        valid=True,
+        valid=not erreurs,
         exists=True,
         path=path_str,
         roles_count=_count_roles(instance),
         entities_count=_count_entities(instance),
+        errors=erreurs,
         data=instance,
+        degraded=True,
     )
 
 
@@ -180,15 +217,15 @@ def load_rbac_contract(project_root: str | Path = ".") -> RbacContractResult:
 
     schemas_dir = _find_schemas_dir()
     if schemas_dir is None:
-        return _result_degraded(path_str, instance)
+        return _result_degraded(path_str, instance, "dossier de schémas introuvable")
 
     registry = _build_registry(schemas_dir)
     if registry is None:
-        return _result_degraded(path_str, instance)
+        return _result_degraded(path_str, instance, "registre de schémas indisponible")
 
     validator = _make_validator(schemas_dir, registry)
     if validator is None:
-        return _result_degraded(path_str, instance)
+        return _result_degraded(path_str, instance, "validateur JSON indisponible")
 
     errors = _collect_errors(validator, instance)
 
