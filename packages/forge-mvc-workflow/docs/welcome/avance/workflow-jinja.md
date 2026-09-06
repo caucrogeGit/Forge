@@ -110,4 +110,4 @@ with router.group("", public=True) as public:
 
 Vous avez parcouru toute la progression workflow : statuts, transitions, affichage.
 
-[Bilan du niveau avancé](bilan.md)
+[Suivant : l'historique des transitions](workflow-historique.md)

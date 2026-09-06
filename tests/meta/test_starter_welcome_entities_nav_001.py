@@ -7,7 +7,6 @@ paliers, bascule de niveau par les bilans, et absence de commande de création
 """
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 import pytest
@@ -47,36 +46,9 @@ class TestDebutantChain:
         assert _has("debutant/bilan.md", "../intermediaire/migrations.md")
 
 
-MKDOCS = PROJECT_ROOT / "packages" / "forge-mvc-entities" / "mkdocs.yml"
-
-
-def _nav_par_niveau() -> "dict[str, list[str]]":
-    """Pages du parcours, par niveau, dans l'ordre du menu.
-
-    La chaîne du niveau intermédiaire était figée sur une seule page
-    (`WELCOME-ENTITIES-CHAINE-DERIVEE-001`). Quatre paliers ajoutés, et ce
-    garde-fou tombait alors que la chaîne était intacte : il fixait la liste
-    d'alors, pas la propriété.
-
-    Le `nav` fait autorité, c'est l'ordre que le lecteur voit dans le menu.
-    """
-    niveaux: "dict[str, list[str]]" = {}
-    for ligne in MKDOCS.read_text(encoding="utf-8").splitlines():
-        trouve = re.search(r"(welcome/(debutant|intermediaire|avance)/([\w-]+\.md))\s*$", ligne)
-        if trouve:
-            niveaux.setdefault(trouve.group(2), []).append(trouve.group(3))
-    return niveaux
-
-
-@pytest.mark.parametrize("niveau", ["debutant", "intermediaire", "avance"])
-def test_chaque_palier_mene_au_suivant(niveau: str) -> None:
-    """Aucun cul-de-sac : le lecteur doit toujours savoir où aller."""
-    pages_du_niveau = _nav_par_niveau()[niveau]
-
-    assert pages_du_niveau[-1] == "bilan.md", f"{niveau} ne finit pas par son bilan"
-    for courante, suivante in zip(pages_du_niveau, pages_du_niveau[1:]):
-        assert _has(f"{niveau}/{courante}", f"({suivante})"), (
-            f"{niveau}/{courante} ne mène pas à {suivante}")
+# La chaîne est dérivée du nav pour tous les paquets à la fois par
+# `tests/meta/test_welcome_chaines_derivees_001.py`
+# (`WELCOME-CHAINES-DERIVEES-001`) : la dupliquer ici en ferait deux.
 
 
 class TestIntermediaireChain:

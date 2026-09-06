@@ -19,10 +19,14 @@ nav:
           - Déclarer les transitions: welcome/intermediaire/workflow-transition.md
           - Vérifier une transition: welcome/intermediaire/workflow-check.md
           - Transitions disponibles: welcome/intermediaire/workflow-available.md
+          - Appliquer une transition: welcome/intermediaire/workflow-appliquer.md
+          - Les conditions de transition: welcome/intermediaire/workflow-conditions.md
+          - Statuts depuis le contrat: welcome/intermediaire/workflow-statuts-entite.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Badge de statut: welcome/avance/workflow-badge.md
           - Couleur, libellé, classe: welcome/avance/workflow-color.md
           - Helpers Workflow dans Jinja: welcome/avance/workflow-jinja.md
+          - L'historique des transitions: welcome/avance/workflow-historique.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

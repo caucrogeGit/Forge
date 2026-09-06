@@ -46,10 +46,11 @@ class TestDebutantChain:
 
 class TestIntermediaireChain:
 
-    def test_chain(self):
-        assert _has("intermediaire/workflow-transition.md", "(workflow-check.md)")
-        assert _has("intermediaire/workflow-check.md", "(workflow-available.md)")
-        assert _has("intermediaire/workflow-available.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété : tout palier ajouté la faisait tomber. Elle est dérivée
+    # du `nav` pour tous les paquets à la fois par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self):
         assert _has("intermediaire/bilan.md", "../avance/workflow-badge.md")
@@ -57,10 +58,8 @@ class TestIntermediaireChain:
 
 class TestAvanceChain:
 
-    def test_chain(self):
-        assert _has("avance/workflow-badge.md", "(workflow-color.md)")
-        assert _has("avance/workflow-color.md", "(workflow-jinja.md)")
-        assert _has("avance/workflow-jinja.md", "(bilan.md)")
+    # Chaîne dérivée du nav pour tous les paquets
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_recapitulatif(self):
         assert _has("avance/bilan.md", "../recapitulatif.md")

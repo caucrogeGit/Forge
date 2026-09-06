@@ -123,4 +123,4 @@ with router.group("", public=True) as public:
 Vous maîtrisez statuts et transitions.
 La suite (avancé) : l'**affichage**.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Suivant : appliquer une transition](workflow-appliquer.md)
