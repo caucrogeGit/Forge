@@ -183,11 +183,43 @@ class MSSQLDialect:
         )
 
     def server_diagnostics_sql(self) -> "dict[str, str]":
+        """Version, encodage, collation, base et compte (`DB-DOCTOR-DIALECT-PARITY-001`).
+
+        Trois de ces lignes disaient autre chose que ce que leur libellé
+        annonce, ou ne disaient rien.
+
+        `compte` interrogeait `CURRENT_USER`, qui en T-SQL est l'utilisateur de
+        **base** et non le compte de connexion : il rend `dbo` pour tout
+        administrateur. Ce diagnostic existe pour révéler une connexion établie
+        sous un compte inattendu, et il rendait une valeur qui ne peut jamais
+        l'être. `ORIGINAL_LOGIN()` rend le compte réellement employé.
+
+        `collation` interrogeait le **serveur**. Une base peut porter la sienne,
+        et c'est elle qui décide du tri et de la comparaison des textes qu'elle
+        contient.
+
+        `encodage` manquait, alors que les trois autres backends le donnent.
+        SQL Server n'a pas de réglage d'encodage : c'est la page de codes de la
+        collation qui décide, et une page autre que 65001 remplace par « ? »
+        tout caractère qu'elle ne sait pas représenter dans les colonnes
+        `VARCHAR`. Le taire laissait croire à un serveur en UTF-8.
+        """
+        collation_base = (
+            "CAST(DATABASEPROPERTYEX(DB_NAME(), 'Collation') AS NVARCHAR(128))"
+        )
+        page = f"CAST(COLLATIONPROPERTY({collation_base}, 'CodePage') AS INT)"
         return {
             "version": "SELECT @@VERSION AS value",
-            "collation": "SELECT CAST(SERVERPROPERTY('Collation') AS NVARCHAR(128)) AS value",
+            # `COLLATIONPROPERTY` rend un `sql_variant`, que le pilote ODBC ne
+            # sait pas convertir : le CAST n'est pas cosmetique.
+            "encodage": (
+                f"SELECT CASE WHEN {page} = 65001 THEN 'UTF-8' "
+                f"ELSE CONCAT('page de codes ', CAST({page} AS NVARCHAR(16))) "
+                "END AS value"
+            ),
+            "collation": f"SELECT {collation_base} AS value",
             "base": "SELECT DB_NAME() AS value",
-            "compte": "SELECT CURRENT_USER AS value",
+            "compte": "SELECT ORIGINAL_LOGIN() AS value",
         }
 
     def unique_nullable_index_sql(self, table: str, name: str, column: str) -> str:

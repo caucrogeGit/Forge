@@ -178,6 +178,13 @@ class PostgreSQLDialect:
                 "SELECT pg_encoding_to_char(encoding) AS value FROM pg_database "
                 "WHERE datname = current_database()"
             ),
+            # Absente jusqu'ici, alors que MariaDB et SQL Server la donnent :
+            # elle décide du tri et de la comparaison des textes de la base
+            # (`DB-DOCTOR-DIALECT-PARITY-001`).
+            "collation": (
+                "SELECT datcollate AS value FROM pg_database "
+                "WHERE datname = current_database()"
+            ),
             "base": "SELECT current_database() AS value",
             "compte": "SELECT current_user AS value",
         }
