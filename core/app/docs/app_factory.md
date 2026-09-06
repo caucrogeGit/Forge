@@ -61,6 +61,9 @@ sequenceDiagram
 |---|---|---|
 | `apply_forge_config` | `apply_forge_config() -> None` | applique la configuration Forge lue depuis `config.py` ; idempotent |
 | `build_application` | `build_application() -> Application` | construit l'`Application` complète : config, Jinja2 et routes |
+| `load_bootstrap` | `load_bootstrap() -> Any \| None` | module de câblage du projet, ou `None` s'il n'en a pas |
+| `project_root` | `project_root() -> Path \| None` | racine du projet, déduite de `config.py` |
+| `BOOTSTRAP_MODULE` | `"bootstrap"` | nom du module de câblage, lu par les **deux** points d'entrée |
 
 ## 5. Contextes d'utilisation
 
@@ -88,7 +91,34 @@ from core.app.app_factory import apply_forge_config
 apply_forge_config()
 ```
 
-## 7. Cohérence dev et production
+## 7. Le câblage du projet : `bootstrap.py`
+
+Les middlewares et les services partagés d'une application ne vivent ni dans `config.py`, qui ne porte que des valeurs, ni dans `app.py`, que cette fabrique ne lit pas.
+Ils vivent dans un module `bootstrap.py`, à la racine du projet, que les **deux** points d'entrée chargent (ADR-093).
+
+```python
+# bootstrap.py, à la racine du projet
+def configure_services() -> None:
+    """Services partagés, posés avant la construction de l'application."""
+
+
+def build_middlewares() -> list:
+    """Middlewares, dans leur ordre d'évaluation."""
+    return []
+```
+
+Les deux fonctions sont appelées dans cet ordre : un middleware peut avoir besoin d'un service, l'inverse ne se produit pas.
+
+Un projet sans `bootstrap.py` n'en a pas besoin : `load_bootstrap()` rend `None`, et le comportement d'avant s'applique.
+Forge n'écrit jamais dans un projet existant (principe 9), et il n'y a rien à migrer.
+
+!!! danger "Pourquoi ce fichier existe, et ce qu'il a coûté"
+    Ce câblage vivait dans `app.py`. Le chemin WSGI ne le lit pas, et construisait donc une application privée de ses gardes, sauf la première.
+
+    Elle démarrait, répondait 200, authentifiait, et laissait passer tout ce que les gardes suivantes auraient refusé, magasin de sessions compris.
+    La panne était silencieuse par nature : rien, dans aucun journal, ne la signalait.
+
+    L'ADR-092 rend cette panne bruyante en la refusant. L'ADR-093, ce fichier, en retire la cause : la divergence devient impossible au lieu d'être détectable.
 
 !!! tip "Source unique d'initialisation"
     La fabrique existe pour éviter que le serveur de développement et le callable WSGI configurent Forge différemment.

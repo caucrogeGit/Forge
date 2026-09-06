@@ -120,7 +120,35 @@ app = Application(router)
 wsgi_app = create_wsgi_app(app)
 ```
 
-## 7. Sécurité et limites
+## 7. Le refus de servir une application désarmée
+
+`build_wsgi_application()` refuse de construire quand il ne peut pas garantir que l'application servira avec ses gardes (ADR-092).
+Le refus lève `UnarmedApplicationError`, au démarrage et jamais en cours de service.
+
+Deux situations le déclenchent, et le message dit laquelle.
+
+| Message | Ce qui se passe | Le geste |
+|---|---|---|
+| « construirait une application **DÉSARMÉE** » | `app.py` câble des middlewares ou un magasin de sessions que ce chemin ne verra pas | Déplacer ce câblage dans `bootstrap.py`, que les deux points d'entrée lisent |
+| « ne peut pas savoir si l'application serait **ARMÉE** » | `app.py` ne s'analyse pas : erreur de syntaxe, ou fichier qui n'est pas de l'UTF-8 | Corriger le fichier ; `python -m py_compile app.py` nomme la faute |
+
+Le fichier est lu sur son arbre syntaxique, jamais importé : l'importer serait exécuter précisément ce que ce chemin cherche à éviter.
+Un exemple de câblage laissé en commentaire n'est donc pas pris pour une déclaration.
+
+!!! danger "Le second cas n'est pas un excès de zèle"
+    Une erreur de syntaxe se lisait auparavant comme un fichier vide, donc comme « rien à signaler » (`WSGI-WIRING-GUARD-UNPARSABLE-001`).
+
+    Le même `app.py` câblant deux middlewares était refusé quand il s'analysait, et **servi** avec une parenthèse en trop.
+    Ce chemin n'important jamais `app.py`, personne d'autre n'aurait vu l'erreur : l'application serait partie sans CSRF ni RBAC, en répondant 200.
+
+    Un fichier qu'on ne sait pas lire ne dit pas qu'il ne câble rien : il ne dit rien du tout, et l'ignorance ne vaut pas l'absence.
+
+!!! info "Ce qui laisse servir"
+    Un `app.py` absent, vide, ou qui ne câble rien.
+
+    Ce sont des états connus : un projet peut n'avoir pas d'`app.py`, et le chemin WSGI se suffit alors à lui même.
+
+## 8. Sécurité et limites
 
 !!! warning "Périmètre de production"
     Le callable WSGI ne sert pas les fichiers statiques : confier ce rôle au reverse proxy.
@@ -129,6 +157,6 @@ wsgi_app = create_wsgi_app(app)
 
 ## Voir aussi
 
-- [La fabrique d'application](app_factory.md) : appelée par `create_configured_wsgi_app`.
+- [La fabrique d'application](app_factory.md) : appelée par `create_configured_wsgi_app`, et le câblage `bootstrap.py`.
 - [L'application](application.md) : l'objet enveloppé par le callable WSGI.
 - [Les avertissements de production](prod_warnings.md) : émis au démarrage en production.
