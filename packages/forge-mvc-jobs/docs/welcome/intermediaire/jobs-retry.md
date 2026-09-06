@@ -75,6 +75,6 @@ if job is not None:
 ## Après ce starter
 
 Vous savez gérer les échecs et suivre les tâches.
-Faisons le point sur le niveau intermédiaire.
+Reste à ordonner la file, et à ne rien perdre en vol.
 
-[Bilan intermédiaire](bilan.md)
+[Suivant : priorité et idempotence](jobs-priorite.md)

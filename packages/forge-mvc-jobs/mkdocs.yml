@@ -18,6 +18,8 @@ nav:
       - Intermédiaire:
           - Le process worker: welcome/intermediaire/jobs-worker.md
           - Reprise sur échec: welcome/intermediaire/jobs-retry.md
+          - Priorité et idempotence: welcome/intermediaire/jobs-priorite.md
+          - Le bail et le battement: welcome/intermediaire/jobs-bail.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Le périmètre: welcome/avance/jobs-perimeter.md

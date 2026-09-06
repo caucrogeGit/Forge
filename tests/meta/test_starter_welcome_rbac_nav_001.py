@@ -34,10 +34,10 @@ def _has(page: str, needle: str) -> bool:
 
 class TestDebutantChain:
 
-    def test_chain(self):
-        assert _has("debutant/rbac-welcome.md", "(rbac-permission.md)")
-        assert _has("debutant/rbac-permission.md", "(rbac-role.md)")
-        assert _has("debutant/rbac-role.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self):
         assert _has("debutant/bilan.md", "../intermediaire/rbac-check.md")

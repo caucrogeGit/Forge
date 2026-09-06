@@ -25,5 +25,6 @@ nav:
       - Avancé:
           - Configurer l'envoi: welcome/avance/mail-config.md
           - Diagnostiquer le module Mail: welcome/avance/mail-doctor.md
+          - Envoyer en file d'attente: welcome/avance/mail-file.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

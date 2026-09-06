@@ -43,10 +43,10 @@ def _has(page: str, needle: str) -> bool:
 
 class TestDebutantChain:
 
-    def test_chain(self):
-        assert _has("debutant/files-welcome.md", "(file-store.md)")
-        assert _has("debutant/file-store.md", "(file-serve.md)")
-        assert _has("debutant/file-serve.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self):
         assert _has("debutant/bilan.md", "../intermediaire/file-validate.md")
@@ -54,10 +54,10 @@ class TestDebutantChain:
 
 class TestIntermediaireChain:
 
-    def test_chain(self):
-        assert _has("intermediaire/file-validate.md", "(file-rate-limit.md)")
-        assert _has("intermediaire/file-rate-limit.md", "(file-delete.md)")
-        assert _has("intermediaire/file-delete.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self):
         assert _has("intermediaire/bilan.md", "../avance/file-safe-name.md")
@@ -65,10 +65,10 @@ class TestIntermediaireChain:
 
 class TestAvanceChain:
 
-    def test_chain(self):
-        assert _has("avance/file-safe-name.md", "(file-safe-path.md)")
-        assert _has("avance/file-safe-path.md", "(file-bytes.md)")
-        assert _has("avance/file-bytes.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_recapitulatif(self):
         assert _has("avance/bilan.md", "../recapitulatif.md")

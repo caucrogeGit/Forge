@@ -58,6 +58,6 @@ Utile pour valider un déploiement sans envoyer le moindre email.
 - Un contrôleur n'a pas toujours besoin d'une vue.
 
 ## Palier suivant
-Vous faites le bilan du niveau avancé.
+Reste à sortir l'envoi du chemin de la requête.
 
-[Continuer avec le Bilan avancé](bilan.md)
+[Suivant : envoyer en file d'attente](mail-file.md)

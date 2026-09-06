@@ -52,27 +52,24 @@ class TestPagesExist:
 
 
 class TestDebutantChain:
-    def test_chain(self) -> None:
-        assert _has("debutant/jobs-welcome.md", "(jobs-handler.md)")
-        assert _has("debutant/jobs-handler.md", "(bilan.md)")
+    # Chaîne dérivée du nav pour tous les paquets
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self) -> None:
         assert _has("debutant/bilan.md", "../intermediaire/jobs-worker.md")
 
 
 class TestIntermediaireChain:
-    def test_chain(self) -> None:
-        assert _has("intermediaire/jobs-worker.md", "(jobs-retry.md)")
-        assert _has("intermediaire/jobs-retry.md", "(bilan.md)")
+    # Chaîne dérivée du nav pour tous les paquets
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self) -> None:
         assert _has("intermediaire/bilan.md", "../avance/jobs-perimeter.md")
 
 
 class TestAvanceChain:
-    def test_chain(self) -> None:
-        assert _has("avance/jobs-perimeter.md", "(jobs-independance.md)")
-        assert _has("avance/jobs-independance.md", "(bilan.md)")
+    # Chaîne dérivée du nav pour tous les paquets
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_closes_parcours(self) -> None:
         assert _has("avance/bilan.md", "../../references/queue.md")

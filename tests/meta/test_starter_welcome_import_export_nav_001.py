@@ -53,28 +53,24 @@ class TestPagesExist:
 
 
 class TestDebutantChain:
-    def test_chain(self) -> None:
-        assert _has("debutant/import-welcome.md", "(import-read.md)")
-        assert _has("debutant/import-read.md", "(bilan.md)")
+    # Chaîne dérivée du nav pour tous les paquets
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self) -> None:
         assert _has("debutant/bilan.md", "../intermediaire/import-validate.md")
 
 
 class TestIntermediaireChain:
-    def test_chain(self) -> None:
-        assert _has("intermediaire/import-validate.md", "(import-coerce.md)")
-        assert _has("intermediaire/import-coerce.md", "(bilan.md)")
+    # Chaîne dérivée du nav pour tous les paquets
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self) -> None:
         assert _has("intermediaire/bilan.md", "../avance/import-partial.md")
 
 
 class TestAvanceChain:
-    def test_chain(self) -> None:
-        assert _has("avance/import-partial.md", "(export-tocsv.md)")
-        assert _has("avance/export-tocsv.md", "(import-independance.md)")
-        assert _has("avance/import-independance.md", "(bilan.md)")
+    # Chaîne dérivée du nav pour tous les paquets
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_closes_parcours(self) -> None:
         assert _has("avance/bilan.md", "../../references/engine.md")

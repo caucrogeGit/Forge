@@ -42,10 +42,10 @@ def _has(page: str, needle: str) -> bool:
 
 class TestDebutantChain:
 
-    def test_chain(self):
-        assert _has("debutant/audio-welcome.md", "(audio-upload.md)")
-        assert _has("debutant/audio-upload.md", "(audio-play.md)")
-        assert _has("debutant/audio-play.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self):
         assert _has("debutant/bilan.md", "../avance/audio-probe.md")
@@ -53,10 +53,10 @@ class TestDebutantChain:
 
 class TestAvanceChain:
 
-    def test_chain(self):
-        assert _has("avance/audio-probe.md", "(audio-transcode.md)")
-        assert _has("avance/audio-transcode.md", "(audio-doctor.md)")
-        assert _has("avance/audio-doctor.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_recapitulatif(self):
         assert _has("avance/bilan.md", "../recapitulatif.md")

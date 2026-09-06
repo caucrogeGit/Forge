@@ -35,12 +35,10 @@ def _has(page: str, needle: str) -> bool:
 
 class TestDebutantChain:
 
-    def test_chain(self):
-        assert _has("debutant/entity-welcome.md", "(entity-make.md)")
-        assert _has("debutant/entity-make.md", "(relation-make.md)")
-        assert _has("debutant/relation-make.md", "(build-model.md)")
-        assert _has("debutant/build-model.md", "(crud-make.md)")
-        assert _has("debutant/crud-make.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self):
         assert _has("debutant/bilan.md", "../intermediaire/migrations.md")
@@ -59,16 +57,10 @@ class TestIntermediaireChain:
 
 class TestAvanceChain:
 
-    def test_chain(self):
-        assert _has("avance/pivot-welcome.md", "(pivot-make.md)")
-        assert _has("avance/pivot-make.md", "(pivot-schema.md)")
-        assert _has("avance/pivot-schema.md", "(pivot-attach.md)")
-        assert _has("avance/pivot-attach.md", "(pivot-update.md)")
-        assert _has("avance/pivot-update.md", "(pivot-list.md)")
-        assert _has("avance/pivot-list.md", "(pivot-constraints.md)")
-        assert _has("avance/pivot-constraints.md", "(pivot-unique.md)")
-        assert _has("avance/pivot-unique.md", "(pivot-form.md)")
-        assert _has("avance/pivot-form.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_recapitulatif(self):
         assert _has("avance/bilan.md", "../recapitulatif.md")

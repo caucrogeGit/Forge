@@ -34,10 +34,10 @@ def _has(page: str, needle: str) -> bool:
 
 class TestDebutantChain:
 
-    def test_chain(self):
-        assert _has("debutant/qrcode-welcome.md", "(qrcode-png.md)")
-        assert _has("debutant/qrcode-png.md", "(qrcode-svg.md)")
-        assert _has("debutant/qrcode-svg.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self):
         assert _has("debutant/bilan.md", "../intermediaire/qrcode-controller.md")
@@ -45,10 +45,10 @@ class TestDebutantChain:
 
 class TestIntermediaireChain:
 
-    def test_chain(self):
-        assert _has("intermediaire/qrcode-controller.md", "(qrcode-svg-response.md)")
-        assert _has("intermediaire/qrcode-svg-response.md", "(qrcode-mime.md)")
-        assert _has("intermediaire/qrcode-mime.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_next_level(self):
         assert _has("intermediaire/bilan.md", "../avance/qrcode-errors.md")
@@ -56,10 +56,10 @@ class TestIntermediaireChain:
 
 class TestAvanceChain:
 
-    def test_chain(self):
-        assert _has("avance/qrcode-errors.md", "(qrcode-options.md)")
-        assert _has("avance/qrcode-options.md", "(qrcode-independance.md)")
-        assert _has("avance/qrcode-independance.md", "(bilan.md)")
+    # La chaîne page par page vivait ici, et figeait la liste d'alors plutôt
+    # que la propriété. Elle est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_bilan_points_to_recapitulatif(self):
         assert _has("avance/bilan.md", "../recapitulatif.md")
