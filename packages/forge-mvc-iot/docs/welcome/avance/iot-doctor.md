@@ -111,4 +111,4 @@ with router.group("", public=True) as public:
 Vous avez terminé le **niveau avancé** et toute la progression IoT : contrat, subscriber temps réel, diagnostic.
 Faites le point dans le bilan du niveau.
 
-[Bilan du niveau avancé](bilan.md)
+[Suivant : les jetons et leur portée](iot-jetons.md)

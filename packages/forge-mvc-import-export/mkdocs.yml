@@ -24,5 +24,6 @@ nav:
           - Tout ou rien, ou partiel: welcome/avance/import-partial.md
           - Export programmatique: welcome/avance/export-tocsv.md
           - Indépendance du cœur: welcome/avance/import-independance.md
+          - Le registre d'importeurs: welcome/avance/import-registre.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

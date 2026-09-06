@@ -44,5 +44,6 @@ nav:
           - Valider un message IoT: welcome/avance/iot-contract.md
           - Le subscriber MQTT: welcome/avance/iot-subscriber.md
           - Diagnostiquer le module IoT: welcome/avance/iot-doctor.md
+          - Les jetons et leur portée: welcome/avance/iot-jetons.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

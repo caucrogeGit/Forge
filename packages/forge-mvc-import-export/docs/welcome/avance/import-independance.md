@@ -64,4 +64,4 @@ print(rapport.imported, "élèves importés")
 Vous avez fait le tour du socle.
 Place au bilan du niveau avancé.
 
-[Bilan avancé](bilan.md)
+[Suivant : le registre d'importeurs](import-registre.md)
