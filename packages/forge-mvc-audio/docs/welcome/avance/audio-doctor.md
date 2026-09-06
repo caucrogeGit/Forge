@@ -101,4 +101,4 @@ with router.group("", public=True) as public:
 
 Vous avez parcouru toute la progression audio : découvrir, ingérer, lire, sonder, transcoder, diagnostiquer.
 
-[Bilan du niveau avancé](bilan.md)
+[Suivant : métadonnées et découpage](audio-tags.md)

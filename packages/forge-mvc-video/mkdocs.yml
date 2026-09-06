@@ -29,5 +29,7 @@ nav:
           - Sonder une vidéo: welcome/avance/video-probe.md
           - Transcoder une vidéo: welcome/avance/video-transcode.md
           - Diagnostiquer le module Vidéo: welcome/avance/video-doctor.md
+          - Les sous-titres: welcome/avance/video-sous-titres.md
+          - Les quotas vidéo: welcome/avance/video-quotas.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

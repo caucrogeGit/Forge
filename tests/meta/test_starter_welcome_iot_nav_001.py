@@ -54,10 +54,9 @@ class TestDebutantChain:
         page = IOT / "debutant" / "iot-events.md"
         assert "(iot-device.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # iot-device est (pour l'instant) le dernier palier débutant.
-        page = IOT / "debutant" / "iot-device.md"
-        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+    # Le « dernier palier mène au bilan » figeait une page nommée. La
+    # propriété est dérivée du `nav` par le contrôle partagé
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_debutant_bilan_points_to_next_level(self):
         # Le niveau intermédiaire existe → le bilan débutant renvoie à son
@@ -78,10 +77,9 @@ class TestIntermediaireChain:
         page = IOT / "intermediaire" / "iot-api.md"
         assert "(iot-dashboard.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # iot-dashboard est (pour l'instant) le dernier palier intermédiaire.
-        page = IOT / "intermediaire" / "iot-dashboard.md"
-        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+    # Le « dernier palier mène au bilan » figeait une page nommée. La
+    # propriété est dérivée du `nav` par le contrôle partagé
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_intermediaire_bilan_points_to_next_level(self):
         # Le niveau avancé existe → le bilan intermédiaire renvoie à son
@@ -102,10 +100,9 @@ class TestAvanceChain:
         page = IOT / "avance" / "iot-subscriber.md"
         assert "(iot-doctor.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # iot-doctor est le dernier palier avancé (et de toute la progression).
-        page = IOT / "avance" / "iot-doctor.md"
-        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+    # Le « dernier palier mène au bilan » figeait une page nommée. La
+    # propriété est dérivée du `nav` par le contrôle partagé
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_avance_bilan_points_to_recapitulatif(self):
         # Dernier niveau → le bilan avancé renvoie au récapitulatif.

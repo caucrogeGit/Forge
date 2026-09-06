@@ -21,5 +21,6 @@ nav:
           - Sonder un audio: welcome/avance/audio-probe.md
           - Transcoder en MP3: welcome/avance/audio-transcode.md
           - Diagnostiquer le module Audio: welcome/avance/audio-doctor.md
+          - Métadonnées et découpage: welcome/avance/audio-tags.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md
