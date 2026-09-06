@@ -922,6 +922,10 @@
 
 ### Tests
 
+- **Un worker de test mort n'est plus remplacé en silence (`TESTS-XDIST-WORKER-CRASH-VISIBLE-001`).**
+  Par défaut, pytest-xdist relance un worker qui meurt ; le remplaçant reprend le test fautif et meurt à son tour, quatre fois. Mesuré sur un worker tué volontairement, le rapport annonce « 5 failed » pour **un seul** test réellement en cause.
+  Un compte faux oriente la recherche vers des tests qui n'ont rien fait. Le drapeau ne corrige rien et n'empêche rien, il rend l'incident lisible. Sans `-n` il est sans effet, donc sans effet en intégration continue, qui n'y recourt pas.
+
 - **La promesse centrale du client de test n'était pas vérifiée (`TESTING-CLIENT-GUARDS-REACHED-001`).**
   Le client dit passer par le chemin de production, et sa docstring explique pourquoi : un client qui reconstruirait sa propre boucle serait un jumeau, il passerait là où la production échoue. Les sept routes de son application d'essai se déclaraient toutes publiques et sans CSRF : un client qui court-circuiterait les middlewares aurait laissé la suite verte.
   Les gardes sont désormais exercées dans les deux sens, et la boucle complète du jeton anti-CSRF est jouée, ce qui prouve aussi que le cookie de session est reporté d'une requête à la suivante.
