@@ -20,11 +20,29 @@ from forge_mvc_rbac.export import (  # noqa: E402
     to_markdown,
 )
 
+#: Contrat écrit dans la forme que le **schéma** impose
+#: (`RBAC-EXPORT-FORME-CONTRAT-001`).
+#:
+#: Ce fixture employait `rôle -> entité -> actions`, forme que le schéma
+#: interdit et qu'aucun contrat validé ne peut porter. L'export passait donc
+#: ses tests et rendait « Aucun rôle déclaré » sur toute donnée réelle.
 _CONTRAT: "dict[str, Any]" = {
+    "schema_version": "1.0",
     "roles": {
-        "admin": {"Article": ["index", "create", "destroy"], "User": True},
-        "editeur": {"Article": ["index", "create"]},
-    }
+        "admin": ["article.destroy"],
+        "editeur": ["article.index", "article.create"],
+        "lecteur": ["article.orpheline"],
+    },
+    "role_inherits": {"admin": ["editeur"]},
+    "entities": {
+        "Article": {
+            "permissions": {
+                "index": "article.index",
+                "create": "article.create",
+                "destroy": "article.destroy",
+            }
+        }
+    },
 }
 
 
@@ -42,8 +60,19 @@ class TestLignesDuContrat:
 
         assert lignes == sorted(lignes)
 
-    def test_la_forme_abregee_devient_une_etoile(self) -> None:
-        assert ("admin", "User", "*") in contract_rows(_CONTRAT)
+    def test_l_heritage_est_rendu(self) -> None:
+        """Rendre les seules permissions directes ferait croire un
+        administrateur privé de droits qu'il possède."""
+        lignes = contract_rows(_CONTRAT)
+
+        assert ("admin", "Article", "index") in lignes
+        assert ("admin", "Article", "create") in lignes
+
+    def test_une_permission_sans_entite_reste_visible(self) -> None:
+        """La taire ferait disparaître d'une revue un droit pourtant accordé."""
+        from forge_mvc_rbac.export import SANS_ENTITE
+
+        assert ("lecteur", SANS_ENTITE, "article.orpheline") in contract_rows(_CONTRAT)
 
     def test_un_contrat_absent_ne_leve_pas(self) -> None:
         assert contract_rows(None) == []
@@ -70,8 +99,7 @@ class TestMarkdown:
     def test_il_compte(self) -> None:
         rendu = to_markdown(_CONTRAT)
 
-        assert "2 rôle(s)" in rendu
-        assert "6 permission(s)" in rendu
+        assert "3 rôle(s)" in rendu
 
     def test_il_dit_qu_il_rend_le_contrat_et_non_la_base(self) -> None:
         """Confondre les deux ferait prendre une intention pour un état."""
@@ -92,8 +120,16 @@ class TestCsv:
         assert "admin,Article,create" in lignes
 
     def test_les_cellules_sont_echappees(self) -> None:
-        """Un nom de rôle commençant par `=` redeviendrait une formule vive."""
-        rendu = to_csv({"roles": {"=cmd|calc": {"A": ["index"]}}})
+        """Un nom de rôle commençant par `=` redeviendrait une formule vive.
+
+        Le contrat est écrit dans la forme du schéma : l'ancien fixture
+        employait une forme interdite, et l'export ne rendait donc que
+        l'en-tête. Ce test protégeait alors une ligne qui n'existait pas.
+        """
+        rendu = to_csv({
+            "roles": {"=cmd|calc": ["a.index"]},
+            "entities": {"A": {"permissions": {"index": "a.index"}}},
+        })
 
         assert "'=cmd" in rendu
 

@@ -51,6 +51,33 @@ class RbacExportError(ValueError):
     """Contrat inexploitable."""
 
 
+#: Entité affichée pour une permission qu'aucune entité ne réclame.
+SANS_ENTITE = "—"
+
+
+def _actions_par_permission(data: "dict[str, Any]") -> "dict[str, list[tuple[str, str]]]":
+    """Code de permission -> couples (entité, action) qui l'exigent.
+
+    Le contrat déclare les rôles par **codes de permission**, et les entités
+    par action. Joindre les deux est ce qui rend l'export lisible : « éditeur
+    peut publier un Article » plutôt que « éditeur a article.publier ».
+    """
+    index: "dict[str, list[tuple[str, str]]]" = {}
+    entites = data.get("entities")
+    if not isinstance(entites, dict):
+        return index
+    for entite, bloc in cast("dict[str, Any]", entites).items():
+        if not isinstance(bloc, dict):
+            continue
+        permissions = cast("dict[str, Any]", bloc).get("permissions")
+        if not isinstance(permissions, dict):
+            continue
+        for action, code in cast("dict[str, Any]", permissions).items():
+            if isinstance(code, str):
+                index.setdefault(code, []).append((str(entite), str(action)))
+    return index
+
+
 def contract_rows(data: "dict[str, Any] | None") -> "list[tuple[str, str, str]]":
     """Triplets `(rôle, entité, action)`, triés.
 
@@ -61,6 +88,23 @@ def contract_rows(data: "dict[str, Any] | None") -> "list[tuple[str, str, str]]"
     Le tri rend deux exports comparables. Sans lui, l'ordre suivrait celui du
     JSON, et un simple réarrangement du fichier ferait apparaître une
     différence là où rien n'a changé.
+
+    ## La forme lue est celle du schéma
+
+    `RBAC-EXPORT-FORME-CONTRAT-001`. Cette fonction lisait `roles` comme une
+    table `rôle -> entité -> actions`. Le schéma, qui fait autorité et que
+    `rbac:audit` applique, déclare `rôle -> liste de codes de permission`. Les
+    deux ne se rencontraient jamais : chaque rôle était écarté, et
+    `forge rbac:export` rendait « Aucun rôle déclaré » sur **tout** contrat
+    valide. Le test de l'export employait la forme que le schéma interdit, ce
+    qui laissait la fonction verte et inerte.
+
+    Les entités et leurs actions viennent donc du bloc `entities`, joint par
+    code de permission.
+
+    Une permission accordée à un rôle et réclamée par aucune entité est rendue
+    quand même, sous l'entité « — » : la taire ferait disparaître d'une revue
+    de sécurité un droit pourtant accordé.
     """
     if not data:
         return []
@@ -75,42 +119,34 @@ def contract_rows(data: "dict[str, Any] | None") -> "list[tuple[str, str, str]]"
     # à un administrateur privé de droits qu'il possède, et c'est exactement ce
     # qu'une revue de sécurité ne doit pas conclure.
     table = inheritance_map(data)
+    index = _actions_par_permission(data)
 
-    lignes: list[tuple[str, str, str]] = []
+    lignes: "list[tuple[str, str, str]]" = []
     par_role = cast("dict[str, Any]", roles)
-    for role, _ in sorted(par_role.items()):
+    for role in sorted(par_role):
         nom_role = str(role)
-        # Permissions du rôle et de tous ceux dont il hérite.
         try:
             portes = sorted(expand_roles([nom_role], table))
         except RoleHierarchyError as exc:
             raise RbacExportError(
                 f"hiérarchie de rôles inexploitable : {exc}"
             ) from exc
-        # Les actions se REUNISSENT par entité. Remplacer le bloc d'une
-        # entité par celui du rôle hérité ferait perdre les actions propres au
-        # rôle héritier, et l'export montrerait moins de droits qu'il n'y en a.
-        contenu: "dict[str, list[str]]" = {}
+
+        couples: "set[tuple[str, str]]" = set()
         for herite in portes:
-            bloc = par_role.get(herite)
-            if not isinstance(bloc, dict):
+            codes = par_role.get(herite)
+            if not isinstance(codes, list):
                 continue
-            for entite, actions in cast("dict[str, Any]", bloc).items():
-                cible = contenu.setdefault(str(entite), [])
-                if isinstance(actions, list):
-                    for action in cast("list[Any]", actions):
-                        if str(action) not in cible:
-                            cible.append(str(action))
-                elif isinstance(actions, bool) and actions:
-                    if "*" not in cible:
-                        cible.append("*")
-                elif isinstance(actions, str) and actions not in cible:
-                    cible.append(actions)
-        if not contenu:
-            continue
-        for entite, actions in sorted(contenu.items()):
-            for action in sorted(set(actions)):
-                lignes.append((nom_role, str(entite), action))
+            for code in cast("list[Any]", codes):
+                nom_code = str(code)
+                cibles = index.get(nom_code)
+                if cibles:
+                    couples.update(cibles)
+                else:
+                    couples.add((SANS_ENTITE, nom_code))
+
+        for entite, action in sorted(couples):
+            lignes.append((nom_role, entite, action))
     return lignes
 
 

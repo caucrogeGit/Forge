@@ -203,13 +203,20 @@ class TestExport:
         administrateur privé de droits qu'il possède, et c'est exactement ce
         qu'une revue de sécurité ne doit pas conclure.
         """
+        # Forme du schéma : rôle -> codes, entités -> action -> code
+        # (`RBAC-EXPORT-FORME-CONTRAT-001`).
         contrat = {
             "roles": {
-                "lecteur": {"Article": ["index"]},
-                "editeur": {"Article": ["create"]},
-                "admin": {"User": ["destroy"]},
+                "lecteur": ["article.index"],
+                "editeur": ["article.create"],
+                "admin": ["user.destroy"],
             },
             "role_inherits": {"admin": ["editeur"], "editeur": ["lecteur"]},
+            "entities": {
+                "Article": {"permissions": {"index": "article.index",
+                                            "create": "article.create"}},
+                "User": {"permissions": {"destroy": "user.destroy"}},
+            },
         }
 
         rendu = to_markdown(contrat)
@@ -221,13 +228,18 @@ class TestExport:
         """Remplacer le bloc d'une entité ferait perdre les actions propres au
         rôle héritier."""
         contrat = {
-            "roles": {"base": {"A": ["lire"]}, "sup": {"A": ["ecrire"]}},
+            "roles": {"base": ["a.lire"], "sup": ["a.ecrire"]},
             "role_inherits": {"sup": ["base"]},
+            "entities": {"A": {"permissions": {"lire": "a.lire",
+                                               "ecrire": "a.ecrire"}}},
         }
 
         assert "| `sup` | `A` | ecrire, lire |" in to_markdown(contrat)
 
     def test_sans_heritage_l_export_est_inchange(self) -> None:
-        rendu = to_markdown({"roles": {"a": {"A": ["x"]}}})
+        rendu = to_markdown({
+            "roles": {"a": ["a.x"]},
+            "entities": {"A": {"permissions": {"x": "a.x"}}},
+        })
 
         assert "| `a` | `A` | x |" in rendu
