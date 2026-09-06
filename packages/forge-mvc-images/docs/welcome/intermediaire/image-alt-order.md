@@ -195,4 +195,4 @@ with router.group("", public=True) as public:
 
 Vous avez fait le tour du niveau intermédiaire : rattacher, afficher, ordonner.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Suivant : les préréglages de variantes](image-presets.md)

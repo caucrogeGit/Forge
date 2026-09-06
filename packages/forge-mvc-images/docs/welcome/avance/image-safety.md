@@ -158,4 +158,4 @@ with router.group("", public=True) as public:
 
 Vous avez fait le tour du niveau avancé : couverture, suppression propre, sécurité.
 
-[Bilan du niveau avancé](bilan.md)
+[Suivant : les limites de dimensions](image-limites.md)

@@ -52,10 +52,11 @@ class TestDebutantChain:
         page = IMAGES / "debutant" / "image-upload.md"
         assert "(image-variants.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # image-variants est le dernier palier débutant.
-        page = IMAGES / "debutant" / "image-variants.md"
-        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+    # Le « dernier palier mène au bilan » était figé sur une page nommée,
+    # que le commentaire lui même disait provisoire (« pour l'instant »).
+    # La propriété est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_debutant_bilan_points_to_next_level(self):
         # Le niveau intermédiaire existe (jalon 2) → le bilan débutant renvoie
@@ -76,10 +77,11 @@ class TestIntermediaireChain:
         page = IMAGES / "intermediaire" / "image-gallery.md"
         assert "(image-alt-order.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # image-alt-order est (pour l'instant) le dernier palier intermédiaire.
-        page = IMAGES / "intermediaire" / "image-alt-order.md"
-        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+    # Le « dernier palier mène au bilan » était figé sur une page nommée,
+    # que le commentaire lui même disait provisoire (« pour l'instant »).
+    # La propriété est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_intermediaire_bilan_points_to_next_level(self):
         # Le niveau avancé existe (jalon 3) → le bilan intermédiaire renvoie à
@@ -100,10 +102,11 @@ class TestAvanceChain:
         page = IMAGES / "avance" / "image-delete.md"
         assert "(image-safety.md)" in page.read_text(encoding="utf-8")
 
-    def test_last_palier_points_to_level_bilan(self):
-        # image-safety est le dernier palier avancé (et de toute la progression).
-        page = IMAGES / "avance" / "image-safety.md"
-        assert "(bilan.md)" in page.read_text(encoding="utf-8")
+    # Le « dernier palier mène au bilan » était figé sur une page nommée,
+    # que le commentaire lui même disait provisoire (« pour l'instant »).
+    # La propriété est dérivée du `nav` pour tous les paquets par
+    # `tests/meta/test_welcome_chaines_derivees_001.py`
+    # (`WELCOME-CHAINES-DERIVEES-001`).
 
     def test_avance_bilan_points_to_recapitulatif(self):
         # Dernier niveau → le bilan avancé renvoie au récapitulatif.
