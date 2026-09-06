@@ -576,6 +576,12 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
     poses: "dict[str, int]" = {}
     ecrits_chemins: "list[Path]" = []
     fragments_routes: "list[str]" = []
+    # Blocs de code que le harnais n'a pas su rattacher a un fichier : la page
+    # nomme la cible en prose (« Ajoutez cette methode a la classe X »), motif
+    # pedagogique assume. Le harnais ne sait pas fusionner une methode dans une
+    # classe : le fichier qu'il pose differe donc de celui du lecteur, et le
+    # controle des routes ne peut rien conclure (`WELCOME-CORE-EXECUTION-001`).
+    non_attribues = 0
     sautes: "dict[str, int]" = {}
     print(f"=== Parcours {paquet} : {len(pages)} page(s), dans l'ordre du site ===")
 
@@ -586,6 +592,8 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
         for ligne, langage, contenu in contenus:
             if langage in LANGAGES_FICHIER:
                 chemin = fichier_du_bloc(contenu)
+                if chemin is None:
+                    non_attribues += 1
                 if chemin is None or projet is None or lister:
                     continue
                 verdict = poser_fichier(chemin, contenu, projet)
@@ -696,6 +704,7 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
     # parcours sans bloc `bash` se vérifiaient jusqu'ici au navigateur, donc
     # jamais. Les routes appelées sont celles que le parcours vient de déclarer.
     routes_appelees = 0
+    indecis = False
     if projet is not None and fragments_routes:
         routes = routes_declarees(fragments_routes)
         if routes:
@@ -704,7 +713,7 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
             propre, lignes = appeler_routes(routes, projet)
             for ligne in lignes:
                 print(ligne)
-            if not propre and fragments:
+            if not propre and (fragments or non_attribues):
                 # Un parcours qui fait AJOUTER une méthode à une classe laisse
                 # un fragment que ce harnais ne sait pas fusionner : la classe
                 # posée n'a donc pas la méthode que la route vise, et l'appel
@@ -713,13 +722,22 @@ def parcourir(paquet: str, projet: "Path | None", *, lister: bool,
                 #
                 # Le dire plutôt que le compter comme un échec : un harnais qui
                 # accuse à tort finit désactivé, et ne garde alors plus rien.
-                print(f"INDÉCIS : {paquet} laisse {fragments} fragment(s) au "
-                      "lecteur ; les routes ne peuvent pas être conclues ici.")
+                laisses = fragments + non_attribues
+                indecis = True
+                print(f"INDÉCIS : {paquet} laisse {laisses} bloc(s) à recopier "
+                      "à la main ; les routes ne peuvent pas être conclues ici.")
             elif not propre:
                 print(f"ÉCHEC : le parcours {paquet} déclare des routes qui ne répondent pas.")
                 return 1
     if lister:
         print("Recensement seul : rien n'a été exécuté.")
+        return 0
+    if indecis:
+        # Ne JAMAIS conclure « les routes répondent » quand l'application ne se
+        # charge pas : un harnais qui annonce un succès qu'il n'a pas constaté
+        # vaut moins que pas de harnais du tout.
+        print(f"INDÉCIS : le parcours {paquet} demande une relecture humaine ; "
+              "le harnais ne peut pas conclure seul.")
         return 0
     if joues == 0 and routes_appelees:
         print(f"OK : le parcours {paquet} n'a aucune commande, mais ses "
