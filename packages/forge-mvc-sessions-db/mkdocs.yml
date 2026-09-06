@@ -15,10 +15,12 @@ nav:
           - Bilan débutant: welcome/debutant/bilan.md
       - Intermédiaire:
           - Sessions partagées entre workers: welcome/intermediaire/sessions-db-multiworker.md
+          - Une durée par nature: welcome/intermediaire/sessions-db-ttl.md
           - Nettoyer les sessions expirées: welcome/intermediaire/sessions-db-cleanup.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Un SQL portable: welcome/avance/sessions-db-portable.md
           - Injecter les exécuteurs: welcome/avance/sessions-db-inject.md
+          - Compter les sessions: welcome/avance/sessions-db-metriques.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

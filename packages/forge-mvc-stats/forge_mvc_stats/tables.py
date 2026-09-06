@@ -62,15 +62,15 @@ STATS_EVENTS = TableDefinition(
 )
 
 #: Migrations livrées par le paquet : (nom de fichier, table décrite).
-MIGRATIONS: list[tuple[str, TableDefinition]] = [
+MIGRATIONS: "list[tuple[str, TableDefinition | AddColumn]]" = [
     ("20260808130000_create_forge_stats_events.sql", STATS_EVENTS),
-]
-
-#: Colonnes ajoutées après la création initiale, rendues en `ALTER TABLE`
-#: (`STATS-EVENT-KIND-001`). Une table déjà créée ne se recrée pas : la
-#: migration additive est la seule façon de la faire évoluer sans perdre les
-#: événements déjà enregistrés.
-ADDED_COLUMNS: "list[tuple[str, AddColumn]]" = [
+    # `kind` vivait dans `ADDED_COLUMNS`, que **personne ne lisait**
+    # (`OPTIN-MIGRATIONS-FRESH-INSTALL-001`). La colonne arrivait donc aux
+    # projets neufs par la création de table, et jamais aux projets déjà
+    # provisionnés : le code lit `kind`, et leur base ne l'avait pas.
+    #
+    # Le socle de rendu écarte cette colonne de la création et joue l'ajout :
+    # les deux cas aboutissent à la même table.
     (
         "20260902120000_add_kind_to_forge_stats_events.sql",
         AddColumn(
@@ -80,3 +80,14 @@ ADDED_COLUMNS: "list[tuple[str, AddColumn]]" = [
         ),
     ),
 ]
+
+#: Colonnes ajoutées après la création initiale, rendues en `ALTER TABLE`
+#: (`STATS-EVENT-KIND-001`). Une table déjà créée ne se recrée pas : la
+#: migration additive est la seule façon de la faire évoluer sans perdre les
+#: événements déjà enregistrés.
+#: Conservé pour compatibilité : la liste est désormais dans `MIGRATIONS`,
+#: seule source lue par le socle de rendu (`OPTIN-MIGRATIONS-FRESH-INSTALL-001`).
+ADDED_COLUMNS: "list[tuple[str, AddColumn]]" = [
+    (nom, decl) for nom, decl in MIGRATIONS if isinstance(decl, AddColumn)
+]
+

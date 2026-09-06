@@ -85,7 +85,6 @@ assert session["langue"] == "fr"
 
 ## Après ce starter
 
-Vous avez fait le tour du socle.
-Place au bilan du niveau avancé.
+Reste à savoir combien de sessions vivent dans cette table.
 
-[Bilan avancé](bilan.md)
+[Suivant : compter les sessions](sessions-db-metriques.md)

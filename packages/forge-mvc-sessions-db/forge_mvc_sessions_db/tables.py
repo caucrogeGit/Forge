@@ -65,7 +65,13 @@ MIGRATIONS: list[tuple[str, TableDefinition | AddColumn]] = [
     # étant déjà enregistrée : l'ajout passe donc par sa propre migration.
     (
         "20260901090000_add_user_id_to_forge_sessions.sql",
-        AddColumn(FORGE_SESSIONS, "user_id"),
+        # L'index est nommé ici : la migration de création ne peut pas le poser
+        # sur une colonne qu'elle n'a pas encore
+        # (`OPTIN-MIGRATIONS-FRESH-INSTALL-001`).
+        AddColumn(
+            FORGE_SESSIONS, "user_id",
+            index_names=("idx_forge_sessions_user_id",),
+        ),
     ),
     # Même raison pour `kind` : les projets déjà provisionnés ne rejouent pas
     # la création de la table (SESSIONS-TTL-PER-KIND-001).

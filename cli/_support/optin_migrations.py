@@ -33,6 +33,7 @@ puis appliqué par ``forge migration:apply`` (charte §7, ADR-071).
 from __future__ import annotations
 
 from collections.abc import Iterator
+from typing import Any
 from importlib import import_module, resources
 from pathlib import Path
 
@@ -77,6 +78,33 @@ def _rendered_migrations(package: str) -> "list[tuple[str, bytes]] | None":
     from core.database.table_ddl import AddColumn, render_add_column, render_create_table
 
     backend = get_backend()
+
+    # Les colonnes qu'une migration ULTÉRIEURE ajoutera sont retirées de la
+    # création (`OPTIN-MIGRATIONS-FRESH-INSTALL-001`).
+    #
+    # La déclaration de table évolue avec le paquet : elle porte aujourd'hui
+    # toutes ses colonnes. La rendre telle quelle dans la migration de création
+    # donnait, sur une base NEUVE, une table déjà complète, puis un
+    # `ALTER TABLE ADD COLUMN` sur une colonne existante. Mesuré :
+    # `duplicate column name: priority`, et `forge migration:apply` s'arrête là.
+    #
+    # Trois opt-ins étaient dans ce cas, et aucun n'était provisionnable sur un
+    # projet neuf : sessions-db, jobs et notifications.
+    #
+    # Retirer ces colonnes de la création rend la suite cohérente pour tout le
+    # monde. Un projet neuf joue création puis ajouts, un projet déjà
+    # provisionné ne rejoue pas la création et joue les seuls ajouts, et les
+    # deux aboutissent à la même table.
+    ajoutees = {
+        d.column_name for _f, d in declarations if isinstance(d, AddColumn)
+    }
+    index_ajoutes = {
+        nom
+        for _f, d in declarations
+        if isinstance(d, AddColumn)
+        for nom in (d.index_names or ())
+    }
+
     out: list[tuple[str, bytes]] = []
     for filename, declaration in declarations:
         # Une déclaration est soit une table à créer, soit une colonne à ajouter
@@ -92,10 +120,43 @@ def _rendered_migrations(package: str) -> "list[tuple[str, bytes]] | None":
                 declaration.unique_nullable_index,
             )
         else:
-            statements = render_create_table(declaration, backend.dialect)
+            statements = render_create_table(
+                _sans_colonnes_ajoutees(declaration, ajoutees, index_ajoutes),
+                backend.dialect,
+            )
         body = _rendered_header(package, filename, backend.name) + "\n".join(statements) + "\n"
         out.append((filename, body.encode("utf-8")))
     return out
+
+
+def _sans_colonnes_ajoutees(
+    table: Any, colonnes: "set[str]", index: "set[str]"
+) -> Any:
+    """Table privée des colonnes qu'une migration ultérieure ajoutera.
+
+    Rend la table telle quelle quand il n'y a rien à retirer : la copie n'a
+    alors aucune raison d'exister, et l'égalité des objets reste vraie pour les
+    paquets qui n'ont qu'une création.
+    """
+    import dataclasses
+
+    if not colonnes:
+        return table
+
+    def _index_survivant(declaration: Any) -> bool:
+        # Un index nommé par l'ajout lui appartient. Un index qui PORTE sur une
+        # colonne retirée ne peut pas être créé ici non plus : la table ne
+        # l'aurait pas encore. Mesuré : « no such column: user_id » à la
+        # création, une fois la colonne écartée.
+        if declaration.name in index:
+            return False
+        return not (set(declaration.columns) & colonnes)
+
+    return dataclasses.replace(
+        table,
+        columns=[c for c in table.columns if c.name not in colonnes],
+        indexes=[i for i in table.indexes if _index_survivant(i)],
+    )
 
 
 def iter_migration_resources(package: str) -> Iterator[tuple[str, bytes]]:

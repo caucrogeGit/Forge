@@ -87,4 +87,4 @@ print(autre_store.get(sid)["utilisateur"])   # alice
 Les sessions partagées s'accumulent en base, y compris celles qui ont expiré.
 Voyons comment les nettoyer.
 
-[Nettoyer les sessions expirées](sessions-db-cleanup.md)
+[Nettoyer les sessions expirées](sessions-db-ttl.md)

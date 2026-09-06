@@ -25,11 +25,23 @@ from forge_mvc_sessions_db.store import DbSessionStore
 
 
 def _ddl_statements() -> list[str]:
-    """Statements SQL du DDL forge_sessions livré (commentaires -- retirés)."""
-    _, content = next(iter(iter_sessions_migration_resources()))
-    raw = content.decode("utf-8")
-    sql = "\n".join(l for l in raw.splitlines() if not l.strip().startswith("--"))
-    return [s.strip() for s in sql.split(";") if s.strip()]
+    """Statements SQL de **toutes** les migrations livrées, dans leur ordre.
+
+    Cette fonction ne jouait que la **première**, la création de table
+    (`OPTIN-MIGRATIONS-FRESH-INSTALL-001`). Elle suffisait tant que la création
+    portait toutes les colonnes ; elle ne le peut plus, celles qu'une migration
+    ultérieure ajoute en étant désormais écartées, sans quoi l'ajout viserait
+    une colonne existante sur une base neuve.
+
+    Jouer la suite entière est de toute façon plus fidèle : c'est ce que fait
+    `forge migration:apply` dans un vrai projet.
+    """
+    statements: list[str] = []
+    for _nom, content in iter_sessions_migration_resources():
+        raw = content.decode("utf-8")
+        sql = "\n".join(l for l in raw.splitlines() if not l.strip().startswith("--"))
+        statements.extend(s.strip() for s in sql.split(";") if s.strip())
+    return statements
 
 
 @pytest.fixture()
