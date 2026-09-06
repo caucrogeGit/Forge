@@ -85,4 +85,4 @@ with router.group("", public=True) as public:
 
 Vous avez parcouru toute la progression RBAC : déclarer, vérifier, appliquer, relier.
 
-[Bilan du niveau avancé](bilan.md)
+[Suivant : agir sur cet objet](rbac-instance.md)

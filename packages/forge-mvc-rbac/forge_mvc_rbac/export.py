@@ -52,7 +52,10 @@ class RbacExportError(ValueError):
 
 
 #: Entité affichée pour une permission qu'aucune entité ne réclame.
-SANS_ENTITE = "—"
+#:
+#: Le mot plutôt qu'un tiret cadratin : celui-ci est proscrit par l'ADR-087, et
+#: un tiret seul dans une colonne se lit mal en CSV comme à l'écran.
+SANS_ENTITE = "(aucune)"
 
 
 def _actions_par_permission(data: "dict[str, Any]") -> "dict[str, list[tuple[str, str]]]":

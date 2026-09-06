@@ -6,6 +6,7 @@ absence de commande de création dans les pages (`installation.md` exempté).
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -43,27 +44,42 @@ class TestDebutantChain:
         assert _has("debutant/bilan.md", "../intermediaire/rbac-check.md")
 
 
-class TestIntermediaireChain:
+MKDOCS = PROJECT_ROOT / "packages" / "forge-mvc-rbac" / "mkdocs.yml"
 
-    def test_chain(self):
-        assert _has("intermediaire/rbac-check.md", "(rbac-guard.md)")
-        assert _has("intermediaire/rbac-guard.md", "(rbac-template.md)")
-        assert _has("intermediaire/rbac-template.md", "(bilan.md)")
+
+def _nav_par_niveau() -> "dict[str, list[str]]":
+    """Pages du parcours, par niveau, dans l'ordre du menu.
+
+    La chaîne était figée page par page (`WELCOME-RBAC-CHAINE-DERIVEE-001`).
+    Quatre paliers ajoutés, et ce garde-fou tombait alors que la chaîne était
+    intacte : il fixait la liste d'alors, pas la propriété.
+    """
+    niveaux: "dict[str, list[str]]" = {}
+    for ligne in MKDOCS.read_text(encoding="utf-8").splitlines():
+        trouve = re.search(r"(welcome/(debutant|intermediaire|avance)/([\w-]+\.md))\s*$", ligne)
+        if trouve:
+            niveaux.setdefault(trouve.group(2), []).append(trouve.group(3))
+    return niveaux
+
+
+@pytest.mark.parametrize("niveau", ["debutant", "intermediaire", "avance"])
+def test_chaque_palier_mene_au_suivant(niveau: str) -> None:
+    """Aucun cul-de-sac : le lecteur doit toujours savoir où aller."""
+    pages_du_niveau = _nav_par_niveau()[niveau]
+
+    assert pages_du_niveau[-1] == "bilan.md", f"{niveau} ne finit pas par son bilan"
+    for courante, suivante in zip(pages_du_niveau, pages_du_niveau[1:]):
+        assert _has(f"{niveau}/{courante}", f"({suivante})"), (
+            f"{niveau}/{courante} ne mène pas à {suivante}")
+
+
+class TestBilansEnchaines:
 
     def test_bilan_points_to_next_level(self):
         assert _has("intermediaire/bilan.md", "../avance/rbac-user-role.md")
 
-
-class TestAvanceChain:
-
-    def test_chain(self):
-        assert _has("avance/rbac-user-role.md", "(rbac-resolve.md)")
-        assert _has("avance/rbac-resolve.md", "(rbac-request-roles.md)")
-        assert _has("avance/rbac-request-roles.md", "(bilan.md)")
-
     def test_bilan_points_to_recapitulatif(self):
         assert _has("avance/bilan.md", "../recapitulatif.md")
-
 
 class TestForbiddenCommandsAbsent:
 

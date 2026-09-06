@@ -24,10 +24,14 @@ nav:
           - Vérifier une permission: welcome/intermediaire/rbac-check.md
           - Protéger une route: welcome/intermediaire/rbac-guard.md
           - Permission dans un template: welcome/intermediaire/rbac-template.md
+          - L'héritage entre rôles: welcome/intermediaire/rbac-heritage.md
           - Bilan intermédiaire: welcome/intermediaire/bilan.md
       - Avancé:
           - Associer un rôle à un utilisateur: welcome/avance/rbac-user-role.md
           - Résoudre les permissions: welcome/avance/rbac-resolve.md
           - Rôles de la requête: welcome/avance/rbac-request-roles.md
+          - Agir sur cet objet: welcome/avance/rbac-instance.md
+          - Journaliser les refus: welcome/avance/rbac-refus.md
+          - Exporter le contrat: welcome/avance/rbac-export.md
           - Bilan avancé: welcome/avance/bilan.md
       - Aide-mémoire: welcome/recapitulatif.md

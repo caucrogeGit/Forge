@@ -121,4 +121,4 @@ with router.group("", public=True) as public:
 Vous savez vérifier et appliquer.
 La suite (avancé) : relier tout ça aux utilisateurs.
 
-[Bilan du niveau intermédiaire](bilan.md)
+[Suivant : l'héritage entre rôles](rbac-heritage.md)
