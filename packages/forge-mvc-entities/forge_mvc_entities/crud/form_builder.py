@@ -10,6 +10,7 @@ from forge_mvc_entities.crud.utils import (
     _FORM_FIELD_CLASS_MAP,
     _FORM_FIELD_STR_CONSTRAINTS,
     _humanize,
+    _is_computed,
     _is_generated,
     _is_managed,
     _media_form_fields,
@@ -147,11 +148,17 @@ def build_form(
 ) -> tuple[str, list[str]]:
     """Retourne (code_python, liste_avertissements)."""
     entity = definition["entity"]
-    # Sont absents du formulaire : les champs auto-générés (slug avec source)
-    # et les champs gérés par le framework (horodatages managed, ADR-081).
+    # Sont absents du formulaire : les champs auto-générés (slug avec source),
+    # les champs gérés par le framework (horodatages managed, ADR-081) et les
+    # champs calculés.
+    #
+    # Ces derniers y figuraient (`ENTITIES-COMPUTED-DDL-FORM-001`), et c'était
+    # le pire des deux mondes : l'écran offrait une saisie, et l'`INSERT`
+    # excluait déjà la colonne. Ce que l'utilisateur tapait disparaissait sans
+    # message, sur un champ que le contrat déclare dérivé d'un autre.
     form_fields = [
         f for f in _non_pk_fields(definition)
-        if not _is_generated(f) and not _is_managed(f)
+        if not _is_generated(f) and not _is_managed(f) and not _is_computed(f)
     ]
     relations_by_field = _relation_by_field(relations)
     warnings: list[str] = []

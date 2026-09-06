@@ -533,6 +533,14 @@ def build_entity_sql(entity_definition: dict[str, Any]) -> str:
     primary_key_column = None
 
     for field in fields:
+        if field.get("computed"):
+            # Un champ calculé n'a **pas de colonne** : il est projeté par son
+            # expression dans les lectures, et le contrat le dit
+            # (`ENTITIES-COMPUTED-DDL-FORM-001`). La table en portait une, que
+            # rien n'écrivait jamais puisque l'`INSERT` l'exclut déjà, et que
+            # rien ne lisait puisque le `SELECT` projette l'expression : une
+            # colonne morte, toujours nulle, qui laissait croire à un stockage.
+            continue
         if field["auto_increment"]:
             # PK auto-incrémentée : la forme exacte dépend du dialecte
             # (MariaDB ajoute une clause PRIMARY KEY séparée ; SQLite la porte
