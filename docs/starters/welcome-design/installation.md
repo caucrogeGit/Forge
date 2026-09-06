@@ -17,6 +17,25 @@
 
 Deux références à garder sous la main : la [Charte graphique](charte-graphique.md) (palette, typographie, usages) et le [Récapitulatif des composants](recapitulatif.md).
 
+## Prérequis : les dépendances Node
+
+Le squelette livre `package.json` et ses deux scripts, `build:css` et `watch:css`, mais pas le dossier `node_modules` : Forge ne versionne pas les dépendances d'autrui.
+
+```bash
+npm install
+npm run build:css
+```
+
+`npm install` n'est à faire qu'une fois. `npm run build:css` reconstruit `static/tailwind.css` à partir de `static/src/input.css`.
+
+!!! info "Ou dès la création du projet"
+    `forge new mon-projet --with-node` installe ces dépendances et construit le CSS dans la foulée.
+
+!!! warning "Sans cette étape, la suite du parcours refuse"
+    Les commandes `npm` répondent alors « Can't resolve 'tailwindcss' », et le premier palier s'arrête là.
+
+    Ce prérequis manquait à cette page : les commandes citées étaient justes, et le manque n'existait qu'avant elles.
+
 ## Le confort : le mode watch
 
 Ouvrez un second terminal :

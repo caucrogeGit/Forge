@@ -15,8 +15,29 @@ Nous abordons un nouveau domaine, la base de données : selon le principe « nou
     |---|---|
     | [Migrations SQL](../../../features/migrations.md) | comment créer une table et appliquer une migration |
 
+??? note "Prérequis : le cœur ne parle à aucune base"
+    Les neuf paliers précédents n'ont touché aucune base, et le cœur de Forge n'en connaît aucune.
+    Trois installations et une commande sont nécessaires avant d'aller plus loin, une seule fois pour ce mini-projet.
+
+    ```bash
+    pip install forge-mvc-sqlite
+    pip install forge-mvc-entities
+    forge db:config
+    ```
+
+    | Étape | Ce qu'elle apporte |
+    |---|---|
+    | `forge-mvc-sqlite` | le backend, un fichier local, sans serveur à installer ; le cœur est agnostique et n'en embarque aucun ([ADR-054](../../../adr/054-database-backend-optins.md)) |
+    | `forge-mvc-entities` | le moteur qui porte `db:init`, `migration:make` et `migration:apply` ([ADR-070](../../../adr/070-entities-engine-extraction.md)) |
+    | `forge db:config` | inscrit les variables du backend dans `env/dev`, `env/prod` et `env/example` ([ADR-064](../../../adr/064-db-config-env-scaffold.md)) |
+
+    !!! warning "Sans elles, la commande suivante refuse"
+        `forge db:init` répond alors « module forge-mvc-entities non installé », et le palier s'arrête là.
+
+        Ces trois étapes manquaient à cette page : chacune des commandes était juste, et le manque n'existait qu'entre elles.
+
 ??? note "Migrations"
-    Avant la première migration, initialisez la base de données (une seule fois pour ce mini-projet) :
+    Une fois les prérequis posés, initialisez la base de données :
 
     ```bash
     forge db:init
