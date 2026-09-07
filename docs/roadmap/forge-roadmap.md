@@ -7,9 +7,9 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> Version courante : **Forge 1.0.0-rc.8** (release candidate, préparée le 2026-09-07).
-> Dernière version publiée sur PyPI : **Forge 1.0.0-rc.7** (2026-08-17).
-> Cent dix tickets sont livrés depuis ce tag, tous consignés au `CHANGELOG.md`.
+> Version courante : **Forge 1.0.0-rc.8** (release candidate, publiée le 2026-09-07).
+> Dernière version publiée sur PyPI : **Forge 1.0.0-rc.8** (2026-09-07), 28 distributions.
+> Cent onze tickets ont été livrés dans ce cycle, tous consignés au `CHANGELOG.md`.
 > Un contrôle de pré-vol refuse désormais de publier un journal qui tairait un ticket livré.
 
 ---
