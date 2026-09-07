@@ -21,7 +21,7 @@ applicative** (``media_repository``, ``media_gallery``) y est rapatriée :
 Voir ``docs/adr/018-image-module-extraction.md``.
 """
 
-__version__ = "1.0.0rc7"
+__version__ = "1.0.0rc8"
 
 from forge_mvc_images.focal import FocalPoint, crop_box, crop_to_focal
 from forge_mvc_images.limits import (

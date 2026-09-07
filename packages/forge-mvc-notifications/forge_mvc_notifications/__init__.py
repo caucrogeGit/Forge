@@ -38,7 +38,7 @@ from forge_mvc_notifications.store import (
     unread_count,
 )
 
-__version__ = "1.0.0rc7"
+__version__ = "1.0.0rc8"
 
 __all__ = [
     # Relais vers d'autres canaux (NOTIF-MAIL-BRIDGE-001)

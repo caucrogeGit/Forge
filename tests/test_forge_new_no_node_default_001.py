@@ -34,6 +34,17 @@ from typing import Any
 
 import pytest
 
+from tests._pypi_publication import version_non_publiee
+
+# TESTS-FORGE-NEW-VERSION-NON-PUBLIEE-001 — ce fichier deroule un `forge new`
+# complet, donc une resolution de dependances depuis PyPI. Entre le bump de
+# preparation d'une release et sa publication, la version epinglee par le
+# squelette (ADR-024) n'existe pas encore, et ses cinq tests echouent pour une
+# raison etrangere au code. Mesure a la preparation de la rc8.
+pytestmark = pytest.mark.skipif(
+    version_non_publiee() is not None, reason=version_non_publiee() or ""
+)
+
 import forge
 from cli.project.front_assets import annoncer_css_livre, installer_node
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## [Non publié]
+## [1.0.0-rc.8] - 2026-09-07
 
 ### Rupture
 
@@ -921,6 +921,10 @@
   Forge ne fournit **aucune** insertion conditionnelle : les quatre formes n'ont pas la même sémantique de verrouillage, et une abstraction promettrait une équivalence qui n'existe pas.
 
 ### Tests
+
+- **Le saut de pré-release ne couvrait qu'un fichier sur deux (`TESTS-FORGE-NEW-VERSION-NON-PUBLIEE-001`).**
+  Le squelette épingle `forge-mvc==<version du dépôt>` (ADR-024), et `forge new` résout donc ses dépendances depuis PyPI. Entre le bump de préparation d'une release et sa publication, cette version n'existe pas encore : `pip` répond « No matching distribution » et tout test qui déroule un `forge new` complet échoue pour une raison étrangère au code.
+  Le saut motivé écrit pour la rc7 vivait dans un seul fichier. La préparation de la rc8 a fait tomber les cinq tests d'un second, qui déroule le même parcours et ne l'avait pas. Le motif vit désormais dans un module partagé, faute de quoi le troisième l'aurait écrit une troisième fois ou pas du tout.
 
 - **Une fixture de test évinçait bien plus de modules qu'elle ne l'annonçait (`FIXTURES-ISOLATION-PORTEE-001`).**
   Elle disait isoler les modules `mvc` du projet fabriqué ; son teardown retirait de `sys.modules` **tout** module apparu pendant le test. Mesuré : un seul import du CLI de fixtures en amène 31, dont `core`, `core.app.env`, `core.database.sql_script` et des modules de la bibliothèque standard.

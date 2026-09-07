@@ -21,7 +21,7 @@ reste utilisable sans base pour qui ne veut que des primitives de stockage.
 
 from __future__ import annotations
 
-__version__ = "1.0.0rc7"
+__version__ = "1.0.0rc8"
 
 # Validation/exceptions : réexport depuis le core (où elles restent).
 from core.forms.upload_exceptions import (

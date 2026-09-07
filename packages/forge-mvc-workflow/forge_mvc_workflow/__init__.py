@@ -69,7 +69,7 @@ from forge_mvc_workflow.transitions import (
     validate_transitions,
 )
 
-__version__ = "1.0.0rc7"
+__version__ = "1.0.0rc8"
 
 __all__ = [
     # Statuts lus du contrat d'entité (WORKFLOW-ENTITY-STATUS-001)

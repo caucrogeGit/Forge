@@ -22,7 +22,7 @@ from forge_mvc_admin.http import AdminController, register_admin_routes
 from forge_mvc_admin.registry import AdminRegistry, registry
 from forge_mvc_admin.resources import AdminResource
 
-__version__ = "1.0.0rc7"
+__version__ = "1.0.0rc8"
 
 __all__ = [
     "AdminResource",

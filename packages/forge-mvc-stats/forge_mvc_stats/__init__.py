@@ -55,7 +55,7 @@ from forge_mvc_stats.tracking import (
     track_event,
 )
 
-__version__ = "1.0.0rc7"
+__version__ = "1.0.0rc8"
 
 __all__ = [
     "StatsEvent",

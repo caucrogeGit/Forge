@@ -36,7 +36,7 @@ from forge_mvc_audit.store import (
     record_request_audit,
 )
 
-__version__ = "1.0.0rc7"
+__version__ = "1.0.0rc8"
 
 __all__ = [
     # Export du journal (AUDIT-CSV-EXPORT-001)
