@@ -922,6 +922,11 @@
 
 ### Tests
 
+- **Une fixture de test évinçait bien plus de modules qu'elle ne l'annonçait (`FIXTURES-ISOLATION-PORTEE-001`).**
+  Elle disait isoler les modules `mvc` du projet fabriqué ; son teardown retirait de `sys.modules` **tout** module apparu pendant le test. Mesuré : un seul import du CLI de fixtures en amène 31, dont `core`, `core.app.env`, `core.database.sql_script` et des modules de la bibliothèque standard.
+  Les réimporter fait coexister deux classes distinctes portant le même nom : un `except` posé sur l'ancienne ne rattrape pas la nouvelle, et l'erreur qui en résulte ne désigne pas sa cause. La suite était verte, ce qui rendait le défaut latent plutôt qu'absent.
+  Le teardown reconnaît désormais les modules du projet jetable à leur chemin, les racines étant les entrées que le test a ajoutées à `sys.path`.
+
 - **Un test pouvait refuser les fichiers de tous les suivants (`TESTS-FORGE-REGISTRY-ISOLATION-001`).**
   `forge.configure(...)` écrit dans un dictionnaire de module et n'a pas de portée : ce qu'un test y pose, tous les suivants du même processus le lisent. Une fixture posait `upload_max_size=512` après avoir isolé scrupuleusement ses trois variables d'environnement par `monkeypatch`, et laissait le registre tel quel.
   Les sept tests de `forge-mvc-images` tombaient alors ensemble sur « Fichier trop volumineux : 2529 octets, maximum 512 », leur JPEG d'essai en faisant 2529. Sous `-n --dist loadfile`, la panne ne se produit que si les deux fichiers échoient au même worker : deux chutes sur une dizaine de passages, aucune reproduction à la demande, et huit hypothèses écartées avant celle-ci.

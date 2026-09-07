@@ -45,14 +45,42 @@ def _write_relations(root: Path, relations: list[dict]) -> None:
     )
 
 
+def _vient_d_un_projet_jetable(module: object, racines: list[str]) -> bool:
+    """Dit si un module a été chargé depuis l'un des projets fabriqués du test.
+
+    Le critère est le **chemin** du module, et les racines sont les entrées que
+    le test a ajoutées à ``sys.path`` : ce sont exactement les projets qu'il a
+    fabriqués. Un module sans ``__file__`` (paquet natif ou d'espace de noms)
+    n'en vient pas.
+    """
+    chemin = getattr(module, "__file__", None)
+    if not isinstance(chemin, str):
+        return False
+    resolu = Path(chemin).resolve()
+    return any(resolu.is_relative_to(Path(racine).resolve()) for racine in racines)
+
+
 @pytest.fixture
 def isolated_imports() -> Iterator[None]:
     """Isole les imports du test.
 
     Un autre test (dans le même worker xdist) peut avoir laissé un module ``mvc``
-    en cache, pointant vers un autre projet : on l'évince au setup (et on le
-    restaure au teardown), on restaure ``sys.path`` et on retire les modules
-    importés pendant le test.
+    en cache, pointant vers un autre projet : on l'évince au setup, on le restaure
+    au teardown, et on retire les modules chargés depuis les projets que le test a
+    fabriqués.
+
+    Le teardown évinçait auparavant **tout** module apparu pendant le test.
+    Mesuré : un seul ``from forge_mvc_fixtures.cli.load import …`` en amène 31,
+    dont ``core``, ``core.app.env``, ``core.database.sql_script`` et des modules
+    de la bibliothèque standard (``ast``, ``typing``, ``dataclasses``,
+    ``inspect``). Les évincer les fait réimporter au test suivant, ce qui rend
+    l'état de module réinitialisé et fait coexister **deux classes distinctes
+    portant le même nom** : un ``except`` sur l'ancienne ne rattrape pas la
+    nouvelle, et l'erreur qui en résulte ne désigne pas sa cause
+    (``FIXTURES-ISOLATION-PORTEE-001``).
+
+    La fixture retire donc ce qu'elle annonce retirer : les modules du projet
+    jetable, reconnus au chemin dont ils viennent.
     """
     saved_path = list(sys.path)
     stashed = {
@@ -62,13 +90,16 @@ def isolated_imports() -> Iterator[None]:
     }
     for name in stashed:
         del sys.modules[name]
-    baseline = set(sys.modules)
     try:
         yield
     finally:
+        # Relevé avant de restaurer `sys.path` : ce sont les projets du test.
+        racines = [chemin for chemin in sys.path if chemin not in saved_path]
         sys.path[:] = saved_path
-        for name in list(sys.modules):
-            if name not in baseline:
+        for name, module in list(sys.modules.items()):
+            if name == "mvc" or name.startswith("mvc."):
+                del sys.modules[name]
+            elif racines and _vient_d_un_projet_jetable(module, racines):
                 del sys.modules[name]
         sys.modules.update(stashed)
 
@@ -377,3 +408,63 @@ class TestF52ForeignKeyWrap:
         assert rc == 1
         # Réactivation FK garantie même en cas d'erreur (finally).
         assert calls[-1] == "SET FOREIGN_KEY_CHECKS = 1"
+
+
+class TestPorteeDeLIsolation:
+    """`FIXTURES-ISOLATION-PORTEE-001` — ce que le teardown retire, et ce qu'il garde.
+
+    Le teardown évinçait **tout** module apparu pendant le test. Un seul import
+    du CLI de fixtures en amène 31, dont `core`, `core.app.env`,
+    `core.database.sql_script` et des modules de la bibliothèque standard.
+
+    Les réimporter fait coexister deux classes distinctes portant le même nom :
+    un `except` posé sur l'ancienne ne rattrape pas la nouvelle, et l'erreur qui
+    en résulte ne désigne pas sa cause. La suite était verte, ce qui rendait le
+    défaut latent plutôt qu'absent.
+
+    Les témoins sont **injectés dans `sys.modules`** plutôt que choisis parmi
+    les modules réels : un module du framework est déjà chargé au moment où la
+    fixture prend son instantané, si bien que le retirer puis le réimporter ne
+    le rend pas « nouveau ». Un premier garde-fou écrit ainsi ne tombait pas sur
+    l'ancien comportement, donc ne gardait rien.
+
+    Les deux méthodes s'exécutent dans leur ordre de définition ; la seconde
+    observe l'état laissé par le teardown de la première, et ne prend donc pas
+    la fixture.
+    """
+
+    #: Ne vient d'aucun projet : il doit survivre au teardown.
+    HORS_PROJET = "_temoin_isolation_hors_projet"
+
+    def test_1_charge_un_projet_jetable_et_un_module_etranger(
+        self, tmp_path: Path, isolated_imports: None
+    ) -> None:
+        import importlib
+        import types
+
+        _write(tmp_path, "mvc/__init__.py", "")
+        _write(tmp_path, "mvc/services/__init__.py", "")
+        _write(tmp_path, "mvc/services/marqueur.py", "VALEUR = 1\n")
+        sys.path.insert(0, str(tmp_path))
+        importlib.import_module("mvc.services.marqueur")
+
+        # Apparaît pendant le test, sans venir du projet fabriqué.
+        sys.modules[self.HORS_PROJET] = types.ModuleType(self.HORS_PROJET)
+
+        assert "mvc.services.marqueur" in sys.modules
+        assert self.HORS_PROJET in sys.modules
+
+    def test_2_le_projet_est_retire_l_etranger_reste(self) -> None:
+        etranger_present = self.HORS_PROJET in sys.modules
+        sys.modules.pop(self.HORS_PROJET, None)
+
+        assert "mvc.services.marqueur" not in sys.modules, (
+            "le module du projet jetable survit au test : un test suivant qui "
+            "importe `mvc.…` lirait le projet du précédent"
+        )
+        assert etranger_present, (
+            "le teardown a évincé un module qui ne venait pas du projet "
+            "fabriqué : appliqué au framework, le prochain qui l'importe en "
+            "obtient une seconde instance, et deux classes de même nom cessent "
+            "d'être la même classe"
+        )
