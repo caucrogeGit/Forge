@@ -922,6 +922,11 @@
 
 ### Tests
 
+- **Un test pouvait refuser les fichiers de tous les suivants (`TESTS-FORGE-REGISTRY-ISOLATION-001`).**
+  `forge.configure(...)` écrit dans un dictionnaire de module et n'a pas de portée : ce qu'un test y pose, tous les suivants du même processus le lisent. Une fixture posait `upload_max_size=512` après avoir isolé scrupuleusement ses trois variables d'environnement par `monkeypatch`, et laissait le registre tel quel.
+  Les sept tests de `forge-mvc-images` tombaient alors ensemble sur « Fichier trop volumineux : 2529 octets, maximum 512 », leur JPEG d'essai en faisant 2529. Sous `-n --dist loadfile`, la panne ne se produit que si les deux fichiers échoient au même worker : deux chutes sur une dizaine de passages, aucune reproduction à la demande, et huit hypothèses écartées avant celle-ci.
+  Le plafond de taille est précisément celui que l'ADR-032 garde au noyau, hors environnement, ce qui le rendait invisible à toute recherche menée du côté des variables. Cinq fixtures le posent sans le rendre ; les corriger une à une laisserait la sixième à écrire, aussi la restauration est-elle faite une fois pour toute la suite.
+
 - **Un worker de test mort n'est plus remplacé en silence (`TESTS-XDIST-WORKER-CRASH-VISIBLE-001`).**
   Par défaut, pytest-xdist relance un worker qui meurt ; le remplaçant reprend le test fautif et meurt à son tour, quatre fois. Mesuré sur un worker tué volontairement, le rapport annonce « 5 failed » pour **un seul** test réellement en cause.
   Un compte faux oriente la recherche vers des tests qui n'ont rien fait. Le drapeau ne corrige rien et n'empêche rien, il rend l'incident lisible. Sans `-n` il est sans effet, donc sans effet en intégration continue, qui n'y recourt pas.

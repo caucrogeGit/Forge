@@ -109,3 +109,41 @@ def pytest_sessionfinish(session: object, exitstatus: object) -> None:
     if reporter is not None:
         reporter.write_line(message, red=True)
     session.exitstatus = pytest.ExitCode.TESTS_FAILED
+
+
+# ── Isolation du registre du noyau (TESTS-FORGE-REGISTRY-ISOLATION-001) ──────
+# `forge.configure(...)` écrit dans un dictionnaire de module. Il n'a pas de
+# portée : ce qu'un test y pose, tous les suivants du même processus le lisent.
+#
+# Mesuré : `tests/test_e2e_upload_http.py` pose `upload_max_size=512` dans une
+# fixture qui isole scrupuleusement ses trois variables d'environnement par
+# `monkeypatch`, et laisse le registre tel quel. Les sept tests de
+# `packages/forge-mvc-images/tests/test_images_registry_record_001.py` tombaient
+# alors ensemble sur « Fichier trop volumineux : 2529 octets, maximum 512 »,
+# leur JPEG d'essai en faisant 2529. Sous `-n --dist loadfile`, la panne ne se
+# produit que si les deux fichiers échoient au même worker, d'où deux chutes
+# sur une dizaine de passages et aucune reproduction à la demande.
+#
+# Cinq fixtures posent `upload_max_size` sans le rendre. Les corriger une à une
+# laisserait la sixième à écrire. La restauration est donc faite ici, pour tous
+# les tests, présents et futurs.
+#
+# `session_store` est repassé par `configure()` et non écrit dans le
+# dictionnaire : sa pose a un effet de bord (`set_session_store`) qu'une simple
+# réaffectation ne défait pas.
+import pytest as _pytest
+
+
+@_pytest.fixture(autouse=True)
+def _isole_le_registre_du_noyau():
+    from core import forge
+
+    avant = dict(forge._cfg)  # pyright: ignore[reportPrivateUsage]
+    try:
+        yield
+    finally:
+        apres = forge._cfg  # pyright: ignore[reportPrivateUsage]
+        if apres.get("session_store") is not avant.get("session_store"):
+            forge.configure(session_store=avant.get("session_store"))
+        apres.clear()
+        apres.update(avant)
