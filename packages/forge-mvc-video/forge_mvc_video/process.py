@@ -115,8 +115,14 @@ def process_video(
         # plafond cumulé se vérifie donc au traitement, la vidéo étant déjà
         # stockée. Sonder avant d'écrire demanderait un fichier temporaire et un
         # appel ffprobe de plus par envoi, pour déplacer le problème.
+        # `VIDEO-QUOTA-REPRISE-001` : ce que cette vidéo pèse déjà dans le
+        # total est retranché. Sur une reprise, ses métadonnées ont été
+        # enregistrées avant l'échec, et sa durée compte donc déjà.
         check_duration_quota(
-            int(meta.duration_seconds or 0), repository=repo, config=cfg
+            int(meta.duration_seconds or 0),
+            repository=repo,
+            config=cfg,
+            already_counted_seconds=int(row.get("duration_seconds") or 0),
         )
         repo.update_metadata(
             video_id,

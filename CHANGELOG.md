@@ -11,6 +11,30 @@
 
 ### Corrigé
 
+- **Une sélection de variantes d'image échouait après avoir écrit (`IMAGES-VARIANTES-SELECTION-001`).**
+  `save_image_upload` acceptait une liste de préréglages, puis reconstruisait son résultat avec deux noms écrits en dur. `variants=["thumbnail"]` levait donc `KeyError('medium')`, après avoir déjà posé des fichiers sur le stockage : une option annoncée par l'API ne fonctionnait pas, et son échec laissait des traces.
+  Les variantes rendues sont désormais celles qui ont été produites. L'original en est exclu, `saved.path` le portant déjà, sans quoi il s'afficherait en double pour qui itère sur les déclinaisons.
+
+- **Une suppression de fichier aboutissait, puis levait (`FILES-DELETE-ORDRE-001`).**
+  Le stockage accepte un chemin absolu situé dans la racine ; la normalisation destinée au registre le refuse. Les deux étaient appelées dans cet ordre : le fichier disparaissait, puis l'appel levait. L'appelant croyait à un échec alors que l'effet avait eu lieu, et le registre n'était pas nettoyé.
+  L'identifiant relatif est maintenant calculé **avant** toute mutation, et un chemin hors de la racine est refusé sans que rien n'ait été supprimé.
+
+- **Le cache des paramètres rechargeait une valeur périmée (`SETTINGS-CACHE-APRES-ECRITURE-001`).**
+  L'invalidation précédait l'écriture en base. Une lecture qui tombait entre les deux rechargeait l'ancienne valeur et la remettait en cache, où elle restait : une modification réussie n'était pas visible du processus, et rien ne la remettait en cause avant la prochaine écriture. Mesuré par un entrelacement déterministe, sans même invoquer plusieurs ouvriers.
+  Le cache est vidé après que la base a pris la valeur, dans un `finally` : une écriture qui lève a pu prendre effet, et laisser un cache que rien ne rafraîchit serait pire que l'échec. Cela ne ferme pas toute course concurrente et ne le prétend pas ; la fenêtre se referme au lieu de rester ouverte jusqu'à l'écriture suivante.
+
+- **Une reprise de traitement vidéo recomptait sa propre durée (`VIDEO-QUOTA-REPRISE-001`).**
+  Le contrôle de quota ajoutait la durée détectée au total du dépôt. Sur une reprise, la vidéo ayant échoué après l'enregistrement de ses métadonnées, sa durée était déjà dans ce total : une vidéo de 60 secondes, un total de 60 et un plafond de 60 faisaient refuser la reprise comme si le total atteignait 120.
+  Une reprise est un parcours normal du produit, pas une seconde exécution du parcours initial.
+
+- **Le service audio ne vérifiait pas le confinement du chemin servi (`AUDIO-CONFINEMENT-CHEMIN-001`).**
+  La validation de l'identifiant ferme la traversée par l'URL, mais pas le cas d'un lien symbolique déposé dans le stockage : un tel lien pointant hors de la racine était servi avec un statut 200. La condition nécessaire est qu'un tiers puisse écrire dans le stockage, et aucun moyen pour un visiteur distant d'y parvenir n'a été établi ; ce n'est donc pas une lecture arbitraire à distance.
+  Le module vidéo portait déjà cette garde, en la décrivant comme le « miroir de la validation côté audio » qui, elle, n'existait pas. Le commentaire est corrigé en même temps que le code.
+
+- **Le garde de démarrage IoT ignorait l'authentification par jetons (`IOT-GARDE-DEMARRAGE-JETONS-001`).**
+  Il portait sur le seul jeton global, si bien qu'un projet fournissant un registre de jetons par appareil voyait son démarrage refusé en production. Le modèle d'autorisation avait avancé plus loin que son contrôle de configuration : le contrôleur savait authentifier par jeton scopé, le garde ne le savait pas.
+  Ce qui est exigé est désormais un moyen d'authentification **utilisable**, quel qu'il soit. N'en avoir aucun reste refusé, et c'est la garantie pour laquelle ce garde existe.
+
 - **Une catégorie de statistiques ne se retrouvait pas par son propre filtre (`STATS-CATEGORY-NORMALISATION-001`).**
   Le filtre d'agrégation appliquait `strip()` à la catégorie cherchée, l'écriture non. Un événement enregistré avec `category=" cours "` existait bien en base, mais un comptage filtré sur cette même valeur rendait une liste vide, le filtre cherchant `"cours"`.
   La règle vit désormais à la frontière d'entrée, et les deux chemins la lisent. La dupliquer d'un côté seulement est précisément ce qui a produit l'écart.

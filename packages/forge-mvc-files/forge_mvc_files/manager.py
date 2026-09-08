@@ -194,9 +194,42 @@ def _oublier(chemin: str) -> None:
         )
 
 
+def _chemin_relatif_au_stockage(path: "str | Path", racine: Path) -> str:
+    """Rend l'identifiant relatif d'un fichier, à partir de n'importe quelle forme.
+
+    `FILES-DELETE-ORDRE-001`. Le stockage accepte un chemin **absolu** situé dans
+    la racine ; la normalisation destinée au registre le refuse. Les deux étant
+    appelées dans cet ordre, un chemin absolu interne faisait supprimer le
+    fichier **puis** lever `UploadStorageError` : l'appelant croyait à un échec
+    alors que l'effet avait eu lieu, et le registre n'était pas nettoyé.
+
+    La conversion se fait donc **avant** toute mutation. Un chemin hors de la
+    racine est refusé ici, sans que rien n'ait été supprimé.
+    """
+    brut = Path(path)
+    if brut.is_absolute():
+        try:
+            relatif = brut.resolve().relative_to(racine.resolve())
+        except ValueError:
+            raise UploadStorageError(
+                "Chemin media absolu hors du stockage : refusé avant toute "
+                "suppression."
+            ) from None
+        return storage.normalize_media_path(relatif.as_posix())
+    return storage.normalize_media_path(str(path))
+
+
 def delete_upload(path: str | Path) -> bool:
-    supprime = storage.delete_file(path, root=upload_root())
-    _oublier(storage.normalize_media_path(str(path)))
+    """Supprime un fichier du stockage et l'oublie du registre.
+
+    L'identifiant relatif est calculé **d'abord** : une entrée que le registre
+    refuserait ne doit pas avoir déjà fait disparaître le fichier
+    (`FILES-DELETE-ORDRE-001`).
+    """
+    racine = upload_root()
+    relatif = _chemin_relatif_au_stockage(path, racine)
+    supprime = storage.delete_file(relatif, root=racine)
+    _oublier(relatif)
     return supprime
 
 

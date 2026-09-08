@@ -228,7 +228,6 @@ def _set_setting_raw(key: str, value: SettingValue, *, db: Any = None) -> None:
     """
     from forge_mvc_settings.cache import cache_invalidate
 
-    cache_invalidate(key)
     serialized, value_type = _serialize(value)
     database = db if db is not None else _db_module()
     # Écrire puis insérer si rien n'a été touché (OPTIN-DML-DIALECT-001).
@@ -242,12 +241,35 @@ def _set_setting_raw(key: str, value: SettingValue, *, db: Any = None) -> None:
     # deux, et le perdant reprend par la mise à jour. Le doublon est reconnu
     # par le cœur (ADR-054), donc de la même façon sur les quatre backends.
     maintenant = utc_now()
-    if database.execute(_UPDATE_SQL, (serialized, value_type, maintenant, key)):
-        return
+    # `SETTINGS-CACHE-APRES-ECRITURE-001` : le cache est vidé **après** que la
+    # base a pris la valeur, jamais avant.
+    #
+    # L'invalidation précédait l'écriture. Une lecture qui tombait entre les
+    # deux rechargeait l'ancienne valeur depuis la base et la remettait en
+    # cache, où elle restait : une modification réussie n'était pas visible du
+    # processus, et rien ne la remettait en cause avant la prochaine écriture.
+    # Mesuré par un entrelacement déterministe, sans même invoquer plusieurs
+    # ouvriers.
+    #
+    # Vider après ne ferme pas toutes les courses possibles, et ne le prétend
+    # pas : une lecture concurrente peut encore recharger une valeur périmée
+    # dans la fenêtre qui précède l'invalidation. Mais la fenêtre se referme,
+    # au lieu de rester ouverte jusqu'à la prochaine écriture.
+    #
+    # La cohérence entre les caches de plusieurs processus est une autre
+    # question, qu'un verrou local ne résout pas et que ce module ne prétend
+    # pas trancher.
     try:
-        database.execute(_INSERT_SQL, (key, serialized, value_type, maintenant))
-    except UniqueViolationError:
-        database.execute(_UPDATE_SQL, (serialized, value_type, maintenant, key))
+        if database.execute(_UPDATE_SQL, (serialized, value_type, maintenant, key)):
+            return
+        try:
+            database.execute(_INSERT_SQL, (key, serialized, value_type, maintenant))
+        except UniqueViolationError:
+            database.execute(_UPDATE_SQL, (serialized, value_type, maintenant, key))
+    finally:
+        # Dans un `finally` : une écriture qui lève a pu prendre effet, et
+        # laisser un cache que rien ne rafraîchit serait pire que l'échec.
+        cache_invalidate(key)
 
 
 def get_setting(

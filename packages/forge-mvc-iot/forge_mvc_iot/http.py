@@ -431,13 +431,27 @@ def register_iot_routes(
     if config is None:
         config = load_iot_config()
 
-    # Sécuriser par défaut (principe 7) : l'API ouverte (sans token) est réservée
-    # au développement. En production, l'exposer sans Bearer token serait une
-    # fuite de données IoT — on refuse explicitement plutôt que d'exposer.
-    if config.api_token is None and _is_prod(_forge_get("app_env")):
+    # Sécuriser par défaut (principe 7) : l'API ouverte (sans aucun moyen
+    # d'authentification) est réservée au développement. En production,
+    # l'exposer serait une fuite de données IoT, et on refuse explicitement
+    # plutôt que d'exposer.
+    #
+    # `IOT-GARDE-DEMARRAGE-JETONS-001` : le contrôle portait sur le seul
+    # `config.api_token`, si bien qu'un projet fournissant un registre de jetons
+    # à portée voyait son démarrage refusé en production. Le modèle
+    # d'autorisation avait avancé plus loin que son contrôle de configuration :
+    # le contrôleur sait authentifier par jeton scopé, le garde ne le savait
+    # pas.
+    #
+    # Ce qui est exigé est donc **un moyen d'authentification utilisable**, quel
+    # qu'il soit, et non un moyen désigné d'avance. N'en avoir aucun reste
+    # refusé, et c'est la garantie que ce garde existe pour tenir.
+    aucune_authentification = config.api_token is None and token_repository is None
+    if aucune_authentification and _is_prod(_forge_get("app_env")):
         raise RuntimeError(
             "API IoT ouverte interdite en production : définir FORGE_IOT_API_TOKEN "
-            "pour exiger un Bearer token, ou n'enregistrer les routes IoT qu'en "
+            "pour exiger un Bearer token global, passer `token_repository=` pour "
+            "des jetons par appareil, ou n'enregistrer les routes IoT qu'en "
             "environnement de développement (le mode ouvert est local/pédagogique)."
         )
 

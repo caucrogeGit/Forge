@@ -95,8 +95,13 @@ class VideoHttpController:
         # Défense en profondeur : le chemin vient de la base (généré via UUID au
         # transcodage, jamais de l'URL), mais on revalide qu'il reste **sous**
         # storage_root. Une ligne DB corrompue ou écrite par un autre composant
-        # (`../`, chemin absolu) ne doit pas permettre de sortir du dossier de
-        # stockage. Mirror de la validation côté audio.
+        # (`../`, chemin absolu, lien symbolique) ne doit pas permettre de sortir
+        # du dossier de stockage.
+        #
+        # Le commentaire disait « miroir de la validation côté audio », alors que
+        # celle-ci n'existait pas : le module audio résolvait sans vérifier, et un
+        # lien symbolique y était servi (`AUDIO-CONFINEMENT-CHEMIN-001`). Les deux
+        # modules portent maintenant la même garde, ce que la phrase affirmait.
         storage_root = Path(self._config.storage_root).resolve()
         path = (storage_root / rel).resolve()
         if not path.is_relative_to(storage_root):

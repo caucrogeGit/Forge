@@ -446,11 +446,23 @@ def save_image_upload(
     if variants:
         demandes = None if variants is True else list(variants)
         generated = generate_image_variants(saved.path, focal=focal, presets=demandes)
+        # `IMAGES-VARIANTES-SELECTION-001` : les variantes rendues sont celles
+        # qui ont été **produites**, et non deux noms historiques écrits en dur.
+        #
+        # `variants=["thumbnail"]` levait `KeyError('medium')` après avoir écrit
+        # les fichiers : une option annoncée par l'API ne fonctionnait pas, et
+        # son échec laissait des traces sur le stockage. Reconstruire le
+        # résultat à partir de deux clés supposées présentes, c'est décider ici
+        # de ce que le générateur a fait là-bas.
+        # `original` est exclu : `saved.path` le porte déjà, et l'ajouter ici
+        # ferait afficher l'image d'origine en double à qui itère sur les
+        # déclinaisons. Le contrat d'avant ne rendait que les déclinaisons.
         saved = replace(
             saved,
             variants={
-                "medium": generated["medium"],
-                "thumbnail": generated["thumbnail"],
+                nom: chemin
+                for nom, chemin in generated.items()
+                if nom != "original"
             },
         )
     return saved

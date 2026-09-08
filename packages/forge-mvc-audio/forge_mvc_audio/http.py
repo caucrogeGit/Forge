@@ -57,7 +57,27 @@ class AudioHttpController:
         if not rel:
             return json_error("not_found", 404)
 
-        path = Path(self._config.storage_root) / rel
+        # `AUDIO-CONFINEMENT-CHEMIN-001` : le chemin est **résolu** puis vérifié
+        # comme descendant de la racine, comme le fait le module vidéo.
+        #
+        # La validation de l'UUID ferme la traversée par l'URL, et c'est ce que
+        # le commentaire ci-dessus dit. Elle ne ferme pas le cas d'un lien
+        # symbolique déposé dans le stockage : mesuré, un
+        # `transcoded/<uuid valide>/audio.mp3` pointant hors de la racine était
+        # servi avec un statut 200.
+        #
+        # La condition nécessaire est qu'un tiers puisse écrire dans le
+        # stockage, et je n'ai pas établi de moyen pour un visiteur distant d'y
+        # parvenir : ce n'est donc pas une lecture arbitraire à distance. Mais
+        # une garde qui existe dans le module voisin et manque ici est une
+        # asymétrie qu'aucune raison ne justifie.
+        storage_root = Path(self._config.storage_root).resolve()
+        path = (storage_root / rel).resolve()
+        if not path.is_relative_to(storage_root):
+            logger.warning(
+                "Forge Audio — chemin hors storage_root refusé pour %s : %s", uuid, rel
+            )
+            return json_error("not_found", 404)
         if not path.is_file():
             logger.warning("Forge Audio — fichier absent pour %s : %s", uuid, path)
             return json_error("file_missing", 404)

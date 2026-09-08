@@ -137,12 +137,21 @@ def check_duration_quota(
     *,
     repository: "_TotalsSource | None" = None,
     config: "VideoConfig | None" = None,
+    already_counted_seconds: int = 0,
 ) -> None:
     """Refuse la vidéo qui ferait dépasser le plafond cumulé de durée.
 
     Appelé **au traitement**, la durée n'étant connue qu'après le sondage. Le
     fichier source est alors déjà écrit, ce que la documentation dit plutôt que
     de le laisser découvrir.
+
+    `already_counted_seconds` est la durée que **cette vidéo** pèse déjà dans le
+    total, et qu'il faut donc retrancher (`VIDEO-QUOTA-REPRISE-001`). Une reprise
+    est un parcours normal du produit, pas une seconde exécution du parcours
+    initial : la vidéo a échoué **après** l'enregistrement de ses métadonnées,
+    sa durée est déjà dans le total du dépôt, et l'y ajouter une seconde fois la
+    comptait double. Mesuré : une vidéo de 60 secondes, un total de 60 et un
+    plafond de 60 faisaient refuser la reprise comme si le total atteignait 120.
 
     Raises:
         VideoQuotaError: la somme dépasserait
@@ -156,10 +165,12 @@ def check_duration_quota(
     plafond = etat.max_duration
     if plafond is None:
         return
-    if etat.total_duration + incoming_seconds > plafond:
+    deja = max(0, int(already_counted_seconds))
+    total_hors_cette_video = max(0, etat.total_duration - deja)
+    if total_hors_cette_video + incoming_seconds > plafond:
         raise VideoQuotaError(
             "plafond de durée vidéo dépassé : "
-            f"{etat.total_duration}s déjà enregistrées sur {plafond}s, "
+            f"{total_hors_cette_video}s déjà enregistrées sur {plafond}s, "
             f"et cette vidéo en ajoute {incoming_seconds}s "
             f"(FORGE_VIDEO_MAX_TOTAL_DURATION_SECONDS={plafond})"
         )
