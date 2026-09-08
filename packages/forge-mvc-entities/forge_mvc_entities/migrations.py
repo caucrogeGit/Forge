@@ -5,6 +5,8 @@ from __future__ import annotations
 from typing import Any, cast
 
 import hashlib
+
+from core.database.sql_script import normalize_sql_whitespace
 import json
 import os
 import re
@@ -805,13 +807,30 @@ def _contains_ddl(statements: "list[str]") -> bool:
 
 
 def _statement_checksum(statement: str) -> str:
-    """Empreinte d'une instruction, blancs normalisés.
+    """Empreinte d'une instruction, blancs du **code** normalisés.
 
     Le découpeur canonique a déjà ôté les commentaires : reformater ou
     recommenter une instruction déjà appliquée ne doit pas faire refuser la
     reprise, seul son SQL effectif compte.
+
+    `ENTITIES-CHECKSUM-LITTERAUX-001` : la normalisation valait pour toute
+    l'instruction, littéraux compris. Mesuré,
+
+        INSERT INTO demo (value) VALUES ('a  b')
+        INSERT INTO demo (value) VALUES ('a b')
+
+    donnaient la **même** empreinte, alors qu'elles n'écrivent pas la même
+    valeur. Une reprise pouvait donc tenir pour déjà exécutée une étape dont un
+    littéral avait changé, et laisser la base dans un état que le fichier ne
+    décrit plus.
+
+    Un outil de migration doit être particulièrement conservateur lorsqu'il
+    décide qu'une étape a eu lieu : l'intention d'ignorer un reformatage reste,
+    mais elle s'arrête où commence le texte.
     """
-    return hashlib.sha256(" ".join(statement.split()).encode("utf-8")).hexdigest()
+    return hashlib.sha256(
+        normalize_sql_whitespace(statement).encode("utf-8")
+    ).hexdigest()
 
 
 def _steps_table_ddl(dialect: Any) -> str:

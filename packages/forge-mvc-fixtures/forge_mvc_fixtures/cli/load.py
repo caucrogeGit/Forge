@@ -31,6 +31,7 @@ from forge_mvc_fixtures.scenarios import (
     available_scenarios,
     select_scenario_files,
 )
+from core.database.sql_script import mask_sql_literals
 from core.database.sql_script import split_sql_statements as _split_sql_statements
 from forge_mvc_fixtures.factory import Fixture
 
@@ -274,7 +275,7 @@ def collect_callable_fixtures(root: Path) -> "list[tuple[Path, type[Fixture]]]":
 def _tables_of_file(path: Path) -> set[str]:
     """Toutes les tables peuplées par un ``.sql`` (chaque ``INSERT INTO``)."""
     try:
-        text = _strip_line_comments(path.read_text(encoding="utf-8"))
+        text = _code_seul(path.read_text(encoding="utf-8"))
     except OSError:
         return set()
     return {match.group(1) for match in _INSERT_INTO.finditer(text)}
@@ -288,7 +289,7 @@ def _referenced_tables_of_file(path: Path) -> set[str]:
     déclarée dans ``relations.json`` (table du socle, comme ``users``).
     """
     try:
-        text = _strip_line_comments(path.read_text(encoding="utf-8"))
+        text = _code_seul(path.read_text(encoding="utf-8"))
     except OSError:
         return set()
     return {match.group(1) for match in _FROM_TABLE.finditer(text)}
@@ -385,11 +386,19 @@ def order_load_units(
     return [units[index] for index in order]
 
 
-def _strip_line_comments(sql: str) -> str:
-    """Retire les lignes de commentaire ``--`` (le SQL affiché les garde)."""
-    return "\n".join(
-        line for line in sql.splitlines() if not line.strip().startswith("--")
-    )
+def _code_seul(sql: str) -> str:
+    """Rend le SQL avec les littéraux et commentaires effacés.
+
+    `FIXTURES-PURGE-LEXER-001`. Ces deux relevés cherchaient `INSERT INTO` et
+    `FROM` dans le texte brut, en se contentant de retirer les lignes commençant
+    par `--`. Une table citée **dans une chaîne** était donc lue comme une
+    écriture ou une dépendance, ce qui fausse l'ordre de chargement autant que
+    le plan de purge.
+
+    Le masquage vient du cœur (ADR-079), qui porte déjà la machine à états
+    distinguant code, chaînes et commentaires.
+    """
+    return mask_sql_literals(sql)
 
 
 # ADR-079 : découpeur SQL canonique du cœur (chaînes '' + commentaires -- et /* */),

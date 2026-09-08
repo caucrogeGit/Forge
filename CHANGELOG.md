@@ -11,6 +11,16 @@
 
 ### Corrigé
 
+- **Le plan de purge des fixtures visait une table qu'aucune fixture n'écrit (`FIXTURES-PURGE-LEXER-001`).**
+  La collecte cherchait `INSERT INTO` dans le texte brut, en se contentant de retirer les lignes commençant par deux tirets. Une table citée **dans une chaîne** entrait donc dans le plan : `INSERT INTO logs (message) VALUES ('INSERT INTO users')` rendait `['logs', 'users']`.
+  La purge bâtit ses `DELETE FROM` sur cette liste. Les garde-fous d'autorisation n'y changent rien, ils autorisent très correctement la mauvaise suppression : un plan faux reste faux quand il est confirmé.
+  Le même relevé sert à l'ordre de chargement, où il produisait la même erreur sur les tables lues comme sur les tables écrites. Les deux passent désormais par le masquage du cœur.
+
+- **Deux instructions de migration différentes avaient la même empreinte (`ENTITIES-CHECKSUM-LITTERAUX-001`).**
+  L'empreinte d'étape normalisait les blancs de toute l'instruction, littéraux compris. `VALUES ('a  b')` et `VALUES ('a b')` donnaient le même checksum, alors qu'elles n'écrivent pas la même valeur.
+  Une reprise de migration pouvait donc tenir pour déjà exécutée une étape dont un littéral avait changé, et laisser la base dans un état que le fichier ne décrit plus. Un outil de migration doit être particulièrement conservateur quand il décide qu'une étape a eu lieu.
+  L'intention d'origine reste, un reformatage ne fait pas refuser la reprise ; elle s'arrête simplement où commence le texte.
+
 - **Le client de test déformait les requêtes qu'il prétendait imiter (`TESTING-CLIENT-FIDELITE-WSGI-001`).**
   Trois écarts avec un vrai serveur. `base_url="https://…"` ne changeait rien, le schéma restant `http` et l'hôte `testserver:80` : un test de cookie `Secure` semblait donc passer sur une connexion claire. `PATH_INFO` gardait son percent-encodage, là où la PEP 3333 impose un chemin décodé. Et `data={"ids": ["1", "2"]}` devenait un champ unique valant la représentation Python de la liste.
   Le deuxième écart est le plus instructif : il **masquait** le défaut de décodage d'URL du cœur corrigé juste avant. Un client qui n'encode pas comme un serveur ne peut pas révéler qu'un serveur décode mal. Un outil de mesure faux ne rend pas les tests inutiles, il les rend rassurants.
@@ -34,6 +44,13 @@
   L'adaptateur recollait `PATH_INFO` et `QUERY_STRING` avec un `?`, puis `Request` repassait le tout dans `urlparse`. Or le serveur a **déjà** séparé les deux morceaux et décodé le chemin (PEP 3333) : un `%3F` du chemin, redevenu `?`, était relu comme un séparateur.
   Mesuré sur des URL produites par le propre `url_for()` de Forge : `/files/a%3Fb` rendait `a`, `/files/a%23b` rendait `a`, et `/files/caf%C3%A9` rendait `cafÃ©`, faute d'être repassé en UTF-8. Un identifiant tronqué désigne un autre enregistrement, ou aucun.
   Les deux morceaux sont désormais pris tels que le serveur les livre, et le chemin est relu dans son encodage réel. Le serveur de développement n'était pas touché, sa ligne de requête arrivant encore encodée.
+
+### Ajouté
+
+- **Le cœur sait masquer et normaliser le SQL, pas seulement le découper (`SQL-MASK-LITERALS-001`, `SQL-NORMALIZE-WHITESPACE-001`).**
+  La machine à états qui distingue code, chaînes et commentaires (ADR-079) ne servait qu'à découper les instructions. Deux opt-ins lisaient donc le SQL avec des motifs appliqués au texte brut, et prenaient le contenu d'une chaîne pour du code.
+  `mask_sql_literals` efface littéraux et commentaires en **préservant les positions**, si bien qu'un motif appliqué au masque pointe le même endroit que dans la source. `normalize_sql_whitespace` réduit les blancs du code sans toucher au contenu des chaînes.
+  Elles vivent à côté du découpeur parce qu'elles répondent à la même question, où finit le code et où commence le texte, et qu'une seconde réponse écrite ailleurs finirait par diverger.
 
 ### Tests
 

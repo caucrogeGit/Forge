@@ -17,6 +17,7 @@ données de démo/test, pas un ``DROP``.
 from __future__ import annotations
 
 from core.app.env import is_prod
+from core.database.sql_script import mask_sql_literals
 
 import re
 import sys
@@ -38,17 +39,34 @@ __all__ = ["collect_target_tables", "purge_fixtures", "main"]
 _INSERT_RE = re.compile(r"\bINSERT\s+INTO\s+`?([A-Za-z_][A-Za-z0-9_]*)`?", re.IGNORECASE)
 
 
-def _strip_line_comments(sql: str) -> str:
-    return "\n".join(
-        line for line in sql.splitlines() if not line.strip().startswith("--")
-    )
+def _code_seul(sql: str) -> str:
+    """Rend le SQL avec les littéraux et commentaires effacés.
+
+    `FIXTURES-PURGE-LEXER-001`. La collecte cherchait `INSERT INTO` dans le
+    texte brut, en se contentant de retirer les lignes commençant par `--`. Une
+    table citée **dans une chaîne** entrait donc dans le plan de purge :
+
+        INSERT INTO logs (message) VALUES ('INSERT INTO users');
+
+    donnait `['logs', 'users']`, alors que l'instruction n'écrit que dans
+    `logs`. La purge construit ses `DELETE FROM` à partir de cette liste : elle
+    visait une table étrangère aux écritures réelles des fixtures. Les
+    garde-fous d'autorisation n'y changent rien, ils autorisent très
+    correctement la mauvaise suppression.
+
+    Le masquage vient du cœur (ADR-079), qui porte déjà la machine à états
+    distinguant code, chaînes et commentaires. En écrire une seconde ici, c'est
+    se donner deux réponses à la même question, dont l'une finira en retard sur
+    l'autre.
+    """
+    return mask_sql_literals(sql)
 
 
 def collect_target_tables(files: list[Path]) -> list[str]:
     """Tables peuplées par les fixtures, dans leur ordre de première apparition."""
     seen: list[str] = []
     for path in files:
-        text = _strip_line_comments(path.read_text(encoding="utf-8"))
+        text = _code_seul(path.read_text(encoding="utf-8"))
         for match in _INSERT_RE.finditer(text):
             table = match.group(1)
             if table not in seen:
