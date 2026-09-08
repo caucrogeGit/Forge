@@ -30,7 +30,10 @@ l'accès si émis à tort. Le helper expose `include_hsts: bool` :
 Voir `tests/test_wsgi_security_headers_001.py` pour le verrouillage de ces
 invariants.
 """
+
 from __future__ import annotations
+
+from collections.abc import Iterable
 
 
 _DEFAULT_HEADERS: tuple[tuple[str, str], ...] = (
@@ -98,6 +101,16 @@ class HeaderInjectionError(ValueError):
     """
 
 
+def _refuser_si_saut_de_ligne(nom: object, valeur: object) -> None:
+    """Refuse une paire dont le nom ou la valeur porte un saut de ligne."""
+    for texte, quoi in ((str(nom), "nom"), (str(valeur), "valeur")):
+        if "\r" in texte or "\n" in texte:
+            raise HeaderInjectionError(
+                f"En-tête refusé : le {quoi} contient un saut de ligne "
+                f"(injection d'en-têtes). En-tête : {str(nom)[:40]!r}."
+            )
+
+
 def assert_headers_are_safe(headers: "dict[str, str]") -> None:
     """Refuse tout en-tête dont le nom ou la valeur porte un saut de ligne.
 
@@ -107,11 +120,34 @@ def assert_headers_are_safe(headers: "dict[str, str]") -> None:
 
     Le nom est contrôlé au même titre que la valeur : une clé forgée y ferait
     passer la même chose.
+
+    Cette forme ne voit que le dictionnaire applicatif. Les couches serveur
+    émettent aussi des en-têtes qui n'y figurent pas, `Content-Type` et les
+    `Set-Cookie` accumulés : contrôler la sortie réelle demande
+    `assert_emitted_headers_are_safe`.
     """
     for nom, valeur in headers.items():
-        for texte, quoi in ((str(nom), "nom"), (str(valeur), "valeur")):
-            if "\r" in texte or "\n" in texte:
-                raise HeaderInjectionError(
-                    f"En-tête refusé : le {quoi} contient un saut de ligne "
-                    f"(injection d'en-têtes). En-tête : {str(nom)[:40]!r}."
-                )
+        _refuser_si_saut_de_ligne(nom, valeur)
+
+
+def assert_emitted_headers_are_safe(headers: "Iterable[tuple[str, str]]") -> None:
+    """Refuse tout saut de ligne dans la liste d'en-têtes **réellement émise**.
+
+    `CORE-HEADER-CRLF-COMPLETUDE-001`. Le contrôle par dictionnaire ne voyait
+    que les en-têtes applicatifs. Deux valeurs lui échappaient sur les deux
+    chemins de sortie, parce qu'elles sont ajoutées **après** lui :
+
+    - `Content-Type`, pris de `response.content_type` ;
+    - chaque `Set-Cookie` de `response.set_cookies`.
+
+    Mesuré : un `content_type` valant `"text/plain\r\nX-Injected: yes"` et un
+    cookie valant `"a=b\r\nX-Injected: yes"` atteignaient tous deux
+    `start_response`, quand un en-tête applicatif portant la même chose était
+    refusé. Le contrôle existait donc, et regardait à côté.
+
+    Prendre la liste finale plutôt que ses ingrédients est ce qui rend l'oubli
+    impossible : une troisième source d'en-têtes ajoutée demain passera devant
+    ce contrôle sans que personne ait à y penser.
+    """
+    for nom, valeur in headers:
+        _refuser_si_saut_de_ligne(nom, valeur)

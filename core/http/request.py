@@ -112,6 +112,48 @@ def resolve_client_ip(remote_addr: str, headers: Any, trusted_proxies: Iterable[
     return forwarded
 
 
+def _chemin_et_requete(handler: Any) -> "tuple[str, str]":
+    """Rend le chemin et la chaîne de requête, sans les faire se contaminer.
+
+    `CORE-WSGI-PATH-DECODE-001`. Le serveur de développement expose la ligne de
+    requête brute, encodée en pourcents : `urlparse` la découpe correctement,
+    car un `?` du chemin y figure encore sous la forme `%3F`.
+
+    L'adaptateur WSGI, lui, reçoit un `PATH_INFO` **déjà décodé** par le serveur
+    (PEP 3333). Le recoller à la chaîne de requête puis repasser le tout dans
+    `urlparse` faisait relire comme séparateurs des caractères qui appartenaient
+    au chemin. Mesuré sur des URL produites par le propre `url_for()` de Forge :
+
+        /files/a%3Fb   ->  paramètre reçu "a"       (tronqué au `?`)
+        /files/a%23b   ->  paramètre reçu "a"       (tronqué au `#`)
+        /files/caf%C3%A9 -> paramètre reçu "cafÃ©"  (jamais repassé en UTF-8)
+
+    Un identifiant tronqué désigne un autre enregistrement, ou aucun.
+
+    Le remède est de ne jamais recoller ce que le serveur a déjà séparé : quand
+    `handler` porte les deux morceaux, on les prend tels quels. PEP 3333 livre
+    `PATH_INFO` comme une chaîne décodée en latin-1 : la repasser par ses octets
+    rend l'UTF-8 que le client avait envoyé. `surrogateescape` garde lisible ce
+    qui n'en est pas, plutôt que de lever sur une URL forgée.
+    """
+    chemin_wsgi = getattr(handler, "path_info", None)
+    if chemin_wsgi is not None:
+        requete = getattr(handler, "query_string", "") or ""
+        return _relire_en_utf8(str(chemin_wsgi)), str(requete)
+
+    parsed = urlparse(cast(str, handler.path))
+    return parsed.path, parsed.query
+
+
+def _relire_en_utf8(valeur: str) -> str:
+    """Repasse une chaîne WSGI (latin-1, PEP 3333) dans son encodage réel."""
+    try:
+        return valeur.encode("latin-1").decode("utf-8", errors="surrogateescape")
+    except UnicodeEncodeError:
+        # Déjà du texte hors latin-1 : le serveur a fait le travail lui-même.
+        return valeur
+
+
 class RequestEntityTooLarge(Exception):
     """Levée si Content-Length dépasse MAX_BODY_SIZE."""
 
@@ -184,12 +226,12 @@ class Request:
     ip: str
 
     def __init__(self, handler: Any) -> None:
-        parsed        = urlparse(cast(str, handler.path))
+        chemin, requete = _chemin_et_requete(handler)
         self.original_method = handler.command
         self.method   = handler.command
-        self.path     = parsed.path
+        self.path     = chemin
         self.headers  = handler.headers
-        self.params   = parse_qs(parsed.query)
+        self.params   = parse_qs(requete)
         self.files    = {}
         self._files_multi = {}
         self.ip           = resolve_client_ip(

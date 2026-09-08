@@ -126,9 +126,15 @@ def test_wsgi_sert_normalement_un_en_tete_sain() -> None:
 
 
 def test_le_controle_precede_start_response() -> None:
-    """Refuser après la première ligne émise n'aurait aucun effet."""
+    """Refuser après la première ligne émise n'aurait aucun effet.
+
+    Le nom de la fonction appelée n'est pas la propriété visée : il a changé
+    quand le contrôle est passé du dictionnaire applicatif à la liste
+    réellement émise (`CORE-HEADER-CRLF-COMPLETUDE-001`). Ce qui compte est que
+    l'appel, quel qu'il soit, précède l'émission.
+    """
     source = (PROJECT_ROOT / "core" / "app" / "wsgi.py").read_text(encoding="utf-8")
-    position_controle = source.index("assert_headers_are_safe(")
+    position_controle = source.index("assert_emitted_headers_are_safe(")
     position_emission = source.index("start_response(_format_status")
 
     assert position_controle < position_emission
@@ -144,20 +150,36 @@ def test_le_serveur_de_dev_controle_aussi() -> None:
     """
     source = (PROJECT_ROOT / "skeleton" / "data" / "app.py").read_text(encoding="utf-8")
 
-    assert "assert_headers_are_safe" in source
-    position_controle = source.index("assert_headers_are_safe(")
+    assert "assert_emitted_headers_are_safe" in source
+    position_controle = source.index("assert_emitted_headers_are_safe(")
     position_emission = source.index("self.send_response(response.status)")
     assert position_controle < position_emission, (
         "le contrôle doit précéder la première ligne émise"
     )
 
 
-def test_le_serveur_de_dev_controle_aussi_les_cookies() -> None:
-    """`add_cookie` accumule hors du dict d'en-têtes : il doit être couvert."""
-    source = (PROJECT_ROOT / "skeleton" / "data" / "app.py").read_text(encoding="utf-8")
-    bloc = source[source.index("_entetes_a_controler"):source.index("self.send_response")]
+def test_le_serveur_de_dev_controle_tout_ce_qu_il_emet() -> None:
+    """Le contrôle porte sur la liste émise, pas sur un dictionnaire à côté.
 
-    assert "set_cookies" in bloc
+    Il lisait un dictionnaire reconstruit à la main, qui reprenait les en-têtes
+    applicatifs et les cookies mais **pas** `Content-Type`. Un `content_type`
+    porteur d'un saut de ligne partait donc sans être vu
+    (`CORE-HEADER-CRLF-COMPLETUDE-001`).
+
+    Ce test vérifie la propriété qui rend l'oubli impossible : la liste passée
+    au contrôle est celle que la boucle d'émission parcourt ensuite.
+    """
+    source = (PROJECT_ROOT / "skeleton" / "data" / "app.py").read_text(encoding="utf-8")
+    bloc = source[
+        source.index("entetes_emis") : source.index("self.end_headers()")
+    ]
+
+    assert "Content-Type" in bloc, "le Content-Type doit entrer dans la liste contrôlée"
+    assert "set_cookies" in bloc, "les cookies accumulés doivent y entrer aussi"
+    assert "assert_emitted_headers_are_safe(entetes_emis)" in bloc
+    assert "for key, value in entetes_emis" in bloc, (
+        "la liste émise doit être celle qui vient d'être contrôlée"
+    )
 
 
 # ── La règle vit à un seul endroit ───────────────────────────────────────────

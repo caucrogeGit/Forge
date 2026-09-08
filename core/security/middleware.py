@@ -70,6 +70,31 @@ class AuthMiddleware:
         return response
 
 
+def _jetons_egaux(fourni: object, attendu: object) -> bool:
+    """Compare deux jetons en temps constant, quels que soient leurs octets.
+
+    `CORE-CSRF-TOKEN-NON-ASCII-001`. `hmac.compare_digest` refuse les `str`
+    porteurs de caractères non ASCII et lève `TypeError`. Un jeton valant `é`
+    ne donnait donc pas un refus 403 mais une erreur serveur 500.
+
+    Ce n'était pas un contournement, la requête restant bloquée. Mais une
+    entrée que n'importe qui peut envoyer ne doit pas devenir une panne : elle
+    remplit les journaux d'erreurs, elle se distingue d'un refus dans toute
+    supervision, et elle apprend à l'appelant que quelque chose casse là.
+
+    Le remède est de comparer des **octets** plutôt que du texte. L'encodage
+    est explicite et ne peut pas échouer : `surrogateescape` accepte jusqu'aux
+    séquences mal formées qu'un client hostile enverrait. Le temps constant est
+    conservé, c'est toujours `compare_digest` qui tranche.
+    """
+    def octets(valeur: object) -> bytes:
+        if isinstance(valeur, bytes):
+            return valeur
+        return str(valeur).encode("utf-8", errors="surrogateescape")
+
+    return _hmac.compare_digest(octets(fourni), octets(attendu))
+
+
 class CsrfMiddleware:
     """
     Vérifie le token CSRF d'une requête unsafe déjà déclarée comme protégée.
@@ -90,7 +115,7 @@ class CsrfMiddleware:
 
         if not expected or not provided:
             return _error_page("errors/403.html", 403)
-        if not _hmac.compare_digest(str(provided), str(expected)):
+        if not _jetons_egaux(provided, expected):
             return _error_page("errors/403.html", 403)
         return None
 

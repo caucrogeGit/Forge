@@ -96,7 +96,7 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from config import (APP_HOST, APP_PORT, APP_SSL_ENABLED, SSL_CERTFILE, SSL_KEYFILE,
                     APP_ENV, APP_CSP_NONCE_ENABLED)
 import core.security.csp as _csp
-from core.security.headers import apply_security_headers, assert_headers_are_safe
+from core.security.headers import apply_security_headers, assert_emitted_headers_are_safe
 import core.forge as forge
 from core.app.dev_server import (
     format_port_in_use_message,
@@ -277,20 +277,6 @@ class RequestHandler(BaseHTTPRequestHandler):
             len(response.body)
         )
 
-        # CORE-HEADER-CRLF-001 : contrôle AVANT la première ligne. Ce serveur
-        # émet ses en-têtes un par un ; une fois `send_response` appelé, il est
-        # trop tard pour refuser la réponse.
-        _entetes_a_controler: dict[str, str] = {
-            str(k): str(v) for k, v in response.headers.items()
-        }
-        for _c in getattr(response, "set_cookies", []):
-            _entetes_a_controler[f"Set-Cookie::{len(_entetes_a_controler)}"] = str(_c)
-        assert_headers_are_safe(_entetes_a_controler)
-
-        self.send_response(response.status)
-        self.send_header("Content-Type", response.content_type)
-        self.send_header("Content-Length", str(content_length))
-
         # Couche de défense partagée avec le chemin WSGI : un seul helper,
         # un seul contrat. `include_hsts=True` : le serveur de dev sait quand
         # il sert TLS via APP_SSL_ENABLED ; HSTS sur HTTP local est inoffensif.
@@ -305,12 +291,34 @@ class RequestHandler(BaseHTTPRequestHandler):
             include_hsts=True,
             csp=_csp.build_csp_header(_csp.get_request_nonce()),
         )
-        for key, value in headers_out.items():
-            self.send_header(key, value)
+
+        # La liste exacte que ce serveur va émettre, dans l'ordre où il l'émet.
+        entetes_emis: list[tuple[str, str]] = [
+            ("Content-Type", str(response.content_type)),
+            ("Content-Length", str(content_length)),
+        ]
+        entetes_emis.extend((str(k), str(v)) for k, v in headers_out.items())
         # Cookies additionnels : une ligne Set-Cookie par cookie accumulé via
         # response.add_cookie (CORE-RESPONSE-MULTI-COOKIE-001).
-        for cookie in getattr(response, "set_cookies", []):
-            self.send_header("Set-Cookie", str(cookie))
+        entetes_emis.extend(
+            ("Set-Cookie", str(cookie))
+            for cookie in getattr(response, "set_cookies", [])
+        )
+
+        # CORE-HEADER-CRLF-001 puis CORE-HEADER-CRLF-COMPLETUDE-001 : contrôle
+        # AVANT la première ligne. Ce serveur émet ses en-têtes un par un ; une
+        # fois `send_response` appelé, il est trop tard pour refuser.
+        #
+        # Le contrôle portait sur un dictionnaire reconstruit à la main, qui
+        # reprenait les en-têtes applicatifs et les cookies mais **pas**
+        # `Content-Type`. Un `content_type` porteur d'un saut de ligne partait
+        # donc sans être vu. Contrôler la liste réellement émise supprime la
+        # question de savoir ce qu'on a pensé à y remettre.
+        assert_emitted_headers_are_safe(entetes_emis)
+
+        self.send_response(response.status)
+        for key, value in entetes_emis:
+            self.send_header(key, value)
         self.end_headers()
         if stream is None:
             self.wfile.write(response.body)

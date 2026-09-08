@@ -68,7 +68,7 @@ from core.http.request import (
 )
 from core.http.response import Response
 from core.security import csp as _csp
-from core.security.headers import apply_security_headers, assert_headers_are_safe
+from core.security.headers import apply_security_headers, assert_emitted_headers_are_safe
 
 
 _REASONS = {
@@ -162,6 +162,15 @@ class _WsgiHandlerStub:
     def __init__(self, environ: dict[str, Any]) -> None:
         path = environ.get("PATH_INFO", "/") or "/"
         qs = environ.get("QUERY_STRING", "") or ""
+        # CORE-WSGI-PATH-DECODE-001 : les deux morceaux sont exposés séparément.
+        # `Request` les prend tels quels, au lieu de les recoller pour les
+        # redécouper : `PATH_INFO` est DÉJÀ décodé par le serveur (PEP 3333),
+        # si bien qu'un `%3F` du chemin, redevenu `?`, était relu comme le
+        # séparateur de la chaîne de requête et tronquait le paramètre.
+        self.path_info = path
+        self.query_string = qs
+        # Conservé pour les lecteurs qui attendent la ligne de requête d'un
+        # `BaseHTTPRequestHandler` (journalisation, diagnostics).
         self.path = f"{path}?{qs}" if qs else path
         self.command = environ.get("REQUEST_METHOD", "GET")
         self.headers = _headers_from_environ(environ)
@@ -260,11 +269,6 @@ def _response_to_wsgi(
         csp=_csp.build_csp_header(_csp.get_request_nonce()),
     )
 
-    # CORE-HEADER-CRLF-001 : contrôle AVANT `start_response`, tant qu'aucune
-    # ligne n'est partie. Un saut de ligne dans une valeur découperait la
-    # réponse pour le client.
-    assert_headers_are_safe(headers_dict)
-
     headers: list[tuple[str, str]] = [
         ("Content-Type", response.content_type),
         ("Content-Length", str(content_length)),
@@ -281,6 +285,13 @@ def _response_to_wsgi(
     # response.add_cookie (CORE-RESPONSE-MULTI-COOKIE-001).
     for cookie in getattr(response, "set_cookies", []):
         headers.append(("Set-Cookie", str(cookie)))
+    # CORE-HEADER-CRLF-001 puis CORE-HEADER-CRLF-COMPLETUDE-001 : contrôle AVANT
+    # `start_response`, tant qu'aucune ligne n'est partie, et sur la liste
+    # **réellement émise**. Il portait sur le seul dictionnaire applicatif, si
+    # bien que `Content-Type` et les `Set-Cookie`, ajoutés après lui, ne
+    # passaient jamais devant. Prendre la liste finale rend l'oubli impossible :
+    # une source d'en-têtes ajoutée demain sera contrôlée sans qu'on y pense.
+    assert_emitted_headers_are_safe(headers)
     start_response(_format_status(response.status), headers)
     return body_iter
 

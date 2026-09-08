@@ -1,5 +1,32 @@
 # Changelog
 
+## [Non publié]
+
+### Sécurité
+
+- **Deux voies d'en-têtes échappaient au contrôle anti-injection (`CORE-HEADER-CRLF-COMPLETUDE-001`).**
+  Le contrôle lisait le dictionnaire d'en-têtes applicatifs. Les deux chemins de sortie y ajoutent ensuite `Content-Type`, pris de `response.content_type`, et une ligne `Set-Cookie` par cookie accumulé : ces valeurs ne passaient jamais devant lui.
+  Mesuré : un `content_type` valant `"text/plain\r\nX-Injected: yes"` et un cookie valant `"a=b\r\nX-Injected: yes"` atteignaient tous deux `start_response`, quand un en-tête applicatif portant la même chose était refusé. Le contrôle existait donc, et regardait à côté. Le serveur de développement couvrait les cookies mais pas le `content_type`.
+  Il porte désormais sur la liste **réellement émise**, dans l'ordre où elle part. Prendre la sortie plutôt que ses ingrédients supprime la question de savoir ce qu'on a pensé à y remettre : une source d'en-têtes ajoutée demain sera contrôlée sans que personne y pense.
+
+### Corrigé
+
+- **Un jeton CSRF non ASCII rendait 500 au lieu de 403 (`CORE-CSRF-TOKEN-NON-ASCII-001`).**
+  `hmac.compare_digest` refuse les `str` porteurs de caractères non ASCII et lève `TypeError`. Un jeton valant `é` provoquait donc une erreur serveur.
+  Ce n'était pas un contournement, la requête restant bloquée. Mais une entrée que n'importe qui peut envoyer ne doit pas devenir une panne : elle remplit les journaux, se confond avec un incident dans toute supervision, et apprend à l'appelant que quelque chose casse là. La comparaison porte maintenant sur des octets, avec un encodage explicite qui accepte jusqu'aux séquences mal formées, et reste en temps constant.
+
+- **Des paramètres d'URL étaient tronqués ou altérés sur le chemin WSGI (`CORE-WSGI-PATH-DECODE-001`).**
+  L'adaptateur recollait `PATH_INFO` et `QUERY_STRING` avec un `?`, puis `Request` repassait le tout dans `urlparse`. Or le serveur a **déjà** séparé les deux morceaux et décodé le chemin (PEP 3333) : un `%3F` du chemin, redevenu `?`, était relu comme un séparateur.
+  Mesuré sur des URL produites par le propre `url_for()` de Forge : `/files/a%3Fb` rendait `a`, `/files/a%23b` rendait `a`, et `/files/caf%C3%A9` rendait `cafÃ©`, faute d'être repassé en UTF-8. Un identifiant tronqué désigne un autre enregistrement, ou aucun.
+  Les deux morceaux sont désormais pris tels que le serveur les livre, et le chemin est relu dans son encodage réel. Le serveur de développement n'était pas touché, sa ligne de requête arrivant encore encodée.
+
+### Tests
+
+- **Trois défauts aux frontières entre composants, tous invisibles d'une suite verte.**
+  Ils vivaient au même genre d'endroit, là où une couche passe la main à une autre, et vingt-trois mille tests les laissaient passer parce qu'ils éprouvaient chaque couche chez elle.
+  Le nouveau fichier éprouve la **sortie réelle** dans les trois cas, avec un vrai serveur WSGI plutôt qu'un environ fabriqué à la main, lequel referait l'erreur qu'on veut interdire. Chaque correction est vérifiée par mutation : dé-corriger un seul endroit fait tomber exactement les tests concernés, deux pour les en-têtes, quatre pour le jeton, cinq pour les URL.
+  Quatre garde-fous existants figeaient le **moyen** plutôt que la fin, en cherchant un nom de fonction dans le source. Ils sont réalignés sur la propriété visée.
+
 ## [1.0.0-rc.8] - 2026-09-07
 
 ### Rupture
