@@ -34,8 +34,8 @@ from __future__ import annotations
 import io
 import json as _json
 from http.cookies import SimpleCookie
-from typing import Any, Callable, Iterable, Mapping
-from urllib.parse import urlencode, urlsplit
+from typing import Any, Callable, Iterable, Mapping, Sequence, cast
+from urllib.parse import unquote_to_bytes, urlencode, urlsplit
 
 __all__ = [
     "ClientError",
@@ -118,6 +118,23 @@ class ClientResponse:
         return f"<ClientResponse {self.status_line} {len(self.body)} octets>"
 
 
+def _paires_de_formulaire(data: "Mapping[str, Any]") -> "list[tuple[str, str]]":
+    """Rend les paires d'un formulaire en préservant les valeurs multiples.
+
+    Une liste ou un tuple donne une paire par élément, comme un navigateur qui
+    envoie plusieurs champs de même nom. Tout le reste est rendu en texte, `None`
+    valant la chaîne vide.
+    """
+    paires: "list[tuple[str, str]]" = []
+    for cle, valeur in data.items():
+        if isinstance(valeur, (list, tuple)):
+            elements = cast("Sequence[Any]", valeur)
+            paires.extend((cle, "" if v is None else str(v)) for v in elements)
+        else:
+            paires.append((cle, "" if valeur is None else str(valeur)))
+    return paires
+
+
 class ForgeTestClient:
     """Navigateur minimal, branché sur le callable WSGI de l'application.
 
@@ -198,10 +215,12 @@ class ForgeTestClient:
             corps = _json.dumps(json, ensure_ascii=False).encode("utf-8")
             type_contenu = "application/json; charset=utf-8"
         elif data is not None:
-            corps = urlencode(
-                {k: "" if v is None else str(v) for k, v in data.items()},
-                doseq=True,
-            ).encode("utf-8")
+            # `doseq=True` ne sert à rien si la valeur a déjà été aplatie en
+            # texte : `{"ids": ["1", "2"]}` devenait un champ unique valant
+            # "['1', '2']", au lieu de deux valeurs `ids`. Un test de formulaire
+            # multivalué vérifiait donc autre chose que ce qu'il croyait
+            # (`TESTING-CLIENT-FIDELITE-WSGI-001`).
+            corps = urlencode(_paires_de_formulaire(data), doseq=True).encode("utf-8")
             type_contenu = "application/x-www-form-urlencoded"
 
         environ = self._environ(method, chemin, params, corps, type_contenu, headers)
@@ -220,6 +239,21 @@ class ForgeTestClient:
 
     # -- Détail ----------------------------------------------------------
 
+    def _origine(self) -> "tuple[str, str, str]":
+        """Rend le schéma, l'hôte et le port tirés de `base_url`.
+
+        Ils étaient figés sur `http` et `testserver:80`, quelle que soit
+        l'URL de base donnée au client.
+        """
+        decoupe = urlsplit(self._base)
+        schema = decoupe.scheme or "http"
+        hote = decoupe.hostname or "testserver"
+        if decoupe.port is not None:
+            port = str(decoupe.port)
+        else:
+            port = "443" if schema == "https" else "80"
+        return schema, hote, port
+
     def _environ(
         self,
         method: str,
@@ -235,17 +269,27 @@ class ForgeTestClient:
         échouer la construction de la `Request` pour une raison qui n'a rien à
         voir avec ce que le test vérifie.
         """
+        schema, hote, port = self._origine()
         env: dict[str, Any] = {
             "REQUEST_METHOD": method.upper(),
-            "PATH_INFO": path,
+            # PEP 3333 : le serveur livre un chemin DÉCODÉ, représenté en
+            # latin-1. Le client laissait le percent-encoding tel quel, si bien
+            # qu'une application recevait `/caf%C3%A9` là où un serveur réel
+            # aurait livré `/cafÃ©`. Un test d'URL accentuée ne prouvait donc
+            # rien, et ce défaut a masqué celui du décodage WSGI du cœur
+            # (`TESTING-CLIENT-FIDELITE-WSGI-001`).
+            "PATH_INFO": unquote_to_bytes(path).decode("latin-1"),
             "QUERY_STRING": query,
-            "SERVER_NAME": "testserver",
-            "SERVER_PORT": "80",
+            "SERVER_NAME": hote,
+            "SERVER_PORT": port,
             "SERVER_PROTOCOL": "HTTP/1.1",
             "REMOTE_ADDR": "127.0.0.1",
-            "HTTP_HOST": "testserver",
+            "HTTP_HOST": hote if port in ("80", "443") else f"{hote}:{port}",
             "wsgi.version": (1, 0),
-            "wsgi.url_scheme": "http",
+            # `base_url="https://…"` ne changeait rien : le schéma restait
+            # `http`, et un cookie `Secure` semblait posé sur une connexion
+            # claire. Le test passait pour la mauvaise raison.
+            "wsgi.url_scheme": schema,
             "wsgi.input": io.BytesIO(body),
             "wsgi.errors": io.StringIO(),
             "wsgi.multithread": False,

@@ -11,6 +11,21 @@
 
 ### Corrigé
 
+- **Le client de test déformait les requêtes qu'il prétendait imiter (`TESTING-CLIENT-FIDELITE-WSGI-001`).**
+  Trois écarts avec un vrai serveur. `base_url="https://…"` ne changeait rien, le schéma restant `http` et l'hôte `testserver:80` : un test de cookie `Secure` semblait donc passer sur une connexion claire. `PATH_INFO` gardait son percent-encodage, là où la PEP 3333 impose un chemin décodé. Et `data={"ids": ["1", "2"]}` devenait un champ unique valant la représentation Python de la liste.
+  Le deuxième écart est le plus instructif : il **masquait** le défaut de décodage d'URL du cœur corrigé juste avant. Un client qui n'encode pas comme un serveur ne peut pas révéler qu'un serveur décode mal. Un outil de mesure faux ne rend pas les tests inutiles, il les rend rassurants.
+  L'étalon du garde-fou est désormais un **vrai serveur WSGI**, jamais une valeur attendue écrite à la main, laquelle serait à son tour une opinion sur ce qu'un serveur fait.
+
+- **Une condition de transition se contournait par la casse (`WORKFLOW-NORMALISATION-FRONTIERE-001`).**
+  `can_transition` ramenait les noms à leur forme canonique pour vérifier la transition, mais les valeurs brutes continuaient leur route. Une condition enregistrée pour `draft` vers `done` n'était donc pas retrouvée quand l'appelant écrivait `DRAFT` vers `DONE` : la transition était jugée valide, la condition introuvable, et l'écriture avait lieu.
+  Mesuré : le même appel refusé en minuscules passait en majuscules, appel du callback d'écriture compris. Une précondition métier qui dépend de la casse de son appelant n'est pas une précondition.
+  Les noms sont maintenant normalisés **une seule fois, à la frontière**, et cette forme sert à tout : conditions, événement, points d'accroche, écriture et valeur rendue. `apply_transition` rend désormais le statut canonique, là où il rendait la saisie de l'appelant.
+
+- **Un ouvrier périmé écrasait la réservation d'un autre (`JOBS-CLAIM-OWNERSHIP-001`).**
+  Les écritures de fin, d'échec et de remise en file filtraient sur le seul identifiant. Scénario mesuré sur une vraie base : A réserve une tâche, son bail expire, la reprise la remet en file, B la réserve, puis le gestionnaire de A finit et passe la tâche à `done` en effaçant le jeton de B. B croyait travailler sur une tâche que personne ne lui reprendrait, et son résultat n'avait nulle part où aller.
+  C'est distinct du contrat « au moins une fois », qui autorise une réexécution après incident : ici, ce n'est pas l'effet applicatif qui est rejoué, c'est la possession qui n'était pas vérifiée.
+  Les trois écritures portent désormais une garde sur le jeton détenu. Zéro ligne modifiée veut dire « réservation perdue », et le journal le dit avec la tâche concernée et les deux remèdes, allonger le bail ou battre le cœur depuis un gestionnaire long.
+
 - **Un jeton CSRF non ASCII rendait 500 au lieu de 403 (`CORE-CSRF-TOKEN-NON-ASCII-001`).**
   `hmac.compare_digest` refuse les `str` porteurs de caractères non ASCII et lève `TypeError`. Un jeton valant `é` provoquait donc une erreur serveur.
   Ce n'était pas un contournement, la requête restant bloquée. Mais une entrée que n'importe qui peut envoyer ne doit pas devenir une panne : elle remplit les journaux, se confond avec un incident dans toute supervision, et apprend à l'appelant que quelque chose casse là. La comparaison porte maintenant sur des octets, avec un encodage explicite qui accepte jusqu'aux séquences mal formées, et reste en temps constant.

@@ -57,23 +57,40 @@ class FakeDb:
                 return 0
             job.update(status="running", claim_token=token, attempts=job["attempts"] + 1)
             return 1
+        # JOBS-CLAIM-OWNERSHIP-001 : les écritures de fin portent désormais une
+        # garde `AND claim_token=?`, donc un paramètre de plus, en dernier. Le
+        # double doit la respecter : sans elle, il rendrait 1 là où la base
+        # rendrait 0, et le test dirait le contraire de la production.
         if "status='done'" in sql:
-            self.jobs[params[0]]["status"] = "done"
+            jid, token = params
+            if not self._detient(jid, token):
+                return 0
+            self.jobs[jid]["status"] = "done"
+            self.jobs[jid]["claim_token"] = None
             return 1
         if "status='failed'" in sql:
-            err, jid = params
-            self.jobs[jid].update(status="failed", last_error=err)
+            err, jid, token = params
+            if not self._detient(jid, token):
+                return 0
+            self.jobs[jid].update(status="failed", last_error=err, claim_token=None)
             return 1
         if "status='pending', claim_token=NULL" in sql:  # reprise
             # JOBS-STALE-RECLAIM-001 : la remise en file porte désormais un
             # délai croissant, annoncé AVANT l'identifiant dans les paramètres
             # (le marqueur du SET précède celui du WHERE).
-            delai, jid = params
+            delai, jid, token = params
+            if not self._detient(jid, token):
+                return 0
             self.jobs[jid].update(
                 status="pending", claim_token=None, available_in=delai
             )
             return 1
         return 0
+
+    def _detient(self, jid: int, token: str) -> bool:
+        """Le jeton fourni est-il celui que porte la tâche ?"""
+        job = self.jobs.get(jid)
+        return job is not None and job["claim_token"] == token
 
     def fetch_one(self, sql: str, params: Any = ()) -> dict[str, Any] | None:
         if sql.startswith("SELECT id FROM"):  # candidate à réserver

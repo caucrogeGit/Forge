@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .conditions import ensure_conditions
+from .status import validate_status_name
 from .transitions import WorkflowTransition, WorkflowTransitionError, can_transition
 
 __all__ = [
@@ -117,16 +118,33 @@ def apply_transition(
             f"Transition non déclarée : '{from_status}' vers '{to_status}'."
         )
 
+    # `WORKFLOW-NORMALISATION-FRONTIERE-001` : les noms sont ramenés à leur
+    # forme canonique **une seule fois**, ici, et cette forme sert ensuite à
+    # tout : conditions, événement, écriture et valeur rendue.
+    #
+    # `can_transition` normalisait déjà pour vérifier la transition, mais les
+    # valeurs brutes continuaient leur route. Une condition enregistrée pour
+    # `draft -> done` n'était donc pas retrouvée quand l'appelant écrivait
+    # `DRAFT -> DONE` : la transition était jugée valide, la condition
+    # introuvable, et l'écriture avait lieu. Mesuré : le même appel refusé en
+    # minuscules passait en majuscules, `commit` compris.
+    #
+    # Une précondition métier qui dépend de la casse de son appelant n'est pas
+    # une précondition. Normaliser à la frontière est ce qui rend l'invariant
+    # partagé par toutes les pièces, au lieu de le confier à chacune.
+    depart = validate_status_name(from_status)
+    arrivee = validate_status_name(to_status)
+
     donnees = dict(context or {})
 
     # Les conditions passent AVANT tout effet de bord : `before` peut écrire,
     # et refuser après coup laisserait une trace d'une transition qui n'a pas eu
     # lieu.
-    ensure_conditions(from_status, to_status, donnees)
+    ensure_conditions(depart, arrivee, donnees)
 
     evenement = TransitionEvent(
-        from_status=from_status,
-        to_status=to_status,
+        from_status=depart,
+        to_status=arrivee,
         context=donnees,
     )
 

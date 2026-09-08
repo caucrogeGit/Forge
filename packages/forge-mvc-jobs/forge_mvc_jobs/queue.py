@@ -44,11 +44,15 @@ import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any, cast
+import logging
 from uuid import uuid4
 
 from forge_mvc_jobs.errors import JobError
 
 #: Nom de la table de file.
+
+logger = logging.getLogger("forge.jobs")
+
 TABLE_NAME = "jobs"
 
 #: Un gestionnaire de tâche : reçoit la charge utile (dict) désérialisée.
@@ -113,13 +117,30 @@ _SELECT_CLAIMED_SQL = (
 
 
 def _done_sql() -> str:
+    """Marque une tâche terminée, **si l'ouvrier la détient encore**.
+
+    `JOBS-CLAIM-OWNERSHIP-001`. Les écritures de fin filtraient sur le seul
+    identifiant. Mesuré : A réserve une tâche, sa réservation expire,
+    `reclaim_stale` la remet en file, B la réserve, puis le gestionnaire de A
+    finit et passe la tâche à `done` en effaçant le jeton de B. B croit
+    travailler sur une tâche que personne ne lui reprendra, et son propre
+    résultat n'aura nulle part où aller.
+
+    C'est distinct du contrat « au moins une fois », qui autorise une
+    réexécution après incident : ici, ce n'est pas l'effet applicatif qui est
+    rejoué, c'est la **possession** qui n'est pas respectée.
+
+    Zéro ligne mise à jour veut dire « réservation perdue », et l'appelant doit
+    le savoir plutôt que de le déduire.
+    """
     return (f"UPDATE {TABLE_NAME} SET status='done', finished_at={_now()}, "
-            "claim_token=NULL WHERE id=?")
+            "claim_token=NULL WHERE id=? AND claim_token=?")
 
 
 def _fail_sql() -> str:
+    """Marque une tâche en échec, sous la même garde de possession."""
     return (f"UPDATE {TABLE_NAME} SET status='failed', last_error=?, "
-            f"finished_at={_now()}, claim_token=NULL WHERE id=?")
+            f"finished_at={_now()}, claim_token=NULL WHERE id=? AND claim_token=?")
 
 
 _SELECT_BY_IDEMPOTENCY_SQL = (
@@ -152,7 +173,7 @@ def _retry_sql() -> str:
     """
     return (f"UPDATE {TABLE_NAME} SET status='pending', claim_token=NULL, "
             f"started_at=NULL, available_at={_dialect().interval_seconds_expression(_now())} "
-            "WHERE id=?")
+            "WHERE id=? AND claim_token=?")
 
 
 #: Priorités nommées (JOBS-PRIORITY-001).
@@ -359,6 +380,32 @@ def _veut_le_jeton(handler: JobHandler) -> bool:
         return True
     return any(p.kind is inspect.Parameter.VAR_KEYWORD for p in parametres.values())
 
+def _ecrire_si_detenue(
+    database: Any, sql: str, params: "tuple[Any, ...]", job_id: int
+) -> bool:
+    """Applique une écriture de fin, et signale la réservation perdue.
+
+    `JOBS-CLAIM-OWNERSHIP-001`. Zéro ligne mise à jour ne veut pas dire « rien à
+    faire » : cela veut dire qu'un autre ouvrier détient la tâche, parce que le
+    bail de celui-ci a expiré pendant son travail.
+
+    Se rabattre est acceptable, se taire ne l'est pas : l'écriture est refusée,
+    et le journal dit pourquoi. L'appelant n'a rien à rattraper, la tâche étant
+    déjà entre d'autres mains ; ce qu'il doit savoir, c'est que son résultat n'a
+    pas été enregistré.
+    """
+    if int(database.execute(sql, params)) >= 1:
+        return True
+    logger.warning(
+        "Tâche %s : réservation perdue pendant l'exécution, résultat non "
+        "enregistré. Un autre ouvrier l'a reprise après expiration du bail. "
+        "Allonger `lease_seconds` ou appeler `heartbeat()` depuis un "
+        "gestionnaire long.",
+        job_id,
+    )
+    return False
+
+
 
 def process_one(handlers: Mapping[str, JobHandler], *, queue: str = "default", db: Any = None) -> bool:
     """Réserve et exécute une tâche disponible de `queue`. Renvoie `True` si une
@@ -389,7 +436,9 @@ def process_one(handlers: Mapping[str, JobHandler], *, queue: str = "default", d
 
     handler = handlers.get(task)
     if handler is None:
-        database.execute(_fail_sql(), (f"tâche inconnue : {task}", job_id))
+        _ecrire_si_detenue(
+            database, _fail_sql(), (f"tâche inconnue : {task}", job_id, token), job_id
+        )
         return True
 
     try:
@@ -399,12 +448,14 @@ def process_one(handlers: Mapping[str, JobHandler], *, queue: str = "default", d
             handler(payload)
     except Exception as exc:  # noqa: BLE001 — toute erreur du gestionnaire est rapportée
         if attempts < max_attempts:
-            database.execute(_retry_sql(), (backoff_seconds(attempts), job_id))
+            _ecrire_si_detenue(
+                database, _retry_sql(), (backoff_seconds(attempts), job_id, token), job_id
+            )
         else:
-            database.execute(_fail_sql(), (str(exc), job_id))
+            _ecrire_si_detenue(database, _fail_sql(), (str(exc), job_id, token), job_id)
         return True
 
-    database.execute(_done_sql(), (job_id,))
+    _ecrire_si_detenue(database, _done_sql(), (job_id, token), job_id)
     return True
 
 
