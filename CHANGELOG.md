@@ -11,6 +11,12 @@
 
 ### Corrigé
 
+- **La traduction des paramètres PostgreSQL altérait le SQL applicatif (`POSTGRES-TRANSLATE-CONTEXTES-001`).**
+  Elle ne connaissait que les littéraux entre apostrophes, et introduisait donc des marqueurs là où le point d'interrogation n'en était pas un : `SELECT ? /* pourquoi ? */` devenait `SELECT %s /* pourquoi %s */`, et `SELECT $$?$$` devenait `SELECT $$%s$$`.
+  Selon le pilote, cela donne un mauvais comptage des paramètres ou un SQL altéré. Les requêtes engendrées par Forge, simples, passaient ; du SQL applicatif parfaitement valide échouait. C'est un défaut de compatibilité pour un framework qui laisse écrire du SQL (principe 5).
+  Quatre contextes sont désormais préservés : le littéral, l'identifiant entre guillemets, les commentaires de ligne et de bloc (imbriqués, comme PostgreSQL l'admet), et le littéral encadré par dollars.
+  Les opérateurs `jsonb` qui commencent par un point d'interrogation sont tranchés par une règle **écrite** plutôt que par une devinette sur la grammaire : collé à `|`, `&`, `-` ou `#`, ce n'est pas un paramètre, et `??` vaut un point d'interrogation littéral, échappement que psycopg emploie déjà dans le même but.
+
 - **Le plan de purge des fixtures visait une table qu'aucune fixture n'écrit (`FIXTURES-PURGE-LEXER-001`).**
   La collecte cherchait `INSERT INTO` dans le texte brut, en se contentant de retirer les lignes commençant par deux tirets. Une table citée **dans une chaîne** entrait donc dans le plan : `INSERT INTO logs (message) VALUES ('INSERT INTO users')` rendait `['logs', 'users']`.
   La purge bâtit ses `DELETE FROM` sur cette liste. Les garde-fous d'autorisation n'y changent rien, ils autorisent très correctement la mauvaise suppression : un plan faux reste faux quand il est confirmé.
