@@ -130,3 +130,57 @@ class TestBranchementAuPreVol:
         assert "_fail" in bloc, (
             "un contrôle branché sans _fail laisse publier ce qu'il vient de refuser"
         )
+
+
+class TestLesFormesDeSujetReellementEmployees:
+    """`GOV-CHANGELOG-COMPLETUDE-MOTIF-001` — le motif voyait deux commits sur neuf.
+
+    Il exigeait que la parenthèse ne contienne **que** le code, et que chaque
+    segment soit fait de majuscules et de chiffres. Deux formes courantes lui
+    échappaient, et il les comptait pour rien tout en annonçant « OK » :
+
+        fix(sql): ... (AAA-001, BBB-001, CCC-001)   -> plusieurs codes, aucun vu
+        docs(roadmap): ... (RELEASE-1.0.0-RC8-001)  -> des points, non vu
+
+    Mesuré sur les neuf commits qui suivaient la rc8 : dix-huit tickets absents
+    du journal auraient passé. Un contrôle qui regarde à côté est pire que pas
+    de contrôle, puisqu'il rassure.
+    """
+
+    def test_plusieurs_codes_dans_une_parenthese(self):
+        """La forme d'un commit qui livre plusieurs tickets d'une même famille."""
+        module = _module()
+        sujet = "fix(sql): un lot (AAA-BBB-001, CCC-DDD-002, EEE-FFF-003)"
+
+        assert module.tickets_absents([sujet], "") == [
+            "AAA-BBB-001", "CCC-DDD-002", "EEE-FFF-003"
+        ]
+
+    def test_un_code_portant_des_points(self):
+        """Les codes de release nomment la version, qui porte des points."""
+        module = _module()
+
+        assert module.tickets_absents(
+            ["docs(roadmap): publiée (RELEASE-1.0.0-RC8-PUBLISH-001)"], ""
+        ) == ["RELEASE-1.0.0-RC8-PUBLISH-001"]
+
+    def test_le_prefixe_conventionnel_ne_gene_pas(self):
+        """`fix(sql):` est un groupe parenthésé, sans code à l'intérieur."""
+        module = _module()
+
+        assert module.tickets_absents(["fix(sql): rien à signaler"], "") == []
+
+    def test_un_code_deja_au_journal_ne_ressort_pas_d_une_liste(self):
+        """La présence se vérifie code par code, pas sur la parenthèse entière."""
+        module = _module()
+        sujet = "fix(x): deux (AAA-BBB-001, CCC-DDD-002)"
+
+        assert module.tickets_absents([sujet], "AAA-BBB-001 est documenté") == [
+            "CCC-DDD-002"
+        ]
+
+    def test_un_code_hors_parenthese_reste_ignore(self):
+        """Un sujet peut citer un code en prose sans le livrer."""
+        module = _module()
+
+        assert module.tickets_absents(["feat(x): comme AAA-BBB-001 le prévoyait"], "") == []

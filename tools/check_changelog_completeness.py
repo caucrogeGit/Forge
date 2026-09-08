@@ -36,9 +36,33 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-# Le code de ticket ferme le sujet de commit, entre parenthèses.
-# Deux segments majuscules au moins, puis un numéro à trois chiffres.
-CODE_TICKET = re.compile(r"\(([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-\d{3})\)")
+# Les codes de ticket vivent entre parenthèses, à la fin du sujet de commit.
+#
+# Le motif exigeait que la parenthèse ne contienne **que** le code, et que
+# chaque segment soit fait de majuscules et de chiffres. Deux formes courantes y
+# échappaient, et le contrôle les comptait pour rien :
+#
+#   fix(sql): ... (AAA-001, BBB-001, CCC-001)   -> plusieurs codes, aucun vu
+#   docs(roadmap): ... (RELEASE-1.0.0-RC8-001)  -> des points, non vu
+#
+# Mesuré sur les neuf commits qui suivaient la rc8 : il en voyait **deux**, et
+# aurait laissé passer dix-huit tickets absents du journal en annonçant « OK ».
+# Un contrôle qui regarde à côté est pire que pas de contrôle, puisqu'il rassure
+# (`GOV-CHANGELOG-COMPLETUDE-MOTIF-001`).
+#
+# La lecture se fait donc en deux temps : les groupes parenthésés d'abord, les
+# codes à l'intérieur ensuite. Exiger les parenthèses reste voulu, un sujet
+# pouvant citer un code en prose sans le livrer.
+GROUPE_PARENTHESE = re.compile(r"\(([^()]*)\)")
+CODE_TICKET = re.compile(r"\b([A-Z][A-Z0-9.]*(?:-[A-Z0-9.]+)+-\d{3})\b")
+
+
+def codes_du_sujet(sujet: str) -> "list[str]":
+    """Rend les codes de ticket cités entre parenthèses dans un sujet de commit."""
+    trouves: list[str] = []
+    for groupe in GROUPE_PARENTHESE.findall(sujet):
+        trouves.extend(CODE_TICKET.findall(groupe))
+    return trouves
 
 
 class HistoriqueIndisponible(RuntimeError):
@@ -87,7 +111,7 @@ def tickets_absents(sujets: list[str], changelog: str) -> list[str]:
     """
     livres: list[str] = []
     for sujet in sujets:
-        livres.extend(CODE_TICKET.findall(sujet))
+        livres.extend(codes_du_sujet(sujet))
     return sorted({code for code in livres if code not in changelog})
 
 
@@ -106,7 +130,7 @@ def main(argv: list[str]) -> int:
 
     changelog = (PROJECT_ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     absents = tickets_absents(sujets, changelog)
-    total = len({code for sujet in sujets for code in CODE_TICKET.findall(sujet)})
+    total = len({code for sujet in sujets for code in codes_du_sujet(sujet)})
 
     if absents:
         pluriel = "s" if len(absents) > 1 else ""

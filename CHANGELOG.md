@@ -22,6 +22,11 @@
 
 ### Corrigé
 
+- **Mon propre contrôle de complétude du journal voyait deux commits sur neuf (`GOV-CHANGELOG-COMPLETUDE-MOTIF-001`).**
+  Le motif exigeait que la parenthèse ne contienne **que** le code, et que chaque segment soit fait de majuscules et de chiffres. Deux formes courantes lui échappaient : un commit livrant plusieurs tickets d'une même famille, et un code de release portant le numéro de version, donc des points.
+  Mesuré sur les neuf commits qui suivaient la rc8 : il en voyait deux, et aurait laissé passer dix-huit tickets absents du journal **en annonçant « OK »**. Un contrôle qui regarde à côté est pire que pas de contrôle, puisqu'il rassure. C'est exactement le défaut qu'il avait été écrit pour empêcher, reproduit dans son propre motif.
+  La lecture se fait désormais en deux temps, les groupes parenthésés puis les codes à l'intérieur. Exiger les parenthèses reste voulu, un sujet pouvant citer un code en prose sans le livrer. Le contrôle voit maintenant 26 tickets là où il en voyait 2.
+
 - **Le script de construction oubliait les `build/` des paquets (`RELEASE-BUILD-NETTOYAGE-PAQUETS-001`).**
   Le nettoyage préalable prenait le `build/` racine et les `*.egg-info` des paquets, mais pas leurs `build/`. Setuptools y laissait donc une copie du code à chaque release, jamais reprise.
   Mesuré : cinq copies dormaient là, la plus ancienne datant d'août, et celle de `forge-mvc-mssql` portait encore un réglage TLS que la source n'a plus. Elles ne sont lues par rien, les paquets étant installés en editable sur leur source, mais elles polluent toute recherche dans le dépôt : cinq tests méta au moins excluent `/build/` de leurs relevés, ce qui est la trace d'un contournement plutôt que d'une correction.
@@ -117,6 +122,11 @@
   La machine à états qui distingue code, chaînes et commentaires (ADR-079) ne servait qu'à découper les instructions. Deux opt-ins lisaient donc le SQL avec des motifs appliqués au texte brut, et prenaient le contenu d'une chaîne pour du code.
   `mask_sql_literals` efface littéraux et commentaires en **préservant les positions**, si bien qu'un motif appliqué au masque pointe le même endroit que dans la source. `normalize_sql_whitespace` réduit les blancs du code sans toucher au contenu des chaînes.
   Elles vivent à côté du découpeur parce qu'elles répondent à la même question, où finit le code et où commence le texte, et qu'une seconde réponse écrite ailleurs finirait par diverger.
+
+### Documentation
+
+- **La roadmap enregistre la publication de la rc8 (`RELEASE-1.0.0-RC8-PUBLISH-001`).**
+  Vingt-huit distributions en ligne, vérifiées contre l'API PyPI et non sur le seul rapport du script de publication. Pré-release GitHub créée, site officiel synchronisé.
 
 ### Tests
 
