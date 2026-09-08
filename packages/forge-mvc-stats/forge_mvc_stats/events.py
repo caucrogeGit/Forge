@@ -44,6 +44,26 @@ KIND_ACTION = "action"
 EVENT_KINDS = frozenset({KIND_PAGE_VIEW, KIND_ACTION})
 
 
+def normalize_category(category: str) -> str:
+    """Rend la forme canonique d'une catégorie, à l'écriture comme à la lecture.
+
+    `STATS-CATEGORY-NORMALISATION-001`. Le filtre d'agrégation appliquait
+    `strip()` à la catégorie cherchée, l'écriture non. Mesuré : un événement
+    enregistré avec `category=" cours "` existait bien en base, mais un comptage
+    filtré sur cette même valeur rendait une liste vide, le filtre cherchant
+    `"cours"`.
+
+    Une donnée doit garder le même sens du début à la fin d'une opération. La
+    règle vit ici, à la frontière d'entrée, et les deux chemins la lisent : la
+    dupliquer d'un côté seulement est précisément ce qui a produit l'écart.
+
+    Une catégorie vide ou faite d'espaces vaut `general`, le défaut du champ.
+    """
+    if not isinstance(category, str):  # pyright: ignore[reportUnnecessaryIsInstance]
+        return "general"
+    return category.strip() or "general"
+
+
 @dataclass(frozen=True)
 class StatsEvent:
     name: str
@@ -57,8 +77,7 @@ class StatsEvent:
         object.__setattr__(self, "name", validated_name)
         if not self.label:
             object.__setattr__(self, "label", validated_name)
-        if not self.category:
-            object.__setattr__(self, "category", "general")
+        object.__setattr__(self, "category", normalize_category(self.category))
         if self.metadata is None:  # pyright: ignore[reportUnnecessaryComparison]
             object.__setattr__(self, "metadata", {})
         if not isinstance(self.metadata, dict):  # pyright: ignore[reportUnnecessaryIsInstance]

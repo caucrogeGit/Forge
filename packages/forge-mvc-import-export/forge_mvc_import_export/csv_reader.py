@@ -36,9 +36,30 @@ def parse_csv(text: str, *, delimiter: str = ",") -> list[dict[str, str]]:
         raise CsvImportError("L'en-tête CSV contient des colonnes en double.")
 
     records: list[dict[str, str]] = []
-    for cells in rows[1:]:
+    for numero, cells in enumerate(rows[1:], start=2):
         if not any(cell.strip() for cell in cells):
             continue  # ligne entièrement vide ignorée
+        if len(cells) > len(header):
+            # `IMPEXP-CSV-LIGNE-TROP-LONGUE-001` : les cellules au-delà de la
+            # largeur de l'en-tête étaient **ignorées sans un mot**.
+            # `nom,note` puis `Alice,12,5` rendait `{"nom": "Alice",
+            # "note": "12"}`, et le `5` disparaissait.
+            #
+            # Les trois causes ordinaires donnent toutes ce symptôme : un
+            # séparateur mal choisi, une virgule décimale non protégée, un
+            # export mal formé. Aucune ne se voit à la lecture du rapport,
+            # puisque l'import se déclare réussi.
+            #
+            # Un import qui perd des données doit s'arrêter, pas se taire. Le
+            # message nomme la ligne, ce qui était attendu et ce qui a été lu :
+            # sans le numéro, il faut chercher dans un fichier de milliers de
+            # lignes ce que la machine savait déjà.
+            raise CsvImportError(
+                f"Ligne {numero} : {len(cells)} cellules pour {len(header)} "
+                f"colonnes déclarées. Vérifiez le séparateur (« {delimiter} »), "
+                "les guillemets autour des valeurs qui le contiennent, et les "
+                "virgules décimales."
+            )
         record = {header[i]: (cells[i] if i < len(cells) else "") for i in range(len(header))}
         records.append(record)
     return records

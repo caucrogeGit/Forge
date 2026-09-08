@@ -95,6 +95,27 @@ _SQL_DELETE_FOR_USER_EXCEPT = (
 _DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
 
 
+def _utc(valeur: datetime) -> datetime:
+    """Attache UTC à une date SQL naïve, avant toute conversion.
+
+    `SESSIONS-DB-HORODATAGE-UTC-001`. `_dt()` écrit une représentation UTC, mais
+    la relecture transformait la date naïve rendue par le pilote en horodatage
+    **selon le fuseau du serveur**. Mesuré sous `TZ=Europe/Paris`, l'aller-retour
+    décalait de 7 200 secondes.
+
+    Ce que cela touche, mesuré : les dates exposées par la liste des sessions.
+    Je n'ai pas établi de prolongation de session ni de contournement du
+    contrôle d'expiration, qui se fait en SQL sur des chaînes comparables ; ces
+    conséquences ne doivent pas être déduites d'un décalage de conversion.
+
+    Une date déjà consciente de son fuseau est laissée telle quelle : c'est un
+    pilote qui a fait le travail, et le refaire le déferait.
+    """
+    if valeur.tzinfo is None:
+        return valeur.replace(tzinfo=timezone.utc)
+    return valeur
+
+
 def _horodatage(valeur: object) -> "float | None":
     """Date de base en horodatage Unix, ou `None`.
 
@@ -107,9 +128,9 @@ def _horodatage(valeur: object) -> "float | None":
     if isinstance(valeur, (int, float)):
         return float(valeur)
     if isinstance(valeur, datetime):
-        return valeur.timestamp()
+        return _utc(valeur).timestamp()
     try:
-        return datetime.strptime(str(valeur), _DATETIME_FMT).timestamp()
+        return _utc(datetime.strptime(str(valeur), _DATETIME_FMT)).timestamp()
     except ValueError:
         return None
 

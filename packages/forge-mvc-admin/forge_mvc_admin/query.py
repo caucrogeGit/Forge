@@ -477,11 +477,27 @@ def transition_rows(
         )
 
     marqueurs = ", ".join("?" for _ in valeurs)
+    # `ADMIN-TRANSITION-TIMESTAMPS-001` : la transition groupée écrivait le
+    # statut sans toucher à `updated_at`, là où `update_row` le pose depuis
+    # l'ADR-081. Une ressource horodatée changeait donc d'état en gardant la
+    # date de sa modification précédente.
+    #
+    # Ce que cela fausse est discret et durable : un tri par date de
+    # modification place la ligne au mauvais endroit, et un traitement
+    # incrémental qui lit « ce qui a changé depuis » ne la voit pas passer.
+    # Rien n'échoue, la valeur est simplement fausse pour toujours.
+    #
+    # `created_at` n'est pas touché : une transition modifie, elle ne crée pas.
+    assignations = f"{resource.status_field} = ?"
+    parametres: "tuple[Any, ...]" = (vers,)
+    if resource.timestamps:
+        assignations += ", updated_at = ?"
+        parametres = (vers, utc_now())
     sql = (
-        f"UPDATE {resource.table} SET {resource.status_field} = ? "
+        f"UPDATE {resource.table} SET {assignations} "
         f"WHERE {resource.pk} IN ({marqueurs}) AND {resource.status_field} = ?"
     )
-    return execute(sql, (vers, *valeurs, depuis))
+    return execute(sql, (*parametres, *valeurs, depuis))
 
 
 def count_rows(

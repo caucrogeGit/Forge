@@ -11,6 +11,26 @@
 
 ### Corrigé
 
+- **Une catégorie de statistiques ne se retrouvait pas par son propre filtre (`STATS-CATEGORY-NORMALISATION-001`).**
+  Le filtre d'agrégation appliquait `strip()` à la catégorie cherchée, l'écriture non. Un événement enregistré avec `category=" cours "` existait bien en base, mais un comptage filtré sur cette même valeur rendait une liste vide, le filtre cherchant `"cours"`.
+  La règle vit désormais à la frontière d'entrée, et les deux chemins la lisent. La dupliquer d'un côté seulement est précisément ce qui a produit l'écart.
+
+- **Un import CSV perdait des cellules sans le dire (`IMPEXP-CSV-LIGNE-TROP-LONGUE-001`).**
+  Les cellules au-delà de la largeur de l'en-tête étaient ignorées : `nom,note` puis `Alice,12,5` rendait `{"nom": "Alice", "note": "12"}`, et le `5` disparaissait.
+  Les trois causes ordinaires donnent toutes ce symptôme, un séparateur mal choisi, une virgule décimale non protégée, un export mal formé. Aucune ne se voit à la lecture du rapport, puisque l'import se déclare réussi. Un import qui perd des données s'arrête désormais, et le message nomme la ligne, ce qui était attendu et ce qui a été lu.
+
+- **Les bornes de période du journal d'audit perdaient leur fuseau (`AUDIT-BORNE-PERIODE-UTC-001`).**
+  Une date consciente de son fuseau était formatée telle quelle : `2026-09-08 12:00:00+02:00` devenait la borne SQL `2026-09-08 12:00:00`, au lieu de `10:00:00`. Une recherche ou un export par période incluait ou excluait donc les mauvais événements, avec deux heures d'écart en été.
+  Une date naïve est tenue pour déjà exprimée en UTC, comme celles que le journal écrit. Deviner autrement, en supposant le fuseau du serveur, ferait rendre des lignes différentes au même export selon la machine qui le lance.
+
+- **L'aller-retour d'horodatage des sessions dépendait du fuseau du serveur (`SESSIONS-DB-HORODATAGE-UTC-001`).**
+  L'écriture produisait une représentation UTC, mais la relecture transformait la date naïve rendue par le pilote en horodatage selon le fuseau local. Mesuré sous `TZ=Europe/Paris`, l'aller-retour décalait de 7 200 secondes.
+  Ce que cela touche, mesuré, ce sont les dates exposées par la liste des sessions. Aucune prolongation de session ni contournement du contrôle d'expiration n'a été établi, celui-ci se faisant en SQL sur des chaînes comparables ; ces conséquences ne doivent pas être déduites d'un décalage de conversion.
+
+- **Une transition groupée du back-office n'horodatait pas (`ADMIN-TRANSITION-TIMESTAMPS-001`).**
+  Elle écrivait le statut sans toucher à `updated_at`, là où la modification unitaire le pose depuis l'ADR-081. Une ressource horodatée changeait donc d'état en gardant la date de sa modification précédente.
+  Rien n'échoue, la valeur est simplement fausse et le reste : un tri par date de modification place la ligne au mauvais endroit, et un traitement incrémental qui lit « ce qui a changé depuis » ne la voit pas passer.
+
 - **La traduction des paramètres PostgreSQL altérait le SQL applicatif (`POSTGRES-TRANSLATE-CONTEXTES-001`).**
   Elle ne connaissait que les littéraux entre apostrophes, et introduisait donc des marqueurs là où le point d'interrogation n'en était pas un : `SELECT ? /* pourquoi ? */` devenait `SELECT %s /* pourquoi %s */`, et `SELECT $$?$$` devenait `SELECT $$%s$$`.
   Selon le pilote, cela donne un mauvais comptage des paramètres ou un SQL altéré. Les requêtes engendrées par Forge, simples, passaient ; du SQL applicatif parfaitement valide échouait. C'est un défaut de compatibilité pour un framework qui laisse écrire du SQL (principe 5).

@@ -16,7 +16,7 @@ doit avoir été appliquée (voir `forge audit:init` puis `forge migration:apply
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 
 from core.database.retention import cutoff_for_days as _cutoff_for_days
 from typing import Any
@@ -95,6 +95,25 @@ def record_audit(
 _DATE_FMT = "%Y-%m-%d"
 
 
+def _en_utc(valeur: datetime) -> datetime:
+    """Ramène un `datetime` à UTC, le fuseau des horodatages du journal.
+
+    `AUDIT-BORNE-PERIODE-UTC-001`. La borne était formatée telle quelle, sans
+    conversion. Mesuré : `2026-09-08 12:00:00+02:00` devenait la borne SQL
+    `2026-09-08 12:00:00`, au lieu de `10:00:00`. Une recherche ou un export par
+    période incluait ou excluait donc les mauvais événements, avec deux heures
+    d'écart en été.
+
+    Une date **naïve** est tenue pour déjà exprimée en UTC, comme celles que le
+    journal écrit. Deviner autrement, en supposant le fuseau du serveur, ferait
+    dépendre le résultat d'une variable d'environnement, et un même export
+    rendrait des lignes différentes selon la machine qui l'a lancé.
+    """
+    if valeur.tzinfo is None:
+        return valeur
+    return valeur.astimezone(timezone.utc).replace(tzinfo=None)
+
+
 def _borne_periode(
     valeur: "datetime | str | None", nom: str, *, fin_de_journee: bool = False
 ) -> "str | None":
@@ -113,7 +132,7 @@ def _borne_periode(
     if valeur is None:
         return None
     if isinstance(valeur, datetime):
-        return valeur.strftime(_DATETIME_FMT)
+        return _en_utc(valeur).strftime(_DATETIME_FMT)
 
     texte = str(valeur).strip()
     if not texte:

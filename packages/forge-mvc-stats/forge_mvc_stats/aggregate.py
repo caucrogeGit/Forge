@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Callable, Iterable
 
-from .events import StatsEventError, validate_event_name
+from .events import StatsEventError, normalize_category, validate_event_name
 from .schema import STATS_EVENTS_TABLE
 
 # Dimensions de regroupement autorisées → colonne SQL réelle (liste blanche).
@@ -109,7 +109,10 @@ def prepare_stats_counts_params(
     if category is not None:
         if not isinstance(category, str) or not category.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
             raise StatsAggregateError("category doit être une chaîne non vide.")
-        params.append(category.strip())
+        # STATS-CATEGORY-NORMALISATION-001 : la même règle qu'à l'écriture,
+        # lue au même endroit. La dupliquer d'un côté seulement est ce qui
+        # a produit l'écart entre ce qui est écrit et ce qui est cherché.
+        params.append(normalize_category(category))
     if since is not None:
         if not isinstance(since, str) or not since.strip():  # pyright: ignore[reportUnnecessaryIsInstance]
             raise StatsAggregateError(
