@@ -72,4 +72,4 @@ __all__ = [
     "to_snake",
 ]
 
-__version__ = "1.0.0rc8"
+__version__ = "1.0.0rc9"

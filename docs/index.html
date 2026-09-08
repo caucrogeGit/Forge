@@ -87,7 +87,7 @@
   </div>
 
   <div class="landing-version-strip landing-accent-text flex flex-wrap justify-center gap-2 text-sm font-medium mb-12">
-    <a href="https://github.com/caucrogeGit/Forge/releases" target="_blank" rel="noopener noreferrer" class="hover:underline">v1.0.0-rc.8</a><span class="opacity-40">·</span>
+    <a href="https://github.com/caucrogeGit/Forge/releases" target="_blank" rel="noopener noreferrer" class="hover:underline">v1.0.0-rc.9</a><span class="opacity-40">·</span>
     <a href="https://docs.python.org/3.12/" target="_blank" rel="noopener noreferrer" class="hover:underline">Python 3.12+</a><span class="opacity-40">·</span>
     <a href="https://mariadb.com/kb/en/" target="_blank" rel="noopener noreferrer" class="hover:underline">MariaDB 11.8</a><span class="opacity-40">·</span>
     <a href="https://www.sqlite.org/docs.html" target="_blank" rel="noopener noreferrer" class="hover:underline">SQLite</a><span class="opacity-40">·</span>
@@ -106,33 +106,33 @@
   </p>
 </section>
 
-<!-- Nouveautés 1.0.0-rc.8 : pré-mortem des vingt-sept opt-ins. Briques injoignables, provisionnement d'un projet neuf, application désarmée en production, journal des changements. -->
+<!-- Nouveautés 1.0.0-rc.9 : deux revues externes reproduites puis corrigées. Contrôles qui regardent à côté, instrument de mesure faussé, correctifs de sécurité, garanties qui cèdent en cours d'opération. -->
 <section id="nouveautes" class="py-24 px-6 sec-light">
   <div class="max-w-5xl mx-auto">
     <div class="text-center mb-16">
-      <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-rc.8</div>
+      <div class="text-5xl sm:text-7xl text-black font-semibold tracking-tight leading-tight mb-0">Nouveautés 1.0.0-rc.9</div>
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Livré, testé, injoignable</h3>
-        <p class="text-white/60 text-sm leading-relaxed">L'export du contrat de permissions rendait un document vide sur tout contrat valide : son test le nourrissait d'une forme que le schéma interdit. Le motif s'est répété sur les vingt-sept opt-ins, un test prouvant un cas qui n'arrive jamais. Chaque brique est désormais exercée sur le chemin réel.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Des gardes qui regardaient à côté</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Aucun de ces défauts ne venait d'un contrôle absent. Le contrôle anti-injection d'en-têtes lisait le dictionnaire applicatif, quand les serveurs y ajoutaient ensuite le type de contenu et les cookies. Il existait, il passait, et il ne voyait pas la sortie réelle. Il porte désormais sur ce qui part vraiment.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Un projet neuf qui démarre</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Trois opt-ins n'étaient pas provisionnables sur un projet neuf, leur migration de création portant des colonnes que des migrations ultérieures ajoutent. Invisible depuis un projet existant, où les colonnes sont arrivées une à une. Le provisionnement les dérive maintenant les unes des autres.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">L'instrument avant la mesure</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Le client de test n'encodait pas les chemins comme un serveur, et masquait ainsi un défaut de décodage d'URL du cœur : un client qui n'imite pas un serveur ne peut pas révéler qu'un serveur se trompe. Corrigé en premier, avant des défauts pourtant plus graves, et désormais comparé à un vrai serveur.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Deux portes, une application</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Forge a deux points d'entrée, et ils ne construisaient pas la même application : un middleware câblé à la main restait invisible du chemin servi en production, sans que rien ne le signale. Le câblage vit dans une source unique que les deux lisent, ce qui retire la cause plutôt que de rendre la panne détectable.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Un code à usage unique, une fois</h3>
+        <p class="text-white/60 text-sm leading-relaxed">L'anti-rejeu retenait l'heure du serveur et non le pas du code présenté. La tolérance étant de plus ou moins un pas, un même code valait trois fois. La RFC 6238 demande qu'un code accepté ne soit pas rejouable : c'est maintenant le pas du code qui est retenu.</p>
       </div>
 
       <div class="landing-panel rounded-xl p-6 border border-white/10 h-full">
-        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Un journal qui dit tout</h3>
-        <p class="text-white/60 text-sm leading-relaxed">Le journal des changements portait cinquante et un des cent six tickets livrés. Le contrôle de publication vérifiait qu'il contienne un titre pour la version, jamais qu'il dise ce qui a été livré. Il compare désormais les tickets des commits au contenu du journal, et refuse de publier s'il en manque un.</p>
+        <h3 class="text-xl font-bold tracking-tight text-[#E8651A] mb-2">Tenir du début à la fin</h3>
+        <p class="text-white/60 text-sm leading-relaxed">Un ouvrier dont le bail avait expiré terminait la tâche d'un autre. Une suppression de fichier aboutissait puis levait. Une catégorie ne se retrouvait pas par son propre filtre. Un propriétaire, un statut, une date doivent garder le même sens du début à la fin d'une opération.</p>
       </div>
 
     </div>

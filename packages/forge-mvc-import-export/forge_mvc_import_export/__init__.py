@@ -52,7 +52,7 @@ from forge_mvc_import_export.queueing import (
     registered_importers,
 )
 
-__version__ = "1.0.0rc8"
+__version__ = "1.0.0rc9"
 
 __all__ = [
     # Import différé par une file (IMPEXP-ASYNC-JOBS-001)

@@ -43,7 +43,7 @@ from forge_mvc_video.subtitles import (
     validate_vtt,
 )
 
-__version__ = "1.0.0rc8"
+__version__ = "1.0.0rc9"
 
 __all__ = [
     "register_video_routes",

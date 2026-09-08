@@ -1,6 +1,6 @@
 # Changelog
 
-## [Non publié]
+## [1.0.0-rc.9] - 2026-09-08
 
 ### Sécurité
 
@@ -128,6 +128,10 @@
   Elles vivent à côté du découpeur parce qu'elles répondent à la même question, où finit le code et où commence le texte, et qu'une seconde réponse écrite ailleurs finirait par diverger.
 
 ### Documentation
+
+- **Préparation de la 1.0.0-rc.9 (`RELEASE-1.0.0-RC9-PREPARE-001`).**
+  Bump des soixante-cinq emplacements versionnés, journal refermé, roadmap et landing **réécrites** pour ce cycle plutôt que renumérotées : le récit d'une version n'est pas celui de la précédente.
+  Le numéro retenu est une release candidate et non la 1.0.0 stable. Le contenu irait à une stable, vingt-huit correctifs sans aucune fonctionnalité nouvelle, mais ce jalon déclenche la bascule de licence vers MIT promise par l'ADR-049 : la décision revient à la personne qui la porte.
 
 - **La roadmap enregistre la publication de la rc8 (`RELEASE-1.0.0-RC8-PUBLISH-001`).**
   Vingt-huit distributions en ligne, vérifiées contre l'API PyPI et non sur le seul rapport du script de publication. Pré-release GitHub créée, site officiel synchronisé.

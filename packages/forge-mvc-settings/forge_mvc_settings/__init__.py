@@ -39,7 +39,7 @@ from forge_mvc_settings.store import (
     set_setting,
 )
 
-__version__ = "1.0.0rc8"
+__version__ = "1.0.0rc9"
 
 __all__ = [
     # Édition depuis un écran (ADMIN-SETTINGS-UI-001)

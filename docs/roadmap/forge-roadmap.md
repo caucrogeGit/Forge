@@ -7,46 +7,56 @@ Cette roadmap concerne uniquement **Forge**, le framework MVC Python : cœur, CL
 Forge Design est désormais traité dans une roadmap séparée.
 
 > **Note** : Ce document contient l'historique de développement interne pré-publication.
-> Version courante : **Forge 1.0.0-rc.8** (release candidate, publiée le 2026-09-07).
+> Version courante : **Forge 1.0.0-rc.9** (release candidate, préparée le 2026-09-08).
 > Dernière version publiée sur PyPI : **Forge 1.0.0-rc.8** (2026-09-07), 28 distributions.
-> Cent onze tickets ont été livrés dans ce cycle, tous consignés au `CHANGELOG.md`.
-> Un contrôle de pré-vol refuse désormais de publier un journal qui tairait un ticket livré.
+> Vingt-huit tickets sont livrés depuis ce tag, tous consignés au `CHANGELOG.md`.
+> Un contrôle de pré-vol refuse de publier un journal qui tairait un ticket livré.
 
 ---
 
-## État actuel : Forge 1.0.0-rc.8
+## État actuel : Forge 1.0.0-rc.9
 
-**Tag courant : `v1.0.0-rc.8`**, septième release candidate avant la 1.0.0 stable.
+**Tag courant : `v1.0.0-rc.9`**, huitième release candidate avant la 1.0.0 stable.
 
-Elle est née d'un pré-mortem mené paquet par paquet, sur les vingt-sept opt-ins après le cœur.
-Cent dix tickets, et un motif qui revient d'un bout à l'autre.
+Elle ne contient que des correctifs.
+Vingt-huit tickets, nés de deux revues externes de la rc8, l'une sur le cœur et l'autre sur les vingt-sept opt-ins.
 
-**Une brique livrée, testée, et injoignable sur le chemin réel.**
-Le test d'origine employait une forme qu'aucune application ne produit, si bien qu'il prouvait le fonctionnement d'un cas qui n'arrive jamais.
-`rbac:export` rendait un document vide sur tout contrat valide, son test l'ayant nourri d'une forme que le schéma interdit.
-Un contrat RBAC jamais examiné passait pour sain, cycle d'héritage compris.
-Un champ calculé recevait une colonne en base et un champ de saisie, dont la valeur n'allait nulle part.
+Les vingt-deux défauts qu'elles signalaient ont été **reproduits sur le dépôt avant d'être corrigés**, et non pris pour argent comptant.
+La seconde revue fournissait dix-sept sondes exécutables : les dix-sept se confirmaient, et les dix-sept sont fermées.
 
-**Trois opt-ins n'étaient pas provisionnables sur un projet neuf.**
-La migration de création portait des colonnes que des migrations ultérieures ajoutent, et le provisionnement s'arrêtait sur un doublon.
-Le défaut ne pouvait pas se voir d'un projet existant, où les colonnes sont arrivées une à une.
+Un seul motif les explique presque toutes.
 
-**La production servait une application désarmée** (ADR-092 et ADR-093).
-Forge a deux points d'entrée, et ils ne construisaient pas la même application.
-Un middleware câblé dans `app.py` restait invisible du chemin WSGI, sans que rien ne le signale.
-Le câblage vit désormais dans une source unique que les deux points d'entrée lisent, ce qui retire la cause au lieu de rendre la panne détectable.
+**Un contrôle qui existe, qui passe, et qui regarde à côté.**
+Aucun de ces défauts ne venait d'une garde absente.
+Le contrôle anti-injection d'en-têtes lisait le dictionnaire applicatif, quand les deux serveurs y ajoutaient ensuite le type de contenu et les cookies.
+Une condition de transition était cherchée sous une casse que l'appelant n'avait pas.
+Le plan de purge des fixtures lisait le contenu d'une chaîne SQL comme du code.
+Le garde de démarrage IoT ignorait le mode d'authentification que son propre contrôleur savait traiter.
 
-Deux ajouts d'architecture accompagnent le cycle, un registre de fichiers dans `forge-mvc-files` (ADR-094) et l'héritage entre rôles RBAC (ADR-095).
-Trente-six paliers d'accueil ont été écrits, chacun **exécuté** avant d'être publié.
+**Un instrument de mesure faux ne rend pas les tests inutiles, il les rend rassurants.**
+Le client de test n'encodait pas les chemins comme un serveur, si bien qu'il **masquait** le défaut de décodage d'URL du cœur : un client qui n'imite pas un serveur ne peut pas révéler qu'un serveur se trompe.
+Il a donc été corrigé en premier, avant des défauts pourtant plus graves.
+Le contrôle de complétude du journal, posé la veille, comptait pour sa part deux tickets sur vingt.
 
-Le journal des changements portait cinquante et un des cent six tickets livrés.
-Le pré-vol de release vérifiait qu'il contienne un titre pour la version, jamais qu'il dise ce qui a été livré.
+**Trois correctifs de sécurité.**
+Le type de contenu et les cookies échappaient au contrôle anti-injection sur les deux chemins de sortie.
+Un code TOTP accepté pouvait être consommé trois fois, la tolérance de plus ou moins un pas se combinant à un anti-rejeu fondé sur l'horloge, là où la RFC 6238 section 5.2 demande qu'un code accepté ne soit pas rejouable.
+La connexion SQL Server ne vérifiait jamais le certificat du serveur.
+
+**Une garantie tient du début à la fin d'une opération, ou elle ne tient pas.**
+Un ouvrier dont le bail avait expiré terminait la tâche d'un autre.
+Une reprise de traitement vidéo recomptait sa propre durée dans le quota.
+Une suppression de fichier aboutissait, puis levait, sans nettoyer le registre.
+Une catégorie de statistiques ne se retrouvait pas par son propre filtre.
 
 L'API publique reste gelée pour la 1.0 et tous les opt-ins restent en Beta (`Development Status :: 4 - Beta`).
 
-Précédent : v1.0.0-rc.7 (2026-08-17, pré-mortem du cœur et de chaque opt-in, nonce CSP inerte en production), v1.0.0-rc.6 (2026-08-14), v1.0.0-rc.4 (2026-08-05, vérification de la documentation par exécution, correctif `GET /health` sous WSGI), v1.0.0-rc.3 (2026-07-31, correctif CRLF des en-têtes, DDL dialectale des opt-ins), v1.0.0-rc.2 (2026-07-01, refonte de la navigation documentaire, dispatch CLI par entry points ADR-059), v1.0.0-rc.1 (2026-06-26, première release candidate, briques opt-in ADR-052, déploiement extrait ADR-053), v1.0.0-beta.17 (2026-06-18, typage strict de bout en bout ADR-036), v1.0.0-beta.16 (2026-06-16, retrait de la génération de starters ADR-035), v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+Un point demande un geste côté exploitant : un projet SQL Server sur certificat auto-signé doit désormais déclarer `DB_MSSQL_TRUST_SERVER_CERTIFICATE=yes`.
+C'est le seul des vingt-huit correctifs dans ce cas, et la référence du paquet le documente.
 
-**Statut : v1.0.0-rc.8, septième release candidate : API publique gelée, tous les opt-ins en Beta, les vingt-sept passés au pré-mortem avec leur documentation et leurs parcours d'accueil.
+Précédent : v1.0.0-rc.8 (2026-09-07, pré-mortem des vingt-sept opt-ins, application désarmée en production ADR-092 et ADR-093), v1.0.0-rc.7 (2026-08-17, pré-mortem du cœur et de chaque opt-in, nonce CSP inerte en production), v1.0.0-rc.6 (2026-08-14), v1.0.0-rc.4 (2026-08-05, vérification de la documentation par exécution, correctif `GET /health` sous WSGI), v1.0.0-rc.3 (2026-07-31, correctif CRLF des en-têtes, DDL dialectale des opt-ins), v1.0.0-rc.2 (2026-07-01, refonte de la navigation documentaire, dispatch CLI par entry points ADR-059), v1.0.0-rc.1 (2026-06-26, première release candidate, briques opt-in ADR-052, déploiement extrait ADR-053), v1.0.0-beta.17 (2026-06-18, typage strict de bout en bout ADR-036), v1.0.0-beta.16 (2026-06-16, retrait de la génération de starters ADR-035), v1.0.0-beta.15 (2026-06-08, i18n opt-in ADR-027, convention de route ADR-029, refonte welcome-forge ADR-025/028), v1.0.0-beta.14 (2026-06-07, squelette dédié ADR-024), v1.0.0-beta.13 (2026-06-06), v1.0.0-beta.12 (2026-05-29), v1.0.0-beta.9 (2026-05-24), v1.0.0-beta.8 (2026-05-22), v1.0.0-beta.7 (2026-05-22), v1.0.0-beta.6 (2026-05-21), v1.0.0-beta.5 (2026-05-17), v1.0.0-beta.3 (2026-05-16), v1.0.0-beta.2 (2026-05-16), v1.0.0-beta.1 (2026-05-15), v3.0.5 (2026-05-14), v3.0.4 (2026-05-14), v3.0.3 (2026-05-14), v3.0.2 (2026-05-13), v3.0.1 (2026-05-12), v3.0.0 (2026-05-12).
+
+**Statut : v1.0.0-rc.9, huitième release candidate : API publique gelée, tous les opt-ins en Beta, vingt-huit correctifs issus de deux revues externes intégralement reproduites avant correction.
 Les acquis des rc précédentes restent en place, comme ceux de beta.17 (typage strict ADR-036), beta.16 (parcours réalisés à la main ADR-035), beta.15 (i18n ADR-027, convention de route ADR-029) et beta.14 (squelette dédié ADR-024).**
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forge-mvc"
-version = "1.0.0rc8"
+version = "1.0.0rc9"
 description = "Framework web applicatif Python minimaliste, pédagogique et extensible."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
@@ -55,7 +55,7 @@ Documentation = "https://forgemvc.com/docs/forge/"
 Issues = "https://github.com/caucrogeGit/Forge/issues"
 
 # Extras de raccourci vers trois opt-ins sans dépendance lourde.
-# Pins alignés sur la version courante : forge-mvc-<nom>>=1.0.0rc8,<2
+# Pins alignés sur la version courante : forge-mvc-<nom>>=1.0.0rc9,<2
 # (politique unifiée OPTIN-DEPS-PIN-B13-001).
 #
 # `forge-mvc[all]` ≠ « tous les opt-ins » : le dépôt en compte vingt-sept, et
@@ -72,13 +72,13 @@ Issues = "https://github.com/caucrogeGit/Forge/issues"
 #   video  = ffmpeg / ffprobe, binaires système hors pip
 
 [project.optional-dependencies]
-rbac = ["forge-mvc-rbac>=1.0.0rc8,<2"]
-workflow = ["forge-mvc-workflow>=1.0.0rc8,<2"]
-stats = ["forge-mvc-stats>=1.0.0rc8,<2"]
+rbac = ["forge-mvc-rbac>=1.0.0rc9,<2"]
+workflow = ["forge-mvc-workflow>=1.0.0rc9,<2"]
+stats = ["forge-mvc-stats>=1.0.0rc9,<2"]
 all = [
-    "forge-mvc-rbac>=1.0.0rc8,<2",
-    "forge-mvc-workflow>=1.0.0rc8,<2",
-    "forge-mvc-stats>=1.0.0rc8,<2",
+    "forge-mvc-rbac>=1.0.0rc9,<2",
+    "forge-mvc-workflow>=1.0.0rc9,<2",
+    "forge-mvc-stats>=1.0.0rc9,<2",
 ]
 
 [project.scripts]
