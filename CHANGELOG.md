@@ -22,6 +22,11 @@
 
 ### Corrigé
 
+- **Le script de construction oubliait les `build/` des paquets (`RELEASE-BUILD-NETTOYAGE-PAQUETS-001`).**
+  Le nettoyage préalable prenait le `build/` racine et les `*.egg-info` des paquets, mais pas leurs `build/`. Setuptools y laissait donc une copie du code à chaque release, jamais reprise.
+  Mesuré : cinq copies dormaient là, la plus ancienne datant d'août, et celle de `forge-mvc-mssql` portait encore un réglage TLS que la source n'a plus. Elles ne sont lues par rien, les paquets étant installés en editable sur leur source, mais elles polluent toute recherche dans le dépôt : cinq tests méta au moins excluent `/build/` de leurs relevés, ce qui est la trace d'un contournement plutôt que d'une correction.
+  326 fichiers et 2,5 Mo purgés à cette occasion.
+
 - **Une sélection de variantes d'image échouait après avoir écrit (`IMAGES-VARIANTES-SELECTION-001`).**
   `save_image_upload` acceptait une liste de préréglages, puis reconstruisait son résultat avec deux noms écrits en dur. `variants=["thumbnail"]` levait donc `KeyError('medium')`, après avoir déjà posé des fichiers sur le stockage : une option annoncée par l'API ne fonctionnait pas, et son échec laissait des traces.
   Les variantes rendues sont désormais celles qui ont été produites. L'original en est exclu, `saved.path` le portant déjà, sans quoi il s'afficherait en double pour qui itère sur les déclinaisons.

@@ -28,9 +28,22 @@ echo " Forge — build release  |  version $VERSION  (tag v$SEMVER)"
 echo "============================================================"
 
 # 1. Nettoyage des artefacts de build (reproductibilité)
+#
+# `RELEASE-BUILD-NETTOYAGE-PAQUETS-001` : les `build/` des PAQUETS étaient
+# oubliés. Le nettoyage prenait le `build/` racine et les `*.egg-info` des
+# paquets, mais pas leurs `build/`, si bien que setuptools y laissait une copie
+# du code à chaque release, jamais reprise.
+#
+# Mesuré : cinq copies dormaient là, la plus ancienne d'août, et celle de
+# `forge-mvc-mssql` portait encore un `TrustServerCertificate=yes` que la source
+# n'a plus. Elles ne sont lues par rien, les paquets étant installés en editable
+# sur leur source, mais elles polluent toute recherche dans le dépôt : cinq
+# tests méta au moins excluent `/build/` de leurs relevés, ce qui est la trace
+# du contournement plutôt que de la correction.
 echo "-- nettoyage dist/ build/ *.egg-info --"
 rm -rf "$DIST" "$ROOT/build" "$ROOT"/*.egg-info
 find packages -maxdepth 2 -name "*.egg-info" -type d -exec rm -rf {} + 2>/dev/null || true
+find packages -maxdepth 2 -name "build" -type d -exec rm -rf {} + 2>/dev/null || true
 
 # PKG-WHEEL-NO-CACHE-001 — purge des caches d'outillage avant build. Le squelette
 # porte sa propre config ruff (`skeleton/data/pyproject.toml`), donc `ruff check .`
