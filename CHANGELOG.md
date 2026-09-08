@@ -22,6 +22,10 @@
 
 ### Corrigé
 
+- **Les fichiers de déploiement engendrés cassaient sur un chemin contenant un espace (`DEPLOY-CHEMIN-NON-CITABLE-001`).**
+  Le chemin du projet est inséré tel quel dans une unité systemd, une configuration Nginx et un README de commandes shell. Les trois découpent différemment : `ExecStart=/srv/Mon projet/app/.venv/bin/gunicorn` désigne pour systemd l'exécutable `/srv/Mon` avec un argument de plus, et `ReadWritePaths` est une liste séparée par des espaces qui souffre du même mal.
+  Le service ne démarre pas, et le message ne désigne pas la cause. Poser trois syntaxes de citation, ce serait se donner trois occasions d'en écrire une fausse, sur des fichiers ensuite copiés tels quels sur un serveur. `deploy:init` refuse donc explicitement, avant toute écriture, en nommant le chemin et la sortie.
+
 - **Mon propre contrôle de complétude du journal voyait deux commits sur neuf (`GOV-CHANGELOG-COMPLETUDE-MOTIF-001`).**
   Le motif exigeait que la parenthèse ne contienne **que** le code, et que chaque segment soit fait de majuscules et de chiffres. Deux formes courantes lui échappaient : un commit livrant plusieurs tickets d'une même famille, et un code de release portant le numéro de version, donc des points.
   Mesuré sur les neuf commits qui suivaient la rc8 : il en voyait deux, et aurait laissé passer dix-huit tickets absents du journal **en annonçant « OK »**. Un contrôle qui regarde à côté est pire que pas de contrôle, puisqu'il rassure. C'est exactement le défaut qu'il avait été écrit pour empêcher, reproduit dans son propre motif.

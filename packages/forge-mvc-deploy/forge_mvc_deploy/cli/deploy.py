@@ -752,11 +752,57 @@ def _write_if_new(path: Path, content: str) -> bool:
 
 # ── deploy:init ───────────────────────────────────────────────────────────────
 
+#: Caractères qu'aucun des trois formats engendrés ne traite de la même façon.
+#:
+#: `DEPLOY-CHEMIN-NON-CITABLE-001`. Le chemin du projet est inséré tel quel dans
+#: une unité systemd, une configuration Nginx et un README de commandes shell.
+#: Les trois découpent ou citent différemment :
+#:
+#: - systemd découpe `ExecStart=` **en mots**, si bien que
+#:   `/srv/Mon projet/app/.venv/bin/gunicorn` désigne l'exécutable `/srv/Mon`
+#:   avec un argument de plus. `ReadWritePaths=` est une liste séparée par des
+#:   espaces, et souffre du même mal ;
+#: - Nginx termine ses directives au point-virgule mais découpe aussi ses
+#:   arguments sur les blancs ;
+#: - le shell du README découpe encore autrement.
+#:
+#: Poser trois syntaxes de citation, c'est se donner trois occasions d'en écrire
+#: une fausse, et le fichier engendré est ensuite copié tel quel sur un serveur.
+#: Le refus est explicite (principe 3) et dit quoi faire, plutôt que de livrer
+#: des fichiers qui démarrent mal.
+CARACTERES_REFUSES = ' \t\n"\'\\'
+
+
+def _refus_de_chemin(root: Path) -> "str | None":
+    """Rend le motif de refus si le chemin du projet ne peut pas être engendré."""
+    fautifs = sorted({c for c in str(root) if c in CARACTERES_REFUSES})
+    if not fautifs:
+        return None
+    lisibles = ", ".join(repr(c) for c in fautifs)
+    return (
+        f"Le chemin du projet contient {lisibles}, que les fichiers engendrés "
+        "ne peuvent pas porter sans risque.\n"
+        f"  Chemin : {root}\n"
+        "  systemd découpe `ExecStart=` en mots, Nginx découpe ses arguments, "
+        "et le shell encore autrement : un fichier engendré ici démarrerait mal, "
+        "sans que le message d'erreur désigne la cause.\n"
+        "  Déplacez le projet vers un chemin sans espace ni guillemet, par "
+        "exemple /srv/mon-projet, puis relancez `forge deploy:init`."
+    )
+
+
 def cmd_deploy_init(root: Path | None = None) -> None:
     if root is None:
         root = Path.cwd()
 
     print("\nforge deploy:init\n")
+
+    # Contrôle AVANT toute écriture : un refus qui laisse des fichiers derrière
+    # lui oblige à deviner lesquels sont bons.
+    refus = _refus_de_chemin(root)
+    if refus is not None:
+        print(refus)
+        raise SystemExit(2)
 
     upload_mb = _upload_max_mb(root)
     files = {
