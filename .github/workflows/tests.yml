@@ -292,4 +292,9 @@ jobs:
           FORGE_TEST_MSSQL_USER: sa
           FORGE_TEST_MSSQL_PASSWORD: "Forge#Test#2026"
           FORGE_TEST_MSSQL_NAME: forge_test
+          # MSSQL-TLS-VERIFICATION-001 : le conteneur SQL Server présente un
+          # certificat auto-signé. La confiance au certificat n'est plus posée
+          # en dur dans le backend, elle se déclare — et cette déclaration est
+          # ici, visible, plutôt qu'héritée sans que personne l'ait choisie.
+          DB_MSSQL_TRUST_SERVER_CERTIFICATE: "yes"
         run: python -m pytest -m db_mssql -v

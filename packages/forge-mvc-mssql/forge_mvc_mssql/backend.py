@@ -95,6 +95,55 @@ def _needs_identity_batch(sql: str) -> bool:
     return not _HANDLES_IDENTITY.search(skeleton)
 
 
+
+#: Réglages TLS de la connexion ODBC, lus de l'environnement.
+#:
+#: `MSSQL-TLS-VERIFICATION-001`. La confiance aveugle au certificat était écrite
+#: **en dur** dans les deux chaînes de connexion, celle d'exécution et celle
+#: d'administration. Cette option demande de se fier au certificat sans la
+#: vérification habituelle : le chiffrement et l'authentification du serveur
+#: sont deux garanties différentes, et Forge n'offrait que la première sur son
+#: chemin normal.
+#:
+#: Le défaut vérifie donc, et l'assouplissement de développement se déclare : un
+#: serveur local à certificat auto-signé est un cas légitime, mais il doit être
+#: **visible et volontaire**, pas hérité sans que personne l'ait choisi.
+ENV_ENCRYPT = "DB_MSSQL_ENCRYPT"
+ENV_TRUST_CERTIFICATE = "DB_MSSQL_TRUST_SERVER_CERTIFICATE"
+
+
+def _oui_non(valeur: "str | None", defaut: str) -> str:
+    """Rend `yes` ou `no` à partir d'une valeur d'environnement.
+
+    Une valeur inconnue prend le **défaut sûr** plutôt que d'être interprétée :
+    une faute de frappe ne doit pas désactiver une vérification par accident.
+    """
+    if valeur is None:
+        return defaut
+    normalise = valeur.strip().lower()
+    if normalise in {"yes", "true", "1", "oui"}:
+        return "yes"
+    if normalise in {"no", "false", "0", "non"}:
+        return "no"
+    return defaut
+
+
+def _options_tls() -> str:
+    """Rend le fragment de chaîne ODBC décrivant le chiffrement et la confiance.
+
+    `Encrypt` accepte aussi `strict` sur les pilotes récents, qui l'exigent et
+    change le sens de la confiance au certificat : cette valeur est donc passée
+    telle quelle plutôt que ramenée à un oui ou un non.
+    """
+    encrypt_brut = os.environ.get(ENV_ENCRYPT)
+    if encrypt_brut is not None and encrypt_brut.strip().lower() == "strict":
+        encrypt = "strict"
+    else:
+        encrypt = _oui_non(encrypt_brut, "yes")
+    trust = _oui_non(os.environ.get(ENV_TRUST_CERTIFICATE), "no")
+    return f"Encrypt={encrypt};TrustServerCertificate={trust};"
+
+
 class _MsCursor:
     """Curseur pyodbc enveloppé : lignes-dict optionnelles et lastrowid."""
 
@@ -258,7 +307,7 @@ class MSSQLBackend:
             f"SERVER={host},{port};"
             f"DATABASE={dbname};"
             f"UID={user};PWD={password};"
-            f"TrustServerCertificate=yes"
+            f"{_options_tls()}"
         )
         raw: Any = odbc.connect(conn_str)
         # Borne d'attente de verrou (DB-LOCK-WAIT-BOUND-001). Par défaut le
@@ -298,7 +347,7 @@ class MSSQLBackend:
             f"SERVER={host},{port};"
             f"DATABASE={db};"
             f"UID={login};PWD={password};"
-            f"TrustServerCertificate=yes"
+            f"{_options_tls()}"
         )
         raw: Any = odbc.connect(conn_str)
         return _MsConnection(raw)

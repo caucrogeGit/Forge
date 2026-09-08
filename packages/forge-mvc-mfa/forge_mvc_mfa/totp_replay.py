@@ -31,6 +31,11 @@ from typing import Protocol
 
 
 _TOTP_PERIOD_SECONDS = 30
+
+#: Durée d'un pas TOTP, en secondes. Exposée pour que le calcul du pas d'un
+#: code présenté (`MFA-ANTI-REJEU-PAS-DU-CODE-001`) lise la même valeur que
+#: `step_for_time`, plutôt qu'un 30 recopié ailleurs.
+PERIODE_SECONDES = _TOTP_PERIOD_SECONDS
 _PURGE_AFTER_SECONDS = 24 * 3600
 _PURGE_EVERY_N_RECORDS = 100
 

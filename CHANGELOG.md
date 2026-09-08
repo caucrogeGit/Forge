@@ -4,6 +4,17 @@
 
 ### Sécurité
 
+- **Un code TOTP accepté pouvait être consommé trois fois (`MFA-ANTI-REJEU-PAS-DU-CODE-001`).**
+  L'anti-rejeu enregistrait le pas de l'**horloge serveur**, pas celui du code présenté. Or la tolérance est de plus ou moins un pas. Mesuré avec PyOTP sur le code inchangé, un code du pas N est accepté à trois pas serveur différents, N moins 1, N et N plus 1, et une clé différente était enregistrée à chaque fois.
+  La RFC 6238 section 5.2 demande qu'un mot de passe à usage unique accepté ne soit pas rejouable. Passer à un magasin partagé entre ouvriers ne corrigeait rien : il retenait fidèlement la mauvaise clé, et cette nuance compte, la limite documentée du magasin en mémoire étant un autre sujet.
+  Une fonction rend désormais le pas du **code accepté**, comparé en temps constant, et c'est lui que l'anti-rejeu retient.
+
+- **La connexion SQL Server ne vérifiait jamais le certificat du serveur (`MSSQL-TLS-VERIFICATION-001`).**
+  `TrustServerCertificate=yes` était écrit en dur dans les deux chaînes de connexion, celle d'exécution et celle d'administration. Cette option demande de se fier au certificat sans la vérification habituelle : chiffrer une connexion et authentifier le serveur en face sont deux garanties distinctes, et seule la première était offerte sur le chemin que tout le monde suit.
+  Aucune connexion n'a été ouverte pour l'établir, et ce n'est pas la preuve qu'une attaque a eu lieu ; c'est un défaut de configuration.
+  Le défaut vérifie désormais, et l'assouplissement se déclare par `DB_MSSQL_TRUST_SERVER_CERTIFICATE`, avec `DB_MSSQL_ENCRYPT` pour le chiffrement, `strict` compris. Une valeur non reconnue garde le réglage sûr : une faute de frappe ne doit pas désactiver une vérification.
+  Mesuré contre le serveur local à certificat auto-signé, la connexion est refusée sans la variable et les 167 tests d'intégration passent avec. L'intégration continue la déclare, visiblement, plutôt que d'en hériter.
+
 - **Deux voies d'en-têtes échappaient au contrôle anti-injection (`CORE-HEADER-CRLF-COMPLETUDE-001`).**
   Le contrôle lisait le dictionnaire d'en-têtes applicatifs. Les deux chemins de sortie y ajoutent ensuite `Content-Type`, pris de `response.content_type`, et une ligne `Set-Cookie` par cookie accumulé : ces valeurs ne passaient jamais devant lui.
   Mesuré : un `content_type` valant `"text/plain\r\nX-Injected: yes"` et un cookie valant `"a=b\r\nX-Injected: yes"` atteignaient tous deux `start_response`, quand un en-tête applicatif portant la même chose était refusé. Le contrôle existait donc, et regardait à côté. Le serveur de développement couvrait les cookies mais pas le `content_type`.

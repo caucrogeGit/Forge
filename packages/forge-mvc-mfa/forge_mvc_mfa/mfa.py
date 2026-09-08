@@ -9,6 +9,8 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any, cast
 
+import hmac as _hmac
+
 import pyotp
 
 from core.auth.exceptions import AuthError, InvalidAuthUserError, InvalidMfaFactorError
@@ -268,6 +270,59 @@ def create_totp_factor(
     )
     uri = totp_provisioning_uri(secret, effective_account, issuer_name)
     return TotpSetup(secret=secret, factor=factor, provisioning_uri=uri)
+
+
+def matching_totp_step(
+    secret: str,
+    code: str,
+    valid_window: int = 1,
+    now: datetime | None = None,
+) -> "int | None":
+    """Rend le **pas** du code accepté, ou `None` si aucun ne correspond.
+
+    `MFA-ANTI-REJEU-PAS-DU-CODE-001`. La vérification rendait un booléen, et
+    l'anti-rejeu enregistrait le pas de l'**horloge serveur**. Or la tolérance
+    est de ±1 pas : mesuré avec PyOTP, un code du pas N est accepté à trois pas
+    serveur différents, N-1, N et N+1, et l'anti-rejeu enregistrait une clé
+    différente à chaque fois. Le même code pouvait donc être consommé trois
+    fois.
+
+    La RFC 6238 §5.2 demande qu'un OTP accepté ne soit pas rejouable. Passer à
+    un magasin partagé entre ouvriers ne corrigeait rien : il retenait
+    fidèlement la mauvaise clé.
+
+    Rendre le pas du code, et non celui de l'heure, fait porter l'anti-rejeu sur
+    ce qui a réellement été présenté.
+
+    La comparaison est en temps constant, comme celle qu'elle remplace : le
+    code est un secret à durée de vie courte, et le comparer caractère par
+    caractère renseignerait sur sa valeur.
+    """
+    try:
+        if not isinstance(secret, str) or not secret:  # pyright: ignore[reportUnnecessaryIsInstance]
+            return None
+        if not isinstance(code, str) or not code:  # pyright: ignore[reportUnnecessaryIsInstance]
+            return None
+        if (
+            not isinstance(valid_window, int)  # pyright: ignore[reportUnnecessaryIsInstance]
+            or isinstance(valid_window, bool)
+            or valid_window < 0
+        ):
+            return None
+
+        from forge_mvc_mfa.totp_replay import PERIODE_SECONDES, step_for_time
+
+        totp = pyotp.TOTP(secret)
+        instant = (now or datetime.now(tz=timezone.utc)).timestamp()
+        propose = code.strip()
+        for decalage in range(-valid_window, valid_window + 1):
+            candidat = instant + decalage * PERIODE_SECONDES
+            attendu = totp.at(datetime.fromtimestamp(candidat, timezone.utc))
+            if _hmac.compare_digest(attendu, propose):
+                return step_for_time(candidat)
+        return None
+    except Exception:  # noqa: BLE001 — aucune entrée ne doit faire lever
+        return None
 
 
 def verify_totp_code(
@@ -631,12 +686,21 @@ def verify_mfa_challenge(
                     continue
                 if factor.user_id != user_id:
                     continue
+                # Raccourci : le pas du code n'est connu qu'après déchiffrement,
+                # et ce test évite ce coût quand l'heure courante est déjà
+                # consommée. Il ne décide de rien seul, `check_and_record`
+                # tranchant ensuite sur le pas réel.
                 if factor.id is not None and _replay.is_replay(factor.id, current_step):
                     continue
                 raw_secret = decrypt_totp_secret(factor.totp_secret)
-                if verify_totp_code(raw_secret, code, now=now):
+                # `MFA-ANTI-REJEU-PAS-DU-CODE-001` : le pas enregistré est celui
+                # du code présenté, jamais celui de l'horloge. Avec la tolérance
+                # de ±1, un même code vaut à trois pas serveur, et retenir
+                # l'heure en faisait trois clés distinctes pour un seul code.
+                pas_du_code = matching_totp_step(raw_secret, code, now=now)
+                if pas_du_code is not None:
                     if factor.id is not None and not _replay.check_and_record(
-                        factor.id, current_step
+                        factor.id, pas_du_code
                     ):
                         # Course anti-replay perdue : code déjà consommé par
                         # une requête concurrente sur la même step.
@@ -887,12 +951,21 @@ def verify_mfa_revalidation(
                     continue
                 if factor.user_id != user_id:
                     continue
+                # Raccourci : le pas du code n'est connu qu'après déchiffrement,
+                # et ce test évite ce coût quand l'heure courante est déjà
+                # consommée. Il ne décide de rien seul, `check_and_record`
+                # tranchant ensuite sur le pas réel.
                 if factor.id is not None and _replay.is_replay(factor.id, current_step):
                     continue
                 raw_secret = decrypt_totp_secret(factor.totp_secret)
-                if verify_totp_code(raw_secret, code, now=now):
+                # `MFA-ANTI-REJEU-PAS-DU-CODE-001` : le pas enregistré est celui
+                # du code présenté, jamais celui de l'horloge. Avec la tolérance
+                # de ±1, un même code vaut à trois pas serveur, et retenir
+                # l'heure en faisait trois clés distinctes pour un seul code.
+                pas_du_code = matching_totp_step(raw_secret, code, now=now)
+                if pas_du_code is not None:
                     if factor.id is not None and not _replay.check_and_record(
-                        factor.id, current_step
+                        factor.id, pas_du_code
                     ):
                         # Course anti-replay perdue : code déjà consommé par
                         # une requête concurrente sur la même step.

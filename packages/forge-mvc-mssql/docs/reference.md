@@ -107,6 +107,33 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     DB_ODBC_DRIVER=ODBC Driver 18 for SQL Server
     ```
 
+    ### Chiffrement et vérification du certificat
+
+    La connexion est chiffrée et le certificat du serveur est **vérifié**, ce qui
+    est le comportement attendu face à un serveur distant.
+    Deux variables permettent d'en décider autrement, et elles n'ont pas de
+    valeur par défaut dans `env/` : leur absence vaut le réglage sûr.
+
+    | Variable | Défaut | Rôle |
+    |---|---|---|
+    | `DB_MSSQL_ENCRYPT` | `yes` | Chiffrement de la connexion. Accepte aussi `strict`, exigé par les pilotes récents. |
+    | `DB_MSSQL_TRUST_SERVER_CERTIFICATE` | `no` | Se fier au certificat sans le vérifier. |
+
+    Un serveur de développement local présente souvent un certificat auto-signé,
+    que la vérification refuse.
+    C'est un cas légitime, et il se déclare :
+
+    ```env
+    DB_MSSQL_TRUST_SERVER_CERTIFICATE=yes
+    ```
+
+    Ne posez pas cette variable en production.
+    Chiffrer une connexion et authentifier le serveur en face sont deux garanties
+    distinctes, et la seconde est celle qui distingue votre serveur d'un autre.
+
+    Une valeur non reconnue garde le réglage sûr plutôt que d'être interprétée :
+    une faute de frappe ne doit pas désactiver une vérification.
+
     `forge doctor` confirme le backend résolu (`mssql`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=mssql`.
 
     `forge db:init` **affiche** le SQL de provisioning dérivé de `env/`, sans se connecter (ADR-067) : logins d'administration et applicatif, base, utilisateurs, `GRANT` sur `SCHEMA::dbo`, table `forge_migrations`, en lots séparés par `GO` pour `sqlcmd` :
