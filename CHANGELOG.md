@@ -1,5 +1,15 @@
 # Changelog
 
+## [Non publié]
+
+### Corrigé
+
+- **L'outil de mise en une phrase par ligne coupait et collait des phrases à tort (`TOOLS-REFLOW-DOCS-FIABILITE-001`).**
+  `tools/reflow_docs.py` reconnaissait les abréviations sans limite de mot. « al. » captait donc « local. » et « minimal. », et deux phrases correctes se retrouvaient collées. Il coupait aussi après tout guillemet fermant, alors qu'une citation se ferme le plus souvent au milieu de la phrase. Ses deux passages de juillet ont ainsi posé 64 coupures visibles au rendu, dont trois lignes que Markdown lit désormais comme des listes de définitions.
+  Il fusionnait encore les blocs de champs (`**Date**` puis `**Ticket**`), traitait en prose les blocs de code `~~~` ou imbriqués, le CSS d'un `<style>`, les définitions et les abréviations, et aplatissait une citation en une seule ligne, bloc de code compris, en la sortant de son admonition.
+  Rien de cela ne se voyait à l'invariant qui validait ses passages : coller deux phrases ne change aucun caractère non blanc. Sur les 277 pages de `docs/` qu'il signalait, 75 n'avaient aucun défaut.
+  L'outil ne coupe plus que devant ce qui peut commencer une phrase, et reformate le contenu d'une citation comme une page. Mesuré sur une copie des 1008 pages du dépôt, le rendu HTML ne diffère plus que par ses sauts de ligne, et les coupures en milieu de phrase passeraient de 2261 à 6. Un test compare désormais ce rendu. Aucune page n'est reformatée par ce ticket.
+
 ## [1.0.0-rc.9] - 2026-09-08
 
 ### Sécurité

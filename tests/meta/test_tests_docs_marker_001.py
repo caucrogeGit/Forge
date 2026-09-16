@@ -46,6 +46,14 @@ EXCEPTIONS_SANS_MARQUEUR: frozenset[str] = frozenset({
     # déjà marqués `docs`, `test_docs_python_examples_executable_001` et
     # `test_crud_generator_split_001`, qui l'emploient sans être du code.
     "tests/meta/test_readme_commands_ratchet_001.py",
+    # TOOLS-REFLOW-DOCS-FIABILITE-001 exerce `tools/reflow_docs.py` sur des
+    # entrées fabriquées : c'est un test de code. Sa docstring cite `docs/`, et
+    # `from tools... import` ne figure pas parmi les signaux de code.
+    #
+    # L'y ajouter serait la vraie correction, mais reclasserait
+    # `test_pkg_orphan_yank_001`, marqué `docs` alors qu'il exerce aussi le garde
+    # de complétude PyPI : décision à prendre séparément.
+    "tests/test_tools_reflow_docs_fiabilite_001.py",
 })
 
 # Fichiers marqués docs bien que la règle statique voie un signal code.
