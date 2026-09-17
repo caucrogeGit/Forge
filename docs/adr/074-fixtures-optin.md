@@ -46,9 +46,11 @@ Il peuple et vide des tables déjà provisionnées.
 
 ### Franchissement des deux filtres d'admission (ADR-052)
 
-- **Filtre A, runtime.** L'opt-in n'a pas de composant WSGI ; il agit hors requête, adossé au backend BDD, piloté par des commandes explicites, sans broker ni dépendance lourde.
+- **Filtre A, runtime.**
+  L'opt-in n'a pas de composant WSGI ; il agit hors requête, adossé au backend BDD, piloté par des commandes explicites, sans broker ni dépendance lourde.
   Il franchit le filtre au titre du mécanisme hors requête « de style Forge ».
-- **Filtre B, charte.** Câblage explicite (commandes invoquées à la main, aucune auto-découverte) ; périmètre borné (charger et purger, pas de génération magique) ; **SQL visible** (principe 5) ; frontière nette avec la migration de seed (principe 11) ; contrat de complétude des commandes.
+- **Filtre B, charte.**
+  Câblage explicite (commandes invoquées à la main, aucune auto-découverte) ; périmètre borné (charger et purger, pas de génération magique) ; **SQL visible** (principe 5) ; frontière nette avec la migration de seed (principe 11) ; contrat de complétude des commandes.
 
 ### Forme des fixtures et SQL visible
 

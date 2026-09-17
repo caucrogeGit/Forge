@@ -17,12 +17,14 @@ Le chargement (`fixtures:load`) n'exécute que des fichiers `mvc/fixtures/*.sql`
 Le banc d'essai RéférenCiel veut supprimer son script de seed maison et tout passer par l'opt-in.
 Deux étapes d'un seed réaliste ne sont **pas** des données statiques et ne peuvent pas s'exprimer en `.sql` :
 
-1. l'**import d'un référentiel** depuis un JSON canonique : une fonction applicative parcourt le canonique et persiste. Le figer en `.sql` dupliquerait des dizaines d'objets et perdrait la source ;
+1. l'**import d'un référentiel** depuis un JSON canonique : une fonction applicative parcourt le canonique et persiste.
+   Le figer en `.sql` dupliquerait des dizaines d'objets et perdrait la source ;
 2. des **valeurs calculées** : un agrégat construit à partir d'autres tables.
 
 Ces deux cas exigent d'exécuter du **code Python** dans le même pipeline que les `.sql`.
 
-L'ADR-077 avait explicitement **différé** cette piste (« fixtures callable »), citant trois points à examiner : dépendance, ordre, sécurité. Cet ADR les tranche.
+L'ADR-077 avait explicitement **différé** cette piste (« fixtures callable »), citant trois points à examiner : dépendance, ordre, sécurité.
+Cet ADR les tranche.
 
 ## Décision
 
@@ -43,10 +45,12 @@ class ReferentielFixture(Fixture):
         import_referentiel("data/referentiel.json")
 ```
 
-- `load(self)` (requis) écrit en base **comme le reste du projet** : la fixture importe `core.database.db` (ou appelle une fonction applicative qui le fait). Le SQL vit dans le code applicatif, paramétré et visible (principe 7).
+- `load(self)` (requis) écrit en base **comme le reste du projet** : la fixture importe `core.database.db` (ou appelle une fonction applicative qui le fait).
+  Le SQL vit dans le code applicatif, paramétré et visible (principe 7).
 - `tables: tuple[str, ...]` (optionnel) : les tables peuplées, pour l'ordre de chargement et la purge.
 - `depends_on: tuple[str, ...]` (optionnel) : noms d'entités ou de tables à charger avant.
-- `purge(self, *, tx=None)` (optionnel) : démontage ; par défaut vide les `tables` déclarées, surchargeable pour un teardown sur-mesure. Reçoit la transaction de `fixtures:purge` et la propage à ses `db.execute` (F52-bis).
+- `purge(self, *, tx=None)` (optionnel) : démontage ; par défaut vide les `tables` déclarées, surchargeable pour un teardown sur-mesure.
+  Reçoit la transaction de `fixtures:purge` et la propage à ses `db.execute` (F52-bis).
 
 Le **préfixe numérique** du nom de fichier (`50_referentiel.py`, `90_bilan.py`) ordonne les fixtures callable entre elles, comme secours déclaratif.
 
@@ -66,7 +70,8 @@ Le pipeline ordonne un ensemble d'**unités** (les fichiers `.sql` et les fixtur
 
 - chaque unité **fournit** des tables : les `INSERT INTO` d'un `.sql`, les `tables` d'un callable ;
 - chaque unité **dépend** de tables : les clés étrangères de ses tables fournies (graphe de `relations.json`), les tables citées par une sous-requête `reference()` d'un `.sql` (`SELECT Id FROM <table>`, F43, même hors `relations.json` comme la table de socle `users`), plus les `depends_on` d'un callable (résolus en tables) ;
-- une unité qui dépend d'une table passe après **toute** unité qui la fournit, quel qu'en soit le type. Un callable fournissant `niveau_classe` (ou `users`) est donc ordonné avant un `.sql` dont une clé étrangère ou une `reference()` en dépend.
+- une unité qui dépend d'une table passe après **toute** unité qui la fournit, quel qu'en soit le type.
+  Un callable fournissant `niveau_classe` (ou `users`) est donc ordonné avant un `.sql` dont une clé étrangère ou une `reference()` en dépend.
 
 Le tri topologique de ce graphe est déterministe : à contrainte égale, les `.sql` passent avant les callable, puis on départage par nom de fichier (préfixe numérique `50_`, `90_` compris).
 Repli en cas de cycle : les unités restantes dans ce même ordre déterministe.
@@ -86,7 +91,8 @@ La protection production reste identique (`--run` seul refusé en `APP_ENV=prod`
 `fixtures:purge` intègre les fixtures callable au démontage, en ordre inverse du chargement (les callable, qui dépendent des tables de base, sont purgées avant les `.sql`).
 
 Le démontage est encadré par la désactivation des contraintes de clés étrangères du dialecte (`foreign_key_checks_ddl`, ADR-054), robuste même pour un callable peuplant plusieurs tables liées.
-`SET FOREIGN_KEY_CHECKS` étant une variable de **session** (par connexion), tout le démontage se déroule dans **une seule transaction** (`core.database.transaction`) : la désactivation, tous les `DELETE` et la réactivation partagent la même connexion (F52-bis). Un `db.execute` sans `tx` repioche une connexion du pool où les FK restent actives.
+`SET FOREIGN_KEY_CHECKS` étant une variable de **session** (par connexion), tout le démontage se déroule dans **une seule transaction** (`core.database.transaction`) : la désactivation, tous les `DELETE` et la réactivation partagent la même connexion (F52-bis).
+Un `db.execute` sans `tx` repioche une connexion du pool où les FK restent actives.
 
 Chaque `Fixture` porte une méthode `purge(self, *, tx=None)` :
 
@@ -98,7 +104,8 @@ Une fixture callable qui écrit dans des tables **non déclarées** et ne surcha
 ### Sécurité
 
 Exécuter un `.py` de `mvc/fixtures/` revient à exécuter du code **du projet lui-même**, écrit par le développeur, versionné et relu.
-Le geste est explicite (`--run`), cadré par environnement (dev/test par défaut, production protégée). Le risque est celui de lancer l'application, pas davantage : aucun code distant, aucune écriture invisible.
+Le geste est explicite (`--run`), cadré par environnement (dev/test par défaut, production protégée).
+Le risque est celui de lancer l'application, pas davantage : aucun code distant, aucune écriture invisible.
 
 ### Frontière réaffirmée (principe 11)
 

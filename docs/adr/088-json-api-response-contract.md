@@ -57,9 +57,11 @@ C'est une violation du principe 11, une seule façon officielle de faire chaque 
 
 ## Décision
 
-**La forme pratiquée devient le contrat unique. La voie déclarée est retirée.**
+**La forme pratiquée devient le contrat unique.
+La voie déclarée est retirée.**
 
-Une réponse de succès rend la ressource, sans enveloppe. Le code HTTP porte l'information de succès.
+Une réponse de succès rend la ressource, sans enveloppe.
+Le code HTTP porte l'information de succès.
 
 Une réponse d'erreur rend un objet plat.
 
@@ -67,7 +69,8 @@ Une réponse d'erreur rend un objet plat.
 {"error": "<code>"}
 ```
 
-Un champ `message` facultatif l'accompagne pour les seules erreurs de validation, où le client a besoin de savoir quoi corriger. Aucune autre erreur ne porte de message.
+Un champ `message` facultatif l'accompagne pour les seules erreurs de validation, où le client a besoin de savoir quoi corriger.
+Aucune autre erreur ne porte de message.
 
 ### Ce qui est retiré
 
@@ -90,7 +93,8 @@ Le tableau des statuts HTTP recommandés, la section de sécurité et la liste d
 ### Quatre raisons
 
 **Trois mises en œuvre indépendantes ont choisi autrement.**
-Quand le besoin s'est présenté à `iot`, puis à `video`, puis à `audio`, les trois ont écarté la voie déclarée. Un contrat qu'aucune de ses propres briques n'adopte après quinze versions est une intention, pas un contrat.
+Quand le besoin s'est présenté à `iot`, puis à `video`, puis à `audio`, les trois ont écarté la voie déclarée.
+Un contrat qu'aucune de ses propres briques n'adopte après quinze versions est une intention, pas un contrat.
 
 **L'enveloppe redouble le code HTTP.**
 Forge traite par ailleurs le code de statut comme porteur de sens, et l'a renforcé à plusieurs reprises, 405 avec en-tête `Allow`, 503 distinct du 500, 401 distinct de la redirection.
@@ -117,11 +121,15 @@ Elle ne préjuge pas des tickets futurs listés par la référence, corps JSON e
 
 - Une application Forge rend une seule forme d'erreur, quelle que soit la route touchée.
 - Le cœur cesse de porter deux implémentations Bearer, dont l'une n'avait pas la posture de sécurité de l'autre.
-- Le retrait d'`api_success`, d'`api_error` et de `core.security.api_auth` est une **suppression d'API publique documentée**. Elle intervient avant le tag 1.0.0 stable, donc sans alias de compatibilité, mais le changelog doit donner le remplacement exact, code à l'appui.
-- `docs/reference/api-json.md` est réécrite plutôt que supprimée. Sa valeur pédagogique tient au reste, statuts, sécurité, limites, organisation des routes.
+- Le retrait d'`api_success`, d'`api_error` et de `core.security.api_auth` est une **suppression d'API publique documentée**.
+  Elle intervient avant le tag 1.0.0 stable, donc sans alias de compatibilité, mais le changelog doit donner le remplacement exact, code à l'appui.
+- `docs/reference/api-json.md` est réécrite plutôt que supprimée.
+  Sa valeur pédagogique tient au reste, statuts, sécurité, limites, organisation des routes.
 - La contradiction laissée par `CORE-ROUTE-API-FLAG-001` sur le caractère déclaratif du drapeau `api` est corrigée dans le même mouvement.
-- Un garde-fou refuse désormais toute construction de réponse d'erreur JSON hors de la fonction canonique. Sans lui la divergence recommencerait, puisque c'est ainsi qu'elle est née.
-- Trois fichiers de tests, dont un de trois cent quarante lignes, ne testent que l'enveloppe. Ils sont relus ligne à ligne, et ce qui porte sur la sérialisation, l'encodage ou le type de contenu est conservé.
+- Un garde-fou refuse désormais toute construction de réponse d'erreur JSON hors de la fonction canonique.
+  Sans lui la divergence recommencerait, puisque c'est ainsi qu'elle est née.
+- Trois fichiers de tests, dont un de trois cent quarante lignes, ne testent que l'enveloppe.
+  Ils sont relus ligne à ligne, et ce qui porte sur la sérialisation, l'encodage ou le type de contenu est conservé.
 
 ## Alternatives écartées
 

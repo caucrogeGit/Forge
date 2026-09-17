@@ -40,13 +40,15 @@ La frontière n'est plus « config livrée / machinerie opt-in », mais « code 
 
 ### 1. Livré par défaut : l'apparat qualité complet
 
-- **Typage strict (F2)** : `pyproject.toml` outillage-only avec `[tool.pyright]` (`include` sur `mvc`, `optins`), et marqueur `# pyright: strict` par fichier sur les fichiers éditables générés (`optins/registry.py`, `mvc/routes.py`, contrôleurs). L'éditeur, la ligne de commande et la CI vérifient enfin la même chose.
+- **Typage strict (F2)** : `pyproject.toml` outillage-only avec `[tool.pyright]` (`include` sur `mvc`, `optins`), et marqueur `# pyright: strict` par fichier sur les fichiers éditables générés (`optins/registry.py`, `mvc/routes.py`, contrôleurs).
+  L'éditeur, la ligne de commande et la CI vérifient enfin la même chose.
 - **Lint (F3)** : `[tool.ruff]` dans le même `pyproject.toml`, aligné sur les valeurs canoniques de Forge (`target-version = "py312"`, `line-length = 120`, `select = ["E", "F"]`, `ignore = ["E501", "E741", "E402"]`).
 - **Tests (F4, A4)** : `pytest.ini` (`--strict-markers`, marqueurs `meta`/`smoke`/`db`), `tests/conftest.py` (constante `PROJECT_ROOT`), un smoke `tests/test_smoke_001.py` qui prouve que l'application démarre et que les routes se chargent, `requirements-dev.txt` épinglant `forge-mvc-testing` au commit du cœur (ADR-041).
 - **Documentation (F5)** : `mkdocs.yml` (Material, français), `requirements-docs.txt`, `docs/index.md`.
 - **Intégration continue (A1)** : `.github/workflows/quality.yml`, miroir du `tests.yml` de Forge, exécutant `pyright` (strict), `ruff`, `pytest`, `mkdocs build --strict`.
 - **Point d'entrée unique de validation (A2)** : un `Makefile` avec une cible `check` lançant les quatre gardes en une commande, visible et sans magie (le développeur reproduit le bloc de validation Forge sans le réécrire).
-- **Journal de décisions (F7, A5)** : `docs/adr/index.md` et `docs/adr/000-template.md`, en plus de `docs/adr/001-adopter-forge.md` déjà posé par `agents:init`. La couche de guidance agent référence explicitement les ADR fondateurs (ADR-024, 036, 041, 054/060, 061, 063), sans recopier leur corps.
+- **Journal de décisions (F7, A5)** : `docs/adr/index.md` et `docs/adr/000-template.md`, en plus de `docs/adr/001-adopter-forge.md` déjà posé par `agents:init`.
+  La couche de guidance agent référence explicitement les ADR fondateurs (ADR-024, 036, 041, 054/060, 061, 063), sans recopier leur corps.
 - **Hygiène de dépôt (A6, A7)** : `.editorconfig` (cohérent avec `git diff --check` et la règle « une phrase par ligne »), `CHANGELOG.md` amorcé (Keep a Changelog, section `[Non publié]`).
 
 Le `pyproject.toml` livré ne porte **ni `[project]` ni `[build-system]`** : c'est une configuration d'outillage, pas une déclaration de paquet distribuable.
@@ -75,7 +77,8 @@ Le défaut, lui, est complet.
 - Le noyau reste léger à l'exécution : les deps dev et doc ne sont pas installées par défaut.
 - La frontière « code métier échafaudé absent / apparat qualité livré » devient la règle de tri pour tout futur ajout au squelette.
 - Des garde-fous vérifient que la config `ruff`/`pyright` livrée reste alignée sur les valeurs canoniques, que les fichiers éditables passent `pyright` strict, et que `--bare` produit bien un squelette dépouillé.
-- Coût assumé : un `forge new` par défaut produit davantage de fichiers qu'avant. C'est le but ; `--bare` couvre le besoin inverse.
+- Coût assumé : un `forge new` par défaut produit davantage de fichiers qu'avant.
+  C'est le but ; `--bare` couvre le besoin inverse.
 
 ### Alternatives écartées
 
@@ -92,7 +95,8 @@ Le défaut, lui, est complet.
 - **Principe 10 (une API publique est un contrat de complétude)** : le squelette ne se contente pas de respecter le standard, il le rend vérifiable et tenable d'emblée.
 - **Principe 11 (une seule façon officielle de faire chaque chose)** : valeurs `ruff`/`pyright` uniques et alignées sur le cœur ; ADR référencés, jamais recopiés ; un seul défaut, l'échappatoire `--bare` étant explicite.
 - **Principe 3 (refuser la magie cachée)** : toute la configuration livrée est lisible dans le projet (`pyproject.toml`, `Makefile`, `quality.yml`), aucun comportement implicite.
-- **Principe 8 (noyau minimal, briques opt-in)** : réinterprété, non contredit. Le noyau applicatif reste minimal ; l'apparat qualité n'est pas une brique métier mais la philosophie du framework.
+- **Principe 8 (noyau minimal, briques opt-in)** : réinterprété, non contredit.
+  Le noyau applicatif reste minimal ; l'apparat qualité n'est pas une brique métier mais la philosophie du framework.
 
 Révise ADR-024 (portée de « nu »).
 Lié à ADR-036 (typage strict par fichier), ADR-041 (infrastructure de test partagée), ADR-047 (guidance agent), ADR-061 (registre d'opt-ins), ADR-062 (pin de source du `requirements.txt`).

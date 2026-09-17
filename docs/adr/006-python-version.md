@@ -26,8 +26,7 @@ La décision de la version minimale doit être prise avant la phase 14.3 car ell
 
 Concrètement :
 
-1. `python_requires = ">=3.12"` dans tous les `pyproject.toml` des distributions
-   Forge 1.0.
+1. `python_requires = ">=3.12"` dans tous les `pyproject.toml` des distributions Forge 1.0.
 
 2. Les nouvelles syntaxes Python 3.12 sont autorisées dans le code de Forge :
    - Syntaxe des paramètres de type génériques (`type X = ...`)
@@ -54,6 +53,8 @@ Concrètement :
 
 ## Alternatives considérées
 
-**Python 3.11+.** Conserverait la compatibilité maximale mais bloque l'utilisation des nouvelles syntaxes et laisse Forge supporter une version Python proche de sa fin de vie.
+**Python 3.11+.**
+Conserverait la compatibilité maximale mais bloque l'utilisation des nouvelles syntaxes et laisse Forge supporter une version Python proche de sa fin de vie.
 
-**Python 3.13+.** Trop restrictif au moment de la release de Forge 1.0 ; 3.13 est récent et beaucoup d'environnements de production sont encore sur 3.12.
+**Python 3.13+.**
+Trop restrictif au moment de la release de Forge 1.0 ; 3.13 est récent et beaucoup d'environnements de production sont encore sur 3.12.

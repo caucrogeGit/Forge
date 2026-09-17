@@ -18,12 +18,14 @@ Il ne couvre **pas** le rendu d'une **valeur littérale** : transformer une vale
 
 Deux constats motivent l'ajout.
 
-**Un besoin nouveau.** L'opt-in `forge-mvc-fixtures` (ADR-074) doit pouvoir **générer** des fichiers `mvc/fixtures/*.sql`.
+**Un besoin nouveau.**
+L'opt-in `forge-mvc-fixtures` (ADR-074) doit pouvoir **générer** des fichiers `mvc/fixtures/*.sql`.
 Un fichier `.sql` est du texte statique : il ne transporte pas de paramètres, les valeurs y sont donc des **littéraux gravés dans le SQL**.
 Or ces littéraux diffèrent selon le backend : booléen `1`/`0` (MariaDB, SQLite, SQL Server) contre `TRUE`/`FALSE` (PostgreSQL), chaîne `'x'` contre `N'x'` (SQL Server, Unicode), formes de dates, quoting d'identifiants.
 Comme un projet a **un seul** backend (exclusif, ADR-054), générer pour ce backend est le choix naturel, et cela exige de savoir rendre un littéral dans son dialecte.
 
-**Une duplication existante, dialecte-naïve.** Le moteur d'entités porte déjà un rendu de littéral, `forge_mvc_entities.make_entity.sql_default_literal`, utilisé pour les clauses `DEFAULT` de la DDL générée.
+**Une duplication existante, dialecte-naïve.**
+Le moteur d'entités porte déjà un rendu de littéral, `forge_mvc_entities.make_entity.sql_default_literal`, utilisé pour les clauses `DEFAULT` de la DDL générée.
 Il est **dialecte-naïf** : booléen toujours `1`/`0`, dates via `str()`, aucune connaissance du backend.
 C'est un rendu de littéral qui vit **hors** du contrat `Dialect` et qui contient un bug de portabilité latent (le `DEFAULT` d'un booléen ou d'une date est faux en PostgreSQL).
 
@@ -53,7 +55,8 @@ Le quoting des identifiants reste `quote_identifier`, déjà au contrat.
 
 **Chaque backend implémente `render_literal`** avec ses règles : `forge-mvc-mariadb`, `forge-mvc-sqlite`, `forge-mvc-postgres`, `forge-mvc-mssql`.
 
-**Consolidation (principe 11).** `sql_default_literal` du moteur d'entités est réécrit **au-dessus** de `dialect.render_literal` : il ne fait plus que lire `field["default"]` puis déléguer.
+**Consolidation (principe 11).**
+`sql_default_literal` du moteur d'entités est réécrit **au-dessus** de `dialect.render_literal` : il ne fait plus que lire `field["default"]` puis déléguer.
 Le rendu de littéral devient ainsi la **seule façon officielle**, dialecte-correcte, et le bug de portabilité des `DEFAULT` disparaît.
 
 ### Périmètre et sécurité (non négociable)

@@ -45,16 +45,21 @@ Cette double réalité contredit le principe 11 de la charte (« une seule faço
 
 ## Décision
 
-1. **D1, Formalisme unique sur les trois niveaux.** Les niveaux intermédiaire et avancé adoptent le **même formalisme** que le débutant : un tutoriel continu manuel, où le learner écrit le code à la main, palier après palier.
+1. **D1, Formalisme unique sur les trois niveaux.**
+   Les niveaux intermédiaire et avancé adoptent le **même formalisme** que le débutant : un tutoriel continu manuel, où le learner écrit le code à la main, palier après palier.
    Plus aucun `forge starter:build` dans welcome-forge.
-2. **D2, Un mini-projet distinct par niveau.** Chaque niveau est un **mini-projet autonome** : il repart d'un `forge new` propre et grandit palier après palier.
+2. **D2, Un mini-projet distinct par niveau.**
+   Chaque niveau est un **mini-projet autonome** : il repart d'un `forge new` propre et grandit palier après palier.
    Un niveau ne continue plus narrativement le projet du niveau précédent ; on peut entrer directement en intermédiaire ou en avancé.
    Chaque niveau établit son propre modèle de données dès son premier palier (intermédiaire : une table travaillée par lister/filtrer/paginer/modifier/supprimer ; avancé : son propre fil conducteur relationnel).
-3. **D3, Suppression des starters buildables intermédiaire et avancé.** Les dossiers `cli/starters/data/<palier>/` des paliers intermédiaires (9) et avancés (5) de welcome-forge sont retirés.
+3. **D3, Suppression des starters buildables intermédiaire et avancé.**
+   Les dossiers `cli/starters/data/<palier>/` des paliers intermédiaires (9) et avancés (5) de welcome-forge sont retirés.
    Le contrat public gelé des starters décroît d'autant ; les survivants ne sont **pas** renumérotés (ADR-025 D5).
-4. **D4, Bootstrap par niveau.** Chaque niveau a son préambule de démarrage (création du projet neuf, prérequis, modèle de données initial).
+4. **D4, Bootstrap par niveau.**
+   Chaque niveau a son préambule de démarrage (création du projet neuf, prérequis, modèle de données initial).
    La page `installation.md` du parcours reste le point d'entrée et oriente vers le bootstrap du niveau choisi.
-5. **D5, Opt-ins inchangés pour l'instant.** Les dix parcours opt-in (iot, video, images, files, audio, mfa, rbac, workflow, stats, mail) et les starters CRUD **restent** des starters buildables `forge starter:build`.
+5. **D5, Opt-ins inchangés pour l'instant.**
+   Les dix parcours opt-in (iot, video, images, files, audio, mfa, rbac, workflow, stats, mail) et les starters CRUD **restent** des starters buildables `forge starter:build`.
    L'unification de leur formalisme est une **question explicitement rouverte plus tard**, hors périmètre de cet ADR.
 
 Cette décision **amende ADR-025 D3** (« intermédiaire et avancé restent buildables ») et **lève** son point « hors périmètre » sur ces deux niveaux.
@@ -120,8 +125,7 @@ Cette duplication contredit le principe 11 (une seule façon officielle de faire
 1. Le point d'entrée du parcours devient `index.md` (et non plus `installation.md`).
    `index.md` présente le parcours, pose comme **prérequis** un projet Forge déjà créé via un guide d'installation, et propose une **vérification** (`forge --version`, `forge doctor`) plutôt qu'une réinstallation.
 2. La page `installation.md` de welcome-forge est **supprimée** : la création du projet n'appartient pas au parcours.
-3. **Convention de point d'entrée des starters** : un starter **opt-in** garde une page `installation.md` (il installe réellement une brique) ; un starter **hors opt-in** a une page `index.md` (présentation et vérification, le projet étant un prérequis).
-   welcome-forge est aujourd'hui le seul starter hors opt-in.
+3. **Convention de point d'entrée des starters** : un starter **opt-in** garde une page `installation.md` (il installe réellement une brique) ; un starter **hors opt-in** a une page `index.md` (présentation et vérification, le projet étant un prérequis). welcome-forge est aujourd'hui le seul starter hors opt-in.
 
 Le reste de l'ADR (tutoriel continu manuel, un mini-projet par niveau, D1 à D5) est inchangé.
 

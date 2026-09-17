@@ -27,9 +27,11 @@ Trois défauts :
 2. `user_id = 507` est un `random_int` : aucune fixture ne peut référencer l'`Id` d'une ligne créée par une autre ;
 3. `fixtures:load` charge les fichiers dans l'ordre du nom, sans respecter les dépendances de clés étrangères, donc les FK cassent.
 
-Impossible d'obtenir un jeu de données cohérent et relié. Les correctifs doivent être **généraux** et vivre dans le paquet, pas dans l'application.
+Impossible d'obtenir un jeu de données cohérent et relié.
+Les correctifs doivent être **généraux** et vivre dans le paquet, pas dans l'application.
 
-Rappel du mapping (normaliseur `forge-mvc-entities`, ADR-069) : la PK est `Id` ; un champ `foreign_key` garde son nom snake (`annee_scolaire_id`) ; un champ ordinaire passe en PascalCase (`user_id` vers `UserId`). Les clés étrangères sont déclarées dans `mvc/entities/relations.json`.
+Rappel du mapping (normaliseur `forge-mvc-entities`, ADR-069) : la PK est `Id` ; un champ `foreign_key` garde son nom snake (`annee_scolaire_id`) ; un champ ordinaire passe en PascalCase (`user_id` vers `UserId`).
+Les clés étrangères sont déclarées dans `mvc/entities/relations.json`.
 
 ## Décision
 
@@ -40,7 +42,8 @@ Rappel du mapping (normaliseur `forge-mvc-entities`, ADR-069) : la PK est `Id` ;
 Le mapping champ vers colonne est la convention canonique du normaliseur : `Id` pour la PK, nom snake conservé pour un `foreign_key`, PascalCase sinon.
 `forge-mvc-fixtures` l'obtient via `forge-mvc-entities`, producteur des contrats : ce dernier expose une fonction publique `column_for_field(field)` que fixtures importe (dépendance **douce** : si `forge-mvc-entities` est absent, repli sur le nom de champ, mode dégradé documenté).
 
-`fixtures:generate` est **inchangé** : il rend les clés du dict telles quelles. Les factories portant désormais les colonnes réelles, le SQL généré utilise `Nom`, `UserId`, etc., correct pour le backend installé (cohérent ADR-075).
+`fixtures:generate` est **inchangé** : il rend les clés du dict telles quelles.
+Les factories portant désormais les colonnes réelles, le SQL généré utilise `Nom`, `UserId`, etc., correct pour le backend installé (cohérent ADR-075).
 
 ### F43 : références inter-fixtures
 
@@ -52,7 +55,8 @@ Nouvelle API de `Factory` : `self.reference(table, key_column, value)` renvoie u
 (SELECT Id FROM users WHERE Email = 'prof.durand@ecole.fr' LIMIT 1)
 ```
 
-La résolution se fait donc à la **charge** (`fixtures:load`), contre les vrais `Id` auto-incrémentés : robuste, et le SQL reste **visible et relu** (principe 5). La valeur de recherche est rendue par `dialect.render_literal` ; la PK cible est `Id` (convention du normaliseur).
+La résolution se fait donc à la **charge** (`fixtures:load`), contre les vrais `Id` auto-incrémentés : robuste, et le SQL reste **visible et relu** (principe 5).
+La valeur de recherche est rendue par `dialect.render_literal` ; la PK cible est `Id` (convention du normaliseur).
 
 `fixtures:make-factory` : pour un champ **clé étrangère** (type `foreign_key`, ou FK de l'entité déclarée dans `relations.json`), échafaude un `self.reference("<table cible>", "<clé naturelle>", ...)` commenté (avec un TODO sur la clé naturelle) au lieu de `random_int`.
 

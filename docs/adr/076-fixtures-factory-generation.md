@@ -81,7 +81,8 @@ Le chargement reste `fixtures:load` : la génération ne crée pas de seconde vo
 - `fixtures:make-factory <entity>` : scaffolde `mvc/fixtures/factories/<entity>_factory.py` depuis le contrat d'entité (write-if-new).
 - `fixtures:generate <entity> [--rows N] [--seed S]` : exécute la factory, affiche puis écrit le `.sql`.
 
-Elles suivent le contrat CLI des opt-ins (ADR-072). `fixtures:generate` déclare `config: True` (il lit le contrat et le backend actif) ; `fixtures:make-factory` scaffolde des fichiers sans toucher la base.
+Elles suivent le contrat CLI des opt-ins (ADR-072).
+`fixtures:generate` déclare `config: True` (il lit le contrat et le backend actif) ; `fixtures:make-factory` scaffolde des fichiers sans toucher la base.
 
 ### Dépendance Faker
 

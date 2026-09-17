@@ -64,8 +64,10 @@ Concrètement :
 
 ## Alternatives considérées
 
-**Mono-package avec extras (`forge-mvc[mfa]`).** Acceptable mais moins propre : les extras sont des mécanismes pip, pas des packages PyPI indépendants.
+**Mono-package avec extras (`forge-mvc[mfa]`).**
+Acceptable mais moins propre : les extras sont des mécanismes pip, pas des packages PyPI indépendants.
 Rend l'ajout de dépendances optionnelles moins explicite.
 Gardé comme option de repli si le monorepo hybride s'avère trop complexe à outiller.
 
-**Multi-dépôts git séparés.** Abandonné : fragmente le développement, complique les releases coordonnées et la cohérence de version.
+**Multi-dépôts git séparés.**
+Abandonné : fragmente le développement, complique les releases coordonnées et la cohérence de version.

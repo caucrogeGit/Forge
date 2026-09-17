@@ -11,7 +11,8 @@ Complète [ADR-022](022-mail-extraction.md) (extraction de l'email vers `forge-m
 
 ## Contexte
 
-ADR-022 a extrait `core/mail/` vers l'opt-in `forge-mvc-mail`, mais a laissé un **couplage résiduel** que l'ADR notait lui-même : « sa seule dépendance core est `core.forge` pour la config ». Concrètement, le core et le squelette nu continuent de connaître le mail :
+ADR-022 a extrait `core/mail/` vers l'opt-in `forge-mvc-mail`, mais a laissé un **couplage résiduel** que l'ADR notait lui-même : « sa seule dépendance core est `core.forge` pour la config ».
+Concrètement, le core et le squelette nu continuent de connaître le mail :
 
 - `core/forge.py` réserve 13 clés `mail_*` dans son registre de configuration ;
 - `core.forge.configure()` accepte des kwargs `mail_*` ;

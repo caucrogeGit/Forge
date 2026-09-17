@@ -58,8 +58,7 @@ Conséquences de câblage :
 - **Plugin pytest porté par le `core`** (`core.testing` + `pytest11`) : rejeté.
   Le core est une dépendance runtime de tous les opt-ins ; un plugin autouse dans le core s'activerait dans la suite de tests **de l'utilisateur**, et `configure_forge_kernel` reconfigurerait son noyau.
   Trop intrusif (contraire au principe 8 : pas d'effet caché côté utilisateur).
-- **Réplication du `conftest.py` dans chaque paquet** : rejeté.
-  ~90 lignes de fixtures dupliquées sur huit paquets, avec dérive garantie (contraire au principe 11 : une seule façon officielle).
+- **Réplication du `conftest.py` dans chaque paquet** : rejeté. ~90 lignes de fixtures dupliquées sur huit paquets, avec dérive garantie (contraire au principe 11 : une seule façon officielle).
 - **Laisser ces tests à la racine** : possible, mais les huit paquets restent alors non autovérifiables, ce que l'ADR-040 visait à corriger.
 
 ---

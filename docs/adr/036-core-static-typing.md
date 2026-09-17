@@ -21,10 +21,12 @@ Mesure initiale : `pyright core/` en mode **basic** relève **41 erreurs** (dont
 
 Deux conséquences :
 
-1. **Côté utilisateur.** Aucun paquet ne ship le marqueur `py.typed` (PEP 561).
+1. **Côté utilisateur.**
+   Aucun paquet ne ship le marqueur `py.typed` (PEP 561).
    Pyright (via Pylance) traite donc `forge-mvc` comme **non typé** : même les annotations existantes sont ignorées dans un projet `forge new`.
    D'où le bruit `reportUnknown*` en mode strict (mitigé provisoirement par un override dans le squelette, `SKELETON-VSCODE-STRICT-NOISE-001`).
-2. **Côté cœur.** Les 41 erreurs basic révèlent de vraies incohérences de type non détectées (le contrat public n'est pas vérifié par machine).
+2. **Côté cœur.**
+   Les 41 erreurs basic révèlent de vraies incohérences de type non détectées (le contrat public n'est pas vérifié par machine).
 
 Pour un framework, les types **font partie du contrat public** (principe 10 : « une API publique est un contrat de complétude »).
 
@@ -34,12 +36,15 @@ Pour un framework, les types **font partie du contrat public** (principe 10 : «
 
 Le cœur de Forge est **typé et vérifié statiquement en intégration continue**.
 
-- **Vérificateur : Pyright.** C'est le moteur de Pylance : la CI voit exactement ce que voit l'éditeur de l'utilisateur (cohérence terrain).
+- **Vérificateur : Pyright.**
+  C'est le moteur de Pylance : la CI voit exactement ce que voit l'éditeur de l'utilisateur (cohérence terrain).
   Configuration dans `pyproject.toml` (`[tool.pyright]`).
 - **Marqueur `py.typed`** ajouté à chaque paquet distribué exposant une API importée par le code utilisateur (`core`, `integrations`, et les douze `forge_mvc_*`), et inclus dans les wheels (PEP 561).
   Sans lui, typer le cœur ne sert pas l'utilisateur.
-- **Stricte par cliquet, pas en big-bang.** On adopte d'abord un niveau qui passe au vert (baseline `basic` sur `core/`, après correction des 41 erreurs), puis on bascule **module par module** en strict (`# pyright: strict` en tête de fichier, en commençant par la surface publique `core/http`), avec une **règle de non-régression** en CI (aucune nouvelle erreur).
-- **Critère de sortie partiel.** Quand la surface publique (`core/http`, `BaseController`) est stricte et `py.typed` publié, l'**override `reportUnknown*` du squelette est retiré** (la cause étant traitée).
+- **Stricte par cliquet, pas en big-bang.**
+  On adopte d'abord un niveau qui passe au vert (baseline `basic` sur `core/`, après correction des 41 erreurs), puis on bascule **module par module** en strict (`# pyright: strict` en tête de fichier, en commençant par la surface publique `core/http`), avec une **règle de non-régression** en CI (aucune nouvelle erreur).
+- **Critère de sortie partiel.**
+  Quand la surface publique (`core/http`, `BaseController`) est stricte et `py.typed` publié, l'**override `reportUnknown*` du squelette est retiré** (la cause étant traitée).
 
 ---
 

@@ -188,8 +188,7 @@ Les projets qui en ont besoin peuvent implémenter leur propre backend une fois 
 
 ## Addendum : le store BDD a quitté le cœur (GOV-SESSIONS-LEAK-CLOSE-001)
 
-Le corps de cette ADR décrit l'état de l'époque, où le cœur portait lui-même un
-troisième backend, `MariaDbSessionStore`, dans `core/sessions/mariadb_store.py`.
+Le corps de cette ADR décrit l'état de l'époque, où le cœur portait lui-même un troisième backend, `MariaDbSessionStore`, dans `core/sessions/mariadb_store.py`.
 
 Ce n'est plus le cas depuis l'ADR-054, qui rend le cœur agnostique de tout SGBD.
 Partout où cette ADR écrit `MariaDbSessionStore`, lire aujourd'hui :
@@ -201,10 +200,8 @@ Partout où cette ADR écrit `MariaDbSessionStore`, lire aujourd'hui :
 | fourni par le cœur | opt-in `forge-mvc-sessions-db`, à installer |
 | lié à MariaDB | adossé au backend de base de données actif, quel qu'il soit |
 
-Le cœur n'expose donc plus que deux stores, `MemorySessionStore` et
-`FileSessionStore`. Le partage entre processus, décrit ici comme « disponible »,
-le reste, mais il demande désormais l'installation de l'opt-in.
+Le cœur n'expose donc plus que deux stores, `MemorySessionStore` et `FileSessionStore`.
+Le partage entre processus, décrit ici comme « disponible », le reste, mais il demande désormais l'installation de l'opt-in.
 
-Le raisonnement de fond de cette ADR, lui, n'a pas bougé : le contrat
-`SessionStore` et le choix explicite du backend restent la stratégie retenue.
+Le raisonnement de fond de cette ADR, lui, n'a pas bougé : le contrat `SessionStore` et le choix explicite du backend restent la stratégie retenue.
 Voir l'addendum de l'ADR-054 pour le détail de l'extraction.

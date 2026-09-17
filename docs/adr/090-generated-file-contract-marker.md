@@ -52,8 +52,7 @@ Un contrat monte quand la **sortie du générateur change de façon signifiante*
 Comparer à la version du framework ferait crier à chaque montée de version, y compris celles qui n'ont rien changé au générateur concerné.
 On apprendrait à ignorer l'avertissement, ce qui est le seul résultat pire que de ne pas l'émettre.
 
-Chaque générateur déclare donc trois choses :
-son nom de commande, son numéro de contrat courant, et un registre disant ce qui a changé à chaque montée.
+Chaque générateur déclare donc trois choses : son nom de commande, son numéro de contrat courant, et un registre disant ce qui a changé à chaque montée.
 
 Le registre est le vrai travail de cet ADR.
 Sans lui, l'avertissement dit « en retard » sans dire de quoi, et un avertissement qu'on ne sait pas traduire en geste se désapprend en trois semaines.
@@ -99,7 +98,8 @@ Aucune API publique n'est touchée : le compteur des deux mois vers la 1.0.0 n'e
 Écartée au point 2 : crie à chaque montée, donc s'apprend à être ignorée.
 
 **Réécrire les fichiers en retard, même sur demande explicite.**
-Écartée. C'est le principe 9, et cet ADR ne l'entame pas.
+Écartée.
+C'est le principe 9, et cet ADR ne l'entame pas.
 Une commande de réécriture demanderait de fusionner les modifications de l'auteur avec la nouvelle sortie, ce qu'aucun générateur ne sait faire sans réviser le principe.
 
 **Ne rien faire et documenter les ruptures dans le changelog.**

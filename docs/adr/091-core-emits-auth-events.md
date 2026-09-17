@@ -96,16 +96,19 @@ Le retrait de `last_login_at` est une rupture de schéma, sans rupture d'API pub
 ## Alternatives écartées
 
 **Le cœur écrit dans `auth_audit_log`.**
-C'est la proposition du relevé. Écartée : elle révise l'ADR-008, qui a examiné la question et rangé la persistance du côté applicatif, avec ses corollaires de rétention et de conformité.
+C'est la proposition du relevé.
+Écartée : elle révise l'ADR-008, qui a examiné la question et rangé la persistance du côté applicatif, avec ses corollaires de rétention et de conformité.
 
 **Le code engendré émet.**
 Écartée au point 1 : le contrôleur ne connaît pas la raison de l'échec, et l'émission y est supprimable en silence.
 
 **Écrire `last_login_at` à la connexion réussie.**
-Écartée au point 5. Elle ferait du cœur un écrivain de `users`, ce qu'il n'est nulle part, pour une information que le journal porte déjà mieux.
+Écartée au point 5.
+Elle ferait du cœur un écrivain de `users`, ce qu'il n'est nulle part, pour une information que le journal porte déjà mieux.
 
 **Ne rien faire, la persistance étant applicative.**
-C'est confondre les deux briques. La persistance est applicative, l'émission ne l'est pas : l'ADR-008 la donne comme fournie par Forge, et elle ne l'était pas.
+C'est confondre les deux briques.
+La persistance est applicative, l'émission ne l'est pas : l'ADR-008 la donne comme fournie par Forge, et elle ne l'était pas.
 
 ## Référence
 

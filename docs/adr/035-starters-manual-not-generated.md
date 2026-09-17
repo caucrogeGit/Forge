@@ -27,11 +27,14 @@ Forge propose deux mécanismes pédagogiques contradictoires pour la même colle
 
 Cette dualité pose trois problèmes :
 
-1. **Écriture dans le code utilisateur.** `starter:build` réécrit `mvc/routes.py`, ce que la charte protège le plus fortement (principe 9, mode §7 « Forge ne réécrit jamais silencieusement un fichier applicatif »).
+1. **Écriture dans le code utilisateur.**
+   `starter:build` réécrit `mvc/routes.py`, ce que la charte protège le plus fortement (principe 9, mode §7 « Forge ne réécrit jamais silencieusement un fichier applicatif »).
    L'injection de routes est déjà une source de régressions connue (audit beta.14 : « la détection du router corrompt `routes.py` »), et l'ADR-030 a dû être ouvert pour tenter de réconcilier ce comportement avec la règle 4.3.
-2. **Incohérence pédagogique (principe 11).** Deux façons officielles de suivre un parcours selon qu'il est de base ou opt-in.
+2. **Incohérence pédagogique (principe 11).**
+   Deux façons officielles de suivre un parcours selon qu'il est de base ou opt-in.
    La charte impose une seule façon officielle de faire chaque chose.
-3. **Coût de maintenance.** Le sous-système de génération représente ~4 900 lignes de code, 419 fichiers de données embarqués et ~19 000 lignes de tests, pour un framework dont l'identité est « noyau minimal, explicite, pédagogique, durable ».
+3. **Coût de maintenance.**
+   Le sous-système de génération représente ~4 900 lignes de code, 419 fichiers de données embarqués et ~19 000 lignes de tests, pour un framework dont l'identité est « noyau minimal, explicite, pédagogique, durable ».
    Si chaque palier dispose d'une page de documentation, le générateur fait largement doublon avec le mode « Forge affiche ».
 
 Sur le fond pédagogique, « l'application tourne sans rien lire » est un anti-objectif pour un framework d'apprentissage : générer invite à sauter la lecture, alors que recopier oblige à lire chaque ligne.
@@ -59,7 +62,8 @@ Chaque palier de documentation devient **autosuffisant** : il indique les fichie
 ## Pré-requis anti-casse : migration de la documentation d'abord
 
 Le code de référence des parcours opt-in n'existe aujourd'hui que dans `cli/starters/data/` ; il est posé par `build`.
-**Aucune suppression n'a lieu avant que la documentation ne soit autosuffisante.** L'ordre est :
+**Aucune suppression n'a lieu avant que la documentation ne soit autosuffisante.**
+L'ordre est :
 
 1. **Rapatrier** dans les pages de doc le code manquant, depuis `data/` :
    - `welcome-mail` (6 paliers) : aujourd'hui sans aucun code dans la doc, à compléter entièrement (contrôleur, vue, route).

@@ -11,10 +11,12 @@ Précise le comportement de `forge new` (ADR-024) sur la génération des fichie
 Retour terrain (ticket `NEW-DB-NAMING-NO-UNDERSCORE-001`).
 Deux ajustements à la décision initiale :
 
-1. **Normalisation sans séparateur ajouté.** L'ancienne normalisation `_to_snake` insérait un « _ » à la frontière de casse et remplaçait les tirets par des « _ » : `ReferenCiel` devenait `referen_ciel`, `welcome-forge` devenait `welcome_forge`.
+1. **Normalisation sans séparateur ajouté.**
+   L'ancienne normalisation `_to_snake` insérait un « _ » à la frontière de casse et remplaçait les tirets par des « _ » : `ReferenCiel` devenait `referen_ciel`, `welcome-forge` devenait `welcome_forge`.
    La nouvelle règle met simplement le nom en minuscules sans ajouter de séparateur : `ReferenCiel` donne `referenciel`, `welcome-forge` donne `welcomeforge`.
    Les « _ » réellement saisis sont conservés.
-2. **`DB_ADMIN_LOGIN` par projet.** Il valait `forge_admin` (partagé) et n'était jamais substitué.
+2. **`DB_ADMIN_LOGIN` par projet.**
+   Il valait `forge_admin` (partagé) et n'était jamais substitué.
    Il vaut désormais `<nom normalisé>_admin`, un compte de provisioning distinct du compte applicatif (ADR-033).
 
 La convention s'applique de façon identique à `env/example` et à `env/dev` (les identifiants y sont projet-spécifiques dans les deux fichiers).
@@ -82,7 +84,8 @@ Le tiret et la casse restent dans `APP_NAME` (nom applicatif humain) ; ils dispa
 
 ## Alternatives rejetées
 
-**Garder les suffixes `_db` / `_app`.** Ils sont auto-documentants (le rôle se lit dans le nom), mais le préfixe de variable le dit déjà, et le résultat est plus verbeux.
+**Garder les suffixes `_db` / `_app`.**
+Ils sont auto-documentants (le rôle se lit dans le nom), mais le préfixe de variable le dit déjà, et le résultat est plus verbeux.
 La lisibilité l'emporte.
 
 ---

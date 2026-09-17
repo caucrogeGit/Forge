@@ -20,7 +20,8 @@ Une colonne, deux usages, et donc un effet de bord inévitable : poser son adres
 `core/auth/user.py` n'exige qu'une chaîne non vide.
 Une application y met donc légitimement autre chose, et c'est déjà le cas : la première application Forge y inscrit `2TNE1-01` pour ses élèves et `admin` pour son compte d'installation.
 
-Le mécanisme est neutre. C'est le **vocabulaire** qui ne l'est pas, et il a fini par produire du comportement.
+Le mécanisme est neutre.
+C'est le **vocabulaire** qui ne l'est pas, et il a fini par produire du comportement.
 
 ### Ce que le vocabulaire a produit
 
@@ -72,7 +73,8 @@ La recherche appartient donc à l'application, et cet ADR ne la lui retire pas.
 
 Il en fixe la **conséquence** : le contact n'étant pas unique, toute recherche par contact peut rendre plusieurs comptes.
 Une application qui sert le premier trouvé se trompera un jour de compte.
-`PasswordResetRequest.email` porte désormais le contact, et vaut `None` quand le compte n'en a pas. La récupération par courriel n'est alors pas possible, et c'est voulu.
+`PasswordResetRequest.email` porte désormais le contact, et vaut `None` quand le compte n'en a pas.
+La récupération par courriel n'est alors pas possible, et c'est voulu.
 
 ### 4. `last_login_at` reste sur la ligne d'utilisateur
 
@@ -100,8 +102,7 @@ Chacune de ces étapes est une occasion de dérive, et l'alias en particulier es
 Le compteur des deux mois sans changement d'API publique, condition de la bascule en 1.0.0, repart de la livraison.
 
 Ce coût n'est pas imputable à cette décision : il l'est au défaut qu'elle corrige.
-Un socle dont le champ d'identité est mal nommé, se comporte différemment selon le backend et refuse par la CLI ce que le cœur accepte, n'est pas taggable en 1.0.0.
-La rendre visible ne la crée pas.
+Un socle dont le champ d'identité est mal nommé, se comporte différemment selon le backend et refuse par la CLI ce que le cœur accepte, n'est pas taggable en 1.0.0. La rendre visible ne la crée pas.
 
 **Ce qui ne change pas.**
 L'authentification à deux facteurs et le journal d'audit lisent l'identité, ils n'en changent pas la nature.

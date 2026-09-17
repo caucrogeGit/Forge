@@ -13,7 +13,9 @@ Décision d'architecture ; relève du mainteneur.
 
 Depuis ADR-047, `forge new` (et `forge agents:init`) posent une couche de guidance dans l'application générée : `CLAUDE.md`, `AGENTS.md`, et un premier ADR d'amorçage `docs/adr/001-adopter-forge.md` qui acte l'adoption de Forge et de ses conventions.
 
-Forge applique à sa propre documentation une directive de style précise (français, une phrase par ligne, pas de tiret cadratin, ponctuation française, liens vérifiés au build strict). Cette directive vit dans la charte et le briefing agent, mais rien ne la donnait au projet généré sous une forme que le projet possède et peut faire respecter chez lui. Un nouveau projet redécouvrait ou ignorait ces règles.
+Forge applique à sa propre documentation une directive de style précise (français, une phrase par ligne, pas de tiret cadratin, ponctuation française, liens vérifiés au build strict).
+Cette directive vit dans la charte et le briefing agent, mais rien ne la donnait au projet généré sous une forme que le projet possède et peut faire respecter chez lui.
+Un nouveau projet redécouvrait ou ignorait ces règles.
 
 ## Décision
 
@@ -30,15 +32,18 @@ C'est une extension du périmètre d'ADR-047 (couche guidance des applications),
 
 - Chaque nouveau projet démarre avec une convention de rédaction explicite, qu'il possède et peut appliquer, plutôt que de la redécouvrir.
 - La règle est un ADR du projet, pas une contrainte imposée par le framework : le projet peut l'amender comme n'importe quel ADR (write-if-new, jamais réécrit).
-- Surface : un fichier supplémentaire posé par `forge new` / `agents:init` (additif). `render_seed_adr_doc_style` dans `cli/agents/seed_adr.py`, émis par `emit_app_agent_files`.
+- Surface : un fichier supplémentaire posé par `forge new` / `agents:init` (additif).
+  `render_seed_adr_doc_style` dans `cli/agents/seed_adr.py`, émis par `emit_app_agent_files`.
 - Garde-fous : le format et le contenu de l'ADR-002 sont figés par test, y compris le fait que l'ADR qui interdit le tiret cadratin n'en contient pas.
 
 ## Alternatives écartées
 
 - **Laisser la directive uniquement dans le briefing agent (`CLAUDE.md`/`AGENTS.md`).**
-  Écartée : le briefing s'adresse aux agents IA et se rafraîchit avec la version de Forge ; il n'est pas un artefact que le projet possède et versionne comme une décision. Un ADR du projet est plus durable et relu par les humains comme par les agents.
+  Écartée : le briefing s'adresse aux agents IA et se rafraîchit avec la version de Forge ; il n'est pas un artefact que le projet possède et versionne comme une décision.
+  Un ADR du projet est plus durable et relu par les humains comme par les agents.
 - **Un ADR unique fusionnant adoption de Forge et style de doc.**
-  Écartée : une décision, une responsabilité (charte, principe 2). Le style de rédaction est une décision distincte de l'adoption du framework.
+  Écartée : une décision, une responsabilité (charte, principe 2).
+  Le style de rédaction est une décision distincte de l'adoption du framework.
 - **Ne rien poser et documenter la règle ailleurs (site, guide).**
   Écartée : un guide externe n'engage pas le projet ; l'ADR posé dans le dépôt du projet, si.
 

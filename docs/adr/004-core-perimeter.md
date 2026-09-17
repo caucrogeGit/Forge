@@ -2,13 +2,10 @@
 
 ## Statut
 
-Acceptée. Périmètre **amendé par l'ADR-070** : la chaîne de génération et de
-modélisation d'entités (`cli/entities` : `make:entity`, `make:relation`,
-`build:model`, migrations, `make:crud`, provisioning `db:*`) quitte le cœur pour
-l'opt-in `forge-mvc-entities`. Le cœur ne conserve que la couture runtime d'accès
-base (`core/database`, contrat `Dialect`). La mention « CLI de génération » du
-périmètre cœur ci-dessous se limite désormais aux commandes non liées aux
-entités (voir ADR-070).
+Acceptée.
+Périmètre **amendé par l'ADR-070** : la chaîne de génération et de modélisation d'entités (`cli/entities`, soit `make:entity`, `make:relation`, `build:model`, migrations, `make:crud`, provisioning `db:*`) quitte le cœur pour l'opt-in `forge-mvc-entities`.
+Le cœur ne conserve que la couture runtime d'accès base (`core/database`, contrat `Dialect`).
+La mention « CLI de génération » du périmètre cœur ci-dessous se limite désormais aux commandes non liées aux entités (voir ADR-070).
 
 ---
 

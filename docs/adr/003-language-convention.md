@@ -58,7 +58,9 @@ Concrètement :
 
 ## Alternatives considérées
 
-**Garder le français.** Abandonné : crée une friction inutile avec l'écosystème Python standard et rend Forge non-contributable sans traduction.
+**Garder le français.**
+Abandonné : crée une friction inutile avec l'écosystème Python standard et rend Forge non-contributable sans traduction.
 
-**Bilingue (alias permanents).** Abandonné : viole le Principe 11 de la charte (une seule façon officielle).
+**Bilingue (alias permanents).**
+Abandonné : viole le Principe 11 de la charte (une seule façon officielle).
 Les aliases temporaires dépréciés sont acceptables pendant la transition, mais pas comme état final.

@@ -60,4 +60,5 @@ Conformément à la convention pré-1.0 (bêta), le renommage se fait sans alias
 - **Principe 3 (refuser la magie cachée)** : un artefact de premier plan est visible à la racine, pas enfoui dans un sous-paquet.
 - **Principe 11 (une seule façon officielle)** : un emplacement unique et évident pour le squelette.
 
-Précise ADR-024 (bootstrap par squelette). Lié à ADR-036 (packaging typé) pour la cohérence des `package-data`.
+Précise ADR-024 (bootstrap par squelette).
+Lié à ADR-036 (packaging typé) pour la cohérence des `package-data`.

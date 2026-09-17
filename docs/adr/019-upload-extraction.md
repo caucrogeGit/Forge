@@ -32,8 +32,7 @@ Le garder dans le core contredit le principe de **noyau minimal** (charte princi
 
 ### Couplage existant à dénouer
 
-- **`core/forms/fields.py` (dans le core)** importe `core.uploads.exceptions` (`UploadError`) et `core.uploads.validators` (`validate_extension`, `validate_mime_type`, `validate_size`) pour valider `FileField`/`ImageField`.
-  ⚠️ Le core **ne peut pas dépendre d'un opt-in** (ADR-004), voir la décision.
+- **`core/forms/fields.py` (dans le core)** importe `core.uploads.exceptions` (`UploadError`) et `core.uploads.validators` (`validate_extension`, `validate_mime_type`, `validate_size`) pour valider `FileField`/`ImageField`. ⚠️ Le core **ne peut pas dépendre d'un opt-in** (ADR-004), voir la décision.
 - **`forge-mvc-images`** dépend de `core.uploads` (`save_upload`, `_read_upload`, `validate_upload_metadata`, `SavedUpload`, `storage`) → dépendra de `forge-mvc-files` (**inversion de dépendance**).
 - **Générateurs** `make:crud` / pages publiques : `cli/entities/crud/controller_builder.py` émet `from core.uploads import save_upload` (fichiers documents).
 - `cli/assets/uploads.py` (`init_upload_storage`) et `cli/_support/help_dispatch.py`.

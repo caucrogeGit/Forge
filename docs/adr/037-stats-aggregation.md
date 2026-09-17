@@ -31,12 +31,14 @@ Le mainteneur a tranché pour **livrer l'agrégation**, le module devant tenir s
 - `prepare_stats_counts_params(...)` produit le tuple de paramètres `?`.
 - `count_stats_events(fetch_all, group_by, ...)` exécute et normalise en `[{"bucket": ..., "total": int}, ...]`.
 
-**Sécurité (principe 5/7).** La dimension de regroupement `group_by` n'est **jamais** interpolée depuis une chaîne libre : elle est résolue via une **liste blanche fermée** (`{"name", "category"}`) vers la colonne SQL réelle.
+**Sécurité (principe 5/7).**
+La dimension de regroupement `group_by` n'est **jamais** interpolée depuis une chaîne libre : elle est résolue via une **liste blanche fermée** (`{"name", "category"}`) vers la colonne SQL réelle.
 Toute autre valeur lève `StatsAggregateError`.
 Les filtres (`name`, `category`, `since`) sont des paramètres liés `?`, jamais concaténés.
 La surface d'injection par nom de colonne ou de valeur est donc nulle.
 
-**Fenêtre temporelle.** Le filtre `since` (timestamp ISO, paramètre lié sur `created_at >= ?`) couvre le besoin « compter depuis une date ».
+**Fenêtre temporelle.**
+Le filtre `since` (timestamp ISO, paramètre lié sur `created_at >= ?`) couvre le besoin « compter depuis une date ».
 Un découpage en buckets temporels (par jour/heure) n'est pas livré ici ; il pourra faire l'objet d'une extension ultérieure si le besoin se confirme.
 
 ---

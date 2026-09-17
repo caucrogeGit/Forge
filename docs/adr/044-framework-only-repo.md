@@ -47,27 +47,33 @@ Rendre cette sortie canonique ne coûte donc aucune perte visuelle : il suffit d
 
 ## Décision
 
-1. **Sortir l'application de dogfooding de la racine.** `app.py`, `config.py`, `mvc/`, `static/`, `storage/`, `translations/` et le `env/` applicatif quittent la racine pour `tests/fixtures/app/`, où ils deviennent une **fixture de test explicite**.
+1. **Sortir l'application de dogfooding de la racine.**
+   `app.py`, `config.py`, `mvc/`, `static/`, `storage/`, `translations/` et le `env/` applicatif quittent la racine pour `tests/fixtures/app/`, où ils deviennent une **fixture de test explicite**.
    La racine du dépôt ne présente plus aucune application ; le squelette `skeleton/data/` reste la seule application de référence produite par `forge new`.
 
    Décision affinée à l'exécution : la suppression *pure* a d'abord été tentée, mais la suite complète a montré que ~300 tests du framework (templating, entités, i18n, schémas SQL d'auth, factory WSGI) utilisaient cette application comme **fixture partagée**, que le squelette nu ne fournit pas.
    La relocaliser en `tests/fixtures/app/` préserve cette couverture sans réintroduire d'application à la racine ni dans le paquet distribué (`tests/` n'est pas packagé).
    C'est l'alternative A, retenue au vu de l'échelle réelle.
 
-2. **Rendre la landing canonique dans `docs/`.** `docs/index.html` et `docs/static/` deviennent les sources directes, éditées et buildées sur place (Tailwind compilé vers `docs/static/`).
+2. **Rendre la landing canonique dans `docs/`.**
+   `docs/index.html` et `docs/static/` deviennent les sources directes, éditées et buildées sur place (Tailwind compilé vers `docs/static/`).
    Sont supprimés : la source `mvc/views/landing/`, le `static/` racine, la commande `sync:landing` (`cli/assets/sync_landing.py`), son entrée de dispatch, sa doc embarquée (`cli/assets/docs/sync_landing.md`) et ses tests.
 
-3. **`schemas/` racine reste.** Les schémas JSON sont une ressource du framework (canonique, gardée en synchronisation avec ses copies par le garde-fou existant).
+3. **`schemas/` racine reste.**
+   Les schémas JSON sont une ressource du framework (canonique, gardée en synchronisation avec ses copies par le garde-fou existant).
    Ils ne font pas partie de l'application et sont conservés.
 
-4. **Reprendre les tests couplés.** Les tests qui lisaient la racine sont repointés vers `tests/fixtures/app/` (constantes de chemin ; pour les tests du factory/WSGI core, `sys.path` + `VIEWS_DIR`/`APP_ROUTES_MODULE` exposant la fixture comme projet).
+4. **Reprendre les tests couplés.**
+   Les tests qui lisaient la racine sont repointés vers `tests/fixtures/app/` (constantes de chemin ; pour les tests du factory/WSGI core, `sys.path` + `VIEWS_DIR`/`APP_ROUTES_MODULE` exposant la fixture comme projet).
    Les tests d'auth *applicative* pure (contrôleurs `auth`/`mfa` de dogfooding) et le boilerplate `app.py` (serving statique, contexte TLS dev, garde prod-host, liste no-store) sont **supprimés** : ce sont des comportements de projet, pas des garanties du framework ; les primitives correspondantes gardent leur couverture dans `core.*`.
 
-5. **Le dépôt framework ne se « run » pas.** `forge run` cible un projet applicatif ; le dépôt Forge n'en est plus un.
+5. **Le dépôt framework ne se « run » pas.**
+   `forge run` cible un projet applicatif ; le dépôt Forge n'en est plus un.
    Le développement et la vérification manuelle se font via un projet créé par `forge new`.
    La documentation contributeur le précise.
 
-6. **Lever l'anti-dérive d'ADR-024.** La duplication `app.py`/`config.py` (racine de dogfood vs squelette) disparaît avec l'app racine : le squelette devient la copie unique.
+6. **Lever l'anti-dérive d'ADR-024.**
+   La duplication `app.py`/`config.py` (racine de dogfood vs squelette) disparaît avec l'app racine : le squelette devient la copie unique.
    Le garde-fou de cohérence correspondant est retiré ou requalifié (il n'a plus de seconde copie à comparer).
 
 ---

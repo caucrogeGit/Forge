@@ -20,7 +20,8 @@ Deux découpeurs distincts coexistaient, chacun incomplet :
 
 Le retour terrain 021 a exposé la conséquence : une migration dont un **commentaire** contient un `;` casse (`You have an error in your SQL syntax ... near '<texte après le ;>'`), le `;` du commentaire étant pris pour un séparateur.
 
-C'est la même famille de bug que le retour 012 (split cassé par une apostrophe). À fiabiliser une bonne fois, avec une seule implémentation robuste.
+C'est la même famille de bug que le retour 012 (split cassé par une apostrophe).
+À fiabiliser une bonne fois, avec une seule implémentation robuste.
 
 ## Décision
 
@@ -30,7 +31,8 @@ Le cœur expose un découpeur **canonique** unique, `core.database.sql_script.sp
 - commentaires de ligne `-- ... <fin de ligne>` et de bloc `/* ... */` : un `;` à l'intérieur n'est pas un séparateur ; les commentaires sont **retirés** des instructions produites (remplacés par une espace pour ne pas coller deux tokens) ;
 - les instructions vides (ou uniquement commentaire/espace) sont ignorées.
 
-`forge-mvc-entities` (`migration:apply`, `db:apply`) et `forge-mvc-fixtures` (`fixtures:load`) consomment ce découpeur ; leurs implémentations locales sont **supprimées** (principe 11, une seule façon officielle). Les deux paquets dépendent déjà du cœur.
+`forge-mvc-entities` (`migration:apply`, `db:apply`) et `forge-mvc-fixtures` (`fixtures:load`) consomment ce découpeur ; leurs implémentations locales sont **supprimées** (principe 11, une seule façon officielle).
+Les deux paquets dépendent déjà du cœur.
 
 Le découpage sert le chemin d'**exécution** ; l'affichage relu (`fixtures:load` en mode par défaut, charte §7) montre toujours le fichier `.sql` intact, commentaires compris.
 

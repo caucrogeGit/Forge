@@ -96,7 +96,8 @@ ADR-060 reste vrai : le squelette produit par `forge new` demeure sans backend.
 ### Alternatives écartées
 
 - **`pip install` modifie les `env`** : techniquement impossible (pip ne connaît pas le projet, un wheel n'exécute pas de code) et ce serait précisément l'écriture invisible que la charte interdit.
-- **`db:init` en deux temps** (amorcer puis, au second appel, provisionner) : une même commande « s'arrête à moitié », ce qui brouille sa responsabilité (charte n°2). Un verbe dédié est plus clair.
+- **`db:init` en deux temps** (amorcer puis, au second appel, provisionner) : une même commande « s'arrête à moitié », ce qui brouille sa responsabilité (charte n°2).
+  Un verbe dédié est plus clair.
 - **`env/dev` seulement** : laisserait `env/example` (le gabarit versionné) et `env/prod` désynchronisés des clés réelles du projet.
 - **Afficher seulement (sans écrire)** : plus conservateur, mais le développeur devrait encore recopier les clés à la main.
 

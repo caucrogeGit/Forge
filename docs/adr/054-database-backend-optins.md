@@ -101,16 +101,19 @@ Positives :
 
 Coûts et limites :
 
-- Rupture interne : `mariadb` quitte les dépendances du cœur ; le squelette dépend désormais de `forge-mvc` plus un opt-in de backend, et `forge new` doit poser le bon backend. Acceptable avant le tag 1.0.0 stable (pas d'alias de dépréciation requis).
+- Rupture interne : `mariadb` quitte les dépendances du cœur ; le squelette dépend désormais de `forge-mvc` plus un opt-in de backend, et `forge new` doit poser le bon backend.
+  Acceptable avant le tag 1.0.0 stable (pas d'alias de dépréciation requis).
 - Refactor de `core/database`, des générateurs (`cli/entities`) et du store de session.
-- Le SQL applicatif reste lié au SGBD choisi : Forge rend le cadre pluggable, pas le SQL utilisateur portable. C'est assumé (principe 5).
+- Le SQL applicatif reste lié au SGBD choisi : Forge rend le cadre pluggable, pas le SQL utilisateur portable.
+  C'est assumé (principe 5).
 - La matrice de tests grandit ; un harnais d'intégration par backend devient nécessaire.
 
 ---
 
 ## Trajectoire
 
-1. **`forge-mvc-mariadb`** : extraire le code existant derrière le nouveau contrat, sans changement de comportement. Le cœur perd sa dépendance `mariadb`.
+1. **`forge-mvc-mariadb`** : extraire le code existant derrière le nouveau contrat, sans changement de comportement.
+   Le cœur perd sa dépendance `mariadb`.
 2. **`forge-mvc-sqlite`** : backend sans serveur ni comptes (fichier), idéal en développement, tests et onboarding sans installation.
 3. **`forge-mvc-postgres`** : backend de production alternatif (placeholders `%s`, `RETURNING`).
 4. **`forge-mvc-mssql`** : à la demande, dialecte propriétaire (`IDENTITY`, crochets, `OUTPUT`).
@@ -126,7 +129,8 @@ Moins de rupture, mais le cœur n'est plus minimal et MariaDB reste un cas privi
 Résoudrait la portabilité du SQL applicatif, mais contredit frontalement le principe 5 (SQL visible) et le périmètre du cœur.
 
 **Autoriser plusieurs backends simultanés.**
-Multiplierait les façons de faire (principe 11) et le SQL applicatif ne serait de toute façon pas portable. Un projet, un SGBD.
+Multiplierait les façons de faire (principe 11) et le SQL applicatif ne serait de toute façon pas portable.
+Un projet, un SGBD.
 
 ---
 
@@ -145,5 +149,6 @@ Ce volet est désormais réalisé de la façon suivante :
 
 - le store BDD quitte le cœur pour l'opt-in **`forge-mvc-sessions-db`**, sous le nom générique **`DbSessionStore`** ;
 - le cœur ne fournit plus que `MemorySessionStore`, `FileSessionStore` et le contrat `SessionStore` (un cœur agnostique n'embarque pas de store BDD) ;
-- le SQL du store devient portable : les horodatages (`created_at`, `updated_at`, comparaison d'expiration) sont calculés côté Python et passés en paramètres, supprimant toute fonction propriétaire (`NOW()` MariaDB, `GETDATE()` SQL Server, `datetime('now')` SQLite). Le store fonctionne donc sur tous les backends via `core.database.db` ;
+- le SQL du store devient portable : les horodatages (`created_at`, `updated_at`, comparaison d'expiration) sont calculés côté Python et passés en paramètres, supprimant toute fonction propriétaire (`NOW()` MariaDB, `GETDATE()` SQL Server, `datetime('now')` SQLite).
+  Le store fonctionne donc sur tous les backends via `core.database.db` ;
 - un seul store générique est publié (pas de copie par backend) : configuration via `forge.configure(session_store=DbSessionStore())`.

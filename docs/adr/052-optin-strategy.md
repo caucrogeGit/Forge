@@ -34,10 +34,12 @@ Plusieurs candidats proposés **doublonnent des fonctionnalités déjà livrées
 
 ### Deux filtres d'admission (un opt-in doit passer les DEUX)
 
-**Filtre A, runtime.** L'opt-in fonctionne dans le modèle WSGI synchrone, ou fournit son propre mécanisme hors requête qui reste de style Forge : adossé à MariaDB, piloté par une commande explicite, sans broker ni dépendance lourde.
+**Filtre A, runtime.**
+L'opt-in fonctionne dans le modèle WSGI synchrone, ou fournit son propre mécanisme hors requête qui reste de style Forge : adossé à MariaDB, piloté par une commande explicite, sans broker ni dépendance lourde.
 Tout ce qui exige ASGI ou des connexions persistantes est **hors trajectoire 1.x**.
 
-**Filtre B, charte.** Câblage explicite (pas d'auto-découverte ni de décorateur magique), une seule façon officielle, SQL visible, périmètre borné, contrat de complétude.
+**Filtre B, charte.**
+Câblage explicite (pas d'auto-découverte ni de décorateur magique), une seule façon officielle, SQL visible, périmètre borné, contrat de complétude.
 Un opt-in qui réintroduit du couplage implicite est refusé.
 
 ### Classification des candidats
