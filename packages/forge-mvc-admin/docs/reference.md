@@ -24,9 +24,8 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -61,8 +60,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-admin`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -79,8 +77,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     forge opt-in:enable admin --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -96,9 +93,8 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
 
     #### 4. Le brancher là où il agit
 
-    Il se branche dans `app.py`, là où l'application compose ses middlewares et ses
-    fournisseurs de contexte. Ce câblage vous appartient : Forge ne l'écrit jamais à
-    votre place (principe 9).
+    Il se branche dans `app.py`, là où l'application compose ses middlewares et ses fournisseurs de contexte.
+    Ce câblage vous appartient : Forge ne l'écrit jamais à votre place (principe 9).
 
     #### 5. Le prouver
 
@@ -108,8 +104,7 @@ Le cœur ne fournit pas de back-office : ce paquet en est un châssis explicite,
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -339,11 +334,13 @@ Il expose les constructeurs `build_list_sql`, `build_count_sql`, `build_get_sql`
     !!! danger "Les identifiants partent en paramètres liés"
         Les concaténer serait une injection, et le fait qu'ils viennent de cases cochées n'y change rien : une case cochée est une donnée de requête comme une autre.
 
-        Une sélection vide est refusée, une suppression groupée sans sélection effaçant la table entière si la clause était omise. Le plafond vaut 200 lignes, une sélection de cette taille venant plus souvent d'un « tout cocher » que d'une intention.
+        Une sélection vide est refusée, une suppression groupée sans sélection effaçant la table entière si la clause était omise.
+        Le plafond vaut 200 lignes, une sélection de cette taille venant plus souvent d'un « tout cocher » que d'une intention.
 
     ### Transitions groupées, et le workflow
 
-    Une transition écrit la colonne `status_field`. La clause porte **aussi** sur le statut de départ.
+    Une transition écrit la colonne `status_field`.
+    La clause porte **aussi** sur le statut de départ.
 
     ```sql
     UPDATE articles SET statut = ? WHERE id IN (?, ?) AND statut = ?
@@ -352,19 +349,23 @@ Il expose les constructeurs `build_list_sql`, `build_count_sql`, `build_get_sql`
     !!! info "C'est ce qui rend l'opération sûre"
         Une ligne dont le statut a changé entre l'affichage et la validation n'est pas touchée.
 
-        Une mise à jour sur la seule clé primaire écraserait un état que quelqu'un d'autre vient de poser. L'écart entre demandé et effectué est **dit** dans le message de retour.
+        Une mise à jour sur la seule clé primaire écraserait un état que quelqu'un d'autre vient de poser.
+        L'écart entre demandé et effectué est **dit** dans le message de retour.
 
     !!! danger "La transition groupée exige `forge-mvc-workflow` installé"
         Sans lui, elle est **refusée**, et ce refus diffère délibérément de celui de la suppression.
 
-        Appliquer un changement de statut à N lignes sans pouvoir vérifier que la transition est déclarée écrirait un état que le workflow de l'application interdit peut-être, sur cinquante lignes d'un coup. Une fonctionnalité absente vaut mieux qu'une fonctionnalité qui contourne la règle.
+        Appliquer un changement de statut à N lignes sans pouvoir vérifier que la transition est déclarée écrirait un état que le workflow de l'application interdit peut-être, sur cinquante lignes d'un coup.
+        Une fonctionnalité absente vaut mieux qu'une fonctionnalité qui contourne la règle.
 
     !!! info "Les transitions sont déclarées, jamais déduites"
         `forge-mvc-admin` ne lit pas le workflow de l'application.
 
-        Deviner qu'un statut `brouillon` mène à `publie` appliquerait à N lignes une transition que personne n'a écrite. La déclaration ne demande d'ailleurs pas `forge-mvc-workflow` : elle nomme des chaînes, et c'est l'exécution qui l'exige.
+        Deviner qu'un statut `brouillon` mène à `publie` appliquerait à N lignes une transition que personne n'a écrite.
+        La déclaration ne demande d'ailleurs pas `forge-mvc-workflow` : elle nomme des chaînes, et c'est l'exécution qui l'exige.
 
-    Les conditions de transition du workflow sont consultées, avec un contexte portant `bulk: True` : une règle métier peut refuser en masse ce qu'elle permet à l'unité. Le motif du refus remonte à l'écran.
+    Les conditions de transition du workflow sont consultées, avec un contexte portant `bulk: True` : une règle métier peut refuser en masse ce qu'elle permet à l'unité.
+    Le motif du refus remonte à l'écran.
 
 ## Voir aussi
 

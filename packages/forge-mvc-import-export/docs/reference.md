@@ -24,9 +24,8 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -61,8 +60,7 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-import-export`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -79,8 +77,7 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     forge opt-in:enable import-export --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -89,8 +86,8 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -100,8 +97,7 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -331,9 +327,11 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     !!! danger "Une colonne absente donne UNE erreur, plus dix mille"
         C'est le défaut le plus coûteux que ce ticket corrige.
 
-        `row.get(spec.name, "")` rendait une chaîne vide pour une colonne qui n'existait pas, et chaque ligne produisait « valeur requise manquante ». Un fichier de dix mille lignes rendait dix mille erreurs pour un seul en-tête mal orthographié, et la vraie cause restait introuvable au milieu.
+        `row.get(spec.name, "")` rendait une chaîne vide pour une colonne qui n'existait pas, et chaque ligne produisait « valeur requise manquante ».
+        Un fichier de dix mille lignes rendait dix mille erreurs pour un seul en-tête mal orthographié, et la vraie cause restait introuvable au milieu.
 
-        Les en-têtes sont désormais rapprochés **une fois**, avant d'examiner la moindre ligne. `ImportReport.rejected_before_reading` dit que le fichier n'a pas été parcouru : l'utilisateur doit corriger son en-tête, pas ses données.
+        Les en-têtes sont désormais rapprochés **une fois**, avant d'examiner la moindre ligne.
+        `ImportReport.rejected_before_reading` dit que le fichier n'a pas été parcouru : l'utilisateur doit corriger son en-tête, pas ses données.
 
     !!! warning "Rien n'est rapproché par ressemblance"
         Ni la casse ni les accents ne sont normalisés : « Email » et « email » sont deux en-têtes différents tant qu'un `source` ne dit pas qu'ils désignent le même champ.
@@ -342,7 +340,8 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
 
         Les espaces de bordure sont en revanche tolérées : un export tableur en pose souvent, et ce n'est pas une intention.
 
-    `HeaderMapping.unused_headers` nomme les colonnes du fichier que personne ne réclame. Elles ne sont pas une erreur, mais les voir aide à repérer une correspondance oubliée.
+    `HeaderMapping.unused_headers` nomme les colonnes du fichier que personne ne réclame.
+    Elles ne sont pas une erreur, mais les voir aide à repérer une correspondance oubliée.
 
 ??? note "13. Rendre le rapport d'erreurs téléchargeable"
 
@@ -412,13 +411,16 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     !!! warning "Le mode tolérant perd des données en silence"
         `parse_jsonl(..., strict=False)` ignore une ligne illisible.
 
-        Cela n'a de sens que pour récupérer ce qui est lisible d'un fichier abîmé. En mode strict, une ligne fautive lève en nommant son numéro.
+        Cela n'a de sens que pour récupérer ce qui est lisible d'un fichier abîmé.
+        En mode strict, une ligne fautive lève en nommant son numéro.
 
-    Le module ne convertit pas entre CSV et JSONL. Les deux se lisent en lignes de dictionnaires, et l'appelant passe de l'un à l'autre en changeant la fonction qu'il appelle : un convertisseur donnerait deux façons de faire la même chose.
+    Le module ne convertit pas entre CSV et JSONL.
+    Les deux se lisent en lignes de dictionnaires, et l'appelant passe de l'un à l'autre en changeant la fonction qu'il appelle : un convertisseur donnerait deux façons de faire la même chose.
 
 ??? note "15. L'export CRUD ne tronque plus en silence"
 
-    L'export de la liste générée par `make:crud` **respectait déjà** recherche, tri et filtres (`IMPEXP-FILTERED-EXPORT-001`). Ce n'était donc pas le manque.
+    L'export de la liste générée par `make:crud` **respectait déjà** recherche, tri et filtres (`IMPEXP-FILTERED-EXPORT-001`).
+    Ce n'était donc pas le manque.
 
     Le manque était ailleurs, et plus grave : `_EXPORT_LIMIT` valait mille, et rien ne le disait.
 
@@ -436,7 +438,8 @@ Le cœur ne sait pas échanger du CSV : ce paquet fournit l'outillage, l'applica
     | en-tête `X-Forge-Export-Limit` | pour savoir où le plafond est posé |
 
     !!! warning "Le CRUD doit être régénéré"
-        Le correctif vit dans le générateur. Un contrôleur déjà engendré garde l'ancien comportement jusqu'à un nouveau `forge make:crud`.
+        Le correctif vit dans le générateur.
+        Un contrôleur déjà engendré garde l'ancien comportement jusqu'à un nouveau `forge make:crud`.
 
     `_EXPORT_LIMIT` reste dans le modèle engendré, donc modifiable par l'application : le bon plafond dépend de la taille des lignes et de la mémoire du serveur, ce n'est pas une constante du framework.
 

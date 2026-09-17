@@ -51,9 +51,7 @@ print(get_setting("maintenance", db=adapter_de_test))   # True
 - En test, un adapter exposant `fetch_one`, `fetch_all` et `execute` suffit, sans base réelle.
 
 ## 3. Le schéma reste visible
-Le paquet ne livre pas de SQL figé : il **déclare** sa table, et `forge settings:init`
-en écrit le DDL dans `mvc/migrations/`, rendu pour le backend que vous avez
-installé.
+Le paquet ne livre pas de SQL figé : il **déclare** sa table, et `forge settings:init` en écrit le DDL dans `mvc/migrations/`, rendu pour le backend que vous avez installé.
 
 ```bash
 forge settings:init            # écrit la migration, sans rien exécuter
@@ -67,10 +65,8 @@ print(TABLE_NAME)   # "app_settings"
 ```
 
 - `TABLE_NAME` vaut `"app_settings"` : le nom de la table.
-- Le SQL reste visible, et il est même **relu avant d'être appliqué** : rien
-  n'est exécuté dans votre dos (principe 5).
-- Il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server : la même
-  déclaration, rendue par le dialecte actif.
+- Le SQL reste visible, et il est même **relu avant d'être appliqué** : rien n'est exécuté dans votre dos (principe 5).
+- Il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server : la même déclaration, rendue par le dialecte actif.
 
 ## À retenir
 

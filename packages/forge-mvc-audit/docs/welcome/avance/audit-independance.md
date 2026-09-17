@@ -43,9 +43,7 @@ entrees = get_audit_log(action="eleve.cree", db=db)
 - En test, on passe un double qui expose `insert` et `fetch_all`, sans toucher à une vraie base.
 
 ## 2. Le schéma reste visible
-Le paquet ne livre pas de SQL figé : il **déclare** sa table, et `forge audit:init`
-en écrit le DDL dans `mvc/migrations/`, rendu pour le backend que vous avez
-installé.
+Le paquet ne livre pas de SQL figé : il **déclare** sa table, et `forge audit:init` en écrit le DDL dans `mvc/migrations/`, rendu pour le backend que vous avez installé.
 
 ```bash
 forge audit:init            # écrit la migration, sans rien exécuter
@@ -59,10 +57,8 @@ print(TABLE_NAME)   # "audit_log"
 ```
 
 - `TABLE_NAME` vaut `"audit_log"` : le nom de la table.
-- Le SQL reste visible, et il est même **relu avant d'être appliqué** : rien
-  n'est exécuté dans votre dos (principe 5).
-- Il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server : la même
-  déclaration, rendue par le dialecte actif.
+- Le SQL reste visible, et il est même **relu avant d'être appliqué** : rien n'est exécuté dans votre dos (principe 5).
+- Il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server : la même déclaration, rendue par le dialecte actif.
 
 ## À retenir
 

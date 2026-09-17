@@ -2,8 +2,7 @@
 
 Objectif : comprendre la brique **rôle**, son nom lisible et son slug stable.
 
-**Ce que vous allez apprendre :** un rôle a un **nom** (« Éditeur en chef »)
-et un **slug** identifiant (`editeur-en-chef`).
+**Ce que vous allez apprendre :** un rôle a un **nom** (« Éditeur en chef ») et un **slug** identifiant (`editeur-en-chef`).
 `normalize_role_slug` dérive le slug ; `validate_role` refuse un rôle invalide.
 
 Troisième palier du **niveau débutant** de la progression RBAC.

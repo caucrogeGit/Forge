@@ -25,9 +25,8 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -62,8 +61,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-images`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -80,8 +78,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     forge opt-in:enable images --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -91,14 +88,13 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     forge migration:apply
     ```
 
-    `images:init` copie la migration embarquée dans `mvc/migrations/` ;
-    `migration:apply` l'exécute et la trace (ADR-071).
+    `images:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute et la trace (ADR-071).
     Sans cette étape, le premier appel échoue sur une table absente.
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -108,8 +104,7 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -369,7 +364,8 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     !!! danger "Le nom devient un dossier sur le disque"
         Un nom hors de `[a-z0-9_-]` est refusé, et `original` est **réservé** : il désigne le fichier source, et une variante portant ce nom l'écraserait.
 
-        Un préréglage déclaré deux fois est refusé lui aussi. Garder la dernière déclaration en silence produirait une taille que personne n'a lue.
+        Un préréglage déclaré deux fois est refusé lui aussi.
+        Garder la dernière déclaration en silence produirait une taille que personne n'a lue.
 
     !!! warning "Retirer un préréglage laisse ses fichiers"
         Les images déjà produites restent sur le disque, et rien ne les régénérera.
@@ -391,17 +387,20 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     )
     ```
 
-    Le point est exprimé en fractions de la largeur et de la hauteur, de sorte qu'il reste valable quelles que soient les dimensions de la source et de la cible. `FocalPoint(0.5, 0.5)` est le centre, et c'est ce qui s'applique par défaut.
+    Le point est exprimé en fractions de la largeur et de la hauteur, de sorte qu'il reste valable quelles que soient les dimensions de la source et de la cible.
+    `FocalPoint(0.5, 0.5)` est le centre, et c'est ce qui s'applique par défaut.
 
     !!! info "Forge ne détecte aucun point d'intérêt"
         La détection de visages ou de saillance demande un modèle, donc une dépendance lourde et des résultats à surveiller.
 
-        Le point est une donnée de l'application, posée par la personne qui téléverse ou par un service qu'elle choisit. Le stocker à côté du média est le motif habituel.
+        Le point est une donnée de l'application, posée par la personne qui téléverse ou par un service qu'elle choisit.
+        Le stocker à côté du média est le motif habituel.
 
     !!! info "Forge n'invente pas de pixels"
         Si la source est plus petite que la boîte demandée, la variante garde le rapport de la boîte mais reste à la taille disponible.
 
-        Agrandir produirait une image floue en se faisant passer pour la taille déclarée. Un portrait de 800 sur 1200 donne ainsi une bannière de 800 sur 450, au bon rapport.
+        Agrandir produirait une image floue en se faisant passer pour la taille déclarée.
+        Un portrait de 800 sur 1200 donne ainsi une bannière de 800 sur 450, au bon rapport.
 
     !!! warning "La fenêtre est ramenée dans l'image"
         Un point proche d'un bord donnerait une fenêtre à cheval sur le vide, que Pillow comblerait par du noir.
@@ -431,7 +430,8 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     !!! warning "Un dossier applicatif peut ressembler à un dossier de variantes"
         La reconnaissance repose sur la forme `parent/nom/photo.jpg` en face de `parent/photo.jpg`.
 
-        Un dossier portant par hasard un nom de préréglage et contenant un fichier homonyme de son voisin du dessus serait pris pour un dossier de variantes. C'est précisément pourquoi la commande affiche avant de supprimer.
+        Un dossier portant par hasard un nom de préréglage et contenant un fichier homonyme de son voisin du dessus serait pris pour un dossier de variantes.
+        C'est précisément pourquoi la commande affiche avant de supprimer.
 
     !!! info "La commande ne régénère rien"
         Reproduire une variante manquante demanderait de décider quand, et une purge qui écrit serait deux gestes sous un seul nom.
@@ -451,12 +451,14 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
     | `IMAGE_MAX_BYTES` | poids du fichier image |
     | `UPLOAD_MAX_IMAGE_PIXELS` | surface, garde anti bombe, déjà présente |
 
-    Sans déclaration, aucune des trois nouvelles n'est appliquée. Le contrôle de surface reste en place, il protégeait contre autre chose.
+    Sans déclaration, aucune des trois nouvelles n'est appliquée.
+    Le contrôle de surface reste en place, il protégeait contre autre chose.
 
     !!! danger "Une valeur illisible interrompt"
         `IMAGE_MAX_WIDTH=5MB` **lève** au lieu d'être ignoré, comme le quota de `forge-mvc-files`.
 
-        Retomber en silence sur « aucune limite » à cause d'une faute de frappe irait exactement dans le mauvais sens. Pour ne pas borner, retirez la variable.
+        Retomber en silence sur « aucune limite » à cause d'une faute de frappe irait exactement dans le mauvais sens.
+        Pour ne pas borner, retirez la variable.
 
     !!! info "Le poids d'une image se borne à part"
         `IMAGE_MAX_BYTES` est distinct d'`upload_max_size`, qui borne **tout** envoi.
@@ -502,12 +504,9 @@ Il s'appuie sur `forge-mvc-files` pour l'écriture disque et le service de fichi
 
 ## Déclaration de table
 
-Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py`
-(`MEDIA`, plus la liste `MIGRATIONS`).
-Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit
-dans `mvc/migrations/` par `forge images:init` (chantier `OPTIN-DDL-DIALECTAL`).
-Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
-MariaDB, SQLite, PostgreSQL comme SQL Server.
+Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py` (`MEDIA`, plus la liste `MIGRATIONS`).
+Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit dans `mvc/migrations/` par `forge images:init` (chantier `OPTIN-DDL-DIALECTAL`).
+Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server.
 
 
 ## Inscription au registre des fichiers

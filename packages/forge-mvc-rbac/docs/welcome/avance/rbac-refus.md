@@ -5,7 +5,8 @@ Objectif : voir qu'un compte essaie une à une les routes protégées.
 ## Ce qu'un refus laissait derrière lui
 
 Rien.
-Une énumération de droits, quelqu'un qui tente chaque route pour voir laquelle cède, ne laissait aucune trace. L'exploitant n'avait aucun moyen de la voir, ni même de savoir qu'un compte butait sur une permission mal attribuée.
+Une énumération de droits, quelqu'un qui tente chaque route pour voir laquelle cède, ne laissait aucune trace.
+L'exploitant n'avait aucun moyen de la voir, ni même de savoir qu'un compte butait sur une permission mal attribuée.
 
 Les **cinq** gardes du paquet annoncent désormais leurs refus, et l'application décide de ce qu'elle en fait.
 
@@ -17,7 +18,8 @@ from forge_mvc_audit import audit_permission_denials
 audit_permission_denials()
 ```
 
-Une ligne au câblage, dans `bootstrap.py`. Chaque refus devient une entrée du journal d'audit.
+Une ligne au câblage, dans `bootstrap.py`.
+Chaque refus devient une entrée du journal d'audit.
 
 | Champ de la ligne | Contenu |
 |---|---|

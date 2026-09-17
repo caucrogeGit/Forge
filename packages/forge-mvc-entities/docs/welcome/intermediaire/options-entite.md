@@ -48,7 +48,8 @@ La ligne quitte les listes et les fiches, et reste en base ([ADR-083](../../../a
 !!! danger "Une contrainte d'unicité ne connaît pas la suppression logique"
     Supprimer logiquement un élève ne libère pas son adresse électronique : la ligne est toujours là, et la contrainte aussi.
 
-    Réinscrire quelqu'un avec la même adresse échouera. C'est une conséquence de la suppression logique, pas un défaut, et elle se décide au moment de choisir l'option.
+    Réinscrire quelqu'un avec la même adresse échouera.
+    C'est une conséquence de la suppression logique, pas un défaut, et elle se décide au moment de choisir l'option.
 
 ## À retenir
 

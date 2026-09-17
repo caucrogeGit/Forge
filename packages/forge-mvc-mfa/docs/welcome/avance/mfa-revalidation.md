@@ -31,8 +31,7 @@ Premier palier du **niveau avancé** de la progression MFA.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/mfa-revalidation` : l'état « MFA récente »
-passe à oui après avoir cliqué « Revalider ».
+Ouvrez `https://localhost:8000/mfa-revalidation` : l'état « MFA récente » passe à oui après avoir cliqué « Revalider ».
 
 ## Le contrôleur
 

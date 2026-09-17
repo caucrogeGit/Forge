@@ -24,9 +24,13 @@ Il se place après `auth:init` : `auth:init` crée les comptes et le SQL, `make:
 
 Le branchement des routes est **affiché**, à coller dans `mvc/routes/__init__.py` (charte principe 9, Forge n'écrit pas en silence un fichier utilisateur).
 
-Le bouton Connexion / Déconnexion est **injecté** dans la barre de navigation `partials/nav.html` (incluse par le `{% block nav %}` de `layouts/base.html`). L'injection est **chirurgicale et idempotente** : le squelette livre `nav.html` avec un ancrage `{# forge:auth-nav #}` où `make:auth` insère le bloc, sans toucher aux liens que vous avez ajoutés (même principe qu'`opt-in:enable`, qui injecte par ancrage dans `mvc/routes/__init__.py` et `optins/registry.py`). Un second passage ne duplique rien. Si `nav.html` est absent, il est créé ; s'il n'a pas l'ancrage, `make:auth` n'écrit pas et affiche le bloc à coller.
+Le bouton Connexion / Déconnexion est **injecté** dans la barre de navigation `partials/nav.html` (incluse par le `{% block nav %}` de `layouts/base.html`).
+L'injection est **chirurgicale et idempotente** : le squelette livre `nav.html` avec un ancrage `{# forge:auth-nav #}` où `make:auth` insère le bloc, sans toucher aux liens que vous avez ajoutés (même principe qu'`opt-in:enable`, qui injecte par ancrage dans `mvc/routes/__init__.py` et `optins/registry.py`).
+Un second passage ne duplique rien.
+Si `nav.html` est absent, il est créé ; s'il n'a pas l'ancrage, `make:auth` n'écrit pas et affiche le bloc à coller.
 
-Le bloc affiche « Connexion » (lien vers `/login`) pour un visiteur, ou « Déconnexion » (POST vers `/logout`) pour un utilisateur connecté. Il s'appuie sur `is_authenticated`, injecté dans tout template par `BaseController.render`.
+Le bloc affiche « Connexion » (lien vers `/login`) pour un visiteur, ou « Déconnexion » (POST vers `/logout`) pour un utilisateur connecté.
+Il s'appuie sur `is_authenticated`, injecté dans tout template par `BaseController.render`.
 
 ## 3. Le flux généré
 

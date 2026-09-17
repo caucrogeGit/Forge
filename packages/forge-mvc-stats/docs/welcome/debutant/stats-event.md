@@ -3,8 +3,7 @@
 Objectif : comprendre le **nom d'événement** et comment Forge le normalise et le valide.
 
 **Ce que vous allez apprendre :** un nom est un identifiant `snake_case`.
-`normalize_event_name` le met en forme (« Page View »
-→ `page_view`) ; `validate_event_name` refuse les caractères interdits (un point, par exemple).
+`normalize_event_name` le met en forme (« Page View » → `page_view`) ; `validate_event_name` refuse les caractères interdits (un point, par exemple).
 
 Deuxième palier du **niveau débutant** de la progression stats.
 

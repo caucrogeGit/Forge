@@ -28,9 +28,8 @@ Aucun cookie visiteur, aucune IP.
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -65,8 +64,7 @@ Aucun cookie visiteur, aucune IP.
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-stats`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -83,8 +81,7 @@ Aucun cookie visiteur, aucune IP.
     forge opt-in:enable stats --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -129,8 +126,8 @@ Aucun cookie visiteur, aucune IP.
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -140,8 +137,7 @@ Aucun cookie visiteur, aucune IP.
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -368,7 +364,8 @@ Aucun cookie visiteur, aucune IP.
 
     Ce n'est pas un oubli, c'est son périmètre : il compte des événements, il n'enquête pas.
 
-    Le champ `metadata` est pourtant libre, et rien n'empêchait d'y écrire `{"ip": request.remote_addr}`. C'est le geste naturel de qui veut compter des visiteurs uniques, et il transforme une table de statistiques en fichier de données personnelles, soumis à conservation limitée et à droit d'accès, sans que personne ne l'ait décidé.
+    Le champ `metadata` est pourtant libre, et rien n'empêchait d'y écrire `{"ip": request.remote_addr}`.
+    C'est le geste naturel de qui veut compter des visiteurs uniques, et il transforme une table de statistiques en fichier de données personnelles, soumis à conservation limitée et à droit d'accès, sans que personne ne l'ait décidé.
 
     ```python
     from forge_mvc_stats import StatsEvent, visitor_hash
@@ -383,12 +380,14 @@ Aucun cookie visiteur, aucune IP.
     !!! danger "Une adresse brute est refusée à l'écriture"
         `StatsEvent(metadata={"ip": "203.0.113.42"})` **lève**.
 
-        Le refus a lieu à l'écriture : la ligne ne doit pas exister, plutôt qu'être filtrée à chaque lecture. Le message nomme les deux solutions, et rappelle que conserver une adresse à des fins de sécurité relève de `forge-mvc-audit`, pas des statistiques.
+        Le refus a lieu à l'écriture : la ligne ne doit pas exister, plutôt qu'être filtrée à chaque lecture.
+        Le message nomme les deux solutions, et rappelle que conserver une adresse à des fins de sécurité relève de `forge-mvc-audit`, pas des statistiques.
 
     !!! info "Le contrôle porte sur la clé, pas sur la valeur"
         « 1.2.3.4 » est une adresse IPv4 valide **et** un numéro de version tout aussi valable.
 
-        Refuser toutes les valeurs de cette forme casserait des métadonnées légitimes. Seule une valeur d'adresse rangée sous une clé qui la nomme, `ip`, `remote_addr`, `client_ip`, est refusée.
+        Refuser toutes les valeurs de cette forme casserait des métadonnées légitimes.
+        Seule une valeur d'adresse rangée sous une clé qui la nomme, `ip`, `remote_addr`, `client_ip`, est refusée.
 
     | Fonction | Ce qu'elle garde |
     |---|---|
@@ -409,7 +408,8 @@ Aucun cookie visiteur, aucune IP.
 
     `category` est la taxonomie de l'application, « blog » ou « boutique », et elle est libre (`STATS-EVENT-KIND-001`).
 
-    Le type d'événement est orthogonal : une consultation passive et un geste délibéré ne se comptent pas, ne se comparent pas et ne se lisent pas pareil. Mille pages vues valent moins qu'une commande passée, et les mélanger sous un même total donne un chiffre que personne ne peut interpréter.
+    Le type d'événement est orthogonal : une consultation passive et un geste délibéré ne se comptent pas, ne se comparent pas et ne se lisent pas pareil.
+    Mille pages vues valent moins qu'une commande passée, et les mélanger sous un même total donne un chiffre que personne ne peut interpréter.
 
     ```python
     StatsEvent(name="page_accueil", kind="page_view")
@@ -419,12 +419,15 @@ Aucun cookie visiteur, aucune IP.
     !!! info "Le vocabulaire est fermé, et c'est voulu"
         `page_view` et `action`, rien d'autre.
 
-        Un troisième type inventé par une application rendrait le champ incomparable d'un projet à l'autre, ce qui est exactement ce qu'il doit permettre. Pour une distinction propre au métier, `category` est là, et elle est libre.
+        Un troisième type inventé par une application rendrait le champ incomparable d'un projet à l'autre, ce qui est exactement ce qu'il doit permettre.
+        Pour une distinction propre au métier, `category` est là, et elle est libre.
 
     !!! info "Le défaut est `action`"
         Les événements déjà en base ont été posés par des appels délibérés de l'application, jamais par un suivi de page : c'est la valeur qui les décrit correctement.
 
-    La colonne arrive par une **migration additive**, `ALTER TABLE`. Une table déjà créée ne se recrée pas, et c'est la seule façon de la faire évoluer sans perdre les événements enregistrés. Appliquez `forge stats:init` puis `forge migration:apply`.
+    La colonne arrive par une **migration additive**, `ALTER TABLE`.
+    Une table déjà créée ne se recrée pas, et c'est la seule façon de la faire évoluer sans perdre les événements enregistrés.
+    Appliquez `forge stats:init` puis `forge migration:apply`.
 
 ??? note "14. Agréger par jour, par page et par type"
 
@@ -457,7 +460,8 @@ Aucun cookie visiteur, aucune IP.
     !!! danger "La liste des dimensions est une liste blanche"
         `group_by` finit dans un `GROUP BY`, où aucun backend n'accepte de paramètre lié.
 
-        C'est la liste blanche qui empêche une injection, et non un échappement. Un `kind` inconnu lève de même, un filtre qui rend zéro sans motif faisant chercher un défaut ailleurs, dans les données ou dans l'écriture des événements.
+        C'est la liste blanche qui empêche une injection, et non un échappement.
+        Un `kind` inconnu lève de même, un filtre qui rend zéro sans motif faisant chercher un défaut ailleurs, dans les données ou dans l'écriture des événements.
 
     Les fonctions vivent dans `aggregate.py` (`get_stats_counts_sql`, `prepare_stats_counts_params`, `count_stats_events`) et l'anonymisation dans `privacy.py` (`anonymize_ip`, `visitor_hash`, `assert_no_raw_address`, `looks_like_address_key`).
 

@@ -15,8 +15,7 @@ Premier palier du **niveau avancé** de la progression Deploy.
 ## Ce que ce starter montre
 
 - la forme particulière d'un opt-in à CLI seule ;
-- le repli « module non installé »
-  ;
+- le repli « module non installé » ;
 - le rattachement à la charte (principe 8, ADR-004, ADR-053).
 
 ## 1. Aucune API runtime

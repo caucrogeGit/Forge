@@ -27,9 +27,8 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -64,8 +63,7 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-qrcode`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -82,8 +80,7 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
     forge opt-in:enable qrcode --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -92,8 +89,8 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -103,8 +100,7 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -345,7 +341,8 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
 
 ??? note "13. Produire un fichier en ligne de commande"
 
-    Le paquet savait produire un QR Code depuis du code Python et le servir en HTTP. Produire un fichier, pour une affiche, une étiquette ou une documentation, demandait d'écrire un script à usage unique (`QRCODE-CLI-001`).
+    Le paquet savait produire un QR Code depuis du code Python et le servir en HTTP.
+    Produire un fichier, pour une affiche, une étiquette ou une documentation, demandait d'écrire un script à usage unique (`QRCODE-CLI-001`).
 
     ```bash
     forge qrcode:make "https://forgemvc.com"
@@ -363,7 +360,8 @@ Le cœur de Forge ignore tout des QR Codes : ce paquet fournit l'API, l'applicat
     !!! warning "L'extension et le format doivent s'accorder"
         `--format svg --out code.png` est **refusé**.
 
-        Un fichier SVG nommé `.png` est servi avec le mauvais type par un serveur web, et refusé par un imprimeur. Sans `--format`, le format se déduit de l'extension.
+        Un fichier SVG nommé `.png` est servi avec le mauvais type par un serveur web, et refusé par un imprimeur.
+        Sans `--format`, le format se déduit de l'extension.
 
     !!! info "Le niveau par défaut est rappelé"
         Un fichier écrit sans `--error` explicite affiche un rappel : `m` tolère 15 % de perte, `h` en tolère 30 %.

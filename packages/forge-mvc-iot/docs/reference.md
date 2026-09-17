@@ -23,9 +23,8 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -60,8 +59,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-iot`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -78,8 +76,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     forge opt-in:enable iot --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -89,14 +86,12 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     forge migration:apply
     ```
 
-    `iot:init` copie la migration embarquée dans `mvc/migrations/` ;
-    `migration:apply` l'exécute et la trace (ADR-071).
+    `iot:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute et la trace (ADR-071).
     Sans cette étape, le premier appel échoue sur une table absente.
 
     #### 4. Le brancher là où il agit
 
-    Ses routes montent avec celles des autres opt-ins, par l'appel
-    `register_optins(router)` déjà présent dans `mvc/routes/__init__.py`.
+    Ses routes montent avec celles des autres opt-ins, par l'appel `register_optins(router)` déjà présent dans `mvc/routes/__init__.py`.
     Rien de plus à écrire.
 
     #### 5. Le prouver
@@ -107,8 +102,7 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -386,7 +380,8 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
         register_iot_routes(router, token_repository=IotTokenRepository())
         ```
 
-        Le monter par défaut exigerait un jeton là où l'API était ouverte, et casserait sans le dire les déploiements existants. Le principe 3 veut que ce changement soit demandé, pas deviné.
+        Le monter par défaut exigerait un jeton là où l'API était ouverte, et casserait sans le dire les déploiements existants.
+        Le principe 3 veut que ce changement soit demandé, pas deviné.
 
         Sans registre, le comportement est exactement celui d'avant : le jeton d'environnement suffit, et son absence laisse l'API ouverte, ce que `register_iot_routes` refuse déjà en production.
 
@@ -396,20 +391,24 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
         Préférez un jeton de site pour tout ce qui n'a pas besoin de tout voir.
 
     !!! info "Le jeton n'est affiché qu'une fois"
-        Seule son empreinte SHA-256 est stockée. Le perdre oblige à en créer un autre, ce qui est le prix à payer pour qu'aucun secret ne dorme en clair dans la base.
+        Seule son empreinte SHA-256 est stockée.
+        Le perdre oblige à en créer un autre, ce qui est le prix à payer pour qu'aucun secret ne dorme en clair dans la base.
 
-        Un simple SHA-256 suffit ici, sans sel ni étirement : le jeton est engendré par Forge avec 256 bits d'entropie, contrairement à un mot de passe choisi par un humain, et il n'existe donc ni dictionnaire ni table arc-en-ciel à lui opposer. C'est la pratique établie pour les jetons d'API, et elle diffère de celle des mots de passe pour cette raison précise.
+        Un simple SHA-256 suffit ici, sans sel ni étirement : le jeton est engendré par Forge avec 256 bits d'entropie, contrairement à un mot de passe choisi par un humain, et il n'existe donc ni dictionnaire ni table arc-en-ciel à lui opposer.
+        C'est la pratique établie pour les jetons d'API, et elle diffère de celle des mots de passe pour cette raison précise.
 
     !!! info "Un refus de portée est un 403, pas un 401"
         Un 401 ferait croire au porteur que son jeton est faux, et il le remplacerait au lieu d'en demander un dont la portée convient.
 
-    Le filtrage a lieu **en SQL**. Rapatrier les mesures des autres sites pour les écarter ensuite les aurait fait passer par un processus qui n'y a pas droit.
+    Le filtrage a lieu **en SQL**.
+    Rapatrier les mesures des autres sites pour les écarter ensuite les aurait fait passer par un processus qui n'y a pas droit.
 
     La révocation pose une date et ne supprime pas la ligne : savoir qu'un jeton a existé, et quand il a cessé de valoir, fait partie de ce qu'un exploitant doit pouvoir retrouver.
 
 ??? note "13. Moyenne, minimum et maximum sur une fenêtre"
 
-    Le paquet rendait les mesures brutes et les comptait. La question qu'on pose à des relevés de capteurs n'avait aucune réponse (`IOT-AGGREGATES-001`) : « quelle a été la température moyenne de la semaine, et jusqu'où est elle montée ».
+    Le paquet rendait les mesures brutes et les comptait.
+    La question qu'on pose à des relevés de capteurs n'avait aucune réponse (`IOT-AGGREGATES-001`) : « quelle a été la température moyenne de la semaine, et jusqu'où est elle montée ».
 
     L'application devait rapatrier toutes les mesures pour les additionner en Python, ce qui charge en mémoire ce que la base sait faire sans rien déplacer, et devient impraticable dès qu'un capteur relève chaque minute.
 
@@ -436,17 +435,20 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
         Le dire vaut mieux que de le laisser supposer.
 
     !!! info "Ce que le module ne fait pas"
-        Il ne **regroupe pas par intervalle**. Une série par tranches de cinq minutes demande des fonctions de fenêtrage que les quatre backends n'écrivent pas de la même façon, et le principe 5 veut du SQL visible plutôt qu'un générateur masquant quatre dialectes.
+        Il ne **regroupe pas par intervalle**.
+        Une série par tranches de cinq minutes demande des fonctions de fenêtrage que les quatre backends n'écrivent pas de la même façon, et le principe 5 veut du SQL visible plutôt qu'un générateur masquant quatre dialectes.
 
         Il n'**interpole** rien non plus.
 
-    Le comptage porte sur `value` et non sur `*` : une mesure sans valeur ne doit pas gonfler l'effectif d'une moyenne qu'elle n'alimente pas. La fenêtre est bornée à un an, au delà la question relevant d'un export.
+    Le comptage porte sur `value` et non sur `*` : une mesure sans valeur ne doit pas gonfler l'effectif d'une moyenne qu'elle n'alimente pas.
+    La fenêtre est bornée à un an, au delà la question relevant d'un export.
 
     PostgreSQL rend `AVG` en `Decimal`, MariaDB en flottant : la valeur est ramenée en flottant, sans quoi la même requête donnerait deux types selon le backend et la sérialisation JSON échouerait sur l'un des deux.
 
 ??? note "14. Brancher un contrôle d'accès applicatif"
 
-    Le jeton dit **ce qu'un porteur peut lire**. Il ne dit rien de **qui** le porte, ni de ce que cette personne a le droit de faire dans l'application (`IOT-RBAC-READ-001`).
+    Le jeton dit **ce qu'un porteur peut lire**.
+    Il ne dit rien de **qui** le porte, ni de ce que cette personne a le droit de faire dans l'application (`IOT-RBAC-READ-001`).
 
     Une console interne où un opérateur consulte les relevés a besoin des deux.
 
@@ -467,9 +469,11 @@ Le cœur de Forge ignore tout de l'IoT : ce paquet fournit le subscriber, le sto
     !!! danger "Une vérification qui échoue refuse la lecture"
         Un contrôle qui lève, ou qui rend autre chose qu'un booléen, ne dit **pas** que l'accès est permis, il ne dit rien.
 
-        Traiter ce silence comme une autorisation est la faute classique de ce genre de branchement : le jour où le service de permissions tombe, tout s'ouvre, et rien ne le signale. L'incident est journalisé pour l'exploitant.
+        Traiter ce silence comme une autorisation est la faute classique de ce genre de branchement : le jour où le service de permissions tombe, tout s'ouvre, et rien ne le signale.
+        L'incident est journalisé pour l'exploitant.
 
-    Plusieurs contrôles peuvent cohabiter : tous doivent accepter, et le premier refus arrête la série. Une politique d'accès s'ajoute, elle ne se remplace pas.
+    Plusieurs contrôles peuvent cohabiter : tous doivent accepter, et le premier refus arrête la série.
+    Une politique d'accès s'ajoute, elle ne se remplace pas.
 
     Sans contrôle branché, seule la portée du jeton s'applique : le paquet n'invente pas une politique que personne n'a demandée.
 

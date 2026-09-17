@@ -24,9 +24,8 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -61,8 +60,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-rbac`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -79,8 +77,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     forge opt-in:enable rbac --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -90,15 +87,13 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     forge migration:apply
     ```
 
-    `rbac:init` copie la migration embarquée dans `mvc/migrations/` ;
-    `migration:apply` l'exécute et la trace (ADR-071).
+    `rbac:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute et la trace (ADR-071).
     Sans cette étape, le premier appel échoue sur une table absente.
 
     #### 4. Le brancher là où il agit
 
-    Il se branche dans `app.py`, là où l'application compose ses middlewares et ses
-    fournisseurs de contexte. Ce câblage vous appartient : Forge ne l'écrit jamais à
-    votre place (principe 9).
+    Il se branche dans `app.py`, là où l'application compose ses middlewares et ses fournisseurs de contexte.
+    Ce câblage vous appartient : Forge ne l'écrit jamais à votre place (principe 9).
 
     #### 5. Le prouver
 
@@ -108,8 +103,7 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -528,7 +522,8 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
 
     `rbac:validate` dit si le contrat est valide, `rbac:audit` le compare à la base (`RBAC-CONTRACT-EXPORT-001`).
 
-    Ni l'un ni l'autre ne répond à « qui a le droit de faire quoi dans cette application », qui demandait d'ouvrir `mvc/security/rbac.json` et de le lire à l'œil, ce qui se fait mal dès la dizaine de rôles. C'est pourtant la question que pose une revue de sécurité, un audit, ou simplement un nouveau venu dans l'équipe.
+    Ni l'un ni l'autre ne répond à « qui a le droit de faire quoi dans cette application », qui demandait d'ouvrir `mvc/security/rbac.json` et de le lire à l'œil, ce qui se fait mal dès la dizaine de rôles.
+    C'est pourtant la question que pose une revue de sécurité, un audit, ou simplement un nouveau venu dans l'équipe.
 
     ```bash
     forge rbac:export
@@ -546,12 +541,14 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     !!! danger "L'export rend le contrat, jamais l'état de la base"
         Il ne lit aucune table : il rend ce qui est **déclaré**, et non ce qui est provisionné.
 
-        Confondre les deux ferait prendre une intention pour un état. `forge rbac:audit` compare déjà les deux, et c'est lui qu'il faut pour cette question.
+        Confondre les deux ferait prendre une intention pour un état.
+        `forge rbac:audit` compare déjà les deux, et c'est lui qu'il faut pour cette question.
 
     !!! warning "Un contrat invalide n'est pas exporté"
         Le tableau ne s'appliquerait à rien, et le lecteur le prendrait pour la vérité.
 
-    Le tri rend deux exports comparables : sans lui, l'ordre suivrait celui du JSON, et un simple réarrangement du fichier ferait apparaître une différence là où rien n'a changé. Les cellules sont échappées, un nom de rôle commençant par `=` redevenant sinon une formule vive à l'ouverture du CSV.
+    Le tri rend deux exports comparables : sans lui, l'ordre suivrait celui du JSON, et un simple réarrangement du fichier ferait apparaître une différence là où rien n'a changé.
+    Les cellules sont échappées, un nom de rôle commençant par `=` redevenant sinon une formule vive à l'ouverture du CSV.
 
     Les fonctions vivent dans `export.py` (`to_markdown`, `to_csv`, `contract_rows`).
 
@@ -559,7 +556,8 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
 
     Le contrat associait un rôle à une liste plate de permissions (`RBAC-ROLE-HIERARCHY-001`, ADR-095).
 
-    Un projet à trois rôles, `lecteur`, `editeur` et `admin`, recopiait donc la liste du lecteur dans l'éditeur, puis les deux dans l'admin. Trois copies de la même règle, qui divergent au premier ajout : on ajoute une permission à l'éditeur, on oublie l'admin, et l'administrateur se retrouve avec **moins** de droits qu'un éditeur.
+    Un projet à trois rôles, `lecteur`, `editeur` et `admin`, recopiait donc la liste du lecteur dans l'éditeur, puis les deux dans l'admin.
+    Trois copies de la même règle, qui divergent au premier ajout : on ajoute une permission à l'éditeur, on oublie l'admin, et l'administrateur se retrouve avec **moins** de droits qu'un éditeur.
 
     Le défaut est silencieux : personne n'écrit un test vérifiant qu'un administrateur peut faire tout ce qu'un éditeur peut faire.
 
@@ -586,12 +584,14 @@ Toutes les gardes **échouent fermé** (401/403) : en cas de doute, l'accès est
     !!! danger "Rien n'est deviné"
         Forge ne déduit aucune hiérarchie d'un nom de rôle.
 
-        « admin » ne domine pas « editeur » parce qu'il s'appelle ainsi, et supposer le contraire accorderait des droits que personne n'a écrits. Une déduction fausse sur un contrôle d'accès ne se répare pas après coup.
+        « admin » ne domine pas « editeur » parce qu'il s'appelle ainsi, et supposer le contraire accorderait des droits que personne n'a écrits.
+        Une déduction fausse sur un contrôle d'accès ne se répare pas après coup.
 
     !!! danger "Une hiérarchie fautive n'accorde RIEN"
         Ni cycle, ni rôle hérité inconnu ne sont tolérés.
 
-        `get_contract_permissions` rend un ensemble vide plutôt que les permissions directes : accorder les droits directs donnerait un contrôle d'accès dégradé sans que rien ne le signale, et un contrôle qui se dégrade en silence est pire qu'un contrôle qui refuse. `forge rbac:validate` nomme la faute.
+        `get_contract_permissions` rend un ensemble vide plutôt que les permissions directes : accorder les droits directs donnerait un contrôle d'accès dégradé sans que rien ne le signale, et un contrôle qui se dégrade en silence est pire qu'un contrôle qui refuse.
+        `forge rbac:validate` nomme la faute.
 
         Un cycle est **nommé** dans le message, « admin puis editeur puis admin » : un cycle qu'on peut lire se corrige.
 

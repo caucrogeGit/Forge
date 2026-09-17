@@ -16,7 +16,8 @@ Les identifiants sont entourés de crochets (`[table]`).
 
 ## Formes gardées
 
-SQL Server n'a pas `IF NOT EXISTS` pour les tables et les index. Le dialecte émet des formes gardées :
+SQL Server n'a pas `IF NOT EXISTS` pour les tables et les index.
+Le dialecte émet des formes gardées :
 
 - tables : `IF OBJECT_ID(N'table', N'U') IS NULL CREATE TABLE ...` ;
 - index : `IF NOT EXISTS (SELECT 1 FROM sys.indexes ...) CREATE INDEX ...`.

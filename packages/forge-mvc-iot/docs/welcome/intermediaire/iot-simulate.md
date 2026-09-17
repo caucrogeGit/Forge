@@ -202,6 +202,7 @@ CREATE TABLE IF NOT EXISTS iot_events (
 
 ## Après ce starter
 
-Vous savez alimenter les données en local. La suite : exposer l'API HTTP JSON officielle.
+Vous savez alimenter les données en local.
+La suite : exposer l'API HTTP JSON officielle.
 
 [Exposer l'API IoT](iot-api.md)

@@ -7,7 +7,8 @@ Objectif : qu'un administrateur ne puisse pas se passer d'un second facteur.
 Il savait dire si un utilisateur **a** un facteur actif.
 Il ne savait pas dire s'il **devrait** en avoir un.
 
-L'application écrivait donc, dans chaque écran sensible, un « si cet utilisateur est administrateur et n'a pas de MFA, alors refuser ». Elle l'écrivait bien la première fois, et l'oubliait au troisième écran d'administration ajouté six mois plus tard.
+L'application écrivait donc, dans chaque écran sensible, un « si cet utilisateur est administrateur et n'a pas de MFA, alors refuser ».
+Elle l'écrivait bien la première fois, et l'oubliait au troisième écran d'administration ajouté six mois plus tard.
 
 ## La politique se déclare une fois
 

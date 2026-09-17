@@ -36,7 +36,8 @@ Sans `--run`, la commande **compte** et n'efface rien.
 !!! danger "La rétention est une décision, pas un réglage technique"
     Un journal d'audit sert à répondre à une question posée après coup, parfois des mois plus tard.
 
-    Quatre-vingt-dix jours conviennent à un usage courant ; une obligation légale ou un besoin d'enquête peut demander bien plus. Forge ne choisit pas à votre place.
+    Quatre-vingt-dix jours conviennent à un usage courant ; une obligation légale ou un besoin d'enquête peut demander bien plus.
+    Forge ne choisit pas à votre place.
 
 !!! info "La purge se planifie"
     Lancée à la main, elle ne tourne jamais.

@@ -22,7 +22,8 @@ mesures = session_metrics()
 !!! warning "Une part d'expirées qui grossit annonce une purge à l'arrêt"
     Les lignes expirées ne gênent personne tant qu'elles sont rares.
 
-    Passé la moitié de la table, chaque lecture les traverse quand même : la table grossit, les requêtes ralentissent, et rien d'autre ne le montre. Le panneau du back-office signale ce seuil.
+    Passé la moitié de la table, chaque lecture les traverse quand même : la table grossit, les requêtes ralentissent, et rien d'autre ne le montre.
+    Le panneau du back-office signale ce seuil.
 
 !!! danger "Ne publiez pas ces nombres sans protection"
     Le nombre de connectés d'un site est une information commerciale, et sa variation en dit long sur une organisation.

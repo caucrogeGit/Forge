@@ -9,8 +9,7 @@ Les données rangées dans une session sont accessibles par des clés.
 Pour rester cohérent, Forge fixe des clés canoniques en anglais (ADR-003).
 
 Ce module fournit ces clés sous forme de constantes et un helper de lecture, `session_get`.
-Le helper accepte aussi les anciens noms français en lecture, afin de ne pas invalider les sessions créées avant Forge 3.0.1.
-Ces noms legacy seront retirés en Forge 4.0.
+Le helper accepte aussi les anciens noms français en lecture, afin de ne pas invalider les sessions créées avant Forge 3.0.1. Ces noms legacy seront retirés en Forge 4.0.
 
 ## 2. Vue d'ensemble rapide
 

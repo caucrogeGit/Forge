@@ -4,8 +4,7 @@ Objectif : exposer les événements IoT via l'**API HTTP JSON officielle** du mo
 
 **Ce que vous allez apprendre :** `register_iot_routes(router)`.
 Une seule ligne branche les trois routes en **lecture seule** de Forge IoT.
-Le code vit dans le paquet `forge-mvc-iot` ; votre application ne fait que le **brancher** : c'est le principe « lock + delegate »
-de Forge.
+Le code vit dans le paquet `forge-mvc-iot` ; votre application ne fait que le **brancher** : c'est le principe « lock + delegate » de Forge.
 
 Palier 2 du **niveau intermédiaire** de la progression IoT, après [Simuler une mesure IoT](iot-simulate.md).
 

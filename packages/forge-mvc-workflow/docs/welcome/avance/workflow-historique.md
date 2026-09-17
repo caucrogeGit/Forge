@@ -48,7 +48,8 @@ dernier = last_transition("Article", article_id)
 !!! warning "Forge n'enregistre pas à votre place"
     `apply_transition` ne consulte pas l'historique et n'y écrit pas.
 
-    C'est délibéré : Forge n'écrit jamais dans votre code, et toutes les applications ne veulent pas d'une trace. Appelez `record_transition` dans votre `commit`, là où l'écriture a lieu.
+    C'est délibéré : Forge n'écrit jamais dans votre code, et toutes les applications ne veulent pas d'une trace.
+    Appelez `record_transition` dans votre `commit`, là où l'écriture a lieu.
 
 !!! danger "Écrivez la trace dans la même transaction que le statut"
     Sinon la trace ment : le statut change et l'historique reste en arrière, ou l'inverse.

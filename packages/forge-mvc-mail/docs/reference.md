@@ -30,9 +30,8 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -67,8 +66,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-mail`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -85,8 +83,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     forge opt-in:enable mail --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -102,8 +99,8 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -113,8 +110,7 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -358,7 +354,8 @@ Extrait du cœur (ADR-022), il lit sa configuration depuis l'environnement (`MAI
         L'email partait, le journal inscrivait `sent`, et le destinataire recevait un corps annonçant un document absent.
 
         La charge utile est du JSON rangé dans la colonne `payload` de la table `jobs`, de type `text`.
-        Sur MariaDB, un `TEXT` tient soixante-cinq mille octets ; une pièce jointe de dix mégaoctets, plafond du paquet, en ferait quatorze millions une fois encodée. Deux cent treize fois la capacité de la colonne.
+        Sur MariaDB, un `TEXT` tient soixante-cinq mille octets ; une pièce jointe de dix mégaoctets, plafond du paquet, en ferait quatorze millions une fois encodée.
+        Deux cent treize fois la capacité de la colonne.
         Élargir la colonne ferait de la file une réserve de fichiers, ce qu'elle n'est pas.
 
         `message_to_payload` **refuse** donc, en nommant les fichiers concernés.
@@ -513,7 +510,8 @@ mailer.send(message)
     Un type erroné serait suivi par le client mail pour ouvrir le fichier.
     Il peut être déclaré explicitement, et une forme malformée est refusée.
 
-La taille est bornée à dix mégaoctets. Un relais refuserait au delà, et un message refusé après coup est plus difficile à diagnostiquer qu'un refus à la construction.
+La taille est bornée à dix mégaoctets.
+Un relais refuserait au delà, et un message refusé après coup est plus difficile à diagnostiquer qu'un refus à la construction.
 
 ## Gabarits réutilisables
 
@@ -547,7 +545,8 @@ Le corps texte a le sien, `layout_text.txt` : donner un layout à l'un sans l'au
 
 ## Vérifier sa configuration sans écrire à personne
 
-`mail:test` envoyait toujours. Vérifier sa configuration commençait donc par écrire à quelqu'un, et exigeait un relais joignable (`MAIL-TEST-GUIDED-001`).
+`mail:test` envoyait toujours.
+Vérifier sa configuration commençait donc par écrire à quelqu'un, et exigeait un relais joignable (`MAIL-TEST-GUIDED-001`).
 
 ```bash
 forge mail:test --to vous@exemple.com --dry-run   # montre ce qui partirait

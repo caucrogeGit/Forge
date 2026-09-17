@@ -26,7 +26,8 @@ Le client appelle le callable rendu par `create_wsgi_app`, c'est à dire exactem
 !!! danger "Un client qui reconstruirait sa boucle serait un jumeau"
     Il passerait là où la production échoue, et les deux dériveraient sans que rien ne le signale.
 
-    Forge a déjà payé cette erreur : un serveur de développement répondait là où Gunicorn rendait 404. Un harnais de test qui n'emprunte pas le chemin de production ne teste pas la production.
+    Forge a déjà payé cette erreur : un serveur de développement répondait là où Gunicorn rendait 404.
+    Un harnais de test qui n'emprunte pas le chemin de production ne teste pas la production.
 
 ## Ce qu'il garde entre deux requêtes
 

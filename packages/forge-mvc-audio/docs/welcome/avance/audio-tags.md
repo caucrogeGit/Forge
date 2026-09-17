@@ -15,7 +15,8 @@ tags = parse_tags(sortie_de_ffprobe)
 !!! danger "Un tag est une donnée d'utilisateur"
     Il vient du fichier déposé, et rien n'oblige qui l'a fabriqué à y mettre du texte raisonnable.
 
-    `clean_tag_value` retire ce qui n'a rien à faire dans une page : caractères de contrôle, longueurs déraisonnables. Afficher un tag brut revient à afficher ce qu'un inconnu a écrit.
+    `clean_tag_value` retire ce qui n'a rien à faire dans une page : caractères de contrôle, longueurs déraisonnables.
+    Afficher un tag brut revient à afficher ce qu'un inconnu a écrit.
 
 ## Le découpage
 
@@ -34,7 +35,8 @@ commande = build_trim_command(
 !!! danger "La commande est une liste, jamais une chaîne"
     `build_trim_command` rend une liste d'arguments, passée telle quelle au processus.
 
-    Un nom de fichier contenant `; rm -rf /` n'est donc qu'un nom de fichier : il n'y a pas de shell pour l'interpréter. Construire la commande par concaténation de texte serait l'inverse exact.
+    Un nom de fichier contenant `; rm -rf /` n'est donc qu'un nom de fichier : il n'y a pas de shell pour l'interpréter.
+    Construire la commande par concaténation de texte serait l'inverse exact.
 
 !!! warning "Un instant illisible ou négatif est refusé"
     `parse_timecode` lève plutôt que de retomber sur zéro.

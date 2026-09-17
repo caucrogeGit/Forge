@@ -27,9 +27,8 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -64,8 +63,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-workflow`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -82,8 +80,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     forge opt-in:enable workflow --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -93,8 +90,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     forge migration:apply
     ```
 
-    `forge workflow:init` écrit la migration de `workflow_history` dans `mvc/migrations/`,
-    où elle reste relisible avant d'être appliquée (charte §7, ADR-071).
+    `forge workflow:init` écrit la migration de `workflow_history` dans `mvc/migrations/`, où elle reste relisible avant d'être appliquée (charte §7, ADR-071).
     La commande n'ouvre aucune connexion.
 
     Cette table est apparue avec `WORKFLOW-HISTORY-001` ; l'opt-in n'en avait aucune avant.
@@ -102,8 +98,8 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -113,8 +109,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -418,9 +413,7 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     `validate_statuses` et `validate_transitions` détectent les configurations incohérentes (statut inconnu, doublon de transition) au démarrage.
 
     !!! note "L'opt-in décide, l'application persiste"
-        `forge-mvc-workflow` répond « cette transition est-elle permise ?
-        »
-        ; il n'écrit jamais en base.
+        `forge-mvc-workflow` répond « cette transition est-elle permise ? » ; il n'écrit jamais en base.
 
         Vous gardez la main sur le stockage du statut (champ d'entité, migration).
 
@@ -436,7 +429,8 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
 
     Le paquet appliquait les transitions sans en garder trace (`WORKFLOW-HISTORY-001`) : on savait dans quel état une entité se trouve, jamais comment elle y est arrivée, ni quand, ni par qui.
 
-    C'est pourtant la question qu'on pose à un workflow dès qu'un dossier pose problème. « Qui a validé cette commande, et à quelle date » n'avait aucune réponse, et chaque application réinventait sa table.
+    C'est pourtant la question qu'on pose à un workflow dès qu'un dossier pose problème.
+    « Qui a validé cette commande, et à quelle date » n'avait aucune réponse, et chaque application réinventait sa table.
 
     ```python
     from forge_mvc_workflow import history_for, record_transition
@@ -459,7 +453,8 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
     !!! info "Un acteur absent est une information"
         Une transition automatique, déclenchée par une tâche de fond, n'a pas d'auteur.
 
-        Inventer « system » masquerait la différence, et `is_automatic` la rend lisible. `actor_kind` et `actor_id` vont en revanche de pair : un identifiant sans nature ne désigne personne.
+        Inventer « system » masquerait la différence, et `is_automatic` la rend lisible.
+        `actor_kind` et `actor_id` vont en revanche de pair : un identifiant sans nature ne désigne personne.
 
     !!! info "Aucune clé étrangère vers l'entité"
         Le paquet ne sait pas ce qu'est une entité de l'application, et un historique doit survivre à la suppression de son sujet.
@@ -472,9 +467,12 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
 
 ??? note "13. Conditions de transition"
 
-    `can_transition` répond à une seule question : cette transition est elle **déclarée** ? (`WORKFLOW-CONDITIONS-001`)
+    `can_transition` répond à une seule question : cette transition est elle **déclarée** ?
+    (`WORKFLOW-CONDITIONS-001`)
 
-    Elle ne peut pas répondre à « cette commande a t elle au moins une ligne », ni à « ce dossier a t il été relu », qui sont pourtant les vraies conditions d'un passage d'état. L'application les vérifiait donc avant d'appeler, chacune à sa façon, et la règle vivait dans les contrôleurs plutôt que dans le workflow. Deux chemins menant au même état s'oubliaient l'un l'autre, et le second passait sans contrôle.
+    Elle ne peut pas répondre à « cette commande a t elle au moins une ligne », ni à « ce dossier a t il été relu », qui sont pourtant les vraies conditions d'un passage d'état.
+    L'application les vérifiait donc avant d'appeler, chacune à sa façon, et la règle vivait dans les contrôleurs plutôt que dans le workflow.
+    Deux chemins menant au même état s'oubliaient l'un l'autre, et le second passait sans contrôle.
 
     ```python
     from forge_mvc_workflow import ensure_conditions, register_condition
@@ -503,7 +501,8 @@ Il ne stocke rien lui-même : l'application garde le statut courant sur son enti
 
         Une condition sans `from_status` ni `to_status` s'applique à toutes les transitions ; « rien ne sort de brouillon sans relecture » se déclare une fois, plutôt qu'une fois par transition sortante.
 
-    `check_conditions` ne lève jamais et sert à **afficher** ce qui bloque, par exemple pour griser un bouton et dire pourquoi. `ensure_conditions` sert à refuser.
+    `check_conditions` ne lève jamais et sert à **afficher** ce qui bloque, par exemple pour griser un bouton et dire pourquoi.
+    `ensure_conditions` sert à refuser.
 
     !!! danger "`apply_transition` consulte le registre, et ne le faisait pas"
         Le registre existe parce que « deux chemins menant au même état s'oubliaient l'un l'autre, et le second passait sans contrôle ».

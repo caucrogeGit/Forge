@@ -8,7 +8,8 @@ Objectif : choisir sans hésiter entre une fixture et une migration de seed.
 
 > Cette donnée doit-elle exister **partout et toujours**, production comprise ?
 
-- **Oui** : c'est du référentiel permanent. Écrivez une **migration de seed**.
+- **Oui** : c'est du référentiel permanent.
+  Écrivez une **migration de seed**.
 - **Non**, c'est de la démo ou du test que je veux pouvoir recharger : écrivez une **fixture**.
 
 ## Migration de seed

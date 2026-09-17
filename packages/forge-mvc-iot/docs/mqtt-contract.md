@@ -147,8 +147,7 @@ Payload :
 ## Exemples invalides
 
 Chaque exemple ci-dessous est refusé.
-La colonne « Raison »
-indique la règle qu'il viole.
+La colonne « Raison » indique la règle qu'il viole.
 
 ### Topic mal formé
 

@@ -29,7 +29,8 @@ HANDLERS = {MAIL_JOB_TASK: make_mail_job_handler()}
 !!! danger "Un message avec pièce jointe est refusé à la mise en file"
     `message_to_payload` lève, en nommant les fichiers.
 
-    La charge utile d'une tâche est du JSON stocké en base : y mettre un PDF ferait grossir la table à chaque envoi, et la lecture de la file en pâtirait. Un envoi avec pièce jointe reste direct, ou passe par une référence au fichier plutôt que par son contenu.
+    La charge utile d'une tâche est du JSON stocké en base : y mettre un PDF ferait grossir la table à chaque envoi, et la lecture de la file en pâtirait.
+    Un envoi avec pièce jointe reste direct, ou passe par une référence au fichier plutôt que par son contenu.
 
 !!! warning "Les deux paquets restent indépendants"
     `forge-mvc-mail` n'importe pas `forge-mvc-jobs`, et l'inverse est vrai aussi.
@@ -44,7 +45,8 @@ HANDLERS = {MAIL_JOB_TASK: make_mail_job_handler()}
 ## Ce que la file ne règle pas
 
 Elle diffère l'envoi ; elle ne le garantit pas.
-Une tâche qui échoue est réessayée selon `max_attempts`, et finit `failed` si le serveur reste injoignable. `forge jobs:status` le montre.
+Une tâche qui échoue est réessayée selon `max_attempts`, et finit `failed` si le serveur reste injoignable.
+`forge jobs:status` le montre.
 
 ## À retenir
 

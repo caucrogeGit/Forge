@@ -24,9 +24,8 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -61,8 +60,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-settings`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -79,8 +77,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     forge opt-in:enable settings --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -90,14 +87,13 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     forge migration:apply
     ```
 
-    `settings:init` copie la migration embarquée dans `mvc/migrations/` ;
-    `migration:apply` l'exécute et la trace (ADR-071).
+    `settings:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute et la trace (ADR-071).
     Sans cette étape, le premier appel échoue sur une table absente.
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -107,8 +103,7 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -324,12 +319,9 @@ Le cœur de Forge ignore tout des paramètres : ce paquet fournit l'API, l'appli
 
 ## Déclaration de table
 
-Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py`
-(`APP_SETTINGS`, plus la liste `MIGRATIONS`).
-Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit
-dans `mvc/migrations/` par `forge settings:init` (chantier `OPTIN-DDL-DIALECTAL`).
-Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
-MariaDB, SQLite, PostgreSQL comme SQL Server.
+Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py` (`APP_SETTINGS`, plus la liste `MIGRATIONS`).
+Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit dans `mvc/migrations/` par `forge settings:init` (chantier `OPTIN-DDL-DIALECTAL`).
+Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server.
 
 ## Éditer les paramètres depuis un écran
 
@@ -441,7 +433,8 @@ clear_settings_cache()           # après une écriture faite hors du paquet
 !!! info "L'invalidation est explicite, jamais par expiration"
     Une expiration ferait cohabiter deux valeurs pendant un délai que personne n'a choisi.
 
-    Écrire par ce paquet invalide l'entrée. Une écriture faite ailleurs, par une migration ou à la main, demande un `clear_settings_cache()` que l'exploitant décide.
+    Écrire par ce paquet invalide l'entrée.
+    Une écriture faite ailleurs, par une migration ou à la main, demande un `clear_settings_cache()` que l'exploitant décide.
 
 !!! warning "Le cache vit dans le processus"
     Ce n'est pas un cache partagé : un déploiement à plusieurs travailleurs en a un par travailleur.
@@ -450,7 +443,8 @@ clear_settings_cache()           # après une écriture faite hors du paquet
 
 ## Ce que les paramètres ne doivent pas contenir
 
-**Aucun secret.** Ni mot de passe, ni jeton d'API, ni clé de chiffrement (`DOC-SETTINGS-NO-SECRETS-001`).
+**Aucun secret.**
+Ni mot de passe, ni jeton d'API, ni clé de chiffrement (`DOC-SETTINGS-NO-SECRETS-001`).
 
 Un paramètre est en clair dans une table applicative, lisible par toute personne ayant accès à la base ou à une sauvegarde, et affiché tel quel par un écran d'administration.
 

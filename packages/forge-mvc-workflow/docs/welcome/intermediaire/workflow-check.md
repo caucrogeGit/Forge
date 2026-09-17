@@ -1,7 +1,6 @@
 # Vérifier une transition
 
-Objectif : répondre « peut-on passer de ce statut à cet autre ?
-».
+Objectif : répondre « peut-on passer de ce statut à cet autre ? ».
 
 **Ce que vous allez apprendre :** `can_transition(transitions, from, to)` dit si le passage est autorisé par les transitions déclarées.
 C'est le contrôle à poser **avant** d'appliquer un changement de statut.

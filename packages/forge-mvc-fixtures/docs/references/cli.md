@@ -27,11 +27,13 @@ Pour ce que le SQL statique ne peut pas exprimer (import, agrégats), une **fixt
 | `Fixture.load()` | Persiste les données (écrit via `core.database.db`). À surcharger. |
 | `Fixture.purge(*, tx=None)` | Démonte (défaut : `DELETE FROM tables` en ordre inverse). Reçoit et propage la transaction de `fixtures:purge` (F52-bis). Surchargeable. |
 
-La factory ne touche jamais la base et ne rend pas de SQL : elle produit des dicts. Elle est importée par le code de factory de l'utilisateur, exécuté par `fixtures:generate`.
+La factory ne touche jamais la base et ne rend pas de SQL : elle produit des dicts.
+Elle est importée par le code de factory de l'utilisateur, exécuté par `fixtures:generate`.
 
 ## 2. Les commandes (`cli/`)
 
-Découvertes par le cœur via l'entry point `forge_mvc.commands` (ADR-059). `load`, `purge` et `generate` déclarent `config: True` (config projet amorcée avant le handler, ADR-072).
+Découvertes par le cœur via l'entry point `forge_mvc.commands` (ADR-059).
+`load`, `purge` et `generate` déclarent `config: True` (config projet amorcée avant le handler, ADR-072).
 
 ### 2.1 `fixtures:load` (`cli/load.py`)
 

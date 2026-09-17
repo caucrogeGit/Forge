@@ -37,7 +37,8 @@ Un jeton de portée `capteur-salle-201` ne peut pas écrire au nom d'un autre ap
 !!! info "La lecture se contrôle séparément"
     Écrire une mesure et lire les agrégats sont deux actions distinctes.
 
-    Un capteur écrit et ne lit pas ; un écran lit et n'écrit pas. `is_read_allowed` porte cette seconde question, et l'application y branche sa propre règle.
+    Un capteur écrit et ne lit pas ; un écran lit et n'écrit pas.
+    `is_read_allowed` porte cette seconde question, et l'application y branche sa propre règle.
 
 ## À retenir
 

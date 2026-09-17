@@ -59,9 +59,12 @@ Une application qui doit distinguer plusieurs contraintes uniques sur la même t
 La question posée au backend est celle d'une **famille**, non d'une cause : le remède est-il d'attendre ?
 Trois situations y répondent oui.
 
-- **Le pool est saturé.** Aucune connexion ne s'est libérée dans le délai imparti.
-- **La connexion était morte.** Le serveur l'avait fermée de son côté, et le pilote l'a remise en circulation sans le savoir.
-- **La ressource est prise.** Un autre écrivain tient le verrou, cas d'un fichier SQLite ou d'une attente de verrou MariaDB.
+- **Le pool est saturé.**
+  Aucune connexion ne s'est libérée dans le délai imparti.
+- **La connexion était morte.**
+  Le serveur l'avait fermée de son côté, et le pilote l'a remise en circulation sans le savoir.
+- **La ressource est prise.**
+  Un autre écrivain tient le verrou, cas d'un fichier SQLite ou d'une attente de verrou MariaDB.
 
 | Backend | Signal discriminant |
 |---|---|

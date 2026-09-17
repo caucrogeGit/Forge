@@ -40,8 +40,7 @@ for err in report.errors:
 
 ## Comportement
 
-Par défaut « tout ou rien »
-au niveau validation : une seule ligne invalide et rien n'est inséré, le rapport liste toutes les erreurs.
+Par défaut « tout ou rien » au niveau validation : une seule ligne invalide et rien n'est inséré, le rapport liste toutes les erreurs.
 L'option `partial=True` insère les lignes valides malgré des lignes en erreur.
 
 ## Pour aller plus loin

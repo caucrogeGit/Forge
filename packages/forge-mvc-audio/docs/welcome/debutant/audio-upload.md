@@ -81,8 +81,7 @@ class AudioUploadController(BaseController):
 ### Comprendre ce code
 
 - `ingest_audio` prend des **octets** (`uploaded.content`) et un nom : il valide **avant** d'écrire, puis range le fichier sous un chemin uuid.
-- Le **nom utilisateur n'entre jamais dans le chemin** : c'est l'anti-traversal par construction (modèle propre à audio/video, distinct du modèle « nom assaini »
-  de `forge-mvc-files`).
+- Le **nom utilisateur n'entre jamais dans le chemin** : c'est l'anti-traversal par construction (modèle propre à audio/video, distinct du modèle « nom assaini » de `forge-mvc-files`).
 - Aucun `ffprobe`/`ffmpeg` : l'ingestion ne fait que valider et stocker.
 
 ## La vue

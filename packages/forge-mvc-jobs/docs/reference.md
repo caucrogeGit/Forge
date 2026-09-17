@@ -25,9 +25,8 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -62,8 +61,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-jobs`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -80,8 +78,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     forge opt-in:enable jobs --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -91,14 +88,13 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     forge migration:apply
     ```
 
-    `jobs:init` copie la migration embarquée dans `mvc/migrations/` ;
-    `migration:apply` l'exécute et la trace (ADR-071).
+    `jobs:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute et la trace (ADR-071).
     Sans cette étape, le premier appel échoue sur une table absente.
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -108,8 +104,7 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -155,7 +150,8 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
         Réglez le bail au-dessus de votre tâche la plus longue.
         Écrivez des gestionnaires **idempotents**, car la reprise ne promet pas l'exécution unique, elle promet qu'aucune tâche ne reste bloquée.
 
-        Le worker ne prolonge pas son bail pendant qu'il travaille, ce qui lèverait cette limite. C'est hors périmètre pour l'instant.
+        Le worker ne prolonge pas son bail pendant qu'il travaille, ce qui lèverait cette limite.
+        C'est hors périmètre pour l'instant.
 
     !!! note "Le réessai attend, désormais"
         Une tâche dont le gestionnaire lève une exception repart en file après un délai croissant, et non plus immédiatement.
@@ -462,12 +458,9 @@ Le cœur de Forge ignore tout des tâches de fond : ce paquet fournit la file et
 
 ## Déclaration de table
 
-Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py`
-(`JOBS`, plus la liste `MIGRATIONS`).
-Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit
-dans `mvc/migrations/` par `forge jobs:init` (chantier `OPTIN-DDL-DIALECTAL`).
-Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
-MariaDB, SQLite, PostgreSQL comme SQL Server.
+Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py` (`JOBS`, plus la liste `MIGRATIONS`).
+Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit dans `mvc/migrations/` par `forge jobs:init` (chantier `OPTIN-DDL-DIALECTAL`).
+Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server.
 
 ## Ne pas faire deux fois
 
@@ -510,13 +503,15 @@ def transcoder(payload, *, claim_token):
 C'est une information utile : le travail est peut-être en train d'être refait ailleurs.
 
 !!! danger "Cet exemple ne fonctionnait pas, et cassait la tâche"
-    Le worker appelait `handler(payload)`. Un gestionnaire n'avait donc aucun moyen d'obtenir son jeton, et `heartbeat` était inutilisable depuis le seul endroit où elle sert (`JOBS-HEARTBEAT-REACHABLE-001`).
+    Le worker appelait `handler(payload)`.
+    Un gestionnaire n'avait donc aucun moyen d'obtenir son jeton, et `heartbeat` était inutilisable depuis le seul endroit où elle sert (`JOBS-HEARTBEAT-REACHABLE-001`).
 
     Mesuré, un gestionnaire écrit comme ci dessus levait `TypeError`, repartait en réessai au bout de dix secondes, puis finissait `failed`.
     L'exemple ne se contentait pas d'être inopérant : il cassait la tâche, et le motif inscrit dans `last_error` parlait d'un argument manquant plutôt que du travail.
 
 !!! info "Le gestionnaire demande ce qu'il reçoit"
-    Un gestionnaire qui déclare `claim_token`, en mot-clé ou par `**kwargs`, le reçoit. Celui qui ne déclare rien continue de recevoir la seule charge utile, et aucun projet existant n'a de geste à faire.
+    Un gestionnaire qui déclare `claim_token`, en mot-clé ou par `**kwargs`, le reçoit.
+    Celui qui ne déclare rien continue de recevoir la seule charge utile, et aucun projet existant n'a de geste à faire.
 
     Ce n'est pas de la magie cachée : c'est le gestionnaire qui demande.
     Un appelable dont la signature ne s'inspecte pas ne reçoit rien, deviner ferait échouer un gestionnaire qui marchait.

@@ -4,8 +4,7 @@ Objectif : consulter les lignes de l'entité depuis le back-office.
 
 ## Ouvrir la liste
 
-Depuis le tableau de bord, la ressource « Articles »
-mène à `/admin/articles`.
+Depuis le tableau de bord, la ressource « Articles » mène à `/admin/articles`.
 
 La page affiche un tableau :
 

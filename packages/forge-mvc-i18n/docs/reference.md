@@ -24,9 +24,8 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -61,8 +60,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-i18n`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -79,8 +77,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     forge opt-in:enable i18n --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -89,8 +86,8 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -100,8 +97,7 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -366,7 +362,8 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
 
     `trans()` rend la clé elle même quand la traduction manque, et c'est le bon comportement : une page ne doit pas casser pour une traduction absente (`I18N-MISSING-KEYS-DEV-001`).
 
-    Mais **rien ne le signalait**. On ajoute `{{ trans("panier_vide") }}` dans une page, on oublie de l'ajouter au catalogue, et la page affiche « panier_vide » à l'utilisateur.
+    Mais **rien ne le signalait**.
+    On ajoute `{{ trans("panier_vide") }}` dans une page, on oublie de l'ajouter au catalogue, et la page affiche « panier_vide » à l'utilisateur.
 
     ```python
     from forge_mvc_i18n import clear_missing_keys, missing_keys
@@ -377,7 +374,8 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
     !!! info "Hors production seulement"
         Journaliser chaque clé manquante à chaque requête noierait le journal, et une traduction absente n'est pas un incident d'exploitation.
 
-        C'est un défaut à corriger au développement, et c'est là qu'il doit se voir. En production, la clé est rendue en silence, comme avant.
+        C'est un défaut à corriger au développement, et c'est là qu'il doit se voir.
+        En production, la clé est rendue en silence, comme avant.
 
     !!! info "Une clé n'est signalée qu'une fois"
         La même clé manquante sur mille requêtes est un seul défaut.
@@ -393,25 +391,30 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
 
     `i18n:check` compare deux catalogues entre eux : il dit quelle clé du français manque à l'anglais (`I18N-EXTRACT-CLI-001`).
 
-    Il ne peut rien dire d'une clé employée dans un gabarit et absente **des deux**, puisqu'il ne lit que les catalogues. C'est pourtant le cas le plus fréquent.
+    Il ne peut rien dire d'une clé employée dans un gabarit et absente **des deux**, puisqu'il ne lit que les catalogues.
+    C'est pourtant le cas le plus fréquent.
 
     ```bash
     forge i18n:extract
     forge i18n:extract --locale en
     ```
 
-    La commande balaye `mvc/views/`, relève les appels à `trans()` et les compare au catalogue. Une clé employée et absente fait échouer la commande ; une clé du catalogue non trouvée dans les gabarits est signalée sans être une erreur, puisqu'elle peut servir à un appel calculé.
+    La commande balaye `mvc/views/`, relève les appels à `trans()` et les compare au catalogue.
+    Une clé employée et absente fait échouer la commande ; une clé du catalogue non trouvée dans les gabarits est signalée sans être une erreur, puisqu'elle peut servir à un appel calculé.
 
     !!! warning "Seules les clés littérales sont extraites"
         `trans(variable)` et `trans("prefixe_" ~ suffixe)` ne peuvent pas être lus : la clé n'existe qu'à l'exécution.
 
-        Ces appels sont **comptés et rapportés** à part, et la sortie annonce alors que la liste est un minorant. Le prétendre exhaustive donnerait une fausse assurance.
+        Ces appels sont **comptés et rapportés** à part, et la sortie annonce alors que la liste est un minorant.
+        Le prétendre exhaustive donnerait une fausse assurance.
 
-    L'extraction elle même vit dans l'opt-in (`extract.py`, `extract_from_directory`, `extract_from_text`, `ExtractionResult`), qui seul connaît la forme des appels. La commande l'importe paresseusement : le cœur ne dépend pas d'un opt-in (ADR-004).
+    L'extraction elle même vit dans l'opt-in (`extract.py`, `extract_from_directory`, `extract_from_text`, `ExtractionResult`), qui seul connaît la forme des appels.
+    La commande l'importe paresseusement : le cœur ne dépend pas d'un opt-in (ADR-004).
 
 ??? note "14. Singulier et pluriel"
 
-    `trans()` rend une chaîne unique par clé (`I18N-PLURALS-001`). Afficher « 1 articles », ou écrire deux clés avec un `if` dans chaque gabarit, sont les deux contournements qu'on rencontre, et aucun ne tient quand une troisième langue arrive.
+    `trans()` rend une chaîne unique par clé (`I18N-PLURALS-001`).
+    Afficher « 1 articles », ou écrire deux clés avec un `if` dans chaque gabarit, sont les deux contournements qu'on rencontre, et aucun ne tient quand une troisième langue arrive.
 
     ```json
     {"articles": {"one": "{n} article", "other": "{n} articles"}}
@@ -437,11 +440,13 @@ Extrait du cœur (ADR-027), il s'active dès qu'il est installé : le renderer J
         Ce module n'a jamais formaté, et le faire ici casserait toute traduction contenant une accolade littérale.
 
     !!! danger "Forge implémente deux formes, CLDR en définit six"
-        `one` et `other`, avec une règle par famille de langues. C'est exact pour le français, l'anglais et la plupart des langues d'Europe occidentale.
+        `one` et `other`, avec une règle par famille de langues.
+        C'est exact pour le français, l'anglais et la plupart des langues d'Europe occidentale.
 
         C'est **faux** pour le russe, l'arabe, le polonais et le gallois, et `plural_form` **lève** pour ces langues plutôt que de rendre une forme qu'elle sait fausse.
 
-        Ce n'est pas un choix par facilité : une implémentation partielle de CLDR donnerait l'impression de couvrir une langue qu'elle massacre. Une application qui doit traduire vers l'une d'elles emploie une bibliothèque d'internationalisation complète.
+        Ce n'est pas un choix par facilité : une implémentation partielle de CLDR donnerait l'impression de couvrir une langue qu'elle massacre.
+        Une application qui doit traduire vers l'une d'elles emploie une bibliothèque d'internationalisation complète.
 
     !!! info "Le français met zéro au singulier"
         « 0 article » en français, « 0 articles » en anglais.

@@ -52,9 +52,7 @@ def test_envoi(db):
 
 ## Le schéma reste visible
 
-Le paquet ne livre pas de SQL figé : il **déclare** sa table, et `forge jobs:init`
-en écrit le DDL dans `mvc/migrations/`, rendu pour le backend que vous avez
-installé.
+Le paquet ne livre pas de SQL figé : il **déclare** sa table, et `forge jobs:init` en écrit le DDL dans `mvc/migrations/`, rendu pour le backend que vous avez installé.
 
 ```bash
 forge db:config          # amorce la connexion dans env/ (une seule fois)
@@ -71,10 +69,8 @@ print(TABLE_NAME)   # "jobs"
 ```
 
 - `TABLE_NAME` vaut `"jobs"` : le nom de la table.
-- Le SQL reste visible, et il est même **relu avant d'être appliqué** : rien
-  n'est exécuté dans votre dos (principe 5).
-- Il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server : la même
-  déclaration, rendue par le dialecte actif.
+- Le SQL reste visible, et il est même **relu avant d'être appliqué** : rien n'est exécuté dans votre dos (principe 5).
+- Il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server : la même déclaration, rendue par le dialecte actif.
 
 ## À retenir
 

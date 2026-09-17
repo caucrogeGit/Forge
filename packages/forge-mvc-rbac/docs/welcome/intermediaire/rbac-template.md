@@ -29,8 +29,7 @@ Troisième palier du **niveau intermédiaire** de la progression RBAC.
 forge run
 ```
 
-Ouvrez `https://localhost:8000/rbac-template` : le bouton « Créer »
-est masqué tant qu'aucun utilisateur n'a la permission.
+Ouvrez `https://localhost:8000/rbac-template` : le bouton « Créer » est masqué tant qu'aucun utilisateur n'a la permission.
 
 ## Le contrôleur
 

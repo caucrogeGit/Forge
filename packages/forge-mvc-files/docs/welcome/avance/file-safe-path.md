@@ -122,8 +122,7 @@ with router.group("", public=True) as public:
 ## À retenir
 
 - L'anti-traversal repose sur `is_safe_media_path` + `normalize_media_path`.
-- Un chemin piégé est **refusé**, pas « corrigé »
-  silencieusement.
+- Un chemin piégé est **refusé**, pas « corrigé » silencieusement.
 - Sécurité écrite **une fois**, composée par tout le module (et les opt-ins média).
 
 ## Après ce starter

@@ -1,8 +1,7 @@
 # ADR-000 : Titre de la décision
 
 Gabarit d'ADR.
-Copiez ce fichier en `docs/adr/<numero>-<sujet>.md`, renumérotez, puis
-remplacez chaque section.
+Copiez ce fichier en `docs/adr/<numero>-<sujet>.md`, renumérotez, puis remplacez chaque section.
 
 ## Statut
 

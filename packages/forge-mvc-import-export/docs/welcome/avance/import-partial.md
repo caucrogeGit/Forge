@@ -1,10 +1,8 @@
 # Import partiel
 
-Objectif : choisir entre « tout ou rien »
-et l'insertion des seules lignes valides.
+Objectif : choisir entre « tout ou rien » et l'insertion des seules lignes valides.
 
-**Ce que vous allez apprendre :** par défaut, `import_rows` est « tout ou rien »
-au niveau validation : une seule ligne invalide empêche toute insertion.
+**Ce que vous allez apprendre :** par défaut, `import_rows` est « tout ou rien » au niveau validation : une seule ligne invalide empêche toute insertion.
 L'option `partial=True` insère les lignes valides malgré des lignes en erreur.
 On voit aussi comment une exception levée par `insert` est capturée et rapportée.
 
@@ -16,8 +14,7 @@ Premier palier du **niveau avancé** de la progression Import/Export.
 
 ## Ce que ce starter montre
 
-- le comportement « tout ou rien »
-  par défaut ;
+- le comportement « tout ou rien » par défaut ;
 - l'insertion partielle avec `partial=True` ;
 - la capture d'une erreur d'insertion levée par `insert`.
 

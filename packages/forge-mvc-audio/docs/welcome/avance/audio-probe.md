@@ -8,8 +8,7 @@ Il valide aussi que la durée reste sous la limite configurée.
 Premier palier du **niveau avancé** de la progression audio.
 
 !!! note "Module opt-in : `ffprobe` requis"
-    Ce starter suppose `forge-mvc-audio` installé
-    et le binaire `ffprobe` présent.
+    Ce starter suppose `forge-mvc-audio` installé et le binaire `ffprobe` présent.
     Sans lui, la page reste **pédagogique** (message d'erreur clair).
 
 ## Ce que ce starter montre

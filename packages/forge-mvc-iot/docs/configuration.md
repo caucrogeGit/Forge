@@ -7,10 +7,7 @@
 ## Objectif
 
 Définir comment `forge-mvc-iot` lit sa configuration MQTT à partir de l'environnement, **avant** d'écrire le subscriber.
-L'objectif est d'isoler les questions « où va-t-on lire host/port/topic ?
-»
-des questions « comment se connecter au broker ?
-».
+L'objectif est d'isoler les questions « où va-t-on lire host/port/topic ? » des questions « comment se connecter au broker ? ».
 
 ## Variables d'environnement
 
@@ -187,7 +184,8 @@ FORGE_IOT_MQTT_USERNAME=forge-prod
 FORGE_IOT_MQTT_PASSWORD=...
 ```
 
-Aucun branchement spécial n'est nécessaire : le contrat est identique à un broker local. Pour un broker exposé, active le [TLS MQTT](#tls-mqtt) (`FORGE_IOT_MQTT_TLS_ENABLED`, `FORGE_IOT_MQTT_TLS_CA_FILE`, port `8883`).
+Aucun branchement spécial n'est nécessaire : le contrat est identique à un broker local.
+Pour un broker exposé, active le [TLS MQTT](#tls-mqtt) (`FORGE_IOT_MQTT_TLS_ENABLED`, `FORGE_IOT_MQTT_TLS_CA_FILE`, port `8883`).
 Les certificats client (mTLS) restent hors périmètre.
 
 ## Limites itération 1
@@ -198,8 +196,7 @@ Sont explicitement **hors périmètre** :
 - TLS est branché dans les clients (`IOT-MQTT-TLS-CLIENTS-001`) via `client.tls_set` ; restent **hors périmètre** : le certificat client (mTLS), la génération de certificats, `tls_insecure_set` et la configuration serveur Mosquitto TLS complète ;
 - pas de ACL Mosquitto : gestion côté broker, hors Forge ;
 - pas de gestion de secrets externes (Vault, AWS Secrets Manager) : la config se contente de lire un mapping `str → str` ;
-- pas de validation runtime du topic vs contrat MQTT (le pattern `forge/+/+/telemetry` est accepté tel quel par Forge IoT, qui s'abonne « bêtement »
-  au topic fourni) ;
+- pas de validation runtime du topic vs contrat MQTT (le pattern `forge/+/+/telemetry` est accepté tel quel par Forge IoT, qui s'abonne « bêtement » au topic fourni) ;
 - pas de connexion au broker : aucune dépendance `paho-mqtt`.
 
 Toute extension passera par un ticket `IOT-CONFIG-NNN` ultérieur, sans casser le contrat actuel.

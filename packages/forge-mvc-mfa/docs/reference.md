@@ -42,9 +42,8 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -79,8 +78,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-mfa`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -97,8 +95,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     forge opt-in:enable mfa --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -106,8 +103,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     Rien à faire dans le cas courant.
     Cet opt-in n'apporte aucune table, la persistance des facteurs appartenant à l'application.
 
-    Une seule exception, si vous servez l'authentification par **plusieurs workers** et voulez
-    un anti-rejeu TOTP commun à tous.
+    Une seule exception, si vous servez l'authentification par **plusieurs workers** et voulez un anti-rejeu TOTP commun à tous.
     Le registre partagé, décrit plus bas, s'appuie alors sur une table.
 
     ```bash
@@ -119,9 +115,8 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     #### 4. Le brancher là où il agit
 
-    Il se branche dans `app.py`, là où l'application compose ses middlewares et ses
-    fournisseurs de contexte. Ce câblage vous appartient : Forge ne l'écrit jamais à
-    votre place (principe 9).
+    Il se branche dans `app.py`, là où l'application compose ses middlewares et ses fournisseurs de contexte.
+    Ce câblage vous appartient : Forge ne l'écrit jamais à votre place (principe 9).
 
     #### 5. Le prouver
 
@@ -131,8 +126,7 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -480,12 +474,14 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
     ### Exigences avant production-ready
 
-    Ce qui relevait du paquet est livré. Ce qui reste relève de l'exploitant, et ne peut pas en relever autrement : Forge ne sait ni où vous sauvegardez vos clés, ni qui relit votre déploiement.
+    Ce qui relevait du paquet est livré.
+    Ce qui reste relève de l'exploitant, et ne peut pas en relever autrement : Forge ne sait ni où vous sauvegardez vos clés, ni qui relit votre déploiement.
 
     1. ~~**Chiffrement applicatif des secrets TOTP**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : Fernet + `FORGE_MFA_SECRET_KEY`.
     2. ~~**Politique de rotation**~~ ✓ livré (`MFA-KEY-ROTATION-001`) : `FORGE_MFA_SECRET_KEY_PREVIOUS`, `rotate_totp_secret`, `uses_current_key`.
     3. ~~**Tests dédiés au stockage chiffré**~~ ✓ livré (`SEC-MFA-SECRET-ENCRYPTION-001`) : `tests/test_mfa_secret_crypto.py`.
-    4. **Sauvegarde de la clé de chiffrement** : à votre charge. Sa perte rend tous les secrets TOTP illisibles, et aucun facteur ne se revalide.
+    4. **Sauvegarde de la clé de chiffrement** : à votre charge.
+       Sa perte rend tous les secrets TOTP illisibles, et aucun facteur ne se revalide.
     5. **Revue de sécurité de votre déploiement** : à votre charge.
 
     ### Tickets liés
@@ -614,9 +610,11 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
 
 ??? note "15. Rendre le facteur obligatoire pour un rôle"
 
-    Le paquet savait dire si un utilisateur **a** un facteur actif. Il ne savait pas dire s'il **devrait** en avoir un (`MFA-REQUIRED-BY-ROLE-001`).
+    Le paquet savait dire si un utilisateur **a** un facteur actif.
+    Il ne savait pas dire s'il **devrait** en avoir un (`MFA-REQUIRED-BY-ROLE-001`).
 
-    L'application écrivait donc, dans chaque contrôleur sensible, un « si cet utilisateur est administrateur et n'a pas de MFA, alors refuser ». Elle l'écrivait bien la première fois, et l'oubliait au troisième écran d'administration ajouté six mois plus tard.
+    L'application écrivait donc, dans chaque contrôleur sensible, un « si cet utilisateur est administrateur et n'a pas de MFA, alors refuser ».
+    Elle l'écrivait bien la première fois, et l'oubliait au troisième écran d'administration ajouté six mois plus tard.
 
     ```bash
     MFA_REQUIRED_ROLES=admin,comptable
@@ -638,14 +636,16 @@ Le secret TOTP est **chiffré au repos** (Fernet) ; l'application décide où pe
     !!! info "Le paquet ne connaît pas `forge-mvc-rbac`"
         Aucun opt-in n'importe un autre.
 
-        Les rôles sont lus dans la session, où l'authentification les a rangés, et la politique n'a pas besoin de savoir d'où ils viennent. Trois emplacements sont acceptés, `user.roles`, `user.role` et `roles` à la racine : les applications les emploient tous les trois, et n'en reconnaître qu'un ferait échouer la politique en silence, ce qui est la pire issue pour un contrôle de sécurité.
+        Les rôles sont lus dans la session, où l'authentification les a rangés, et la politique n'a pas besoin de savoir d'où ils viennent.
+        Trois emplacements sont acceptés, `user.roles`, `user.role` et `roles` à la racine : les applications les emploient tous les trois, et n'en reconnaître qu'un ferait échouer la politique en silence, ce qui est la pire issue pour un contrôle de sécurité.
 
     !!! warning "`check_mfa_requirement` ne lève jamais"
         Un contrôle de sécurité qui échoue en levant sur une session mal formée priverait d'accès un utilisateur légitime.
 
         Il rend un verdict, et l'appelant décide.
 
-    Sans `MFA_REQUIRED_ROLES`, rien n'est obligatoire : le paquet n'impose pas une politique que personne n'a demandée. Les noms de rôles sont normalisés en minuscules, une majuscule ne devant pas faire échouer une politique.
+    Sans `MFA_REQUIRED_ROLES`, rien n'est obligatoire : le paquet n'impose pas une politique que personne n'a demandée.
+    Les noms de rôles sont normalisés en minuscules, une majuscule ne devant pas faire échouer une politique.
 
     Les fonctions vivent dans `policy.py` (`check_mfa_requirement`, `required_roles`, `roles_of`, `is_mfa_required_for`, `MfaRequirement`).
 

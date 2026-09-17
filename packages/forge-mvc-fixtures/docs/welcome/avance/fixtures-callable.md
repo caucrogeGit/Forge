@@ -12,7 +12,8 @@ Deux étapes d'un seed réaliste leur échappent :
 - **importer un référentiel** depuis une source (un JSON canonique) : le figer en `.sql` dupliquerait des dizaines d'objets et perdrait la source ;
 - **calculer une valeur** à partir d'autres tables (un agrégat, un bilan).
 
-Ces deux cas demandent du code. C'est le rôle d'une **fixture callable**.
+Ces deux cas demandent du code.
+C'est le rôle d'une **fixture callable**.
 
 ## Écrire une fixture callable
 
@@ -33,7 +34,9 @@ class ReferentielFixture(Fixture):
 
 Points clés :
 
-- `load()` (obligatoire) **persiste** les données. Elle écrit en base comme le reste de votre code : `from core.database import db`, ou en appelant une fonction applicative (ici un importeur) qui le fait. Le SQL reste paramétré et vit dans votre code, visible.
+- `load()` (obligatoire) **persiste** les données.
+  Elle écrit en base comme le reste de votre code : `from core.database import db`, ou en appelant une fonction applicative (ici un importeur) qui le fait.
+  Le SQL reste paramétré et vit dans votre code, visible.
 - `tables` déclare les tables peuplées : elles servent à l'ordre de chargement et à la purge.
 - `depends_on` liste les entités ou tables à charger avant.
 
@@ -74,8 +77,7 @@ Un préfixe numérique dans le nom du fichier ordonne les fixtures callable entr
 
 ## Un seul pipeline, un seul ordre
 
-`fixtures:load` découvre vos `mvc/fixtures/*.py` et les mêle aux `.sql` dans **un seul ordre** :
-le tri topologique des dépendances (clés étrangères de `relations.json`, liens `reference()`, `depends_on`) place chaque unité, `.sql` comme callable, après **toute** unité qui fournit une table dont elle dépend.
+`fixtures:load` découvre vos `mvc/fixtures/*.py` et les mêle aux `.sql` dans **un seul ordre** : le tri topologique des dépendances (clés étrangères de `relations.json`, liens `reference()`, `depends_on`) place chaque unité, `.sql` comme callable, après **toute** unité qui fournit une table dont elle dépend.
 Un callable déclarant `tables = ("niveau_classe",)` est donc chargé avant un `.sql` dont une clé étrangère pointe `niveau_classe`.
 
 Comme partout dans Forge, la commande **affiche** d'abord et n'exécute rien :
@@ -85,7 +87,8 @@ forge fixtures:load          # affiche les .sql ET le source des fixtures .py
 forge fixtures:load --run    # exécute les INSERT et appelle load()
 ```
 
-Vous relisez le code Python qui va s'exécuter avant qu'il s'exécute. Rien de caché.
+Vous relisez le code Python qui va s'exécuter avant qu'il s'exécute.
+Rien de caché.
 La production reste protégée : `--run` seul y est refusé, `--force` est requis.
 
 ## Démonter proprement

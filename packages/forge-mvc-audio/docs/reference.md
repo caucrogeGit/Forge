@@ -24,9 +24,8 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -61,8 +60,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-audio`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -79,8 +77,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     forge opt-in:enable audio --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -89,8 +86,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
 
     #### 4. Le brancher là où il agit
 
-    Ses routes montent avec celles des autres opt-ins, par l'appel
-    `register_optins(router)` déjà présent dans `mvc/routes/__init__.py`.
+    Ses routes montent avec celles des autres opt-ins, par l'appel `register_optins(router)` déjà présent dans `mvc/routes/__init__.py`.
     Rien de plus à écrire.
 
     #### 5. Le prouver
@@ -101,8 +97,7 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -333,12 +328,16 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     meta.tags.track_number       # 3, sur meta.tags.track_total
     ```
 
-    `meta.tags` n'est jamais `None` : un fichier sans étiquette donne un objet vide, de sorte qu'un appelant n'ait pas à tester avant de lire. C'est d'ailleurs le cas courant d'un enregistrement brut, ou d'un fichier transcodé par le paquet, qui pose `-map_metadata -1`.
+    `meta.tags` n'est jamais `None` : un fichier sans étiquette donne un objet vide, de sorte qu'un appelant n'ait pas à tester avant de lire.
+    C'est d'ailleurs le cas courant d'un enregistrement brut, ou d'un fichier transcodé par le paquet, qui pose `-map_metadata -1`.
 
     !!! danger "Une étiquette vient du fichier envoyé"
         Elle est écrite par qui a produit le fichier, ou par qui l'a modifié avant de l'envoyer, et elle finit affichée dans une page.
 
-        Trois précautions sont donc appliquées ici plutôt que laissées à l'appelant, qui les oublierait une fois sur deux. Les caractères de contrôle sont retirés, y compris `U+2028` que `str.strip` laisse passer et qui casse une chaîne JavaScript. La longueur est bornée à 300 caractères, rien n'empêchant un titre d'un mégaoctet. Et rien n'est interprété.
+        Trois précautions sont donc appliquées ici plutôt que laissées à l'appelant, qui les oublierait une fois sur deux.
+        Les caractères de contrôle sont retirés, y compris `U+2028` que `str.strip` laisse passer et qui casse une chaîne JavaScript.
+        La longueur est bornée à 300 caractères, rien n'empêchant un titre d'un mégaoctet.
+        Et rien n'est interprété.
 
     !!! warning "L'échappement reste au gabarit"
         Le module ne décode aucune entité et n'échappe rien.
@@ -348,11 +347,13 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     !!! info "Les noms d'étiquettes varient selon le conteneur"
         ID3 dit `tit2`, Vorbis dit `TITLE`, et la casse change d'un outil à l'autre.
 
-        Les clés sont donc cherchées en minuscules, par ordre de préférence. Un conteneur sans bloc de format, comme le WAV, voit ses étiquettes lues sur le flux audio.
+        Les clés sont donc cherchées en minuscules, par ordre de préférence.
+        Un conteneur sans bloc de format, comme le WAV, voit ses étiquettes lues sur le flux audio.
 
     Une année implausible ou un « piste 5 sur 2 » sont écartés : afficher une valeur manifestement fausse vaut moins que ne rien afficher.
 
-    Le module ne **réécrit** jamais les étiquettes d'un fichier. Les lire et les écrire sont deux gestes, et le second appartiendrait à un autre ticket.
+    Le module ne **réécrit** jamais les étiquettes d'un fichier.
+    Les lire et les écrire sont deux gestes, et le second appartiendrait à un autre ticket.
 
 ??? note "13. Découper un fichier"
 
@@ -388,7 +389,8 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
 
     Un intervalle vide ou renversé est refusé plutôt que joué : `ffmpeg` écrirait un fichier de zéro seconde sans se plaindre.
 
-    L'option `-ss` est placée **avant** `-i`, ce qui fait sauter `ffmpeg` directement à l'instant demandé au lieu de décoder tout ce qui précède. Sur un long fichier, cela change une découpe de plusieurs minutes en une opération immédiate.
+    L'option `-ss` est placée **avant** `-i`, ce qui fait sauter `ffmpeg` directement à l'instant demandé au lieu de décoder tout ce qui précède.
+    Sur un long fichier, cela change une découpe de plusieurs minutes en une opération immédiate.
 
 ??? note "14. Alignement avec le module vidéo"
 
@@ -401,7 +403,8 @@ Volontairement sobre : aucune base de données, aucune file de transcodage, des 
     !!! danger "Une valeur de configuration illisible lève désormais"
         `FORGE_AUDIO_MAX_DURATION_SECONDS=7200x` retombait sur le défaut en silence : les fichiers plus longs étaient refusés, et rien ne l'expliquait.
 
-        Le paquet suit maintenant `forge-mvc-video`, `forge-mvc-files` et `forge-mvc-images` : une limite mal écrite se signale au démarrage. Pour ne pas borner, retirez la variable.
+        Le paquet suit maintenant `forge-mvc-video`, `forge-mvc-files` et `forge-mvc-images` : une limite mal écrite se signale au démarrage.
+        Pour ne pas borner, retirez la variable.
 
     L'harmonisation de deux paquets porte d'abord sur ce que fait leur code, pas seulement sur ce qu'affiche leur diagnostic.
 

@@ -1,8 +1,6 @@
 # Vérifier une permission
 
-Objectif : répondre « ces **rôles** accordent-ils cette **permission** ?
-»
-selon le contrat.
+Objectif : répondre « ces **rôles** accordent-ils cette **permission** ? » selon le contrat.
 
 **Ce que vous allez apprendre :** `has_contract_permission(result, roles, permission)` agrège les permissions des rôles via le contrat et répond oui/non.
 Pur, sans base.
@@ -147,8 +145,7 @@ with router.group("", public=True) as public:
 
 ## À retenir
 
-- `has_contract_permission` répond à « ces rôles ont-ils ce droit ?
-  ».
+- `has_contract_permission` répond à « ces rôles ont-ils ce droit ? ».
 - Le contrat est la **source de vérité** unique.
 - Cette brique alimente guards et templates.
 

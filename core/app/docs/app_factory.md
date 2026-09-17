@@ -113,12 +113,14 @@ Un projet sans `bootstrap.py` n'en a pas besoin : `load_bootstrap()` rend `None`
 Forge n'écrit jamais dans un projet existant (principe 9), et il n'y a rien à migrer.
 
 !!! danger "Pourquoi ce fichier existe, et ce qu'il a coûté"
-    Ce câblage vivait dans `app.py`. Le chemin WSGI ne le lit pas, et construisait donc une application privée de ses gardes, sauf la première.
+    Ce câblage vivait dans `app.py`.
+    Le chemin WSGI ne le lit pas, et construisait donc une application privée de ses gardes, sauf la première.
 
     Elle démarrait, répondait 200, authentifiait, et laissait passer tout ce que les gardes suivantes auraient refusé, magasin de sessions compris.
     La panne était silencieuse par nature : rien, dans aucun journal, ne la signalait.
 
-    L'ADR-092 rend cette panne bruyante en la refusant. L'ADR-093, ce fichier, en retire la cause : la divergence devient impossible au lieu d'être détectable.
+    L'ADR-092 rend cette panne bruyante en la refusant.
+    L'ADR-093, ce fichier, en retire la cause : la divergence devient impossible au lieu d'être détectable.
 
 !!! tip "Source unique d'initialisation"
     La fabrique existe pour éviter que le serveur de développement et le callable WSGI configurent Forge différemment.

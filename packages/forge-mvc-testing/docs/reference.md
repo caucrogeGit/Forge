@@ -26,9 +26,8 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -355,7 +354,8 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
 
 ??? note "12. Client de test, de la requête à la réponse"
 
-    `FakeRequest` permet d'appeler un contrôleur directement. C'est utile et insuffisant : rien n'y passe par le routeur, ni par les middlewares, ni par la construction d'une `Request` depuis un environnement WSGI (`TESTING-CLIENT-001`).
+    `FakeRequest` permet d'appeler un contrôleur directement.
+    C'est utile et insuffisant : rien n'y passe par le routeur, ni par les middlewares, ni par la construction d'une `Request` depuis un environnement WSGI (`TESTING-CLIENT-001`).
 
     Un test qui appelle `ArticleController.show(fake_request)` ne prouve donc rien du CSRF, de l'authentification, des en-têtes de sécurité, ni même de l'existence de la route.
 
@@ -372,7 +372,9 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     !!! danger "Le client passe par le VRAI chemin de production"
         Il construit un environnement WSGI et appelle le callable rendu par `create_wsgi_app`, c'est à dire exactement ce que Gunicorn appelle.
 
-        Ce n'est pas un détail d'élégance. Un client qui reconstruirait sa propre boucle serait un **jumeau** : il passerait là où la production échoue, et les deux dériveraient sans que rien ne le signale. Forge a déjà payé cette erreur une fois, avec un serveur de développement qui répondait là où Gunicorn rendait 404.
+        Ce n'est pas un détail d'élégance.
+        Un client qui reconstruirait sa propre boucle serait un **jumeau** : il passerait là où la production échoue, et les deux dériveraient sans que rien ne le signale.
+        Forge a déjà payé cette erreur une fois, avec un serveur de développement qui répondait là où Gunicorn rendait 404.
 
     !!! info "Les cookies sont gardés entre deux requêtes"
         Un scénario réaliste enchaîne une connexion, une lecture de formulaire et un envoi, et chacune dépend de la précédente.
@@ -410,7 +412,8 @@ C'est un paquet **dev-only** (ADR-041) : il n'est **jamais** une dépendance d'e
     !!! info "Aucun utilisateur n'est créé en base"
         Le contenu de la session est celui que l'appelant donne, et il n'a pas à correspondre à une ligne.
 
-        Un test de contrôle d'accès vérifie ce que le middleware fait d'une session, pas ce que le dépôt contient. Un test qui a besoin des deux crée son utilisateur lui même.
+        Un test de contrôle d'accès vérifie ce que le middleware fait d'une session, pas ce que le dépôt contient.
+        Un test qui a besoin des deux crée son utilisateur lui même.
 
     !!! warning "`logout` détruit la session"
         Oublier le cookie sans détruire la session laisserait un test de déconnexion passer alors que la session reste utilisable par qui la connaît.

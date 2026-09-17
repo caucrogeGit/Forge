@@ -32,9 +32,8 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -71,10 +70,8 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-mssql`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points),
-    adaptée à un backend : il n'y a pas d'inscription au registre, le cœur le découvre par
-    son entry point.
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points), adaptée à un backend.
+    Il n'y a pas d'inscription au registre, le cœur le découvre par son entry point.
 
     #### 1. L'épingler
 
@@ -83,8 +80,7 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     ```
 
     Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
-    Sans cette ligne, le pilote n'existe que sur votre machine, et l'application démarre
-    sans backend chez un collègue, sur un serveur ou en intégration continue.
+    Sans cette ligne, le pilote n'existe que sur votre machine, et l'application démarre sans backend chez un collègue, sur un serveur ou en intégration continue.
 
     #### 2. Configurer, provisionner et vérifier
 
@@ -109,18 +105,15 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
 
     ### Chiffrement et vérification du certificat
 
-    La connexion est chiffrée et le certificat du serveur est **vérifié**, ce qui
-    est le comportement attendu face à un serveur distant.
-    Deux variables permettent d'en décider autrement, et elles n'ont pas de
-    valeur par défaut dans `env/` : leur absence vaut le réglage sûr.
+    La connexion est chiffrée et le certificat du serveur est **vérifié**, ce qui est le comportement attendu face à un serveur distant.
+    Deux variables permettent d'en décider autrement, et elles n'ont pas de valeur par défaut dans `env/` : leur absence vaut le réglage sûr.
 
     | Variable | Défaut | Rôle |
     |---|---|---|
     | `DB_MSSQL_ENCRYPT` | `yes` | Chiffrement de la connexion. Accepte aussi `strict`, exigé par les pilotes récents. |
     | `DB_MSSQL_TRUST_SERVER_CERTIFICATE` | `no` | Se fier au certificat sans le vérifier. |
 
-    Un serveur de développement local présente souvent un certificat auto-signé,
-    que la vérification refuse.
+    Un serveur de développement local présente souvent un certificat auto-signé, que la vérification refuse.
     C'est un cas légitime, et il se déclare :
 
     ```env
@@ -128,11 +121,9 @@ Le cœur de Forge est agnostique BDD (ADR-054) : il découvre le backend install
     ```
 
     Ne posez pas cette variable en production.
-    Chiffrer une connexion et authentifier le serveur en face sont deux garanties
-    distinctes, et la seconde est celle qui distingue votre serveur d'un autre.
+    Chiffrer une connexion et authentifier le serveur en face sont deux garanties distinctes, et la seconde est celle qui distingue votre serveur d'un autre.
 
-    Une valeur non reconnue garde le réglage sûr plutôt que d'être interprétée :
-    une faute de frappe ne doit pas désactiver une vérification.
+    Une valeur non reconnue garde le réglage sûr plutôt que d'être interprétée : une faute de frappe ne doit pas désactiver une vérification.
 
     `forge doctor` confirme le backend résolu (`mssql`) ; si plusieurs backends sont installés, fixez `DB_BACKEND=mssql`.
 

@@ -37,7 +37,8 @@ L'administrateur possède ses trois permissions : la sienne, celle de l'éditeur
 !!! danger "Un cycle est refusé, et le refus nomme le cycle"
     `admin` héritant d'`editeur` héritant d'`admin` n'a pas d'ordre de lecture.
 
-    S'arrêter arbitrairement donnerait des permissions différentes selon l'ordre du fichier, ce qu'un contrôle d'accès ne peut pas se permettre. `forge rbac:audit` refuse et dit « cycle d'héritage : admin puis editeur puis admin ».
+    S'arrêter arbitrairement donnerait des permissions différentes selon l'ordre du fichier, ce qu'un contrôle d'accès ne peut pas se permettre.
+    `forge rbac:audit` refuse et dit « cycle d'héritage : admin puis editeur puis admin ».
 
 !!! warning "Un rôle hérité inconnu est signalé"
     Une faute de frappe n'accorde rien du tout, et personne ne s'en aperçoit avant qu'un utilisateur se plaigne.

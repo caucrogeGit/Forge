@@ -25,9 +25,8 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -62,8 +61,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-notifications`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -80,8 +78,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     forge opt-in:enable notifications --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -91,14 +88,13 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     forge migration:apply
     ```
 
-    `notifications:init` copie la migration embarquée dans `mvc/migrations/` ;
-    `migration:apply` l'exécute et la trace (ADR-071).
+    `notifications:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute et la trace (ADR-071).
     Sans cette étape, le premier appel échoue sur une table absente.
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -108,8 +104,7 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -344,12 +339,9 @@ Le cœur de Forge ignore tout des notifications : ce paquet fournit la table et 
 
 ## Déclaration de table
 
-Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py`
-(`NOTIFICATIONS`, plus la liste `MIGRATIONS`).
-Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit
-dans `mvc/migrations/` par `forge notifications:init` (chantier `OPTIN-DDL-DIALECTAL`).
-Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour
-MariaDB, SQLite, PostgreSQL comme SQL Server.
+Le paquet ne livre plus de fichier SQL figé : il **déclare** sa table dans `tables.py` (`NOTIFICATIONS`, plus la liste `MIGRATIONS`).
+Le DDL est rendu pour le backend installé par `core.database.table_ddl`, puis écrit dans `mvc/migrations/` par `forge notifications:init` (chantier `OPTIN-DDL-DIALECTAL`).
+Le SQL reste donc relisible avant `forge migration:apply`, mais il est correct pour MariaDB, SQLite, PostgreSQL comme SQL Server.
 
 ## Doubler une notification par un autre canal
 
@@ -390,7 +382,8 @@ def doubler_par_email(notification):
     `forge-mvc-mail` et `forge-mvc-jobs` sont les destinataires évidents sans être imposés : une application peut relayer vers un SMS, une alerte d'exploitation, ou rien du tout.
 
 !!! warning "Un relais ne peut pas annuler une notification"
-    L'annonce suit l'écriture. Si un relais lève, l'exception est avalée et journalisée en avertissement.
+    L'annonce suit l'écriture.
+    Si un relais lève, l'exception est avalée et journalisée en avertissement.
 
     La notification est déjà en base : faire échouer `notify` après coup laisserait l'appelant croire qu'elle n'existe pas, alors qu'elle s'affiche.
     Les relais suivants sont appelés malgré tout.
@@ -541,12 +534,13 @@ Le rafraîchissement s'écrit avec HTMX, que le squelette livre déjà :
 
 `notify` validait le destinataire sur sa forme **élaguée** et stockait la forme **brute**.
 
-Une notification écrite pour `"  professeur.42  "` était donc invisible à `get_notifications`, `unread_count` et `mark_all_read`, qui interrogent la valeur telle qu'on la leur passe (`NOTIF-STORE-AS-VALIDATED-001`).
+Une notification écrite pour `" professeur.42 "` était donc invisible à `get_notifications`, `unread_count` et `mark_all_read`, qui interrogent la valeur telle qu'on la leur passe (`NOTIF-STORE-AS-VALIDATED-001`).
 
 !!! danger "Écrite, comptée comme réussie, et jamais lue"
-    Mesuré : écrit avec `recipient = '  professeur.42  '`, relu avec `'professeur.42'` rendait zéro notification et zéro non lue.
+    Mesuré : écrit avec `recipient = ' professeur.42 '`, relu avec `'professeur.42'` rendait zéro notification et zéro non lue.
 
-    Aucune erreur nulle part. C'est le pire mode de panne, tout paraît avoir marché.
+    Aucune erreur nulle part.
+    C'est le pire mode de panne, tout paraît avoir marché.
 
 !!! warning "Le paquet était incohérent d'une fonction à l'autre"
     `mark_read` élaguait, seule de toutes.

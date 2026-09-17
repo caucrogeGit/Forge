@@ -1,9 +1,11 @@
 # Module média Forge
 
 !!! info "Un opt-in officiel, qui suit la version du cœur"
-    `forge-mvc-images` détient la couche applicative média. Il n'a pas de cycle de maturité propre : sa version est celle du `pyproject.toml` racine (`OPTINS-MATURITY-FOLLOWS-CORE-001`).
+    `forge-mvc-images` détient la couche applicative média.
+    Il n'a pas de cycle de maturité propre : sa version est celle du `pyproject.toml` racine (`OPTINS-MATURITY-FOLLOWS-CORE-001`).
 
-    Installation : `pip install --pre forge-mvc-images`. Pour le développement depuis les sources, voir [section ci-dessous](#installation).
+    Installation : `pip install --pre forge-mvc-images`.
+    Pour le développement depuis les sources, voir [section ci-dessous](#installation).
 
     Le module reste opt-in : le cœur de Forge ne dépend pas de `forge-mvc-images`.
 

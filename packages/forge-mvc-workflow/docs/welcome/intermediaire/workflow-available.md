@@ -65,8 +65,7 @@ class WorkflowAvailableController(BaseController):
 
 - Plutôt que de coder chaque bouton en dur, on **dérive** les actions possibles du statut courant : l'UI suit le workflow automatiquement.
 - Un statut final renvoie une liste vide → aucune action, naturellement.
-- C'est la version « lecture »
-  de `can_transition` : on liste au lieu de tester un cas.
+- C'est la version « lecture » de `can_transition` : on liste au lieu de tester un cas.
 
 ## La vue
 

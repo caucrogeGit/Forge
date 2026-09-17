@@ -8,8 +8,7 @@ Forge Audio reste **sobre** : pas de file de jobs, pas de table ; l'opération a
 Deuxième palier du **niveau avancé** de la progression audio.
 
 !!! note "Module opt-in : `ffmpeg` requis"
-    Ce starter suppose `forge-mvc-audio` installé
-    et le binaire `ffmpeg` présent.
+    Ce starter suppose `forge-mvc-audio` installé et le binaire `ffmpeg` présent.
     Sans lui, la page reste **pédagogique**.
 
 ## Ce que ce starter montre

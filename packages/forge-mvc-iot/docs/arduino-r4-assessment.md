@@ -22,16 +22,14 @@ Toute évaluation d'une autre carte se compare à cette référence.
 
 ## Identifier le modèle Arduino R4 exact
 
-« Arduino R4 »
-recouvre plusieurs réalités.
+« Arduino R4 » recouvre plusieurs réalités.
 Avant tout test, identifier précisément la variante :
 
 - **Arduino UNO R4 WiFi** : intègre un module Wi-Fi (ESP32-S3 dédié à la connectivité).
   C'est la seule variante R4 pertinente pour MQTT sans matériel additionnel ;
 - **Arduino UNO R4 Minima** (et variantes **sans Wi-Fi**) : pas de connectivité réseau intégrée, inadaptée à MQTT sans shield/module réseau externe.
 
-La distinction est décisive : une bonne partie des « Arduino R4 »
-en circulation **n'ont pas** de Wi-Fi.
+La distinction est décisive : une bonne partie des « Arduino R4 » en circulation **n'ont pas** de Wi-Fi.
 
 ## Cas Arduino R4 WiFi
 

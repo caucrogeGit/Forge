@@ -4,8 +4,7 @@ Objectif : modifier un article existant.
 
 ## Le formulaire d'édition
 
-La fiche détail propose un lien « Modifier »
-vers `/admin/articles/<id>/edit`.
+La fiche détail propose un lien « Modifier » vers `/admin/articles/<id>/edit`.
 Le formulaire est pré-rempli avec les valeurs actuelles de la ligne.
 
 Comme la création, il est protégé par un jeton CSRF.

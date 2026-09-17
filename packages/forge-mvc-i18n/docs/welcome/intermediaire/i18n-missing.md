@@ -6,8 +6,7 @@ Objectif : comprendre ce que renvoie `trans` quand une clé n'existe nulle part.
 La page reste affichable ; la clé non traduite est visible, ce qui aide à repérer les oublis.
 
 !!! note "Module opt-in"
-    Ce comportement « clé en dernier recours »
-    vaut pour une **clé** manquante.
+    Ce comportement « clé en dernier recours » vaut pour une **clé** manquante.
     Un catalogue principal absent ou invalide est traité différemment (avancé).
 
 ## Classes Forge utilisées

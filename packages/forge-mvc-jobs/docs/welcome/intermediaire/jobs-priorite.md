@@ -42,7 +42,8 @@ enqueue("mail.reset", {...}, idempotency_key=f"reset:{utilisateur.id}")
 !!! danger "La clé ne vaut que tant que la tâche est en file"
     Une fois traitée, la même clé enfile de nouveau.
 
-    C'est voulu : sinon un utilisateur ne pourrait jamais redemander une réinitialisation. Si vous voulez un verrou durable, il vous appartient.
+    C'est voulu : sinon un utilisateur ne pourrait jamais redemander une réinitialisation.
+    Si vous voulez un verrou durable, il vous appartient.
 
 !!! info "Choisissez une clé qui décrit l'intention"
     `reset:42` dit « une réinitialisation pour l'utilisateur 42 ».

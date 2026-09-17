@@ -10,7 +10,8 @@ Pour compter des visiteurs uniques, le réflexe est d'écrire l'adresse IP dans 
 track_event("accueil", metadata={"ip": request.remote_addr})   # refusé
 ```
 
-Forge refuse. Une adresse brute rangée sous une clé qui la nomme transforme la table en fichier de données personnelles, soumis à conservation limitée et à droit d'accès, sans que personne ne l'ait décidé.
+Forge refuse.
+Une adresse brute rangée sous une clé qui la nomme transforme la table en fichier de données personnelles, soumis à conservation limitée et à droit d'accès, sans que personne ne l'ait décidé.
 
 ## Deux réponses, selon le besoin
 

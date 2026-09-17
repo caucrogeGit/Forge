@@ -82,8 +82,7 @@ for erreur in rapport.errors:
 - `RowError.row` est le numéro de la ligne de données, 1-based ; la ligne 2 ici.
 - `RowError.field` indique la colonne fautive, `RowError.message` le motif.
 - Par défaut, une seule ligne invalide empêche toute insertion : `imported` vaut 0.
-  Ce comportement « tout ou rien »
-  est détaillé au niveau avancé.
+  Ce comportement « tout ou rien » est détaillé au niveau avancé.
 
 ## À retenir
 

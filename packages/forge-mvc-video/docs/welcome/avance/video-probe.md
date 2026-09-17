@@ -11,8 +11,7 @@ Après le [niveau intermédiaire](../intermediaire/bilan.md).
 
 !!! note "ffprobe requis"
     Ce palier exécute **ffprobe**.
-    Installez ffmpeg/ffprobe et renseignez au besoin `FORGE_VIDEO_FFPROBE_BIN`.
-    ffprobe **lit** la source ; il ne transcode pas.
+    Installez ffmpeg/ffprobe et renseignez au besoin `FORGE_VIDEO_FFPROBE_BIN`. ffprobe **lit** la source ; il ne transcode pas.
 
 ## Ce que ce starter montre
 

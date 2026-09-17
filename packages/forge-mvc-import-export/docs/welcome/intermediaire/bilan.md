@@ -14,7 +14,6 @@ Vous savez décrire vos colonnes, convertir les valeurs et insérer les lignes v
 
 ## Et ensuite
 
-Place au niveau **avancé** : la stratégie « tout ou rien »
-contre l'import partiel, l'export programmatique et l'indépendance du cœur.
+Place au niveau **avancé** : la stratégie « tout ou rien » contre l'import partiel, l'export programmatique et l'indépendance du cœur.
 
 [Niveau avancé : Import partiel](../avance/import-partial.md)

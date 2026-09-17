@@ -32,9 +32,8 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -69,8 +68,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-fixtures`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -87,8 +85,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     forge opt-in:enable fixtures --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -108,8 +105,7 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -363,12 +359,16 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     ```
 
     - `load(self, *, tx=None)` écrit en base **comme le reste du projet** (`from core.database import db`, ou une fonction applicative qui le fait) : le SQL reste paramétré et visible dans le code appelé (principe 7).
-    - Propagez `tx` à vos `db.execute`, comme le fait déjà `purge()`. Le chargement se déroule dans **une seule transaction** : sans `tx`, vos écritures repartiraient sur d'autres connexions du pool, échapperaient à l'annulation en cas d'échec, et `--no-fk-checks` ne les couvrirait pas. Une fixture qui déclare `load(self)` sans `tx` est refusée, avec un message qui indique la correction.
+    - Propagez `tx` à vos `db.execute`, comme le fait déjà `purge()`.
+      Le chargement se déroule dans **une seule transaction** : sans `tx`, vos écritures repartiraient sur d'autres connexions du pool, échapperaient à l'annulation en cas d'échec, et `--no-fk-checks` ne les couvrirait pas.
+      Une fixture qui déclare `load(self)` sans `tx` est refusée, avec un message qui indique la correction.
     - `tables` et `depends_on` placent la fixture dans l'ordre de chargement (tri topologique unifié avec les `.sql`) ; un préfixe numérique (`50_referentiel.py`) ordonne les callable entre elles.
     - `purge(self)` (surchargeable) démonte la fixture ; par défaut, vide les `tables` déclarées.
 
     `fixtures:load` découvre les `mvc/fixtures/*.py` (hors `factories/`), **affiche** leur source par défaut, puis les exécute avec `--run`.
-    `fixtures:purge` démonte dans l'ordre **inverse exact** du chargement (le même graphe topologique renversé, `.sql` et callable), dans **une seule transaction** encadrée par la **désactivation des contraintes FK** du dialecte (`SET FOREIGN_KEY_CHECKS`, `PRAGMA foreign_keys`...). `SET FOREIGN_KEY_CHECKS` étant une variable de session (par connexion), tout le démontage partage une même connexion, et `Fixture.purge(*, tx=None)` propage cette transaction (robuste même pour un callable peuplant plusieurs tables liées). Si bien que `fixtures:purge --run` puis `fixtures:load --run` reconstruit un état propre sans erreur de clé étrangère, de façon rejouable.
+    `fixtures:purge` démonte dans l'ordre **inverse exact** du chargement (le même graphe topologique renversé, `.sql` et callable), dans **une seule transaction** encadrée par la **désactivation des contraintes FK** du dialecte (`SET FOREIGN_KEY_CHECKS`, `PRAGMA foreign_keys`...).
+    `SET FOREIGN_KEY_CHECKS` étant une variable de session (par connexion), tout le démontage partage une même connexion, et `Fixture.purge(*, tx=None)` propage cette transaction (robuste même pour un callable peuplant plusieurs tables liées).
+    Si bien que `fixtures:purge --run` puis `fixtures:load --run` reconstruit un état propre sans erreur de clé étrangère, de façon rejouable.
     Une fixture qui écrit dans des tables non déclarées et ne surcharge pas `purge()` n'est pas purgée automatiquement (limite : déclarer `tables`, ou écrire `purge()`).
 
     Frontière (principe 11) : la fixture callable n'est **pas** une deuxième façon d'insérer du statique (cela reste des `.sql`), mais le recours pour ce que le SQL statique ne peut pas exprimer.
@@ -401,19 +401,22 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
         test/10_articles.sql    <- forge fixtures:load --scenario test
     ```
 
-    Le jeu commun est chargé **d'abord**, puis celui du scénario : un scénario complète une base partagée au lieu de la réécrire. Sans `--scenario`, seul le jeu commun est chargé, ce qui est le comportement d'avant ce ticket.
+    Le jeu commun est chargé **d'abord**, puis celui du scénario : un scénario complète une base partagée au lieu de la réécrire.
+    Sans `--scenario`, seul le jeu commun est chargé, ce qui est le comportement d'avant ce ticket.
 
     !!! danger "Un scénario inconnu est une erreur, jamais un chargement vide"
         C'est le point qui compte.
 
         `--scenario dmo`, faute de frappe pour `demo`, chargerait zéro fichier et annoncerait un succès : l'exploitant croirait ses données en place, et chercherait ailleurs pourquoi son application est vide.
 
-        Le message liste les scénarios présents. Un dossier de scénario vide est refusé pour la même raison.
+        Le message liste les scénarios présents.
+        Un dossier de scénario vide est refusé pour la même raison.
 
     !!! info "Trois noms suggérés, aucun imposé"
         `demo`, `test` et `minimal` couvrent les besoins courants et la documentation les emploie.
 
-        Ce ne sont que des noms de dossiers : Forge n'en connaît aucun et n'en réserve aucun. Imposer une liste fermée obligerait à un ticket pour chaque projet ayant un quatrième besoin.
+        Ce ne sont que des noms de dossiers : Forge n'en connaît aucun et n'en réserve aucun.
+        Imposer une liste fermée obligerait à un ticket pour chaque projet ayant un quatrième besoin.
 
     Le nom devient un dossier sur le disque : il est validé, et une valeur comme `../etc` est refusée.
 
@@ -431,7 +434,8 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     !!! warning "Un fichier peut écrire dans plusieurs tables"
         L'ordre ne regardait que le **premier** `INSERT INTO` de chaque fichier.
 
-        Un fichier insérant dans `articles` puis `commentaires` était classé comme s'il ne touchait qu'`articles`, et pouvait passer avant celui dont `commentaires` dépend. Toutes les tables écrites sont maintenant lues, et le fichier est classé après la plus tardive de leurs dépendances.
+        Un fichier insérant dans `articles` puis `commentaires` était classé comme s'il ne touchait qu'`articles`, et pouvait passer avant celui dont `commentaires` dépend.
+        Toutes les tables écrites sont maintenant lues, et le fichier est classé après la plus tardive de leurs dépendances.
 
     !!! info "Une table qui se référence elle même est signalée"
         Une hiérarchie `parent_id` demande que l'ordre soit respecté **ligne à ligne** dans le fichier.
@@ -454,19 +458,22 @@ Le cœur de Forge ignore tout des fixtures : ce paquet fournit les commandes et 
     !!! danger "La sortie vient d'une base réelle"
         Sur un environnement de recette alimenté depuis la production, ces données sont celles de personnes, et le fichier produit finit dans un dépôt Git, où il ne s'efface plus.
 
-        L'exécution en `APP_ENV=prod` est **refusée** sans `--force`, comme `fixtures:load --run` (ADR-074). L'en-tête du fichier le rappelle : un fichier de fixtures est relu des mois plus tard, souvent par quelqu'un d'autre, et rien dans un `INSERT` ne dit d'où il vient.
+        L'exécution en `APP_ENV=prod` est **refusée** sans `--force`, comme `fixtures:load --run` (ADR-074).
+        L'en-tête du fichier le rappelle : un fichier de fixtures est relu des mois plus tard, souvent par quelqu'un d'autre, et rien dans un `INSERT` ne dit d'où il vient.
 
     !!! info "Forge ne devine pas quelles colonnes masquer"
         Il ne sait pas lesquelles portent une donnée personnelle, et prétendre le deviner donnerait une fausse assurance.
 
-        C'est précisément pourquoi la sortie est **affichée** par défaut : vous relisez avant d'écrire. Un fichier existant n'est jamais écrasé (charte §9).
+        C'est précisément pourquoi la sortie est **affichée** par défaut : vous relisez avant d'écrire.
+        Un fichier existant n'est jamais écrasé (charte §9).
 
     !!! warning "Une fixture est une amorce, pas une sauvegarde"
         Le plafond vaut 50 lignes par défaut et 1000 au maximum.
 
         Une ligne de plus que le plafond est lue, pour savoir qu'il en restait et le dire dans le fichier, plutôt que de rendre un instantané tronqué qui ressemble à un instantané complet.
 
-    Les valeurs sont rendues par `Dialect.render_literal` (ADR-075), réservé aux artefacts relus par un humain avant d'être joués. Le nom de table et le tri sont validés plutôt qu'échappés, aucun backend n'acceptant un nom de table en paramètre lié.
+    Les valeurs sont rendues par `Dialect.render_literal` (ADR-075), réservé aux artefacts relus par un humain avant d'être joués.
+    Le nom de table et le tri sont validés plutôt qu'échappés, aucun backend n'acceptant un nom de table en paramètre lié.
 
     ### API Python des trois tickets
 

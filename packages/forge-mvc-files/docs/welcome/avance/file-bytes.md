@@ -3,7 +3,8 @@
 Objectif : écrire un fichier **produit côté serveur** (rapport, export) avec la primitive `save_bytes`, sans passer par un upload HTTP.
 
 **Ce que vous allez apprendre :** tout n'arrive pas d'un formulaire.
-`save_bytes` range des octets dans la zone d'upload, avec un nom sûr et la même garde anti-traversal. C'est la brique d'écriture bas niveau sur laquelle `save_upload` lui-même est bâti (ADR-020).
+`save_bytes` range des octets dans la zone d'upload, avec un nom sûr et la même garde anti-traversal.
+C'est la brique d'écriture bas niveau sur laquelle `save_upload` lui-même est bâti (ADR-020).
 
 Troisième palier du **niveau avancé** de la progression files.
 

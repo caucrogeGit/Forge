@@ -94,8 +94,7 @@ Table absente (migration pas appliquée) :
            Conseil : lance forge iot:init puis forge migration:apply
 ```
 
-Le `--db` traite l'absence de table comme un **`warn`** (pas un `fail`) : le module est installé correctement, c'est juste l'étape « apply »
-qui manque.
+Le `--db` traite l'absence de table comme un **`warn`** (pas un `fail`) : le module est installé correctement, c'est juste l'étape « apply » qui manque.
 Exit code 0.
 
 Connexion MariaDB impossible :
@@ -253,7 +252,8 @@ Si `FORGE_IOT_MQTT_HOST` est défini mais vide, par exemple :
   [FAIL]  configuration IoT - FORGE_IOT_MQTT_HOST ne peut pas être vide
 ```
 
-Idem pour un port hors plage, un topic vide, etc. Voir [Configuration Forge IoT : erreurs](configuration.md#erreurs-levees).
+Idem pour un port hors plage, un topic vide, etc.
+Voir [Configuration Forge IoT : erreurs](configuration.md#erreurs-levees).
 
 ### Migration manquante
 

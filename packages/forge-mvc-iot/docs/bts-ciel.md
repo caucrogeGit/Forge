@@ -199,7 +199,8 @@ Associer chaque panne à la commande utile :
 
 ## Limites
 
-Cette page pose le cadre pédagogique général. Sont **hors périmètre** :
+Cette page pose le cadre pédagogique général.
+Sont **hors périmètre** :
 
 - en classe, on part du simulateur `forge iot:simulate` ; pour un capteur réel, voir l'[exemple ESP32](esp32-example.md) ;
 - l'**Arduino R4** n'est pas couvert ici (hors périmètre) : l'exemple cible l'ESP32 ;

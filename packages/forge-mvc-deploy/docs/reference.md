@@ -24,9 +24,8 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -61,8 +60,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-deploy`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -79,8 +77,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     forge opt-in:enable deploy --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -107,8 +104,7 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -268,7 +264,8 @@ Il n'expose aucune API runtime : une application ne l'importe jamais à l'exécu
         `deploy:init` ne réécrit jamais un fichier existant (principe 9), donc un projet plus ancien garde son unité d'origine.
         Sous un autre backend, cet `After=` désigne un service inexistant et ne retarde donc rien : au démarrage de la machine, l'application part avant sa base et rate ses premières connexions.
 
-        `deploy:check` le signale désormais. La correction reste manuelle, dans `deploy/systemd/forge-app.service`.
+        `deploy:check` le signale désormais.
+        La correction reste manuelle, dans `deploy/systemd/forge-app.service`.
 
 ??? note "9 bis. Secrets laissés à leur valeur d'amorçage"
 

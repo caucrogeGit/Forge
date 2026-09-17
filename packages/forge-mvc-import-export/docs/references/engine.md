@@ -36,8 +36,7 @@ report = import_rows(rows, specs, add_eleve)
 
 ## 3. Tout ou rien, ou partiel
 
-Par défaut, l'import est « tout ou rien »
-au niveau validation : si une ligne est invalide, **aucune** ligne n'est insérée et le rapport liste toutes les erreurs.
+Par défaut, l'import est « tout ou rien » au niveau validation : si une ligne est invalide, **aucune** ligne n'est insérée et le rapport liste toutes les erreurs.
 Avec `partial=True`, les lignes valides sont insérées malgré les lignes en erreur.
 
 Pour une vraie atomicité au niveau base, l'application enveloppe l'appel dans une transaction (le moteur ne gère pas la transaction lui-même : le SQL reste à l'application).

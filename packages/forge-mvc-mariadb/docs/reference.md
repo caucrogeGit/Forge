@@ -28,9 +28,8 @@ Forge n'impose aucun backend de référence.
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -69,10 +68,8 @@ Forge n'impose aucun backend de référence.
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-mariadb`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points),
-    adaptée à un backend : il n'y a pas d'inscription au registre, le cœur le découvre par
-    son entry point.
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points), adaptée à un backend.
+    Il n'y a pas d'inscription au registre, le cœur le découvre par son entry point.
 
     #### 1. L'épingler
 
@@ -81,8 +78,7 @@ Forge n'impose aucun backend de référence.
     ```
 
     Dans `requirements.txt`, à la même version ou au même commit que `forge-mvc`.
-    Sans cette ligne, le pilote n'existe que sur votre machine, et l'application démarre
-    sans backend chez un collègue, sur un serveur ou en intégration continue.
+    Sans cette ligne, le pilote n'existe que sur votre machine, et l'application démarre sans backend chez un collègue, sur un serveur ou en intégration continue.
 
     #### 2. Amorcer l'environnement
 

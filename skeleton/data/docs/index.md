@@ -18,5 +18,4 @@ Ajoutez les vôtres en suivant la même trame.
 
 ## Aller plus loin
 
-La documentation du framework Forge et de ses opt-ins est publiée sur le site
-officiel du projet.
+La documentation du framework Forge et de ses opt-ins est publiée sur le site officiel du projet.

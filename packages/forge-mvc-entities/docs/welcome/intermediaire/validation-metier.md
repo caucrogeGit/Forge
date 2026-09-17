@@ -56,7 +56,8 @@ if not rapport.ok:
     L'inverse laisserait passer une écriture parce qu'une garde est cassée, ce qui est exactement le moment où il faut refuser.
 
 !!! info "Enregistrez au câblage, pas à l'import d'un contrôleur"
-    Le registre vit dans le processus. `bootstrap.py` est l'endroit prévu, lu par les deux points d'entrée.
+    Le registre vit dans le processus.
+    `bootstrap.py` est l'endroit prévu, lu par les deux points d'entrée.
 
     Enregistrer depuis un module importé au hasard rendrait la règle active ou non selon l'ordre des imports.
 

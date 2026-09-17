@@ -24,7 +24,8 @@ trans("articles", "fr", count=compte).format(n=compte)
 !!! danger "Forge implémente deux formes, CLDR en définit six"
     C'est exact pour le français, l'anglais et la plupart des langues d'Europe occidentale.
 
-    C'est **faux** pour le russe, l'arabe, le polonais et le gallois : `plural_form` lève pour ces langues plutôt que de rendre une forme qu'elle sait fausse. Une implémentation partielle donnerait l'impression de couvrir une langue qu'elle massacre.
+    C'est **faux** pour le russe, l'arabe, le polonais et le gallois : `plural_form` lève pour ces langues plutôt que de rendre une forme qu'elle sait fausse.
+    Une implémentation partielle donnerait l'impression de couvrir une langue qu'elle massacre.
 
 !!! warning "Une forme absente est refusée au chargement"
     Pas à la requête qui porte le nombre manquant.

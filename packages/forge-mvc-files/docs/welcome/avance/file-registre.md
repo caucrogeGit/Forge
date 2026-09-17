@@ -27,7 +27,8 @@ La commande les liste ; `--delete` les efface.
 !!! danger "Tout ce qui écrit doit inscrire"
     Un opt-in qui écrit sous `UPLOAD_ROOT` sans inscrire produit des fichiers que cette purge prendra pour des orphelins.
 
-    C'est arrivé : les images et leurs variantes étaient écrites sans inscription, et `--delete` les supprimait. La règle n'est pas un confort de comptage, c'est ce qui empêche une purge de détruire des fichiers vivants.
+    C'est arrivé : les images et leurs variantes étaient écrites sans inscription, et `--delete` les supprimait.
+    La règle n'est pas un confort de comptage, c'est ce qui empêche une purge de détruire des fichiers vivants.
 
 !!! warning "Un fichier trop récent n'est jamais un orphelin"
     Une écriture en cours n'a pas encore été inscrite : la prendre pour un orphelin la détruirait pendant qu'elle se fait.

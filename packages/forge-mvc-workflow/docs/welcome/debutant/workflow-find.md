@@ -70,8 +70,7 @@ class WorkflowFindController(BaseController):
 
 - `find_status` renvoie `None` plutôt que de lever une exception : on teste explicitement l'existence.
 - On normalise le nom recherché avant la recherche (cohérence avec les noms stockés).
-- C'est la brique qui relie un objet (« cet article est en `review` »)
-  à la définition de son statut.
+- C'est la brique qui relie un objet (« cet article est en `review` ») à la définition de son statut.
 
 ## La vue
 

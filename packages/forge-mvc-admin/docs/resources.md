@@ -57,8 +57,7 @@ AdminResource(
 !!! warning "Sans cette déclaration, la création échoue"
 
     Le back-office ignorait ce mécanisme jusqu'à `ADMIN-MANAGED-TIMESTAMPS-001`.
-    Créer un enregistrement levait alors une violation de contrainte sur les quatre backends,
-    et modifier laissait `updated_at` figé, ce qui est plus discret et plus durable.
+    Créer un enregistrement levait alors une violation de contrainte sur les quatre backends, et modifier laissait `updated_at` figé, ce qui est plus discret et plus durable.
 
     Le défaut par défaut reste `False` : une ressource déclarée avant ce ticket ne change pas de comportement.
 
@@ -89,8 +88,7 @@ L'édition (`GET`/`POST /admin/<slug>/<id>/edit`) pré-remplit le formulaire dep
 La fiche détail propose un lien « Modifier ».
 
 La suppression est **contrôlée** : `GET /admin/<slug>/<id>/delete` affiche une page de confirmation (lecture seule), et seule la soumission `POST /admin/<slug>/<id>/delete` exécute `DELETE … WHERE <pk> = ?` (jamais en GET, CSRF vérifié), puis redirige vers la liste.
-La fiche détail propose un lien « Supprimer »
-vers la page de confirmation.
+La fiche détail propose un lien « Supprimer » vers la page de confirmation.
 
 ## `AdminRegistry`
 

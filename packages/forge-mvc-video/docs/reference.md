@@ -24,9 +24,8 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -61,8 +60,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-video`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -79,8 +77,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     forge opt-in:enable video --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -90,14 +87,12 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     forge migration:apply
     ```
 
-    `video:init` copie la migration embarquée dans `mvc/migrations/` ;
-    `migration:apply` l'exécute et la trace (ADR-071).
+    `video:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute et la trace (ADR-071).
     Sans cette étape, le premier appel échoue sur une table absente.
 
     #### 4. Le brancher là où il agit
 
-    Ses routes montent avec celles des autres opt-ins, par l'appel
-    `register_optins(router)` déjà présent dans `mvc/routes/__init__.py`.
+    Ses routes montent avec celles des autres opt-ins, par l'appel `register_optins(router)` déjà présent dans `mvc/routes/__init__.py`.
     Rien de plus à écrire.
 
     #### 5. Le prouver
@@ -108,8 +103,7 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -332,14 +326,16 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     vue.public_message   # ce que le visiteur peut lire
     ```
 
-    La route `GET /videos/{uuid}/status` rend la même chose en JSON, de quoi rafraîchir une page sans la recharger. Elle suit la règle d'accès de la lecture : protégée par le même jeton, ou ouverte comme elle.
+    La route `GET /videos/{uuid}/status` rend la même chose en JSON, de quoi rafraîchir une page sans la recharger.
+    Elle suit la règle d'accès de la lecture : protégée par le même jeton, ou ouverte comme elle.
 
     !!! danger "La sortie d'erreur de ffmpeg ne sort jamais"
         `error_message` porte le message de ffmpeg, qui contient les **chemins absolus** des fichiers d'entrée et de sortie.
 
         Le rendre à un visiteur publierait l'arborescence du serveur, et un gabarit qui affiche « la raison de l'échec » le fait sans y penser.
 
-        `VideoStatusView` sépare donc `public_message`, destiné à l'écran, de `technical_detail`, destiné au journal. `as_public_dict()` ne peut pas rendre le second : la séparation est portée par le type, non par une consigne, et un gabarit ne peut pas afficher par accident un champ qui n'est pas là.
+        `VideoStatusView` sépare donc `public_message`, destiné à l'écran, de `technical_detail`, destiné au journal.
+        `as_public_dict()` ne peut pas rendre le second : la séparation est portée par le type, non par une consigne, et un gabarit ne peut pas afficher par accident un champ qui n'est pas là.
 
     !!! info "Un état inconnu ne lève pas"
         Une ligne absente ou un état que le paquet ne connaît pas donnent « État inconnu ».
@@ -348,7 +344,8 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
 
 ??? note "13. Plafonner la vidéothèque entière"
 
-    Le paquet bornait déjà **un** fichier, par sa taille (`FORGE_VIDEO_MAX_UPLOAD_MB`) et par sa durée (`FORGE_VIDEO_MAX_DURATION_SECONDS`). Ces deux contrôles existaient et fonctionnaient.
+    Le paquet bornait déjà **un** fichier, par sa taille (`FORGE_VIDEO_MAX_UPLOAD_MB`) et par sa durée (`FORGE_VIDEO_MAX_DURATION_SECONDS`).
+    Ces deux contrôles existaient et fonctionnaient.
 
     Rien ne bornait leur **somme** (`VIDEO-QUOTA-001`) : cinq cents vidéos d'une heure et de 999 Mo passent chacune le contrôle, et remplissent le disque de cinq cents gigaoctets.
 
@@ -364,14 +361,17 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     !!! warning "La durée se vérifie au traitement, pas à l'envoi"
         La taille est connue avant d'écrire, la durée seulement après le sondage.
 
-        Un dépassement fait donc échouer le traitement et laisse le fichier source, que l'application supprime si elle le souhaite. Sonder avant d'écrire demanderait un fichier temporaire et un appel à `ffprobe` de plus par envoi, pour déplacer le problème sans le résoudre.
+        Un dépassement fait donc échouer le traitement et laisse le fichier source, que l'application supprime si elle le souhaite.
+        Sonder avant d'écrire demanderait un fichier temporaire et un appel à `ffprobe` de plus par envoi, pour déplacer le problème sans le résoudre.
 
     !!! danger "Une valeur de configuration illisible lève"
         `FORGE_VIDEO_MAX_DURATION_SECONDS=7200x` **interrompt** le chargement de la configuration.
 
-        Elle retombait auparavant sur le défaut en silence : les vidéos de deux heures étaient refusées, et rien n'expliquait pourquoi. Le paquet suit maintenant `forge-mvc-files` et `forge-mvc-images`.
+        Elle retombait auparavant sur le défaut en silence : les vidéos de deux heures étaient refusées, et rien n'expliquait pourquoi.
+        Le paquet suit maintenant `forge-mvc-files` et `forge-mvc-images`.
 
-    `library_totals()` rend l'état courant sans rien refuser, de quoi afficher une jauge. Les restants valent `None` quand aucun plafond n'est déclaré, jamais zéro, qui voudrait dire le contraire.
+    `library_totals()` rend l'état courant sans rien refuser, de quoi afficher une jauge.
+    Les restants valent `None` quand aucun plafond n'est déclaré, jamais zéro, qui voudrait dire le contraire.
 
 ??? note "14. Associer des sous-titres"
 
@@ -395,19 +395,22 @@ Le travail lourd (transcodage) se fait **hors requête HTTP**, via des commandes
     !!! info "Un seul format, WebVTT"
         C'est le seul que la balise `<track>` lit nativement, sans script ni conversion.
 
-        En accepter d'autres, SRT ou ASS, demanderait de convertir à la volée ou de faire porter la conversion au navigateur, qui ne sait pas la faire. Le principe 11 veut une seule façon officielle.
+        En accepter d'autres, SRT ou ASS, demanderait de convertir à la volée ou de faire porter la conversion au navigateur, qui ne sait pas la faire.
+        Le principe 11 veut une seule façon officielle.
 
     !!! danger "Ce qui n'est pas du WebVTT est refusé à l'entrée"
         Le contrôle porte sur la signature `WEBVTT`, que la spécification exige en tête de fichier.
 
-        Sans lui, n'importe quel fichier pourrait être stocké et servi depuis le domaine de l'application sous un nom rassurant. Le refuser à l'écriture vaut mieux que de le filtrer à chaque lecture : la ligne ne doit pas exister.
+        Sans lui, n'importe quel fichier pourrait être stocké et servi depuis le domaine de l'application sous un nom rassurant.
+        Le refuser à l'écriture vaut mieux que de le filtrer à chaque lecture : la ligne ne doit pas exister.
 
     !!! info "Le chemin ne prend rien de l'utilisateur"
         Il est bâti depuis l'UUID de la vidéo et l'étiquette de langue, tous deux validés.
 
         Le nom du fichier envoyé n'entre pas dans le chemin, et aucune traversée n'est donc possible.
 
-    L'étiquette de langue est normalisée en minuscules : `FR` et `fr` créeraient sinon deux pistes que la contrainte d'unicité laisserait passer et que le lecteur afficherait deux fois. Poser une nouvelle piste par défaut retire le drapeau des autres, deux pistes par défaut laissant le navigateur choisir.
+    L'étiquette de langue est normalisée en minuscules : `FR` et `fr` créeraient sinon deux pistes que la contrainte d'unicité laisserait passer et que le lecteur afficherait deux fois.
+    Poser une nouvelle piste par défaut retire le drapeau des autres, deux pistes par défaut laissant le navigateur choisir.
 
     La piste est servie avec la même règle d'accès que la vidéo : une piste dit ce que la vidéo raconte, la protéger moins n'aurait pas de sens.
 

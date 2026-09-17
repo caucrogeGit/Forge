@@ -22,9 +22,8 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -68,8 +67,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-sessions-db`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -86,8 +84,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     forge opt-in:enable sessions-db --apply
     ```
 
-    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du
-    projet.
+    L'opt-in est inscrit dans `optins/registry.py` (ADR-061), ce qui le rend visible du projet.
     `--apply` est **obligatoire** : sans lui, la commande simule et n'écrit rien.
 
     #### 3. Poser ce dont il a besoin
@@ -97,14 +94,13 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     forge migration:apply
     ```
 
-    `sessions:init` copie la migration embarquée dans `mvc/migrations/` ;
-    `migration:apply` l'exécute et la trace (ADR-071).
+    `sessions:init` copie la migration embarquée dans `mvc/migrations/` ; `migration:apply` l'exécute et la trace (ADR-071).
     Sans cette étape, le premier appel échoue sur une table absente.
 
     #### 4. Le brancher là où il agit
 
-    Il s'importe dans le code qui s'en sert. Il n'y a ni route à monter ni middleware
-    à poser.
+    Il s'importe dans le code qui s'en sert.
+    Il n'y a ni route à monter ni middleware à poser.
 
     #### 5. Le prouver
 
@@ -114,8 +110,7 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -315,7 +310,8 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
 ??? note "12. Une durée de vie par nature de session"
 
-    Le store portait **une** durée pour tout le monde (`SESSIONS-TTL-PER-KIND-001`). Les trois natures de session n'ont pourtant ni le même risque ni le même usage.
+    Le store portait **une** durée pour tout le monde (`SESSIONS-TTL-PER-KIND-001`).
+    Les trois natures de session n'ont pourtant ni le même risque ni le même usage.
 
     | Nature | Ce qu'elle porte | Ce qu'une fuite coûte |
     |---|---|---|
@@ -323,7 +319,9 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     | `authenticated` | une identité | l'accès au compte |
     | `remembered` | une identité, sur des semaines | l'accès au compte, longtemps |
 
-    Une durée unique force un arbitrage perdant. Réglée court, elle déconnecte les utilisateurs authentifiés toutes les heures. Réglée long, elle laisse traîner des sessions anonymes par milliers, que la purge doit balayer et qui occupent la table pour un jeton CSRF.
+    Une durée unique force un arbitrage perdant.
+    Réglée court, elle déconnecte les utilisateurs authentifiés toutes les heures.
+    Réglée long, elle laisse traîner des sessions anonymes par milliers, que la purge doit balayer et qui occupent la table pour un jeton CSRF.
 
     ```bash
     SESSION_TTL_ANONYMOUS=7200
@@ -359,11 +357,13 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
     !!! warning "Un `ttl` passé au constructeur reste prioritaire"
         Un projet qui l'avait réglé à la main garde son réglage : le retirer sous ses pieds serait une rupture silencieuse.
 
-    La colonne `kind` arrive par une **migration additive**. Les projets déjà provisionnés ne rejouent pas la création de la table, son empreinte étant enregistrée.
+    La colonne `kind` arrive par une **migration additive**.
+    Les projets déjà provisionnés ne rejouent pas la création de la table, son empreinte étant enregistrée.
 
 ??? note "13. Compter les sessions actives"
 
-    `sessions:gc` dit combien de sessions il a purgées. Personne ne pouvait dire combien il en reste, ni comment ce nombre évolue (`SESSIONS-ACTIVE-METRIC-001`).
+    `sessions:gc` dit combien de sessions il a purgées.
+    Personne ne pouvait dire combien il en reste, ni comment ce nombre évolue (`SESSIONS-ACTIVE-METRIC-001`).
 
     C'est pourtant la première chose qu'on veut savoir d'un magasin adossé à la base : une table qui grossit sans fin signale une purge qui ne tourne pas, et une chute brutale signale une déconnexion de masse.
 
@@ -387,7 +387,8 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
 
 ??? note "14. Faire tourner la purge, avec systemd"
 
-    `sessions:gc` doit tourner régulièrement (`SESSIONS-GC-TIMER-DOC-001`). Forge ne fournit **pas** de planificateur : c'est le rôle du système, et en embarquer un ferait de Forge un ordonnanceur, ce que le principe 8 refuse.
+    `sessions:gc` doit tourner régulièrement (`SESSIONS-GC-TIMER-DOC-001`).
+    Forge ne fournit **pas** de planificateur : c'est le rôle du système, et en embarquer un ferait de Forge un ordonnanceur, ce que le principe 8 refuse.
 
     Deux fichiers, dans `/etc/systemd/system/`.
 
@@ -436,14 +437,16 @@ Le cœur de Forge, agnostique du SGBD, ne fournit qu'un store mémoire et un sto
         Cinq minutes de dispersion suffisent à étaler la charge.
 
     !!! warning "Le minuteur, pas le service"
-        `systemctl enable` porte sur le `.timer`. Activer le `.service` le ferait tourner une fois au démarrage, puis plus jamais.
+        `systemctl enable` porte sur le `.timer`.
+        Activer le `.service` le ferait tourner une fois au démarrage, puis plus jamais.
 
     !!! danger "`EnvironmentFile` porte les identifiants de base"
         Le fichier doit appartenir au compte de service et n'être lisible que par lui, `chmod 600`.
 
         `sessions:gc` se connecte à la base, et un `env/prod` lisible par tous rend les identifiants applicatifs lisibles par tous.
 
-    La fréquence dépend de la durée de vie la plus courte : purger toutes les heures des sessions anonymes de deux heures laisse la table à deux fois sa taille utile, ce qui est raisonnable. `session_metrics().purge_backlog_ratio` le vérifie.
+    La fréquence dépend de la durée de vie la plus courte : purger toutes les heures des sessions anonymes de deux heures laisse la table à deux fois sa taille utile, ce qui est raisonnable.
+    `session_metrics().purge_backlog_ratio` le vérifie.
 
 ## Voir aussi
 

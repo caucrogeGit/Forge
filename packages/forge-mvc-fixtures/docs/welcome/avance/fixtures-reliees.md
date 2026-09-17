@@ -36,7 +36,8 @@ Le SQL généré porte donc les bonnes colonnes, et tourne tel quel sur votre ba
 
 ## Référencer une autre table
 
-Un `eleve` pointe un compte `users`. Au moment de générer les fixtures, l'`Id` du compte n'existe pas encore : il sera attribué par la base au chargement.
+Un `eleve` pointe un compte `users`.
+Au moment de générer les fixtures, l'`Id` du compte n'existe pas encore : il sera attribué par la base au chargement.
 On référence donc la ligne par une **clé naturelle** (un email, un identifiant unique), pas par son `Id` :
 
 ```python
@@ -101,7 +102,8 @@ Si vous fournissez vous-même `CreatedAt` dans la factory, c'est votre valeur qu
 - `fixtures:load` charge dans l'ordre des dépendances ; `--no-fk-checks` reste une échappatoire pour les cycles ;
 - les timestamps `NOT NULL` (`CreatedAt`, `UpdatedAt`) sont ajoutés automatiquement à la génération.
 
-Tout cela reste des données **statiques** (des `.sql`). Le palier suivant montre comment exécuter du code Python pour ce que le SQL ne peut pas exprimer.
+Tout cela reste des données **statiques** (des `.sql`).
+Le palier suivant montre comment exécuter du code Python pour ce que le SQL ne peut pas exprimer.
 
 ## La suite
 

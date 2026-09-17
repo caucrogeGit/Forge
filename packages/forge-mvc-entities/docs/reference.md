@@ -32,9 +32,8 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
         source .venv/bin/activate
         ```
 
-        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+),
-        protégé par PEP 668. Il refuse alors d'installer, pour ne pas écraser les paquets
-        gérés par `apt`, et affiche `externally-managed-environment`.
+        Lancé hors d'un venv, `pip` vise le Python **système** (Debian 12+, Ubuntu 23.04+), protégé par PEP 668.
+        Il refuse alors d'installer, pour ne pas écraser les paquets gérés par `apt`, et affiche `externally-managed-environment`.
         Le venv de projet créé par `forge new` n'a pas ce verrou.
 
     #### Installer le paquet
@@ -69,8 +68,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     Installer le paquet ne suffit pas à le rendre opérationnel.
     Voici les gestes propres à `forge-mvc-entities`, dans l'ordre.
 
-    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq
-    points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
+    Ils déclinent la procédure canonique, [Rendre un opt-in opérationnel : les cinq points](/docs/forge/install/opt-ins/#rendre-un-opt-in-operationnel-les-cinq-points).
 
     #### 1. L'épingler
 
@@ -83,8 +81,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
 
     #### 2. L'inscrire
 
-    Rien à faire : ses commandes sont découvertes par l'entry point
-    `forge_mvc.commands` dès l'installation (ADR-070).
+    Rien à faire : ses commandes sont découvertes par l'entry point `forge_mvc.commands` dès l'installation (ADR-070).
 
     #### 3. Poser ce dont il a besoin
 
@@ -103,8 +100,7 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     ```
 
     Puis un premier usage réel.
-    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas
-    opérationnel : il est seulement présent.
+    Un opt-in installé, inscrit et provisionné qu'aucun code n'appelle n'est pas opérationnel : il est seulement présent.
 
 
 ??? note "4. Désinstallation"
@@ -115,16 +111,11 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
 
     Retirez aussi sa ligne de `requirements.txt`.
 
-    Il n'y a pas d'`opt-in:disable` : le moteur est découvert par son entry point
-    `forge_mvc.commands` (ADR-070), donc retirer le paquet suffit à ce que le cœur ne le
-    voie plus.
+    Il n'y a pas d'`opt-in:disable` : le moteur est découvert par son entry point `forge_mvc.commands` (ADR-070), donc retirer le paquet suffit à ce que le cœur ne le voie plus.
 
-    Ce que la désinstallation **ne fait pas** : vos contrats d'entités
-    (`mvc/entities/*.json`), le code généré et les migrations déjà appliquées restent en
-    place. C'est voulu : ils vous appartiennent (principe 4).
-    Sans le moteur, les commandes `make:entity`, `make:crud`, `migration:*` et `db:*`
-    disparaissent simplement de `forge`, mais l'application continue de tourner sur le code
-    déjà généré.
+    Ce que la désinstallation **ne fait pas** : vos contrats d'entités (`mvc/entities/*.json`), le code généré et les migrations déjà appliquées restent en place.
+    C'est voulu : ils vous appartiennent (principe 4).
+    Sans le moteur, les commandes `make:entity`, `make:crud`, `migration:*` et `db:*` disparaissent simplement de `forge`, mais l'application continue de tourner sur le code déjà généré.
 
 ??? note "5. Commandes"
 
@@ -347,9 +338,11 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
         Le perdre rendrait la clé en minuscules, et un gabarit lisant `{{ ligne.Total }}` afficherait du vide sans une ligne de journal.
 
     !!! danger "L'expression n'est pas paramétrable, et c'est voulu"
-        Elle part telle quelle dans la projection. Une expression construite depuis une saisie serait une injection.
+        Elle part telle quelle dans la projection.
+        Une expression construite depuis une saisie serait une injection.
 
-        Le contrat d'entité est du code du projet, relu et versionné, pas une donnée d'utilisateur. Un point-virgule y est néanmoins refusé : l'expression est projetée dans un `SELECT`, pas exécutée comme une instruction.
+        Le contrat d'entité est du code du projet, relu et versionné, pas une donnée d'utilisateur.
+        Un point-virgule y est néanmoins refusé : l'expression est projetée dans un `SELECT`, pas exécutée comme une instruction.
 
     Six combinaisons sont refusées, chacune parce qu'elle produirait un SQL faux plutôt qu'une simple maladresse : `required`, `unique`, `default`, `form`, `source`, et le type `foreign_key`.
 
@@ -366,9 +359,11 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
 
 ??? note "11. Validation métier déclarable"
 
-    Le contrat décrit des **types** et des contraintes de forme (`ENTITIES-BUSINESS-VALIDATION-001`). Il ne peut rien dire de « la date de fin doit suivre la date de début », ni de « une remise au delà de trente pour cent demande une validation ».
+    Le contrat décrit des **types** et des contraintes de forme (`ENTITIES-BUSINESS-VALIDATION-001`).
+    Il ne peut rien dire de « la date de fin doit suivre la date de début », ni de « une remise au delà de trente pour cent demande une validation ».
 
-    Ces règles vivaient donc dans les contrôleurs, réécrites à chaque point d'entrée. Une entité créée par l'écran passait le contrôle ; la même créée par un import CSV ne le passait pas, et rien ne le signalait.
+    Ces règles vivaient donc dans les contrôleurs, réécrites à chaque point d'entrée.
+    Une entité créée par l'écran passait le contrôle ; la même créée par un import CSV ne le passait pas, et rien ne le signalait.
 
     ```python
     from forge_mvc_entities import ValidationIssue, ensure_entity_data, register_entity_validator
@@ -385,12 +380,14 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     !!! info "Une fonction, et non une expression au contrat"
         Une règle métier a besoin de la base, de l'heure, parfois d'un service.
 
-        Une mini-langue d'expressions dans le JSON en couvrirait un dixième et demanderait un interpréteur, c'est à dire du code caché dans de la donnée, que le principe 3 refuse. Le contrat déclare qu'une entité **a** des règles ; le code dit lesquelles.
+        Une mini-langue d'expressions dans le JSON en couvrirait un dixième et demanderait un interpréteur, c'est à dire du code caché dans de la donnée, que le principe 3 refuse.
+        Le contrat déclare qu'une entité **a** des règles ; le code dit lesquelles.
 
     !!! info "Toutes les règles sont évaluées"
         Rendre le premier problème seul obligerait l'utilisateur à corriger son formulaire une erreur à la fois.
 
-        `ValidationReport.by_field()` les groupe pour les rendre en face de leur champ. Un problème sans champ est permis : « la date de fin doit suivre la date de début » n'appartient à aucun des deux.
+        `ValidationReport.by_field()` les groupe pour les rendre en face de leur champ.
+        Un problème sans champ est permis : « la date de fin doit suivre la date de début » n'appartient à aucun des deux.
 
     !!! danger "Une règle qui échoue refuse l'écriture"
         Une règle qui lève ne dit pas que la donnée est valide, elle ne dit rien.
@@ -411,12 +408,14 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
                    name="article-show_by_slug")
     ```
 
-    La méthode `show_by_slug` et sa route sont engendrées dès que l'entité porte un champ de formulaire `slug`. Une entité sans slug ne voit aucun changement.
+    La méthode `show_by_slug` et sa route sont engendrées dès que l'entité porte un champ de formulaire `slug`.
+    Une entité sans slug ne voit aucun changement.
 
     !!! warning "La route est déclarée en dernier, et ce n'est pas cosmétique"
         Les segments fixes, `/new`, `/edit/{id}`, `/export-csv`, sont déclarés avant.
 
-        Un slug valant « new » serait capturé par eux, et sa fiche resterait inatteignable. `RESERVED_SLUG_SEGMENTS` nomme ces valeurs, pour que l'application les écarte à l'écriture : Forge ne peut pas le faire à sa place, un slug étant une donnée.
+        Un slug valant « new » serait capturé par eux, et sa fiche resterait inatteignable.
+        `RESERVED_SLUG_SEGMENTS` nomme ces valeurs, pour que l'application les écarte à l'écriture : Forge ne peut pas le faire à sa place, un slug étant une donnée.
 
     !!! info "Distincte de `show`, qui adresse par clé primaire"
         Les deux rendent la même vue.
@@ -425,7 +424,8 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
 
 ??? note "13. Lire un diff de schéma, et l'essayer à blanc"
 
-    `migration:diff` rendait un tableau de lignes, sans total (`ENTITIES-MIGRATION-DIFF-READABLE-001`). Sur une entité de trente colonnes, savoir s'il reste un écart demandait de lire les trente lignes et de compter à la main, ce qui se fait mal et se fait faux.
+    `migration:diff` rendait un tableau de lignes, sans total (`ENTITIES-MIGRATION-DIFF-READABLE-001`).
+    Sur une entité de trente colonnes, savoir s'il reste un écart demandait de lire les trente lignes et de compter à la main, ce qui se fait mal et se fait faux.
 
     ```bash
     forge migration:diff Article
@@ -438,7 +438,8 @@ Extrait du cœur (ADR-070) : le cœur reste un noyau web avec la seule couture r
     !!! info "`--sql` montre sans écrire"
         C'est l'essai à blanc : lire le SQL avant de créer un fichier évite d'avoir à supprimer une migration qu'on vient d'engendrer.
 
-        Un diff risqué, colonne changée ou colonne en trop, ne se traduit pas en SQL automatiquement. La commande le dit à cet instant, plutôt que de laisser l'exploitant découvrir le refus au moment où il croyait créer sa migration.
+        Un diff risqué, colonne changée ou colonne en trop, ne se traduit pas en SQL automatiquement.
+        La commande le dit à cet instant, plutôt que de laisser l'exploitant découvrir le refus au moment où il croyait créer sa migration.
 
     !!! info "`--check` sert à l'intégration continue"
         Il rend un code de sortie non nul quand un écart subsiste.

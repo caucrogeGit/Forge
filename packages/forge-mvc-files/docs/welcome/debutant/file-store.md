@@ -133,8 +133,7 @@ with router.group("", public=True) as public:
 
 - `save_upload` = valider **puis** écrire, jamais l'inverse.
 - Le `SavedUpload` décrit le fichier stocké (nom, chemin, taille, type).
-- C'est la façade « document »
-  ; le chemin image-aware vit dans `forge-mvc-images`.
+- C'est la façade « document » ; le chemin image-aware vit dans `forge-mvc-images`.
 
 ## Après ce starter
 
