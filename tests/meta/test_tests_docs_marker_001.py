@@ -46,14 +46,6 @@ EXCEPTIONS_SANS_MARQUEUR: frozenset[str] = frozenset({
     # déjà marqués `docs`, `test_docs_python_examples_executable_001` et
     # `test_crud_generator_split_001`, qui l'emploient sans être du code.
     "tests/meta/test_readme_commands_ratchet_001.py",
-    # TOOLS-REFLOW-DOCS-FIABILITE-001 exerce `tools/reflow_docs.py` sur des
-    # entrées fabriquées : c'est un test de code. Sa docstring cite `docs/`, et
-    # `from tools... import` ne figure pas parmi les signaux de code.
-    #
-    # L'y ajouter serait la vraie correction, mais reclasserait
-    # `test_pkg_orphan_yank_001`, marqué `docs` alors qu'il exerce aussi le garde
-    # de complétude PyPI : décision à prendre séparément.
-    "tests/test_tools_reflow_docs_fiabilite_001.py",
 })
 
 # Fichiers marqués docs bien que la règle statique voie un signal code.
@@ -67,7 +59,7 @@ _CODE_SIGNALS = (
     re.compile(r"tmp_path|subprocess"),
     re.compile(r"[A-Za-z_]\w*\.__file__|getsource"),
     re.compile(
-        r"^\s*(?:from|import)\s+(?:core|cli|forge_mvc\w*|skeleton|integrations)\b",
+        r"^\s*(?:from|import)\s+(?:core|cli|forge_mvc\w*|skeleton|integrations|tools)\b",
         re.MULTILINE,
     ),
     re.compile(r"[\"'](?:core|cli|skeleton|tools)[\"'](?!\s*/\s*[\"']docs[\"'])"),
@@ -134,3 +126,17 @@ def test_marqueur_declare_dans_pytest_ini():
     assert re.search(r"^\s*docs:", ini, re.MULTILINE), (
         "le marqueur docs doit rester déclaré dans pytest.ini"
     )
+
+
+def test_un_import_de_tools_est_un_signal_de_code():
+    """TESTS-DOCS-MARKER-TOOLS-IMPORT-001.
+
+    La docstring de ce garde-fou range `tools/` parmi les signaux de code, mais
+    son motif d'import l'oubliait.
+    Un test qui importait un outil et citait `docs/` passait pour de la prose.
+    `test_pkg_orphan_yank_001` portait ainsi le marqueur `docs`, et sortait de la
+    boucle code alors qu'il exerce le garde de complétude PyPI.
+    """
+    source = '"""Voir `docs/release/`."""\nfrom tools import check_pypi_completeness\n'
+
+    assert not _is_pure_prose(source)

@@ -25,9 +25,10 @@ from pathlib import Path
 
 import pytest
 
-# Ce fichier lit une procédure écrite : il relève donc aussi de la couche
-# `docs` (TESTS-DOCS-MARKER-001), qui isole la prose de la boucle code.
-pytestmark = [pytest.mark.meta, pytest.mark.docs]
+# Pas de marqueur `docs` : même la procédure écrite est comparée au garde
+# (`guard.ABSORBED`), donc ce fichier doit tourner dans la boucle code
+# (TESTS-DOCS-MARKER-TOOLS-IMPORT-001).
+pytestmark = pytest.mark.meta
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 PROCEDURE = PROJECT_ROOT / "docs" / "release" / "orphan-packages.md"

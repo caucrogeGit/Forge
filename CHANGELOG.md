@@ -10,6 +10,11 @@
   Rien de cela ne se voyait à l'invariant qui validait ses passages : coller deux phrases ne change aucun caractère non blanc. Sur les 277 pages de `docs/` qu'il signalait, 75 n'avaient aucun défaut.
   L'outil ne coupe plus que devant ce qui peut commencer une phrase, et reformate le contenu d'une citation comme une page. Mesuré sur une copie des 1008 pages du dépôt, le rendu HTML ne diffère plus que par ses sauts de ligne, et les coupures en milieu de phrase passeraient de 2261 à 6. Un test compare désormais ce rendu. Aucune page n'est reformatée par ce ticket.
 
+- **Un test de comportement échappait à la boucle de tests du code (`TESTS-DOCS-MARKER-TOOLS-IMPORT-001`).**
+  Le garde-fou qui sépare les tests de prose des tests de code range `tools/` parmi les signaux de code, mais son motif d'import l'oubliait. Un test qui importait un outil et citait `docs/` passait donc pour de la prose.
+  `test_pkg_orphan_yank_001` portait ainsi le marqueur `docs`, et `pytest -m "not docs"` l'ignorait. Il exerce pourtant le garde de complétude PyPI, et compare même sa procédure écrite à la liste des paquets absorbés : une modification de cette liste passait sous le radar local.
+  Le motif compte désormais `tools`, le marqueur est retiré, et l'exception posée la veille pour contourner l'oubli disparaît.
+
 ## [1.0.0-rc.9] - 2026-09-08
 
 ### Sécurité
