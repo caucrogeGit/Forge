@@ -106,6 +106,53 @@ def test_une_citation_qui_finit_sa_phrase_coupe() -> None:
     assert reflow(source) == "Le message dit «\u00a0Terminé.\u00a0»\nLa suite démarre."
 
 
+@pytest.mark.parametrize(
+    ("source", "attendu"),
+    [
+        (
+            "Pour le pivot : `installez forge-mvc-entities.` Pour media : `installez forge-mvc-images.`",
+            "Pour le pivot : `installez forge-mvc-entities.`\nPour media : `installez forge-mvc-images.`",
+        ),
+        (
+            "Le message `Terminé.`\nRelancez la commande.",
+            "Le message `Terminé.`\nRelancez la commande.",
+        ),
+        (
+            "La commande affiche `OK.` puis rend la main.",
+            "La commande affiche `OK.` puis rend la main.",
+        ),
+        (
+            "Le mot-clé pilote une clause `WHERE content LIKE ?`\n**paramétrée**, jamais concaténée.",
+            "Le mot-clé pilote une clause `WHERE content LIKE ?` **paramétrée**, jamais concaténée.",
+        ),
+        (
+            "Il fait un `UPDATE … WHERE id = ?`\n(POST et CSRF).",
+            "Il fait un `UPDATE … WHERE id = ?` (POST et CSRF).",
+        ),
+        (
+            "L'autocomplétion sur `request.`\n(query, form, json) fonctionne.",
+            "L'autocomplétion sur `request.` (query, form, json) fonctionne.",
+        ),
+        (
+            "Il génère `from forge_mvc_media import ...`\n(dans le contrôleur).",
+            "Il génère `from forge_mvc_media import ...` (dans le contrôleur).",
+        ),
+    ],
+)
+def test_une_phrase_peut_finir_dans_un_code_en_ligne(source: str, attendu: str) -> None:
+    """TOOLS-REFLOW-CODE-FIN-DE-PHRASE-001 : le point était masqué avec le code.
+
+    L'outil collait alors la phrase suivante, et la comparaison des rendus ne
+    pouvait pas le voir : elle ignore les sauts de ligne, par construction.
+    Le cliquet des deux-points l'a trouvé, sur deux phrases devenues une ligne.
+
+    Une première règle, tout code finissant par `.`, `!` ou `?`, coupait à tort
+    dix phrases de la documentation : le `?` d'une requête SQL, `request.` et
+    `import ...` ne terminent rien. D'où les quatre derniers cas.
+    """
+    assert reflow(source) == attendu
+
+
 def test_une_minuscule_ne_commence_pas_une_phrase() -> None:
     """Dans le doute, ne pas couper : une question en incise en est l'exemple."""
     source = "Une commande dédiée (`make:pivot-crud` ?) ou un module gère cela."

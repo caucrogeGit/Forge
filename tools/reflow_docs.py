@@ -11,8 +11,10 @@ règle à des fichiers existants qui coupent encore les phrases au milieu.
 Règles :
 
 - coupe uniquement aux vraies fins de phrase (`.`, `!`, `?`, éventuellement
-  suivis d'un fermant), jamais après `:` ni `;`, ni après un guillemet fermant
-  seul, qui clôt une citation le plus souvent au milieu de la phrase ;
+  suivis d'un fermant, y compris à la fin d'un code en ligne qui porte une
+  phrase et que suit une majuscule), jamais après `:`
+  ni `;`, ni après un guillemet fermant seul, qui clôt une citation le plus
+  souvent au milieu de la phrase ;
 - rejoint les phrases coupées en plein milieu ;
 - dans le doute, ne coupe pas : une coupure fautive se voit au rendu, deux
   phrases laissées sur une ligne ne se voient pas. D'où trois refus : devant ce
@@ -70,6 +72,16 @@ _DOT = "\uE000"   # point protégé (abréviation, décimal)
 _ELL = "\uE001"   # ellipse « ... »
 _C0 = "\uE002"    # début d'un span de code masqué
 _C1 = "\uE003"    # fin d'un span de code masqué
+
+# Span de code masqué, suivi de fermants.
+_CODE_END = re.compile(
+    re.escape(_C0) + r"(\d+)" + re.escape(_C1) + r"(?:[)\"*_]|[\u00a0\u202f]?»)*"
+)
+# Code en ligne qui termine une phrase (« `installez forge-mvc-images.` »).
+# Il faut une lettre avant `.` ou `!` : `import ...` est une ellipse, et le `?`
+# d'un `WHERE id = ?` un marqueur SQL. La majuscule exigée ensuite écarte
+# `request.` suivi de sa liste d'attributs.
+_CODE_SENTENCE = re.compile(r"`[^`]*[^\W\d_][.!]`")
 
 _LIST = re.compile(r"^(\s*)([-*+]|\d+\.)\s+(.*)$")
 # Fin de phrase : `.`, `!` ou `?`, suivi de fermants éventuels (parenthèse,
@@ -145,21 +157,32 @@ def resplit(text: str) -> list[str]:
     text = _DECIMAL.sub(lambda m: m.group(1) + _DOT + m.group(2), text)
     text = text.replace("...", _ELL)
 
+    ends = [(match.start(), match.end()) for match in _END.finditer(text)]
+    ends += [
+        (match.start(), -match.end())
+        for match in _CODE_END.finditer(text)
+        if _CODE_SENTENCE.fullmatch(codes[int(match.group(1))])
+    ]
     sentences: list[str] = []
     start = 0
-    for match in _END.finditer(text):
-        rest = text[match.end():]
+    for begin, signed_end in sorted(ends):
+        # Une fin négative marque un code en ligne : plus prudent, il n'accepte
+        # qu'une majuscule après lui.
+        end = abs(signed_end)
+        rest = text[end:]
         following = rest.lstrip(" ")
         if not following or following == rest:
             continue
         if not _starts_sentence(following):
             continue
+        if signed_end < 0 and not following[0].isupper():
+            continue
         if _BLOCK_START.match(following):
             continue
-        if _numbering(text[:match.start()]):
+        if _numbering(text[:begin]):
             continue
-        sentences.append(text[start:match.end()])
-        start = match.end() + (len(rest) - len(following))
+        sentences.append(text[start:end])
+        start = end + (len(rest) - len(following))
     sentences.append(text[start:])
     return [_restore(sentence) for sentence in sentences if sentence.strip()]
 

@@ -10,6 +10,11 @@
   Rien de cela ne se voyait à l'invariant qui validait ses passages : coller deux phrases ne change aucun caractère non blanc. Sur les 277 pages de `docs/` qu'il signalait, 75 n'avaient aucun défaut.
   L'outil ne coupe plus que devant ce qui peut commencer une phrase, et reformate le contenu d'une citation comme une page. Mesuré sur une copie des 1008 pages du dépôt, le rendu HTML ne diffère plus que par ses sauts de ligne, et les coupures en milieu de phrase passeraient de 2261 à 6. Un test compare désormais ce rendu. Aucune page n'est reformatée par ce ticket.
 
+- **Le même outil collait une phrase qui finissait dans un code en ligne (`TOOLS-REFLOW-CODE-FIN-DE-PHRASE-001`).**
+  Le code en ligne est masqué avant la recherche des fins de phrase, et son point final l'était avec lui. Dans ``installez `forge-mvc-entities.` Pour media``, l'outil ne voyait pas de fin de phrase et joignait les deux lignes.
+  La comparaison des rendus ne pouvait pas le voir, puisqu'elle ignore les sauts de ligne par construction. C'est le cliquet des deux-points qui l'a trouvé, sur deux phrases devenues une seule ligne à l'application.
+  Un code en ligne termine désormais la phrase s'il finit par une lettre suivie de `.` ou `!`, et que la suite commence par une majuscule. Une première version acceptait tout code finissant par `.`, `!` ou `?`, et coupait dix phrases à tort : le `?` d'un `WHERE id = ?`, un accès `request.` ou un `import ...` ne terminent rien.
+
 - **Un test de comportement échappait à la boucle de tests du code (`TESTS-DOCS-MARKER-TOOLS-IMPORT-001`).**
   Le garde-fou qui sépare les tests de prose des tests de code range `tools/` parmi les signaux de code, mais son motif d'import l'oubliait. Un test qui importait un outil et citait `docs/` passait donc pour de la prose.
   `test_pkg_orphan_yank_001` portait ainsi le marqueur `docs`, et `pytest -m "not docs"` l'ignorait. Il exerce pourtant le garde de complétude PyPI, et compare même sa procédure écrite à la liste des paquets absorbés : une modification de cette liste passait sous le radar local.
