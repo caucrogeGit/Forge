@@ -9,8 +9,7 @@ Le fichier de code correspondant est `forge_mvc_workflow/transitions.py`.
 Une transition décrit **explicitement** un passage autorisé d'un statut à un autre.
 Aucune transition n'est jamais exécutée automatiquement : le module dit seulement si un passage est permis, l'application décide de l'appliquer.
 
-C'est une application directe du principe « refuser la magie cachée »
-: les passages permis sont déclarés, pas devinés.
+C'est une application directe du principe « refuser la magie cachée » : les passages permis sont déclarés, pas devinés.
 
 ## 2. Déclarer des transitions
 

@@ -356,8 +356,7 @@ Il n'y a plus d'application à sa racine, et on ne lance donc pas le dépôt ave
 Pour exercer Forge de bout en bout (serveur, vues, base), créer un projet avec `forge new` puis travailler dedans.
 
 Une application de dogfooding subsiste sous `tests/fixtures/app/` : c'est une **fixture de test** (non distribuée), qui sert de harnais d'intégration à la suite.
-Elle n'est pas « le projet de référence »
-: ce rôle revient au squelette `skeleton/data/`, seule application produite par `forge new`.
+Elle n'est pas « le projet de référence » : ce rôle revient au squelette `skeleton/data/`, seule application produite par `forge new`.
 
 ---
 

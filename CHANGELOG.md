@@ -15,6 +15,10 @@
   `test_pkg_orphan_yank_001` portait ainsi le marqueur `docs`, et `pytest -m "not docs"` l'ignorait. Il exerce pourtant le garde de complétude PyPI, et compare même sa procédure écrite à la liste des paquets absorbés : une modification de cette liste passait sous le radar local.
   Le motif compte désormais `tools`, le marqueur est retiré, et l'exception posée la veille pour contourner l'oubli disparaît.
 
+- **Trois phrases s'affichaient comme des listes de définitions (`DOC-DEFINITIONS-FAUTIVES-001`).**
+  Le passage de juillet de l'outil de mise en une phrase par ligne avait coupé trois phrases après un guillemet fermant, juste devant leur deux-points. Une ligne qui commence par « : » est une définition pour Python-Markdown : la suite de chaque phrase était rendue en retrait, comme la définition du début.
+  Les pages touchées sont `philosophy/contributing.md`, la référence des registres du cœur (`core/mvc/docs/registry.md`) et celle des transitions de `forge-mvc-workflow`. Les phrases sont rejointes, avec l'espace insécable que demande la ponctuation française devant le deux-points.
+
 ## [1.0.0-rc.9] - 2026-09-08
 
 ### Sécurité
