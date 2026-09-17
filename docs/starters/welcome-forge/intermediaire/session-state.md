@@ -2,7 +2,9 @@
 
 **Objectif**{ .intro-label } : mémoriser un état côté serveur **entre** les requêtes.
 
-**Ce que vous allez apprendre :**{ .intro-label } une requête HTTP est *sans mémoire* : le serveur oublie tout d'une requête à l'autre. La **session** garde un état rattaché à l'utilisateur via un cookie `session_id`. Ce palier compte les visites de la liste.
+**Ce que vous allez apprendre :**{ .intro-label } une requête HTTP est *sans mémoire* : le serveur oublie tout d'une requête à l'autre.
+La **session** garde un état rattaché à l'utilisateur via un cookie `session_id`.
+Ce palier compte les visites de la liste.
 
 Le flash du palier précédent stockait déjà un message dans la session.
 
@@ -105,6 +107,7 @@ Nous y écrivons maintenant **notre propre** état : un compteur de visites, lu 
     Forge ne l'ajoute pas au framework : le noyau reste minimal et explicite, l'ergonomie est à votre main.
     Un parcours dédié vous montre comment construire ces façades pas à pas (`Session`, `Cookies`, `Flash`) : [Construire vos façades helper](../../welcome-helpers/installation.md).
 
-Vous avez parcouru les huit paliers du niveau intermédiaire. Place au bilan.
+Vous avez parcouru les huit paliers du niveau intermédiaire.
+Place au bilan.
 
 [Bilan du niveau intermédiaire](bilan.md)

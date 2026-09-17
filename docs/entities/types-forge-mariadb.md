@@ -6,7 +6,8 @@ Dans les JSON canoniques Forge, les champs utilisent des **types Forge**, pas de
 { "name": "title", "type": "string", "max_length": 255 }
 ```
 
-`VARCHAR(255)` est une **projection SQL** dérivée par Forge lors de la génération, elle n'apparaît pas dans le JSON canonique. `sql_type` et `python_type` ne sont pas des clés canoniques.
+`VARCHAR(255)` est une **projection SQL** dérivée par Forge lors de la génération, elle n'apparaît pas dans le JSON canonique.
+`sql_type` et `python_type` ne sont pas des clés canoniques.
 
 ---
 
@@ -62,7 +63,8 @@ Projection :
 title VARCHAR(255)
 ```
 
-Si `max_length` est absent, Forge utilise 255 par défaut (comportement conservateur documenté dans le code). La valeur doit être un entier positif.
+Si `max_length` est absent, Forge utilise 255 par défaut (comportement conservateur documenté dans le code).
+La valeur doit être un entier positif.
 
 ### decimal
 
@@ -81,7 +83,8 @@ Projection :
 price DECIMAL(10,2)
 ```
 
-`precision` (chiffres significatifs) et `scale` (chiffres après la virgule) sont **obligatoires** pour le type `decimal`. Forge lève une erreur immédiate si l'un des deux est absent.
+`precision` (chiffres significatifs) et `scale` (chiffres après la virgule) sont **obligatoires** pour le type `decimal`.
+Forge lève une erreur immédiate si l'un des deux est absent.
 
 ---
 
@@ -98,9 +101,9 @@ price DECIMAL(10,2)
 | `"required": false` | `NULL` |
 | `"required": true` + `"nullable": true` | `NOT NULL` (`required` prioritaire) |
 
-**Règle** (ADR-013) : un champ est nullable par défaut. `required: true` rend le champ `NOT NULL`,
-même si `nullable: true` est déclaré. Cette règle s'applique uniformément aux `fields[]` d'entité
-et aux `pivot.fields[]`.
+**Règle** (ADR-013) : un champ est nullable par défaut.
+`required: true` rend le champ `NOT NULL`, même si `nullable: true` est déclaré.
+Cette règle s'applique uniformément aux `fields[]` d'entité et aux `pivot.fields[]`.
 
 ### unique
 
@@ -137,7 +140,8 @@ Valeurs spéciales :
 
 ### min / max
 
-Les clés `min` et `max` sont conservées dans la structure interne et peuvent être utilisées pour la validation applicative. Elles ne génèrent pas de contrainte SQL `CHECK`.
+Les clés `min` et `max` sont conservées dans la structure interne et peuvent être utilisées pour la validation applicative.
+Elles ne génèrent pas de contrainte SQL `CHECK`.
 
 ---
 

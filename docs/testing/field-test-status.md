@@ -2,7 +2,8 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Cette page donne une vue synthétique de l'avancement de la campagne de tests terrain Forge. Elle ne remplace pas la [roadmap complète](../roadmap/forge-field-test-roadmap.md) ni le [détail des tickets disponibles](tickets/index.md).
+Cette page donne une vue synthétique de l'avancement de la campagne de tests terrain Forge.
+Elle ne remplace pas la [roadmap complète](../roadmap/forge-field-test-roadmap.md) ni le [détail des tickets disponibles](tickets/index.md).
 
 ---
 

@@ -76,7 +76,8 @@ Pour les scripts inline contrôlés, activer le nonce par requête (`APP_CSP_NON
 
 ### HSTS
 
-Forge émet `Strict-Transport-Security` sur toutes les réponses, y compris en HTTP local. En développement, cet en-tête est inoffensif mais techniquement redondant.
+Forge émet `Strict-Transport-Security` sur toutes les réponses, y compris en HTTP local.
+En développement, cet en-tête est inoffensif mais techniquement redondant.
 **En production, HTTPS doit être terminé par Nginx** ou un reverse proxy équivalent.
 
 ### Limites

@@ -252,8 +252,7 @@ forge_app    → utilisé par l'application en production
 
 Après application des migrations, l'application tourne uniquement avec `forge_app`.
 On peut même ne pas stocker le mot de passe `forge_admin` dans le fichier d'environnement courant de l'application, mais le réserver à une procédure d'exploitation.
-Voir la
-[checklist de production](../deployment/production-checklist.md).
+Voir la [checklist de production](../deployment/production-checklist.md).
 
 ---
 

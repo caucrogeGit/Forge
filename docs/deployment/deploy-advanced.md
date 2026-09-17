@@ -133,7 +133,8 @@ UPLOAD_MAX_SIZE=5242880     # 5 Mo
 - `env/prod` ne doit **jamais** être versionné dans Git
 - Vérifiez que `.gitignore` contient `env/prod`
 - Permissions : `600` (lisible uniquement par l'utilisateur applicatif)
-- Les credentials admin (`DB_ADMIN_*`) ne vivent **pas** dans `env/prod` mais dans `env/db-admin.local` (non commité, ignoré via `env/*.local`) ; ils ne servent qu'au provisioning (`db:init`, `db:apply`). Politique `ENV-PROD-DB-ADMIN-SECRETS-POLICY-001`, voir [production-security.md](production-security.md)
+- Les credentials admin (`DB_ADMIN_*`) ne vivent **pas** dans `env/prod` mais dans `env/db-admin.local` (non commité, ignoré via `env/*.local`) ; ils ne servent qu'au provisioning (`db:init`, `db:apply`).
+  Politique `ENV-PROD-DB-ADMIN-SECRETS-POLICY-001`, voir [production-security.md](production-security.md)
 
 ---
 

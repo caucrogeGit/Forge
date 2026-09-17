@@ -216,7 +216,8 @@ Lire attentivement le `CHANGELOG.md` pour identifier les nouvelles dépréciatio
 
 ## Migration MAJOR
 
-Un MAJOR peut introduire des ruptures d'API stable. C'est le seul niveau qui autorise le retrait de fonctionnalités stables précédemment dépréciées.
+Un MAJOR peut introduire des ruptures d'API stable.
+C'est le seul niveau qui autorise le retrait de fonctionnalités stables précédemment dépréciées.
 
 **Exemple :** `1.x → version majeure suivante`
 
@@ -238,7 +239,8 @@ git checkout -b migration/forge-major
 
 ### Ce qui ne change pas sans guide explicite
 
-Un guide de migration spécifique est publié avec chaque version MAJOR. Aucune rupture non documentée n'est introduite en version MAJOR.
+Un guide de migration spécifique est publié avec chaque version MAJOR.
+Aucune rupture non documentée n'est introduite en version MAJOR.
 
 ### Étapes d'une migration MAJOR
 
@@ -293,7 +295,8 @@ Ces fichiers sont créés une fois puis jamais réécrasés par Forge :
 | `mvc/routes/__init__.py` | `forge new` |
 | `static/` (fichiers utilisateur) | manuellement |
 
-**Principe :** `make:entity` et `make:crud` refusent d'écraser un fichier existant. Cette garantie est couverte par les tests E2E (`E2E-NON-OVERWRITE-001`).
+**Principe :** `make:entity` et `make:crud` refusent d'écraser un fichier existant.
+Cette garantie est couverte par les tests E2E (`E2E-NON-OVERWRITE-001`).
 
 ### Comportement lors d'une migration
 
@@ -381,7 +384,9 @@ forge migration:apply  # applique les migrations en attente
 forge sync:entity      # régénère les artefacts d'une entité depuis son JSON canonique
 ```
 
-**Forge ne fournit pas encore de système de migrations versionnées au sens strict** (type Alembic). Les fichiers SQL générés reflètent l'état courant des entités. Toute modification de schéma doit être gérée manuellement ou via des scripts SQL dédiés.
+**Forge ne fournit pas encore de système de migrations versionnées au sens strict** (type Alembic).
+Les fichiers SQL générés reflètent l'état courant des entités.
+Toute modification de schéma doit être gérée manuellement ou via des scripts SQL dédiés.
 
 ---
 

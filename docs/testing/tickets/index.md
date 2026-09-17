@@ -4,9 +4,11 @@
 
 Cette section regroupe les premiers tickets détaillés de la campagne de tests terrain Forge.
 
-Ces tickets ne sont pas des tutoriels publics. Ce sont des outils de validation interne : ils guident un testeur à travers une action précise, demandent des preuves observables et un retour d'expérience structuré.
+Ces tickets ne sont pas des tutoriels publics.
+Ce sont des outils de validation interne : ils guident un testeur à travers une action précise, demandent des preuves observables et un retour d'expérience structuré.
 
-Un ticket FT validé par un testeur externe pourra ensuite être converti en tutoriel. Voir [Conversion des tickets FT en tutoriels](../field-test-to-tutorial.md).
+Un ticket FT validé par un testeur externe pourra ensuite être converti en tutoriel.
+Voir [Conversion des tickets FT en tutoriels](../field-test-to-tutorial.md).
 
 Les retours doivent utiliser le [modèle de retour testeur](../field-test-feedback-template.md) ou le [formulaire GitHub Issue](https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml).
 

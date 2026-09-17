@@ -2,7 +2,8 @@
 
 **Objectif**{ .intro-label } : filtrer la liste selon un mot-clé saisi par l'utilisateur.
 
-**Ce que vous allez apprendre :**{ .intro-label } combiner un **paramètre d'URL** (`request.query`) et le **SQL visible** pour construire une recherche. Le mot-clé pilote une clause `WHERE content LIKE ?` **paramétrée**, jamais concaténée.
+**Ce que vous allez apprendre :**{ .intro-label } combiner un **paramètre d'URL** (`request.query`) et le **SQL visible** pour construire une recherche.
+Le mot-clé pilote une clause `WHERE content LIKE ?` **paramétrée**, jamais concaténée.
 
 `NoteController.index` lit toute la table avec `SELECT_ALL`.
 

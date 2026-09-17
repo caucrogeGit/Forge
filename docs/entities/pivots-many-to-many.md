@@ -114,7 +114,8 @@ Exemple : un même article ne peut pas être associé deux fois au même tag dan
 
 Cette contrainte est distincte de l'`id` technique, l'`id` identifie la ligne, la contrainte unique protège la cohérence de la relation.
 
-`unique_pair` est contraint à `true` dans `pivot.schema.json` (`const: true`). Toute autre valeur est invalide.
+`unique_pair` est contraint à `true` dans `pivot.schema.json` (`const: true`).
+Toute autre valeur est invalide.
 
 ---
 

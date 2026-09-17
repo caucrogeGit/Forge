@@ -28,7 +28,8 @@ Comprendre et appliquer la procédure à suivre lorsque la documentation officie
 
 ## 3. Ce que ce ticket permet de tester dans Forge
 
-Ce ticket ne teste pas le framework. Il vérifie que le testeur :
+Ce ticket ne teste pas le framework.
+Il vérifie que le testeur :
 
 - sait que la documentation fait partie de ce qui est testé ;
 - sait qu'il ne doit pas corriger lui-même la documentation ;
@@ -56,7 +57,8 @@ Ce ticket ne teste pas le framework. Il vérifie que le testeur :
 
 ## 5. Contexte utile avant de commencer
 
-La documentation officielle Forge fait partie de ce qui est testé dans la campagne terrain. Si elle est fausse, incomplète ou contradictoire, le testeur ne la corrige pas directement.
+La documentation officielle Forge fait partie de ce qui est testé dans la campagne terrain.
+Si elle est fausse, incomplète ou contradictoire, le testeur ne la corrige pas directement.
 
 La procédure à respecter est la suivante :
 

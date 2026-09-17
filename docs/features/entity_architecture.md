@@ -2,7 +2,8 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Forge sépare la description d'une entité en trois niveaux distincts : la source canonique JSON, les projections techniques générées, et le code métier manuel. Cette séparation permet de régénérer les fichiers techniques sans jamais écraser le travail manuel.
+Forge sépare la description d'une entité en trois niveaux distincts : la source canonique JSON, les projections techniques générées, et le code métier manuel.
+Cette séparation permet de régénérer les fichiers techniques sans jamais écraser le travail manuel.
 
 ---
 
@@ -109,7 +110,8 @@ La clé `default` accepte uniquement des valeurs simples : `str`, `int`, `float`
 
 ### `contact.sql` : projection SQL locale
 
-Contient uniquement la table de l'entité. Pas de clé étrangère.
+Contient uniquement la table de l'entité.
+Pas de clé étrangère.
 
 ```sql
 CREATE TABLE IF NOT EXISTS contact (
@@ -194,7 +196,9 @@ Types Python supportés : `int`, `str`, `float`, `bool`, `date`, `datetime`.
 
 ### `contact.py` : classe métier
 
-Hérite de `ContactBase`. Créé une seule fois par Forge s'il est absent. Jamais écrasé.
+Hérite de `ContactBase`.
+Créé une seule fois par Forge s'il est absent.
+Jamais écrasé.
 
 ```python
 from .contact_base import ContactBase
@@ -210,7 +214,8 @@ Ajouter ici les méthodes métier, les validations croisées et les surcharges s
 
 ### `__init__.py`
 
-Créé une seule fois. Jamais écrasé.
+Créé une seule fois.
+Jamais écrasé.
 
 ```python
 from .contact import Contact
@@ -279,7 +284,9 @@ ALTER TABLE commande
 
 ### Relations many-to-many
 
-`many_to_many` est un type de relation supporté dans `relations.json`. `sync:relations` génère la table pivot ; `make:crud` génère le formulaire côté source et l'affichage des libellés dans list/show. Voir [docs/relations.md](relations.md) pour la référence complète.
+`many_to_many` est un type de relation supporté dans `relations.json`.
+`sync:relations` génère la table pivot ; `make:crud` génère le formulaire côté source et l'affichage des libellés dans list/show.
+Voir [docs/relations.md](relations.md) pour la référence complète.
 
 Un lien many-to-many peut aussi se modéliser avec une entité pivot normale et deux relations `many_to_one`, utile quand la table pivot a ses propres champs ou son propre CRUD :
 

@@ -49,7 +49,8 @@ Les points ci-dessous détaillent ce qu'il contrôle, et servent à diagnostique
 git status
 ```
 
-Le working tree doit être propre. Aucun fichier modifié non commité.
+Le working tree doit être propre.
+Aucun fichier modifié non commité.
 
 ### 2. Tests automatiques
 
@@ -57,7 +58,8 @@ Le working tree doit être propre. Aucun fichier modifié non commité.
 python -m pytest
 ```
 
-Tous les tests doivent passer. Aucune régression tolérée.
+Tous les tests doivent passer.
+Aucune régression tolérée.
 
 ### 3. Validation compilation
 
@@ -89,7 +91,8 @@ Aucun espace de fin de ligne, aucune erreur de formatage.
 ruff check .
 ```
 
-Aucune erreur de lint (règles E, F). Les règles E501, E741, E402 sont ignorées délibérément.
+Aucune erreur de lint (règles E, F).
+Les règles E501, E741, E402 sont ignorées délibérément.
 Si de nouvelles violations apparaissent, les corriger avant de publier.
 
 ### 7. Audit des dépendances
@@ -161,10 +164,8 @@ grep -rn "x\.y\.z\|vx\.y\.z" pyproject.toml forge.py core/__init__.py README.md 
 
 Adapter `x.y.z` et `vx.y.z` à la version cible (ex. `2\.0\.2` et `v2\.0\.2`).
 
-> **Numéros brûlés** : avant de figer la version cible, vérifier qu'elle
-> n'est pas dans la liste des [numéros de version brûlés](burned-version-numbers.md).
-> Les versions `1.0.1` et `1.1.0` ont été supprimées de PyPI et ne pourront
-> jamais être republiées : ne pas les bumper ni les taguer.
+> **Numéros brûlés** : avant de figer la version cible, vérifier qu'elle n'est pas dans la liste des [numéros de version brûlés](burned-version-numbers.md).
+> Les versions `1.0.1` et `1.1.0` ont été supprimées de PyPI et ne pourront jamais être republiées : ne pas les bumper ni les taguer.
 
 ---
 
@@ -202,7 +203,8 @@ Structure attendue pour chaque entrée :
 - ...
 ```
 
-Ne lister que les sections non vides. Chaque ligne doit référencer le ticket correspondant entre parenthèses.
+Ne lister que les sections non vides.
+Chaque ligne doit référencer le ticket correspondant entre parenthèses.
 
 ---
 
@@ -214,7 +216,8 @@ git add pyproject.toml forge.py core/__init__.py CHANGELOG.md docs/
 git commit -m "release: preparer forge x.y.z"
 ```
 
-Les fichiers exacts dépendent de la release. Le message de commit commence toujours par `release:`.
+Les fichiers exacts dépendent de la release.
+Le message de commit commence toujours par `release:`.
 
 Vérifier après commit :
 
@@ -231,7 +234,8 @@ git diff --check
 git push origin main
 ```
 
-Le tag n'est pas poussé ici. Il vient en dernier, une fois la publication faite.
+Le tag n'est pas poussé ici.
+Il vient en dernier, une fois la publication faite.
 
 Laisser la CI confirmer sur `main` avant de publier.
 
@@ -243,7 +247,8 @@ Laisser la CI confirmer sur `main` avant de publier.
 bash tools/publish.sh
 ```
 
-Sans option, le script est en simulation. Il construit, vérifie et affiche l'ordre de publication, sans rien envoyer.
+Sans option, le script est en simulation.
+Il construit, vérifie et affiche l'ordre de publication, sans rien envoyer.
 
 Quand la séquence affichée est la bonne :
 

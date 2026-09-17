@@ -258,8 +258,7 @@ Ces commandes vérifient des règles que le JSON Schema ne peut pas exprimer :
 
 1. Vérifier que le dossier ouvert dans VS Code est **la racine du projet Forge** (celui qui contient `mvc/`, `schemas/`, `.vscode/`).
 2. Vérifier que `.vscode/settings.json` existe et contient `json.schemas`.
-3. Vérifier que les schémas existent : `schemas/entity.schema.json`, etc.
-   → `python forge.py schema:doctor`
+3. Vérifier que les schémas existent : `schemas/entity.schema.json`, etc. → `python forge.py schema:doctor`
 4. Recharger la fenêtre VS Code : `Ctrl+Shift+P` → `Developer: Reload Window`.
 
 ### VS Code signale une erreur mais `entity:validate` ne trouve rien

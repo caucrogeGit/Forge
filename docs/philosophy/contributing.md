@@ -185,7 +185,8 @@ Forge distingue plusieurs types :
 
 ### Tests MariaDB opt-in
 
-Deux variables distinctes gouvernent les tests adossés à une base réelle. Les confondre fait croire qu'on a testé.
+Deux variables distinctes gouvernent les tests adossés à une base réelle.
+Les confondre fait croire qu'on a testé.
 
 `tests/test_e2e_mariadb.py` n'attend aucune variable pour tourner : il lui faut une base joignable.
 Si elle ne l'est pas, il **se saute en silence**.
@@ -429,7 +430,8 @@ FORGE_TEST_DB_NAME=forge_e2e_test FORGE_REQUIRE_DB=1 pytest tests/test_e2e_maria
 
 Uniquement si une instance MariaDB réelle est configurée avec une base nommée `forge_test` ou préfixée `forge_e2e_`.
 
-`FORGE_REQUIRE_DB=1` compte ici plus que le reste. Sans elle, une base arrêtée donne des tests sautés, indiscernables d'une validation réussie dans un `-q`.
+`FORGE_REQUIRE_DB=1` compte ici plus que le reste.
+Sans elle, une base arrêtée donne des tests sautés, indiscernables d'une validation réussie dans un `-q`.
 
 Voir [Tests bout en bout](../reference/tests-e2e.md) pour les trois backends et leurs variables.
 

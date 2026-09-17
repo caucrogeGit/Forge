@@ -208,8 +208,7 @@ Le formulaire de filtres est un formulaire `GET` standard avec une amélioration
 Sans HTMX, le formulaire recharge la page complète.
 Avec HTMX, le formulaire remplace uniquement la zone `#crud-results` et pousse l'URL dans l'historique.
 
-Un lien « Réinitialiser »
-est généré dans le formulaire.
+Un lien « Réinitialiser » est généré dans le formulaire.
 Il s'affiche dès que `pagination.q` est non vide **ou** que `pagination.filters` contient au moins un filtre actif.
 Le lien a un `href` classique (fallback sans JavaScript) et les attributs HTMX pour une navigation fluide.
 

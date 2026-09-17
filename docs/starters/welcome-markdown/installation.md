@@ -37,7 +37,8 @@ La documentation Forge suit une typographie française stricte (directive §2.1)
 Markdown n'est pas un outil que l'on installe seul.
 Dans la documentation Forge, il est rendu par **MkDocs** et le thème **Material** ; les extensions viennent du paquet **pymdown-extensions** (quelques-unes sont fournies directement par Markdown).
 
-Trois paquets suffisent. Le dépôt les déclare dans `requirements-docs.txt` :
+Trois paquets suffisent.
+Le dépôt les déclare dans `requirements-docs.txt` :
 
 ```text
 mkdocs>=1.6

@@ -6,7 +6,8 @@
 
 ## Principe général
 
-Le testeur ne corrige pas Forge pendant un ticket FT. Son rôle est d'observer, de lancer les outils de diagnostic prévus, de collecter les preuves et de remplir un retour exploitable.
+Le testeur ne corrige pas Forge pendant un ticket FT.
+Son rôle est d'observer, de lancer les outils de diagnostic prévus, de collecter les preuves et de remplir un retour exploitable.
 
 Un bon retour terrain ne dit pas seulement "ça ne marche pas".
 Il indique la commande lancée, le résultat obtenu, le diagnostic exécuté, les logs utiles, le statut et la gravité.
@@ -35,9 +36,11 @@ Il indique la commande lancée, le résultat obtenu, le diagnostic exécuté, le
 
 ### `forge doctor`
 
-**Objectif :** diagnostic large et tolérant de l'environnement Forge. Lecture seule, non destructif.
+**Objectif :** diagnostic large et tolérant de l'environnement Forge.
+Lecture seule, non destructif.
 
-**Quand l'utiliser :** à chaque fois que quelque chose semble anormal dans le projet ou l'environnement. En particulier avant de signaler un problème.
+**Quand l'utiliser :** à chaque fois que quelque chose semble anormal dans le projet ou l'environnement.
+En particulier avant de signaler un problème.
 
 **Ce que le testeur doit copier :** la sortie complète de la commande.
 
@@ -51,7 +54,8 @@ forge doctor
 
 ### `forge project:check`
 
-**Objectif :** contrôle strict des conventions du projet (CI-ready). Signale les écarts structurels.
+**Objectif :** contrôle strict des conventions du projet (CI-ready).
+Signale les écarts structurels.
 
 **Quand l'utiliser :** quand la structure du projet semble incorrecte ou quand un ticket demande de vérifier la conformité.
 
@@ -67,7 +71,8 @@ forge project:check
 
 ### `forge project:audit`
 
-**Objectif :** rapport d'audit détaillé non destructif. Donne plus de détails que `project:check`.
+**Objectif :** rapport d'audit détaillé non destructif.
+Donne plus de détails que `project:check`.
 
 **Quand l'utiliser :** pour approfondir un diagnostic après `project:check`, ou quand `project:check` signale une anomalie.
 
@@ -159,7 +164,8 @@ python -m compileall -q .
 
 **Objectif :** exécute la suite de tests automatisés de Forge.
 
-**Quand l'utiliser :** uniquement si le ticket le demande explicitement. Ne pas lancer `pytest` de façon préventive pendant un ticket documentaire ou d'installation.
+**Quand l'utiliser :** uniquement si le ticket le demande explicitement.
+Ne pas lancer `pytest` de façon préventive pendant un ticket documentaire ou d'installation.
 
 **Ce que le testeur doit copier :** la ligne de résumé finale (`X passed, Y failed`) et les messages d'erreur éventuels.
 
@@ -184,7 +190,8 @@ storage/logs/errors.dev.md      - vue lisible générée depuis le JSONL
 
 **Quoi copier :** les lignes correspondant à l'erreur observée, champ `message`, `exception_type`, `path`, `traceback`.
 
-**Quoi ne pas publier :** les champs qui pourraient contenir des secrets (mots de passe, tokens, clés API). Vérifier le champ `message` avant de le copier dans un retour public.
+**Quoi ne pas publier :** les champs qui pourraient contenir des secrets (mots de passe, tokens, clés API).
+Vérifier le champ `message` avant de le copier dans un retour public.
 
 **Comment signaler sans exposer de secret :**
 

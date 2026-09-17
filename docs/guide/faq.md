@@ -2,7 +2,8 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Cette page regroupe les questions fréquentes retirées de la landing page. La landing reste une vitrine courte ; la FAQ appartient à la documentation.
+Cette page regroupe les questions fréquentes retirées de la landing page.
+La landing reste une vitrine courte ; la FAQ appartient à la documentation.
 
 ---
 
@@ -35,13 +36,15 @@ Si vos tests passaient d'un côté et échouaient de l'autre, c'était cela.
 - les vues Jinja2 `index`, `show` et `form` ;
 - les indications de routes à ajouter dans `mvc/routes/__init__.py`.
 
-Le code généré reste lisible et modifiable. Forge ne cherche pas à cacher le fonctionnement du CRUD.
+Le code généré reste lisible et modifiable.
+Forge ne cherche pas à cacher le fonctionnement du CRUD.
 
 ---
 
 ## Pourquoi les routes ne sont-elles pas injectées automatiquement partout ?
 
-Parce que les routes sont une décision applicative. Forge peut générer ou afficher le bloc prêt à intégrer, mais le développeur doit garder la main sur l'organisation de `mvc/routes/__init__.py`.
+Parce que les routes sont une décision applicative.
+Forge peut générer ou afficher le bloc prêt à intégrer, mais le développeur doit garder la main sur l'organisation de `mvc/routes/__init__.py`.
 
 Cette règle évite les injections silencieuses et rend la structure du projet plus facile à auditer.
 
@@ -129,7 +132,8 @@ forge deploy:check
 
 `forge deploy:check` vérifie les éléments importants avant la mise en production : environnement, variables, chemins, modules et configuration attendue.
 
-Forge ne modifie pas automatiquement le serveur de production. Le développeur garde la main.
+Forge ne modifie pas automatiquement le serveur de production.
+Le développeur garde la main.
 
 ---
 
@@ -137,7 +141,8 @@ Forge ne modifie pas automatiquement le serveur de production. Le développeur g
 
 Non.
 
-Forge n'est pas un clone des grands frameworks. Il vise une autre approche :
+Forge n'est pas un clone des grands frameworks.
+Il vise une autre approche :
 
 - moins de magie ;
 - plus de fichiers visibles ;
@@ -152,15 +157,18 @@ Forge n'est pas un clone des grands frameworks. Il vise une autre approche :
 
 Non.
 
-Les starters sont des démonstrateurs. Ils servent à prouver que Forge peut générer des applications concrètes, mais ils ne doivent pas dicter le cœur du framework.
+Les starters sont des démonstrateurs.
+Ils servent à prouver que Forge peut générer des applications concrètes, mais ils ne doivent pas dicter le cœur du framework.
 
-Le core reste générique. Les applications métier restent dans les projets, starters ou modules.
+Le core reste générique.
+Les applications métier restent dans les projets, starters ou modules.
 
 ---
 
 ## Forge fournit-il déjà une authentification complète ?
 
-Forge fournit déjà des briques de sécurité, de session et de RBAC. Les starters peuvent démontrer une authentification applicative.
+Forge fournit déjà des briques de sécurité, de session et de RBAC.
+Les starters peuvent démontrer une authentification applicative.
 
 En revanche, la brique Auth/User avancée générique, table `users` optionnelle, login/logout standardisé, reset password, vérification email, MFA, OIDC, appartient à la phase suivante de la roadmap.
 

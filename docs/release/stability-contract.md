@@ -6,7 +6,9 @@
 
 Ce document définit ce que Forge considère comme stable, interne, expérimental ou garanti pour les projets construits sur Forge 1.x.
 
-Il ne décrit pas de nouvelles fonctionnalités. Il explicite les promesses implicites présentes dans le code, les générateurs et la documentation pour la série 1.x. Pour les changements entre versions majeures, voir le guide de migration.
+Il ne décrit pas de nouvelles fonctionnalités.
+Il explicite les promesses implicites présentes dans le code, les générateurs et la documentation pour la série 1.x.
+Pour les changements entre versions majeures, voir le guide de migration.
 
 ---
 
@@ -16,7 +18,8 @@ Forge 1.x garantit la stabilité de son interface publique : commandes CLI docum
 
 Le contrat couvre également :
 
-- Les modules opt-in officiels selon leur niveau de maturité (Bêta pour la plupart, les quatre backends BDD au niveau plein depuis la révision d'ADR-084). La grille de maturité à jour fait foi dans [release-policy.md](release-policy.md) (source unique) ; ce contrat ne la duplique pas pour éviter toute dérive.
+- Les modules opt-in officiels selon leur niveau de maturité (Bêta pour la plupart, les quatre backends BDD au niveau plein depuis la révision d'ADR-084).
+  La grille de maturité à jour fait foi dans [release-policy.md](release-policy.md) (source unique) ; ce contrat ne la duplique pas pour éviter toute dérive.
 - Le mécanisme de plugins pour étendre le contexte Jinja (`core.mvc.controller.register_jinja_context_provider`).
 - L'absence de dépendance nominale du core sur les modules opt-in.
 
@@ -97,7 +100,8 @@ Les éléments suivants sont disponibles mais peuvent évoluer dans leur interfa
 
 ### Régénérables : Forge peut les écraser
 
-Ces fichiers sont entièrement pilotés par le JSON canonique. Toute modification manuelle sera perdue à la prochaine régénération.
+Ces fichiers sont entièrement pilotés par le JSON canonique.
+Toute modification manuelle sera perdue à la prochaine régénération.
 
 | Fichier | Commande source |
 |---|---|
@@ -114,7 +118,8 @@ Ces fichiers sont entièrement pilotés par le JSON canonique. Toute modificatio
 
 ### Générés une fois : Forge ne réécrit pas si le fichier existe
 
-Ces fichiers sont créés par un générateur lors de la première exécution. Forge vérifie leur existence avant d'écrire et ne les écrase jamais sans action explicite (`--force` si disponible).
+Ces fichiers sont créés par un générateur lors de la première exécution.
+Forge vérifie leur existence avant d'écrire et ne les écrase jamais sans action explicite (`--force` si disponible).
 
 | Fichier | Commande créatrice |
 |---|---|
@@ -228,7 +233,8 @@ Ces commandes et leurs options documentées sont garanties pour Forge 1.x.
 
 ## Format de l'aide CLI
 
-`forge help`, `forge --help`, `forge -h` et `forge` (sans argument) affichent une aide groupée par famille de commandes. Ce comportement est stable sur Forge 1.x.
+`forge help`, `forge --help`, `forge -h` et `forge` (sans argument) affichent une aide groupée par famille de commandes.
+Ce comportement est stable sur Forge 1.x.
 
 | Élément | Comportement |
 |---|---|
@@ -253,7 +259,9 @@ Conseil : <suggestion>   # optionnel
 - Ce format est stable sur Forge 1.x.
 - Les tags `[ERREUR]` dans les sorties de génération d'artefacts sont distincts et non concernés.
 
-Les conseils (`Conseil :`) indiquent une action simple à essayer. Ils n'appliquent jamais de correction automatique. Les détails des rapports `forge doctor` et `forge project:check` suivent le même principe : ils ajoutent une piste d'action à la fin du message de diagnostic.
+Les conseils (`Conseil :`) indiquent une action simple à essayer.
+Ils n'appliquent jamais de correction automatique.
+Les détails des rapports `forge doctor` et `forge project:check` suivent le même principe : ils ajoutent une piste d'action à la fin du message de diagnostic.
 
 ---
 

@@ -2,7 +2,8 @@
 
 **Objectif**{ .intro-label } : exposer le catalogue en **JSON** à des clients, derrière un **jeton d'authentification**.
 
-**Ce que vous allez apprendre :**{ .intro-label } renvoyer du JSON avec `Response.json`, et **protéger** la route par un jeton `Authorization: Bearer …` lu via `request.header(...)`. Sans jeton valide, l'API répond `401`.
+**Ce que vous allez apprendre :**{ .intro-label } renvoyer du JSON avec `Response.json`, et **protéger** la route par un jeton `Authorization: Bearer …` lu via `request.header(...)`.
+Sans jeton valide, l'API répond `401`.
 
 Le catalogue est complet côté navigateur : lister et créer.
 
@@ -85,6 +86,7 @@ Nous l'exposons maintenant à des clients (front JavaScript, script, autre servi
     - `request.header(...)` donne accès aux en-têtes, dont `Authorization`.
     - On vérifie l'autorisation **avant** de produire la donnée ; un refus, c'est `401`.
 
-Vous avez parcouru les trois paliers du niveau avancé. Place au bilan.
+Vous avez parcouru les trois paliers du niveau avancé.
+Place au bilan.
 
 [Bilan du niveau avancé](bilan.md)

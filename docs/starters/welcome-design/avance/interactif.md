@@ -66,9 +66,7 @@ from mvc.controllers.showcase_controller import ShowcaseController
 public.add("POST", "/showcase/delete", ShowcaseController.delete, name="showcase-delete")
 ```
 
-La modale confirme, le formulaire poste vers `/showcase/delete`, et le flash « Contact supprimé.
-»
-s'affiche au retour (via `flash_messages`).
+La modale confirme, le formulaire poste vers `/showcase/delete`, et le flash « Contact supprimé. » s'affiche au retour (via `flash_messages`).
 
 ??? note "À retenir"
     - `accordion` et `dropdown` reposent sur `<details>` : zéro JavaScript.

@@ -109,8 +109,7 @@ Ces dépendances sont installées automatiquement avec Forge via `pip` ou `pipx`
 **Philosophie :** Forge vise un minimum de dépendances runtime.
 Les trois dépendances fondamentales sont `mariadb`, `jinja2` et `python-dotenv` ; `argon2-cffi` n'est utilisée que pour le hachage des mots de passe (Auth/User).
 Toutes sont installées par défaut.
-Les dépendances spécifiques aux modules opt-in ne sont installées que via le bon extra ou le paquet opt-in, `pyotp` pour MFA, **`Pillow>=10.0,<13` pour l'opt-in `forge-mvc-images`** (traitement d'images, retiré du core par l'ADR-018), voir « Dépendances optionnelles »
-ci-dessous.
+Les dépendances spécifiques aux modules opt-in ne sont installées que via le bon extra ou le paquet opt-in, `pyotp` pour MFA, **`Pillow>=10.0,<13` pour l'opt-in `forge-mvc-images`** (traitement d'images, retiré du core par l'ADR-018), voir « Dépendances optionnelles » ci-dessous.
 
 ---
 

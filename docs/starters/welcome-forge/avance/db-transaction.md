@@ -2,7 +2,9 @@
 
 **Objectif**{ .intro-label } : regrouper plusieurs écritures pour qu'elles soient **atomiques** : soit tout réussit, soit rien.
 
-**Ce que vous allez apprendre :**{ .intro-label } le bloc `with transaction() as tx:`. Il ouvre une transaction explicite et passe `tx` aux helpers DB, qui réutilisent la connexion **sans jamais committer eux-mêmes**. À la sortie du bloc, Forge committe ; si une exception traverse le bloc, Forge **annule** (rollback).
+**Ce que vous allez apprendre :**{ .intro-label } le bloc `with transaction() as tx:`.
+Il ouvre une transaction explicite et passe `tx` aux helpers DB, qui réutilisent la connexion **sans jamais committer eux-mêmes**.
+À la sortie du bloc, Forge committe ; si une exception traverse le bloc, Forge **annule** (rollback).
 
 Le catalogue est en lecture seule.
 

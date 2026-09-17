@@ -4,13 +4,10 @@
 
 !!! tip "Sécurité en production"
     Ce guide couvre l'installation et la configuration Nginx/systemd.
-    Pour la checklist de sécurité complète (cookies, headers, CSRF, RBAC, uploads, secrets),
-    voir **[Sécurité en production](production-security.md)**.
+    Pour la checklist de sécurité complète (cookies, headers, CSRF, RBAC, uploads, secrets), voir **[Sécurité en production](production-security.md)**.
 
 !!! info "Déploiement WSGI"
-    Pour exposer Forge publiquement via Gunicorn + reverse proxy
-    (recommandé en production), voir
-    **[Déploiement WSGI minimal](wsgi-deployment.md)**.
+    Pour exposer Forge publiquement via Gunicorn + reverse proxy (recommandé en production), voir **[Déploiement WSGI minimal](wsgi-deployment.md)**.
 
 ## 1. Architecture recommandée
 
@@ -21,14 +18,16 @@ flowchart LR
     F -->|"SQL"| M[("MariaDB<br/>:3306")]
 ```
 
-Forge inclut un serveur HTTPS Python autonome adapté au développement local. En production, **ne jamais l'exposer directement à Internet** :
+Forge inclut un serveur HTTPS Python autonome adapté au développement local.
+En production, **ne jamais l'exposer directement à Internet** :
 
 - il ne gère pas la concurrence à grande échelle
 - les connexions keep-alive et les timeouts réseau ne sont pas optimisés
 - Nginx ou Apache absorbent les connexions simultanées et relaient proprement vers le processus Python
 - le reverse proxy permet d'ajouter TLS, la compression gzip et les headers de sécurité sans modifier l'application
 
-En production, le flux recommandé est : **Nginx termine HTTPS publiquement**, puis relaie vers Forge en **HTTP local** sur `127.0.0.1:8000`. Le mode `prod` de `app.py` désactive HTTPS par défaut ; vous pouvez forcer l'ancien comportement avec `APP_SSL_ENABLED=true` si votre proxy est configuré pour parler HTTPS au backend.
+En production, le flux recommandé est : **Nginx termine HTTPS publiquement**, puis relaie vers Forge en **HTTP local** sur `127.0.0.1:8000`.
+Le mode `prod` de `app.py` désactive HTTPS par défaut ; vous pouvez forcer l'ancien comportement avec `APP_SSL_ENABLED=true` si votre proxy est configuré pour parler HTTPS au backend.
 
 ## 2. Checklist de déploiement
 
@@ -128,7 +127,8 @@ server {
 
 - Remplacer `server_name _;` par votre domaine réel (ex. `server_name mon-domaine.fr;`).
 - La valeur `client_max_body_size` est calculée automatiquement à partir de `UPLOAD_MAX_SIZE` défini dans `config.py` (valeur générée = UPLOAD_MAX_SIZE en Mo + 1).
-- Pour activer HTTPS public, ajouter un bloc `listen 443 ssl;` et les directives `ssl_certificate` / `ssl_certificate_key` dans Nginx. Le backend Forge reste en HTTP local.
+- Pour activer HTTPS public, ajouter un bloc `listen 443 ssl;` et les directives `ssl_certificate` / `ssl_certificate_key` dans Nginx.
+  Le backend Forge reste en HTTP local.
 
 **Installation sur le serveur :**
 
@@ -222,7 +222,8 @@ UPLOAD_MAX_SIZE=5242880
 ```
 
 !!! warning "Sécurité"
-    Ne jamais versionner `env/prod`. Vérifier que `.gitignore` contient `env/prod`.
+    Ne jamais versionner `env/prod`.
+    Vérifier que `.gitignore` contient `env/prod`.
 
 <a id="deployer-une-starter-app-comme-demonstration"></a>
 
@@ -252,7 +253,8 @@ Consultez [la page des starters](../starters/index.md) pour la liste complète e
 
 ## 9. Limite importante : sessions mémoire
 
-Forge utilise par défaut `MemorySessionStore`, sessions en mémoire processus, perdues au redémarrage. Des backends alternatifs sont disponibles.
+Forge utilise par défaut `MemorySessionStore`, sessions en mémoire processus, perdues au redémarrage.
+Des backends alternatifs sont disponibles.
 
 **Backends disponibles :**
 
@@ -280,9 +282,12 @@ from forge_mvc_sessions_db import DbSessionStore
 forge.configure(session_store=DbSessionStore())
 ```
 
-Cet appel se place au point d'entrée, avant la construction de l'application : `wsgi.py` en production, `app.py` en développement. Voir [Mise en production pas à pas](mise-en-production.md).
+Cet appel se place au point d'entrée, avant la construction de l'application : `wsgi.py` en production, `app.py` en développement.
+Voir [Mise en production pas à pas](mise-en-production.md).
 
-Le store BDD (opt-in `forge-mvc-sessions-db`) partage les sessions entre tous les workers Gunicorn (et entre plusieurs processus Forge sur la même base). C'est lui qui rend possible le chemin de production officiel (Gunicorn multi-worker). Il **ne rend pas Forge automatiquement scalable horizontalement** : la configuration du load balancer et de la base reste à charge du déploiement.
+Le store BDD (opt-in `forge-mvc-sessions-db`) partage les sessions entre tous les workers Gunicorn (et entre plusieurs processus Forge sur la même base).
+C'est lui qui rend possible le chemin de production officiel (Gunicorn multi-worker).
+Il **ne rend pas Forge automatiquement scalable horizontalement** : la configuration du load balancer et de la base reste à charge du déploiement.
 
 **Avec le store par défaut `MemorySessionStore` :**
 
@@ -299,9 +304,12 @@ Voir aussi [ADR-002, Stratégie de session](../adr/002-session-strategy.md).
 
 ## 10. Serveur HTTPS de développement (TLS)
 
-Le serveur HTTPS intégré à Forge (`APP_SSL_ENABLED=true`) est destiné au **développement local, à la pédagogie et aux tests**. Il impose explicitement **TLS 1.2 minimum** (`ssl.TLSVersion.TLSv1_2`).
+Le serveur HTTPS intégré à Forge (`APP_SSL_ENABLED=true`) est destiné au **développement local, à la pédagogie et aux tests**.
+Il impose explicitement **TLS 1.2 minimum** (`ssl.TLSVersion.TLSv1_2`).
 
-**En production, TLS doit être terminé par Nginx** (ou un reverse proxy équivalent). Forge écoute alors en HTTP local (`APP_SSL_ENABLED=false`, le défaut en mode `prod`). Cette configuration est documentée en section 1.
+**En production, TLS doit être terminé par Nginx** (ou un reverse proxy équivalent).
+Forge écoute alors en HTTP local (`APP_SSL_ENABLED=false`, le défaut en mode `prod`).
+Cette configuration est documentée en section 1.
 
 | Contexte | TLS | Recommandation |
 |---|---|---|
@@ -323,8 +331,7 @@ Puis dans vos templates Jinja :
 <script nonce="{{ csp_nonce() }}">/* script inline autorisé */</script>
 ```
 
-Quand `APP_CSP_NONCE_ENABLED=false` (défaut), `csp_nonce()` retourne `""` et
-la CSP reste `script-src 'self'`, aucun `unsafe-inline` n'est ajouté.
+Quand `APP_CSP_NONCE_ENABLED=false` (défaut), `csp_nonce()` retourne `""` et la CSP reste `script-src 'self'`, aucun `unsafe-inline` n'est ajouté.
 
 ## 12. Endpoint de santé
 
@@ -337,7 +344,8 @@ GET /health
 → {"status": "ok"}
 ```
 
-Ce endpoint permet à Nginx, systemd, Proxmox, Docker ou un script de monitoring de vérifier que le **processus Forge répond**. Il ne vérifie pas la base de données, les migrations, les sessions ni les services externes.
+Ce endpoint permet à Nginx, systemd, Proxmox, Docker ou un script de monitoring de vérifier que le **processus Forge répond**.
+Il ne vérifie pas la base de données, les migrations, les sessions ni les services externes.
 
 Exemple de sonde Nginx (`health_check` module) ou curl :
 
@@ -353,5 +361,6 @@ curl -s http://127.0.0.1:8000/health
 - **Pas de déploiement automatique**, Forge génère les fichiers de configuration, l'installation sur le serveur reste manuelle.
 - **Pas de HTTPS automatique**, configurer Nginx pour terminer TLS (Let's Encrypt + Certbot recommandé).
 - **Pas de Docker**, non prévu pour l'instant.
-- **Sessions à partager en multi-worker**, Gunicorn multi-worker exige le store partagé `DbSessionStore`. Voir section 9.
+- **Sessions à partager en multi-worker**, Gunicorn multi-worker exige le store partagé `DbSessionStore`.
+  Voir section 9.
 - **Nginx uniquement documenté**, Apache httpd est également un reverse proxy valide mais non documenté ici.

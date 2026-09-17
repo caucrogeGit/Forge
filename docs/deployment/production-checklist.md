@@ -28,26 +28,22 @@ Corrige tout `[WARN]`/`[FAIL]` avant d'exposer.
 
 - [ ] `env/prod` existe et **ne contient aucun secret réel commité** (les fichiers `env/*` sont protégés et ignorés du suivi).
 - [ ] `APP_ENV=prod`.
-- [ ] Compte DB **applicatif** (`DB_APP_*`) distinct du compte **admin** (`DB_ADMIN_*`), avec privilèges minimaux.
-      → [Configurer les comptes MariaDB d'un projet](../install/mariadb-comptes.md).
+- [ ] Compte DB **applicatif** (`DB_APP_*`) distinct du compte **admin** (`DB_ADMIN_*`), avec privilèges minimaux. → [Configurer les comptes MariaDB d'un projet](../install/mariadb-comptes.md).
 - [ ] `SSL_CERTFILE` / `SSL_KEYFILE` configurés (ou TLS terminé par le reverse proxy, voir §4).
 - [ ] Plafond du corps multipart : `UPLOAD_MAX_SIZE` (noyau).
-      Si le module d'upload optionnel est utilisé, configure aussi `UPLOAD_ALLOWED_EXTENSIONS` et `UPLOAD_ALLOWED_MIME_TYPES` (lus depuis l'environnement, ADR-032).
+  Si le module d'upload optionnel est utilisé, configure aussi `UPLOAD_ALLOWED_EXTENSIONS` et `UPLOAD_ALLOWED_MIME_TYPES` (lus depuis l'environnement, ADR-032).
 
 ## 3. Sessions
 
 - [ ] **Ne pas** utiliser le store mémoire en production (sessions perdues au redémarrage).
-      Forge **avertit** au démarrage en `APP_ENV=prod` avec un store mémoire, configure un store partagé (ex. `FileSessionStore`).
-      Voir [ADR-002](../adr/002-session-strategy.md).
+  Forge **avertit** au démarrage en `APP_ENV=prod` avec un store mémoire, configure un store partagé (ex. `FileSessionStore`).
+  Voir [ADR-002](../adr/002-session-strategy.md).
 
 ## 4. Serveur d'application + reverse proxy
 
-- [ ] Servir via **WSGI** (pas le serveur de dev `forge run`).
-      → [Déploiement WSGI minimal](wsgi-deployment.md).
-- [ ] Placer Forge derrière **Caddy / Nginx** (TLS, en-têtes, fichiers statiques).
-      → [Déploiement avancé](deploy-advanced.md).
-- [ ] Vérifier les en-têtes de sécurité et la CSP.
-      → [Sécurité en production](production-security.md).
+- [ ] Servir via **WSGI** (pas le serveur de dev `forge run`). → [Déploiement WSGI minimal](wsgi-deployment.md).
+- [ ] Placer Forge derrière **Caddy / Nginx** (TLS, en-têtes, fichiers statiques). → [Déploiement avancé](deploy-advanced.md).
+- [ ] Vérifier les en-têtes de sécurité et la CSP. → [Sécurité en production](production-security.md).
 
 ## 5. Migrations & exploitation
 

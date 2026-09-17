@@ -4,7 +4,8 @@
 
 Cette section regroupe les documents de pilotage de la campagne de tests terrain progressive de Forge.
 
-La campagne ne cherche pas à ajouter de nouvelles fonctionnalités. Elle cherche à répondre à une question simple :
+La campagne ne cherche pas à ajouter de nouvelles fonctionnalités.
+Elle cherche à répondre à une question simple :
 
 > Un développeur qui ne connaît pas Forge peut-il l'installer, le comprendre, l'utiliser, diagnostiquer ses erreurs, construire une application et la maintenir ?
 
@@ -12,9 +13,11 @@ La campagne ne cherche pas à ajouter de nouvelles fonctionnalités. Elle cherch
 
 ## Principe central
 
-Cette campagne ne sert pas à développer Forge. Elle sert à vérifier que Forge peut être installé, compris, utilisé, maintenu et déployé par des utilisateurs réels.
+Cette campagne ne sert pas à développer Forge.
+Elle sert à vérifier que Forge peut être installé, compris, utilisé, maintenu et déployé par des utilisateurs réels.
 
-Un ticket terrain `FT-*` ne corrige pas le framework. Il produit un retour reproductible, des preuves, un verdict et, si nécessaire, une proposition de ticket correctif séparé.
+Un ticket terrain `FT-*` ne corrige pas le framework.
+Il produit un retour reproductible, des preuves, un verdict et, si nécessaire, une proposition de ticket correctif séparé.
 
 ```text
 ticket FT rédigé
@@ -26,13 +29,16 @@ ticket FT rédigé
 → ajout au menu Tutoriels
 ```
 
-Un ticket FT reste un outil de validation interne. Un tutoriel Forge est sa version nettoyée, publiée seulement après validation terrain.
+Un ticket FT reste un outil de validation interne.
+Un tutoriel Forge est sa version nettoyée, publiée seulement après validation terrain.
 
 ---
 
 ## Documentation officielle erronée pendant un ticket
 
-La documentation officielle fait partie de ce qui est testé. Si elle est fausse, incomplète ou contradictoire, le testeur ne corrige pas directement. Il documente l'écart, fournit les preuves, classe la gravité et met le statut adapté.
+La documentation officielle fait partie de ce qui est testé.
+Si elle est fausse, incomplète ou contradictoire, le testeur ne corrige pas directement.
+Il documente l'écart, fournit les preuves, classe la gravité et met le statut adapté.
 
 ```text
 BLOQUÉ PAR DOCUMENTATION

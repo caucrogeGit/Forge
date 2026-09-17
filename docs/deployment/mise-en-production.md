@@ -19,8 +19,7 @@ flowchart LR
 ```
 
 !!! info "Pré-requis"
-    Une application Forge fonctionnelle, un serveur Linux Debian ou Ubuntu avec un accès `sudo`,
-    et un nom de domaine pointant vers ce serveur.
+    Une application Forge fonctionnelle, un serveur Linux Debian ou Ubuntu avec un accès `sudo`, et un nom de domaine pointant vers ce serveur.
 
 ---
 
@@ -230,8 +229,7 @@ sudo certbot --nginx -d exemple.com
 ```
 
 Certbot ajoute la configuration TLS et la redirection HTTP vers HTTPS.
-C'est le **reverse proxy** qui ajoute l'en-tête HSTS sur le trafic public ;
-le détail des en-têtes est dans [Déploiement WSGI minimal](wsgi-deployment.md) et [Sécurité en production](production-security.md).
+C'est le **reverse proxy** qui ajoute l'en-tête HSTS sur le trafic public ; le détail des en-têtes est dans [Déploiement WSGI minimal](wsgi-deployment.md) et [Sécurité en production](production-security.md).
 
 Fermez l'accès direct au port applicatif : seul Nginx (HTTPS) doit être exposé.
 
@@ -254,8 +252,7 @@ La stratégie complète (bloc `location /static/`, permissions `storage/`) est d
 
 ## 10. Sécuriser l'application
 
-La page [Sécurité en production](production-security.md) est la référence : cookies `__Host-`, CSP, CSRF,
-RBAC, limitation de débit des uploads, journaux d'audit, secrets et base de données à moindre privilège.
+La page [Sécurité en production](production-security.md) est la référence : cookies `__Host-`, CSP, CSRF, RBAC, limitation de débit des uploads, journaux d'audit, secrets et base de données à moindre privilège.
 Parcourez sa checklist sécurité avant l'ouverture au public.
 
 ---
@@ -305,8 +302,7 @@ sudo systemctl restart forge-app
 curl -I https://exemple.com
 ```
 
-`deploy:check` ne doit plus signaler d'erreur, et la réponse publique doit être servie en HTTPS
-avec l'en-tête `Strict-Transport-Security`.
+`deploy:check` ne doit plus signaler d'erreur, et la réponse publique doit être servie en HTTPS avec l'en-tête `Strict-Transport-Security`.
 La [Checklist de production](production-checklist.md) récapitule les points à cocher avant l'ouverture.
 
 ---

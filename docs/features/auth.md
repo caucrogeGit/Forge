@@ -716,14 +716,11 @@ logging.getLogger("forge.auth.audit").addHandler(AuditSqlHandler())
 
 !!! warning "Deux points de cette recette ont été corrigés"
 
-    `created_at` est **nommé**. La table n'a plus de `DEFAULT CURRENT_TIMESTAMP` :
-    l'autorité sur les horodatages est Python (ADR-081), et une insertion qui ne
-    nomme pas la colonne échouerait sur `NOT NULL`.
+    `created_at` est **nommé**.
+    La table n'a plus de `DEFAULT CURRENT_TIMESTAMP` : l'autorité sur les horodatages est Python (ADR-081), et une insertion qui ne nomme pas la colonne échouerait sur `NOT NULL`.
 
     Les marqueurs de paramètre sont des `?`, jamais des `%s`.
-    Forge traduit `?` vers le format de chaque pilote et **double** tout `%`
-    littéral au passage : écrit en `%s`, ce code rendait « 0 marqueurs pour 6
-    paramètres » sur PostgreSQL comme sur SQL Server.
+    Forge traduit `?` vers le format de chaque pilote et **double** tout `%` littéral au passage : écrit en `%s`, ce code rendait « 0 marqueurs pour 6 paramètres » sur PostgreSQL comme sur SQL Server.
 
 
 

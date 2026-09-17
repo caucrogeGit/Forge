@@ -1,7 +1,6 @@
 # Release et compatibilité Forge
 
-Cette section regroupe les documents officiels de versionnement, de compatibilité
-et de migration pour Forge.
+Cette section regroupe les documents officiels de versionnement, de compatibilité et de migration pour Forge.
 
 ---
 

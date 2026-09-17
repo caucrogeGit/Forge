@@ -28,7 +28,8 @@ Produire un retour d'expérience fictif complet en utilisant le modèle officiel
 
 ## 3. Ce que ce ticket permet de tester dans Forge
 
-Ce ticket ne teste pas le framework. Il vérifie que le testeur :
+Ce ticket ne teste pas le framework.
+Il vérifie que le testeur :
 
 - connaît la structure du modèle de retour ;
 - sait identifier et remplir tous les champs obligatoires ;
@@ -64,7 +65,8 @@ Un retour d'expérience exploitable contient :
 - un verdict parmi les statuts officiels ;
 - une gravité éventuelle.
 
-Un retour sans preuve est faible. Un retour sans verdict est inexploitable.
+Un retour sans preuve est faible.
+Un retour sans verdict est inexploitable.
 
 ---
 

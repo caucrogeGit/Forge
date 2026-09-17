@@ -26,8 +26,7 @@ Ce comportement vient du défaut de configuration : en `dev`, le défaut de `APP
 Conséquence : le serveur écoute en **HTTPS**.
 Un client en clair (`http://`) ouvre la socket TCP puis attend une réponse qui ne viendra jamais.
 Le serveur, lui, attend un **handshake TLS**.
-D'où le `curl` qui « pend »
-et le `HTTP 000`.
+D'où le `curl` qui « pend » et le `HTTP 000`.
 
 Le log de démarrage le dit explicitement :
 

@@ -2,6 +2,14 @@
 
 ## [Non publié]
 
+### Documentation
+
+- **La documentation publiée passe en une phrase par ligne (`DOC-UNE-PHRASE-PAR-LIGNE-APPLICATION-001`).**
+  Sous nl2br, chaque retour à la ligne de la source devient un saut de ligne à l'écran. Plus de 700 phrases coupées en leur milieu s'affichaient donc sur deux lignes, parfois trois. L'outil corrigé a été appliqué en trois temps : 90 pages de `docs/`, 116 pages embarquées dans le cœur, la CLI, le squelette et les opt-ins, puis 45 ADR.
+  `docs/history/` reste en l'état : c'est la mémoire brute du projet, déjà hors du cliquet de style.
+  Vérifié page par page, le rendu HTML ne diffère que par ses sauts de ligne, et aucun caractère n'a changé, à cinq phrases près. Le cliquet des deux-points a vu ces cinq phrases, qui en portaient déjà deux mais qu'une coupure de ligne lui cachait. Elles sont réécrites sans changer leur sens : le périmètre amendé de l'ADR-004, et une phrase commune aux références des quatre backends. Cinq fichiers devenus conformes sortent de la liste gelée.
+  Trois pages du squelette sont concernées (`skeleton/data/docs/`) : un projet créé par `forge new` les reçoit désormais dans cette forme.
+
 ### Corrigé
 
 - **L'outil de mise en une phrase par ligne coupait et collait des phrases à tort (`TOOLS-REFLOW-DOCS-FIABILITE-001`).**

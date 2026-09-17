@@ -37,7 +37,8 @@ Le parcours cœur se poursuit ensuite avec [les listes et la pagination](welcome
 
 ## Parcours par fonctionnalité
 
-Chaque opt-in a son propre parcours d'apprentissage. Suivez-le quand vous ajoutez la fonctionnalité à votre projet.
+Chaque opt-in a son propre parcours d'apprentissage.
+Suivez-le quand vous ajoutez la fonctionnalité à votre projet.
 
 ### Sécurité et accès
 

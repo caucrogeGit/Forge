@@ -11,10 +11,8 @@ Le paquet s'appelle `forge-mvc-admin`.
 Son nom fonctionnel est Forge Admin.
 
 > **Statut** : cadrage exécuté, roadmap close.
-> Les dix-sept tickets de la section 9 sont livrés, et le paquet sert un
-> back-office fonctionnel.
-> La suite du travail est suivie dans
-> [la roadmap des opt-ins rc8](forge-rc8-optins-roadmap.md).
+> Les dix-sept tickets de la section 9 sont livrés, et le paquet sert un back-office fonctionnel.
+> La suite du travail est suivie dans [la roadmap des opt-ins rc8](forge-rc8-optins-roadmap.md).
 
 ---
 
@@ -188,7 +186,8 @@ packages/forge-mvc-admin/
 └── tests/
 ```
 
-Le châssis reste minimal. Il ne contient aucune connaissance des entités d'un projet donné.
+Le châssis reste minimal.
+Il ne contient aucune connaissance des entités d'un projet donné.
 
 ### Couche 2 : contrôleurs de ressource générés (dans le projet)
 
@@ -391,8 +390,7 @@ Pages prévues, ajoutées avec leur ticket de fonctionnalité :
 - intégration RBAC ;
 - limites assumées.
 
-Conformément à l'ADR-042, ces pages restent dans l'espace « Opt-ins officiels »
-et ne tissent pas de liens transversaux avec la documentation du cœur.
+Conformément à l'ADR-042, ces pages restent dans l'espace « Opt-ins officiels » et ne tissent pas de liens transversaux avec la documentation du cœur.
 
 ### Parcours `welcome-admin` (cadrage)
 

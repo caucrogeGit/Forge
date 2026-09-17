@@ -2,7 +2,8 @@
 
 **Objectif** : retrouver d'un coup d'œil toute la syntaxe Markdown de la documentation Forge, son rendu et le nom de chaque signe.
 
-**Ce que vous allez apprendre :** rien de neuf, c'est la synthèse. La syntaxe **en ligne** est donnée avec son **rendu** dans une colonne ; la syntaxe **en bloc** est dans des encadrés dépliables (source plus rendu) ; la dernière partie nomme les **signes**.
+**Ce que vous allez apprendre :** rien de neuf, c'est la synthèse.
+La syntaxe **en ligne** est donnée avec son **rendu** dans une colonne ; la syntaxe **en bloc** est dans des encadrés dépliables (source plus rendu) ; la dernière partie nomme les **signes**.
 
 # Syntaxe en ligne
 

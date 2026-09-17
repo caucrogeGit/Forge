@@ -289,7 +289,8 @@ register_contact_routes(router)
     Forge n'écrit jamais dans `mvc/routes/__init__.py` : ce fichier vous appartient (charte, principe 9).
     Sans ce collage, `forge routes:list` ne montrera aucune route de l'entité, et l'application répondra 404 sur `/contact`.
 
-    Cette page annonçait auparavant un branchement « automatique ». Il ne l'a jamais été, et un lecteur qui s'y fiait obtenait un 404 sans comprendre pourquoi (`GUIDE-PRISE-EN-MAIN-EXEC-001`).
+    Cette page annonçait auparavant un branchement « automatique ».
+    Il ne l'a jamais été, et un lecteur qui s'y fiait obtenait un 404 sans comprendre pourquoi (`GUIDE-PRISE-EN-MAIN-EXEC-001`).
 
 ---
 

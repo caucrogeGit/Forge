@@ -2,11 +2,13 @@
 
 ## Principe
 
-Un profil Forge décrit le type de projet à créer. Il ne remplace pas les starters : un profil définit une base technique, un starter fournit un exemple ou un démonstrateur.
+Un profil Forge décrit le type de projet à créer.
+Il ne remplace pas les starters : un profil définit une base technique, un starter fournit un exemple ou un démonstrateur.
 
 Chaque profil cible un cas d'usage précis et permet de créer des projets adaptés sans avoir à retirer ou ajouter manuellement des composants.
 
-**Le profil ne change pas le fonctionnement de Forge. Il enregistre l'intention de départ du projet.**
+**Le profil ne change pas le fonctionnement de Forge.
+Il enregistre l'intention de départ du projet.**
 
 ---
 
@@ -82,7 +84,8 @@ forge new MonProjet --profile standard
 - pagination ;
 - composants de base.
 
-**Usage** : pour la majorité des projets Forge. C'est le profil utilisé si aucune option `--profile` n'est fournie.
+**Usage** : pour la majorité des projets Forge.
+C'est le profil utilisé si aucune option `--profile` n'est fournie.
 
 ---
 
@@ -114,7 +117,8 @@ forge new MonProjet --profile standard
 - helper `trans(...)` disponible dans les templates ;
 - conventions de clés documentées.
 
-**Décision** : `multilingual` hérite de `standard`, pas de `dynamic`. L'i18n et le dynamisme front sont deux dimensions indépendantes.
+**Décision** : `multilingual` hérite de `standard`, pas de `dynamic`.
+L'i18n et le dynamisme front sont deux dimensions indépendantes.
 
 **Usage** : pour les projets qui gèrent plusieurs langues ou préparent une internationalisation.
 
@@ -142,7 +146,8 @@ forge new MonProjet --profile auth-mfa
 Pour obtenir les contrôleurs auth complets, réalisez les contrôleurs MFA à la main (enrôlement, challenge, récupération).
 Vous remplacez ainsi les contrôleurs stub du squelette par les versions complètes (sans try/except ni `_MFA_AVAILABLE`).
 
-**Prérequis** : le module MFA optionnel installé dans le venv. Sans ce module, les routes `/login/mfa` redirigent vers `/login` (comportement du squelette stub par défaut).
+**Prérequis** : le module MFA optionnel installé dans le venv.
+Sans ce module, les routes `/login/mfa` redirigent vers `/login` (comportement du squelette stub par défaut).
 
 ---
 
@@ -156,7 +161,11 @@ minimal
         └── auth-mfa     (standard + intention MFA)
 ```
 
-`minimal` est la base la plus sobre. `standard` est le profil par défaut. `dynamic` ajoute l'intention front dynamique. `multilingual` ajoute l'intention i18n. `auth-mfa` ajoute l'intention MFA.
+`minimal` est la base la plus sobre.
+`standard` est le profil par défaut.
+`dynamic` ajoute l'intention front dynamique.
+`multilingual` ajoute l'intention i18n.
+`auth-mfa` ajoute l'intention MFA.
 
 ---
 
@@ -192,7 +201,8 @@ La Phase 9 a livré l'intégralité du contrat des profils :
 
 ## Profils et starters
 
-Un profil cible une **base technique** ; un starter fournit un **exemple d'application**. Les deux sont complémentaires : on choisit un profil pour définir la structure du projet, puis on peut s'inspirer d'un starter pour construire dessus.
+Un profil cible une **base technique** ; un starter fournit un **exemple d'application**.
+Les deux sont complémentaires : on choisit un profil pour définir la structure du projet, puis on peut s'inspirer d'un starter pour construire dessus.
 
 | Besoin | Profil recommandé | Starter recommandé |
 |---|---|---|
@@ -203,7 +213,8 @@ Un profil cible une **base technique** ; un starter fournit un **exemple d'appli
 | Démonstrateur avancé, pages publiques | `standard` | Communes & Séjours |
 | Démonstrateur historique / legacy |, | Suivi pédagogique (non recommandé pour un nouveau projet) |
 
-Les statuts des starters ont été formalisés dans `STARTER-LEGACY-AUDIT-001` et `STARTER-LEGACY-DECISION-001`. Le ticket `STARTER-CS-REPLACE-001` confirme Communes & Séjours comme démonstrateur avancé principal.
+Les statuts des starters ont été formalisés dans `STARTER-LEGACY-AUDIT-001` et `STARTER-LEGACY-DECISION-001`.
+Le ticket `STARTER-CS-REPLACE-001` confirme Communes & Séjours comme démonstrateur avancé principal.
 
 ---
 
@@ -215,7 +226,8 @@ Les statuts des starters ont été formalisés dans `STARTER-LEGACY-AUDIT-001` e
 - Les profils personnalisés ne sont pas encore supportés.
 - Forge Design n'est pas concerné directement par ce ticket.
 
-À ce stade, les profils sont une base contractuelle et CLI. Ils ne déclenchent pas encore une refonte complète du squelette généré.
+À ce stade, les profils sont une base contractuelle et CLI.
+Ils ne déclenchent pas encore une refonte complète du squelette généré.
 
 ---
 

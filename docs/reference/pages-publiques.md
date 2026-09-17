@@ -31,8 +31,7 @@ Règles :
 | `forge make:public-form <Entite>` | Formulaire public de saisie |
 | `forge make:public-contact` | Page contact statique |
 
-Toutes les commandes sont non destructives et idempotentes.
-→ Voir les sections détaillées dans `### Pages publiques simples`, `### Listes publiques simples`, `### Fiches publiques simples`, `### Formulaires publics` et `### Page contact publique`.
+Toutes les commandes sont non destructives et idempotentes. → Voir les sections détaillées dans `### Pages publiques simples`, `### Listes publiques simples`, `### Fiches publiques simples`, `### Formulaires publics` et `### Page contact publique`.
 
 ### Pages publiques : Templates et layout public
 
@@ -73,8 +72,7 @@ Pas de traduction automatique, pas de routes traduites, pas de détection de lan
 ### Pages publiques : Médias publics
 
 Les listes et fiches publiques générées intègrent les médias déclarés dans l'entité en lecture seule.
-Aucun upload, aucune suppression, aucune réorganisation n'est possible côté public.
-→ Voir `### Médias dans les pages publiques` pour le comportement détaillé.
+Aucun upload, aucune suppression, aucune réorganisation n'est possible côté public. → Voir `### Médias dans les pages publiques` pour le comportement détaillé.
 
 Le mécanisme de position des médias (`media_order`) est propre au système média et ne dépend pas du champ `order_column` des relations `many_to_many`.
 

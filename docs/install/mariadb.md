@@ -182,7 +182,8 @@ forge db:init
 ```
 
 !!! warning "Si `forge db:init --run` ne parvient pas à se connecter"
-    C’est le compte `DB_ADMIN_LOGIN` que Forge emploie pour ce provisioning. Causes fréquentes :
+    C’est le compte `DB_ADMIN_LOGIN` que Forge emploie pour ce provisioning.
+    Causes fréquentes :
 
     * ce compte n’existe pas encore dans MariaDB (voir « Créer les comptes du projet » plus haut) ;
     * le mot de passe `DB_ADMIN_PWD` de `env/dev` ne correspond pas à celui du `CREATE USER` ;

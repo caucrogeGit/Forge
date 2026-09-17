@@ -59,8 +59,7 @@ VS Code colore alors le format `KEY=VALUE` et les commentaires `#`, sans renomme
 Le squelette produit par `forge new` embarque la même association, pour que chaque nouveau projet en bénéficie sans configuration.
 
 !!! note "L'association s'applique à l'ouverture du fichier"
-    Après modification de `files.associations`, rechargez la fenêtre (« Developer: Reload Window »)
-    ou rouvrez le fichier.
+    Après modification de `files.associations`, rechargez la fenêtre (« Developer: Reload Window ») ou rouvrez le fichier.
     Le mode de langage affiché en bas à droite doit indiquer **Properties**.
 
 !!! warning "Validation partielle"

@@ -133,8 +133,7 @@ Se référer au [Contrat de stabilité Forge 1.x](stability-contract.md) pour la
 ## Stratégie de classification PyPI
 
 > **Note RC** : en `{{forge_version}}` (release candidate), la **version** est une préversion finale, mais le classifier `Development Status` reste `4 - Beta`.
-> PyPI ne propose pas de classifier « Release Candidate »
-> distinct ; le signal RC passe donc par le numéro de version (PEP 440 `rc`), pas par le classifier.
+> PyPI ne propose pas de classifier « Release Candidate » distinct ; le signal RC passe donc par le numéro de version (PEP 440 `rc`), pas par le classifier.
 > Le passage à `5 - Production/Stable` se fera avec la `1.0.0` stable.
 
 Les classifiers `Development Status` reflètent la maturité réelle de chaque package publiable :
@@ -282,7 +281,8 @@ Cette bibliothèque livre ses correctifs de sécurité dans une **nouvelle majeu
 Un plafond `<majeure+1` exclut donc le correctif au moment même de sa parution.
 Le fait mesuré : le plafond `<49` a été posé le 2026-06-24, alors que la 49.0.0 était sortie douze jours plus tôt.
 
-Le plafond nuisait deux fois. Tant qu'il tient, un utilisateur de `forge-mvc-mfa` ne peut pas prendre le correctif amont même en le voulant, et attend une release de Forge : la fenêtre de vulnérabilité passe de l'amont à Forge.
+Le plafond nuisait deux fois.
+Tant qu'il tient, un utilisateur de `forge-mvc-mfa` ne peut pas prendre le correctif amont même en le voulant, et attend une release de Forge : la fenêtre de vulnérabilité passe de l'amont à Forge.
 Et `forge-mvc-mfa` étant une bibliothèque, son plafond casse la résolution de toute application qui aurait besoin d'une majeure plus récente pour une autre dépendance.
 
 Ce que le plafond protégeait est tenu autrement.
@@ -290,7 +290,8 @@ Une rupture d'API dans Fernet, seul usage de Forge, ferait rougir l'aller-retour
 L'abandon d'un vieux Python par une majeure relève de `requires-python`, que pip respecte sans plafond.
 Sur les majeures 42 à 50, aucun des quatre changements de borne n'a été motivé par une rupture d'API : tous venaient d'un avis de sécurité.
 
-La décision ne vaut que pour cette dépendance. L'étendre aux autres serait une décision distincte, à prendre sur ses propres mesures.
+La décision ne vaut que pour cette dépendance.
+L'étendre aux autres serait une décision distincte, à prendre sur ses propres mesures.
 
 ---
 

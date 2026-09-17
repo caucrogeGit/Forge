@@ -61,8 +61,7 @@ Les acquis des rc précédentes restent en place, comme ceux de beta.17 (typage 
 
 > Note historique : Forge 1.5.0 marquait la fin du socle initial (Phases 0–4 RBAC).
 > Les phases 4.5 à 10 ont abouti à Forge 2.0.0, puis à Forge 2.0.1 (corrections critiques) et Forge 2.0.2 (cohérence documentaire).
-> La Phase 14 (refonte vers 3.0) a reconstruit le cœur minimal, extrait les opt-ins officiels (`forge-mvc-mfa`, `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`) et migré l'API publique en anglais (ADR-003), aboutissant à Forge 2.10.0 puis à la release candidate 3.0.0rc1, puis au tag stable v3.0.0.
-> Voir le [journal d'avancement détaillé](../history/forge-roadmap-history-2.0.md).
+> La Phase 14 (refonte vers 3.0) a reconstruit le cœur minimal, extrait les opt-ins officiels (`forge-mvc-mfa`, `forge-mvc-rbac`, `forge-mvc-workflow`, `forge-mvc-stats`) et migré l'API publique en anglais (ADR-003), aboutissant à Forge 2.10.0 puis à la release candidate 3.0.0rc1, puis au tag stable v3.0.0. Voir le [journal d'avancement détaillé](../history/forge-roadmap-history-2.0.md).
 
 | Phase | Domaine | État |
 |---|---|---|
@@ -117,8 +116,7 @@ Le ticket devra donc dire, quelle que soit l'option retenue, **à quel moment de
 
 Audit transversal en six axes (architecture, sécurité, tests, packaging, qualité de code, documentation), avec preuves `file:line`.
 Verdict : base de conception saine et fidèle à la charte ; aucune vulnérabilité critique ou haute ; faiblesses concentrées sur la **profondeur de validation** (tests) et l'**onboarding**.
-Les tickets suivent « un ticket, une responsabilité »
-(principe 2) ; statut « à faire ».
+Les tickets suivent « un ticket, une responsabilité » (principe 2) ; statut « à faire ».
 
 | Chantier | Ticket | Responsabilité unique | Sévérité |
 |---|---|---|---|
@@ -133,8 +131,7 @@ Les tickets suivent « un ticket, une responsabilité »
 | 5. Sécurité | `SEC-IOT-TOKEN-PROD-001` | **Fait** : `register_iot_routes` refuse le mode ouvert (sans token) en `APP_ENV=prod` (lève une erreur actionnable) ; mode ouvert conservé hors prod. Test `test_iot_http_prod_guard_001` + doc `http-api.md` à jour | fait |
 | 5. Sécurité | `SEC-UPLOAD-MIME-MAGIC-001` | **Fait** : `validate_magic_bytes` (pur, core) vérifie la signature du contenu pour image/PDF ; `save_upload` l'applique avant écriture (refuse un HTML renommé `.png`). Tests core + files ; doc `file-validate.md` MAJ (`content_type` non fiable) | fait |
 
-Points d'hygiène de moindre sévérité relevés par l'audit, à traiter au fil de l'eau (pas de ticket dédié) : convention de fichier de routes incohérente (`core/modules/remove.py:146`), mention obsolète d'un shim `forge-mvc-media` dans `CLAUDE.md`, doc « six officiels »
-au lieu de douze (`reference/vocabulaire-opt-in.md`), classifiers `Development Status` hétérogènes, tirets cadratins dans les vieux guides, `build_controller` (824 lignes) à découper.
+Points d'hygiène de moindre sévérité relevés par l'audit, à traiter au fil de l'eau (pas de ticket dédié) : convention de fichier de routes incohérente (`core/modules/remove.py:146`), mention obsolète d'un shim `forge-mvc-media` dans `CLAUDE.md`, doc « six officiels » au lieu de douze (`reference/vocabulaire-opt-in.md`), classifiers `Development Status` hétérogènes, tirets cadratins dans les vieux guides, `build_controller` (824 lignes) à découper.
 
 ---
 
@@ -1567,7 +1564,8 @@ La numérotation rigide qui figurait dans cette section a été retirée, l'ordr
 
 ### Corrections terrain hors-audit (livrées en cours de phase)
 
-Tickets résolvant des problèmes découverts en condition réelle pendant la phase B10, hors du périmètre de l'audit initial. Indépendants des sections ci-dessus.
+Tickets résolvant des problèmes découverts en condition réelle pendant la phase B10, hors du périmètre de l'audit initial.
+Indépendants des sections ci-dessus.
 
 | Ticket | Statut | Rôle |
 |---|---|---|
@@ -1578,8 +1576,7 @@ Tickets résolvant des problèmes découverts en condition réelle pendant la ph
 
 ## Phase post-beta.10 : Point d'entrée unifié, inspectabilité, DX et premier contact
 
-Petite série de tickets qui remplace les deux entrées historiques (`python app.py` et `scripts/dev-server.sh`) par une commande officielle unique `forge run`, ajoute l'autoreload développement, amorce la convention d'inspection des classes API publiques (`Request`, `Response`), aligne les squelettes générés sur cette convention pour que l'autocomplétion fonctionne par défaut, rend les erreurs de rendu de template pédagogiques en développement, et repositionne le starter d'entrée autour de « Bonjour Forge »
-pour que le premier contact passe par `Response.text(...)` avant `BaseController.render(...)`.
+Petite série de tickets qui remplace les deux entrées historiques (`python app.py` et `scripts/dev-server.sh`) par une commande officielle unique `forge run`, ajoute l'autoreload développement, amorce la convention d'inspection des classes API publiques (`Request`, `Response`), aligne les squelettes générés sur cette convention pour que l'autocomplétion fonctionne par défaut, rend les erreurs de rendu de template pédagogiques en développement, et repositionne le starter d'entrée autour de « Bonjour Forge » pour que le premier contact passe par `Response.text(...)` avant `BaseController.render(...)`.
 L'intégration WSGI/Gunicorn et le live reload navigateur restent hors série.
 
 | Ticket | Statut | Rôle |
@@ -1661,8 +1658,7 @@ L'intégration WSGI/Gunicorn et le live reload navigateur restent hors série.
 
 ## Phase beta.13 : Consolidation du premier contact (starters)
 
-Tickets de consolidation issus du test terrain du parcours « Bonjour Forge »
-(niveau débutant).
+Tickets de consolidation issus du test terrain du parcours « Bonjour Forge » (niveau débutant).
 Objectif : une seule façon officielle de construire un starter, et des pages de palier sans commande d'installation.
 
 | Ticket | État | Rôle |
@@ -1674,11 +1670,9 @@ Objectif : une seule façon officielle de construire un starter, et des pages de
 
 ## Chantier issu du retour terrain RéférenCiel (2026-07)
 
-Banc d'essai RéférenCiel Manager (ADR-005 / ADR-009). Le ticket 01 (FORGE-1 à FORGE-9)
-et le ticket 02 (FORGE-10 : login refusé sur MariaDB car `is_active` int `0/1` rejeté par
-`normalize_auth_user` ; FORGE-11 : `500` au rendu CRUD, `components/button.html` inexistant,
-le bouton étant la macro de `components/ui.html`) sont livrés. Reste un chantier de cohérence
-documentaire découvert pendant FORGE-11 :
+Banc d'essai RéférenCiel Manager (ADR-005 / ADR-009).
+Le ticket 01 (FORGE-1 à FORGE-9) et le ticket 02 (FORGE-10 : login refusé sur MariaDB car `is_active` int `0/1` rejeté par `normalize_auth_user` ; FORGE-11 : `500` au rendu CRUD, `components/button.html` inexistant, le bouton étant la macro de `components/ui.html`) sont livrés.
+Reste un chantier de cohérence documentaire découvert pendant FORGE-11 :
 
 | Ticket | État | Rôle |
 |---|---|---|
@@ -1688,9 +1682,8 @@ documentaire découvert pendant FORGE-11 :
 
 ## Chantier : extraction du moteur d'entités (ADR-070)
 
-Le moteur d'entités (`cli/entities` : génération et modélisation, provisioning
-`db:*`, pivot enrichi) est extrait du cœur vers l'opt-in `forge-mvc-entities`
-(voir ADR-070). Phases 0 à 6 livrées ; suites ouvertes :
+Le moteur d'entités (`cli/entities` : génération et modélisation, provisioning `db:*`, pivot enrichi) est extrait du cœur vers l'opt-in `forge-mvc-entities` (voir ADR-070).
+Phases 0 à 6 livrées ; suites ouvertes :
 
 | Ticket | État | Rôle |
 |---|---|---|

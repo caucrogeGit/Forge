@@ -2,7 +2,8 @@
 
 [Accueil](../index.html) <a href="javascript:void(0)" onclick="window.history.back()">Retour</a>
 
-Forge génère un squelette CRUD lisible et modifiable à partir d'une entité JSON. La génération produit un point de départ, pas une cage : chaque fichier est ouvert, explicite, et ne sera jamais écrasé si vous le modifiez.
+Forge génère un squelette CRUD lisible et modifiable à partir d'une entité JSON.
+La génération produit un point de départ, pas une cage : chaque fichier est ouvert, explicite, et ne sera jamais écrasé si vous le modifiez.
 
 ---
 
@@ -76,13 +77,15 @@ Routes à ajouter dans mvc/routes/__init__.py :
       g.add("POST", "/destroy/{id}",  ContactController.destroy, name="contact-destroy")
 ```
 
-Si un fichier existe déjà, il est marqué `[PRÉSERVÉ]` et non touché. Pour régénérer un fichier modifié manuellement, le supprimer avant de relancer la commande.
+Si un fichier existe déjà, il est marqué `[PRÉSERVÉ]` et non touché.
+Pour régénérer un fichier modifié manuellement, le supprimer avant de relancer la commande.
 
 ---
 
 ## 3. Routes
 
-Les routes sont affichées par `forge make:crud` mais jamais injectées automatiquement. Les copier dans `mvc/routes/__init__.py` :
+Les routes sont affichées par `forge make:crud` mais jamais injectées automatiquement.
+Les copier dans `mvc/routes/__init__.py` :
 
 ```python
 from mvc.controllers.contact_controller import ContactController
@@ -98,7 +101,8 @@ with router.group("/contact") as g:
 ```
 
 !!! warning "Ordre obligatoire"
-    `/new` doit être déclaré avant `/{id}`. Le routeur parcourt les routes dans l'ordre, sinon `new` est capturé comme identifiant.
+    `/new` doit être déclaré avant `/{id}`.
+    Le routeur parcourt les routes dans l'ordre, sinon `new` est capturé comme identifiant.
 
 Par défaut, un groupe de routes sans `public=True` est protégé par les middlewares d'authentification.
 
@@ -114,7 +118,8 @@ mvc/forms/       ← formulaires applicatifs (ContactForm, LoginForm…)
 mvc/validators/  ← règles réutilisables
 ```
 
-Un formulaire Forge lit les données HTTP, valide, remplit `cleaned_data` et produit des erreurs affichables. Il ne fait pas de requête SQL et ne décide pas d'une redirection.
+Un formulaire Forge lit les données HTTP, valide, remplit `cleaned_data` et produit des erreurs affichables.
+Il ne fait pas de requête SQL et ne décide pas d'une redirection.
 
 ### Exemple généré
 
@@ -182,7 +187,9 @@ Le générateur déduit le `type` HTML à partir du type SQL **et du nom du cham
 | Autres VARCHAR | `text` |
 
 !!! note "Choix numérique"
-    Les JSON d'entité gardent `python_type: "float"` pour les types SQL décimaux afin de rester compatibles avec la doctrine initiale. Le formulaire généré utilise toutefois `DecimalField`, plus sûr pour la saisie utilisateur. Si votre classe métier attend strictement un `float`, convertissez explicitement dans le contrôleur ou dans votre code applicatif manuel.
+    Les JSON d'entité gardent `python_type: "float"` pour les types SQL décimaux afin de rester compatibles avec la doctrine initiale.
+    Le formulaire généré utilise toutefois `DecimalField`, plus sûr pour la saisie utilisateur.
+    Si votre classe métier attend strictement un `float`, convertissez explicitement dans le contrôleur ou dans votre code applicatif manuel.
 
 ### Relations `many_to_one`
 
@@ -207,7 +214,8 @@ Le CRUD sans relation, ou avec un `relations.json` vide, conserve le comportemen
 
 ## 5. Modèle applicatif SQL généré
 
-Le modèle expose des fonctions avec SQL visible et paramétré. Pas d'abstraction cachée.
+Le modèle expose des fonctions avec SQL visible et paramétré.
+Pas d'abstraction cachée.
 
 ```python
 from core.database.db import fetch_one, fetch_all, execute, insert
@@ -266,7 +274,8 @@ def find_contacts_paginated(q=None, sort=None, direction="asc", limit=10, offset
 ```
 
 - **`_SEARCH_COLS`**, colonnes `VARCHAR`/`CHAR`/`TEXT` ; la recherche est ignorée si la liste est vide.
-- **`_ALLOWED_SORT`**, seuls les champs déclarés dans le JSON sont acceptés comme clé de tri. Toute valeur inconnue revient au tri par défaut.
+- **`_ALLOWED_SORT`**, seuls les champs déclarés dans le JSON sont acceptés comme clé de tri.
+  Toute valeur inconnue revient au tri par défaut.
 - Le tri est construit par concaténation de chaînes whitelistées (`sort_col` et `sort_dir`), jamais par interpolation de valeurs utilisateur.
 - La recherche utilise des `?` paramétrés (`LIKE ?`), pas d'injection possible.
 
@@ -343,11 +352,7 @@ Si `mvc/entities/relations.json` déclare une relation `many_to_one` dont l'enti
 
 ### CRUD média : ce qui est généré et ce qui reste à venir
 
-Les entités déclarant une clé `"media"` bénéficient d'une génération complète :
-formulaire multipart avec `ImageField`/`FileField`, upload à la création, remplacement
-et suppression explicite à l'édition, preview dans les vues `show` et `edit`, suppression
-des fichiers physiques à la destruction de l'entité parente, galerie `multiple=true`
-(multi-upload, affichage, suppression individuelle, réorganisation par position, alt_text).
+Les entités déclarant une clé `"media"` bénéficient d'une génération complète : formulaire multipart avec `ImageField`/`FileField`, upload à la création, remplacement et suppression explicite à l'édition, preview dans les vues `show` et `edit`, suppression des fichiers physiques à la destruction de l'entité parente, galerie `multiple=true` (multi-upload, affichage, suppression individuelle, réorganisation par position, alt_text).
 
 Ce qui reste à venir :
 

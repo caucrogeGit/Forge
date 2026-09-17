@@ -2,7 +2,8 @@
 
 `schemas/relations.schema.json` verrouille la **structure autorisée** du fichier `mvc/entities/relations.json`.
 
-Ce fichier décrit les relations entre entités Forge : `many_to_one` et `many_to_many`. Les relations sont **séparées** des fichiers d'entités, un seul fichier `relations.json` centralise toutes les déclarations relationnelles du projet.
+Ce fichier décrit les relations entre entités Forge : `many_to_one` et `many_to_many`.
+Les relations sont **séparées** des fichiers d'entités, un seul fichier `relations.json` centralise toutes les déclarations relationnelles du projet.
 
 ```
 relations.schema.json   →  validation de structure (JSON Schema)
@@ -42,7 +43,8 @@ Les clés inconnues sont **interdites** (`additionalProperties: false`).
 
 ## Relation many_to_one
 
-Une relation `many_to_one` signifie que l'entité source porte la clé étrangère vers l'entité cible. C'est la relation la plus courante (article → catégorie, commentaire → article…).
+Une relation `many_to_one` signifie que l'entité source porte la clé étrangère vers l'entité cible.
+C'est la relation la plus courante (article → catégorie, commentaire → article…).
 
 ```json
 {
@@ -70,13 +72,15 @@ Une relation `many_to_one` signifie que l'entité source porte la clé étrangè
 | `on_delete` | non | comportement SQL ON DELETE |
 | `index` | non | créer un index sur la clé étrangère (défaut : `true`) |
 
-La clé étrangère est **technique**, elle n'a pas à être déclarée comme champ métier dans `fields[]` de l'entité source. Forge la génère dans la projection SQL via `relations.sql`.
+La clé étrangère est **technique**, elle n'a pas à être déclarée comme champ métier dans `fields[]` de l'entité source.
+Forge la génère dans la projection SQL via `relations.sql`.
 
 ---
 
 ## Relation many_to_many
 
-Une relation `many_to_many` passe par une **table pivot** explicite. Les deux entités ne se portent pas mutuellement de clé étrangère, c'est la table pivot qui porte les deux.
+Une relation `many_to_many` passe par une **table pivot** explicite.
+Les deux entités ne se portent pas mutuellement de clé étrangère, c'est la table pivot qui porte les deux.
 
 ```json
 {
@@ -121,9 +125,11 @@ La table pivot est définie dans le bloc `pivot` d'une relation `many_to_many`.
 | `on_delete` | non | comportement SQL ON DELETE appliqué aux deux clés étrangères |
 | `fields` | non | attributs métier supplémentaires sur la table pivot |
 
-`pivot.id` et `pivot.unique_pair` sont contraints à `true` dans le schéma (`const: true`). Ces deux propriétés ne sont pas optionnelles, elles doivent être déclarées et valoir exactement `true`.
+`pivot.id` et `pivot.unique_pair` sont contraints à `true` dans le schéma (`const: true`).
+Ces deux propriétés ne sont pas optionnelles, elles doivent être déclarées et valoir exactement `true`.
 
-`pivot.fields` peut contenir des champs métier contrôlés (voir [Le JSON canonique](json-canonique.md) pour les exemples). Les noms `id`, `from_key` et `to_key` sont réservés et interdits dans `pivot.fields`.
+`pivot.fields` peut contenir des champs métier contrôlés (voir [Le JSON canonique](json-canonique.md) pour les exemples).
+Les noms `id`, `from_key` et `to_key` sont réservés et interdits dans `pivot.fields`.
 
 ---
 
@@ -138,13 +144,15 @@ Les valeurs autorisées dans `on_delete` (pour `many_to_one` et `pivot`) sont d�
 | `set_null` | met la clé étrangère à NULL quand la cible est supprimée |
 | `no_action` | aucune action automatique (comportement dépend du moteur) |
 
-Les valeurs sont écrites **en minuscules** dans le JSON canonique. Forge les traduit vers les formes SQL nécessaires lors de la génération.
+Les valeurs sont écrites **en minuscules** dans le JSON canonique.
+Forge les traduit vers les formes SQL nécessaires lors de la génération.
 
 ---
 
 ## Ce qui n'est plus canonique
 
-Ces clés appartiennent à l'ancien format legacy. Elles **ne doivent pas apparaître** dans les fichiers `schema_version: "1.0"`.
+Ces clés appartiennent à l'ancien format legacy.
+Elles **ne doivent pas apparaître** dans les fichiers `schema_version: "1.0"`.
 
 | Clé interdite | Remplacée par |
 |---|---|
@@ -158,7 +166,8 @@ Ces clés appartiennent à l'ancien format legacy. Elles **ne doivent pas appara
 | `source_key` | `pivot.from_key` |
 | `target_key` | `pivot.to_key` |
 
-Le JSON Schema bloque toute clé inconnue via `additionalProperties: false`. Un fichier utilisant `from_entity` sera rejeté dès la validation JSON Schema.
+Le JSON Schema bloque toute clé inconnue via `additionalProperties: false`.
+Un fichier utilisant `from_entity` sera rejeté dès la validation JSON Schema.
 
 ---
 
@@ -170,7 +179,8 @@ Le JSON Schema bloque toute clé inconnue via `additionalProperties: false`. Un 
 { "type": "many_to_one", "from_entity": "Article", ... }
 ```
 
-`from_entity` est une clé legacy. La clé canonique est `from`.
+`from_entity` est une clé legacy.
+La clé canonique est `from`.
 
 ---
 
@@ -190,7 +200,8 @@ La clé canonique est `to`.
 { "relations": [...] }
 ```
 
-`schema_version` est obligatoire. Sans elle, le fichier est invalide.
+`schema_version` est obligatoire.
+Sans elle, le fichier est invalide.
 
 ---
 
@@ -226,7 +237,8 @@ Le JSON Schema ne détecte pas cette incohérence, mais `forge entity:validate` 
 "pivot": { ..., "id": false, "unique_pair": false }
 ```
 
-Ces deux propriétés sont contraintes à `true` par le schéma. Toute autre valeur est invalide.
+Ces deux propriétés sont contraintes à `true` par le schéma.
+Toute autre valeur est invalide.
 
 ---
 

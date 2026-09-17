@@ -2,7 +2,8 @@
 
 **Objectif**{ .intro-label } : confirmer une action par un message qui s'affiche **une seule fois**, à la requête suivante.
 
-**Ce que vous allez apprendre :**{ .intro-label } le motif **POST-Redirect-GET** complet. Une action `POST` pose un **message flash** puis **redirige** ; la page cible lit le flash (`get_flash`, qui le supprime aussitôt) et l'affiche.
+**Ce que vous allez apprendre :**{ .intro-label } le motif **POST-Redirect-GET** complet.
+Une action `POST` pose un **message flash** puis **redirige** ; la page cible lit le flash (`get_flash`, qui le supprime aussitôt) et l'affiche.
 
 La modification ré-affiche la page d'édition, et la suppression redirige sans confirmation.
 

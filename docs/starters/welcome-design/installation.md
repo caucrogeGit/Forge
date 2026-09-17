@@ -26,7 +26,8 @@ npm install
 npm run build:css
 ```
 
-`npm install` n'est à faire qu'une fois. `npm run build:css` reconstruit `static/tailwind.css` à partir de `static/src/input.css`.
+`npm install` n'est à faire qu'une fois.
+`npm run build:css` reconstruit `static/tailwind.css` à partir de `static/src/input.css`.
 
 !!! info "Ou dès la création du projet"
     `forge new mon-projet --with-node` installe ces dépendances et construit le CSS dans la foulée.

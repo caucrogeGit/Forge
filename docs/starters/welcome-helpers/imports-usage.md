@@ -82,8 +82,7 @@ class NoteController(BaseController):
 
 ## Tester
 
-Lancez l'application (`forge run`) et ouvrez le formulaire : le jeton CSRF est rempli, le thème lu depuis le cookie, et après une création le message « Note enregistrée »
-apparaît une seule fois au retour.
+Lancez l'application (`forge run`) et ouvrez le formulaire : le jeton CSRF est rempli, le thème lu depuis le cookie, et après une création le message « Note enregistrée » apparaît une seule fois au retour.
 
 ## À retenir
 

@@ -121,7 +121,8 @@ Les trois autres rendent un entier, que Python considère comme vrai ou faux san
 !!! warning "Un `DEFAULT` de booléen n'est pas un littéral de requête"
     `Dialect.boolean_default_literal()` est distinct de `render_literal()` (ADR-075).
 
-    Le premier écrit du DDL, relu et joué une fois ; le second écrit un artefact de données. Les confondre marcherait sur trois backends et casserait sur PostgreSQL.
+    Le premier écrit du DDL, relu et joué une fois ; le second écrit un artefact de données.
+    Les confondre marcherait sur trois backends et casserait sur PostgreSQL.
 
 ### L'insertion conditionnelle
 
@@ -137,7 +138,8 @@ Aucune forme n'est portable, et Forge n'en fournit **aucune**.
 !!! info "Pourquoi Forge n'en propose pas"
     Les quatre formes n'ont pas la même sémantique de verrouillage, et `MERGE` de SQL Server est connu pour des conditions de course que les trois autres n'ont pas.
 
-    Une abstraction qui les recouvrirait promettrait une équivalence qui n'existe pas. Le motif portable est de **tenter l'insertion et de rattraper le doublon**, `UniqueViolationError` étant qualifiée sur les quatre backends.
+    Une abstraction qui les recouvrirait promettrait une équivalence qui n'existe pas.
+    Le motif portable est de **tenter l'insertion et de rattraper le doublon**, `UniqueViolationError` étant qualifiée sur les quatre backends.
 
 ### Les erreurs
 
@@ -152,7 +154,8 @@ Aucun signal n'est portable, et c'est pourquoi Forge les traduit.
 !!! danger "Le SQLSTATE ne discrimine pas partout"
     MariaDB rend `23000` pour un doublon **comme** pour un `NOT NULL` et pour une clé étrangère.
 
-    SQL Server rend `23000` pour les trois également. Seuls l'errno et le numéro natif discriminent, et c'est pourquoi le contrat les lit plutôt que le SQLSTATE.
+    SQL Server rend `23000` pour les trois également.
+    Seuls l'errno et le numéro natif discriminent, et c'est pourquoi le contrat les lit plutôt que le SQLSTATE.
 
 !!! warning "Un message d'erreur est traduit"
     PostgreSQL rend « droit refusé pour ... » sur un serveur en français.

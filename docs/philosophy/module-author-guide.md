@@ -337,7 +337,8 @@ Les fichiers copiés par `module:files` sont supprimés s'ils n'ont pas été mo
 
 Si vous modifiez un fichier installé par Forge (par exemple un contrôleur), `forge module:remove` le conservera au lieu de le supprimer.
 
-Forge calcule un hash SHA256 du fichier installé et le compare au fichier source original. Si les deux diffèrent, le fichier est conservé et signalé :
+Forge calcule un hash SHA256 du fichier installé et le compare au fichier source original.
+Si les deux diffèrent, le fichier est conservé et signalé :
 
 ```text
 Fichiers conservés (non supprimés) :

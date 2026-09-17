@@ -1,7 +1,6 @@
 # Configurer VS Code pour l'auto-import des classes Forge
 
-Ce guide configure VS Code et Pylance pour qu'ils **résolvent** et **proposent automatiquement** (`Ctrl + .`, puis « Ajouter l'import »)
-les classes du framework Forge (paquet `core`, fourni par `forge-mvc`) dans un projet Forge nu.
+Ce guide configure VS Code et Pylance pour qu'ils **résolvent** et **proposent automatiquement** (`Ctrl + .`, puis « Ajouter l'import ») les classes du framework Forge (paquet `core`, fourni par `forge-mvc`) dans un projet Forge nu.
 
 !!! info "Pourquoi cette configuration est nécessaire"
     Le code du framework (`core.mvc.controller.BaseController`, etc.) n'est **pas** présent dans le dépôt du projet.
@@ -104,8 +103,7 @@ Patienter une quinzaine de secondes : Pylance ré-indexe `core` en arrière-plan
    ```
 
 2. `BaseController` est souligné (signalé comme non défini).
-3. Placer le curseur sur `BaseController`, puis `Ctrl + .` : la correction rapide **« Ajouter l'import "BaseController" depuis core.mvc.controller »**
-   doit apparaître.
+3. Placer le curseur sur `BaseController`, puis `Ctrl + .` : la correction rapide **« Ajouter l'import "BaseController" depuis core.mvc.controller »** doit apparaître.
    La sélectionner insère l'import en haut du fichier.
 
 ---
@@ -115,8 +113,7 @@ Patienter une quinzaine de secondes : Pylance ré-indexe `core` en arrière-plan
 L'auto-import n'apparaît toujours pas ?
 Vérifier dans l'ordre :
 
-1. **L'interpréteur** : la barre d'état doit afficher `.venv`, pas un « Python 3.x »
-   système.
+1. **L'interpréteur** : la barre d'état doit afficher `.venv`, pas un « Python 3.x » système.
    Sinon, relancer **Python: Select Interpreter**, puis recharger la fenêtre.
 
 2. **Pylance a-t-il relu la configuration ?**

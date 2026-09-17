@@ -2,7 +2,8 @@
 
 **Objectif**{ .intro-label } : lire des données **réparties sur deux tables liées**, combinées par une jointure SQL.
 
-**Ce que vous allez apprendre :**{ .intro-label } relier deux tables par une **clé étrangère** (`articles.category_id` vers `categories.id`) et les lire ensemble avec un `JOIN` SQL **visible**. Forge ne masque pas ces relations derrière un ORM : le SQL reste sous vos yeux.
+**Ce que vous allez apprendre :**{ .intro-label } relier deux tables par une **clé étrangère** (`articles.category_id` vers `categories.id`) et les lire ensemble avec un `JOIN` SQL **visible**.
+Forge ne masque pas ces relations derrière un ORM : le SQL reste sous vos yeux.
 
 !!! info "Un mini-projet autonome"
     Le niveau avancé est un **tutoriel continu** : vous construisez à la main un seul petit projet, le « Catalogue d'articles », qui grandit palier après palier.

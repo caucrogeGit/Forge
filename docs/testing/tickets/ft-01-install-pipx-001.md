@@ -58,14 +58,16 @@ Ce ticket vérifie que :
 
 ## 5. Contexte utile avant de commencer
 
-`pipx` est un outil qui installe des applications Python dans des environnements virtuels isolés et les rend accessibles globalement dans le terminal. Il est recommandé pour les CLI Python comme Forge.
+`pipx` est un outil qui installe des applications Python dans des environnements virtuels isolés et les rend accessibles globalement dans le terminal.
+Il est recommandé pour les CLI Python comme Forge.
 
 ```text
 pipx installe Forge dans un environnement isolé.
 La commande forge devient accessible partout sans activer un venv.
 ```
 
-Si `forge` n'est pas trouvé après installation, vérifier que le répertoire `~/.local/bin` est dans le `PATH`. C'est une friction fréquente sur certains systèmes.
+Si `forge` n'est pas trouvé après installation, vérifier que le répertoire `~/.local/bin` est dans le `PATH`.
+C'est une friction fréquente sur certains systèmes.
 
 ---
 

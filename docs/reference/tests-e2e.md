@@ -9,7 +9,8 @@ Forge dispose de tests HTTP E2E minimaux (`tests/test_http_e2e_001.py`) qui dém
 - Tentatives de path traversal bloquées
 - CSP nonce injecté quand `APP_CSP_NONCE_ENABLED=true`
 
-La fixture démarre un sous-processus via `tests/_e2e_launcher.py`. Elle ne dépend pas de MariaDB.
+La fixture démarre un sous-processus via `tests/_e2e_launcher.py`.
+Elle ne dépend pas de MariaDB.
 
 ---
 
@@ -17,7 +18,8 @@ La fixture démarre un sous-processus via `tests/_e2e_launcher.py`. Elle ne dép
 
 Forge dispose d'un test d'intégration MariaDB réel (`tests/test_e2e_mariadb.py`) qui applique le SQL généré sur une vraie base de données et vérifie les résultats.
 
-**Ces tests sont désactivés par défaut.** Ils ne s'exécutent que si `FORGE_E2E_MARIADB=1` est défini.
+**Ces tests sont désactivés par défaut.**
+Ils ne s'exécutent que si `FORGE_E2E_MARIADB=1` est défini.
 
 ### Activation
 
@@ -44,7 +46,8 @@ FORGE_E2E_MARIADB=1 \
 
 ### Sécurité
 
-Si `FORGE_E2E_DB_NAME` ne commence pas par `forge_e2e_`, les tests refusent de s'exécuter (erreur de collection pytest). Cette garde protège contre toute exécution accidentelle sur une base applicative réelle.
+Si `FORGE_E2E_DB_NAME` ne commence pas par `forge_e2e_`, les tests refusent de s'exécuter (erreur de collection pytest).
+Cette garde protège contre toute exécution accidentelle sur une base applicative réelle.
 
 ### Préparation de la base
 
@@ -75,11 +78,14 @@ GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP
 
 Forge protège par défaut toutes les méthodes HTTP non sûres (`POST`, `PUT`, `PATCH`, `DELETE`) via un mécanisme CSRF opt-out.
 
-**Modèle opt-out**, `csrf=True` est la valeur par défaut de chaque route. Une route doit déclarer explicitement `csrf=False` pour être exemptée.
+**Modèle opt-out**, `csrf=True` est la valeur par défaut de chaque route.
+Une route doit déclarer explicitement `csrf=False` pour être exemptée.
 
-**Stockage du token**, `MemorySessionStore.create()` génère un token avec `secrets.token_hex(16)` et le stocke sous la clé `"csrf_token"` dans la session au moment de sa création. Le token est renouvelé lors de l'authentification (`authentifier_session()`).
+**Stockage du token**, `MemorySessionStore.create()` génère un token avec `secrets.token_hex(16)` et le stocke sous la clé `"csrf_token"` dans la session au moment de sa création.
+Le token est renouvelé lors de l'authentification (`authentifier_session()`).
 
-**Injection dans les templates**, `BaseController.render()` injecte `csrf_token` dans le contexte Jinja2. Les générateurs CRUD (`views_builder.py`) et les formulaires publics (`public_form.py`) incluent systématiquement :
+**Injection dans les templates**, `BaseController.render()` injecte `csrf_token` dans le contexte Jinja2.
+Les générateurs CRUD (`views_builder.py`) et les formulaires publics (`public_form.py`) incluent systématiquement :
 ```html
 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 ```
@@ -90,7 +96,8 @@ Forge protège par défaut toutes les méthodes HTTP non sûres (`POST`, `PUT`, 
 
 Si aucun token attendu n'existe ou si les tokens ne correspondent pas, la réponse est `403`.
 
-**Ordre**, la validation CSRF est effectuée **avant** les middlewares d'authentification dans `Application.dispatch()`. Un CSRF invalide retourne immédiatement 403 sans appeler les middlewares.
+**Ordre**, la validation CSRF est effectuée **avant** les middlewares d'authentification dans `Application.dispatch()`.
+Un CSRF invalide retourne immédiatement 403 sans appeler les middlewares.
 
 ### Exemptions
 
@@ -152,7 +159,8 @@ assert resp.status == 200
 
 ### Limites restantes
 
-- CSRF non testé sur un vrai serveur HTTP réseau (avec port TCP, cookies Set-Cookie réels et transport HTTP/1.1). Les tests utilisent `Application.dispatch()` + `FakeRequest`, ce qui couvre le cycle CSRF complet sans couche réseau.
+- CSRF non testé sur un vrai serveur HTTP réseau (avec port TCP, cookies Set-Cookie réels et transport HTTP/1.1).
+  Les tests utilisent `Application.dispatch()` + `FakeRequest`, ce qui couvre le cycle CSRF complet sans couche réseau.
 - Le starter 5 (Communes & Séjours) est partiellement vérifié, les formulaires présents contiennent le champ, mais il n'y a pas de test de cycle HTTP complet pour ce starter.
 
 ---

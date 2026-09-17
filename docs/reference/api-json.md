@@ -96,8 +96,7 @@ Avec un statut personnalisé, à la création :
 return json_response({"id": 42}, status=201)
 ```
 
-Une liste se rend telle quelle, et une métadonnée de comptage se place dans la
-ressource quand elle en fait partie :
+Une liste se rend telle quelle, et une métadonnée de comptage se place dans la ressource quand elle en fait partie :
 
 ```python
 items = [{"id": 1, "nom": "Alice"}, {"id": 2, "nom": "Bob"}]
@@ -105,17 +104,13 @@ return json_response({"items": items, "count": len(items)})
 ```
 
 !!! info "Pourquoi pas d'enveloppe `success` / `data`"
-    Forge a longtemps proposé `api_success` et `api_error`, qui enveloppaient
-    la réponse dans `{"success": ..., "data": ...}`.
+    Forge a longtemps proposé `api_success` et `api_error`, qui enveloppaient la réponse dans `{"success": ..., "data": ...}`.
     L'ADR-088 les a retirés, pour deux raisons.
 
-    Le code HTTP porte déjà l'information de succès, et Forge le traite comme
-    tel avec soin, 405 accompagné de son en-tête `Allow`, 503 distinct du 500,
-    401 distinct d'une redirection. Un champ `success` la redoublait.
+    Le code HTTP porte déjà l'information de succès, et Forge le traite comme tel avec soin, 405 accompagné de son en-tête `Allow`, 503 distinct du 500, 401 distinct d'une redirection.
+    Un champ `success` la redoublait.
 
-    Et l'enveloppe n'avait **aucun adoptant** : quand les trois opt-ins de
-    Forge exposant du JSON ont eu ce besoin, les trois ont rendu la ressource
-    directement.
+    Et l'enveloppe n'avait **aucun adoptant** : quand les trois opt-ins de Forge exposant du JSON ont eu ce besoin, les trois ont rendu la ressource directement.
 
 ---
 
@@ -136,9 +131,8 @@ Réponse :
 {"error": "not_found"}
 ```
 
-Le `code` est un identifiant **stable et lisible par une machine**, jamais une
-phrase destinée à un humain. Un client teste `error == "not_found"`, il ne lit
-pas un message.
+Le `code` est un identifiant **stable et lisible par une machine**, jamais une phrase destinée à un humain.
+Un client teste `error == "not_found"`, il ne lit pas un message.
 
 ### Le champ `message`, réservé à la validation
 
@@ -150,19 +144,14 @@ return json_error("validation_error", 422, message="email est obligatoire")
 {"error": "validation_error", "message": "email est obligatoire"}
 ```
 
-C'est le **seul** cas prévu, celui où le client a besoin de savoir quoi
-corriger.
+C'est le **seul** cas prévu, celui où le client a besoin de savoir quoi corriger.
 
 !!! warning "Ne pas expliquer un refus"
     Une erreur d'authentification ou d'autorisation ne porte pas de message.
 
-    Distinguer « en-tête absent », « schéma invalide » et « jeton invalide »
-    renseigne un attaquant sur l'étape qu'il a franchie, et lui indique où
-    porter son effort suivant.
+    Distinguer « en-tête absent », « schéma invalide » et « jeton invalide » renseigne un attaquant sur l'étape qu'il a franchie, et lui indique où porter son effort suivant.
 
-    C'est la raison pour laquelle l'ADR-088 a retiré l'implémentation qui
-    faisait cette distinction, au profit de celle des opt-ins, qui rend un
-    refus opaque.
+    C'est la raison pour laquelle l'ADR-088 a retiré l'implémentation qui faisait cette distinction, au profit de celle des opt-ins, qui rend un refus opaque.
 
 ### Statuts HTTP recommandés
 
@@ -274,14 +263,11 @@ def status(request):
     return json_response({"status": "ok", "service": "forge"})
 ```
 
-`is_bearer_authorized` compare le jeton en temps constant, avec
-`secrets.compare_digest`, ce qui écarte les attaques par mesure du temps de
-réponse.
+`is_bearer_authorized` compare le jeton en temps constant, avec `secrets.compare_digest`, ce qui écarte les attaques par mesure du temps de réponse.
 
 !!! danger "Jeton absent égale API ouverte"
-    Quand le second argument vaut `None`, `is_bearer_authorized` **autorise
-    tout le monde**. C'est le mode local et pédagogique, et c'est un piège en
-    production.
+    Quand le second argument vaut `None`, `is_bearer_authorized` **autorise tout le monde**.
+    C'est le mode local et pédagogique, et c'est un piège en production.
 
     Refusez de démarrer plutôt que de servir une API ouverte sans le savoir.
     C'est ce que fait `forge-mvc-iot`, dont vous pouvez reprendre le geste.
@@ -327,14 +313,10 @@ Un seul code, et c'est délibéré.
 | Jeton invalide | 401 | `{"error": "unauthorized"}` |
 
 !!! info "Pourquoi un seul code"
-    Distinguer « en-tête absent », « schéma invalide » et « jeton invalide »
-    renseigne un attaquant sur l'étape qu'il a franchie, et lui indique où
-    porter son effort suivant.
+    Distinguer « en-tête absent », « schéma invalide » et « jeton invalide » renseigne un attaquant sur l'étape qu'il a franchie, et lui indique où porter son effort suivant.
 
-    Forge rend donc un refus **opaque**. C'est la pratique qu'avaient adoptée
-    d'eux-mêmes `forge-mvc-iot`, `forge-mvc-video` et `forge-mvc-audio`, et que
-    l'ADR-088 a retenue en retirant l'implémentation concurrente qui distinguait
-    trois causes.
+    Forge rend donc un refus **opaque**.
+    C'est la pratique qu'avaient adoptée d'eux-mêmes `forge-mvc-iot`, `forge-mvc-video` et `forge-mvc-audio`, et que l'ADR-088 a retenue en retirant l'implémentation concurrente qui distinguait trois causes.
 
 ---
 

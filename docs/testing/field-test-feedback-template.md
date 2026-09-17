@@ -12,7 +12,8 @@ Un formulaire structuré est disponible directement sur GitHub :
 
 **[Soumettre un retour de test terrain →](https://github.com/caucrogeGit/Forge/issues/new?template=field-test-feedback.yml)**
 
-Le formulaire reprend tous les champs du modèle ci-dessous. Il permet de soumettre un retour sans copier-coller le modèle Markdown manuellement.
+Le formulaire reprend tous les champs du modèle ci-dessous.
+Il permet de soumettre un retour sans copier-coller le modèle Markdown manuellement.
 
 ---
 

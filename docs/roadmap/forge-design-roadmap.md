@@ -2,7 +2,8 @@
 
 Forge Design est un projet compagnon de Forge.
 
-Il ne fait pas partie du cœur Forge 2.0. Il doit être construit après stabilisation du framework Forge.
+Il ne fait pas partie du cœur Forge 2.0.
+Il doit être construit après stabilisation du framework Forge.
 
 ---
 
@@ -185,7 +186,8 @@ Objectif : permettre l’habillage Tailwind sans transformer Forge Design en usi
 | FD-TAILWIND-007 | Présets visuels simples |
 | FD-TAILWIND-DOC-001 | Documentation Tailwind dans Forge Design |
 
-Règle : Tailwind reste lisible. Forge Design ne doit pas produire des chaînes de classes incontrôlables.
+Règle : Tailwind reste lisible.
+Forge Design ne doit pas produire des chaînes de classes incontrôlables.
 
 ---
 
@@ -273,7 +275,8 @@ Objectif : gérer de petits comportements locaux.
 | FD-ALPINE-005 | Petites interactions locales |
 | FD-ALPINE-DOC-001 | Documentation Alpine |
 
-Règle : Alpine complète le HTML serveur. Il ne remplace pas l’état applicatif côté serveur.
+Règle : Alpine complète le HTML serveur.
+Il ne remplace pas l’état applicatif côté serveur.
 
 ---
 

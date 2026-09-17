@@ -1,6 +1,7 @@
 # Dépôt canonique Forge et récupération de commits
 
-> **Document opérationnel.** Verrouille la procédure de contrôle du dépôt de travail avant tout ticket Forge, et la procédure officielle de récupération si des commits ont été faits hors du dépôt canonique (projet généré, clone temporaire, environnement WSL secondaire…).
+> **Document opérationnel.**
+> Verrouille la procédure de contrôle du dépôt de travail avant tout ticket Forge, et la procédure officielle de récupération si des commits ont été faits hors du dépôt canonique (projet généré, clone temporaire, environnement WSL secondaire…).
 >
 > **Audience** : contributeurs (humains et agents IA) qui s'apprêtent à ouvrir un ticket Forge ou à porter des commits faits par erreur dans un autre dépôt.
 >

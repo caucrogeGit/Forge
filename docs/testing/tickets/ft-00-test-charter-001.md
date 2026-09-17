@@ -28,7 +28,8 @@ Lire la charte de campagne et vérifier que le testeur comprend son rôle, ses r
 
 ## 3. Ce que ce ticket permet de tester dans Forge
 
-Ce ticket ne teste pas le framework. Il vérifie que le testeur est opérationnel pour la campagne :
+Ce ticket ne teste pas le framework.
+Il vérifie que le testeur est opérationnel pour la campagne :
 
 - il sait distinguer ce qu'il doit faire et ce qu'il ne doit pas faire ;
 - il connaît les niveaux de guidage G0 à G3 ;
@@ -58,9 +59,12 @@ Ce ticket ne teste pas le framework. Il vérifie que le testeur est opérationne
 
 ## 5. Contexte utile avant de commencer
 
-La campagne de tests terrain Forge est indépendante du développement du framework. Elle ne cherche pas à ajouter des fonctionnalités. Elle cherche à vérifier qu'un utilisateur réel peut installer, comprendre, utiliser et déployer Forge.
+La campagne de tests terrain Forge est indépendante du développement du framework.
+Elle ne cherche pas à ajouter des fonctionnalités.
+Elle cherche à vérifier qu'un utilisateur réel peut installer, comprendre, utiliser et déployer Forge.
 
-Un ticket terrain `FT-*` ne corrige pas Forge. Il produit un retour reproductible, des preuves, un verdict et, si nécessaire, une proposition de ticket correctif séparé.
+Un ticket terrain `FT-*` ne corrige pas Forge.
+Il produit un retour reproductible, des preuves, un verdict et, si nécessaire, une proposition de ticket correctif séparé.
 
 ---
 
@@ -121,7 +125,8 @@ Le référent Forge décidera ensuite si un ticket documentaire séparé doit ê
 
 ## 9. Exemple indicatif décorrélé
 
-Ce ticket ne demande pas de modifier du code. L'exemple ci-dessous illustre la forme d'un statut et d'une gravité dans un retour différent de ce ticket :
+Ce ticket ne demande pas de modifier du code.
+L'exemple ci-dessous illustre la forme d'un statut et d'une gravité dans un retour différent de ce ticket :
 
 ```text
 Statut : VALIDÉ AVEC FRICTION

@@ -1,6 +1,7 @@
 # Conventions internes de Forge
 
-> **Document opérationnel.** Cette page consolide les patterns émergents de la consolidation pré-1.0 (phase 14).
+> **Document opérationnel.**
+> Cette page consolide les patterns émergents de la consolidation pré-1.0 (phase 14).
 > Elle complète la charte philosophique (`CHARTE_DOC.md`) et les ADR (`docs/adr/`) avec des techniques de travail concrètes éprouvées sur le terrain.
 >
 > **Audience** : contributeurs (humains et agents IA) qui rédigent du code, écrivent des tests, modifient la documentation ou structurent le projet.
@@ -9,10 +10,14 @@
 
 Quatre sections thématiques :
 
-- **A. Audit avant action**, 5 patterns
-- **B. Tests : conventions et patterns**, 7 patterns
-- **C. Code : architecture**, 6 patterns
-- **D. Documentation : structure**, 3 patterns
+- **A.
+  Audit avant action**, 5 patterns
+- **B.
+  Tests : conventions et patterns**, 7 patterns
+- **C.
+  Code : architecture**, 6 patterns
+- **D.
+  Documentation : structure**, 3 patterns
 
 Total : 21 patterns documentés.
 

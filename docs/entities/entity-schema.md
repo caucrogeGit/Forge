@@ -2,7 +2,8 @@
 
 `schemas/entity.schema.json` verrouille la **structure autorisée** des fichiers d'entités canoniques Forge, c'est-à-dire les fichiers `mvc/entities/<entité>/<entité>.json`.
 
-Ce schéma valide la **forme** d'un fichier d'entité. Il ne valide pas toute la logique métier : les règles sémantiques (unicité des noms, types cohérents, index sur champs existants…) sont vérifiées par `forge entity:validate`.
+Ce schéma valide la **forme** d'un fichier d'entité.
+Il ne valide pas toute la logique métier : les règles sémantiques (unicité des noms, types cohérents, index sur champs existants…) sont vérifiées par `forge entity:validate`.
 
 ```
 entity.schema.json   →  validation de structure (JSON Schema)
@@ -39,7 +40,8 @@ forge entity:validate →  validation sémantique complète
 }
 ```
 
-Le champ `id` (clé primaire `AUTO_INCREMENT`) n'est **pas déclaré**. Forge l'ajoute automatiquement dans toutes les projections SQL et Python.
+Le champ `id` (clé primaire `AUTO_INCREMENT`) n'est **pas déclaré**.
+Forge l'ajoute automatiquement dans toutes les projections SQL et Python.
 
 ---
 
@@ -69,7 +71,9 @@ Les clés inconnues sont **interdites** (`additionalProperties: false`).
 
 ## fields[]
 
-`fields[]` contient les champs métier de l'entité. Chaque champ est validé par `field.schema.json`. Au moins un champ est requis.
+`fields[]` contient les champs métier de l'entité.
+Chaque champ est validé par `field.schema.json`.
+Au moins un champ est requis.
 
 **Clés obligatoires de chaque champ :**
 
@@ -82,7 +86,8 @@ Les clés inconnues sont **interdites** (`additionalProperties: false`).
 
 `string`, `text`, `integer`, `big_integer`, `float`, `decimal`, `boolean`, `date`, `datetime`, `email`, `password`, `json`, `foreign_key`
 
-Le type `foreign_key` déclare une clé étrangère : il exige la clé `references` (entité cible en PascalCase), produit une colonne snake_case et adopte le type de la clé primaire visée (`BIGINT UNSIGNED`). Voir [ADR-069](../adr/069-foreign-key-field-type.md).
+Le type `foreign_key` déclare une clé étrangère : il exige la clé `references` (entité cible en PascalCase), produit une colonne snake_case et adopte le type de la clé primaire visée (`BIGINT UNSIGNED`).
+Voir [ADR-069](../adr/069-foreign-key-field-type.md).
 
 **Clés optionnelles :**
 
@@ -153,7 +158,8 @@ Les clés inconnues dans `options` sont **interdites**.
 }
 ```
 
-Quand `timestamps: true`, Forge ajoute `created_at DATETIME` et `updated_at DATETIME` dans la projection SQL. Ces colonnes ne sont pas déclarées dans `fields[]`.
+Quand `timestamps: true`, Forge ajoute `created_at DATETIME` et `updated_at DATETIME` dans la projection SQL.
+Ces colonnes ne sont pas déclarées dans `fields[]`.
 
 Ces horodatages sont **gérés par le framework** (ADR-081), jamais saisis.
 Le CRUD généré les exclut du formulaire.
@@ -232,7 +238,8 @@ Un même élève peut donc s'inscrire à plusieurs sessions, et une session accu
 
 ## Ce qui n'est plus canonique
 
-Ces clés appartenaient à l'ancien format (`format_version: 1`) ou sont des projections dérivées. Elles **ne doivent pas apparaître** dans les fichiers canoniques `schema_version: "1.0"`.
+Ces clés appartenaient à l'ancien format (`format_version: 1`) ou sont des projections dérivées.
+Elles **ne doivent pas apparaître** dans les fichiers canoniques `schema_version: "1.0"`.
 
 | Clé interdite | Explication |
 |---|---|
@@ -245,7 +252,8 @@ Ces clés appartenaient à l'ancien format (`format_version: 1`) ou sont des pro
 | `auto_increment` | idem |
 | `constraints` | ancien format des contraintes |
 
-Le JSON Schema bloque toute clé inconnue via `additionalProperties: false`. Un fichier contenant `sql_type` sera rejeté dès la validation JSON Schema.
+Le JSON Schema bloque toute clé inconnue via `additionalProperties: false`.
+Un fichier contenant `sql_type` sera rejeté dès la validation JSON Schema.
 
 ---
 
@@ -257,7 +265,8 @@ Le JSON Schema bloque toute clé inconnue via `additionalProperties: false`. Un 
 { "name": "id", "type": "integer" }
 ```
 
-`id` est réservé. `forge entity:validate` rejette ce champ avec une erreur explicite.
+`id` est réservé.
+`forge entity:validate` rejette ce champ avec une erreur explicite.
 
 ---
 
@@ -267,7 +276,8 @@ Le JSON Schema bloque toute clé inconnue via `additionalProperties: false`. Un 
 { "name": "title", "type": "VARCHAR(255)" }
 ```
 
-`VARCHAR(255)` n'est pas un type Forge. Le type canonique est `"type": "string", "max_length": 255`.
+`VARCHAR(255)` n'est pas un type Forge.
+Le type canonique est `"type": "string", "max_length": 255`.
 
 ---
 
@@ -277,13 +287,15 @@ Le JSON Schema bloque toute clé inconnue via `additionalProperties: false`. Un 
 { "name": "Article", "table": "article", "fields": [...] }
 ```
 
-`schema_version` est obligatoire. Sans elle, le fichier est invalide selon le JSON Schema.
+`schema_version` est obligatoire.
+Sans elle, le fichier est invalide selon le JSON Schema.
 
 ---
 
 **Utiliser `sql_type` ou `python_type` :**
 
-Ces clés sont des projections de l'ancien format. Elles sont inconnues du schéma canonique et bloquées par `additionalProperties: false`.
+Ces clés sont des projections de l'ancien format.
+Elles sont inconnues du schéma canonique et bloquées par `additionalProperties: false`.
 
 ---
 
@@ -325,6 +337,7 @@ Sortie machine : JSON structuré avec `valid`, `errors_count`, `errors[]`.
 forge build:model
 ```
 
-Refuse de générer si `entity:validate` détecte des erreurs. `make:crud` et certaines migrations utilisent également ce garde-fou.
+Refuse de générer si `entity:validate` détecte des erreurs.
+`make:crud` et certaines migrations utilisent également ce garde-fou.
 
 La commande `entity:validate` est la **validation officielle**, VS Code aide à écrire, mais ne remplace pas cette étape.

@@ -2,7 +2,8 @@
 
 **Objectif**{ .intro-label } : éditer une note existante via un formulaire pré-rempli.
 
-**Ce que vous allez apprendre :**{ .intro-label } la première **écriture** du niveau. Le formulaire est chargé avec la valeur courante (`fetch_one`), puis l'enregistrement passe par `core.database.db.execute("UPDATE … WHERE id = ?")`, en POST **protégé par CSRF**.
+**Ce que vous allez apprendre :**{ .intro-label } la première **écriture** du niveau.
+Le formulaire est chargé avec la valeur courante (`fetch_one`), puis l'enregistrement passe par `core.database.db.execute("UPDATE … WHERE id = ?")`, en POST **protégé par CSRF**.
 
 Jusqu'ici, le Carnet de notes est en **lecture seule** : lister, rechercher, paginer.
 

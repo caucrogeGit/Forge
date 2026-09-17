@@ -63,7 +63,8 @@ Ce ticket vérifie que :
 
 ## 5. Contexte utile avant de commencer
 
-Les outils de diagnostic Forge sont des commandes en lecture seule. Leur rôle est d'observer l'état du projet, pas de le modifier.
+Les outils de diagnostic Forge sont des commandes en lecture seule.
+Leur rôle est d'observer l'état du projet, pas de le modifier.
 
 Trois niveaux de diagnostic sont disponibles :
 
@@ -73,7 +74,8 @@ forge project:check  - contrôle strict CI-ready
 forge project:audit  - rapport d'audit détaillé
 ```
 
-Ces trois commandes ne modifient rien dans le projet. Elles peuvent être lancées à tout moment pendant un ticket, sans risque.
+Ces trois commandes ne modifient rien dans le projet.
+Elles peuvent être lancées à tout moment pendant un ticket, sans risque.
 
 ---
 
@@ -110,7 +112,8 @@ Si une documentation indiquée dans ce ticket est fausse, incomplète ou contrad
 - un projet Forge existant pour les commandes qui le nécessitent (`forge project:check`, `forge routes:list`) ;
 - accès à la documentation Forge.
 
-Note : si aucun projet Forge n'est disponible, `forge doctor` peut être exécuté depuis n'importe quel répertoire. Les autres commandes nécessitent un projet Forge valide.
+Note : si aucun projet Forge n'est disponible, `forge doctor` peut être exécuté depuis n'importe quel répertoire.
+Les autres commandes nécessitent un projet Forge valide.
 
 ---
 
@@ -175,12 +178,18 @@ Pour ce ticket, transposer avec la sortie réelle obtenue sur l'environnement de
 
 1. Lire la page [Outils de diagnostic](../field-test-debug-tools.md) en entier.
 2. Ouvrir un terminal dans le répertoire d'un projet Forge (ou n'importe quel répertoire pour `forge doctor`).
-3. Exécuter `forge doctor`. Copier la sortie complète.
-4. Depuis la racine d'un projet Forge, exécuter `forge project:check`. Copier la sortie.
-5. Exécuter `forge routes:list`. Copier la sortie.
-6. Exécuter `git status`. Copier la sortie.
-7. Exécuter `git diff --check`. Copier la sortie (vide = OK).
-8. Localiser le fichier `storage/logs/errors.dev.md`. Identifier ce qu'il contient.
+3. Exécuter `forge doctor`.
+   Copier la sortie complète.
+4. Depuis la racine d'un projet Forge, exécuter `forge project:check`.
+   Copier la sortie.
+5. Exécuter `forge routes:list`.
+   Copier la sortie.
+6. Exécuter `git status`.
+   Copier la sortie.
+7. Exécuter `git diff --check`.
+   Copier la sortie (vide = OK).
+8. Localiser le fichier `storage/logs/errors.dev.md`.
+   Identifier ce qu'il contient.
 9. Identifier une ligne de log qui ne devrait pas être publiée dans un retour public.
 10. Remplir le retour d'expérience.
 

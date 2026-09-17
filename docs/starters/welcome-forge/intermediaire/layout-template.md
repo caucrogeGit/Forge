@@ -2,7 +2,8 @@
 
 **Objectif**{ .intro-label } : factoriser l'enveloppe HTML commune (en-tête, pied, `<head>`) dans un **gabarit** partagé, au lieu de la répéter dans chaque page.
 
-**Ce que vous allez apprendre :**{ .intro-label } une page peut **hériter** d'un gabarit avec `{% extends %}` et n'y injecter que son contenu via des `{% block %}`. C'est le principe DRY appliqué aux templates Jinja.
+**Ce que vous allez apprendre :**{ .intro-label } une page peut **hériter** d'un gabarit avec `{% extends %}` et n'y injecter que son contenu via des `{% block %}`.
+C'est le principe DRY appliqué aux templates Jinja.
 
 Le Carnet de notes a une page liste `note/index.html`, écrite comme un document HTML complet au palier précédent.
 

@@ -21,8 +21,7 @@ Vous récupérez ainsi le **CLI et le squelette les plus récents**, ceux de `ma
 Vous pouvez viser une autre référence à la place de `main` : un tag, une branche ou un commit précis (`...Forge.git@<tag-ou-commit>`).
 
 !!! warning "Si `forge-mvc` est déjà installé"
-    Si vous avez déjà installé Forge par `pipx` (par exemple la version stable PyPI), pipx refuse d'écraser l'installation existante :
-    `'forge-mvc' already seems to be installed. Pass '--force' to force installation.`
+    Si vous avez déjà installé Forge par `pipx` (par exemple la version stable PyPI), pipx refuse d'écraser l'installation existante : `'forge-mvc' already seems to be installed. Pass '--force' to force installation.`
     Ajoutez alors `--force` :
 
     ```bash

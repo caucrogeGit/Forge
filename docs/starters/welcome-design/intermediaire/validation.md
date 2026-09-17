@@ -66,8 +66,7 @@ Affichez-le en haut de `showcase/index.html` :
 {{ flash_messages(flash) }}
 ```
 
-Après un ajout réussi, `store` redirige vers `/showcase` avec le flash « Contact ajouté.
-», et `flash_messages` le rend une seule fois.
+Après un ajout réussi, `store` redirige vers `/showcase` avec le flash « Contact ajouté. », et `flash_messages` le rend une seule fois.
 
 ??? note "À retenir"
     - La validation vit dans le contrôleur ; les composants n'affichent que le résultat.

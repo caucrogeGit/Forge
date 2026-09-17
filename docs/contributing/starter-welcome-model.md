@@ -78,7 +78,8 @@ Aucune notion qui appartient à un palier ultérieur ne doit apparaître avant.
 
 - Le palier 1 (`welcome`) ne montre **que** `Response.text(...)`, pas de `request.query(...)` (c'est le palier 2 `query-params`).
 - Le palier CSRF explique le jeton **sans** traiter le POST (c'est le palier `form-post`).
-- Chaque page liste explicitement **ce qu'elle ne fait pas** (« Aucune base de données. Aucun CRUD. ») pour cadrer le périmètre.
+- Chaque page liste explicitement **ce qu'elle ne fait pas** (« Aucune base de données.
+  Aucun CRUD. ») pour cadrer le périmètre.
 
 C'est l'application directe du **principe 2 de la charte** (« petits tickets, une responsabilité ») au niveau pédagogique.
 

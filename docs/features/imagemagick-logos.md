@@ -101,7 +101,8 @@ Un réglage doit donc être placé **avant** l'opérateur qu'il concerne.
 
 ### 3.3. La géométrie
 
-Beaucoup d'options prennent une « geometry ». Les formes utiles :
+Beaucoup d'options prennent une « geometry ».
+Les formes utiles :
 
 | Écriture | Effet |
 |---|---|
@@ -123,7 +124,8 @@ Le `>` est le plus sûr pour un jeu de tailles : il évite tout agrandissement d
 
 - `-background none` demande un fond transparent pour les zones ajoutées.
 - `PNG32:` en préfixe de la sortie force un PNG avec canal alpha propre (8 bits par canal, transparence incluse).
-- `+repage` réinitialise le « canevas virtuel » après un `-trim` ou un `-crop`, pour que la nouvelle taille soit nette. Oublier `+repage` est la cause la plus fréquente de comportements surprenants.
+- `+repage` réinitialise le « canevas virtuel » après un `-trim` ou un `-crop`, pour que la nouvelle taille soit nette.
+  Oublier `+repage` est la cause la plus fréquente de comportements surprenants.
 
 ---
 

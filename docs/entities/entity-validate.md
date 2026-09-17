@@ -1,6 +1,7 @@
 # Valider les contrats JSON : forge entity:validate
 
-`forge entity:validate` est la **commande officielle de diagnostic** des fichiers JSON canoniques Forge. Elle vérifie chaque entité et `relations.json` avant toute génération.
+`forge entity:validate` est la **commande officielle de diagnostic** des fichiers JSON canoniques Forge.
+Elle vérifie chaque entité et `relations.json` avant toute génération.
 
 Elle ne génère pas de fichiers, elle diagnostique.
 
@@ -52,7 +53,8 @@ En cas d'erreur :
 Validation terminée : 1 fichier invalide, 1 erreur.
 ```
 
-La sortie humaine est destinée au développeur. Elle ne doit pas être parsée par des outils.
+La sortie humaine est destinée au développeur.
+Elle ne doit pas être parsée par des outils.
 
 ---
 
@@ -244,7 +246,8 @@ Erreur : `FORGE_PIVOT_RESERVED_FIELD`, `id`, `from_key` et `to_key` sont réserv
 
 ## Utilisation par les autres commandes
 
-Certaines commandes Forge utilisent les contrats JSON comme garde-fou automatique. En cas d'erreur de validation, elles s'arrêtent et renvoient vers `entity:validate` pour le détail.
+Certaines commandes Forge utilisent les contrats JSON comme garde-fou automatique.
+En cas d'erreur de validation, elles s'arrêtent et renvoient vers `entity:validate` pour le détail.
 
 | Commande | Comportement en cas d'erreur |
 |---|---|
@@ -253,7 +256,8 @@ Certaines commandes Forge utilisent les contrats JSON comme garde-fou automatiqu
 | `forge migration:diff --entity` | arrêt sur erreur de contrat |
 | `forge migration:make --from-diff` | arrêt sur erreur de contrat |
 
-Ces commandes doivent rester courtes en cas d'erreur. La commande `entity:validate` est le point d'entrée officiel pour le diagnostic complet.
+Ces commandes doivent rester courtes en cas d'erreur.
+La commande `entity:validate` est le point d'entrée officiel pour le diagnostic complet.
 
 ---
 
@@ -271,13 +275,15 @@ Code de retour : `0` si valide, non-zéro si erreur.
 python forge.py entity:validate --json
 ```
 
-La sortie JSON peut être exploitée par un outil ou un script pour extraire les erreurs et les présenter dans un rapport. La commande humaine suffit pour une validation simple ou une revue manuelle.
+La sortie JSON peut être exploitée par un outil ou un script pour extraire les erreurs et les présenter dans un rapport.
+La commande humaine suffit pour une validation simple ou une revue manuelle.
 
 ---
 
 ## Limites
 
 - VS Code peut aider à la saisie via `$schema`, mais ne remplace pas `entity:validate`, les erreurs sémantiques (entités inconnues, collisions, doublons) ne sont pas détectées par l'éditeur.
-- Les starters Forge utilisent tous le format canonique `schema_version: "1.0"`. Le format `format_version: 1` est refusé par `build:model` et `make:crud`.
+- Les starters Forge utilisent tous le format canonique `schema_version: "1.0"`.
+  Le format `format_version: 1` est refusé par `build:model` et `make:crud`.
 - `entity:validate` valide les contrats JSON, pas l'état réel d'une base MariaDB déjà déployée, utiliser les commandes de migration pour comparer avec la base.
 - La sortie JSON (`--json`) est un contrat d'outil maintenu par les tests, ne pas la parser manuellement en production sans vérifier la compatibilité de version.

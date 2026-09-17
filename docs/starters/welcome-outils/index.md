@@ -12,12 +12,10 @@ Deux outils, du plus simple au plus riche :
 
 1. **Calculateur de sous-réseau** : un outil **SSR pur**, sans JavaScript.
    Un formulaire, un POST protégé par CSRF, un service Python testable, un rendu Jinja.
-   C'est le motif idiomatique de Forge, à préférer chaque fois qu'il suffit.
-   [Suivre](subnet-calculator.md)
+   C'est le motif idiomatique de Forge, à préférer chaque fois qu'il suffit. [Suivre](subnet-calculator.md)
 
 2. **Oscilloscope** : un outil **temps réel**, avec du JavaScript **local**.
-   Un canvas animé piloté par un module servi depuis `static/js/`, autorisé par `script-src 'self'` sans nonce.
-   [Suivre](oscilloscope.md)
+   Un canvas animé piloté par un module servi depuis `static/js/`, autorisé par `script-src 'self'` sans nonce. [Suivre](oscilloscope.md)
 
 Un [bilan](bilan.md) referme le parcours et renvoie au guide de référence.
 

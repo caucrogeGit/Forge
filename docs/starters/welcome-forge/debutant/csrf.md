@@ -119,8 +119,7 @@ Vous allez donc garantir une session pour obtenir un jeton non vide, puis le pla
 
 ??? note "À retenir"
     - Le jeton CSRF **vit dans la session** : sans session active, il est **vide**.
-    - On garantit une session (`get_session_store().create()`) et on pose son cookie
-      avec `set_session_cookie`, sinon le POST serait refusé.
+    - On garantit une session (`get_session_store().create()`) et on pose son cookie avec `set_session_cookie`, sinon le POST serait refusé.
     - Le jeton se transmet dans un champ caché `name="csrf_token"` du formulaire.
 
 ??? tip "Astuces"

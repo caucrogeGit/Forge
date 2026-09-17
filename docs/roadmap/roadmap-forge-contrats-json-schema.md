@@ -1625,8 +1625,7 @@ Optionnel mais utile avant publication.
 - **`cli/schemas/schema_doctor.py`**, commande `schema_doctor_main()` avec 5 contrôles par schéma (existence, JSON valide, `$schema` Draft 2020-12, `$id`, `$ref` locaux résolus)
 - **`tests/test_schema_doctor_command.py`**, 42 tests (sortie humaine, sortie `--json`, gestion d'erreurs, non-régression)
 - **`forge.py`**, dispatch `schema:doctor` ajouté
-- **`cli/_support/help.py`**, section « Schémas JSON »
-  complétée avec `schema:doctor`
+- **`cli/_support/help.py`**, section « Schémas JSON » complétée avec `schema:doctor`
 - Suite complète : 11 440 tests passent, 6 skipped, 0 régression
 
 Exemple de sortie :

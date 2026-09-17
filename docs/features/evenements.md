@@ -101,7 +101,8 @@ C'est le motif de refus de l'ADR-052 : violation du principe 3 (refuser la magie
 
 C'est le contresens le plus fréquent.
 
-**Les événements découplent le code. Les jobs découplent le temps.**
+**Les événements découplent le code.
+Les jobs découplent le temps.**
 
 Le runtime de Forge est synchrone (WSGI).
 Un `emit()` s'exécute **à l'intérieur** de la requête HTTP : si l'envoi du courriel prend deux secondes, l'utilisateur attend deux secondes de plus.

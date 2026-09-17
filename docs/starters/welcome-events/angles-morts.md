@@ -109,9 +109,14 @@ Retenez la répartition des rôles : **les événements découplent le code, les
 
 ## 5. Ce que nous n'avons volontairement pas écrit
 
-- **Se désabonner.** Aucun `unsubscribe()`. Si un test abonne un écouteur, il pollue les suivants ; prévoyez une remise à zéro du registre dans vos fixtures.
-- **Les cycles.** Rien n'empêche un écouteur d'émettre un événement qui le rappelle. La récursion infinie est à votre charge.
-- **La priorité.** Pas de poids, pas de tri : voir le point 2.
+- **Se désabonner.**
+  Aucun `unsubscribe()`.
+  Si un test abonne un écouteur, il pollue les suivants ; prévoyez une remise à zéro du registre dans vos fixtures.
+- **Les cycles.**
+  Rien n'empêche un écouteur d'émettre un événement qui le rappelle.
+  La récursion infinie est à votre charge.
+- **La priorité.**
+  Pas de poids, pas de tri : voir le point 2.
 
 Chacune de ces absences est une fonctionnalité que l'on pourrait ajouter, et chacune est un engagement que l'on devrait ensuite tenir.
 

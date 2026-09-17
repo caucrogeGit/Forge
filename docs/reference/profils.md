@@ -40,7 +40,9 @@ Voir [docs/profiles.md](../features/profiles.md) pour la documentation complète
 GET /health  →  200 OK  {"status": "ok"}  application/json
 ```
 
-Permet à Nginx, systemd, Docker ou un script de supervision de vérifier que le processus Forge répond. Ne vérifie pas la base de données ni les services externes. Inclut les headers de sécurité habituels.
+Permet à Nginx, systemd, Docker ou un script de supervision de vérifier que le processus Forge répond.
+Ne vérifie pas la base de données ni les services externes.
+Inclut les headers de sécurité habituels.
 
 ---
 

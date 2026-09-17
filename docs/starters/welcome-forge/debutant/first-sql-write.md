@@ -110,6 +110,7 @@ Nous ajoutons deux méthodes, deux routes et un gabarit.
     - Le `?` paramétré protège contre l'injection SQL.
     - On valide toujours la saisie avant d'écrire en base.
 
-Vous avez parcouru tous les paliers du niveau débutant. Place au bilan.
+Vous avez parcouru tous les paliers du niveau débutant.
+Place au bilan.
 
 [Continuer avec le Bilan](bilan.md)

@@ -10,8 +10,7 @@ Un système de starters **propre, anglais et conventionné** :
 
 - **noms anglais** pour tous les starters ;
 - la **dépendance** d'un starter (opt-in vs cœur) est **lisible dans son nom** ;
-- les « applications »
-  métier ne sont **plus** des starters (archivées, débranchées de Forge, conservées pour mémoire).
+- les « applications » métier ne sont **plus** des starters (archivées, débranchées de Forge, conservées pour mémoire).
 
 ## Conventions de nommage actées
 
@@ -101,8 +100,7 @@ Règles :
 - `git mv docs/starters/{carnet-contacts,communes-sejours,suivi-comportement-eleves}` → `docs/starters/old/<id>/` **+ relink** (les pages descendent d'un niveau : `../index.md` → `../../index.md`, etc.).
 - Supprimer `cli/starters/data/<id>/` (sortie du registry / CLI / build).
 - [`docs/starters/index.md`](../starters/index.md) : retirer des tableaux et sections, recâbler la chaîne « prochain starter ».
-- `mkdocs.yml` : section nav « Anciennes applications (archive) »
-  → `old/`.
+- `mkdocs.yml` : section nav « Anciennes applications (archive) » → `old/`.
 - Landing (`mvc/views/landing/index.html` **+** `docs/index.html`) : retirer les cartes.
 - Tests : adapter/retirer ceux qui traitent ces 3 comme starters actifs (canonical, e2e, relations, scaffold, navigation séquentielle, reposition).
 - Validation : `mkdocs build --strict`, tests starters ciblés.
@@ -143,8 +141,7 @@ Chaque ticket : rename `data/<ancien>/` → `data/<nouveau>/` + page `docs/start
 - **Cascade tests numéros** (Phase 2) : plusieurs `test_starter_*_001` figent un numéro (`form-post`, `server-validation`, `first-sql`…).
 - **Cascade renommages** (Phase 3) : chaque rename touche ~30-40 fichiers (cf. précédent `progression → welcome`).
 - **Neutralisation d'entité** (`first-crud-generated`) : réécriture du manifeste d'entité + artefacts générés + tests associés.
-- **Archives immuables** : les snapshots sous `docs/history/**` ne sont pas réécrits ; seules les références « état courant »
-  sont mises à jour.
+- **Archives immuables** : les snapshots sous `docs/history/**` ne sont pas réécrits ; seules les références « état courant » sont mises à jour.
 - **Landing** : source `mvc/views/landing/index.html` et généré `docs/index.html` à garder synchronisés.
 
 ## Ordre recommandé

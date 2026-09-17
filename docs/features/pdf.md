@@ -27,7 +27,8 @@ Produire un PDF de la documentation Forge à partir des fichiers Markdown exista
 
 ## Prérequis : Quarkdown
 
-Quarkdown est un système de typesetting moderne basé sur Markdown. Il requiert **Java 17+**.
+Quarkdown est un système de typesetting moderne basé sur Markdown.
+Il requiert **Java 17+**.
 
 ### Installation
 
@@ -46,7 +47,8 @@ Vérifier l'installation :
 quarkdown --version
 ```
 
-Quarkdown n'est **pas** une dépendance de Forge. Le framework fonctionne entièrement sans lui.
+Quarkdown n'est **pas** une dépendance de Forge.
+Le framework fonctionne entièrement sans lui.
 
 ---
 
@@ -77,7 +79,8 @@ build/
     forge-documentation.pdf  ← PDF généré (ignoré par git)
 ```
 
-Le fichier `.qd` est versionné. Le PDF généré ne l'est pas.
+Le fichier `.qd` est versionné.
+Le PDF généré ne l'est pas.
 
 ---
 

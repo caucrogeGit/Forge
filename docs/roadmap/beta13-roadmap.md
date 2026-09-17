@@ -2,15 +2,13 @@
 
 > **Thème** : *dernière beta fonctionnelle*, slugs, gel du contrat public, production-readiness.
 > **Finalité** : `RELEASE-BETA13-001`.
-> **Principe directeur** : finir et **figer** ce qui existe ; une seule vraie feature (slugs).
-> beta.14 sera la beta de *stabilisation* (doc + field-fixes, **zéro feature**), jalon séparé, hors de cette roadmap.
+> **Principe directeur** : finir et **figer** ce qui existe ; une seule vraie feature (slugs). beta.14 sera la beta de *stabilisation* (doc + field-fixes, **zéro feature**), jalon séparé, hors de cette roadmap.
 
 ---
 
 ## État de l'existant (`BETA13-EXISTING-AUDIT-001`)
 
-Beaucoup de « net-new »
-supposé est en réalité **déjà présent, partiel**.
+Beaucoup de « net-new » supposé est en réalité **déjà présent, partiel**.
 Cet audit dimensionne la roadmap : 🔨 construire · 🔧 compléter/durcir · 📋 auditer/documenter.
 
 | Domaine | Existe déjà | Manque | Verdict |

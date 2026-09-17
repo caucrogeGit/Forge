@@ -8,7 +8,7 @@ Il doit permettre à chaque élève d’avancer à son rythme, à partir d’une
 
 Chaque palier doit correspondre à un objectif précis, concret et vérifiable.
 
-Un palier ne doit pas mélanger trop de notions.  
+Un palier ne doit pas mélanger trop de notions.
 Si le contenu devient trop lourd, il faut le découper en plusieurs paliers.
 
 Un palier doit garder une logique simple :
@@ -122,7 +122,7 @@ Le dossier technique est la ressource principale de l’élève.
 
 Il doit contenir les connaissances nécessaires pour réussir l’activité.
 
-Il ne doit pas être une simple fiche de consignes.  
+Il ne doit pas être une simple fiche de consignes.
 Il doit permettre à l’élève de chercher les informations utiles.
 
 Le dossier technique doit contenir :
@@ -499,7 +499,7 @@ Exemples :
 
 Les traces doivent être adaptées au palier.
 
-Elles ne doivent pas être trop nombreuses.  
+Elles ne doivent pas être trop nombreuses.
 Un excès de traces rend l’activité lourde et peu lisible.
 
 ## 18. Nommage des fichiers rendus par l’élève
@@ -592,7 +592,7 @@ Elle doit contenir des colonnes séparées pour :
 - la validation professeur ;
 - les observations.
 
-La checklist ne contient pas les réponses du QCM.  
+La checklist ne contient pas les réponses du QCM.
 Elle ne remplace pas le corrigé.
 
 ## 21. Structure recommandée de la checklist de validation

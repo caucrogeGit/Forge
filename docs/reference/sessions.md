@@ -150,8 +150,7 @@ forge.configure(session_store=store)
 
 ### `DbSessionStore` (opt-in `forge-mvc-sessions-db`)
 
-Le cœur agnostique du SGBD ne fournit pas de store BDD : il vit dans l'opt-in
-`forge-mvc-sessions-db` (`pip install --pre forge-mvc-sessions-db`).
+Le cœur agnostique du SGBD ne fournit pas de store BDD : il vit dans l'opt-in `forge-mvc-sessions-db` (`pip install --pre forge-mvc-sessions-db`).
 
 ```python
 from forge_mvc_sessions_db import DbSessionStore

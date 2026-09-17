@@ -223,15 +223,14 @@ Le code applicatif `row["ville_id"]` n'a pas besoin d'être modifié.
 | Absent | `nullable` (requis) |
 | Absent | `index` (optionnel) |
 
-Les valeurs `on_delete` canoniques sont en minuscules : `cascade`, `set_null`, `restrict`,
-`no_action`.
+Les valeurs `on_delete` canoniques sont en minuscules : `cascade`, `set_null`, `restrict`, `no_action`.
 
 ---
 
 ## 6. Migrer une relation many-to-many
 
-Le format canonique `many_to_many` utilise un bloc `pivot` explicite. Les anciennes clés
-`pivot_table`, `source_key`, `target_key` n'existent pas en canonique.
+Le format canonique `many_to_many` utilise un bloc `pivot` explicite.
+Les anciennes clés `pivot_table`, `source_key`, `target_key` n'existent pas en canonique.
 
 ```json
 {
